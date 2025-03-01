@@ -12,11 +12,6 @@ import org.koin.androidx.compose.koinViewModel
 fun MainScreen(viewModel: SharedViewModel = koinViewModel()) {
     val navController = rememberNavController()
 
-    // Загружаем данные при запуске
-    LaunchedEffect(Unit) {
-        viewModel.loadTransactions()
-    }
-
     FinanceAnalyzerTheme {
         NavHost(navController, startDestination = "home") {
             composable("home") {
