@@ -12,8 +12,13 @@ import java.io.File
 import java.io.FileNotFoundException
 import java.io.InputStream
 import java.io.OutputStream
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 object FileHelper {
+
+    private val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     // Создание CSV-файла в папке Documents
     fun createCsvFile(context: Context, fileName: String): Uri? {
@@ -31,7 +36,7 @@ object FileHelper {
                 uri?.also {
                     // Убедимся, что файл создан
                     resolver.openOutputStream(it)?.use { outputStream ->
-                        outputStream.write("Date,Description,Amount,Type\n".toByteArray())
+                        outputStream.write("Date,Title,Amount,Category,IsExpense,Note\n".toByteArray())
                     }
                 }
                 uri
@@ -44,7 +49,7 @@ object FileHelper {
                 val file = File(documentsDir, fileName)
                 if (!file.exists()) {
                     file.createNewFile()
-                    file.writeText("Date,Description,Amount,Type\n")  // Добавляем заголовок
+                    file.writeText("Date,Title,Amount,Category,IsExpense,Note\n")  // Добавляем заголовок
                 }
                 Uri.fromFile(file)
             }
@@ -66,12 +71,25 @@ object FileHelper {
 
                 for (line in lines.drop(1)) {  // Пропускаем заголовок
                     val parts = line.split(",")
-                    if (parts.size == 4) {
-                        val date = parts[0]
-                        val description = parts[1]
+                    if (parts.size >= 5) {
+                        val date = try {
+                            dateFormat.parse(parts[0]) ?: Date()
+                        } catch (e: Exception) {
+                            Date()
+                        }
+                        val title = parts[1]
                         val amount = parts[2].toDoubleOrNull() ?: 0.0
-                        val type = parts[3]
-                        transactions.add(Transaction(date, description, amount, type))
+                        val category = parts[3]
+                        val isExpense = parts[4].toBoolean()
+                        val note = if (parts.size > 5) parts[5] else null
+                        transactions.add(Transaction(
+                            date = date,
+                            title = title,
+                            amount = amount,
+                            category = category,
+                            isExpense = isExpense,
+                            note = note
+                        ))
                     }
                 }
             }
@@ -91,9 +109,16 @@ object FileHelper {
         try {
             resolver.openOutputStream(uri)?.use { outputStream ->
                 val writer = outputStream.bufferedWriter()
-                writer.write("Date,Description,Amount,Type\n")  // Заголовок
+                writer.write("Date,Title,Amount,Category,IsExpense,Note\n")  // Заголовок
                 for (transaction in transactions) {
-                    writer.write("${transaction.date},${transaction.description},${transaction.amount},${transaction.type}\n")
+                    writer.write(
+                        "${dateFormat.format(transaction.date)}," +
+                        "${transaction.title}," +
+                        "${transaction.amount}," +
+                        "${transaction.category}," +
+                        "${transaction.isExpense}," +
+                        "${transaction.note ?: ""}\n"
+                    )
                 }
                 writer.flush()
             }

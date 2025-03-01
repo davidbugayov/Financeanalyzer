@@ -2,15 +2,14 @@ plugins {
     id("com.android.application")
     id("org.jetbrains.kotlin.android")
     id("kotlin-kapt")
-    id("dagger.hilt.android.plugin")
 }
 
 android {
-    namespace = "com.example.financeanalyzer"
+    namespace = "com.davidbugayov.financeanalyzer"
     compileSdk = 34
 
     defaultConfig {
-        applicationId = "com.example.financeanalyzer"
+        applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 24
         targetSdk = 34
         versionCode = 1
@@ -39,7 +38,7 @@ android {
         compose = true
     }
     composeOptions {
-        kotlinCompilerExtensionVersion = "1.5.1"
+        kotlinCompilerExtensionVersion = "1.5.6"
     }
     packaging {
         resources {
@@ -72,13 +71,15 @@ dependencies {
     implementation("androidx.room:room-ktx:2.6.1")
     kapt("androidx.room:room-compiler:2.6.1")
     
-    // Hilt
-    implementation("com.google.dagger:hilt-android:2.50")
-    kapt("com.google.dagger:hilt-android-compiler:2.50")
-    implementation("androidx.hilt:hilt-navigation-compose:1.1.0")
+    // Koin
+    implementation("io.insert-koin:koin-android:3.5.0")
+    implementation("io.insert-koin:koin-androidx-compose:3.5.0")
     
     // Charts
     implementation("com.github.PhilJay:MPAndroidChart:v3.1.0")
+    
+    // CSV Parser
+    implementation("org.apache.commons:commons-csv:1.10.0")
     
     // Testing
     testImplementation("junit:junit:4.13.2")

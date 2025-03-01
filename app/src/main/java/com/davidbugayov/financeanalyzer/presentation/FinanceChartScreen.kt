@@ -21,6 +21,8 @@ import com.github.mikephil.charting.data.BarData
 import com.github.mikephil.charting.data.BarDataSet
 import com.github.mikephil.charting.data.BarEntry
 import com.github.mikephil.charting.formatter.ValueFormatter
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -34,40 +36,43 @@ fun FinanceChartScreen(viewModel: SharedViewModel) {
              CenterAlignedTopAppBar(
                  title = { Text("Финансовый анализ") },
              )
-        },
-        content = { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                if (financeData != null) {
-                    BarChartView(financeData = financeData)
-                } else {
-                    Text("Нет данных")
-                }
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            if (financeData != null) {
+                BarChartView(financeData = financeData)
+            } else {
+                Text("Нет данных")
             }
         }
-    )
+    }
 }
 
 private fun calculateFinanceData(transactions: List<Transaction>): FinanceData? {
     if (transactions.isEmpty()) return null
 
-    val labels = transactions.map { it.date }.distinct()
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    val labels = transactions.map { dateFormat.format(it.date) }.distinct()
+    
     val incomes = labels.map { date ->
-        transactions.filter { it.date == date && it.type == "Income" }
+        transactions.filter { dateFormat.format(it.date) == date && !it.isExpense }
             .sumOf { it.amount }.toFloat()
     }
+    
     val expenses = labels.map { date ->
-        transactions.filter { it.date == date && it.type == "Expense" }
+        transactions.filter { dateFormat.format(it.date) == date && it.isExpense }
             .sumOf { it.amount }.toFloat()
     }
 
     return FinanceData(labels, incomes, expenses)
 }
+
 @Composable
 private fun BarChartView(financeData: FinanceData) {
     AndroidView(
@@ -79,8 +84,8 @@ private fun BarChartView(financeData: FinanceData) {
                 setScaleEnabled(true)
                 setPinchZoom(true)
                 animateY(1000)
-                setBackgroundColor(Color.WHITE) // Белый фон
-                legend.textColor = Color.BLACK // Цвет легенды
+                setBackgroundColor(Color.WHITE)
+                legend.textColor = Color.BLACK
             }
         },
         update = { chart ->

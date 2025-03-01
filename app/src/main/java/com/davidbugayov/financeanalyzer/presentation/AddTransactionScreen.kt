@@ -32,136 +32,151 @@ fun AddTransactionScreen(
     viewModel: SharedViewModel,
     onTransactionAdded: () -> Unit
 ) {
-    var date by remember { mutableStateOf("") }
-    var description by remember { mutableStateOf("") }
+    var selectedDate by remember { mutableStateOf(Date()) }
+    var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
-    var type by remember { mutableStateOf("Income") }
+    var category by remember { mutableStateOf("") }
+    var isExpense by remember { mutableStateOf(false) }
+    var note by remember { mutableStateOf("") }
     var isAmountValid by remember { mutableStateOf(true) }
     var showDatePicker by remember { mutableStateOf(false) }
     val datePickerState = rememberDatePickerState()
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         topBar = {
-            // Если нужно, добавьте тулбар здесь
-        },
-        content = { innerPadding ->
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(innerPadding),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                OutlinedTextField(
-                    value = date,
-                    onValueChange = { },
-                    label = { Text("Дата (MM/DD/YYYY)") },
-                    modifier = Modifier.fillMaxWidth(),
-                    readOnly = true,
-                    trailingIcon = {
-                        IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Filled.DateRange, contentDescription = "Выбрать дату")
-                        }
+            TopAppBar(
+                title = { Text("Добавить транзакцию") }
+            )
+        }
+    ) { innerPadding ->
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(innerPadding)
+                .padding(16.dp),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            // Дата
+            OutlinedTextField(
+                value = dateFormat.format(selectedDate),
+                onValueChange = { },
+                label = { Text("Дата") },
+                modifier = Modifier.fillMaxWidth(),
+                readOnly = true,
+                trailingIcon = {
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(Icons.Filled.DateRange, contentDescription = "Выбрать дату")
                     }
-                )
+                }
+            )
 
-                if (showDatePicker) {
-                    DatePickerDialog(
-                        onDismissRequest = { showDatePicker = false },
-                        confirmButton = {
-                            TextButton(
-                                onClick = {
-                                    showDatePicker = false
-                                    datePickerState.selectedDateMillis?.let {
-                                        date = convertMillisToDate(it)
-                                    }
+            if (showDatePicker) {
+                DatePickerDialog(
+                    onDismissRequest = { showDatePicker = false },
+                    confirmButton = {
+                        TextButton(
+                            onClick = {
+                                showDatePicker = false
+                                datePickerState.selectedDateMillis?.let {
+                                    selectedDate = Date(it)
                                 }
-                            ) {
-                                Text("OK")
                             }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showDatePicker = false }) {
-                                Text("Отмена")
-                            }
-                        }
-                    ) {
-                        DatePicker(state = datePickerState)
-                    }
-                }
-
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = description,
-                    onValueChange = { description = it },
-                    label = { Text("Описание") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                OutlinedTextField(
-                    value = amount,
-                    onValueChange = { newAmount ->
-                        if (newAmount.matches(Regex("^[0-9]+(\\.[0-9]+)?$"))) {
-                            amount = newAmount
-                            isAmountValid = true
-                        } else {
-                            amount = newAmount
-                            isAmountValid = false
+                        ) {
+                            Text("OK")
                         }
                     },
-                    label = { Text("Сумма") },
-                    modifier = Modifier.fillMaxWidth(),
-                    isError = !isAmountValid,
-                    keyboardOptions = KeyboardOptions.Default.copy(keyboardType = KeyboardType.Decimal),
-                    supportingText = {
-                        if (!isAmountValid) {
-                            Text(
-                                text = "Неправильный формат суммы.",
-                                color = MaterialTheme.colorScheme.error
-                            )
+                    dismissButton = {
+                        TextButton(onClick = { showDatePicker = false }) {
+                            Text("Отмена")
                         }
                     }
-                )
-                Spacer(modifier = Modifier.height(8.dp))
-                Row {
-                    RadioButton(
-                        selected = type == "Income",
-                        onClick = { type = "Income" }
-                    )
-                    Text(text = "Доход", modifier = Modifier.padding(8.dp))
-                    RadioButton(
-                        selected = type == "Expense",
-                        onClick = { type = "Expense" }
-                    )
-                    Text(text = "Расход", modifier = Modifier.padding(8.dp))
-                }
-                Spacer(modifier = Modifier.height(16.dp))
-                Button(
-                    onClick = {
-                        if (date.isNotEmpty() && isAmountValid) {
-                            val transaction = Transaction(
-                                date = date,
-                                description = description,
-                                amount = amount.toDoubleOrNull() ?: 0.0,
-                                type = type
-                            )
-                            viewModel.addTransaction(transaction)
-                            onTransactionAdded()
-                        } else {
-                            isAmountValid = amount.matches(Regex("^[0-9]+(\\.[0-9]+)?$"))
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth()
                 ) {
-                    Text("Добавить транзакцию")
+                    DatePicker(state = datePickerState)
                 }
             }
-        }
-    )
-}
 
-fun convertMillisToDate(millis: Long): String {
-    val formatter = SimpleDateFormat("MM/dd/yyyy", Locale.getDefault())
-    return formatter.format(Date(millis))
+            // Название
+            OutlinedTextField(
+                value = title,
+                onValueChange = { title = it },
+                label = { Text("Название") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Сумма
+            OutlinedTextField(
+                value = amount,
+                onValueChange = { newAmount ->
+                    if (newAmount.isEmpty() || newAmount.matches(Regex("^\\d*\\.?\\d*$"))) {
+                        amount = newAmount
+                        isAmountValid = true
+                    }
+                },
+                label = { Text("Сумма") },
+                modifier = Modifier.fillMaxWidth(),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                isError = !isAmountValid
+            )
+
+            // Категория
+            OutlinedTextField(
+                value = category,
+                onValueChange = { category = it },
+                label = { Text("Категория") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            // Тип транзакции
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = !isExpense,
+                    onClick = { isExpense = false }
+                )
+                Text("Доход")
+                RadioButton(
+                    selected = isExpense,
+                    onClick = { isExpense = true }
+                )
+                Text("Расход")
+            }
+
+            // Заметка
+            OutlinedTextField(
+                value = note,
+                onValueChange = { note = it },
+                label = { Text("Заметка") },
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Кнопка добавления
+            Button(
+                onClick = {
+                    if (title.isNotEmpty() && amount.isNotEmpty() && category.isNotEmpty()) {
+                        val transaction = Transaction(
+                            title = title,
+                            amount = amount.toDoubleOrNull() ?: 0.0,
+                            category = category,
+                            isExpense = isExpense,
+                            date = selectedDate,
+                            note = note.takeIf { it.isNotEmpty() }
+                        )
+                        viewModel.addTransaction(transaction)
+                        onTransactionAdded()
+                    }
+                },
+                modifier = Modifier.fillMaxWidth(),
+                enabled = title.isNotEmpty() && amount.isNotEmpty() && category.isNotEmpty() && isAmountValid
+            ) {
+                Text("Добавить")
+            }
+        }
+    }
 }

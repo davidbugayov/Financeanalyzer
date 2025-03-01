@@ -1,8 +1,17 @@
 package com.davidbugayov.financeanalyzer.data.model
 
+import androidx.room.Entity
+import androidx.room.PrimaryKey
+import java.util.Date
+
+@Entity(tableName = "transactions")
 data class Transaction(
-    val date: String,
-    val description: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Long = 0,
+    val title: String,
     val amount: Double,
-    val type: String // "Income" или "Expense"
+    val category: String,
+    val isExpense: Boolean,
+    val date: Date,
+    val note: String? = null
 )
