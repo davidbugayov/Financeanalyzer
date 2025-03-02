@@ -15,14 +15,15 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.math.abs
 
 /**
- * Виджет для отображения текущего баланса, доходов и расходов.
- * Обновляется каждые 30 минут или при запуске приложения.
- * Визуально соответствует компоненту BalanceCard из приложения.
+ * Компактный виджет для отображения текущего баланса.
+ * Размер 1x1, отображает только сумму баланса.
  * При нажатии на виджет открывается приложение.
+ * Обновляется каждые 30 минут или при запуске приложения.
  */
-class BalanceWidget : AppWidgetProvider(), KoinComponent {
+class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
 
     private val loadTransactionsUseCase: LoadTransactionsUseCase by inject()
 
@@ -46,7 +47,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         appWidgetId: Int
     ) {
         // Создаем RemoteViews для обновления виджета
-        val views = RemoteViews(context.packageName, R.layout.balance_widget_layout)
+        val views = RemoteViews(context.packageName, R.layout.small_balance_widget_layout)
         
         // Создаем Intent для запуска главной активности приложения
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
@@ -57,24 +58,21 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
             val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 PendingIntent.getActivity(
                     context,
-                    0,
+                    1, // Используем другой requestCode, чтобы не конфликтовать с основным виджетом
                     launchAppIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
                 )
             } else {
                 PendingIntent.getActivity(
                     context,
-                    0,
+                    1,
                     launchAppIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
             }
             
             // Устанавливаем обработчик нажатия на весь виджет
-            views.setOnClickPendingIntent(R.id.widget_balance, pendingIntent)
-            
-            // Также добавляем обработчик на весь контейнер для лучшей отзывчивости
-            views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
+            views.setOnClickPendingIntent(R.id.small_widget_container, pendingIntent)
         }
 
         // Загружаем данные о транзакциях в фоновом потоке
@@ -82,28 +80,24 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
             try {
                 val transactions = loadTransactionsUseCase()
                 
-                // Рассчитываем баланс, доходы и расходы
+                // Рассчитываем баланс
                 val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
                 val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
                 val balance = income - expense
                 
                 // Обновляем UI виджета в главном потоке
                 CoroutineScope(Dispatchers.Main).launch {
-                    // Форматируем числа с двумя знаками после запятой
-                    val formattedBalance = String.format("%.2f", balance)
-                    val formattedIncome = String.format("%.2f", income)
-                    val formattedExpense = String.format("%.2f", expense)
+                    // Форматируем баланс для компактного отображения
+                    val formattedBalance = formatCompactBalance(balance)
                     
-                    // Устанавливаем значения в виджет
-                    views.setTextViewText(R.id.widget_balance, "₽ $formattedBalance")
-                    views.setTextViewText(R.id.widget_income, "₽ $formattedIncome")
-                    views.setTextViewText(R.id.widget_expense, "₽ $formattedExpense")
+                    // Устанавливаем значение в виджет
+                    views.setTextViewText(R.id.small_widget_balance, formattedBalance)
                     
                     // Устанавливаем цвет баланса в зависимости от значения
                     if (balance >= 0) {
-                        views.setTextColor(R.id.widget_balance, 0xFF4CAF50.toInt())
+                        views.setTextColor(R.id.small_widget_balance, 0xFF4CAF50.toInt())
                     } else {
-                        views.setTextColor(R.id.widget_balance, 0xFFF44336.toInt())
+                        views.setTextColor(R.id.small_widget_balance, 0xFFF44336.toInt())
                     }
                     
                     // Обновляем виджет
@@ -112,9 +106,31 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
             } catch (e: Exception) {
                 // В случае ошибки показываем сообщение об ошибке
                 CoroutineScope(Dispatchers.Main).launch {
-                    views.setTextViewText(R.id.widget_balance, "Ошибка загрузки")
+                    views.setTextViewText(R.id.small_widget_balance, "?")
                     appWidgetManager.updateAppWidget(appWidgetId, views)
                 }
+            }
+        }
+    }
+    
+    /**
+     * Форматирует баланс для компактного отображения
+     */
+    private fun formatCompactBalance(balance: Double): String {
+        val prefix = if (balance < 0) "-₽" else "₽"
+        val absBalance = abs(balance)
+        
+        return when {
+            absBalance >= 1_000_000 -> {
+                val millions = absBalance / 1_000_000
+                "$prefix${String.format("%.1f", millions)}М"
+            }
+            absBalance >= 1_000 -> {
+                val thousands = absBalance / 1_000
+                "$prefix${String.format("%.1f", thousands)}К"
+            }
+            else -> {
+                "$prefix${absBalance.toInt()}"
             }
         }
     }
@@ -129,7 +145,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, BalanceWidget::class.java)
+                ComponentName(context, SmallBalanceWidget::class.java)
             )
             onUpdate(context, appWidgetManager, appWidgetIds)
         }
@@ -142,13 +158,13 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         fun updateAllWidgets(context: Context) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, BalanceWidget::class.java)
+                ComponentName(context, SmallBalanceWidget::class.java)
             )
             
             // Отправляем широковещательное сообщение для обновления виджетов
             val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
                 putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-                component = ComponentName(context, BalanceWidget::class.java)
+                component = ComponentName(context, SmallBalanceWidget::class.java)
             }
             context.sendBroadcast(intent)
         }

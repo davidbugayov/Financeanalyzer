@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/small_widget_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:padding="4dp"
+    android:background="@drawable/small_widget_background">
+
+    <TextView
+        android:id="@+id/small_widget_balance"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="₽0"
+        android:textSize="14sp"
+        android:textStyle="bold"
+        android:textColor="#4CAF50"
+        android:gravity="center"
+        android:maxLines="1"
+        android:ellipsize="end" />
+
+</FrameLayout> 

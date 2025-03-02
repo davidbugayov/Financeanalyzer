@@ -69,8 +69,12 @@ class AddTransactionViewModel(
         viewModelScope.launch {
             try {
                 val context = getApplication<Application>().applicationContext
-                val intent = Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.BalanceWidgetService"))
-                context.startService(intent)
+                
+                // Обновляем основной виджет баланса
+                com.davidbugayov.financeanalyzer.widget.BalanceWidget.updateAllWidgets(context)
+                
+                // Обновляем маленький виджет баланса
+                com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget.updateAllWidgets(context)
             } catch (e: Exception) {
                 // Игнорируем ошибки при обновлении виджета
             }
