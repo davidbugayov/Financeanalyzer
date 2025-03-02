@@ -8,17 +8,22 @@ import java.io.File
 import java.io.FileReader
 import java.io.FileWriter
 import java.text.SimpleDateFormat
-import java.util.*
+import java.util.Date
+import java.util.Locale
 
 object CsvParser {
-    private val dateFormat = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
+    // Используем lazy для инициализации dateFormat, чтобы избежать проблем при смене локали
+    private val dateFormat by lazy { SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()) }
+    private val HEADERS = arrayOf("Date", "Title", "Amount", "Category", "IsExpense", "Note")
 
     // Чтение CSV-файла
     fun readCsv(file: File): List<Transaction> {
         val reader = FileReader(file)
-        val csvParser = CSVParser(reader, CSVFormat.DEFAULT.withHeader(
-            "Date", "Title", "Amount", "Category", "IsExpense", "Note"
-        ))
+        val csvFormat = CSVFormat.DEFAULT.builder()
+            .setHeader(*HEADERS)
+            .setSkipHeaderRecord(true)
+            .build()
+        val csvParser = CSVParser(reader, csvFormat)
         val transactions = mutableListOf<Transaction>()
 
         for (record in csvParser) {
@@ -49,9 +54,10 @@ object CsvParser {
     // Запись в CSV-файл
     fun writeCsv(file: File, transactions: List<Transaction>) {
         val writer = FileWriter(file, true)  // true для добавления в конец файла
-        val csvPrinter = CSVPrinter(writer, CSVFormat.DEFAULT.withHeader(
-            "Date", "Title", "Amount", "Category", "IsExpense", "Note"
-        ))
+        val csvFormat = CSVFormat.DEFAULT.builder()
+            .setHeader(*HEADERS)
+            .build()
+        val csvPrinter = CSVPrinter(writer, csvFormat)
 
         for (transaction in transactions) {
             csvPrinter.printRecord(
