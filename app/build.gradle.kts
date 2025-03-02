@@ -80,4 +80,7 @@ dependencies {
     // Debug
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
+    
+    // SplashScreen API
+    implementation("androidx.core:core-splashscreen:1.0.1")
 }

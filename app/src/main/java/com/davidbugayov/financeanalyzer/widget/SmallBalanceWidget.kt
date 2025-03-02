@@ -95,9 +95,9 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                     
                     // Устанавливаем цвет баланса в зависимости от значения
                     if (balance >= 0) {
-                        views.setTextColor(R.id.small_widget_balance, 0xFF4CAF50.toInt())
+                        views.setTextColor(R.id.small_widget_balance, 0xFF4CAF50.toInt()) // Зеленый цвет
                     } else {
-                        views.setTextColor(R.id.small_widget_balance, 0xFFF44336.toInt())
+                        views.setTextColor(R.id.small_widget_balance, 0xFFF44336.toInt()) // Красный цвет
                     }
                     
                     // Обновляем виджет
@@ -117,20 +117,22 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
      * Форматирует баланс для компактного отображения
      */
     private fun formatCompactBalance(balance: Double): String {
-        val prefix = if (balance < 0) "-₽" else "₽"
         val absBalance = abs(balance)
         
         return when {
             absBalance >= 1_000_000 -> {
                 val millions = absBalance / 1_000_000
-                "$prefix${String.format("%.1f", millions)}М"
+                val prefix = if (balance < 0) "-" else ""
+                "${prefix}${String.format("%.1f", millions)}М"
             }
             absBalance >= 1_000 -> {
                 val thousands = absBalance / 1_000
-                "$prefix${String.format("%.1f", thousands)}К"
+                val prefix = if (balance < 0) "-" else ""
+                "${prefix}${String.format("%.1f", thousands)}К"
             }
             else -> {
-                "$prefix${absBalance.toInt()}"
+                val prefix = if (balance < 0) "-" else ""
+                "${prefix}${absBalance.toInt()}"
             }
         }
     }
@@ -153,7 +155,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
     
     companion object {
         /**
-         * Обновляет все экземпляры виджета
+         * Обновляет все экземпляры виджета, но только если они добавлены на домашний экран
          */
         fun updateAllWidgets(context: Context) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -161,12 +163,15 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                 ComponentName(context, SmallBalanceWidget::class.java)
             )
             
-            // Отправляем широковещательное сообщение для обновления виджетов
-            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-                component = ComponentName(context, SmallBalanceWidget::class.java)
+            // Обновляем виджеты только если они добавлены (есть хотя бы один экземпляр)
+            if (appWidgetIds.isNotEmpty()) {
+                // Отправляем широковещательное сообщение для обновления виджетов
+                val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
+                    component = ComponentName(context, SmallBalanceWidget::class.java)
+                }
+                context.sendBroadcast(intent)
             }
-            context.sendBroadcast(intent)
         }
     }
 } 

@@ -24,8 +24,12 @@ import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.font.FontWeight
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.foundation.clickable
@@ -73,13 +77,26 @@ fun AddTransactionScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Добавить транзакцию") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+                title = { 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.add_transaction),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 },
-                modifier = Modifier.height(48.dp)
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    }
+                },
+                modifier = Modifier.height(56.dp)
             )
         }
     ) { paddingValues ->
@@ -105,7 +122,7 @@ fun AddTransactionScreen(
                         .padding(bottom = 16.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text("Тип транзакции:", modifier = Modifier.weight(1f))
+                    Text(stringResource(R.string.transaction_type), modifier = Modifier.weight(1f))
                     
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         RadioButton(
@@ -113,7 +130,7 @@ fun AddTransactionScreen(
                             onClick = { isExpense = true }
                         )
                         Text(
-                            text = "Расход",
+                            text = stringResource(R.string.expense_type),
                             modifier = Modifier.clickable { isExpense = true }
                         )
                     }
@@ -126,7 +143,7 @@ fun AddTransactionScreen(
                             onClick = { isExpense = false }
                         )
                         Text(
-                            text = "Доход",
+                            text = stringResource(R.string.income_type),
                             modifier = Modifier.clickable { isExpense = false }
                         )
                     }
@@ -136,7 +153,7 @@ fun AddTransactionScreen(
                 OutlinedTextField(
                     value = title,
                     onValueChange = { title = it },
-                    label = { Text("Название") },
+                    label = { Text(stringResource(R.string.title)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 8.dp)
@@ -146,7 +163,7 @@ fun AddTransactionScreen(
                 OutlinedTextField(
                     value = amount,
                     onValueChange = { amount = it },
-                    label = { Text("Сумма") },
+                    label = { Text(stringResource(R.string.amount)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     modifier = Modifier
                         .fillMaxWidth()
@@ -158,11 +175,11 @@ fun AddTransactionScreen(
                 OutlinedTextField(
                     value = dateFormatter.format(selectedDate),
                     onValueChange = { },
-                    label = { Text("Дата") },
+                    label = { Text(stringResource(R.string.date)) },
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
-                            Icon(Icons.Filled.DateRange, contentDescription = "Выбрать дату")
+                            Icon(Icons.Filled.DateRange, contentDescription = stringResource(R.string.select_date_button))
                         }
                     },
                     modifier = Modifier
@@ -175,11 +192,11 @@ fun AddTransactionScreen(
                 OutlinedTextField(
                     value = category,
                     onValueChange = { },
-                    label = { Text("Категория") },
+                    label = { Text(stringResource(R.string.category)) },
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showCategoryPicker = true }) {
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Выбрать категорию")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.select_category))
                         }
                     },
                     modifier = Modifier
@@ -192,7 +209,7 @@ fun AddTransactionScreen(
                 OutlinedTextField(
                     value = note,
                     onValueChange = { note = it },
-                    label = { Text("Примечание (необязательно)") },
+                    label = { Text(stringResource(R.string.note_optional)) },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(bottom = 16.dp)
@@ -226,7 +243,7 @@ fun AddTransactionScreen(
                     enabled = title.isNotEmpty() && viewModel.isAmountValid(amount) && 
                              category.isNotEmpty() && !isLoading
                 ) {
-                    Text("Добавить")
+                    Text(stringResource(R.string.add_button))
                 }
             }
             
@@ -254,12 +271,12 @@ fun AddTransactionScreen(
                     }
                     showDatePicker = false
                 }) {
-                    Text("OK")
+                    Text(stringResource(R.string.ok))
                 }
             },
             dismissButton = {
                 TextButton(onClick = { showDatePicker = false }) {
-                    Text("Отмена")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         ) {
@@ -273,7 +290,7 @@ fun AddTransactionScreen(
         
         AlertDialog(
             onDismissRequest = { showCategoryPicker = false },
-            title = { Text("Выберите категорию") },
+            title = { Text(stringResource(R.string.select_category_title)) },
             text = {
                 Column {
                     categories.forEach { cat ->
@@ -304,7 +321,7 @@ fun AddTransactionScreen(
             },
             confirmButton = {
                 TextButton(onClick = { showCategoryPicker = false }) {
-                    Text("Отмена")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )

@@ -15,6 +15,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import kotlin.math.abs
 
 /**
  * Виджет для отображения текущего баланса, доходов и расходов.
@@ -90,23 +91,23 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                 // Обновляем UI виджета в главном потоке
                 CoroutineScope(Dispatchers.Main).launch {
                     // Форматируем числа с двумя знаками после запятой
-                    val formattedBalance = String.format("%.2f", balance)
-                    val formattedIncome = String.format("%.2f", income)
-                    val formattedExpense = String.format("%.2f", expense)
+                    val formattedBalance = formatCompactBalance(balance)
+                    val formattedIncome = formatCompactBalance(income)
+                    val formattedExpense = formatCompactBalance(expense)
                     
-                    // Устанавливаем значения в виджет
-                    views.setTextViewText(R.id.widget_balance, "₽ $formattedBalance")
-                    views.setTextViewText(R.id.widget_income, "₽ $formattedIncome")
-                    views.setTextViewText(R.id.widget_expense, "₽ $formattedExpense")
+                    // Обновляем виджет с новыми данными
+                    views.setTextViewText(R.id.widget_balance, formattedBalance)
+                    views.setTextViewText(R.id.widget_income, formattedIncome)
+                    views.setTextViewText(R.id.widget_expense, formattedExpense)
                     
-                    // Устанавливаем цвет баланса в зависимости от значения
+                    // Устанавливаем цвет баланса в зависимости от его значения
                     if (balance >= 0) {
                         views.setTextColor(R.id.widget_balance, 0xFF4CAF50.toInt())
                     } else {
                         views.setTextColor(R.id.widget_balance, 0xFFF44336.toInt())
                     }
                     
-                    // Обновляем виджет
+                    // Применяем изменения к виджету
                     appWidgetManager.updateAppWidget(appWidgetId, views)
                 }
             } catch (e: Exception) {
@@ -137,7 +138,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
     
     companion object {
         /**
-         * Обновляет все экземпляры виджета
+         * Обновляет все экземпляры виджета, но только если они добавлены на домашний экран
          */
         fun updateAllWidgets(context: Context) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
@@ -145,12 +146,37 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                 ComponentName(context, BalanceWidget::class.java)
             )
             
-            // Отправляем широковещательное сообщение для обновления виджетов
-            val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-                component = ComponentName(context, BalanceWidget::class.java)
+            // Обновляем виджеты только если они добавлены (есть хотя бы один экземпляр)
+            if (appWidgetIds.isNotEmpty()) {
+                // Отправляем широковещательное сообщение для обновления виджетов
+                val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
+                    component = ComponentName(context, BalanceWidget::class.java)
+                }
+                context.sendBroadcast(intent)
             }
-            context.sendBroadcast(intent)
+        }
+    }
+
+    /**
+     * Форматирует число для компактного отображения
+     */
+    private fun formatCompactBalance(value: Double): String {
+        val absValue = abs(value)
+        val prefix = if (value < 0) "-₽" else "₽"
+        
+        return when {
+            absValue >= 1_000_000 -> {
+                val millions = absValue / 1_000_000
+                "$prefix ${String.format("%.1f", millions)}М"
+            }
+            absValue >= 1_000 -> {
+                val thousands = absValue / 1_000
+                "$prefix ${String.format("%.1f", thousands)}К"
+            }
+            else -> {
+                "$prefix ${String.format("%.0f", absValue)}"
+            }
         }
     }
 } 

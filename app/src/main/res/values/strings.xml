@@ -2,4 +2,74 @@
     <string name="app_name">Деньги под Контролем</string>
     <string name="balance_widget_description">Виджет для отображения текущего баланса, доходов и расходов</string>
     <string name="small_balance_widget_description">Компактный виджет для отображения текущего баланса</string>
+    
+    <!-- Общие строки -->
+    <string name="currency_format">%s ₽</string>
+    <string name="income_currency_format">+%s ₽</string>
+    <string name="expense_currency_format">-%s ₽</string>
+    <string name="retry">Повторить</string>
+    <string name="error_occurred">Произошла ошибка</string>
+    <string name="no_transactions">Нет транзакций для отображения</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Отмена</string>
+    <string name="back">Назад</string>
+    <string name="show_summary">Показать сводку</string>
+    
+    <!-- Главный экран -->
+    <string name="app_title">Финансовый анализатор</string>
+    <string name="current_balance">Текущий баланс</string>
+    <string name="income">Доходы</string>
+    <string name="expense">Расходы</string>
+    <string name="balance">Баланс</string>
+    <string name="all">Все</string>
+    <string name="charts">Графики</string>
+    <string name="charts_title">Финансовая аналитика</string>
+    <string name="add">Добавить</string>
+    <string name="history">История</string>
+    
+    <!-- Фильтры -->
+    <string name="filter_today">Сегодня</string>
+    <string name="filter_week">Неделя</string>
+    <string name="filter_month">Месяц</string>
+    <string name="transactions_today">Транзакции за сегодня</string>
+    <string name="transactions_week">Транзакции за неделю</string>
+    <string name="transactions_month">Транзакции за месяц</string>
+    <string name="no_transactions_today">Нет транзакций за сегодня. Добавьте новую!</string>
+    <string name="no_transactions_week">Нет транзакций за неделю. Добавьте новую!</string>
+    <string name="no_transactions_month">Нет транзакций за месяц. Добавьте новую!</string>
+    
+    <!-- Экран истории -->
+    <string name="history_title">История транзакций</string>
+    <string name="select_date">Выбрать дату</string>
+    <string name="date_format">Дата: %s</string>
+    <string name="group_by_day">По дням</string>
+    <string name="group_by_week">По неделям</string>
+    <string name="group_by_month">По месяцам</string>
+    <string name="income_label">Доход: %s</string>
+    <string name="expense_label">Расход: %s</string>
+    <string name="balance_label">Баланс: %s</string>
+    
+    <!-- Экран добавления транзакции -->
+    <string name="add_transaction">Добавить транзакцию</string>
+    <string name="transaction_type">Тип транзакции:</string>
+    <string name="expense_type">Расход</string>
+    <string name="income_type">Доход</string>
+    <string name="title">Название</string>
+    <string name="amount">Сумма</string>
+    <string name="date">Дата</string>
+    <string name="select_date_button">Выбрать дату</string>
+    <string name="category">Категория</string>
+    <string name="select_category">Выбрать категорию</string>
+    <string name="note_optional">Примечание (необязательно)</string>
+    <string name="add_button">Добавить</string>
+    <string name="select_category_title">Выберите категорию</string>
+    
+    <!-- Форматы -->
+    <string name="category_date_format">%1$s • %2$s</string>
+    
+    <!-- Строки для ярлыков -->
+    <string name="add_transaction_short">Добавить</string>
+    <string name="add_transaction_long">Добавить транзакцию</string>
+    <string name="quick_add_short">+</string>
+    <string name="quick_add_long">Быстрое добавление</string>
 </resources>

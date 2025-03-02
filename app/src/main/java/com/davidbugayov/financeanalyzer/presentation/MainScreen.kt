@@ -1,5 +1,11 @@
 package com.davidbugayov.financeanalyzer.presentation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.Scaffold
@@ -20,7 +26,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
-fun MainScreen() {
+fun MainScreen(startDestination: String = "home") {
     val navController = rememberNavController()
     val layoutDirection = LocalLayoutDirection.current
 
@@ -30,13 +36,47 @@ fun MainScreen() {
         ) { paddingValues ->
             NavHost(
                 navController = navController, 
-                startDestination = "home",
+                startDestination = startDestination,
                 modifier = Modifier.padding(
                     start = paddingValues.calculateLeftPadding(layoutDirection),
                     end = paddingValues.calculateRightPadding(layoutDirection)
                 )
             ) {
-                composable("home") {
+                composable(
+                    route = "home",
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideIntoContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    },
+                    popEnterTransition = {
+                        fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideIntoContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    },
+                    popExitTransition = {
+                        fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    }
+                ) {
                     val homeViewModel: HomeViewModel = koinViewModel()
                     
                     HomeScreen(
@@ -47,7 +87,25 @@ fun MainScreen() {
                     )
                 }
                 
-                composable("chart") {
+                composable(
+                    route = "chart",
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideIntoContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    }
+                ) {
                     val chartViewModel: ChartViewModel = koinViewModel()
                     
                     FinanceChartScreen(
@@ -56,7 +114,25 @@ fun MainScreen() {
                     )
                 }
                 
-                composable("add") {
+                composable(
+                    route = "add",
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideIntoContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Up
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Down
+                        )
+                    }
+                ) {
                     val addViewModel: AddTransactionViewModel = koinViewModel()
                     
                     AddTransactionScreen(
@@ -68,11 +144,39 @@ fun MainScreen() {
                                 }
                             }
                         },
-                        onNavigateBack = { navController.popBackStack() }
+                        onNavigateBack = { 
+                            if (navController.previousBackStackEntry == null) {
+                                navController.navigate("home") {
+                                    popUpTo("add") {
+                                        inclusive = true
+                                    }
+                                }
+                            } else {
+                                navController.popBackStack()
+                            }
+                        }
                     )
                 }
                 
-                composable("history") {
+                composable(
+                    route = "history",
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideIntoContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        ) + slideOutOfContainer(
+                            animationSpec = tween(300, easing = EaseOut),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        )
+                    }
+                ) {
                     val chartViewModel: ChartViewModel = koinViewModel()
                     
                     TransactionHistoryScreen(

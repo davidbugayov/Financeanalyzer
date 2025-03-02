@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import android.appwidget.AppWidgetManager
+import android.content.ComponentName
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -63,18 +65,31 @@ class AddTransactionViewModel(
     }
     
     /**
-     * Обновляет виджет баланса после изменения данных
+     * Обновляет виджет баланса после изменения данных, но только если виджеты добавлены на домашний экран
      */
     private fun updateBalanceWidget() {
         viewModelScope.launch {
             try {
                 val context = getApplication<Application>().applicationContext
+                val appWidgetManager = AppWidgetManager.getInstance(context)
                 
-                // Обновляем основной виджет баланса
-                com.davidbugayov.financeanalyzer.widget.BalanceWidget.updateAllWidgets(context)
+                // Проверяем наличие основного виджета баланса
+                val balanceWidgetIds = appWidgetManager.getAppWidgetIds(
+                    ComponentName(context, com.davidbugayov.financeanalyzer.widget.BalanceWidget::class.java)
+                )
+                // Обновляем основной виджет только если он добавлен (есть хотя бы один экземпляр)
+                if (balanceWidgetIds.isNotEmpty()) {
+                    com.davidbugayov.financeanalyzer.widget.BalanceWidget.updateAllWidgets(context)
+                }
                 
-                // Обновляем маленький виджет баланса
-                com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget.updateAllWidgets(context)
+                // Проверяем наличие маленького виджета баланса
+                val smallBalanceWidgetIds = appWidgetManager.getAppWidgetIds(
+                    ComponentName(context, com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget::class.java)
+                )
+                // Обновляем маленький виджет только если он добавлен (есть хотя бы один экземпляр)
+                if (smallBalanceWidgetIds.isNotEmpty()) {
+                    com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget.updateAllWidgets(context)
+                }
             } catch (e: Exception) {
                 // Игнорируем ошибки при обновлении виджета
             }

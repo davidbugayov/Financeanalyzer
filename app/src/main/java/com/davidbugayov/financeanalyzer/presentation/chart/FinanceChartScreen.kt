@@ -18,6 +18,8 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.presentation.chart.components.CategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.components.MonthlyBarChart
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.R
 
 /**
  * Экран с финансовой аналитикой и графиками.
@@ -38,10 +40,21 @@ fun FinanceChartScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Финансовая аналитика") },
+                title = { 
+                    Box(
+                        modifier = Modifier.fillMaxWidth(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.charts_title),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
+                },
                 navigationIcon = {
                     IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
                     }
                 },
                 modifier = Modifier.height(48.dp)

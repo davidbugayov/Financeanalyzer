@@ -5,19 +5,25 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import java.text.SimpleDateFormat
 import java.util.*
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.text.style.TextAlign
+import java.time.LocalDate
+import java.time.ZoneId
 
 /**
  * Экран истории транзакций.
@@ -37,16 +43,74 @@ fun TransactionHistoryScreen(
     // Состояние для выбранного типа группировки
     var groupingType by remember { mutableStateOf(GroupingType.MONTH) }
     
+    // Состояние для выбора даты
+    var showDatePicker by remember { mutableStateOf(false) }
+    var selectedDate by remember { mutableStateOf(Date()) }
+    
+    // Состояние для фильтрованных транзакций
+    val filteredTransactions = remember(transactions, selectedDate) {
+        filterTransactionsByDate(transactions, selectedDate)
+    }
+    
+    // Диалог выбора даты
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedDate.time
+        )
+        
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        datePickerState.selectedDateMillis?.let {
+                            selectedDate = Date(it)
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+    
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("История транзакций") },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = "Назад")
+                title = { 
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.history_title),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
                     }
                 },
-                modifier = Modifier.height(48.dp)
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
+                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    }
+                },
+                actions = {
+                    // Кнопка выбора даты
+                    IconButton(onClick = { showDatePicker = true }) {
+                        Icon(Icons.Default.CalendarMonth, contentDescription = stringResource(R.string.select_date))
+                    }
+                },
+                modifier = Modifier.height(56.dp)
             )
         }
     ) { paddingValues ->
@@ -71,6 +135,19 @@ fun TransactionHistoryScreen(
                     onGroupingSelected = { groupingType = it }
                 )
                 
+                // Отображение выбранной даты
+                Text(
+                    text = stringResource(
+                        R.string.date_format,
+                        SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(selectedDate)
+                    ),
+                    fontSize = 14.sp,
+                    color = Color.Gray,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                )
+                
                 if (error != null) {
                     Column(
                         modifier = Modifier
@@ -80,22 +157,22 @@ fun TransactionHistoryScreen(
                         horizontalAlignment = Alignment.CenterHorizontally
                     ) {
                         Text(
-                            text = error ?: "Произошла ошибка",
+                            text = error ?: stringResource(R.string.error_occurred),
                             color = MaterialTheme.colorScheme.error,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
                         Button(onClick = { viewModel.loadTransactions() }) {
-                            Text("Повторить")
+                            Text(stringResource(R.string.retry))
                         }
                     }
-                } else if (transactions.isEmpty() && !isLoading) {
+                } else if (filteredTransactions.isEmpty() && !isLoading) {
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Нет транзакций для отображения",
+                            text = stringResource(R.string.no_transactions),
                             color = Color.Gray
                         )
                     }
@@ -107,18 +184,16 @@ fun TransactionHistoryScreen(
                     ) {
                         // Группируем транзакции в зависимости от выбранного типа группировки
                         val groupedTransactions = when (groupingType) {
-                            GroupingType.DAY -> groupTransactionsByDay(transactions)
-                            GroupingType.WEEK -> groupTransactionsByWeek(transactions)
-                            GroupingType.MONTH -> groupTransactionsByMonth(transactions)
+                            GroupingType.DAY -> groupTransactionsByDay(filteredTransactions)
+                            GroupingType.WEEK -> groupTransactionsByWeek(filteredTransactions)
+                            GroupingType.MONTH -> groupTransactionsByMonth(filteredTransactions)
                         }
                         
                         groupedTransactions.forEach { (period, transactionsInPeriod) ->
                             item {
-                                Text(
-                                    text = period,
-                                    fontSize = 18.sp,
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(vertical = 8.dp)
+                                GroupHeader(
+                                    period = period,
+                                    transactions = transactionsInPeriod
                                 )
                             }
                             
@@ -145,6 +220,63 @@ fun TransactionHistoryScreen(
 }
 
 /**
+ * Заголовок группы транзакций с суммой
+ */
+@Composable
+fun GroupHeader(period: String, transactions: List<Transaction>) {
+    val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
+    val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
+    val balance = income - expense
+    
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+    ) {
+        Text(
+            text = period,
+            fontSize = 18.sp,
+            fontWeight = FontWeight.Bold
+        )
+        
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Text(
+                text = stringResource(
+                    R.string.income_label,
+                    stringResource(R.string.currency_format, String.format("%.2f", income))
+                ),
+                fontSize = 12.sp,
+                color = Color(0xFF4CAF50)
+            )
+            
+            Text(
+                text = stringResource(
+                    R.string.expense_label,
+                    stringResource(R.string.currency_format, String.format("%.2f", expense))
+                ),
+                fontSize = 12.sp,
+                color = Color(0xFFF44336)
+            )
+            
+            Text(
+                text = stringResource(
+                    R.string.balance_label,
+                    stringResource(R.string.currency_format, String.format("%.2f", balance))
+                ),
+                fontSize = 12.sp,
+                color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                fontWeight = FontWeight.Bold
+            )
+        }
+    }
+}
+
+/**
  * Компонент с фильтрами группировки транзакций
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -162,19 +294,19 @@ fun GroupingChips(
         FilterChip(
             selected = currentGrouping == GroupingType.DAY,
             onClick = { onGroupingSelected(GroupingType.DAY) },
-            label = { Text("По дням") }
+            label = { Text(stringResource(R.string.group_by_day)) }
         )
         
         FilterChip(
             selected = currentGrouping == GroupingType.WEEK,
             onClick = { onGroupingSelected(GroupingType.WEEK) },
-            label = { Text("По неделям") }
+            label = { Text(stringResource(R.string.group_by_week)) }
         )
         
         FilterChip(
             selected = currentGrouping == GroupingType.MONTH,
             onClick = { onGroupingSelected(GroupingType.MONTH) },
-            label = { Text("По месяцам") }
+            label = { Text(stringResource(R.string.group_by_month)) }
         )
     }
 }
@@ -201,7 +333,11 @@ fun TransactionHistoryItem(transaction: Transaction) {
                 fontWeight = FontWeight.Medium
             )
             Text(
-                text = "${transaction.category} • ${dateFormat.format(transaction.date)}",
+                text = stringResource(
+                    R.string.category_date_format,
+                    transaction.category,
+                    dateFormat.format(transaction.date)
+                ),
                 fontSize = 12.sp,
                 color = Color.Gray
             )
@@ -218,7 +354,10 @@ fun TransactionHistoryItem(transaction: Transaction) {
         }
         
         Text(
-            text = "${if (transaction.isExpense) "-" else "+"}₽ ${String.format("%.2f", transaction.amount)}",
+            text = if (transaction.isExpense) 
+                stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
+            else 
+                stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
             color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
             fontWeight = FontWeight.Bold
         )
@@ -230,6 +369,27 @@ fun TransactionHistoryItem(transaction: Transaction) {
  */
 enum class GroupingType {
     DAY, WEEK, MONTH
+}
+
+/**
+ * Фильтрует транзакции по выбранной дате
+ */
+private fun filterTransactionsByDate(transactions: List<Transaction>, selectedDate: Date): List<Transaction> {
+    val calendar = Calendar.getInstance()
+    calendar.time = selectedDate
+    
+    // Получаем год и месяц выбранной даты
+    val selectedYear = calendar.get(Calendar.YEAR)
+    val selectedMonth = calendar.get(Calendar.MONTH)
+    
+    return transactions.filter {
+        calendar.time = it.date
+        val transactionYear = calendar.get(Calendar.YEAR)
+        val transactionMonth = calendar.get(Calendar.MONTH)
+        
+        // Фильтруем по году и месяцу
+        transactionYear == selectedYear && transactionMonth == selectedMonth
+    }
 }
 
 /**

@@ -17,12 +17,23 @@
         <activity
             android:name=".FinanceActivity"
             android:exported="true"
-            android:theme="@style/Theme.FinanceAnalyzer">
+            android:theme="@style/Theme.FinanceAnalyzer.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
-
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            
+            <!-- Обработка deep links для ярлыков -->
+            <intent-filter>
+                <action android:name="android.intent.action.VIEW" />
+                <category android:name="android.intent.category.DEFAULT" />
+                <data android:scheme="financeanalyzer" />
+            </intent-filter>
+            
+            <!-- Объявление ярлыков -->
+            <meta-data
+                android:name="android.app.shortcuts"
+                android:resource="@xml/shortcuts" />
         </activity>
         
         <!-- Объявление виджета баланса -->
