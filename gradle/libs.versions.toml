@@ -1,10 +1,10 @@
 [versions]
 # Plugins
 androidGradlePlugin = "8.8.2"
-kotlinAndroid = "2.1.0"
-kotlinCompilerExtension = "1.5.15"
+kotlinAndroid = "1.9.22"
+kotlinCompilerExtension = "1.5.8"
 jetbrainsCompose = "1.5.11"
-ksp = "2.1.0-1.0.29"
+ksp = "1.9.22-1.0.17"
 
 # AndroidX
 coreKtx = "1.15.0"
@@ -14,9 +14,6 @@ navigationCompose = "2.9.0-alpha07"
 
 # Compose
 composeBom = "2025.02.00"
-
-# Room
-room = "2.7.0-rc01"
 
 # Koin
 koin = "4.0.0"
@@ -47,11 +44,6 @@ compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
 compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 
-# Room
-room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
-room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
-room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
-
 # Koin
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
@@ -70,4 +62,3 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlinAndroid" }
 jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrainsCompose" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlinAndroid" }

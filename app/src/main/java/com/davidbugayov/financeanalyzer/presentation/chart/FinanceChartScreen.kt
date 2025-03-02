@@ -54,6 +54,7 @@ fun FinanceChartScreen(
                 .padding(
                     start = paddingValues.calculateLeftPadding(layoutDirection),
                     end = paddingValues.calculateRightPadding(layoutDirection),
+                    top = paddingValues.calculateTopPadding(),
                     bottom = paddingValues.calculateBottomPadding()
                 )
         ) {
@@ -98,7 +99,7 @@ fun FinanceChartScreen(
                         text = "Расходы по категориям",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(vertical = 8.dp)
                     )
                     
                     val expensesByCategory = viewModel.getExpensesByCategory()

@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">Деньги под Контролем</string>
+    <string name="balance_widget_description">Виджет для отображения текущего баланса, доходов и расходов</string>
 </resources>

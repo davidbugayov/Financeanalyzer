@@ -28,38 +28,49 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.foundation.clickable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.saveable.rememberSaveable
 
 /**
  * Экран добавления новой транзакции.
- * Позволяет пользователю ввести данные о транзакции и сохранить их.
+ * Позволяет пользователю ввести данные о транзакции и сохранить её.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     viewModel: AddTransactionViewModel,
-    onTransactionAdded: () -> Unit,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onTransactionAdded: () -> Unit
 ) {
-    var selectedDate by remember { mutableStateOf(Date()) }
+    val isLoading by viewModel.isLoading.collectAsState()
+    val error by viewModel.error.collectAsState()
+    val isSuccess by viewModel.isSuccess.collectAsState()
+    val layoutDirection = LocalLayoutDirection.current
+    
+    // Если транзакция успешно добавлена, возвращаемся назад
+    LaunchedEffect(isSuccess) {
+        if (isSuccess) {
+            onTransactionAdded()
+        }
+    }
+    
+    // Состояние для полей формы
     var title by remember { mutableStateOf("") }
     var amount by remember { mutableStateOf("") }
     var category by remember { mutableStateOf("") }
-    var isExpense by remember { mutableStateOf(false) }
     var note by remember { mutableStateOf("") }
+    var isExpense by remember { mutableStateOf(true) }
+    var selectedDate by remember { mutableStateOf(Date()) }
+    
+    // Состояние для диалогов
     var showDatePicker by remember { mutableStateOf(false) }
-    var showCategoryDialog by remember { mutableStateOf(false) }
+    var showCategoryPicker by remember { mutableStateOf(false) }
     
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    // Форматтер для отображения даты
+    val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     
-    val datePickerState = rememberDatePickerState()
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    
-    val categories = if (isExpense) viewModel.expenseCategories else viewModel.incomeCategories
-    val layoutDirection = LocalLayoutDirection.current
-
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
         topBar = {
             TopAppBar(
                 title = { Text("Добавить транзакцию") },
@@ -71,140 +82,131 @@ fun AddTransactionScreen(
                 modifier = Modifier.height(48.dp)
             )
         }
-    ) { innerPadding ->
+    ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    start = innerPadding.calculateLeftPadding(layoutDirection),
-                    end = innerPadding.calculateRightPadding(layoutDirection),
-                    bottom = innerPadding.calculateBottomPadding()
+                    start = paddingValues.calculateLeftPadding(layoutDirection),
+                    end = paddingValues.calculateRightPadding(layoutDirection),
+                    top = paddingValues.calculateTopPadding(),
+                    bottom = paddingValues.calculateBottomPadding()
                 )
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                    .padding(16.dp)
             ) {
-                // Дата
+                // Выбор типа транзакции (доход/расход)
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text("Тип транзакции:", modifier = Modifier.weight(1f))
+                    
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = isExpense,
+                            onClick = { isExpense = true }
+                        )
+                        Text(
+                            text = "Расход",
+                            modifier = Modifier.clickable { isExpense = true }
+                        )
+                    }
+                    
+                    Spacer(modifier = Modifier.width(8.dp))
+                    
+                    Row(verticalAlignment = Alignment.CenterVertically) {
+                        RadioButton(
+                            selected = !isExpense,
+                            onClick = { isExpense = false }
+                        )
+                        Text(
+                            text = "Доход",
+                            modifier = Modifier.clickable { isExpense = false }
+                        )
+                    }
+                }
+                
+                // Поле для ввода названия
                 OutlinedTextField(
-                    value = dateFormat.format(selectedDate),
+                    value = title,
+                    onValueChange = { title = it },
+                    label = { Text("Название") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                )
+                
+                // Поле для ввода суммы
+                OutlinedTextField(
+                    value = amount,
+                    onValueChange = { amount = it },
+                    label = { Text("Сумма") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp),
+                    isError = amount.isNotEmpty() && !viewModel.isAmountValid(amount)
+                )
+                
+                // Поле для выбора даты
+                OutlinedTextField(
+                    value = dateFormatter.format(selectedDate),
                     onValueChange = { },
                     label = { Text("Дата") },
-                    modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
                     trailingIcon = {
                         IconButton(onClick = { showDatePicker = true }) {
                             Icon(Icons.Filled.DateRange, contentDescription = "Выбрать дату")
                         }
-                    }
-                )
-
-                if (showDatePicker) {
-                    DatePickerDialog(
-                        onDismissRequest = { showDatePicker = false },
-                        confirmButton = {
-                            TextButton(
-                                onClick = {
-                                    showDatePicker = false
-                                    datePickerState.selectedDateMillis?.let {
-                                        selectedDate = Date(it)
-                                    }
-                                }
-                            ) {
-                                Text("OK")
-                            }
-                        },
-                        dismissButton = {
-                            TextButton(onClick = { showDatePicker = false }) {
-                                Text("Отмена")
-                            }
-                        }
-                    ) {
-                        DatePicker(state = datePickerState)
-                    }
-                }
-
-                // Название
-                OutlinedTextField(
-                    value = title,
-                    onValueChange = { title = it },
-                    label = { Text("Название") },
-                    modifier = Modifier.fillMaxWidth()
-                )
-
-                // Сумма
-                OutlinedTextField(
-                    value = amount,
-                    onValueChange = { newAmount ->
-                        if (newAmount.isEmpty() || newAmount.matches(Regex("^\\d*\\.?\\d*$"))) {
-                            amount = newAmount
-                        }
                     },
-                    label = { Text("Сумма") },
-                    modifier = Modifier.fillMaxWidth(),
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    isError = !viewModel.isAmountValid(amount)
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                        .clickable { showDatePicker = true }
                 )
-
-                // Категория
+                
+                // Поле для выбора категории
                 OutlinedTextField(
                     value = category,
-                    onValueChange = { category = it },
+                    onValueChange = { },
                     label = { Text("Категория") },
-                    modifier = Modifier.fillMaxWidth(),
                     readOnly = true,
                     trailingIcon = {
-                        IconButton(onClick = { showCategoryDialog = true }) {
-                            Icon(Icons.Filled.ArrowDropDown, contentDescription = "Выбрать категорию")
+                        IconButton(onClick = { showCategoryPicker = true }) {
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Выбрать категорию")
                         }
-                    }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 8.dp)
+                        .clickable { showCategoryPicker = true }
                 )
-
-                // Тип транзакции
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    RadioButton(
-                        selected = !isExpense,
-                        onClick = { 
-                            isExpense = false
-                            category = "" // Сбрасываем категорию при смене типа
-                        }
-                    )
-                    Text("Доход")
-                    RadioButton(
-                        selected = isExpense,
-                        onClick = { 
-                            isExpense = true
-                            category = "" // Сбрасываем категорию при смене типа
-                        }
-                    )
-                    Text("Расход")
-                }
-
-                // Заметка
+                
+                // Поле для ввода примечания
                 OutlinedTextField(
                     value = note,
                     onValueChange = { note = it },
-                    label = { Text("Заметка") },
-                    modifier = Modifier.fillMaxWidth()
+                    label = { Text("Примечание (необязательно)") },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = 16.dp)
                 )
-
-                Spacer(modifier = Modifier.height(16.dp))
-
+                
                 // Сообщение об ошибке
                 error?.let {
                     Text(
                         text = it,
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                 }
-
+                
                 // Кнопка добавления
                 Button(
                     onClick = {
@@ -217,7 +219,7 @@ fun AddTransactionScreen(
                                 date = selectedDate,
                                 note = note.takeIf { it.isNotEmpty() }
                             )
-                            viewModel.addTransaction(transaction, onTransactionAdded)
+                            viewModel.addTransaction(transaction)
                         }
                     },
                     modifier = Modifier.fillMaxWidth(),
@@ -228,34 +230,6 @@ fun AddTransactionScreen(
                 }
             }
             
-            // Диалог выбора категории
-            if (showCategoryDialog) {
-                AlertDialog(
-                    onDismissRequest = { showCategoryDialog = false },
-                    title = { Text("Выберите категорию") },
-                    text = {
-                        Column {
-                            categories.forEach { categoryName ->
-                                TextButton(
-                                    onClick = {
-                                        category = categoryName
-                                        showCategoryDialog = false
-                                    },
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(categoryName)
-                                }
-                            }
-                        }
-                    },
-                    confirmButton = {
-                        TextButton(onClick = { showCategoryDialog = false }) {
-                            Text("Отмена")
-                        }
-                    }
-                )
-            }
-            
             // Индикатор загрузки
             if (isLoading) {
                 CircularProgressIndicator(
@@ -263,5 +237,76 @@ fun AddTransactionScreen(
                 )
             }
         }
+    }
+    
+    // Диалог выбора даты
+    if (showDatePicker) {
+        val datePickerState = rememberDatePickerState(
+            initialSelectedDateMillis = selectedDate.time
+        )
+        
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        selectedDate = Date(it)
+                    }
+                    showDatePicker = false
+                }) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Отмена")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
+    
+    // Диалог выбора категории
+    if (showCategoryPicker) {
+        val categories = if (isExpense) viewModel.expenseCategories else viewModel.incomeCategories
+        
+        AlertDialog(
+            onDismissRequest = { showCategoryPicker = false },
+            title = { Text("Выберите категорию") },
+            text = {
+                Column {
+                    categories.forEach { cat ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    category = cat
+                                    showCategoryPicker = false
+                                }
+                                .padding(vertical = 12.dp),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            RadioButton(
+                                selected = category == cat,
+                                onClick = {
+                                    category = cat
+                                    showCategoryPicker = false
+                                }
+                            )
+                            Text(
+                                text = cat,
+                                modifier = Modifier.padding(start = 8.dp)
+                            )
+                        }
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showCategoryPicker = false }) {
+                    Text("Отмена")
+                }
+            }
+        )
     }
 }

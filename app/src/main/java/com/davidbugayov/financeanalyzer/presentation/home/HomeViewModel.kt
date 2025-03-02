@@ -10,6 +10,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import java.util.Calendar
+import java.util.Date
 
 /**
  * ViewModel для главного экрана.
@@ -28,9 +30,20 @@ class HomeViewModel(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
+    
+    // Текущий выбранный фильтр для главного экрана
+    private val _currentFilter = MutableStateFlow(TransactionFilter.MONTH)
+    val currentFilter: StateFlow<TransactionFilter> get() = _currentFilter
 
     init {
         loadTransactions()
+    }
+    
+    /**
+     * Устанавливает текущий фильтр для отображения транзакций
+     */
+    fun setFilter(filter: TransactionFilter) {
+        _currentFilter.value = filter
     }
 
     /**
@@ -85,6 +98,65 @@ class HomeViewModel(
     fun getRecentTransactions(count: Int = 5): List<Transaction> {
         return _transactions.value.sortedByDescending { it.date }.take(count)
     }
+    
+    /**
+     * Возвращает транзакции за последний месяц
+     * @return Список транзакций за последний месяц
+     */
+    fun getLastMonthTransactions(): List<Transaction> {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.MONTH, -1)
+        val monthAgo = calendar.time
+        
+        return _transactions.value
+            .filter { it.date.after(monthAgo) || it.date == monthAgo }
+            .sortedByDescending { it.date }
+    }
+    
+    /**
+     * Возвращает транзакции за сегодня
+     * @return Список транзакций за сегодня
+     */
+    fun getTodayTransactions(): List<Transaction> {
+        val calendar = Calendar.getInstance()
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startOfDay = calendar.time
+        
+        calendar.add(Calendar.DAY_OF_MONTH, 1)
+        val endOfDay = calendar.time
+        
+        return _transactions.value
+            .filter { it.date.after(startOfDay) && it.date.before(endOfDay) }
+            .sortedByDescending { it.date }
+    }
+    
+    /**
+     * Возвращает транзакции за последнюю неделю
+     * @return Список транзакций за последнюю неделю
+     */
+    fun getLastWeekTransactions(): List<Transaction> {
+        val calendar = Calendar.getInstance()
+        calendar.add(Calendar.DAY_OF_MONTH, -7)
+        val weekAgo = calendar.time
+        
+        return _transactions.value
+            .filter { it.date.after(weekAgo) || it.date == weekAgo }
+            .sortedByDescending { it.date }
+    }
+    
+    /**
+     * Возвращает отфильтрованные транзакции в соответствии с текущим фильтром
+     */
+    fun getFilteredTransactions(): List<Transaction> {
+        return when (_currentFilter.value) {
+            TransactionFilter.TODAY -> getTodayTransactions()
+            TransactionFilter.WEEK -> getLastWeekTransactions()
+            TransactionFilter.MONTH -> getLastMonthTransactions()
+        }
+    }
 
     /**
      * Возвращает общую сумму доходов
@@ -109,4 +181,11 @@ class HomeViewModel(
     fun getCurrentBalance(): Double {
         return getTotalIncome() - getTotalExpense()
     }
+}
+
+/**
+ * Перечисление для фильтров транзакций
+ */
+enum class TransactionFilter {
+    TODAY, WEEK, MONTH
 } 

@@ -2,16 +2,17 @@ package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidApplication
+import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.core.module.dsl.singleOf
-import org.koin.core.module.dsl.viewModel
 import org.koin.dsl.bind
 import org.koin.dsl.module
 
@@ -32,5 +33,5 @@ val appModule = module {
     // ViewModels
     viewModel { HomeViewModel(get(), get<AddTransactionUseCase>()) }
     viewModel { ChartViewModel(get()) }
-    viewModel { AddTransactionViewModel(get()) }
+    viewModel { AddTransactionViewModel(androidApplication(), get()) }
 }

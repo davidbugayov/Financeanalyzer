@@ -1,78 +1,89 @@
 package com.davidbugayov.financeanalyzer.presentation.add
 
-import androidx.lifecycle.ViewModel
+import android.app.Application
+import android.content.Context
+import android.content.Intent
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 
 /**
- * ViewModel для экрана добавления транзакций.
- * Отвечает за валидацию и сохранение новых транзакций.
+ * ViewModel для экрана добавления транзакции.
+ * Отвечает за валидацию и сохранение новой транзакции.
  */
 class AddTransactionViewModel(
+    application: Application,
     private val addTransactionUseCase: AddTransactionUseCase
-) : ViewModel() {
+) : AndroidViewModel(application), KoinComponent {
 
+    // Категории для выбора пользователем
+    val expenseCategories = listOf(
+        "Продукты", "Транспорт", "Развлечения", "Рестораны", 
+        "Здоровье", "Одежда", "Жилье", "Связь", "Образование", "Прочее"
+    )
+    
+    val incomeCategories = listOf(
+        "Зарплата", "Фриланс", "Подарки", "Проценты", "Аренда", "Прочее"
+    )
+    
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
-
+    
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
 
-    /**
-     * Категории расходов для выбора пользователем
-     */
-    val expenseCategories = listOf(
-        "Продукты", "Транспорт", "Развлечения", "Здоровье", 
-        "Одежда", "Рестораны", "Коммунальные платежи", "Другое"
-    )
-
-    /**
-     * Категории доходов для выбора пользователем
-     */
-    val incomeCategories = listOf(
-        "Зарплата", "Фриланс", "Подарки", "Инвестиции", "Другое"
-    )
+    private val _isSuccess = MutableStateFlow(false)
+    val isSuccess: StateFlow<Boolean> get() = _isSuccess
 
     /**
      * Добавляет новую транзакцию
-     * @param transaction Транзакция для добавления
-     * @param onSuccess Callback, вызываемый при успешном добавлении
      */
-    fun addTransaction(transaction: Transaction, onSuccess: () -> Unit) {
+    fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
             try {
                 _isLoading.value = true
                 _error.value = null
-                
                 addTransactionUseCase(transaction)
-                onSuccess()
+                _isSuccess.value = true
+                
+                // Обновляем виджет баланса
+                updateBalanceWidget()
             } catch (e: Exception) {
-                _error.value = "Ошибка при сохранении: ${e.message}"
+                _error.value = "Ошибка при добавлении транзакции: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
         }
     }
-
+    
     /**
-     * Сбрасывает сообщение об ошибке
+     * Обновляет виджет баланса после изменения данных
      */
-    fun resetError() {
-        _error.value = null
+    private fun updateBalanceWidget() {
+        viewModelScope.launch {
+            try {
+                val context = getApplication<Application>().applicationContext
+                val intent = Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.BalanceWidgetService"))
+                context.startService(intent)
+            } catch (e: Exception) {
+                // Игнорируем ошибки при обновлении виджета
+            }
+        }
     }
 
     /**
-     * Проверяет валидность введенной суммы
-     * @param amount Строка с суммой
-     * @return true, если сумма валидна
+     * Проверяет, является ли введенная сумма валидной
      */
     fun isAmountValid(amount: String): Boolean {
         return try {
-            amount.toDoubleOrNull()?.let { it > 0 } ?: false
+            val value = amount.toDouble()
+            value > 0
         } catch (e: Exception) {
             false
         }

@@ -38,6 +38,7 @@ fun HomeScreen(
     val transactions by viewModel.transactions.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
+    val currentFilter by viewModel.currentFilter.collectAsState()
     val layoutDirection = LocalLayoutDirection.current
     
     // Загружаем транзакции при первом запуске
@@ -81,15 +82,38 @@ fun HomeScreen(
                     )
                 }
 
-                // Последние транзакции
-                Text(
-                    text = "Последние транзакции",
-                    fontSize = 18.sp,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                // Фильтры транзакций
+                FilterChips(
+                    currentFilter = currentFilter,
+                    onFilterSelected = { viewModel.setFilter(it) }
                 )
 
-                if (transactions.isEmpty() && !isLoading) {
+                // Заголовок для транзакций
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = when(currentFilter) {
+                            TransactionFilter.TODAY -> "Транзакции за сегодня"
+                            TransactionFilter.WEEK -> "Транзакции за неделю"
+                            TransactionFilter.MONTH -> "Транзакции за месяц"
+                        },
+                        fontSize = 18.sp,
+                        fontWeight = FontWeight.Medium
+                    )
+                    
+                    TextButton(onClick = onNavigateToHistory) {
+                        Text("Все")
+                    }
+                }
+
+                // Список транзакций
+                val filteredTransactions = viewModel.getFilteredTransactions()
+                if (filteredTransactions.isEmpty() && !isLoading) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -97,7 +121,11 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Нет транзакций. Добавьте новую!",
+                            text = when(currentFilter) {
+                                TransactionFilter.TODAY -> "Нет транзакций за сегодня. Добавьте новую!"
+                                TransactionFilter.WEEK -> "Нет транзакций за неделю. Добавьте новую!"
+                                TransactionFilter.MONTH -> "Нет транзакций за месяц. Добавьте новую!"
+                            },
                             color = Color.Gray
                         )
                     }
@@ -107,7 +135,7 @@ fun HomeScreen(
                             .weight(1f)
                             .fillMaxWidth()
                     ) {
-                        items(viewModel.getRecentTransactions()) { transaction ->
+                        items(filteredTransactions) { transaction ->
                             TransactionItem(transaction = transaction)
                             HorizontalDivider()
                         }
@@ -193,6 +221,41 @@ fun HomeScreen(
                 )
             }
         }
+    }
+}
+
+/**
+ * Компонент с фильтрами транзакций
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun FilterChips(
+    currentFilter: TransactionFilter,
+    onFilterSelected: (TransactionFilter) -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        FilterChip(
+            selected = currentFilter == TransactionFilter.TODAY,
+            onClick = { onFilterSelected(TransactionFilter.TODAY) },
+            label = { Text("Сегодня") }
+        )
+        
+        FilterChip(
+            selected = currentFilter == TransactionFilter.WEEK,
+            onClick = { onFilterSelected(TransactionFilter.WEEK) },
+            label = { Text("Неделя") }
+        )
+        
+        FilterChip(
+            selected = currentFilter == TransactionFilter.MONTH,
+            onClick = { onFilterSelected(TransactionFilter.MONTH) },
+            label = { Text("Месяц") }
+        )
     }
 }
 
@@ -286,6 +349,17 @@ fun TransactionItem(transaction: Transaction) {
                 fontSize = 12.sp,
                 color = Color.Gray
             )
+            // Добавляем отображение примечания, если оно есть
+            transaction.note?.let {
+                if (it.isNotEmpty()) {
+                    Text(
+                        text = it,
+                        fontSize = 12.sp,
+                        color = Color.Gray,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+            }
         }
         
         Text(
