@@ -27,7 +27,6 @@ androidxJunit = "1.2.1"
 espressoCore = "3.6.1"
 
 # Other
-mpAndroidChart = "v3.1.0"
 commonsCsv = "1.10.0"
 
 [libraries]
@@ -56,9 +55,6 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 # Koin
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
-
-# Charts
-mp-android-chart = { group = "com.github.PhilJay", name = "MPAndroidChart", version.ref = "mpAndroidChart" }
 
 # CSV Parser
 commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "commonsCsv" }

@@ -73,9 +73,6 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     
-    // Charts
-    implementation(libs.mp.android.chart)
-    
     // CSV parsing
     implementation(libs.commons.csv)
     

@@ -4,15 +4,15 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 
 /**
- * Use case для добавления новой транзакции.
+ * Use case для удаления транзакции.
  * Следует принципу единственной ответственности (Single Responsibility Principle).
  */
-class AddTransactionUseCase(private val repository: ITransactionRepository) {
+class DeleteTransactionUseCase(private val repository: ITransactionRepository) {
     /**
-     * Добавляет новую транзакцию в репозиторий
-     * @param transaction Транзакция для добавления
+     * Удаляет транзакцию из репозитория
+     * @param transaction Транзакция для удаления
      */
     suspend operator fun invoke(transaction: Transaction) {
-        repository.addTransaction(transaction)
+        repository.deleteTransaction(transaction)
     }
-}
+} 
