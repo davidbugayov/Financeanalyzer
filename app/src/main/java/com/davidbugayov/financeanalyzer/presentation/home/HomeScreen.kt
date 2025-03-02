@@ -7,6 +7,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -140,23 +141,23 @@ fun HomeScreen(
                     )
                     
                     Row(
-                        verticalAlignment = CenterVertically
+                        verticalAlignment = CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
                     ) {
-                        // Чекбокс для управления видимостью GroupSummary
+                        // Иконка с чекбоксом для управления видимостью GroupSummary
                         Row(
                             verticalAlignment = CenterVertically,
                             modifier = Modifier
-                                .padding(end = 12.dp)
                                 .height(36.dp)
                         ) {
                             Checkbox(
                                 checked = showGroupSummary,
                                 onCheckedChange = { showGroupSummary = it }
                             )
-                            Text(
-                                text = stringResource(R.string.show_summary),
-                                fontSize = 14.sp,
-                                modifier = Modifier.padding(start = 4.dp)
+                            Icon(
+                                imageVector = Icons.Default.Summarize,
+                                contentDescription = stringResource(R.string.show_summary),
+                                modifier = Modifier.size(20.dp)
                             )
                         }
                         

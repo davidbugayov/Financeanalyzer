@@ -118,21 +118,19 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
      */
     private fun formatCompactBalance(balance: Double): String {
         val absBalance = abs(balance)
+        val prefix = if (balance < 0) "-" else ""
         
         return when {
             absBalance >= 1_000_000 -> {
                 val millions = absBalance / 1_000_000
-                val prefix = if (balance < 0) "-" else ""
-                "${prefix}${String.format("%.1f", millions)}М"
+                "${prefix}${String.format("%.1f", millions)}М₽"
             }
             absBalance >= 1_000 -> {
                 val thousands = absBalance / 1_000
-                val prefix = if (balance < 0) "-" else ""
-                "${prefix}${String.format("%.1f", thousands)}К"
+                "${prefix}${String.format("%.1f", thousands)}К₽"
             }
             else -> {
-                val prefix = if (balance < 0) "-" else ""
-                "${prefix}${absBalance.toInt()}"
+                "${prefix}${absBalance.toInt()}₽"
             }
         }
     }

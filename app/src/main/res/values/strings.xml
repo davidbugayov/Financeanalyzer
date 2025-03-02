@@ -48,6 +48,18 @@
     <string name="income_label">Доход: %s</string>
     <string name="expense_label">Расход: %s</string>
     <string name="balance_label">Баланс: %s</string>
+    <string name="select_period">Выбрать период</string>
+    <string name="period_all">Все время</string>
+    <string name="period_month">Месяц</string>
+    <string name="period_quarter">Квартал</string>
+    <string name="period_half_year">Полгода</string>
+    <string name="period_year">Год</string>
+    <string name="period_custom">Произвольный</string>
+    <string name="from_date">С: %s</string>
+    <string name="to_date">По: %s</string>
+    <string name="select_start_date">Выберите начальную дату</string>
+    <string name="select_end_date">Выберите конечную дату</string>
+    <string name="apply">Применить</string>
     
     <!-- Экран добавления транзакции -->
     <string name="add_transaction">Добавить транзакцию</string>

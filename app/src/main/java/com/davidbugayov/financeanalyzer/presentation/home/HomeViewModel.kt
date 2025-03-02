@@ -125,11 +125,14 @@ class HomeViewModel(
         calendar.set(Calendar.MILLISECOND, 0)
         val startOfDay = calendar.time
         
-        calendar.add(Calendar.DAY_OF_MONTH, 1)
-        val endOfDay = calendar.time
-        
         return _transactions.value
-            .filter { it.date.after(startOfDay) && it.date.before(endOfDay) }
+            .filter { 
+                val transactionDate = Calendar.getInstance().apply { time = it.date }
+                val today = Calendar.getInstance()
+                
+                transactionDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+                transactionDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
+            }
             .sortedByDescending { it.date }
     }
     

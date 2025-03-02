@@ -163,19 +163,19 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
      */
     private fun formatCompactBalance(value: Double): String {
         val absValue = abs(value)
-        val prefix = if (value < 0) "-₽" else "₽"
+        val prefix = if (value < 0) "-" else ""
         
         return when {
             absValue >= 1_000_000 -> {
                 val millions = absValue / 1_000_000
-                "$prefix ${String.format("%.1f", millions)}М"
+                "${prefix}${String.format("%.1f", millions)}М₽"
             }
             absValue >= 1_000 -> {
                 val thousands = absValue / 1_000
-                "$prefix ${String.format("%.1f", thousands)}К"
+                "${prefix}${String.format("%.1f", thousands)}К₽"
             }
             else -> {
-                "$prefix ${String.format("%.0f", absValue)}"
+                "${prefix}${String.format("%.0f", absValue)}₽"
             }
         }
     }
