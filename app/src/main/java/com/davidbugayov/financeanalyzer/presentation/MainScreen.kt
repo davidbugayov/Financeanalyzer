@@ -51,40 +51,19 @@ fun MainScreen(startDestination: String = "home") {
                     enterTransition = {
                         fadeIn(
                             animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideIntoContainer(
-                            animationSpec = tween(300, easing = EaseOut),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
                         )
                     },
                     exitTransition = {
                         fadeOut(
                             animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideOutOfContainer(
-                            animationSpec = tween(300, easing = EaseOut),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        )
-                    },
-                    popEnterTransition = {
-                        fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideIntoContainer(
-                            animationSpec = tween(300, easing = EaseOut),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        )
-                    },
-                    popExitTransition = {
-                        fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideOutOfContainer(
-                            animationSpec = tween(300, easing = EaseOut),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
                         )
                     }
                 ) {
                     HomeScreen(
                         viewModel = homeViewModel,
                         onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                        onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) }
+                        onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
+                        onNavigateToChart = { navController.navigate(Screen.Chart.route) }
                     )
                 }
                 

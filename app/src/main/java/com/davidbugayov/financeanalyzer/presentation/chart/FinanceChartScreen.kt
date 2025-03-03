@@ -186,7 +186,7 @@ fun FinanceChartScreen(
                             data = transactionsByMonth,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(300.dp)
+                                .height(400.dp)
                         )
                     } else {
                         Box(
@@ -216,7 +216,6 @@ fun FinanceChartScreen(
                     if (expensesByDay.isNotEmpty()) {
                         MonthlyBarChart(
                             data = expensesByDay,
-                            isExpense = true,
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .height(300.dp)

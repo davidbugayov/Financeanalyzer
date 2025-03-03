@@ -40,7 +40,8 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToHistory: () -> Unit,
-    onNavigateToAdd: () -> Unit
+    onNavigateToAdd: () -> Unit,
+    onNavigateToChart: () -> Unit
 ) {
     val balance by viewModel.balance.collectAsState()
     val income by viewModel.income.collectAsState()
@@ -83,7 +84,17 @@ fun HomeScreen(
                         )
                     }
                 },
-                // Уменьшаем отступы в TopAppBar
+                actions = {
+                    // Кнопка для генерации тестовых данных
+                    IconButton(
+                        onClick = { viewModel.generateAndSaveTestData() }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Add,
+                            contentDescription = "Сгенерировать тестовые данные"
+                        )
+                    }
+                },
                 modifier = Modifier.height(56.dp)
             )
         }
@@ -218,7 +229,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         FilledTonalIconButton(
-                            onClick = { /* Implement chart navigation */ },
+                            onClick = onNavigateToChart,
                             modifier = Modifier.size(48.dp)
                         ) {
                             Icon(

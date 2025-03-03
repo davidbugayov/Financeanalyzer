@@ -13,3 +13,35 @@
 .externalNativeBuild
 .cxx
 local.properties
+
+# Keystore files
+*.keystore
+*.jks
+keystore.properties
+keystore/
+
+# Log/OS Files
+*.log
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Android Studio generated files and folders
+*.apk
+*.aab
+output.json
+output-metadata.json
+
+# IntelliJ
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml
+
+# Google Services (e.g. APIs or Firebase)
+google-services.json
+
+# Android Profiling
+*.hprof

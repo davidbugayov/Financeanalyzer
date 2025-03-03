@@ -85,7 +85,7 @@ class HomeViewModel(
     /**
      * Генерирует и сохраняет тестовые данные
      */
-    private fun generateAndSaveTestData() {
+    fun generateAndSaveTestData() {
         viewModelScope.launch {
             try {
                 val testTransactions = TestDataGenerator.generateTransactions(20)
@@ -96,7 +96,7 @@ class HomeViewModel(
                 }
                 
                 // Загружаем сохраненные транзакции
-                _transactions.value = loadTransactionsUseCase()
+                loadTransactions()
             } catch (e: Exception) {
                 _error.value = "Ошибка при генерации тестовых данных: ${e.message}"
             }

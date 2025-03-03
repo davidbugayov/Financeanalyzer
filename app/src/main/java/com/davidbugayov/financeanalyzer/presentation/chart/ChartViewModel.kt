@@ -67,15 +67,37 @@ class ChartViewModel(
     }
 
     /**
-     * Возвращает данные для графика транзакций по месяцам
-     * @return Карта месяцев и сумм транзакций
+     * Возвращает данные для графика транзакций по месяцам с разбивкой по категориям
+     * @return Карта месяцев и транзакций по категориям
      */
-    fun getTransactionsByMonth(): Map<String, Double> {
+    data class MonthlyTransactionData(
+        val totalIncome: Double,
+        val totalExpense: Double,
+        val categoryBreakdown: Map<String, Double>
+    )
+
+    fun getTransactionsByMonth(): Map<String, MonthlyTransactionData> {
         val dateFormat = SimpleDateFormat("MM.yyyy", Locale.getDefault())
+        
         return _transactions.value
             .groupBy { dateFormat.format(it.date) }
-            .mapValues { (_, transactions) -> 
-                transactions.sumOf { if (it.isExpense) -it.amount else it.amount }
+            .mapValues { (_, transactions) ->
+                val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
+                val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
+                
+                // Группируем расходы по категориям
+                val categoryBreakdown = transactions
+                    .filter { it.isExpense }
+                    .groupBy { it.category }
+                    .mapValues { (_, categoryTransactions) ->
+                        categoryTransactions.sumOf { it.amount }
+                    }
+                
+                MonthlyTransactionData(
+                    totalIncome = income,
+                    totalExpense = expense,
+                    categoryBreakdown = categoryBreakdown
+                )
             }
             .toSortedMap()
     }
@@ -83,17 +105,33 @@ class ChartViewModel(
     /**
      * Возвращает данные для графика расходов по дням
      * @param days Количество дней для отображения
-     * @return Карта дней и сумм расходов
+     * @return Карта дней и данных о расходах
      */
-    fun getExpensesByDay(days: Int = 7): Map<String, Double> {
+    fun getExpensesByDay(days: Int = 7): Map<String, MonthlyTransactionData> {
         val dateFormat = SimpleDateFormat("dd.MM", Locale.getDefault())
         val currentTime = System.currentTimeMillis()
         val daysInMillis = days * 24 * 60 * 60 * 1000L
         
         return _transactions.value
-            .filter { it.isExpense && (currentTime - it.date.time) <= daysInMillis }
+            .filter { (currentTime - it.date.time) <= daysInMillis }
             .groupBy { dateFormat.format(it.date) }
-            .mapValues { (_, transactions) -> transactions.sumOf { it.amount } }
+            .mapValues { (_, transactions) ->
+                val dailyExpenses = transactions.filter { it.isExpense }
+                val dailyIncome = transactions.filter { !it.isExpense }
+                
+                // Группируем расходы по категориям
+                val categoryBreakdown = dailyExpenses
+                    .groupBy { it.category }
+                    .mapValues { (_, categoryTransactions) ->
+                        categoryTransactions.sumOf { it.amount }
+                    }
+                
+                MonthlyTransactionData(
+                    totalIncome = dailyIncome.sumOf { it.amount },
+                    totalExpense = dailyExpenses.sumOf { it.amount },
+                    categoryBreakdown = categoryBreakdown
+                )
+            }
             .toSortedMap()
     }
 
