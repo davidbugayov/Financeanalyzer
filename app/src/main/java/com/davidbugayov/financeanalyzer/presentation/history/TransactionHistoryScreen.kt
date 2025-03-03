@@ -29,6 +29,11 @@ import java.time.LocalDate
 import java.time.ZoneId
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.analytics.ktx.analytics
+import com.google.firebase.analytics.ktx.logEvent
+import com.google.firebase.ktx.Firebase
+import android.os.Bundle
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,6 +41,7 @@ fun TransactionHistoryScreen(
     viewModel: ChartViewModel,
     onNavigateBack: () -> Unit
 ) {
+    val analytics = Firebase.analytics
     val transactions by viewModel.transactions.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
@@ -59,6 +65,22 @@ fun TransactionHistoryScreen(
     // Состояние для фильтрованных транзакций
     val filteredTransactions = remember(transactions, periodType, startDate, endDate) {
         filterTransactionsByPeriod(transactions, periodType, startDate, endDate)
+    }
+
+    // Добавляем логирование при изменении периода
+    LaunchedEffect(periodType) {
+        analytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
+            param(FirebaseAnalytics.Param.ITEM_NAME, "period_type")
+            param(FirebaseAnalytics.Param.ITEM_ID, periodType.name)
+        }
+    }
+
+    // Добавляем логирование при изменении группировки
+    LaunchedEffect(groupingType) {
+        analytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
+            param(FirebaseAnalytics.Param.ITEM_NAME, "grouping_type")
+            param(FirebaseAnalytics.Param.ITEM_ID, groupingType.name)
+        }
     }
 
     // Диалог выбора периода
