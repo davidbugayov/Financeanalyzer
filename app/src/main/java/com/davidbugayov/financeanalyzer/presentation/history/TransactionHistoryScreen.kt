@@ -625,7 +625,6 @@ private fun filterTransactionsByPeriod(
     endDate: Date? = null
 ): List<Transaction> {
     val calendar = Calendar.getInstance()
-    val currentDate = calendar.time
 
     return when (periodType) {
         PeriodType.ALL -> transactions
@@ -692,16 +691,13 @@ private fun groupTransactionsByWeek(transactions: List<Transaction>): Map<String
     for (transaction in sortedTransactions) {
         calendar.time = transaction.date
 
-        // Получаем номер недели и год
-        val weekOfYear = calendar.get(Calendar.WEEK_OF_YEAR)
-        val year = calendar.get(Calendar.YEAR)
-
         // Определяем первый и последний день недели
         calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
         val firstDay = SimpleDateFormat("dd.MM", Locale("ru")).format(calendar.time)
 
         calendar.add(Calendar.DAY_OF_WEEK, 6)
         val lastDay = SimpleDateFormat("dd.MM", Locale("ru")).format(calendar.time)
+        val year = calendar.get(Calendar.YEAR)
 
         // Формируем ключ для группировки
         val weekKey = "$firstDay - $lastDay $year"

@@ -17,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -40,15 +39,15 @@ import androidx.compose.ui.Alignment.Companion.CenterVertically
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    onNavigateToChart: () -> Unit,
-    onNavigateToAddTransaction: () -> Unit,
-    onNavigateToHistory: () -> Unit
+    onNavigateToHistory: () -> Unit,
+    onNavigateToAdd: () -> Unit
 ) {
-    val transactions by viewModel.transactions.collectAsState()
+    val balance by viewModel.balance.collectAsState()
+    val income by viewModel.income.collectAsState()
+    val expense by viewModel.expense.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val currentFilter by viewModel.currentFilter.collectAsState()
-    val layoutDirection = LocalLayoutDirection.current
     val context = LocalContext.current
     
     // Загружаем сохраненное состояние видимости GroupSummary
@@ -102,9 +101,9 @@ fun HomeScreen(
             ) {
                 // Карточка с балансом
                 BalanceCard(
-                    income = viewModel.getTotalIncome(),
-                    expense = viewModel.getTotalExpense(),
-                    balance = viewModel.getCurrentBalance()
+                    income = income,
+                    expense = expense,
+                    balance = balance
                 )
 
                 // Сообщение об ошибке
@@ -219,7 +218,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         FilledTonalIconButton(
-                            onClick = onNavigateToChart,
+                            onClick = { /* Implement chart navigation */ },
                             modifier = Modifier.size(48.dp)
                         ) {
                             Icon(
@@ -240,7 +239,7 @@ fun HomeScreen(
                         modifier = Modifier.weight(1f)
                     ) {
                         FilledIconButton(
-                            onClick = onNavigateToAddTransaction,
+                            onClick = onNavigateToAdd,
                             modifier = Modifier.size(56.dp)
                         ) {
                             Icon(

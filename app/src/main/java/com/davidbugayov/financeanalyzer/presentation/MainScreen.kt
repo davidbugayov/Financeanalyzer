@@ -23,12 +23,16 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryS
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun MainScreen(startDestination: String = "home") {
     val navController = rememberNavController()
     val layoutDirection = LocalLayoutDirection.current
+    val homeViewModel: HomeViewModel = koinViewModel()
+    val chartViewModel: ChartViewModel = koinViewModel()
+    val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
 
     FinanceAnalyzerTheme {
         Scaffold(
@@ -43,7 +47,7 @@ fun MainScreen(startDestination: String = "home") {
                 )
             ) {
                 composable(
-                    route = "home",
+                    route = Screen.Home.route,
                     enterTransition = {
                         fadeIn(
                             animationSpec = tween(300, easing = EaseInOut)
@@ -77,18 +81,15 @@ fun MainScreen(startDestination: String = "home") {
                         )
                     }
                 ) {
-                    val homeViewModel: HomeViewModel = koinViewModel()
-                    
                     HomeScreen(
                         viewModel = homeViewModel,
-                        onNavigateToChart = { navController.navigate("chart") },
-                        onNavigateToAddTransaction = { navController.navigate("add") },
-                        onNavigateToHistory = { navController.navigate("history") }
+                        onNavigateToHistory = { navController.navigate(Screen.History.route) },
+                        onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) }
                     )
                 }
                 
                 composable(
-                    route = "chart",
+                    route = Screen.History.route,
                     enterTransition = {
                         fadeIn(
                             animationSpec = tween(300, easing = EaseInOut)
@@ -106,16 +107,14 @@ fun MainScreen(startDestination: String = "home") {
                         )
                     }
                 ) {
-                    val chartViewModel: ChartViewModel = koinViewModel()
-                    
-                    FinanceChartScreen(
+                    TransactionHistoryScreen(
                         viewModel = chartViewModel,
                         onNavigateBack = { navController.popBackStack() }
                     )
                 }
                 
                 composable(
-                    route = "add",
+                    route = Screen.AddTransaction.route,
                     enterTransition = {
                         fadeIn(
                             animationSpec = tween(300, easing = EaseInOut)
@@ -133,21 +132,19 @@ fun MainScreen(startDestination: String = "home") {
                         )
                     }
                 ) {
-                    val addViewModel: AddTransactionViewModel = koinViewModel()
-                    
                     AddTransactionScreen(
-                        viewModel = addViewModel,
+                        viewModel = addTransactionViewModel,
                         onTransactionAdded = {
-                            navController.navigate("home") {
-                                popUpTo("home") {
+                            navController.navigate(Screen.Home.route) {
+                                popUpTo(Screen.Home.route) {
                                     inclusive = true
                                 }
                             }
                         },
                         onNavigateBack = { 
                             if (navController.previousBackStackEntry == null) {
-                                navController.navigate("home") {
-                                    popUpTo("add") {
+                                navController.navigate(Screen.Home.route) {
+                                    popUpTo(Screen.AddTransaction.route) {
                                         inclusive = true
                                     }
                                 }
@@ -159,7 +156,7 @@ fun MainScreen(startDestination: String = "home") {
                 }
                 
                 composable(
-                    route = "history",
+                    route = Screen.Chart.route,
                     enterTransition = {
                         fadeIn(
                             animationSpec = tween(300, easing = EaseInOut)
@@ -177,9 +174,7 @@ fun MainScreen(startDestination: String = "home") {
                         )
                     }
                 ) {
-                    val chartViewModel: ChartViewModel = koinViewModel()
-                    
-                    TransactionHistoryScreen(
+                    FinanceChartScreen(
                         viewModel = chartViewModel,
                         onNavigateBack = { navController.popBackStack() }
                     )

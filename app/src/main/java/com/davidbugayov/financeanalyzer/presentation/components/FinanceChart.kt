@@ -66,7 +66,7 @@ fun FinanceBarChart(
                 val chartHeight = size.height
                 
                 // Рисуем горизонтальные линии сетки
-                drawGridLines(chartHeight, maxValue)
+                drawGridLines(chartHeight)
                 
                 // Рисуем бары
                 financeData.labels.forEachIndexed { index, _ ->
@@ -138,24 +138,19 @@ private fun LegendItem(color: Color, text: String) {
     }
 }
 
-private fun DrawScope.drawGridLines(height: Float, maxValue: Float) {
+private fun DrawScope.drawGridLines(height: Float) {
     val gridLineCount = 5
     val gridLineSpacing = height / gridLineCount
     
     repeat(gridLineCount + 1) { i ->
         val y = i * gridLineSpacing
         
-        // Рисуем горизонтальную линию
         drawLine(
             color = Color.LightGray.copy(alpha = 0.5f),
             start = Offset(0f, y),
             end = Offset(size.width, y),
             strokeWidth = 1.dp.toPx()
         )
-        
-        // Подпись значения
-        val value = maxValue * (gridLineCount - i) / gridLineCount
-        // Подписи значений можно добавить отдельно через Text
     }
 }
 

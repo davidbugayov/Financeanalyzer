@@ -23,13 +23,28 @@ class HomeViewModel(
 ) : ViewModel() {
 
     private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
-    val transactions: StateFlow<List<Transaction>> get() = _transactions
+    val transactions = _transactions.asStateFlow()
 
     private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
+    val isLoading = _isLoading.asStateFlow()
 
     private val _error = MutableStateFlow<String?>(null)
-    val error: StateFlow<String?> get() = _error
+    val error = _error.asStateFlow()
+
+    private val _balance = MutableStateFlow(0.0)
+    val balance = _balance.asStateFlow()
+
+    private val _income = MutableStateFlow(0.0)
+    val income = _income.asStateFlow()
+
+    private val _expense = MutableStateFlow(0.0)
+    val expense = _expense.asStateFlow()
+
+    private val _dailyIncome = MutableStateFlow(0.0)
+    val dailyIncome = _dailyIncome.asStateFlow()
+
+    private val _dailyExpense = MutableStateFlow(0.0)
+    val dailyExpense = _dailyExpense.asStateFlow()
     
     // Текущий выбранный фильтр для главного экрана
     private val _currentFilter = MutableStateFlow(TransactionFilter.MONTH)
@@ -51,18 +66,16 @@ class HomeViewModel(
      */
     fun loadTransactions() {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+            
             try {
-                _isLoading.value = true
-                _error.value = null
                 val result = loadTransactionsUseCase()
                 _transactions.value = result
-                
-                // Если транзакций нет, генерируем тестовые данные
-                if (result.isEmpty()) {
-                    generateAndSaveTestData()
-                }
+                calculateTotalStats()
+                calculateDailyStats()
             } catch (e: Exception) {
-                _error.value = "Ошибка при загрузке транзакций: ${e.message}"
+                _error.value = e.message
             } finally {
                 _isLoading.value = false
             }
@@ -118,13 +131,6 @@ class HomeViewModel(
      * @return Список транзакций за сегодня
      */
     fun getTodayTransactions(): List<Transaction> {
-        val calendar = Calendar.getInstance()
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        val startOfDay = calendar.time
-        
         return _transactions.value
             .filter { 
                 val transactionDate = Calendar.getInstance().apply { time = it.date }
@@ -183,6 +189,28 @@ class HomeViewModel(
      */
     fun getCurrentBalance(): Double {
         return getTotalIncome() - getTotalExpense()
+    }
+
+    private fun calculateTotalStats() {
+        _income.value = _transactions.value
+            .filter { !it.isExpense }
+            .sumOf { it.amount }
+
+        _expense.value = _transactions.value
+            .filter { it.isExpense }
+            .sumOf { it.amount }
+
+        _balance.value = _income.value - _expense.value
+    }
+
+    private fun calculateDailyStats() {
+        viewModelScope.launch {
+            try {
+                calculateTotalStats()
+            } catch (e: Exception) {
+                _error.value = e.message
+            }
+        }
     }
 }
 
