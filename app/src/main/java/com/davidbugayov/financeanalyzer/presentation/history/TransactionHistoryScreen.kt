@@ -52,10 +52,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.AddCategoryDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.components.*
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.*
+import com.davidbugayov.financeanalyzer.util.formatNumber
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -327,23 +326,6 @@ fun PeriodRadioButton(
 }
 
 /**
- * Форматирует число в сокращенный вид (1.2K, 1.3M и т.д.)
- */
-private fun formatAbbreviatedNumber(number: Double): String {
-    return when {
-        kotlin.math.abs(number) >= 1_000_000 -> {
-            String.format("%.1fM", number / 1_000_000)
-        }
-        kotlin.math.abs(number) >= 1_000 -> {
-            String.format("%.1fK", number / 1_000)
-        }
-        else -> {
-            String.format("%.0f", number)
-        }
-    }
-}
-
-/**
  * Заголовок группы транзакций с суммой
  */
 @Composable
@@ -398,7 +380,7 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     Text(
                         text = stringResource(
                             R.string.income_label,
-                            stringResource(R.string.currency_format, formatAbbreviatedNumber(income))
+                            stringResource(R.string.currency_format, formatNumber(income, useDecimals = true))
                         ),
                         fontSize = 12.sp,
                         color = Color(0xFF4CAF50)
@@ -407,7 +389,7 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     Text(
                         text = stringResource(
                             R.string.expense_label,
-                            stringResource(R.string.currency_format, formatAbbreviatedNumber(expense))
+                            stringResource(R.string.currency_format, formatNumber(expense, useDecimals = true))
                         ),
                         fontSize = 12.sp,
                         color = Color(0xFFF44336)
@@ -416,7 +398,7 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     Text(
                         text = stringResource(
                             R.string.balance_label,
-                            stringResource(R.string.currency_format, formatAbbreviatedNumber(balance))
+                            stringResource(R.string.currency_format, formatNumber(balance, useDecimals = true))
                         ),
                         fontSize = 12.sp,
                         color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
@@ -527,7 +509,6 @@ fun TransactionHistoryItem(transaction: Transaction) {
  * Перечисление для типов группировки транзакций
  */
 enum class GroupingType {
-
     DAY, WEEK, MONTH
 }
 
@@ -535,6 +516,5 @@ enum class GroupingType {
  * Перечисление для типов периодов
  */
 enum class PeriodType {
-
     ALL, MONTH, QUARTER, HALF_YEAR, YEAR, CUSTOM
 }

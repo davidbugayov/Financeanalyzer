@@ -10,10 +10,15 @@ import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import kotlinx.coroutines.*
+import com.davidbugayov.financeanalyzer.util.formatNumberWithCurrency
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.math.abs
 
 /**
  * Виджет для отображения текущего баланса, доходов и расходов.
@@ -89,10 +94,10 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                 
                 // Обновляем UI виджета
                 withContext(Dispatchers.Main) {
-                    // Форматируем числа с двумя знаками после запятой
-                    val formattedBalance = formatCompactBalance(balance)
-                    val formattedIncome = formatCompactBalance(income)
-                    val formattedExpense = formatCompactBalance(expense)
+                    // Форматируем числа для компактного отображения
+                    val formattedBalance = formatNumberWithCurrency(balance)
+                    val formattedIncome = formatNumberWithCurrency(income)
+                    val formattedExpense = formatNumberWithCurrency(expense)
                     
                     // Обновляем виджет с новыми данными
                     views.setTextViewText(R.id.widget_balance, formattedBalance)
@@ -136,50 +141,6 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                 ComponentName(context, BalanceWidget::class.java)
             )
             onUpdate(context, appWidgetManager, appWidgetIds)
-        }
-    }
-    
-    companion object {
-        /**
-         * Обновляет все экземпляры виджета, но только если они добавлены на домашний экран
-         */
-        fun updateAllWidgets(context: Context) {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, BalanceWidget::class.java)
-            )
-            
-            // Обновляем виджеты только если они добавлены (есть хотя бы один экземпляр)
-            if (appWidgetIds.isNotEmpty()) {
-                // Отправляем широковещательное сообщение для обновления виджетов
-                val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-                    component = ComponentName(context, BalanceWidget::class.java)
-                }
-                context.sendBroadcast(intent)
-            }
-        }
-    }
-
-    /**
-     * Форматирует число для компактного отображения
-     */
-    private fun formatCompactBalance(value: Double): String {
-        val absValue = abs(value)
-        val prefix = if (value < 0) "-" else ""
-        
-        return when {
-            absValue >= 1_000_000 -> {
-                val millions = absValue / 1_000_000
-                "${prefix}${String.format("%.1f", millions)}М₽"
-            }
-            absValue >= 1_000 -> {
-                val thousands = absValue / 1_000
-                "${prefix}${String.format("%.1f", thousands)}К₽"
-            }
-            else -> {
-                "${prefix}${String.format("%.0f", absValue)}₽"
-            }
         }
     }
 } 

@@ -10,10 +10,15 @@ import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import kotlinx.coroutines.*
+import com.davidbugayov.financeanalyzer.util.formatNumberWithCurrency
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
-import kotlin.math.abs
 
 /**
  * Компактный виджет для отображения текущего баланса.
@@ -87,7 +92,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                 // Обновляем UI виджета
                 withContext(Dispatchers.Main) {
                     // Форматируем баланс для компактного отображения
-                    val formattedBalance = formatCompactBalance(balance)
+                    val formattedBalance = formatNumberWithCurrency(balance)
                     
                     // Устанавливаем значение в виджет
                     views.setTextViewText(R.id.small_widget_balance, formattedBalance)
@@ -115,28 +120,6 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
     }
     
     /**
-     * Форматирует баланс для компактного отображения
-     */
-    private fun formatCompactBalance(balance: Double): String {
-        val absBalance = abs(balance)
-        val prefix = if (balance < 0) "-" else ""
-        
-        return when {
-            absBalance >= 1_000_000 -> {
-                val millions = absBalance / 1_000_000
-                "${prefix}${String.format("%.1f", millions)}М₽"
-            }
-            absBalance >= 1_000 -> {
-                val thousands = absBalance / 1_000
-                "${prefix}${String.format("%.1f", thousands)}К₽"
-            }
-            else -> {
-                "${prefix}${absBalance.toInt()}₽"
-            }
-        }
-    }
-    
-    /**
      * Вызывается при получении широковещательного сообщения
      */
     override fun onReceive(context: Context, intent: Intent) {
@@ -149,28 +132,6 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                 ComponentName(context, SmallBalanceWidget::class.java)
             )
             onUpdate(context, appWidgetManager, appWidgetIds)
-        }
-    }
-    
-    companion object {
-        /**
-         * Обновляет все экземпляры виджета, но только если они добавлены на домашний экран
-         */
-        fun updateAllWidgets(context: Context) {
-            val appWidgetManager = AppWidgetManager.getInstance(context)
-            val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, SmallBalanceWidget::class.java)
-            )
-            
-            // Обновляем виджеты только если они добавлены (есть хотя бы один экземпляр)
-            if (appWidgetIds.isNotEmpty()) {
-                // Отправляем широковещательное сообщение для обновления виджетов
-                val intent = Intent(AppWidgetManager.ACTION_APPWIDGET_UPDATE).apply {
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, appWidgetIds)
-                    component = ComponentName(context, SmallBalanceWidget::class.java)
-                }
-                context.sendBroadcast(intent)
-            }
         }
     }
 } 

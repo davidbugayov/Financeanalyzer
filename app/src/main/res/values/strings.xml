@@ -14,6 +14,8 @@
     <string name="cancel">Отмена</string>
     <string name="back">Назад</string>
     <string name="show_summary">Показать сводку</string>
+    <string name="expand">Развернуть</string>
+    <string name="collapse">Свернуть</string>
     
     <!-- Главный экран -->
     <string name="app_title">Финансовый анализатор</string>
@@ -89,8 +91,6 @@
     <string name="add_category">Добавить категорию</string>
     <string name="add_category_title">Добавление категории</string>
     <string name="category_name">Название категории</string>
-    <string name="expand">Развернуть</string>
-    <string name="collapse">Свернуть</string>
     <string name="current_period">Текущий период</string>
     <string name="previous_period">Прошлый период</string>
     <string name="change_increase">На %d%% больше чем в прошлом периоде</string>
