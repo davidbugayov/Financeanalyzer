@@ -1,40 +1,82 @@
 package com.davidbugayov.financeanalyzer.presentation.add
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.Checkroom
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.HomeWork
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.foundation.clickable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.saveable.rememberSaveable
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 /**
  * Экран добавления новой транзакции.
@@ -296,36 +338,57 @@ fun AddTransactionScreen(
     
     // Диалог выбора категории
     if (showCategoryPicker) {
-        val categories = if (isExpense) viewModel.expenseCategories else viewModel.incomeCategories
+        val categories = if (isExpense) {
+            listOf(
+                CategoryItem("Продукты", Icons.Default.ShoppingCart),
+                CategoryItem("Транспорт", Icons.Default.DirectionsCar),
+                CategoryItem("Развлечения", Icons.Default.Movie),
+                CategoryItem("Рестораны", Icons.Default.Restaurant),
+                CategoryItem("Здоровье", Icons.Default.LocalHospital),
+                CategoryItem("Одежда", Icons.Default.Checkroom),
+                CategoryItem("Жилье", Icons.Default.Home),
+                CategoryItem("Связь", Icons.Default.Phone),
+                CategoryItem("Образование", Icons.Default.School),
+                CategoryItem("Прочее", Icons.Default.MoreHoriz),
+                CategoryItem("Другое", Icons.Default.Add)
+            )
+        } else {
+            listOf(
+                CategoryItem("Зарплата", Icons.Default.Payments),
+                CategoryItem("Фриланс", Icons.Default.Computer),
+                CategoryItem("Подарки", Icons.Default.CardGiftcard),
+                CategoryItem("Проценты", Icons.Default.TrendingUp),
+                CategoryItem("Аренда", Icons.Default.HomeWork),
+                CategoryItem("Прочее", Icons.Default.MoreHoriz),
+                CategoryItem("Другое", Icons.Default.Add)
+            )
+        }
+
+        var showCustomCategoryDialog by remember { mutableStateOf(false) }
+        var customCategory by remember { mutableStateOf("") }
         
         AlertDialog(
             onDismissRequest = { showCategoryPicker = false },
             title = { Text(stringResource(R.string.select_category_title)) },
             text = {
-                Column {
-                    categories.forEach { cat ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable {
-                                    category = cat
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(3),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    items(categories) { categoryItem ->
+                        CategoryCard(
+                            categoryItem = categoryItem,
+                            isSelected = category == categoryItem.name,
+                            onClick = {
+                                if (categoryItem.name == "Другое") {
+                                    showCustomCategoryDialog = true
+                                } else {
+                                    category = categoryItem.name
                                     showCategoryPicker = false
                                 }
-                                .padding(vertical = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            RadioButton(
-                                selected = category == cat,
-                                onClick = {
-                                    category = cat
-                                    showCategoryPicker = false
-                                }
-                            )
-                            Text(
-                                text = cat,
-                                modifier = Modifier.padding(start = 8.dp)
-                            )
-                        }
+                            }
+                        )
                     }
                 }
             },
@@ -335,5 +398,86 @@ fun AddTransactionScreen(
                 }
             }
         )
+
+        // Диалог для ввода пользовательской категории
+        if (showCustomCategoryDialog) {
+            AlertDialog(
+                onDismissRequest = { showCustomCategoryDialog = false },
+                title = { Text("Добавить категорию") },
+                text = {
+                    OutlinedTextField(
+                        value = customCategory,
+                        onValueChange = { customCategory = it },
+                        label = { Text("Название категории") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                },
+                confirmButton = {
+                    TextButton(
+                        onClick = {
+                            if (customCategory.isNotBlank()) {
+                                category = customCategory
+                                showCustomCategoryDialog = false
+                                showCategoryPicker = false
+                            }
+                        },
+                        enabled = customCategory.isNotBlank()
+                    ) {
+                        Text("Добавить")
+                    }
+                },
+                dismissButton = {
+                    TextButton(onClick = { showCustomCategoryDialog = false }) {
+                        Text("Отмена")
+                    }
+                }
+            )
+        }
+    }
+}
+
+data class CategoryItem(
+    val name: String,
+    val icon: ImageVector
+)
+
+@Composable
+fun CategoryCard(
+    categoryItem: CategoryItem,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
+    Surface(
+        modifier = Modifier
+            .aspectRatio(1f)
+            .clickable(onClick = onClick),
+        shape = MaterialTheme.shapes.medium,
+        color = if (isSelected) MaterialTheme.colorScheme.primaryContainer else MaterialTheme.colorScheme.surface,
+        border = BorderStroke(
+            width = 1.dp,
+            color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline.copy(alpha = 0.12f)
+        )
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(4.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Icon(
+                imageVector = categoryItem.icon,
+                contentDescription = categoryItem.name,
+                tint = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(24.dp)
+            )
+            Text(
+                text = categoryItem.name,
+                style = MaterialTheme.typography.bodySmall,
+                textAlign = TextAlign.Center,
+                color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
     }
 }
