@@ -1,39 +1,82 @@
 package com.davidbugayov.financeanalyzer.presentation.history
 
-import androidx.compose.foundation.layout.*
+import android.os.Bundle
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.clickable
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.LocalContentColor
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
-import java.text.SimpleDateFormat
-import java.util.*
-import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.text.style.TextAlign
-import java.time.LocalDate
-import java.time.ZoneId
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
-import android.os.Bundle
+import java.text.SimpleDateFormat
+import java.util.Calendar
+import java.util.Date
+import java.util.Locale
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -65,6 +108,8 @@ fun TransactionHistoryScreen(
     // Состояние для фильтрации по категориям
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     var showCategoryDialog by remember { mutableStateOf(false) }
+    var showAddCategoryDialog by remember { mutableStateOf(false) }
+    var newCategoryText by remember { mutableStateOf("") }
 
     // Получаем список всех категорий
     val categories = remember(transactions) {
@@ -265,15 +310,73 @@ fun TransactionHistoryScreen(
         )
     }
 
+    // Диалог добавления новой категории
+    if (showAddCategoryDialog) {
+        AlertDialog(
+            onDismissRequest = {
+                showAddCategoryDialog = false
+                newCategoryText = ""
+            },
+            title = { Text("Добавить категорию") },
+            text = {
+                OutlinedTextField(
+                    value = newCategoryText,
+                    onValueChange = { newCategoryText = it },
+                    label = { Text("Название категории") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        if (newCategoryText.isNotBlank()) {
+                            selectedCategory = newCategoryText
+                            showAddCategoryDialog = false
+                            showCategoryDialog = false
+                            newCategoryText = ""
+                        }
+                    },
+                    enabled = newCategoryText.isNotBlank()
+                ) {
+                    Text("Добавить")
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = {
+                        showAddCategoryDialog = false
+                        newCategoryText = ""
+                    }
+                ) {
+                    Text("Отмена")
+                }
+            }
+        )
+    }
+
     // Диалог выбора категории
     if (showCategoryDialog) {
         AlertDialog(
             onDismissRequest = { showCategoryDialog = false },
             title = { Text(stringResource(R.string.select_category)) },
             text = {
-                Column {
+                Column(
+                    modifier = Modifier.verticalScroll(rememberScrollState())
+                ) {
+                    // Кнопка добавления новой категории
+                    Button(
+                        onClick = { showAddCategoryDialog = true },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 8.dp)
+                            .height(56.dp)
+                    ) {
+                        Text("Добавить категорию")
+                    }
+
                     // Опция "Все категории"
-                    PeriodRadioButton(
+                    CategoryButton(
                         text = stringResource(R.string.all),
                         selected = selectedCategory == null,
                         onClick = {
@@ -281,9 +384,10 @@ fun TransactionHistoryScreen(
                             showCategoryDialog = false
                         }
                     )
+
                     // Список категорий
                     categories.forEach { category ->
-                        PeriodRadioButton(
+                        CategoryButton(
                             text = category,
                             selected = category == selectedCategory,
                             onClick = {
@@ -591,11 +695,15 @@ fun TransactionHistoryScreen(
                                     period = period,
                                     transactions = transactionsInPeriod
                                 )
+                                Spacer(modifier = Modifier.height(4.dp))
                             }
 
                             items(transactionsInPeriod) { transaction ->
                                 TransactionHistoryItem(transaction = transaction)
-                                HorizontalDivider()
+                            }
+
+                            item {
+                                Spacer(modifier = Modifier.height(8.dp))
                             }
                         }
                     }
@@ -644,58 +752,103 @@ fun PeriodRadioButton(
 }
 
 /**
+ * Форматирует число в сокращенный вид (1.2K, 1.3M и т.д.)
+ */
+private fun formatAbbreviatedNumber(number: Double): String {
+    return when {
+        kotlin.math.abs(number) >= 1_000_000 -> {
+            String.format("%.1fM", number / 1_000_000)
+        }
+        kotlin.math.abs(number) >= 1_000 -> {
+            String.format("%.1fK", number / 1_000)
+        }
+        else -> {
+            String.format("%.0f", number)
+        }
+    }
+}
+
+/**
  * Заголовок группы транзакций с суммой
  */
 @Composable
 fun GroupHeader(period: String, transactions: List<Transaction>) {
+    var isExpanded by remember { mutableStateOf(true) }
     val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
     val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
     val balance = income - expense
 
-    Column(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp)
+            .padding(vertical = 4.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .shadow(elevation = 1.dp)
+            .clickable { isExpanded = !isExpanded },
+        color = MaterialTheme.colorScheme.surfaceVariant
     ) {
-        Text(
-            text = period,
-            fontSize = 18.sp,
-            fontWeight = FontWeight.Bold
-        )
-
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(16.dp)
         ) {
-            Text(
-                text = stringResource(
-                    R.string.income_label,
-                    stringResource(R.string.currency_format, String.format("%.2f", income))
-                ),
-                fontSize = 12.sp,
-                color = Color(0xFF4CAF50)
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = period,
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Icon(
+                    imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    contentDescription = if (isExpanded) "Свернуть" else "Развернуть",
+                    tint = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
 
-            Text(
-                text = stringResource(
-                    R.string.expense_label,
-                    stringResource(R.string.currency_format, String.format("%.2f", expense))
-                ),
-                fontSize = 12.sp,
-                color = Color(0xFFF44336)
-            )
+            AnimatedVisibility(
+                visible = isExpanded,
+                enter = expandVertically() + fadeIn(),
+                exit = shrinkVertically() + fadeOut()
+            ) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 8.dp),
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(
+                            R.string.income_label,
+                            stringResource(R.string.currency_format, formatAbbreviatedNumber(income))
+                        ),
+                        fontSize = 12.sp,
+                        color = Color(0xFF4CAF50)
+                    )
 
-            Text(
-                text = stringResource(
-                    R.string.balance_label,
-                    stringResource(R.string.currency_format, String.format("%.2f", balance))
-                ),
-                fontSize = 12.sp,
-                color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
-                fontWeight = FontWeight.Bold
-            )
+                    Text(
+                        text = stringResource(
+                            R.string.expense_label,
+                            stringResource(R.string.currency_format, formatAbbreviatedNumber(expense))
+                        ),
+                        fontSize = 12.sp,
+                        color = Color(0xFFF44336)
+                    )
+
+                    Text(
+                        text = stringResource(
+                            R.string.balance_label,
+                            stringResource(R.string.currency_format, formatAbbreviatedNumber(balance))
+                        ),
+                        fontSize = 12.sp,
+                        color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+            }
         }
     }
 }
@@ -741,49 +894,57 @@ fun GroupingChips(
 fun TransactionHistoryItem(transaction: Transaction) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
-    Row(
+    Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 12.dp),
-        horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+            .padding(horizontal = 16.dp, vertical = 4.dp),
+        color = MaterialTheme.colorScheme.surface,
+        shape = MaterialTheme.shapes.small
     ) {
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = transaction.title,
-                fontWeight = FontWeight.Medium
-            )
-            Text(
-                text = stringResource(
-                    R.string.category_date_format,
-                    transaction.category,
-                    dateFormat.format(transaction.date)
-                ),
-                fontSize = 12.sp,
-                color = Color.Gray
-            )
-            transaction.note?.let {
-                if (it.isNotEmpty()) {
-                    Text(
-                        text = it,
-                        fontSize = 12.sp,
-                        color = Color.Gray,
-                        modifier = Modifier.padding(top = 4.dp)
-                    )
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
+                Text(
+                    text = transaction.title,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = stringResource(
+                        R.string.category_date_format,
+                        transaction.category,
+                        dateFormat.format(transaction.date)
+                    ),
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                transaction.note?.let {
+                    if (it.isNotEmpty()) {
+                        Text(
+                            text = it,
+                            fontSize = 12.sp,
+                            color = Color.Gray,
+                            modifier = Modifier.padding(top = 4.dp)
+                        )
+                    }
                 }
             }
-        }
 
-        Text(
-            text = if (transaction.isExpense)
-                stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
-            else
-                stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
-            color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
-            fontWeight = FontWeight.Bold
-        )
+            Text(
+                text = if (transaction.isExpense)
+                    stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
+                else
+                    stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
+                color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
+                fontWeight = FontWeight.Bold
+            )
+        }
     }
 }
 
@@ -906,4 +1067,37 @@ private fun groupTransactionsByMonth(transactions: List<Transaction>): Map<Strin
     return transactions
         .sortedByDescending { it.date }
         .groupBy { format.format(it.date).replaceFirstChar { it.uppercase() } }
+}
+
+/**
+ * Кнопка выбора категории
+ */
+@Composable
+private fun CategoryButton(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Button(
+        onClick = onClick,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .height(56.dp),
+        colors = ButtonDefaults.buttonColors(
+            containerColor = if (selected)
+                MaterialTheme.colorScheme.primary
+            else
+                MaterialTheme.colorScheme.surfaceVariant,
+            contentColor = if (selected)
+                MaterialTheme.colorScheme.onPrimary
+            else
+                MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    ) {
+        Text(
+            text = text,
+            style = MaterialTheme.typography.bodyLarge
+        )
+    }
 }
