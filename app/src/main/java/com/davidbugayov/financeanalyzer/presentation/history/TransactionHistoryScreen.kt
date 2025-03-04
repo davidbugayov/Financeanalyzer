@@ -62,6 +62,15 @@ fun TransactionHistoryScreen(
     var periodType by remember { mutableStateOf(PeriodType.MONTH) }
     var showPeriodDialog by remember { mutableStateOf(false) }
 
+    // Состояние для фильтрации по категориям
+    var selectedCategory by remember { mutableStateOf<String?>(null) }
+    var showCategoryDialog by remember { mutableStateOf(false) }
+
+    // Получаем список всех категорий
+    val categories = remember(transactions) {
+        transactions.map { it.category }.distinct().sorted()
+    }
+
     // Состояние для выбора дат
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
@@ -71,8 +80,40 @@ fun TransactionHistoryScreen(
     var endDate by remember { mutableStateOf(Date()) }
 
     // Состояние для фильтрованных транзакций
-    val filteredTransactions = remember(transactions, periodType, startDate, endDate) {
+    val filteredTransactions = remember(transactions, periodType, startDate, endDate, selectedCategory) {
         filterTransactionsByPeriod(transactions, periodType, startDate, endDate)
+            .filter { transaction -> 
+                selectedCategory == null || transaction.category == selectedCategory
+            }
+    }
+
+    // Вычисляем статистику для выбранной категории
+    val categoryStats = remember(filteredTransactions, selectedCategory) {
+        if (selectedCategory != null) {
+            val currentPeriodTransactions = filteredTransactions.filter { it.category == selectedCategory }
+            val currentPeriodTotal = currentPeriodTransactions.sumOf { it.amount }
+            
+            // Вычисляем даты для предыдущего периода
+            val periodDuration = endDate.time - startDate.time
+            val previousStartDate = Date(startDate.time - periodDuration)
+            val previousEndDate = Date(endDate.time - periodDuration)
+            
+            // Получаем транзакции за предыдущий период
+            val previousPeriodTransactions = filterTransactionsByPeriod(
+                transactions.filter { it.category == selectedCategory },
+                PeriodType.CUSTOM,
+                previousStartDate,
+                previousEndDate
+            )
+            val previousPeriodTotal = previousPeriodTransactions.sumOf { it.amount }
+            
+            // Вычисляем разницу в процентах
+            val percentChange = if (previousPeriodTotal != 0.0) {
+                ((currentPeriodTotal - previousPeriodTotal) / kotlin.math.abs(previousPeriodTotal) * 100).toInt()
+            } else null
+            
+            Triple(currentPeriodTotal, previousPeriodTotal, percentChange)
+        } else null
     }
 
     // Добавляем логирование при изменении периода
@@ -224,6 +265,51 @@ fun TransactionHistoryScreen(
         )
     }
 
+    // Диалог выбора категории
+    if (showCategoryDialog) {
+        AlertDialog(
+            onDismissRequest = { showCategoryDialog = false },
+            title = { Text(stringResource(R.string.select_category)) },
+            text = {
+                Column {
+                    // Опция "Все категории"
+                    PeriodRadioButton(
+                        text = stringResource(R.string.all),
+                        selected = selectedCategory == null,
+                        onClick = {
+                            selectedCategory = null
+                            showCategoryDialog = false
+                        }
+                    )
+                    // Список категорий
+                    categories.forEach { category ->
+                        PeriodRadioButton(
+                            text = category,
+                            selected = category == selectedCategory,
+                            onClick = {
+                                selectedCategory = category
+                                showCategoryDialog = false
+                            }
+                        )
+                    }
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = { showCategoryDialog = false }) {
+                    Text(stringResource(R.string.ok))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { 
+                    selectedCategory = null
+                    showCategoryDialog = false 
+                }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     // Диалог выбора начальной даты
     if (showStartDatePicker) {
         val datePickerState = rememberDatePickerState(
@@ -299,21 +385,13 @@ fun TransactionHistoryScreen(
                             fontSize = 18.sp,
                             fontWeight = FontWeight.Medium,
                             modifier = Modifier.fillMaxWidth(),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                            textAlign = TextAlign.Center
                         )
                     }
                 },
                 navigationIcon = {
                     IconButton(
-                        onClick = {
-                            // Логируем возврат на предыдущий экран
-                            val bundle = Bundle().apply {
-                                putString(FirebaseAnalytics.Param.CONTENT_TYPE, "navigation")
-                                putString(FirebaseAnalytics.Param.ITEM_NAME, "back_from_history")
-                            }
-                            Firebase.analytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM, bundle)
-                            onNavigateBack()
-                        },
+                        onClick = onNavigateBack,
                         modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
@@ -323,9 +401,20 @@ fun TransactionHistoryScreen(
                     }
                 },
                 actions = {
-                    // Кнопка выбора периода
+                    // Кнопка фильтра по категориям
+                    IconButton(onClick = { showCategoryDialog = true }) {
+                        Icon(
+                            imageVector = Icons.Default.FilterAlt,
+                            contentDescription = stringResource(R.string.select_category),
+                            tint = if (selectedCategory != null) MaterialTheme.colorScheme.primary else LocalContentColor.current
+                        )
+                    }
+                    // Кнопка фильтра по периоду
                     IconButton(onClick = { showPeriodDialog = true }) {
-                        Icon(Icons.Default.FilterAlt, contentDescription = stringResource(R.string.select_period))
+                        Icon(
+                            imageVector = Icons.Default.DateRange,
+                            contentDescription = stringResource(R.string.select_period)
+                        )
                     }
                 },
                 modifier = Modifier.height(56.dp)
@@ -382,6 +471,76 @@ fun TransactionHistoryScreen(
                             fontSize = 14.sp,
                             color = Color.Gray
                         )
+                    }
+                }
+
+                // Показываем статистику по категории, если она выбрана
+                val category = selectedCategory // сохраняем значение в локальную переменную
+                if (category != null && categoryStats != null) {
+                    val (currentTotal, previousTotal, percentChange) = categoryStats
+                    Surface(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colorScheme.surfaceVariant,
+                        shape = MaterialTheme.shapes.medium
+                    ) {
+                        Column(
+                            modifier = Modifier.padding(16.dp)
+                        ) {
+                            Text(
+                                text = category,
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = "Текущий период",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        text = String.format("%.2f ₽", currentTotal),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                }
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = "Прошлый период",
+                                        style = MaterialTheme.typography.bodyMedium
+                                    )
+                                    Text(
+                                        text = String.format("%.2f ₽", previousTotal),
+                                        style = MaterialTheme.typography.titleMedium,
+                                        color = MaterialTheme.colorScheme.secondary
+                                    )
+                                }
+                            }
+                            if (percentChange != null) {
+                                Spacer(modifier = Modifier.height(8.dp))
+                                val currentPercentChange = percentChange // сохраняем в локальную переменную
+                                val changeText = when {
+                                    currentPercentChange.compareTo(0) > 0 -> "На $currentPercentChange% больше чем в прошлом периоде"
+                                    currentPercentChange.compareTo(0) < 0 -> "На ${kotlin.math.abs(currentPercentChange)}% меньше чем в прошлом периоде"
+                                    else -> "Без изменений по сравнению с прошлым периодом"
+                                }
+                                val changeColor = when {
+                                    currentPercentChange.compareTo(0) > 0 -> Color(0xFFE57373) // Красный для увеличения расходов
+                                    currentPercentChange.compareTo(0) < 0 -> Color(0xFF81C784) // Зеленый для уменьшения расходов
+                                    else -> MaterialTheme.colorScheme.onSurfaceVariant
+                                }
+                                Text(
+                                    text = changeText,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    color = changeColor
+                                )
+                            }
+                        }
                     }
                 }
 

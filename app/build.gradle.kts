@@ -19,14 +19,14 @@ fun getKeystoreProperties(): Properties {
 
 android {
     namespace = "com.davidbugayov.financeanalyzer"
-    compileSdk = 35
+    compileSdk = 34
 
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -152,18 +152,6 @@ android {
         }
         dex {
             useLegacyPackaging = false
-        }
-    }
-
-    bundle {
-        language {
-            enableSplit = true
-        }
-        density {
-            enableSplit = true
-        }
-        abi {
-            enableSplit = true
         }
     }
 }
