@@ -55,6 +55,8 @@ fun AddTransactionScreen(
     // Если транзакция успешно добавлена, возвращаемся назад
     LaunchedEffect(isSuccess) {
         if (isSuccess) {
+            // Сбрасываем состояние успеха
+            viewModel.resetSuccess()
             onTransactionAdded()
         }
     }
@@ -81,19 +83,27 @@ fun AddTransactionScreen(
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(),
-                        contentAlignment = Alignment.Center
+                            .height(56.dp),
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
                             text = stringResource(R.string.add_transaction),
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
                     }
                 },
                 modifier = Modifier.height(56.dp)

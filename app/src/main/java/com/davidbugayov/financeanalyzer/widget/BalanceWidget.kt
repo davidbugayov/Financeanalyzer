@@ -10,9 +10,7 @@ import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.math.abs
@@ -79,7 +77,8 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         }
 
         // Загружаем данные о транзакциях в фоновом потоке
-        CoroutineScope(Dispatchers.IO).launch {
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        scope.launch {
             try {
                 val transactions = loadTransactionsUseCase()
                 
@@ -88,8 +87,8 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                 val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
                 val balance = income - expense
                 
-                // Обновляем UI виджета в главном потоке
-                CoroutineScope(Dispatchers.Main).launch {
+                // Обновляем UI виджета
+                withContext(Dispatchers.Main) {
                     // Форматируем числа с двумя знаками после запятой
                     val formattedBalance = formatCompactBalance(balance)
                     val formattedIncome = formatCompactBalance(income)
@@ -101,21 +100,25 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                     views.setTextViewText(R.id.widget_expense, formattedExpense)
                     
                     // Устанавливаем цвет баланса в зависимости от его значения
-                    if (balance >= 0) {
-                        views.setTextColor(R.id.widget_balance, 0xFF4CAF50.toInt())
+                    val balanceColor = if (balance >= 0) {
+                        0xFF4CAF50.toInt() // Green
                     } else {
-                        views.setTextColor(R.id.widget_balance, 0xFFF44336.toInt())
+                        0xFFF44336.toInt() // Red
                     }
+                    views.setTextColor(R.id.widget_balance, balanceColor)
                     
                     // Применяем изменения к виджету
                     appWidgetManager.updateAppWidget(appWidgetId, views)
                 }
             } catch (e: Exception) {
-                // В случае ошибки показываем сообщение об ошибке
-                CoroutineScope(Dispatchers.Main).launch {
-                    views.setTextViewText(R.id.widget_balance, "Ошибка загрузки")
+                withContext(Dispatchers.Main) {
+                    views.setTextViewText(R.id.widget_balance, "?")
+                    views.setTextViewText(R.id.widget_income, "?")
+                    views.setTextViewText(R.id.widget_expense, "?")
                     appWidgetManager.updateAppWidget(appWidgetId, views)
                 }
+            } finally {
+                coroutineContext.cancel()
             }
         }
     }

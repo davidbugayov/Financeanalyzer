@@ -7,6 +7,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.Event
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -44,6 +46,13 @@ class AddTransactionViewModel(
     val isSuccess: StateFlow<Boolean> get() = _isSuccess
 
     /**
+     * Сбрасывает состояние успешного добавления транзакции
+     */
+    fun resetSuccess() {
+        _isSuccess.value = false
+    }
+
+    /**
      * Добавляет новую транзакцию
      */
     fun addTransaction(transaction: Transaction) {
@@ -52,10 +61,15 @@ class AddTransactionViewModel(
                 _isLoading.value = true
                 _error.value = null
                 addTransactionUseCase(transaction)
-                _isSuccess.value = true
+                
+                // Отправляем событие о добавлении транзакции
+                EventBus.emit(Event.TransactionAdded)
                 
                 // Обновляем виджет баланса
                 updateBalanceWidget()
+                
+                // Устанавливаем флаг успеха после всех операций
+                _isSuccess.value = true
             } catch (e: Exception) {
                 _error.value = "Ошибка при добавлении транзакции: ${e.message}"
             } finally {
@@ -68,31 +82,16 @@ class AddTransactionViewModel(
      * Обновляет виджет баланса после изменения данных, но только если виджеты добавлены на домашний экран
      */
     private fun updateBalanceWidget() {
-        viewModelScope.launch {
-            try {
-                val context = getApplication<Application>().applicationContext
-                val appWidgetManager = AppWidgetManager.getInstance(context)
-                
-                // Проверяем наличие основного виджета баланса
-                val balanceWidgetIds = appWidgetManager.getAppWidgetIds(
-                    ComponentName(context, com.davidbugayov.financeanalyzer.widget.BalanceWidget::class.java)
-                )
-                // Обновляем основной виджет только если он добавлен (есть хотя бы один экземпляр)
-                if (balanceWidgetIds.isNotEmpty()) {
-                    com.davidbugayov.financeanalyzer.widget.BalanceWidget.updateAllWidgets(context)
-                }
-                
-                // Проверяем наличие маленького виджета баланса
-                val smallBalanceWidgetIds = appWidgetManager.getAppWidgetIds(
-                    ComponentName(context, com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget::class.java)
-                )
-                // Обновляем маленький виджет только если он добавлен (есть хотя бы один экземпляр)
-                if (smallBalanceWidgetIds.isNotEmpty()) {
-                    com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget.updateAllWidgets(context)
-                }
-            } catch (e: Exception) {
-                // Игнорируем ошибки при обновлении виджета
-            }
+        val context = getApplication<Application>().applicationContext
+        val widgetManager = AppWidgetManager.getInstance(context)
+        val widgetComponent = ComponentName(context, "com.davidbugayov.financeanalyzer.widget.BalanceWidget")
+        val widgetIds = widgetManager.getAppWidgetIds(widgetComponent)
+        
+        if (widgetIds.isNotEmpty()) {
+            val intent = Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.BalanceWidget"))
+            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
+            context.sendBroadcast(intent)
         }
     }
 

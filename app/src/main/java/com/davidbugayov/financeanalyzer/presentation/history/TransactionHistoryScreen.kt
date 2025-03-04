@@ -29,11 +29,11 @@ import java.time.LocalDate
 import java.time.ZoneId
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.analytics.ktx.logEvent
 import com.google.firebase.ktx.Firebase
 import android.os.Bundle
-import com.google.firebase.analytics.FirebaseAnalytics
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -48,10 +48,11 @@ fun TransactionHistoryScreen(
     
     // Логируем открытие экрана истории
     LaunchedEffect(Unit) {
-        Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW) {
-            param(FirebaseAnalytics.Param.SCREEN_NAME, "transaction_history")
-            param(FirebaseAnalytics.Param.SCREEN_CLASS, "TransactionHistoryScreen")
+        val bundle = Bundle().apply {
+            putString(FirebaseAnalytics.Param.SCREEN_NAME, "transaction_history")
+            putString(FirebaseAnalytics.Param.SCREEN_CLASS, "TransactionHistoryScreen")
         }
+        Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
     }
 
     // Состояние для выбранного типа группировки
@@ -76,18 +77,20 @@ fun TransactionHistoryScreen(
 
     // Добавляем логирование при изменении периода
     LaunchedEffect(periodType) {
-        Firebase.analytics.logEvent("user_action") {
-            param(FirebaseAnalytics.Param.CONTENT_TYPE, "period_type_selected")
-            param(FirebaseAnalytics.Param.ITEM_NAME, periodType.name)
+        val params = Bundle().apply {
+            putString(FirebaseAnalytics.Param.CONTENT_TYPE, "period_type")
+            putString(FirebaseAnalytics.Param.ITEM_NAME, periodType.name)
         }
+        Firebase.analytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params)
     }
 
     // Добавляем логирование при изменении группировки
     LaunchedEffect(groupingType) {
-        Firebase.analytics.logEvent("user_action") {
-            param(FirebaseAnalytics.Param.CONTENT_TYPE, "grouping_type_selected")
-            param(FirebaseAnalytics.Param.ITEM_NAME, groupingType.name)
+        val params = Bundle().apply {
+            putString(FirebaseAnalytics.Param.CONTENT_TYPE, "grouping_type")
+            putString(FirebaseAnalytics.Param.ITEM_NAME, groupingType.name)
         }
+        Firebase.analytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, params)
     }
 
     // Диалог выбора периода
@@ -284,17 +287,19 @@ fun TransactionHistoryScreen(
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
+                title = { 
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .fillMaxHeight(),
-                        contentAlignment = Alignment.Center
+                            .height(56.dp),
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
                             text = stringResource(R.string.history_title),
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
                 },
@@ -302,12 +307,14 @@ fun TransactionHistoryScreen(
                     IconButton(
                         onClick = {
                             // Логируем возврат на предыдущий экран
-                            Firebase.analytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM) {
-                                param(FirebaseAnalytics.Param.CONTENT_TYPE, "navigation")
-                                param(FirebaseAnalytics.Param.ITEM_NAME, "back_from_history")
+                            val bundle = Bundle().apply {
+                                putString(FirebaseAnalytics.Param.CONTENT_TYPE, "navigation")
+                                putString(FirebaseAnalytics.Param.ITEM_NAME, "back_from_history")
                             }
+                            Firebase.analytics.logEvent(FirebaseAnalytics.Event.SELECT_ITEM, bundle)
                             onNavigateBack()
-                        }
+                        },
+                        modifier = Modifier.size(48.dp)
                     ) {
                         Icon(
                             Icons.AutoMirrored.Filled.ArrowBack,
@@ -462,7 +469,8 @@ fun PeriodRadioButton(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp)
-            .height(48.dp),
+            .height(48.dp)
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(

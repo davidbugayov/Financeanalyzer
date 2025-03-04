@@ -6,10 +6,13 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
+import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.Event
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 
@@ -51,7 +54,34 @@ class HomeViewModel(
     val currentFilter: StateFlow<TransactionFilter> get() = _currentFilter
 
     init {
+        Timber.d("HomeViewModel initialized")
         loadTransactions()
+        subscribeToEvents()
+    }
+    
+    /**
+     * Подписываемся на события изменения транзакций
+     */
+    private fun subscribeToEvents() {
+        viewModelScope.launch {
+            Timber.d("Subscribing to transaction events")
+            EventBus.events.collect { event ->
+                when (event) {
+                    is Event.TransactionAdded -> {
+                        Timber.d("Transaction added event received")
+                        loadTransactions()
+                    }
+                    is Event.TransactionDeleted -> {
+                        Timber.d("Transaction deleted event received")
+                        loadTransactions()
+                    }
+                    is Event.TransactionUpdated -> {
+                        Timber.d("Transaction updated event received")
+                        loadTransactions()
+                    }
+                }
+            }
+        }
     }
     
     /**
@@ -66,15 +96,18 @@ class HomeViewModel(
      */
     fun loadTransactions() {
         viewModelScope.launch {
+            Timber.d("Loading transactions")
             _isLoading.value = true
             _error.value = null
             
             try {
                 val result = loadTransactionsUseCase()
                 _transactions.value = result
+                Timber.d("Loaded ${result.size} transactions")
                 calculateTotalStats()
                 calculateDailyStats()
             } catch (e: Exception) {
+                Timber.e(e, "Error loading transactions")
                 _error.value = e.message
             } finally {
                 _isLoading.value = false
@@ -88,16 +121,18 @@ class HomeViewModel(
     fun generateAndSaveTestData() {
         viewModelScope.launch {
             try {
+                Timber.d("Generating test data")
                 val testTransactions = TestDataGenerator.generateTransactions(20)
                 
-                // Сохраняем каждую транзакцию
                 testTransactions.forEach { transaction ->
+                    Timber.d("Saving test transaction: ${transaction.title}")
                     addTransactionUseCase(transaction)
                 }
                 
-                // Загружаем сохраненные транзакции
-                loadTransactions()
+                EventBus.emit(Event.TransactionAdded)
+                Timber.d("Test data generation completed")
             } catch (e: Exception) {
+                Timber.e(e, "Error generating test data")
                 _error.value = "Ошибка при генерации тестовых данных: ${e.message}"
             }
         }
@@ -192,6 +227,7 @@ class HomeViewModel(
     }
 
     private fun calculateTotalStats() {
+        Timber.d("Calculating total stats")
         _income.value = _transactions.value
             .filter { !it.isExpense }
             .sumOf { it.amount }
@@ -201,16 +237,27 @@ class HomeViewModel(
             .sumOf { it.amount }
 
         _balance.value = _income.value - _expense.value
+        Timber.d("Total stats calculated: Income=${_income.value}, Expense=${_expense.value}, Balance=${_balance.value}")
     }
 
     private fun calculateDailyStats() {
-        viewModelScope.launch {
-            try {
-                calculateTotalStats()
-            } catch (e: Exception) {
-                _error.value = e.message
-            }
+        Timber.d("Calculating daily stats")
+        val today = Calendar.getInstance()
+        val todayTransactions = _transactions.value.filter { transaction ->
+            val transactionDate = Calendar.getInstance().apply { time = transaction.date }
+            transactionDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
+            transactionDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
         }
+
+        _dailyIncome.value = todayTransactions
+            .filter { !it.isExpense }
+            .sumOf { it.amount }
+
+        _dailyExpense.value = todayTransactions
+            .filter { it.isExpense }
+            .sumOf { it.amount }
+            
+        Timber.d("Daily stats calculated: Income=${_dailyIncome.value}, Expense=${_dailyExpense.value}")
     }
 }
 

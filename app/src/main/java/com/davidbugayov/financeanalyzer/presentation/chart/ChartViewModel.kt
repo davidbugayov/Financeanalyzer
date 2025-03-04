@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.Event
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -26,6 +28,26 @@ class ChartViewModel(
 
     private val _error = MutableStateFlow<String?>(null)
     val error: StateFlow<String?> get() = _error
+
+    init {
+        loadTransactions()
+        subscribeToEvents()
+    }
+
+    /**
+     * Подписываемся на события изменения транзакций
+     */
+    private fun subscribeToEvents() {
+        viewModelScope.launch {
+            EventBus.events.collect { event ->
+                when (event) {
+                    is Event.TransactionAdded,
+                    is Event.TransactionDeleted,
+                    is Event.TransactionUpdated -> loadTransactions()
+                }
+            }
+        }
+    }
 
     /**
      * Загружает транзакции из репозитория
@@ -133,9 +155,5 @@ class ChartViewModel(
                 )
             }
             .toSortedMap()
-    }
-
-    init {
-        loadTransactions()
     }
 } 

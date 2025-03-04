@@ -42,22 +42,32 @@ fun FinanceChartScreen(
             TopAppBar(
                 title = { 
                     Box(
-                        modifier = Modifier.fillMaxWidth(),
-                        contentAlignment = Alignment.Center
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        contentAlignment = Alignment.CenterStart
                     ) {
                         Text(
                             text = stringResource(R.string.charts_title),
                             fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
+                            modifier = Modifier.fillMaxWidth(),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.Center
                         )
                     }
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(Icons.AutoMirrored.Filled.ArrowBack, contentDescription = stringResource(R.string.back))
+                    IconButton(
+                        onClick = onNavigateBack,
+                        modifier = Modifier.size(48.dp)
+                    ) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
                     }
                 },
-                modifier = Modifier.height(48.dp)
+                modifier = Modifier.height(56.dp)
             )
         }
     ) { paddingValues ->

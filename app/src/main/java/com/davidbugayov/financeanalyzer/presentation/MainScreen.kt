@@ -114,6 +114,8 @@ fun MainScreen(startDestination: String = "home") {
                     AddTransactionScreen(
                         viewModel = addTransactionViewModel,
                         onTransactionAdded = {
+                            homeViewModel.loadTransactions()
+                            chartViewModel.loadTransactions()
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(Screen.Home.route) {
                                     inclusive = true

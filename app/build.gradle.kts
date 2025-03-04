@@ -19,12 +19,12 @@ fun getKeystoreProperties(): Properties {
 
 android {
     namespace = "com.davidbugayov.financeanalyzer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 1
         versionName = "1.0"
 
@@ -78,7 +78,6 @@ android {
         }
         debug {
             isDebuggable = true
-            applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
         }
     }
@@ -196,7 +195,7 @@ dependencies {
     implementation(libs.firebase.perf.ktx)
 
     // Logging
-    implementation("com.jakewharton.timber:timber:5.0.1")
+    implementation(libs.timber)
 
     // Testing
     testImplementation(libs.junit)

@@ -10,9 +10,7 @@ import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.*
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import kotlin.math.abs
@@ -76,7 +74,8 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
         }
 
         // Загружаем данные о транзакциях в фоновом потоке
-        CoroutineScope(Dispatchers.IO).launch {
+        val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
+        scope.launch {
             try {
                 val transactions = loadTransactionsUseCase()
                 
@@ -85,8 +84,8 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                 val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
                 val balance = income - expense
                 
-                // Обновляем UI виджета в главном потоке
-                CoroutineScope(Dispatchers.Main).launch {
+                // Обновляем UI виджета
+                withContext(Dispatchers.Main) {
                     // Форматируем баланс для компактного отображения
                     val formattedBalance = formatCompactBalance(balance)
                     
@@ -94,21 +93,23 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                     views.setTextViewText(R.id.small_widget_balance, formattedBalance)
                     
                     // Устанавливаем цвет баланса в зависимости от значения
-                    if (balance >= 0) {
-                        views.setTextColor(R.id.small_widget_balance, 0xFF4CAF50.toInt()) // Зеленый цвет
+                    val balanceColor = if (balance >= 0) {
+                        0xFF4CAF50.toInt() // Green
                     } else {
-                        views.setTextColor(R.id.small_widget_balance, 0xFFF44336.toInt()) // Красный цвет
+                        0xFFF44336.toInt() // Red
                     }
+                    views.setTextColor(R.id.small_widget_balance, balanceColor)
                     
                     // Обновляем виджет
                     appWidgetManager.updateAppWidget(appWidgetId, views)
                 }
             } catch (e: Exception) {
-                // В случае ошибки показываем сообщение об ошибке
-                CoroutineScope(Dispatchers.Main).launch {
+                withContext(Dispatchers.Main) {
                     views.setTextViewText(R.id.small_widget_balance, "?")
                     appWidgetManager.updateAppWidget(appWidgetId, views)
                 }
+            } finally {
+                coroutineContext.cancel()
             }
         }
     }

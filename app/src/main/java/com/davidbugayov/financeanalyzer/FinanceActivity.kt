@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer
 
+import android.app.Activity
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
@@ -15,6 +16,9 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
+import com.davidbugayov.financeanalyzer.widget.BalanceWidget
+import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
+import timber.log.Timber
 
 class FinanceActivity : ComponentActivity() {
     
@@ -77,25 +81,29 @@ class FinanceActivity : ComponentActivity() {
         try {
             val appWidgetManager = AppWidgetManager.getInstance(this)
             
-            // Проверяем наличие основного виджета баланса
-            val balanceWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(this, com.davidbugayov.financeanalyzer.widget.BalanceWidget::class.java)
-            )
-            // Обновляем основной виджет только если он добавлен (есть хотя бы один экземпляр)
+            // Обновляем основной виджет баланса
+            val balanceWidgetComponent = ComponentName(this, BalanceWidget::class.java)
+            val balanceWidgetIds = appWidgetManager.getAppWidgetIds(balanceWidgetComponent)
             if (balanceWidgetIds.isNotEmpty()) {
-                com.davidbugayov.financeanalyzer.widget.BalanceWidget.updateAllWidgets(this)
+                val intent = Intent(this, BalanceWidget::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, balanceWidgetIds)
+                }
+                sendBroadcast(intent)
             }
             
-            // Проверяем наличие маленького виджета баланса
-            val smallBalanceWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(this, com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget::class.java)
-            )
-            // Обновляем маленький виджет только если он добавлен (есть хотя бы один экземпляр)
+            // Обновляем маленький виджет баланса
+            val smallBalanceWidgetComponent = ComponentName(this, SmallBalanceWidget::class.java)
+            val smallBalanceWidgetIds = appWidgetManager.getAppWidgetIds(smallBalanceWidgetComponent)
             if (smallBalanceWidgetIds.isNotEmpty()) {
-                com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget.updateAllWidgets(this)
+                val intent = Intent(this, SmallBalanceWidget::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallBalanceWidgetIds)
+                }
+                sendBroadcast(intent)
             }
         } catch (e: Exception) {
-            // Игнорируем ошибки при обновлении виджетов
+            Timber.e(e, "Error updating widgets")
         }
     }
 }

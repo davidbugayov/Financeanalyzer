@@ -1,6 +1,6 @@
 [versions]
 # Plugins
-androidGradlePlugin = "8.3.0"
+androidGradlePlugin = "8.8.1"
 kotlin = "1.9.22"
 googleServices = "4.4.1"
 firebaseCrashlytics = "2.9.9"
@@ -26,6 +26,9 @@ koin = "3.5.3"
 junit = "4.13.2"
 androidxJunit = "1.2.1"
 espressoCore = "3.6.1"
+
+# Logging
+timber = "5.0.1"
 
 # Other
 commonsCsv = "1.10.0"
@@ -58,6 +61,9 @@ firebase-perf-ktx = { group = "com.google.firebase", name = "firebase-perf-ktx" 
 # Koin
 koin-android = { group = "io.insert-koin", name = "koin-android", version.ref = "koin" }
 koin-androidx-compose = { group = "io.insert-koin", name = "koin-androidx-compose", version.ref = "koin" }
+
+# Logging
+timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "timber" }
 
 # CSV Parser
 commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "commonsCsv" }

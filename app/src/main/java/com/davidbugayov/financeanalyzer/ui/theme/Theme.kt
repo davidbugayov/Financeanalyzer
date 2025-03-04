@@ -45,11 +45,17 @@ fun FinanceAnalyzerTheme(
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
-            val window = (view.context as Activity).window
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            window.decorView.setBackgroundColor(colorScheme.primary.toArgb())
-            WindowCompat.getInsetsController(window, view).apply {
-                isAppearanceLightStatusBars = !darkTheme
+            val context = view.context
+            val window = when (context) {
+                is Activity -> context.window
+                else -> null
+            }
+            window?.let {
+                WindowCompat.setDecorFitsSystemWindows(it, false)
+                it.statusBarColor = colorScheme.primary.toArgb()
+                WindowCompat.getInsetsController(it, view).apply {
+                    isAppearanceLightStatusBars = !darkTheme
+                }
             }
         }
     }
