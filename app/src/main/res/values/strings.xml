@@ -22,8 +22,8 @@
     <string name="expense">Расходы</string>
     <string name="balance">Баланс</string>
     <string name="all">Все</string>
-    <string name="charts">Графики</string>
-    <string name="charts_title">Финансовая аналитика</string>
+    <string name="charts">Статистика</string>
+    <string name="charts_title">Финансовая статистика</string>
     <string name="add">Добавить</string>
     <string name="history">История</string>
     

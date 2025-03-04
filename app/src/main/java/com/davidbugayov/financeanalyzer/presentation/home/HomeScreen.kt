@@ -30,6 +30,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment.Companion.CenterVertically
+import com.davidbugayov.financeanalyzer.BuildConfig
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 
 /**
  * Главный экран приложения.
@@ -50,27 +53,27 @@ fun HomeScreen(
     val error by viewModel.error.collectAsState()
     val currentFilter by viewModel.currentFilter.collectAsState()
     val context = LocalContext.current
-    
+
     // Загружаем сохраненное состояние видимости GroupSummary
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
-    var showGroupSummary by rememberSaveable { 
-        mutableStateOf(sharedPreferences.getBoolean("show_group_summary", true)) 
+    var showGroupSummary by rememberSaveable {
+        mutableStateOf(sharedPreferences.getBoolean("show_group_summary", true))
     }
-    
+
     // Загружаем транзакции при первом запуске
     LaunchedEffect(key1 = Unit) {
         viewModel.loadTransactions()
     }
-    
+
     // Сохраняем настройку при изменении
     LaunchedEffect(showGroupSummary) {
         sharedPreferences.edit().putBoolean("show_group_summary", showGroupSummary).apply()
     }
-    
+
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { 
+                title = {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -85,15 +88,16 @@ fun HomeScreen(
                     }
                 },
                 actions = {
+                    if (BuildConfig.DEBUG)
                     // Кнопка для генерации тестовых данных
-                    IconButton(
-                        onClick = { viewModel.generateAndSaveTestData() }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Add,
-                            contentDescription = "Сгенерировать тестовые данные"
-                        )
-                    }
+                        IconButton(
+                            onClick = { viewModel.generateAndSaveTestData() }
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = "Сгенерировать тестовые данные"
+                            )
+                        }
                 },
                 modifier = Modifier.height(56.dp)
             )
@@ -109,6 +113,8 @@ fun HomeScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
+                    .padding(bottom = 88.dp) // Добавляем отступ снизу для кнопок
+                    .verticalScroll(rememberScrollState())
             ) {
                 // Карточка с балансом
                 BalanceCard(
@@ -141,7 +147,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = when(currentFilter) {
+                        text = when (currentFilter) {
                             TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
                             TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
                             TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
@@ -149,7 +155,7 @@ fun HomeScreen(
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium
                     )
-                    
+
                     Row(
                         verticalAlignment = CenterVertically,
                         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -170,7 +176,7 @@ fun HomeScreen(
                                 modifier = Modifier.size(20.dp)
                             )
                         }
-                        
+
                         TextButton(
                             onClick = onNavigateToHistory,
                             modifier = Modifier.height(36.dp)
@@ -179,7 +185,7 @@ fun HomeScreen(
                         }
                     }
                 }
-                
+
                 // Отображение суммы для выбранного периода
                 val filteredTransactions = viewModel.getFilteredTransactions()
                 if (filteredTransactions.isNotEmpty() && showGroupSummary) {
@@ -195,7 +201,7 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = when(currentFilter) {
+                            text = when (currentFilter) {
                                 TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
                                 TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
                                 TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
@@ -204,24 +210,33 @@ fun HomeScreen(
                         )
                     }
                 } else {
-                    LazyColumn(
+                    Column(
                         modifier = Modifier
-                            .weight(1f)
                             .fillMaxWidth()
                     ) {
-                        items(filteredTransactions) { transaction ->
+                        filteredTransactions.forEach { transaction ->
                             TransactionItem(transaction = transaction)
                             HorizontalDivider()
                         }
                     }
                 }
+            }
 
-                // Кнопки навигации с новой организацией
+            // Кнопки навигации поверх контента
+            Surface(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .fillMaxWidth(),
+                color = MaterialTheme.colorScheme.surface,
+                shadowElevation = 8.dp
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp, bottom = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly
+                        .padding(horizontal = 16.dp, vertical = 8.dp)
+                        .height(80.dp),
+                    horizontalArrangement = Arrangement.SpaceEvenly,
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Кнопка Графики
                     Column(
@@ -233,7 +248,7 @@ fun HomeScreen(
                             modifier = Modifier.size(48.dp)
                         ) {
                             Icon(
-                                imageVector = Icons.Default.BarChart,
+                                imageVector = Icons.Default.Summarize,
                                 contentDescription = stringResource(R.string.charts)
                             )
                         }
@@ -243,7 +258,7 @@ fun HomeScreen(
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
-                    
+
                     // Кнопка Добавить
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -264,7 +279,7 @@ fun HomeScreen(
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
-                    
+
                     // Кнопка История
                     Column(
                         horizontalAlignment = Alignment.CenterHorizontally,
@@ -287,7 +302,7 @@ fun HomeScreen(
                     }
                 }
             }
-            
+
             // Индикатор загрузки
             if (isLoading) {
                 CircularProgressIndicator(
@@ -301,7 +316,6 @@ fun HomeScreen(
 /**
  * Компонент с фильтрами транзакций
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun FilterChips(
     currentFilter: TransactionFilter,
@@ -318,13 +332,13 @@ fun FilterChips(
             onClick = { onFilterSelected(TransactionFilter.TODAY) },
             label = { Text(stringResource(R.string.filter_today)) }
         )
-        
+
         FilterChip(
             selected = currentFilter == TransactionFilter.WEEK,
             onClick = { onFilterSelected(TransactionFilter.WEEK) },
             label = { Text(stringResource(R.string.filter_week)) }
         )
-        
+
         FilterChip(
             selected = currentFilter == TransactionFilter.MONTH,
             onClick = { onFilterSelected(TransactionFilter.MONTH) },
@@ -353,16 +367,16 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
                 fontSize = 16.sp,
                 color = Color.Gray
             )
-            
+
             Text(
                 text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
             )
-            
+
             Spacer(modifier = Modifier.height(12.dp)) // Уменьшаем отступ
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -379,7 +393,7 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
                         color = Color(0xFF4CAF50)
                     )
                 }
-                
+
                 Column {
                     Text(
                         text = stringResource(R.string.expense),
@@ -403,7 +417,7 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
 @Composable
 fun TransactionItem(transaction: Transaction) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -439,11 +453,11 @@ fun TransactionItem(transaction: Transaction) {
                 }
             }
         }
-        
+
         Text(
-            text = if (transaction.isExpense) 
+            text = if (transaction.isExpense)
                 stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
-            else 
+            else
                 stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
             color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
             fontWeight = FontWeight.Bold
@@ -459,7 +473,7 @@ fun GroupSummary(transactions: List<Transaction>) {
     val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
     val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
     val balance = income - expense
-    
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -484,7 +498,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     fontWeight = FontWeight.Medium
                 )
             }
-            
+
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Text(
                     text = stringResource(R.string.expense),
@@ -498,7 +512,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     fontWeight = FontWeight.Medium
                 )
             }
-            
+
             Column(horizontalAlignment = Alignment.End) {
                 Text(
                     text = stringResource(R.string.balance),

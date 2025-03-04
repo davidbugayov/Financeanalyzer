@@ -147,7 +147,7 @@ fun FinanceChartScreen(
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     
                     // Секция доходов по категориям
                     Text(
@@ -180,7 +180,7 @@ fun FinanceChartScreen(
                         }
                     }
                     
-                    Spacer(modifier = Modifier.height(32.dp))
+                    Spacer(modifier = Modifier.height(16.dp))
                     
                     // Секция баланса по месяцам
                     Text(
@@ -196,7 +196,7 @@ fun FinanceChartScreen(
                             data = transactionsByMonth,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(400.dp)
+                                .height(300.dp)
                         )
                     } else {
                         Box(
@@ -211,15 +211,15 @@ fun FinanceChartScreen(
                             )
                         }
                     }
-                    
-                    Spacer(modifier = Modifier.height(32.dp))
-                    
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
                     // Секция расходов по дням
                     Text(
                         text = "Расходы за последние 7 дней",
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(bottom = 16.dp)
+                        modifier = Modifier.padding(bottom = 8.dp)
                     )
                     
                     val expensesByDay = viewModel.getExpensesByDay()

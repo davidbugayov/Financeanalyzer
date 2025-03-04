@@ -24,7 +24,7 @@ android {
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
-        targetSdk = 35
+        targetSdk = 34
         versionCode = 1
         versionName = "1.0"
 
@@ -70,6 +70,7 @@ android {
             signingConfig = signingConfigs.getByName("release")
             isDebuggable = false
             multiDexEnabled = false
+            buildConfigField("boolean", "DEBUG", "false")
 
             // Дополнительные оптимизации
             ndk {
@@ -79,6 +80,7 @@ android {
         debug {
             isDebuggable = true
             versionNameSuffix = "-debug"
+            buildConfigField("boolean", "DEBUG", "true")
         }
     }
 
@@ -99,7 +101,7 @@ android {
         
         create("prod") {
             dimension = "environment"
-            resValue("string", "app_name", "Finance Analyzer")
+            resValue("string", "app_name", "Деньги под Контролем")
             buildConfigField("String", "API_BASE_URL", "\"https://api.financeanalyzer.com/\"")
             buildConfigField("boolean", "ENABLE_LOGGING", "false")
             

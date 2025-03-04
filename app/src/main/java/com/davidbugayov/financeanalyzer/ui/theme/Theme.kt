@@ -52,7 +52,7 @@ fun FinanceAnalyzerTheme(
             }
             window?.let {
                 WindowCompat.setDecorFitsSystemWindows(it, false)
-                it.statusBarColor = colorScheme.primary.toArgb()
+                it.statusBarColor = Color.Transparent.toArgb()
                 WindowCompat.getInsetsController(it, view).apply {
                     isAppearanceLightStatusBars = !darkTheme
                 }
