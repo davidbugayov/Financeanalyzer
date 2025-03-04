@@ -1,8 +1,8 @@
 package com.davidbugayov.financeanalyzer.presentation.navigation
 
 sealed class Screen(val route: String) {
-    object Home : Screen("home")
-    object History : Screen("history")
-    object AddTransaction : Screen("add")
-    object Chart : Screen("chart")
+    data object Home : Screen("home")
+    data object History : Screen("history")
+    data object AddTransaction : Screen("add")
+    data object Chart : Screen("chart")
 } 

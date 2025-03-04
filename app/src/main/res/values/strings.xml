@@ -84,4 +84,16 @@
     <string name="add_transaction_long">Добавить транзакцию</string>
     <string name="quick_add_short">+</string>
     <string name="quick_add_long">Быстрое добавление</string>
+
+    <!-- Категории -->
+    <string name="add_category">Добавить категорию</string>
+    <string name="add_category_title">Добавление категории</string>
+    <string name="category_name">Название категории</string>
+    <string name="expand">Развернуть</string>
+    <string name="collapse">Свернуть</string>
+    <string name="current_period">Текущий период</string>
+    <string name="previous_period">Прошлый период</string>
+    <string name="change_increase">На %d%% больше чем в прошлом периоде</string>
+    <string name="change_decrease">На %d%% меньше чем в прошлом периоде</string>
+    <string name="change_no_change">Без изменений по сравнению с прошлым периодом</string>
 </resources>

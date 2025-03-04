@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -20,12 +21,14 @@ import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
+import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
-import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(startDestination: String = "home") {
     val navController = rememberNavController()
@@ -87,8 +90,8 @@ fun MainScreen(startDestination: String = "home") {
                     }
                 ) {
                     TransactionHistoryScreen(
-                        viewModel = chartViewModel,
-                        onNavigateBack = { navController.popBackStack() }
+                        viewModel = koinViewModel<TransactionHistoryViewModel>(),
+                        onNavigateBack = { navController.navigateUp() }
                     )
                 }
                 
