@@ -82,10 +82,8 @@ fun TransactionGroupItem(
         ) {
             Text(
                 text = group.date,
-                color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Medium,
-                modifier = Modifier
+                fontWeight = FontWeight.Medium
             )
 
             Row(
@@ -99,10 +97,9 @@ fun TransactionGroupItem(
 
                 Text(
                     text = formattedAmount,
-                    color = if (group.balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    modifier = Modifier
+                    color = if (group.balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
                 )
 
                 IconButton(onClick = { expanded = !expanded }) {

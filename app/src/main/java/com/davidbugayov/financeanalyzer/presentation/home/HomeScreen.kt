@@ -54,6 +54,7 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -378,11 +379,11 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp) // Уменьшаем вертикальный отступ
+            .padding(vertical = 4.dp)
     ) {
         Column(
             modifier = Modifier
-                .padding(12.dp) // Уменьшаем внутренний отступ
+                .padding(12.dp)
                 .fillMaxWidth()
         ) {
             Text(
@@ -392,13 +393,13 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
             )
 
             Text(
-                text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
+                text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
             )
 
-            Spacer(modifier = Modifier.height(12.dp)) // Уменьшаем отступ
+            Spacer(modifier = Modifier.height(12.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -411,7 +412,7 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", income)),
+                        text = stringResource(R.string.currency_format, formatTransactionAmount(income)),
                         fontSize = 16.sp,
                         color = Color(0xFF4CAF50)
                     )
@@ -424,7 +425,7 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", expense)),
+                        text = stringResource(R.string.currency_format, formatTransactionAmount(expense)),
                         fontSize = 16.sp,
                         color = Color(0xFFF44336)
                     )
@@ -444,7 +445,7 @@ fun TransactionItem(transaction: Transaction) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp), // Уменьшаем вертикальный отступ
+            .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -464,7 +465,6 @@ fun TransactionItem(transaction: Transaction) {
                 fontSize = 12.sp,
                 color = Color.Gray
             )
-            // Добавляем отображение примечания, если оно есть
             transaction.note?.let {
                 if (it.isNotEmpty()) {
                     Text(
@@ -479,9 +479,9 @@ fun TransactionItem(transaction: Transaction) {
 
         Text(
             text = if (transaction.isExpense)
-                stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
+                stringResource(R.string.expense_currency_format, formatTransactionAmount(transaction.amount))
             else
-                stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
+                stringResource(R.string.income_currency_format, formatTransactionAmount(transaction.amount)),
             color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
             fontWeight = FontWeight.Bold
         )
@@ -515,7 +515,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, String.format("%.2f", income)),
+                    text = stringResource(R.string.currency_format, formatTransactionAmount(income)),
                     fontSize = 14.sp,
                     color = Color(0xFF4CAF50),
                     fontWeight = FontWeight.Medium
@@ -529,7 +529,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, String.format("%.2f", expense)),
+                    text = stringResource(R.string.currency_format, formatTransactionAmount(expense)),
                     fontSize = 14.sp,
                     color = Color(0xFFF44336),
                     fontWeight = FontWeight.Medium
@@ -543,7 +543,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
+                    text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
                     fontSize = 14.sp,
                     color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
                     fontWeight = FontWeight.Bold
