@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -26,6 +27,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -58,7 +60,6 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySel
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -309,6 +310,33 @@ fun TransactionHistoryScreen(
     }
 }
 
+/**
+ * Компонент для отображения радиокнопки выбора периода
+ */
+@Composable
+fun PeriodRadioButton(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .height(48.dp)
+            .clickable { onClick() },
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        RadioButton(
+            selected = selected,
+            onClick = onClick
+        )
+        Text(
+            text = text,
+            modifier = Modifier.padding(start = 8.dp)
+        )
+    }
+}
 
 /**
  * Заголовок группы транзакций с суммой
@@ -363,21 +391,21 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(R.string.income_currency_format, formatTransactionAmount(income)),
+                        text = stringResource(R.string.currency_format, String.format("%.2f", income)),
                         fontSize = 14.sp,
                         color = Color(0xFF4CAF50),
                         fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(R.string.expense_currency_format, formatTransactionAmount(expense)),
+                        text = stringResource(R.string.currency_format, String.format("%.2f", expense)),
                         fontSize = 14.sp,
                         color = Color(0xFFF44336),
                         fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
+                        text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
                         fontSize = 14.sp,
                         color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
                         fontWeight = FontWeight.Bold
@@ -439,9 +467,9 @@ fun TransactionHistoryItem(transaction: Transaction) {
 
             Text(
                 text = if (transaction.isExpense)
-                    stringResource(R.string.expense_currency_format, formatTransactionAmount(transaction.amount))
+                    stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
                 else
-                    stringResource(R.string.income_currency_format, formatTransactionAmount(transaction.amount)),
+                    stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
                 color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
                 fontWeight = FontWeight.Bold
             )

@@ -41,13 +41,20 @@ fun formatNumber(
 fun formatTransactionAmount(amount: Double): String {
     val absAmount = abs(amount)
     val prefix = if (amount < 0) "-" else ""
+    val hasDecimals = absAmount % 1 != 0.0
 
-    return if (absAmount % 1.0 == 0.0) {
-        // Если число целое, форматируем без десятичных знаков
-        "${prefix}${String.format("%.0f", absAmount)}"
-    } else {
-        // Если есть десятичная часть, показываем два знака после запятой
+    // Пробуем отформатировать полное число
+    val fullNumber = if (hasDecimals) {
         "${prefix}${String.format("%.2f", absAmount)}"
+    } else {
+        "${prefix}${String.format("%.0f", absAmount)}"
+    }
+
+    // Если число большое, используем сокращенный формат
+    return when {
+        absAmount >= 1_000_000 -> "${prefix}${String.format("%.1fM", absAmount / 1_000_000)}"
+        absAmount >= 1_000_000_000 -> "${prefix}${String.format("%.1fB", absAmount / 1_000_000_000)}"
+        else -> fullNumber
     }
 }
 
