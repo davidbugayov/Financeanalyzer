@@ -1,19 +1,47 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Summarize
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.FilledTonalIconButton
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.Alignment.Companion.CenterVertically
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
@@ -21,22 +49,18 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
+import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import java.text.SimpleDateFormat
-import java.util.*
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment.Companion.CenterVertically
-import com.davidbugayov.financeanalyzer.BuildConfig
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
+import java.util.Locale
 
 /**
  * Главный экран приложения.
  * Отображает текущий баланс и последние транзакции.
+ * Следует принципам MVI и Clean Architecture.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -46,12 +70,7 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit
 ) {
-    val balance by viewModel.balance.collectAsState()
-    val income by viewModel.income.collectAsState()
-    val expense by viewModel.expense.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
-    val currentFilter by viewModel.currentFilter.collectAsState()
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
 
     // Загружаем сохраненное состояние видимости GroupSummary
@@ -62,12 +81,16 @@ fun HomeScreen(
 
     // Загружаем транзакции при первом запуске
     LaunchedEffect(key1 = Unit) {
-        viewModel.loadTransactions()
+        viewModel.onEvent(HomeEvent.LoadTransactions)
+        // Инициализируем состояние showGroupSummary в ViewModel из SharedPreferences
+        viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
     }
 
     // Сохраняем настройку при изменении
     LaunchedEffect(showGroupSummary) {
         sharedPreferences.edit().putBoolean("show_group_summary", showGroupSummary).apply()
+        // Обновляем состояние в ViewModel
+        viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
     }
 
     Scaffold(
@@ -88,16 +111,17 @@ fun HomeScreen(
                     }
                 },
                 actions = {
-                    if (BuildConfig.DEBUG)
                     // Кнопка для генерации тестовых данных
+                    if (BuildConfig.DEBUG) {
                         IconButton(
-                            onClick = { viewModel.generateAndSaveTestData() }
+                            onClick = { viewModel.onEvent(HomeEvent.GenerateTestData) }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = "Сгенерировать тестовые данные"
                             )
                         }
+                    }
                 },
                 modifier = Modifier.height(56.dp)
             )
@@ -118,13 +142,13 @@ fun HomeScreen(
             ) {
                 // Карточка с балансом
                 BalanceCard(
-                    income = income,
-                    expense = expense,
-                    balance = balance
+                    income = state.income,
+                    expense = state.expense,
+                    balance = state.balance
                 )
 
                 // Сообщение об ошибке
-                error?.let {
+                state.error?.let {
                     Text(
                         text = it,
                         color = MaterialTheme.colorScheme.error,
@@ -134,8 +158,8 @@ fun HomeScreen(
 
                 // Фильтры транзакций
                 FilterChips(
-                    currentFilter = currentFilter,
-                    onFilterSelected = { viewModel.setFilter(it) }
+                    currentFilter = state.currentFilter,
+                    onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) }
                 )
 
                 // Заголовок для транзакций с чекбоксом для GroupSummary
@@ -147,7 +171,7 @@ fun HomeScreen(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = when (currentFilter) {
+                        text = when (state.currentFilter) {
                             TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
                             TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
                             TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
@@ -187,13 +211,12 @@ fun HomeScreen(
                 }
 
                 // Отображение суммы для выбранного периода
-                val filteredTransactions = viewModel.getFilteredTransactions()
-                if (filteredTransactions.isNotEmpty() && showGroupSummary) {
-                    GroupSummary(transactions = filteredTransactions)
+                if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
+                    GroupSummary(transactions = state.filteredTransactions)
                 }
 
                 // Список транзакций
-                if (filteredTransactions.isEmpty() && !isLoading) {
+                if (state.filteredTransactions.isEmpty() && !state.isLoading) {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -201,7 +224,7 @@ fun HomeScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = when (currentFilter) {
+                            text = when (state.currentFilter) {
                                 TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
                                 TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
                                 TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
@@ -214,7 +237,7 @@ fun HomeScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                     ) {
-                        filteredTransactions.forEach { transaction ->
+                        state.filteredTransactions.forEach { transaction ->
                             TransactionItem(transaction = transaction)
                             HorizontalDivider()
                         }
@@ -304,7 +327,7 @@ fun HomeScreen(
             }
 
             // Индикатор загрузки
-            if (isLoading) {
+            if (state.isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.align(Alignment.Center)
                 )

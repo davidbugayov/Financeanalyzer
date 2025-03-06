@@ -2,44 +2,30 @@ package com.davidbugayov.financeanalyzer.presentation.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
+import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Calendar
-import java.util.Date
-import java.util.Locale
+import org.koin.core.component.KoinComponent
 
-data class TransactionHistoryState(
-    val transactions: List<Transaction> = emptyList(),
-    val filteredTransactions: List<Transaction> = emptyList(),
-    val isLoading: Boolean = false,
-    val error: String? = null,
-    val selectedCategory: String? = null,
-    val groupingType: GroupingType = GroupingType.MONTH,
-    val periodType: PeriodType = PeriodType.MONTH,
-    val startDate: Date = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time,
-    val endDate: Date = Date(),
-    val categoryStats: Triple<Double, Double, Int?>? = null
-)
-
-sealed class TransactionHistoryEvent {
-    data class SetGroupingType(val type: GroupingType) : TransactionHistoryEvent()
-    data class SetPeriodType(val type: PeriodType) : TransactionHistoryEvent()
-    data class SetCategory(val category: String?) : TransactionHistoryEvent()
-    data class SetDateRange(val startDate: Date, val endDate: Date) : TransactionHistoryEvent()
-    data class SetStartDate(val date: Date) : TransactionHistoryEvent()
-    data class SetEndDate(val date: Date) : TransactionHistoryEvent()
-    object ReloadTransactions : TransactionHistoryEvent()
-}
-
+/**
+ * ViewModel для экрана истории транзакций.
+ * Следует принципам MVI и Clean Architecture.
+ */
 class TransactionHistoryViewModel(
-    private val loadTransactionsUseCase: LoadTransactionsUseCase
-) : ViewModel() {
+    private val loadTransactionsUseCase: LoadTransactionsUseCase,
+    private val filterTransactionsUseCase: FilterTransactionsUseCase,
+    private val groupTransactionsUseCase: GroupTransactionsUseCase,
+    private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase
+) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
@@ -48,6 +34,9 @@ class TransactionHistoryViewModel(
         loadTransactions()
     }
 
+    /**
+     * Обрабатывает события экрана истории транзакций
+     */
     fun onEvent(event: TransactionHistoryEvent) {
         when (event) {
             is TransactionHistoryEvent.SetGroupingType -> {
@@ -80,12 +69,40 @@ class TransactionHistoryViewModel(
                 _state.update { it.copy(endDate = event.date) }
                 updateFilteredTransactions()
             }
-            TransactionHistoryEvent.ReloadTransactions -> {
+            is TransactionHistoryEvent.ReloadTransactions -> {
                 loadTransactions()
+            }
+            // События для управления диалогами
+            is TransactionHistoryEvent.ShowPeriodDialog -> {
+                _state.update { it.copy(showPeriodDialog = true) }
+            }
+            is TransactionHistoryEvent.HidePeriodDialog -> {
+                _state.update { it.copy(showPeriodDialog = false) }
+            }
+            is TransactionHistoryEvent.ShowCategoryDialog -> {
+                _state.update { it.copy(showCategoryDialog = true) }
+            }
+            is TransactionHistoryEvent.HideCategoryDialog -> {
+                _state.update { it.copy(showCategoryDialog = false) }
+            }
+            is TransactionHistoryEvent.ShowStartDatePicker -> {
+                _state.update { it.copy(showStartDatePicker = true) }
+            }
+            is TransactionHistoryEvent.HideStartDatePicker -> {
+                _state.update { it.copy(showStartDatePicker = false) }
+            }
+            is TransactionHistoryEvent.ShowEndDatePicker -> {
+                _state.update { it.copy(showEndDatePicker = true) }
+            }
+            is TransactionHistoryEvent.HideEndDatePicker -> {
+                _state.update { it.copy(showEndDatePicker = false) }
             }
         }
     }
 
+    /**
+     * Загружает транзакции из репозитория
+     */
     private fun loadTransactions() {
         _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
@@ -110,144 +127,50 @@ class TransactionHistoryViewModel(
         }
     }
 
+    /**
+     * Обновляет отфильтрованные транзакции на основе текущих фильтров
+     */
     private fun updateFilteredTransactions() {
         val currentState = _state.value
-        val filtered = filterTransactionsByPeriod(
-            currentState.transactions,
-            currentState.periodType,
-            currentState.startDate,
-            currentState.endDate
-        ).filter { transaction ->
-            currentState.selectedCategory == null || transaction.category == currentState.selectedCategory
-        }
+        val filtered = filterTransactionsUseCase(
+            transactions = currentState.transactions,
+            periodType = currentState.periodType,
+            startDate = currentState.startDate,
+            endDate = currentState.endDate,
+            category = currentState.selectedCategory
+        )
         _state.update { it.copy(filteredTransactions = filtered) }
         updateCategoryStats()
     }
 
+    /**
+     * Обновляет статистику по выбранной категории
+     */
     private fun updateCategoryStats() {
         val currentState = _state.value
         val selectedCategory = currentState.selectedCategory
 
         if (selectedCategory != null) {
-            val currentPeriodTransactions = currentState.filteredTransactions
-                .filter { it.category == selectedCategory }
-            val currentPeriodTotal = currentPeriodTransactions.sumOf { it.amount }
-
-            val periodDuration = currentState.endDate.time - currentState.startDate.time
-            val previousStartDate = Date(currentState.startDate.time - periodDuration)
-            val previousEndDate = Date(currentState.endDate.time - periodDuration)
-
-            val previousPeriodTransactions = filterTransactionsByPeriod(
-                currentState.transactions.filter { it.category == selectedCategory },
-                PeriodType.CUSTOM,
-                previousStartDate,
-                previousEndDate
+            val stats = calculateCategoryStatsUseCase(
+                transactions = currentState.transactions,
+                category = selectedCategory,
+                periodType = currentState.periodType,
+                startDate = currentState.startDate,
+                endDate = currentState.endDate
             )
-            val previousPeriodTotal = previousPeriodTransactions.sumOf { it.amount }
-
-            val percentChange = if (previousPeriodTotal != 0.0) {
-                ((currentPeriodTotal - previousPeriodTotal) / kotlin.math.abs(previousPeriodTotal) * 100).toInt()
-            } else null
-
-            _state.update {
-                it.copy(categoryStats = Triple(currentPeriodTotal, previousPeriodTotal, percentChange))
-            }
+            _state.update { it.copy(categoryStats = stats) }
         } else {
             _state.update { it.copy(categoryStats = null) }
         }
     }
 
-    fun getGroupedTransactions(): Map<String, List<Transaction>> {
-        return when (_state.value.groupingType) {
-            GroupingType.DAY -> groupTransactionsByDay(_state.value.filteredTransactions)
-            GroupingType.WEEK -> groupTransactionsByWeek(_state.value.filteredTransactions)
-            GroupingType.MONTH -> groupTransactionsByMonth(_state.value.filteredTransactions)
-        }
-    }
-
-    private fun filterTransactionsByPeriod(
-        transactions: List<Transaction>,
-        periodType: PeriodType,
-        startDate: Date? = null,
-        endDate: Date? = null
-    ): List<Transaction> {
-        val calendar = Calendar.getInstance()
-
-        return when (periodType) {
-            PeriodType.ALL -> transactions
-            PeriodType.MONTH -> {
-                calendar.add(Calendar.MONTH, -1)
-                val monthAgo = calendar.time
-                transactions.filter { it.date.after(monthAgo) || it.date == monthAgo }
-            }
-            PeriodType.QUARTER -> {
-                calendar.add(Calendar.MONTH, -3)
-                val quarterAgo = calendar.time
-                transactions.filter { it.date.after(quarterAgo) || it.date == quarterAgo }
-            }
-            PeriodType.HALF_YEAR -> {
-                calendar.add(Calendar.MONTH, -6)
-                val halfYearAgo = calendar.time
-                transactions.filter { it.date.after(halfYearAgo) || it.date == halfYearAgo }
-            }
-            PeriodType.YEAR -> {
-                calendar.add(Calendar.YEAR, -1)
-                val yearAgo = calendar.time
-                transactions.filter { it.date.after(yearAgo) || it.date == yearAgo }
-            }
-            PeriodType.CUSTOM -> {
-                if (startDate != null && endDate != null) {
-                    val endCalendar = Calendar.getInstance()
-                    endCalendar.time = endDate
-                    endCalendar.set(Calendar.HOUR_OF_DAY, 23)
-                    endCalendar.set(Calendar.MINUTE, 59)
-                    endCalendar.set(Calendar.SECOND, 59)
-
-                    transactions.filter {
-                        (it.date.after(startDate) || it.date == startDate) &&
-                                (it.date.before(endCalendar.time) || it.date == endCalendar.time)
-                    }
-                } else {
-                    transactions
-                }
-            }
-        }
-    }
-
-    private fun groupTransactionsByDay(transactions: List<Transaction>): Map<String, List<Transaction>> {
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
-        return transactions
-            .sortedByDescending { it.date }
-            .groupBy { dateFormat.format(it.date).replaceFirstChar { it.uppercase() } }
-    }
-
-    private fun groupTransactionsByWeek(transactions: List<Transaction>): Map<String, List<Transaction>> {
-        val calendar = Calendar.getInstance()
-        val result = mutableMapOf<String, MutableList<Transaction>>()
-        val sortedTransactions = transactions.sortedByDescending { it.date }
-
-        for (transaction in sortedTransactions) {
-            calendar.time = transaction.date
-            calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
-            val firstDay = SimpleDateFormat("dd.MM", Locale("ru")).format(calendar.time)
-            calendar.add(Calendar.DAY_OF_WEEK, 6)
-            val lastDay = SimpleDateFormat("dd.MM", Locale("ru")).format(calendar.time)
-            val year = calendar.get(Calendar.YEAR)
-            val weekKey = "$firstDay - $lastDay $year"
-
-            if (!result.containsKey(weekKey)) {
-                result[weekKey] = mutableListOf()
-            }
-            result[weekKey]?.add(transaction)
-        }
-
-        return result
-    }
-
-    private fun groupTransactionsByMonth(transactions: List<Transaction>): Map<String, List<Transaction>> {
-        val format = SimpleDateFormat("MMMM yyyy", Locale("ru"))
-        return transactions
-            .sortedByDescending { it.date }
-            .groupBy { format.format(it.date).replaceFirstChar { it.uppercase() } }
+    /**
+     * Возвращает сгруппированные транзакции на основе текущего типа группировки
+     */
+    fun getGroupedTransactions(): Map<String, List<com.davidbugayov.financeanalyzer.domain.model.Transaction>> {
+        return groupTransactionsUseCase(
+            transactions = _state.value.filteredTransactions,
+            groupingType = _state.value.groupingType
+        )
     }
 } 

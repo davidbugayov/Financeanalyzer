@@ -32,13 +32,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.history.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryButton
+import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun PeriodSelectionDialog(
     currentPeriodType: PeriodType,

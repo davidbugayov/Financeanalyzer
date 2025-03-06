@@ -116,24 +116,13 @@ fun MainScreen(startDestination: String = "home") {
                 ) {
                     AddTransactionScreen(
                         viewModel = addTransactionViewModel,
-                        onTransactionAdded = {
-                            homeViewModel.loadTransactions()
+                        onNavigateBack = {
+                            homeViewModel.onEvent(com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent.LoadTransactions)
                             chartViewModel.loadTransactions()
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(Screen.Home.route) {
                                     inclusive = true
                                 }
-                            }
-                        },
-                        onNavigateBack = { 
-                            if (navController.previousBackStackEntry == null) {
-                                navController.navigate(Screen.Home.route) {
-                                    popUpTo(Screen.AddTransaction.route) {
-                                        inclusive = true
-                                    }
-                                }
-                            } else {
-                                navController.popBackStack()
                             }
                         }
                     )

@@ -3,62 +3,62 @@ package com.davidbugayov.financeanalyzer.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
-import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
+import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.utils.Event
+import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import java.util.Calendar
-import java.util.Date
 
 /**
  * ViewModel для главного экрана.
- * Отвечает за загрузку и отображение данных о транзакциях.
+ * Следует принципам MVI и Clean Architecture.
  */
 class HomeViewModel(
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
     private val addTransactionUseCase: AddTransactionUseCase
-) : ViewModel() {
+) : ViewModel(), KoinComponent {
 
-    private val _transactions = MutableStateFlow<List<Transaction>>(emptyList())
-    val transactions = _transactions.asStateFlow()
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading = _isLoading.asStateFlow()
-
-    private val _error = MutableStateFlow<String?>(null)
-    val error = _error.asStateFlow()
-
-    private val _balance = MutableStateFlow(0.0)
-    val balance = _balance.asStateFlow()
-
-    private val _income = MutableStateFlow(0.0)
-    val income = _income.asStateFlow()
-
-    private val _expense = MutableStateFlow(0.0)
-    val expense = _expense.asStateFlow()
-
-    private val _dailyIncome = MutableStateFlow(0.0)
-    val dailyIncome = _dailyIncome.asStateFlow()
-
-    private val _dailyExpense = MutableStateFlow(0.0)
-    val dailyExpense = _dailyExpense.asStateFlow()
-    
-    // Текущий выбранный фильтр для главного экрана
-    private val _currentFilter = MutableStateFlow(TransactionFilter.MONTH)
-    val currentFilter: StateFlow<TransactionFilter> get() = _currentFilter
+    private val _state = MutableStateFlow(HomeState())
+    val state: StateFlow<HomeState> = _state.asStateFlow()
 
     init {
         Timber.d("HomeViewModel initialized")
         loadTransactions()
         subscribeToEvents()
     }
-    
+
+    /**
+     * Обрабатывает события экрана Home
+     */
+    fun onEvent(event: HomeEvent) {
+        when (event) {
+            is HomeEvent.SetFilter -> {
+                _state.update { it.copy(currentFilter = event.filter) }
+                updateFilteredTransactions()
+            }
+            is HomeEvent.LoadTransactions -> {
+                loadTransactions()
+            }
+            is HomeEvent.GenerateTestData -> {
+                generateAndSaveTestData()
+            }
+            is HomeEvent.SetShowGroupSummary -> {
+                _state.update { it.copy(showGroupSummary = event.show) }
+            }
+        }
+    }
+
     /**
      * Подписываемся на события изменения транзакций
      */
@@ -83,34 +83,27 @@ class HomeViewModel(
             }
         }
     }
-    
-    /**
-     * Устанавливает текущий фильтр для отображения транзакций
-     */
-    fun setFilter(filter: TransactionFilter) {
-        _currentFilter.value = filter
-    }
 
     /**
      * Загружает транзакции из репозитория
      */
-    fun loadTransactions() {
+    private fun loadTransactions() {
         viewModelScope.launch {
             Timber.d("Loading transactions")
-            _isLoading.value = true
-            _error.value = null
+            _state.update { it.copy(isLoading = true, error = null) }
             
             try {
                 val result = loadTransactionsUseCase()
-                _transactions.value = result
+                _state.update { it.copy(transactions = result) }
                 Timber.d("Loaded ${result.size} transactions")
                 calculateTotalStats()
                 calculateDailyStats()
+                updateFilteredTransactions()
             } catch (e: Exception) {
                 Timber.e(e, "Error loading transactions")
-                _error.value = e.message
+                _state.update { it.copy(error = e.message) }
             } finally {
-                _isLoading.value = false
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -118,7 +111,7 @@ class HomeViewModel(
     /**
      * Генерирует и сохраняет тестовые данные
      */
-    fun generateAndSaveTestData() {
+    private fun generateAndSaveTestData() {
         viewModelScope.launch {
             try {
                 Timber.d("Generating test data")
@@ -133,40 +126,42 @@ class HomeViewModel(
                 Timber.d("Test data generation completed")
             } catch (e: Exception) {
                 Timber.e(e, "Error generating test data")
-                _error.value = "Ошибка при генерации тестовых данных: ${e.message}"
+                _state.update { it.copy(error = "Ошибка при генерации тестовых данных: ${e.message}") }
             }
         }
     }
 
     /**
-     * Возвращает последние транзакции
-     * @param count Количество транзакций для отображения
-     * @return Список последних транзакций
+     * Обновляет отфильтрованные транзакции на основе текущего фильтра
      */
-    fun getRecentTransactions(count: Int = 5): List<Transaction> {
-        return _transactions.value.sortedByDescending { it.date }.take(count)
+    private fun updateFilteredTransactions() {
+        val currentState = _state.value
+        val filtered = when (currentState.currentFilter) {
+            TransactionFilter.TODAY -> getTodayTransactions(currentState.transactions)
+            TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
+            TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
+        }
+        _state.update { it.copy(filteredTransactions = filtered) }
     }
-    
+
     /**
      * Возвращает транзакции за последний месяц
-     * @return Список транзакций за последний месяц
      */
-    fun getLastMonthTransactions(): List<Transaction> {
+    private fun getLastMonthTransactions(transactions: List<Transaction>): List<Transaction> {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.MONTH, -1)
         val monthAgo = calendar.time
-        
-        return _transactions.value
+
+        return transactions
             .filter { it.date.after(monthAgo) || it.date == monthAgo }
             .sortedByDescending { it.date }
     }
     
     /**
      * Возвращает транзакции за сегодня
-     * @return Список транзакций за сегодня
      */
-    fun getTodayTransactions(): List<Transaction> {
-        return _transactions.value
+    private fun getTodayTransactions(transactions: List<Transaction>): List<Transaction> {
+        return transactions
             .filter { 
                 val transactionDate = Calendar.getInstance().apply { time = it.date }
                 val today = Calendar.getInstance()
@@ -179,85 +174,75 @@ class HomeViewModel(
     
     /**
      * Возвращает транзакции за последнюю неделю
-     * @return Список транзакций за последнюю неделю
      */
-    fun getLastWeekTransactions(): List<Transaction> {
+    private fun getLastWeekTransactions(transactions: List<Transaction>): List<Transaction> {
         val calendar = Calendar.getInstance()
         calendar.add(Calendar.DAY_OF_MONTH, -7)
         val weekAgo = calendar.time
-        
-        return _transactions.value
+
+        return transactions
             .filter { it.date.after(weekAgo) || it.date == weekAgo }
             .sortedByDescending { it.date }
     }
-    
-    /**
-     * Возвращает отфильтрованные транзакции в соответствии с текущим фильтром
-     */
-    fun getFilteredTransactions(): List<Transaction> {
-        return when (_currentFilter.value) {
-            TransactionFilter.TODAY -> getTodayTransactions()
-            TransactionFilter.WEEK -> getLastWeekTransactions()
-            TransactionFilter.MONTH -> getLastMonthTransactions()
-        }
-    }
 
     /**
-     * Возвращает общую сумму доходов
-     * @return Сумма всех доходов
+     * Рассчитывает общую статистику
      */
-    fun getTotalIncome(): Double {
-        return _transactions.value.filter { !it.isExpense }.sumOf { it.amount }
-    }
-
-    /**
-     * Возвращает общую сумму расходов
-     * @return Сумма всех расходов
-     */
-    fun getTotalExpense(): Double {
-        return _transactions.value.filter { it.isExpense }.sumOf { it.amount }
-    }
-
-    /**
-     * Возвращает текущий баланс
-     * @return Разница между доходами и расходами
-     */
-    fun getCurrentBalance(): Double {
-        return getTotalIncome() - getTotalExpense()
-    }
-
     private fun calculateTotalStats() {
         Timber.d("Calculating total stats")
-        _income.value = _transactions.value
+        val transactions = _state.value.transactions
+
+        val totalIncome = transactions
             .filter { !it.isExpense }
             .sumOf { it.amount }
 
-        _expense.value = _transactions.value
+        val totalExpense = transactions
             .filter { it.isExpense }
             .sumOf { it.amount }
 
-        _balance.value = _income.value - _expense.value
-        Timber.d("Total stats calculated: Income=${_income.value}, Expense=${_expense.value}, Balance=${_balance.value}")
+        val balance = totalIncome - totalExpense
+
+        _state.update {
+            it.copy(
+                income = totalIncome,
+                expense = totalExpense,
+                balance = balance
+            )
+        }
+
+        Timber.d("Total stats calculated: Income=$totalIncome, Expense=$totalExpense, Balance=$balance")
     }
 
+    /**
+     * Рассчитывает ежедневную статистику
+     */
     private fun calculateDailyStats() {
         Timber.d("Calculating daily stats")
         val today = Calendar.getInstance()
-        val todayTransactions = _transactions.value.filter { transaction ->
+        val transactions = _state.value.transactions
+
+        val todayTransactions = transactions.filter { transaction ->
             val transactionDate = Calendar.getInstance().apply { time = transaction.date }
             transactionDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
             transactionDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
         }
 
-        _dailyIncome.value = todayTransactions
+        val dailyIncome = todayTransactions
             .filter { !it.isExpense }
             .sumOf { it.amount }
 
-        _dailyExpense.value = todayTransactions
+        val dailyExpense = todayTransactions
             .filter { it.isExpense }
             .sumOf { it.amount }
-            
-        Timber.d("Daily stats calculated: Income=${_dailyIncome.value}, Expense=${_dailyExpense.value}")
+
+        _state.update {
+            it.copy(
+                dailyIncome = dailyIncome,
+                dailyExpense = dailyExpense
+            )
+        }
+
+        Timber.d("Daily stats calculated: Income=$dailyIncome, Expense=$dailyExpense")
     }
 }
 

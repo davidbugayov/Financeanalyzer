@@ -3,7 +3,10 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
@@ -28,10 +31,13 @@ val appModule = module {
     single { AddTransactionUseCase(get()) }
     single { DeleteTransactionUseCase(get()) }
     single { UpdateTransactionUseCase(get()) }
+    single { FilterTransactionsUseCase() }
+    single { GroupTransactionsUseCase() }
+    single { CalculateCategoryStatsUseCase(get()) }
 
     // ViewModels
     viewModel { HomeViewModel(get(), get<AddTransactionUseCase>()) }
     viewModel { ChartViewModel(get()) }
     viewModel { AddTransactionViewModel(androidApplication(), get()) }
-    viewModel { TransactionHistoryViewModel(get()) }
+    viewModel { TransactionHistoryViewModel(get(), get(), get(), get()) }
 }

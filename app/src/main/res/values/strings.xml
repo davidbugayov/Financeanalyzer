@@ -28,6 +28,12 @@
     <string name="charts_title">Финансовая статистика</string>
     <string name="add">Добавить</string>
     <string name="history">История</string>
+    <string name="home">Главная</string>
+    <string name="today">Сегодня</string>
+    <string name="week">Неделя</string>
+    <string name="month">Месяц</string>
+    <string name="recent_transactions">Последние транзакции</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
     
     <!-- Фильтры -->
     <string name="filter_today">Сегодня</string>
@@ -96,4 +102,16 @@
     <string name="change_increase">На %d%% больше чем в прошлом периоде</string>
     <string name="change_decrease">На %d%% меньше чем в прошлом периоде</string>
     <string name="change_no_change">Без изменений по сравнению с прошлым периодом</string>
+
+    <!-- AddTransaction strings -->
+    <string name="confirm">Подтвердить</string>
+    <string name="success">Успешно</string>
+    <string name="transaction_added_successfully">Транзакция успешно добавлена</string>
+    <string name="add_another">Добавить еще</string>
+    <string name="done">Готово</string>
+    <string name="error">Ошибка</string>
+    <string name="cancel_transaction">Отменить транзакцию</string>
+    <string name="cancel_transaction_confirmation">Вы уверены, что хотите отменить добавление транзакции?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources>

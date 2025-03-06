@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
@@ -47,13 +46,17 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.history.components.*
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.*
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.AddCategoryDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
+import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
+import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.util.formatNumber
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
@@ -79,12 +82,9 @@ fun TransactionHistoryScreen(
     }
 
     // Состояние диалогов
-    var showPeriodDialog by remember { mutableStateOf(false) }
     var showCategoryDialog by remember { mutableStateOf(false) }
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var newCategoryText by remember { mutableStateOf("") }
-    var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
 
     // Получаем список всех категорий
     val categories = remember(state.transactions) {
@@ -92,17 +92,44 @@ fun TransactionHistoryScreen(
     }
 
     // Диалог выбора периода
-    if (showPeriodDialog) {
+    if (state.showPeriodDialog) {
         PeriodSelectionDialog(
             currentPeriodType = state.periodType,
             onPeriodTypeSelected = { periodType ->
                 viewModel.onEvent(TransactionHistoryEvent.SetPeriodType(periodType))
             },
-            onDismiss = { showPeriodDialog = false },
-            onShowStartDatePicker = { showStartDatePicker = true },
-            onShowEndDatePicker = { showEndDatePicker = true },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
+            },
+            onShowStartDatePicker = {
+                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
+                viewModel.onEvent(TransactionHistoryEvent.ShowStartDatePicker)
+            },
+            onShowEndDatePicker = {
+                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
+                viewModel.onEvent(TransactionHistoryEvent.ShowEndDatePicker)
+            },
             startDate = state.startDate,
             endDate = state.endDate
+        )
+    }
+
+    // Диалог выбора категории
+    if (state.showCategoryDialog) {
+        CategorySelectionDialog(
+            selectedCategory = state.selectedCategory,
+            categories = categories,
+            onCategorySelected = { category ->
+                viewModel.onEvent(TransactionHistoryEvent.SetCategory(category))
+                viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
+            },
+            onAddCategory = {
+                viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
+                showAddCategoryDialog = true
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
+            }
         )
     }
 
@@ -114,85 +141,64 @@ fun TransactionHistoryScreen(
             onConfirm = {
                 if (newCategoryText.isNotBlank()) {
                     viewModel.onEvent(TransactionHistoryEvent.SetCategory(newCategoryText))
-                    showAddCategoryDialog = false
-                    showCategoryDialog = false
                     newCategoryText = ""
                 }
+                showAddCategoryDialog = false
+                showCategoryDialog = true
             },
             onDismiss = {
-                showAddCategoryDialog = false
                 newCategoryText = ""
+                showAddCategoryDialog = false
+                showCategoryDialog = true
             }
         )
     }
 
-    // Диалог выбора категории
-    if (showCategoryDialog) {
-        CategorySelectionDialog(
-            selectedCategory = state.selectedCategory,
-            categories = categories,
-            onCategorySelected = { category ->
-                viewModel.onEvent(TransactionHistoryEvent.SetCategory(category))
-            },
-            onAddCategory = { showAddCategoryDialog = true },
-            onDismiss = { showCategoryDialog = false }
-        )
-    }
-
     // Диалог выбора начальной даты
-    if (showStartDatePicker) {
+    if (state.showStartDatePicker) {
         DatePickerDialog(
             initialDate = state.startDate,
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
+                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
+                viewModel.onEvent(TransactionHistoryEvent.ShowEndDatePicker)
             },
-            onDismiss = { showStartDatePicker = false }
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
+                viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog)
+            }
         )
     }
 
     // Диалог выбора конечной даты
-    if (showEndDatePicker) {
+    if (state.showEndDatePicker) {
         DatePickerDialog(
             initialDate = state.endDate,
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
+                viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
             },
-            onDismiss = { showEndDatePicker = false }
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
+                viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog)
+            }
         )
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(56.dp),
-                        contentAlignment = Alignment.CenterStart
-                    ) {
-                        Text(
-                            text = stringResource(R.string.history_title),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium,
-                            modifier = Modifier.fillMaxWidth(),
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                },
+                title = { Text(stringResource(R.string.history_title)) },
                 navigationIcon = {
-                    IconButton(
-                        onClick = onNavigateBack,
-                        modifier = Modifier.size(48.dp)
-                    ) {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
-                            Icons.AutoMirrored.Filled.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showCategoryDialog = true }) {
+                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }) {
                         Icon(
                             imageVector = Icons.Default.FilterAlt,
                             contentDescription = stringResource(R.string.select_category),
@@ -202,7 +208,7 @@ fun TransactionHistoryScreen(
                                 LocalContentColor.current
                         )
                     }
-                    IconButton(onClick = { showPeriodDialog = true }) {
+                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }) {
                         Icon(
                             imageVector = Icons.Default.DateRange,
                             contentDescription = stringResource(R.string.select_period)
@@ -503,18 +509,4 @@ fun TransactionHistoryItem(transaction: Transaction) {
             )
         }
     }
-}
-
-/**
- * Перечисление для типов группировки транзакций
- */
-enum class GroupingType {
-    DAY, WEEK, MONTH
-}
-
-/**
- * Перечисление для типов периодов
- */
-enum class PeriodType {
-    ALL, MONTH, QUARTER, HALF_YEAR, YEAR, CUSTOM
 }
