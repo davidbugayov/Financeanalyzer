@@ -18,5 +18,8 @@ data class HomeState(
     val dailyIncome: Double = 0.0,
     val dailyExpense: Double = 0.0,
     val currentFilter: TransactionFilter = TransactionFilter.MONTH,
-    val showGroupSummary: Boolean = true
+    val showGroupSummary: Boolean = true,
+    val filteredIncome: Double = 0.0,
+    val filteredExpense: Double = 0.0,
+    val filteredBalance: Double = 0.0
 ) 

@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Button
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -23,8 +23,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.util.formatNumber
 
 @Composable
 fun CategoryStatsCard(
@@ -59,7 +61,7 @@ fun CategoryStatsCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = String.format("%.2f ₽", currentTotal),
+                        text = formatNumber(currentTotal),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -70,7 +72,7 @@ fun CategoryStatsCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = String.format("%.2f ₽", previousTotal),
+                        text = formatNumber(previousTotal),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -134,15 +136,6 @@ fun EmptyContent() {
     }
 }
 
-@Composable
-fun LoadingIndicator() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        CircularProgressIndicator()
-    }
-}
 
 @Composable
 fun TransactionsList(
@@ -169,6 +162,36 @@ fun TransactionsList(
             item {
                 Spacer(modifier = Modifier.height(8.dp))
             }
+        }
+    }
+}
+
+@Composable
+fun ComparisonCard(
+    currentTotal: Double,
+    previousTotal: Double
+) {
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Text(
+                text = formatNumber(currentTotal),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = formatNumber(previousTotal),
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
         }
     }
 } 

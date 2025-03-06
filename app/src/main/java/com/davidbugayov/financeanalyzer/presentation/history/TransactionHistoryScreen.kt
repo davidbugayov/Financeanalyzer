@@ -17,10 +17,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FilterAlt
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -31,6 +32,7 @@ import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -50,10 +52,13 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
+import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
+import com.davidbugayov.financeanalyzer.presentation.components.PeriodFilterChips
+import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.AddCategoryDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
@@ -93,24 +98,25 @@ fun TransactionHistoryScreen(
 
     // Диалог выбора периода
     if (state.showPeriodDialog) {
-        PeriodSelectionDialog(
-            currentPeriodType = state.periodType,
-            onPeriodTypeSelected = { periodType ->
-                viewModel.onEvent(TransactionHistoryEvent.SetPeriodType(periodType))
+        AlertDialog(
+            onDismissRequest = { viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog) },
+            title = { Text(stringResource(R.string.select_period)) },
+            text = {
+                PeriodFilterChips(
+                    currentFilter = state.periodType,
+                    onFilterSelected = {
+                        viewModel.onEvent(TransactionHistoryEvent.SetPeriodType(it))
+                        if (it != PeriodType.CUSTOM) {
+                            viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
+                        }
+                    }
+                )
             },
-            onDismiss = {
-                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
-            },
-            onShowStartDatePicker = {
-                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
-                viewModel.onEvent(TransactionHistoryEvent.ShowStartDatePicker)
-            },
-            onShowEndDatePicker = {
-                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
-                viewModel.onEvent(TransactionHistoryEvent.ShowEndDatePicker)
-            },
-            startDate = state.startDate,
-            endDate = state.endDate
+            confirmButton = {
+                TextButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog) }) {
+                    Text(stringResource(R.string.done))
+                }
+            }
         )
     }
 
@@ -210,7 +216,7 @@ fun TransactionHistoryScreen(
                     }
                     IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }) {
                         Icon(
-                            imageVector = Icons.Default.DateRange,
+                            imageVector = Icons.Default.FilterList,
                             contentDescription = stringResource(R.string.select_period)
                         )
                     }
@@ -228,12 +234,16 @@ fun TransactionHistoryScreen(
                     .fillMaxSize()
                     .padding(horizontal = 16.dp)
             ) {
-                GroupingChips(
-                    currentGrouping = state.groupingType,
-                    onGroupingSelected = {
-                        viewModel.onEvent(TransactionHistoryEvent.SetGroupingType(it))
-                    }
-                )
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    GroupingChips(
+                        currentGrouping = state.groupingType,
+                        onGroupingSelected = { viewModel.onEvent(TransactionHistoryEvent.SetGroupingType(it)) }
+                    )
+                }
 
                 // Отображение выбранного периода
                 Row(
@@ -384,29 +394,22 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(
-                            R.string.income_label,
-                            stringResource(R.string.currency_format, formatNumber(income, useDecimals = true))
-                        ),
-                        fontSize = 12.sp,
-                        color = Color(0xFF4CAF50)
+                        text = formatNumber(income),
+                        fontSize = 14.sp,
+                        color = Color(0xFF4CAF50),
+                        fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(
-                            R.string.expense_label,
-                            stringResource(R.string.currency_format, formatNumber(expense, useDecimals = true))
-                        ),
-                        fontSize = 12.sp,
-                        color = Color(0xFFF44336)
+                        text = formatNumber(expense),
+                        fontSize = 14.sp,
+                        color = Color(0xFFF44336),
+                        fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(
-                            R.string.balance_label,
-                            stringResource(R.string.currency_format, formatNumber(balance, useDecimals = true))
-                        ),
-                        fontSize = 12.sp,
+                        text = formatNumber(balance),
+                        fontSize = 14.sp,
                         color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
                         fontWeight = FontWeight.Bold
                     )

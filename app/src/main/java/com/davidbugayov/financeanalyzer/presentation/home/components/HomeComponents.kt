@@ -13,7 +13,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -28,7 +27,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.util.formatNumber
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -61,7 +60,7 @@ fun BalanceCard(
             )
 
             Text(
-                text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
+                text = formatNumber(balance),
                 fontSize = 32.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
@@ -83,7 +82,7 @@ fun BalanceCard(
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", income)),
+                        text = formatNumber(income),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF4CAF50)
@@ -100,7 +99,7 @@ fun BalanceCard(
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", expense)),
+                        text = formatNumber(expense),
                         fontSize = 18.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFFF44336)
@@ -153,7 +152,7 @@ fun DailyStatsCard(
                         modifier = Modifier.padding(end = 4.dp)
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", dailyIncome)),
+                        text = formatNumber(dailyIncome),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFF4CAF50)
@@ -170,7 +169,7 @@ fun DailyStatsCard(
                         modifier = Modifier.padding(end = 4.dp)
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", dailyExpense)),
+                        text = formatNumber(dailyExpense),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = Color(0xFFF44336)
@@ -178,40 +177,6 @@ fun DailyStatsCard(
                 }
             }
         }
-    }
-}
-
-/**
- * Фильтры для транзакций
- */
-@Composable
-fun FilterChips(
-    currentFilter: TransactionFilter,
-    onFilterSelected: (TransactionFilter) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        FilterChip(
-            selected = currentFilter == TransactionFilter.TODAY,
-            onClick = { onFilterSelected(TransactionFilter.TODAY) },
-            label = { Text(stringResource(R.string.today)) }
-        )
-
-        FilterChip(
-            selected = currentFilter == TransactionFilter.WEEK,
-            onClick = { onFilterSelected(TransactionFilter.WEEK) },
-            label = { Text(stringResource(R.string.week)) }
-        )
-
-        FilterChip(
-            selected = currentFilter == TransactionFilter.MONTH,
-            onClick = { onFilterSelected(TransactionFilter.MONTH) },
-            label = { Text(stringResource(R.string.month)) }
-        )
     }
 }
 
@@ -265,10 +230,7 @@ fun TransactionItem(transaction: Transaction) {
             }
 
             Text(
-                text = if (transaction.isExpense)
-                    stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
-                else
-                    stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
+                text = formatNumber(transaction.amount),
                 color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
                 fontWeight = FontWeight.Bold
             )

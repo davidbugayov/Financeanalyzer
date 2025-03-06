@@ -5,39 +5,56 @@ import kotlin.math.abs
 /**
  * Форматирует число для отображения в компактном или сокращенном виде
  * @param number Число для форматирования
- * @param useDecimals Использовать ли десятичные знаки (по умолчанию false)
- * @param decimals Количество знаков после запятой (по умолчанию 1)
+ * @param maxLength Максимальная длина результата (по умолчанию без ограничений)
  * @return Отформатированное число в виде строки
  */
 fun formatNumber(
     number: Double,
-    useDecimals: Boolean = false,
-    decimals: Int = 1
+    maxLength: Int? = null
 ): String {
     val absNumber = abs(number)
     val prefix = if (number < 0) "-" else ""
+
+    // Пробуем сначала отформатировать с десятичными знаками
+    val fullFormatted = when {
+        absNumber >= 1_000_000 -> "${prefix}${String.format("%.1fM", absNumber / 1_000_000)}"
+        absNumber >= 1_000 -> "${prefix}${String.format("%.1fK", absNumber / 1_000)}"
+        else -> "${prefix}${String.format("%.2f", absNumber)}"
+    }
+
+    // Если число помещается полностью или нет ограничения длины
+    if (maxLength == null || fullFormatted.length <= maxLength) {
+        return fullFormatted
+    }
+
+    // Иначе используем сокращенный формат
     return when {
-        absNumber >= 1_000_000 -> {
-            if (useDecimals) {
-                "${prefix}${String.format("%." + decimals + "fM", absNumber / 1_000_000)}"
-            } else {
-                "${prefix}${String.format("%.0fM", absNumber / 1_000_000)}"
-            }
-        }
-        absNumber >= 1_000 -> {
-            if (useDecimals) {
-                "${prefix}${String.format("%." + decimals + "fK", absNumber / 1_000)}"
-            } else {
-                "${prefix}${String.format("%.0fK", absNumber / 1_000)}"
-            }
-        }
-        else -> {
-            if (useDecimals) {
-                "${prefix}${String.format("%." + decimals + "f", absNumber)}"
-            } else {
-                "${prefix}${String.format("%.0f", absNumber)}"
-            }
-        }
+        absNumber >= 1_000_000 -> "${prefix}${String.format("%.0fM", absNumber / 1_000_000)}"
+        absNumber >= 1_000 -> "${prefix}${String.format("%.0fK", absNumber / 1_000)}"
+        else -> "${prefix}${String.format("%.0f", absNumber)}"
+    }
+}
+
+/**
+ * Форматирует сумму транзакции, скрывая десятичные знаки, если они нулевые
+ */
+fun formatTransactionAmount(amount: Double): String {
+    val absAmount = abs(amount)
+    val prefix = if (amount < 0) "-" else ""
+    val hasDecimals = absAmount % 1 != 0.0
+
+    // Пробуем отформатировать полное число
+    val fullNumber = if (hasDecimals) {
+        "${prefix}${String.format("%.2f", absAmount)}"
+    } else {
+        "${prefix}${String.format("%.0f", absAmount)}"
+    }
+
+    // Если число большое, используем сокращенный формат
+    return when {
+        absAmount >= 1_000_000 -> "${prefix}${String.format("%.1fM", absAmount / 1_000_000)}"
+        absAmount >= 1_000_000_000 -> "${prefix}${String.format("%.1fB", absAmount / 1_000_000_000)}"
+        else -> fullNumber
     }
 }
 
@@ -64,7 +81,12 @@ fun formatNumberWithCurrency(
             "${prefix}${String.format("%.1f", thousands)}К$currencySymbol"
         }
         else -> {
-            "${prefix}${String.format("%.0f", absNumber)}$currencySymbol"
+            val hasDecimals = absNumber % 1 != 0.0
+            if (hasDecimals) {
+                "${prefix}${String.format("%.2f", absNumber)}$currencySymbol"
+            } else {
+                "${prefix}${String.format("%.0f", absNumber)}$currencySymbol"
+            }
         }
     }
 }

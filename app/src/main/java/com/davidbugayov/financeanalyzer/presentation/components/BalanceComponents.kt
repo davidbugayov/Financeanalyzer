@@ -17,6 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 
 /**
  * Карточка с информацией о балансе
@@ -45,7 +46,10 @@ fun BalanceCard(
             )
 
             Text(
-                text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
+                text = stringResource(
+                    if (balance >= 0) R.string.income_currency_format else R.string.expense_currency_format,
+                    formatTransactionAmount(balance)
+                ),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
@@ -64,7 +68,7 @@ fun BalanceCard(
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", income)),
+                        text = stringResource(R.string.income_currency_format, formatTransactionAmount(income)),
                         fontSize = 16.sp,
                         color = Color(0xFF4CAF50)
                     )
@@ -77,7 +81,7 @@ fun BalanceCard(
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", expense)),
+                        text = stringResource(R.string.expense_currency_format, formatTransactionAmount(expense)),
                         fontSize = 16.sp,
                         color = Color(0xFFF44336)
                     )
@@ -115,7 +119,7 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, String.format("%.2f", income)),
+                    text = stringResource(R.string.income_currency_format, formatTransactionAmount(income)),
                     fontSize = 14.sp,
                     color = Color(0xFF4CAF50),
                     fontWeight = FontWeight.Medium
@@ -129,7 +133,7 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, String.format("%.2f", expense)),
+                    text = stringResource(R.string.expense_currency_format, formatTransactionAmount(expense)),
                     fontSize = 14.sp,
                     color = Color(0xFFF44336),
                     fontWeight = FontWeight.Medium
@@ -143,7 +147,10 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
+                    text = stringResource(
+                        if (balance >= 0) R.string.income_currency_format else R.string.expense_currency_format,
+                        formatTransactionAmount(balance)
+                    ),
                     fontSize = 14.sp,
                     color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
                     fontWeight = FontWeight.Bold

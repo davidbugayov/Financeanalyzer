@@ -141,7 +141,20 @@ class HomeViewModel(
             TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
             TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
         }
-        _state.update { it.copy(filteredTransactions = filtered) }
+
+        // Рассчитываем суммы для отфильтрованных транзакций
+        val filteredIncome = filtered.filter { !it.isExpense }.sumOf { it.amount }
+        val filteredExpense = filtered.filter { it.isExpense }.sumOf { it.amount }
+        val filteredBalance = filteredIncome - filteredExpense
+
+        _state.update {
+            it.copy(
+                filteredTransactions = filtered,
+                filteredIncome = filteredIncome,
+                filteredExpense = filteredExpense,
+                filteredBalance = filteredBalance
+            )
+        }
     }
 
     /**

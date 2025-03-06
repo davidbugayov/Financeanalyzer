@@ -11,10 +11,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -34,9 +38,98 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.util.formatNumber
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.presentation.components.GroupSummary
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
+
+@Composable
+fun TransactionHistory(
+    transactionGroups: List<TransactionGroup>,
+    onTransactionClick: (Transaction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    LazyColumn(
+        modifier = modifier,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        items(transactionGroups) { group ->
+            TransactionGroupItem(
+                group = group,
+                onTransactionClick = onTransactionClick
+            )
+        }
+    }
+}
+
+@Composable
+fun TransactionGroupItem(
+    group: TransactionGroup,
+    onTransactionClick: (Transaction) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    var expanded by remember { mutableStateOf(true) }
+
+    Column(
+        modifier = modifier.fillMaxWidth()
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = group.date,
+                color = MaterialTheme.colorScheme.onSurface,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier
+            )
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                val amount = formatTransactionAmount(group.balance)
+                val formattedAmount = stringResource(
+                    if (group.balance >= 0) R.string.income_currency_format else R.string.expense_currency_format,
+                    amount
+                )
+
+                Text(
+                    text = formattedAmount,
+                    color = if (group.balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    style = MaterialTheme.typography.bodyMedium,
+                    fontWeight = FontWeight.Medium,
+                    modifier = Modifier
+                )
+
+                IconButton(onClick = { expanded = !expanded }) {
+                    Icon(
+                        imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                        contentDescription = if (expanded) "Свернуть" else "Развернуть",
+                        tint = MaterialTheme.colorScheme.onSurface
+                    )
+                }
+            }
+        }
+
+        if (expanded) {
+            Column(
+                modifier = Modifier.padding(horizontal = 16.dp),
+                verticalArrangement = Arrangement.spacedBy(4.dp)
+            ) {
+                group.transactions.forEach { transaction ->
+                    TransactionItem(
+                        transaction = transaction,
+                        onClick = { onTransactionClick(transaction) }
+                    )
+                }
+            }
+        }
+    }
+}
 
 @Composable
 fun GroupHeader(
@@ -84,40 +177,12 @@ fun GroupHeader(
                 enter = expandVertically() + fadeIn(),
                 exit = shrinkVertically() + fadeOut()
             ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 8.dp),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    Text(
-                        text = stringResource(
-                            R.string.income_label,
-                            stringResource(R.string.currency_format, formatNumber(income, useDecimals = true))
-                        ),
-                        fontSize = 12.sp,
-                        color = Color(0xFF4CAF50)
-                    )
-
-                    Text(
-                        text = stringResource(
-                            R.string.expense_label,
-                            stringResource(R.string.currency_format, formatNumber(expense, useDecimals = true))
-                        ),
-                        fontSize = 12.sp,
-                        color = Color(0xFFF44336)
-                    )
-
-                    Text(
-                        text = stringResource(
-                            R.string.balance_label,
-                            stringResource(R.string.currency_format, formatNumber(balance, useDecimals = true))
-                        ),
-                        fontSize = 12.sp,
-                        color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
-                        fontWeight = FontWeight.Bold
-                    )
-                }
+                GroupSummary(
+                    income = income,
+                    expense = expense,
+                    balance = balance,
+                    modifier = Modifier.padding(top = 8.dp)
+                )
             }
         }
     }
@@ -127,60 +192,10 @@ fun GroupHeader(
 fun TransactionHistoryItem(
     transaction: Transaction
 ) {
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-
-    Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp),
-        color = MaterialTheme.colorScheme.surface,
-        shape = MaterialTheme.shapes.small
-    ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Column(
-                modifier = Modifier.weight(1f)
-            ) {
-                Text(
-                    text = transaction.title,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = stringResource(
-                        R.string.category_date_format,
-                        transaction.category,
-                        dateFormat.format(transaction.date)
-                    ),
-                    fontSize = 12.sp,
-                    color = Color.Gray
-                )
-                transaction.note?.let {
-                    if (it.isNotEmpty()) {
-                        Text(
-                            text = it,
-                            fontSize = 12.sp,
-                            color = Color.Gray,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-            }
-
-            Text(
-                text = if (transaction.isExpense)
-                    stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
-                else
-                    stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
-                color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
-                fontWeight = FontWeight.Bold
-            )
-        }
-    }
+    TransactionItem(
+        transaction = transaction,
+        onClick = {}
+    )
 }
 
 @Composable
@@ -189,5 +204,85 @@ fun TransactionGroup(
     transactions: List<Transaction>,
     onTransactionClick: (Transaction) -> Unit
 ) {
-    // ... rest of the file content ...
+    Column(
+        modifier = Modifier.fillMaxWidth()
+    ) {
+        GroupHeader(
+            period = groupTitle,
+            transactions = transactions
+        )
+
+        transactions.forEach { transaction ->
+            TransactionHistoryItem(transaction = transaction)
+        }
+    }
+}
+
+/**
+ * Компонент для отображения сводки по группе транзакций
+ */
+@Composable
+fun GroupSummary(
+    income: Double,
+    expense: Double,
+    balance: Double,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column {
+                Text(
+                    text = stringResource(R.string.income),
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = stringResource(R.string.income_currency_format, formatTransactionAmount(income)),
+                    fontSize = 14.sp,
+                    color = Color(0xFF4CAF50),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Column {
+                Text(
+                    text = stringResource(R.string.expense),
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = stringResource(R.string.expense_currency_format, formatTransactionAmount(expense)),
+                    fontSize = 14.sp,
+                    color = Color(0xFFF44336),
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Column {
+                Text(
+                    text = stringResource(R.string.balance),
+                    fontSize = 12.sp,
+                    color = Color.Gray
+                )
+                Text(
+                    text = stringResource(
+                        if (balance >= 0) R.string.income_currency_format else R.string.expense_currency_format,
+                        formatTransactionAmount(balance)
+                    ),
+                    fontSize = 14.sp,
+                    color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
 } 
