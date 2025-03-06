@@ -28,16 +28,23 @@ val appModule = module {
 
     // Use cases
     single { LoadTransactionsUseCase(get()) }
-    single { AddTransactionUseCase(get()) }
-    single { DeleteTransactionUseCase(get()) }
-    single { UpdateTransactionUseCase(get()) }
     single { FilterTransactionsUseCase() }
     single { GroupTransactionsUseCase() }
     single { CalculateCategoryStatsUseCase(get()) }
+    single { AddTransactionUseCase(get()) }
+    single { DeleteTransactionUseCase(get()) }
+    single { UpdateTransactionUseCase(get()) }
 
     // ViewModels
-    viewModel { HomeViewModel(get(), get<AddTransactionUseCase>()) }
+    viewModel {
+        TransactionHistoryViewModel(
+            loadTransactionsUseCase = get(),
+            filterTransactionsUseCase = get(),
+            groupTransactionsUseCase = get(),
+            calculateCategoryStatsUseCase = get()
+        )
+    }
+    viewModel { HomeViewModel(get(), get()) }
     viewModel { ChartViewModel(get()) }
     viewModel { AddTransactionViewModel(androidApplication(), get()) }
-    viewModel { TransactionHistoryViewModel(get(), get(), get(), get()) }
 }

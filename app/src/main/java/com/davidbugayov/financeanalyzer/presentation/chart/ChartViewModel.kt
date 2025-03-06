@@ -4,8 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartMonthlyData
 import com.davidbugayov.financeanalyzer.utils.Event
+import com.davidbugayov.financeanalyzer.utils.EventBus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
@@ -92,13 +93,7 @@ class ChartViewModel(
      * Возвращает данные для графика транзакций по месяцам с разбивкой по категориям
      * @return Карта месяцев и транзакций по категориям
      */
-    data class MonthlyTransactionData(
-        val totalIncome: Double,
-        val totalExpense: Double,
-        val categoryBreakdown: Map<String, Double>
-    )
-
-    fun getTransactionsByMonth(): Map<String, MonthlyTransactionData> {
+    fun getTransactionsByMonth(): Map<String, ChartMonthlyData> {
         val dateFormat = SimpleDateFormat("MM.yyyy", Locale.getDefault())
         
         return _transactions.value
@@ -114,8 +109,8 @@ class ChartViewModel(
                     .mapValues { (_, categoryTransactions) ->
                         categoryTransactions.sumOf { it.amount }
                     }
-                
-                MonthlyTransactionData(
+
+                ChartMonthlyData(
                     totalIncome = income,
                     totalExpense = expense,
                     categoryBreakdown = categoryBreakdown
@@ -129,7 +124,7 @@ class ChartViewModel(
      * @param days Количество дней для отображения
      * @return Карта дней и данных о расходах
      */
-    fun getExpensesByDay(days: Int = 7): Map<String, MonthlyTransactionData> {
+    fun getExpensesByDay(days: Int = 7): Map<String, ChartMonthlyData> {
         val dateFormat = SimpleDateFormat("dd.MM", Locale.getDefault())
         val currentTime = System.currentTimeMillis()
         val daysInMillis = days * 24 * 60 * 60 * 1000L
@@ -147,8 +142,8 @@ class ChartViewModel(
                     .mapValues { (_, categoryTransactions) ->
                         categoryTransactions.sumOf { it.amount }
                     }
-                
-                MonthlyTransactionData(
+
+                ChartMonthlyData(
                     totalIncome = dailyIncome.sumOf { it.amount },
                     totalExpense = dailyExpenses.sumOf { it.amount },
                     categoryBreakdown = categoryBreakdown

@@ -5,5 +5,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.model
  */
 enum class GroupingType {
 
-    DAY, WEEK, MONTH
+    DAY,
+    WEEK,
+    MONTH
 } 

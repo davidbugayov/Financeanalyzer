@@ -1,11 +1,13 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import java.util.*
+import java.util.Calendar
+import java.util.Date
 import kotlin.random.Random
 
 /**
  * Утилитарный класс для генерации тестовых данных транзакций.
+ * В String не выносить!
  */
 object TestDataGenerator {
     

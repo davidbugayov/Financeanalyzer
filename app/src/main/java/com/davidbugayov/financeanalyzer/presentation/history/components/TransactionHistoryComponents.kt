@@ -14,7 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -35,41 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.util.formatNumber
 import java.text.SimpleDateFormat
 import java.util.Locale
-
-@Composable
-fun GroupingChips(
-    currentGrouping: GroupingType,
-    onGroupingSelected: (GroupingType) -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        FilterChip(
-            selected = currentGrouping == GroupingType.DAY,
-            onClick = { onGroupingSelected(GroupingType.DAY) },
-            label = { Text(stringResource(R.string.group_by_day)) }
-        )
-
-        FilterChip(
-            selected = currentGrouping == GroupingType.WEEK,
-            onClick = { onGroupingSelected(GroupingType.WEEK) },
-            label = { Text(stringResource(R.string.group_by_week)) }
-        )
-
-        FilterChip(
-            selected = currentGrouping == GroupingType.MONTH,
-            onClick = { onGroupingSelected(GroupingType.MONTH) },
-            label = { Text(stringResource(R.string.group_by_month)) }
-        )
-    }
-}
 
 @Composable
 fun GroupHeader(
@@ -214,4 +181,13 @@ fun TransactionHistoryItem(
             )
         }
     }
+}
+
+@Composable
+fun TransactionGroup(
+    groupTitle: String,
+    transactions: List<Transaction>,
+    onTransactionClick: (Transaction) -> Unit
+) {
+    // ... rest of the file content ...
 } 

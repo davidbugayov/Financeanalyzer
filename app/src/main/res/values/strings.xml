@@ -114,4 +114,19 @@
     <string name="cancel_transaction_confirmation">Вы уверены, что хотите отменить добавление транзакции?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+
+    <!-- FinanceChartScreen strings -->
+    <string name="error_loading_transactions">Ошибка при загрузке транзакций: %s</string>
+    <string name="no_data_to_display">Нет данных для отображения</string>
+    <string name="expenses_by_category">Расходы по категориям</string>
+    <string name="no_expense_data">Нет данных о расходах</string>
+    <string name="income_by_category">Доходы по категориям</string>
+    <string name="no_income_data">Нет данных о доходах</string>
+    <string name="balance_by_month">Баланс по месяцам</string>
+    <string name="insufficient_data">Недостаточно данных для отображения</string>
+    <string name="expenses_last_7_days">Расходы за последние 7 дней</string>
+    <string name="no_expenses_recent_days">Нет данных о расходах за последние дни</string>
+    <string name="chart_income">Доходы</string>
+    <string name="chart_expenses">Расходы</string>
+    <string name="currency_format_with_percent">%.2f ₽ (%.1f%%)</string>
 </resources>
