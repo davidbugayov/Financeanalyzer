@@ -32,6 +32,14 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
 
+/**
+ * Столбчатая диаграмма для отображения доходов и расходов по месяцам.
+ * Отображает два столбца для каждого месяца: доходы и расходы.
+ * Включает легенду и подписи осей.
+ *
+ * @param data Карта с данными по месяцам, где ключ - название месяца, значение - данные о доходах и расходах
+ * @param modifier Модификатор для настройки внешнего вида
+ */
 @Composable
 fun MonthlyBarChart(
     data: Map<String, ChartMonthlyData>,

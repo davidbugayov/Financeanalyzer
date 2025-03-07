@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.history.components
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.*
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -43,6 +43,14 @@ import com.davidbugayov.financeanalyzer.presentation.components.GroupSummary
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 
+/**
+ * Основной компонент для отображения истории транзакций.
+ * Отображает список групп транзакций с возможностью сворачивания/разворачивания.
+ *
+ * @param transactionGroups Список групп транзакций для отображения
+ * @param onTransactionClick Callback, вызываемый при нажатии на транзакцию
+ * @param modifier Модификатор для настройки внешнего вида
+ */
 @Composable
 fun TransactionHistory(
     transactionGroups: List<TransactionGroup>,
@@ -62,6 +70,14 @@ fun TransactionHistory(
     }
 }
 
+/**
+ * Компонент для отображения группы транзакций.
+ * Включает заголовок с суммарной информацией и список транзакций.
+ *
+ * @param group Группа транзакций для отображения
+ * @param onTransactionClick Callback, вызываемый при нажатии на транзакцию
+ * @param modifier Модификатор для настройки внешнего вида
+ */
 @Composable
 fun TransactionGroupItem(
     group: TransactionGroup,
@@ -131,6 +147,13 @@ fun TransactionGroupItem(
     }
 }
 
+/**
+ * Заголовок группы транзакций с возможностью сворачивания/разворачивания.
+ * Отображает период и суммарную информацию о транзакциях в группе.
+ *
+ * @param period Название периода (например, "Январь 2024")
+ * @param transactions Список транзакций в группе
+ */
 @Composable
 fun GroupHeader(
     period: String,
@@ -188,6 +211,12 @@ fun GroupHeader(
     }
 }
 
+/**
+ * Компонент для отображения одной транзакции в истории.
+ * Использует общий компонент TransactionItem.
+ *
+ * @param transaction Транзакция для отображения
+ */
 @Composable
 fun TransactionHistoryItem(
     transaction: Transaction
@@ -198,6 +227,14 @@ fun TransactionHistoryItem(
     )
 }
 
+/**
+ * Компонент для отображения группы транзакций с заголовком.
+ * Объединяет GroupHeader и список транзакций.
+ *
+ * @param groupTitle Название группы
+ * @param transactions Список транзакций в группе
+ * @param onTransactionClick Callback, вызываемый при нажатии на транзакцию
+ */
 @Composable
 fun TransactionGroup(
     groupTitle: String,

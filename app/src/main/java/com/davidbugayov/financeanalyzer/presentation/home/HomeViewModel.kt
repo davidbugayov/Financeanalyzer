@@ -24,6 +24,11 @@ import java.util.Calendar
 /**
  * ViewModel для главного экрана.
  * Следует принципам MVI и Clean Architecture.
+ *
+ * @property loadTransactionsUseCase UseCase для загрузки транзакций
+ * @property addTransactionUseCase UseCase для добавления новых транзакций
+ * @property _state Внутренний MutableStateFlow для хранения состояния экрана
+ * @property state Публичный StateFlow для наблюдения за состоянием экрана
  */
 class HomeViewModel(
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
@@ -41,6 +46,7 @@ class HomeViewModel(
 
     /**
      * Обрабатывает события экрана Home
+     * @param event Событие для обработки
      */
     fun onEvent(event: HomeEvent) {
         when (event) {
@@ -61,32 +67,23 @@ class HomeViewModel(
     }
 
     /**
-     * Подписываемся на события изменения транзакций
+     * Подписываемся на события изменения транзакций через EventBus
      */
     private fun subscribeToEvents() {
         viewModelScope.launch {
             Timber.d("Subscribing to transaction events")
             EventBus.events.collect { event ->
                 when (event) {
-                    is Event.TransactionAdded -> {
-                        Timber.d("Transaction added event received")
-                        loadTransactions()
-                    }
-                    is Event.TransactionDeleted -> {
-                        Timber.d("Transaction deleted event received")
-                        loadTransactions()
-                    }
-                    is Event.TransactionUpdated -> {
-                        Timber.d("Transaction updated event received")
-                        loadTransactions()
-                    }
+                    is Event.TransactionAdded,
+                    is Event.TransactionDeleted,
+                    is Event.TransactionUpdated -> loadTransactions()
                 }
             }
         }
     }
 
     /**
-     * Загружает транзакции из репозитория
+     * Загружает транзакции из репозитория и обновляет состояние
      */
     private fun loadTransactions() {
         viewModelScope.launch {
@@ -161,6 +158,8 @@ class HomeViewModel(
 
     /**
      * Возвращает транзакции за последний месяц
+     * @param transactions Список всех транзакций
+     * @return Отфильтрованный список транзакций за последний месяц
      */
     private fun getLastMonthTransactions(transactions: List<Transaction>): List<Transaction> {
         val calendar = Calendar.getInstance()
@@ -174,6 +173,8 @@ class HomeViewModel(
     
     /**
      * Возвращает транзакции за сегодня
+     * @param transactions Список всех транзакций
+     * @return Отфильтрованный список транзакций за сегодня
      */
     private fun getTodayTransactions(transactions: List<Transaction>): List<Transaction> {
         return transactions
@@ -189,6 +190,8 @@ class HomeViewModel(
     
     /**
      * Возвращает транзакции за последнюю неделю
+     * @param transactions Список всех транзакций
+     * @return Отфильтрованный список транзакций за последнюю неделю
      */
     private fun getLastWeekTransactions(transactions: List<Transaction>): List<Transaction> {
         val calendar = Calendar.getInstance()
@@ -201,7 +204,7 @@ class HomeViewModel(
     }
 
     /**
-     * Рассчитывает общую статистику
+     * Рассчитывает общую статистику по всем транзакциям
      */
     private fun calculateTotalStats() {
         Timber.d("Calculating total stats")
@@ -229,37 +232,9 @@ class HomeViewModel(
     }
 
     /**
-     * Рассчитывает ежедневную статистику
+     * Добавляет новую транзакцию
+     * @param transaction Транзакция для добавления
      */
-    private fun calculateDailyStats() {
-        Timber.d("Calculating daily stats")
-        val today = Calendar.getInstance()
-        val transactions = _state.value.transactions
-
-        val todayTransactions = transactions.filter { transaction ->
-            val transactionDate = Calendar.getInstance().apply { time = transaction.date }
-            transactionDate.get(Calendar.YEAR) == today.get(Calendar.YEAR) &&
-            transactionDate.get(Calendar.DAY_OF_YEAR) == today.get(Calendar.DAY_OF_YEAR)
-        }
-
-        val dailyIncome = todayTransactions
-            .filter { !it.isExpense }
-            .sumOf { it.amount }
-
-        val dailyExpense = todayTransactions
-            .filter { it.isExpense }
-            .sumOf { it.amount }
-
-        _state.update {
-            it.copy(
-                dailyIncome = dailyIncome,
-                dailyExpense = dailyExpense
-            )
-        }
-
-        Timber.d("Daily stats calculated: Income=$dailyIncome, Expense=$dailyExpense")
-    }
-
     fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
             addTransactionUseCase(transaction).fold(
@@ -279,5 +254,13 @@ class HomeViewModel(
  * Перечисление для фильтров транзакций
  */
 enum class TransactionFilter {
-    TODAY, WEEK, MONTH
+
+    /** Фильтр для отображения транзакций за сегодня */
+    TODAY,
+
+    /** Фильтр для отображения транзакций за неделю */
+    WEEK,
+
+    /** Фильтр для отображения транзакций за месяц */
+    MONTH
 } 

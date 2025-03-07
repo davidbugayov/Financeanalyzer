@@ -28,6 +28,9 @@ import timber.log.Timber
  * Размер 1x1, отображает только сумму баланса.
  * При нажатии на виджет открывается приложение.
  * Обновляется каждые 30 минут или при запуске приложения.
+ *
+ * @property loadTransactionsUseCase UseCase для загрузки транзакций
+ * @property scope Корутин скоуп для асинхронных операций с SupervisorJob для обработки ошибок
  */
 class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
 

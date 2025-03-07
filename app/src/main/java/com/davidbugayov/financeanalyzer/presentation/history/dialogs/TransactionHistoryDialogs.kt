@@ -38,15 +38,27 @@ import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Диалог выбора периода для фильтрации транзакций.
+ * Позволяет выбрать предустановленный период или указать произвольный диапазон дат.
+ *
+ * @param selectedPeriod Текущий выбранный период
+ * @param startDate Начальная дата для произвольного периода
+ * @param endDate Конечная дата для произвольного периода
+ * @param onPeriodSelected Callback, вызываемый при выборе периода
+ * @param onStartDateClick Callback для открытия диалога выбора начальной даты
+ * @param onEndDateClick Callback для открытия диалога выбора конечной даты
+ * @param onDismiss Callback для закрытия диалога
+ */
 @Composable
 fun PeriodSelectionDialog(
-    currentPeriodType: PeriodType,
-    onPeriodTypeSelected: (PeriodType) -> Unit,
-    onDismiss: () -> Unit,
-    onShowStartDatePicker: () -> Unit,
-    onShowEndDatePicker: () -> Unit,
+    selectedPeriod: PeriodType,
     startDate: Date,
-    endDate: Date
+    endDate: Date,
+    onPeriodSelected: (PeriodType) -> Unit,
+    onStartDateClick: () -> Unit,
+    onEndDateClick: () -> Unit,
+    onDismiss: () -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -55,72 +67,72 @@ fun PeriodSelectionDialog(
             Column {
                 PeriodRadioButton(
                     text = stringResource(R.string.period_all),
-                    selected = currentPeriodType == PeriodType.ALL,
+                    selected = selectedPeriod == PeriodType.ALL,
                     onClick = {
-                        onPeriodTypeSelected(PeriodType.ALL)
+                        onPeriodSelected(PeriodType.ALL)
                         onDismiss()
                     }
                 )
                 PeriodRadioButton(
                     text = stringResource(R.string.period_month),
-                    selected = currentPeriodType == PeriodType.MONTH,
+                    selected = selectedPeriod == PeriodType.MONTH,
                     onClick = {
-                        onPeriodTypeSelected(PeriodType.MONTH)
+                        onPeriodSelected(PeriodType.MONTH)
                         onDismiss()
                     }
                 )
                 PeriodRadioButton(
                     text = stringResource(R.string.period_quarter),
-                    selected = currentPeriodType == PeriodType.QUARTER,
+                    selected = selectedPeriod == PeriodType.QUARTER,
                     onClick = {
-                        onPeriodTypeSelected(PeriodType.QUARTER)
+                        onPeriodSelected(PeriodType.QUARTER)
                         onDismiss()
                     }
                 )
                 PeriodRadioButton(
                     text = stringResource(R.string.period_half_year),
-                    selected = currentPeriodType == PeriodType.HALF_YEAR,
+                    selected = selectedPeriod == PeriodType.HALF_YEAR,
                     onClick = {
-                        onPeriodTypeSelected(PeriodType.HALF_YEAR)
+                        onPeriodSelected(PeriodType.HALF_YEAR)
                         onDismiss()
                     }
                 )
                 PeriodRadioButton(
                     text = stringResource(R.string.period_year),
-                    selected = currentPeriodType == PeriodType.YEAR,
+                    selected = selectedPeriod == PeriodType.YEAR,
                     onClick = {
-                        onPeriodTypeSelected(PeriodType.YEAR)
+                        onPeriodSelected(PeriodType.YEAR)
                         onDismiss()
                     }
                 )
                 PeriodRadioButton(
                     text = stringResource(R.string.period_custom),
-                    selected = currentPeriodType == PeriodType.CUSTOM,
+                    selected = selectedPeriod == PeriodType.CUSTOM,
                     onClick = {
-                        onPeriodTypeSelected(PeriodType.CUSTOM)
+                        onPeriodSelected(PeriodType.CUSTOM)
                     }
                 )
 
-                if (currentPeriodType == PeriodType.CUSTOM) {
+                if (selectedPeriod == PeriodType.CUSTOM) {
                     Spacer(modifier = Modifier.height(8.dp))
 
                     DateSelectionRow(
                         label = stringResource(R.string.from_date).split(":")[0],
                         date = startDate,
-                        onClick = onShowStartDatePicker
+                        onClick = onStartDateClick
                     )
 
                     DateSelectionRow(
                         label = stringResource(R.string.to_date).split(":")[0],
                         date = endDate,
-                        onClick = onShowEndDatePicker
+                        onClick = onEndDateClick
                     )
                 }
             }
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(if (currentPeriodType == PeriodType.CUSTOM) R.string.apply else R.string.ok))
+                Text(stringResource(if (selectedPeriod == PeriodType.CUSTOM) R.string.apply else R.string.ok))
             }
         },
         dismissButton = {
@@ -131,6 +143,14 @@ fun PeriodSelectionDialog(
     )
 }
 
+/**
+ * Компонент радиокнопки для выбора периода.
+ * Отображает радиокнопку с текстом и обрабатывает нажатия.
+ *
+ * @param text Текст рядом с радиокнопкой
+ * @param selected Выбрана ли радиокнопка
+ * @param onClick Callback, вызываемый при нажатии
+ */
 @Composable
 private fun PeriodRadioButton(
     text: String,
@@ -156,6 +176,15 @@ private fun PeriodRadioButton(
     }
 }
 
+/**
+ * Строка выбора даты в диалоге периода.
+ * Отображает метку и текущую дату с иконкой календаря.
+ * При нажатии открывает диалог выбора даты.
+ *
+ * @param label Метка (например, "С" или "По")
+ * @param date Выбранная дата
+ * @param onClick Callback для открытия календаря
+ */
 @Composable
 private fun DateSelectionRow(
     label: String,
@@ -191,6 +220,14 @@ private fun DateSelectionRow(
     }
 }
 
+/**
+ * Диалог выбора даты.
+ * Использует стандартный DatePicker из Material3.
+ *
+ * @param initialDate Начальная дата для отображения в календаре
+ * @param onDateSelected Callback, вызываемый при выборе даты
+ * @param onDismiss Callback для закрытия диалога
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialog(
@@ -226,6 +263,16 @@ fun DatePickerDialog(
     }
 }
 
+/**
+ * Диалог выбора категории для фильтрации транзакций.
+ * Отображает список доступных категорий и возможность добавить новую.
+ *
+ * @param selectedCategory Текущая выбранная категория
+ * @param categories Список доступных категорий
+ * @param onCategorySelected Callback, вызываемый при выборе категории
+ * @param onAddCategory Callback для открытия диалога добавления новой категории
+ * @param onDismiss Callback для закрытия диалога
+ */
 @Composable
 fun CategorySelectionDialog(
     selectedCategory: String?,
@@ -288,10 +335,19 @@ fun CategorySelectionDialog(
     )
 }
 
+/**
+ * Диалог добавления новой категории.
+ * Позволяет пользователю ввести название новой категории.
+ *
+ * @param categoryText Текущий текст в поле ввода
+ * @param onCategoryTextChange Callback, вызываемый при изменении текста
+ * @param onConfirm Callback для подтверждения добавления категории
+ * @param onDismiss Callback для закрытия диалога
+ */
 @Composable
 fun AddCategoryDialog(
     categoryText: String,
-    onCategoryTextChanged: (String) -> Unit,
+    onCategoryTextChange: (String) -> Unit,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -301,7 +357,7 @@ fun AddCategoryDialog(
         text = {
             OutlinedTextField(
                 value = categoryText,
-                onValueChange = onCategoryTextChanged,
+                onValueChange = onCategoryTextChange,
                 label = { Text(stringResource(R.string.category_name)) },
                 singleLine = true,
                 modifier = Modifier.fillMaxWidth()

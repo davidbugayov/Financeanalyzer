@@ -25,6 +25,9 @@ import timber.log.Timber
  * Обновляется каждые 30 минут или при запуске приложения.
  * Визуально соответствует компоненту BalanceCard из приложения.
  * При нажатии на виджет открывается приложение.
+ *
+ * @property loadTransactionsUseCase UseCase для загрузки транзакций
+ * @property scope Корутин скоуп для асинхронных операций
  */
 class BalanceWidget : AppWidgetProvider(), KoinComponent {
 

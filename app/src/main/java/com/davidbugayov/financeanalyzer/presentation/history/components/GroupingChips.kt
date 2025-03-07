@@ -14,7 +14,12 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 
 /**
- * Компонент с чипами для группировки транзакций
+ * Компонент с чипами для выбора типа группировки транзакций.
+ * Позволяет пользователю выбрать группировку по дням, неделям или месяцам.
+ * Отображает текущий выбранный тип группировки.
+ *
+ * @param currentGrouping Текущий выбранный тип группировки
+ * @param onGroupingSelected Callback, вызываемый при выборе типа группировки
  */
 @Composable
 fun GroupingChips(

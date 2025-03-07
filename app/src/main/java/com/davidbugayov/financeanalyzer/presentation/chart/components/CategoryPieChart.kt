@@ -25,6 +25,14 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.util.formatNumber
 
+/**
+ * Круговая диаграмма для отображения распределения расходов/доходов по категориям.
+ * Включает в себя легенду с процентным соотношением каждой категории.
+ *
+ * @param data Карта с данными, где ключ - название категории, значение - сумма
+ * @param isIncome Флаг, указывающий тип данных (true - доходы, false - расходы)
+ * @param modifier Модификатор для настройки внешнего вида
+ */
 @Composable
 fun CategoryPieChart(
     data: Map<String, Double>,

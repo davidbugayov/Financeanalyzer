@@ -40,7 +40,11 @@ import java.util.Date
 import java.util.Locale
 
 /**
- * Компонент для выбора типа транзакции (доход/расход)
+ * Селектор типа транзакции (доход/расход).
+ * Позволяет пользователю выбрать тип добавляемой транзакции.
+ *
+ * @param isExpense Текущий выбранный тип (true - расход, false - доход)
+ * @param onTypeSelected Callback, вызываемый при выборе типа
  */
 @Composable
 fun TransactionTypeSelector(
@@ -91,7 +95,11 @@ fun TransactionTypeSelector(
 }
 
 /**
- * Поле для ввода названия транзакции
+ * Поле для ввода названия транзакции.
+ * Позволяет пользователю ввести название или описание транзакции.
+ *
+ * @param title Текущее значение названия
+ * @param onTitleChange Callback, вызываемый при изменении названия
  */
 @Composable
 fun TitleField(
@@ -109,7 +117,12 @@ fun TitleField(
 }
 
 /**
- * Поле для ввода суммы транзакции
+ * Поле для ввода суммы транзакции.
+ * Позволяет пользователю ввести сумму транзакции.
+ * Поддерживает только числовой ввод.
+ *
+ * @param amount Текущее значение суммы
+ * @param onAmountChange Callback, вызываемый при изменении суммы
  */
 @Composable
 fun AmountField(
@@ -128,12 +141,16 @@ fun AmountField(
 }
 
 /**
- * Поле для выбора даты транзакции
+ * Поле для выбора даты транзакции.
+ * При нажатии открывает диалог выбора даты.
+ *
+ * @param date Текущая выбранная дата
+ * @param onClick Callback, вызываемый при нажатии на поле
  */
 @Composable
 fun DateField(
     date: Date,
-    onDateClick: () -> Unit
+    onClick: () -> Unit
 ) {
     val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
@@ -143,24 +160,28 @@ fun DateField(
         label = { Text(stringResource(R.string.date)) },
         readOnly = true,
         trailingIcon = {
-            IconButton(onClick = onDateClick) {
+            IconButton(onClick = onClick) {
                 Icon(Icons.Default.DateRange, contentDescription = stringResource(R.string.select_date))
             }
         },
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable(onClick = onDateClick)
+            .clickable(onClick = onClick)
     )
 }
 
 /**
- * Поле для выбора категории транзакции
+ * Поле для выбора категории транзакции.
+ * При нажатии открывает диалог выбора категории.
+ *
+ * @param category Текущая выбранная категория
+ * @param onClick Callback, вызываемый при нажатии на поле
  */
 @Composable
 fun CategoryField(
     category: String,
-    onCategoryClick: () -> Unit
+    onClick: () -> Unit
 ) {
     OutlinedTextField(
         value = category,
@@ -168,19 +189,23 @@ fun CategoryField(
         label = { Text(stringResource(R.string.category)) },
         readOnly = true,
         trailingIcon = {
-            IconButton(onClick = onCategoryClick) {
+            IconButton(onClick = onClick) {
                 Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.select_category))
             }
         },
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp)
-            .clickable(onClick = onCategoryClick)
+            .clickable(onClick = onClick)
     )
 }
 
 /**
- * Поле для ввода примечания к транзакции
+ * Поле для ввода заметки к транзакции.
+ * Позволяет пользователю добавить дополнительную информацию.
+ *
+ * @param note Текущий текст заметки
+ * @param onNoteChange Callback, вызываемый при изменении заметки
  */
 @Composable
 fun NoteField(
@@ -198,7 +223,11 @@ fun NoteField(
 }
 
 /**
- * Кнопка добавления транзакции
+ * Кнопка для добавления транзакции.
+ * Становится активной только когда все обязательные поля заполнены.
+ *
+ * @param enabled Доступность кнопки
+ * @param onClick Callback, вызываемый при нажатии на кнопку
  */
 @Composable
 fun AddTransactionButton(

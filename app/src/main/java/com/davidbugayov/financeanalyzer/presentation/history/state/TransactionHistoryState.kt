@@ -8,7 +8,23 @@ import java.util.Date
 
 /**
  * Состояние экрана истории транзакций.
+ * Содержит данные для отображения списка транзакций, фильтров и статистики.
  * Следует принципу единственной ответственности (SRP) из SOLID.
+ *
+ * @property transactions Полный список всех транзакций
+ * @property filteredTransactions Отфильтрованный список транзакций по выбранным критериям
+ * @property isLoading Флаг загрузки данных
+ * @property error Текст ошибки (null если ошибок нет)
+ * @property selectedCategory Выбранная категория для фильтрации (null для всех категорий)
+ * @property groupingType Тип группировки транзакций (по дням, неделям, месяцам)
+ * @property periodType Тип периода для фильтрации
+ * @property startDate Начальная дата выбранного периода
+ * @property endDate Конечная дата выбранного периода
+ * @property categoryStats Статистика по категории: (текущая сумма, предыдущая сумма, процент изменения)
+ * @property showPeriodDialog Флаг отображения диалога выбора периода
+ * @property showCategoryDialog Флаг отображения диалога выбора категории
+ * @property showStartDatePicker Флаг отображения календаря начальной даты
+ * @property showEndDatePicker Флаг отображения календаря конечной даты
  */
 data class TransactionHistoryState(
     val transactions: List<Transaction> = emptyList(),

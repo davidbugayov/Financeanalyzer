@@ -140,7 +140,7 @@ fun TransactionHistoryScreen(
     if (showAddCategoryDialog) {
         AddCategoryDialog(
             categoryText = newCategoryText,
-            onCategoryTextChanged = { newCategoryText = it },
+            onCategoryTextChange = { newCategoryText = it },
             onConfirm = {
                 if (newCategoryText.isNotBlank()) {
                     viewModel.onEvent(TransactionHistoryEvent.SetCategory(newCategoryText))

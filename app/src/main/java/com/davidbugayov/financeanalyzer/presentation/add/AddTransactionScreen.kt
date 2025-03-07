@@ -116,7 +116,7 @@ fun AddTransactionScreen(
                 // Поле для выбора категории
                 CategoryField(
                     category = state.category,
-                    onCategoryClick = {
+                    onClick = {
                         viewModel.onEvent(AddTransactionEvent.ShowCategoryPicker)
                     }
                 )
@@ -124,7 +124,7 @@ fun AddTransactionScreen(
                 // Поле для выбора даты
                 DateField(
                     date = state.selectedDate,
-                    onDateClick = {
+                    onClick = {
                         viewModel.onEvent(AddTransactionEvent.ShowDatePicker)
                     }
                 )
