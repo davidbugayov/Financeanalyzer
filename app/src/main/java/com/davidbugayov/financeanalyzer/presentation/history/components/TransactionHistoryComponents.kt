@@ -9,10 +9,14 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -24,6 +28,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -56,11 +61,21 @@ fun TransactionHistory(
     onTransactionClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Используем rememberLazyListState для оптимизации прокрутки
+    val listState = rememberLazyListState()
+
+    // Кэшируем список групп для предотвращения ненужных перерисовок
+    val groups = remember(transactionGroups) { transactionGroups }
+    
     LazyColumn(
+        state = listState,
         modifier = modifier,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        items(transactionGroups) { group ->
+        itemsIndexed(
+            items = groups,
+            key = { _, group -> group.date }
+        ) { _, group ->
             TransactionGroupItem(
                 group = group,
                 onTransactionClick = onTransactionClick
@@ -85,6 +100,17 @@ fun TransactionGroupItem(
 ) {
     var expanded by remember { mutableStateOf(true) }
 
+    // Кэшируем данные группы для предотвращения ненужных перерисовок
+    val date = remember(group) { group.date }
+    val balance = remember(group) { group.balance }
+    val transactions = remember(group) { group.transactions }
+
+    // Кэшируем форматированные значения
+    val amount = remember(balance) { balance.format(false) }
+    val amountColor = remember(balance) {
+        if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336)
+    }
+
     Column(
         modifier = modifier.fillMaxWidth()
     ) {
@@ -96,7 +122,7 @@ fun TransactionGroupItem(
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
-                text = group.date,
+                text = date,
                 color = MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Medium,
@@ -106,15 +132,12 @@ fun TransactionGroupItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val amount = group.balance.format(false)
-                val formattedAmount = stringResource(
-                    if (group.balance >= Money.zero()) R.string.income_currency_format else R.string.expense_currency_format,
-                    amount
-                )
-
                 Text(
-                    text = formattedAmount,
-                    color = if (group.balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    text = if (balance >= Money.zero())
+                        stringResource(R.string.income_currency_format, amount)
+                    else
+                        stringResource(R.string.expense_currency_format, amount),
+                    color = amountColor,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
@@ -130,16 +153,24 @@ fun TransactionGroupItem(
             }
         }
 
-        if (expanded) {
+        // Используем AnimatedVisibility для анимации сворачивания/разворачивания
+        AnimatedVisibility(
+            visible = expanded,
+            enter = expandVertically() + fadeIn(),
+            exit = shrinkVertically() + fadeOut()
+        ) {
             Column(
                 modifier = Modifier.padding(horizontal = 16.dp),
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                group.transactions.forEach { transaction ->
-                    TransactionItem(
-                        transaction = transaction,
-                        onClick = { onTransactionClick(transaction) }
-                    )
+                // Используем key для каждой транзакции, чтобы избежать ненужных перерисовок
+                transactions.forEach { transaction ->
+                    key(transaction.id) {
+                        TransactionItem(
+                            transaction = transaction,
+                            onClick = { onTransactionClick(transaction) }
+                        )
+                    }
                 }
             }
         }
@@ -160,16 +191,30 @@ fun GroupHeader(
 ) {
     var isExpanded by remember { mutableStateOf(true) }
 
-    // Используем reduce для суммирования Money или создаем нулевое значение, если список пуст
-    val income = transactions.filter { !it.isExpense }
-        .map { it.amount }
-        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+    // Вычисляем суммы только при изменении списка транзакций
+    val financialSummary = remember(transactions) {
+        // Используем reduce для суммирования Money или создаем нулевое значение, если список пуст
+        val income = transactions.filter { !it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
-    val expense = transactions.filter { it.isExpense }
-        .map { it.amount }
-        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
-        
-    val balance = income - expense
+        val expense = transactions.filter { it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+        val balance = income - expense
+
+        Triple(income, expense, balance)
+    }
+
+    val (income, expense, balance) = financialSummary
+
+    // Кэшируем форматированные значения
+    val formattedIncome = remember(income) { income.format(false) }
+    val formattedExpense = remember(expense) { expense.format(false) }
+    val balanceColor = remember(balance) {
+        if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336)
+    }
 
     Surface(
         modifier = Modifier
@@ -227,12 +272,15 @@ fun GroupHeader(
 @Composable
 fun TransactionHistoryItem(
     transaction: Transaction,
-    onClick: () -> Unit
+    onClick: () -> Unit = {}
 ) {
-    TransactionItem(
-        transaction = transaction,
-        onClick = onClick
-    )
+    // Используем key для предотвращения ненужных перерисовок
+    key(transaction.id) {
+        TransactionItem(
+            transaction = transaction,
+            onClick = onClick
+        )
+    }
 }
 
 /**
@@ -249,19 +297,24 @@ fun TransactionGroup(
     transactions: List<Transaction>,
     onTransactionClick: (Transaction) -> Unit
 ) {
+    // Кэшируем список транзакций для предотвращения ненужных перерисовок
+    val transactionsList = remember(transactions) { transactions }
+    
     Column(
         modifier = Modifier.fillMaxWidth()
     ) {
         GroupHeader(
             period = groupTitle,
-            transactions = transactions
+            transactions = transactionsList
         )
 
-        transactions.forEach { transaction ->
-            TransactionHistoryItem(
-                transaction = transaction,
-                onClick = { onTransactionClick(transaction) }
-            )
+        transactionsList.forEach { transaction ->
+            key(transaction.id) {
+                TransactionHistoryItem(
+                    transaction = transaction,
+                    onClick = { onTransactionClick(transaction) }
+                )
+            }
         }
     }
 }
@@ -276,6 +329,14 @@ fun GroupSummary(
     balance: Money,
     modifier: Modifier = Modifier
 ) {
+    // Кэшируем форматированные значения
+    val formattedIncome = remember(income) { income.format(false) }
+    val formattedExpense = remember(expense) { expense.format(false) }
+    val formattedBalance = remember(balance) { balance.format(false) }
+    val balanceColor = remember(balance) {
+        if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336)
+    }
+
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -294,7 +355,7 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.income_currency_format, income.format(false)),
+                    text = stringResource(R.string.income_currency_format, formattedIncome),
                     fontSize = 14.sp,
                     color = Color(0xFF4CAF50),
                     fontWeight = FontWeight.Medium
@@ -308,7 +369,7 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.expense_currency_format, expense.format(false)),
+                    text = stringResource(R.string.expense_currency_format, formattedExpense),
                     fontSize = 14.sp,
                     color = Color(0xFFF44336),
                     fontWeight = FontWeight.Medium
@@ -322,15 +383,99 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(
-                        if (balance >= Money.zero()) R.string.income_currency_format else R.string.expense_currency_format,
-                        balance.format(false)
-                    ),
+                    text = if (balance >= Money.zero())
+                        stringResource(R.string.income_currency_format, formattedBalance)
+                    else
+                        stringResource(R.string.expense_currency_format, formattedBalance),
                     fontSize = 14.sp,
-                    color = if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    color = balanceColor,
                     fontWeight = FontWeight.Bold
                 )
             }
+        }
+    }
+}
+
+/**
+ * Компонент для отображения списка транзакций с пагинацией.
+ * Использует LazyColumn для эффективного отображения больших списков.
+ *
+ * @param groupedTransactions Сгруппированные транзакции для отображения
+ */
+@Composable
+fun TransactionsList(
+    groupedTransactions: Map<String, List<Transaction>>
+) {
+    // Используем rememberLazyListState для оптимизации прокрутки
+    val listState = rememberLazyListState()
+
+    // Кэшируем сгруппированные транзакции для предотвращения ненужных перерисовок
+    val groups = remember(groupedTransactions) { groupedTransactions }
+
+    // Получаем список периодов (ключей) для использования в качестве ключей элементов списка
+    val periods = remember(groups) { groups.keys.toList() }
+
+    LazyColumn(
+        state = listState,
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(vertical = 8.dp)
+    ) {
+        periods.forEach { period ->
+            val transactions = groups[period] ?: emptyList()
+
+            item(key = "header_$period") {
+                GroupHeader(
+                    period = period,
+                    transactions = transactions
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+            }
+
+            itemsIndexed(
+                items = transactions,
+                key = { _, transaction -> "transaction_${transaction.id}" }
+            ) { _, transaction ->
+                TransactionHistoryItem(transaction = transaction)
+            }
+
+            item(key = "spacer_$period") {
+                Spacer(modifier = Modifier.height(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun ComparisonCard(
+    currentTotal: Money,
+    previousTotal: Money
+) {
+    // Кэшируем форматированные значения
+    val formattedCurrent = remember(currentTotal) { currentTotal.format(false) }
+    val formattedPrevious = remember(previousTotal) { previousTotal.format(false) }
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp)
+        ) {
+            Text(
+                text = formattedCurrent,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold
+            )
+
+            Text(
+                text = formattedPrevious,
+                fontSize = 14.sp,
+                color = Color.Gray
+            )
         }
     }
 } 

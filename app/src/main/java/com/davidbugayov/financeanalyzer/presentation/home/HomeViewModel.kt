@@ -39,6 +39,10 @@ class HomeViewModel(
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
+    // Кэши для хранения результатов вычислений
+    private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, List<Transaction>>()
+    private val statsCache = mutableMapOf<List<Transaction>, Triple<Money, Money, Money>>()
+
     init {
         Timber.d("HomeViewModel initialized")
         loadTransactions()
@@ -77,7 +81,11 @@ class HomeViewModel(
                 when (event) {
                     is Event.TransactionAdded,
                     is Event.TransactionDeleted,
-                    is Event.TransactionUpdated -> loadTransactions()
+                    is Event.TransactionUpdated -> {
+                        // Очищаем кэши при изменении данных
+                        clearCaches()
+                        loadTransactions()
+                    }
                 }
             }
         }
@@ -88,15 +96,21 @@ class HomeViewModel(
      */
     private fun loadTransactions() {
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
             loadTransactionsUseCase().fold(
                 onSuccess = { transactions: List<Transaction> ->
-                    _state.update { it.copy(transactions = transactions) }
+                    _state.update { it.copy(transactions = transactions, isLoading = false) }
                     updateFilteredTransactions()
                     calculateTotalStats()
                 },
                 onFailure = { exception: Throwable ->
                     Timber.e(exception, "Failed to load transactions")
-                    _state.update { it.copy(error = exception.message ?: "Failed to load transactions") }
+                    _state.update {
+                        it.copy(
+                            error = exception.message ?: "Failed to load transactions",
+                            isLoading = false
+                        )
+                    }
                 }
             )
         }
@@ -123,6 +137,8 @@ class HomeViewModel(
             }
 
             if (!hasError) {
+                // Очищаем кэши при добавлении тестовых данных
+                clearCaches()
                 EventBus.emit(Event.TransactionAdded)
                 Timber.d("Test data generation completed successfully")
             } else {
@@ -136,24 +152,39 @@ class HomeViewModel(
      */
     private fun updateFilteredTransactions() {
         val currentState = _state.value
-        val filtered = when (currentState.currentFilter) {
-            TransactionFilter.TODAY -> getTodayTransactions(currentState.transactions)
-            TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
-            TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
+
+        // Создаем ключ для кэша
+        val cacheKey = FilterCacheKey(
+            transactions = currentState.transactions,
+            filter = currentState.currentFilter
+        )
+
+        // Получаем отфильтрованные транзакции из кэша или вычисляем их
+        val filtered = filteredTransactionsCache.getOrPut(cacheKey) {
+            when (currentState.currentFilter) {
+                TransactionFilter.TODAY -> getTodayTransactions(currentState.transactions)
+                TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
+                TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
+            }
         }
 
-        // Рассчитываем суммы для отфильтрованных транзакций
-        val filteredIncome = filtered
-            .filter { !it.isExpense }
-            .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+        // Получаем статистику из кэша или вычисляем её
+        val (filteredIncome, filteredExpense, filteredBalance) = statsCache.getOrPut(filtered) {
+            // Рассчитываем суммы для отфильтрованных транзакций
+            val income = filtered
+                .filter { !it.isExpense }
+                .map { it.amount }
+                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
-        val filteredExpense = filtered
-            .filter { it.isExpense }
-            .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
-            
-        val filteredBalance = filteredIncome - filteredExpense
+            val expense = filtered
+                .filter { it.isExpense }
+                .map { it.amount }
+                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+            val balance = income - expense
+
+            Triple(income, expense, balance)
+        }
 
         _state.update {
             it.copy(
@@ -219,17 +250,22 @@ class HomeViewModel(
         Timber.d("Calculating total stats")
         val transactions = _state.value.transactions
 
-        val totalIncome = transactions
-            .filter { !it.isExpense }
-            .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+        // Получаем статистику из кэша или вычисляем её
+        val (totalIncome, totalExpense, balance) = statsCache.getOrPut(transactions) {
+            val income = transactions
+                .filter { !it.isExpense }
+                .map { it.amount }
+                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
-        val totalExpense = transactions
-            .filter { it.isExpense }
-            .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            val expense = transactions
+                .filter { it.isExpense }
+                .map { it.amount }
+                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
-        val balance = totalIncome - totalExpense
+            val balance = income - expense
+
+            Triple(income, expense, balance)
+        }
 
         _state.update {
             it.copy(
@@ -250,6 +286,8 @@ class HomeViewModel(
         viewModelScope.launch {
             addTransactionUseCase(transaction).fold(
                 onSuccess = {
+                    // Очищаем кэши при добавлении новой транзакции
+                    clearCaches()
                     loadTransactions()
                 },
                 onFailure = { exception: Throwable ->
@@ -259,6 +297,22 @@ class HomeViewModel(
             )
         }
     }
+
+    /**
+     * Очищает все кэши
+     */
+    private fun clearCaches() {
+        filteredTransactionsCache.clear()
+        statsCache.clear()
+    }
+
+    /**
+     * Ключ для кэша фильтрованных транзакций
+     */
+    private data class FilterCacheKey(
+        val transactions: List<Transaction>,
+        val filter: TransactionFilter
+    )
 }
 
 /**

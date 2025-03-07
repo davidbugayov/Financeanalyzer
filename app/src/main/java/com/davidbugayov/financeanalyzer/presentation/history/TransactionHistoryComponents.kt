@@ -10,7 +10,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
@@ -136,18 +137,20 @@ fun EmptyContent() {
     }
 }
 
-
 @Composable
 fun TransactionsList(
     groupedTransactions: Map<String, List<Transaction>>
 ) {
+    val listState = rememberLazyListState()
+    
     LazyColumn(
+        state = listState,
         modifier = Modifier
             .fillMaxSize()
             .padding(vertical = 8.dp)
     ) {
         groupedTransactions.forEach { (period, transactionsInPeriod) ->
-            item {
+            item(key = "header_$period") {
                 GroupHeader(
                     period = period,
                     transactions = transactionsInPeriod
@@ -155,11 +158,14 @@ fun TransactionsList(
                 Spacer(modifier = Modifier.height(4.dp))
             }
 
-            items(transactionsInPeriod) { transaction ->
+            itemsIndexed(
+                items = transactionsInPeriod,
+                key = { _, transaction -> "transaction_${transaction.id}" }
+            ) { _, transaction ->
                 TransactionHistoryItem(transaction = transaction)
             }
 
-            item {
+            item(key = "spacer_$period") {
                 Spacer(modifier = Modifier.height(8.dp))
             }
         }
