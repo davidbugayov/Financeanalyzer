@@ -87,6 +87,9 @@ class ChartViewModel(
      */
     private fun updateChartData(transactions: List<Transaction>) {
         try {
+            // Используем transactions для обновления данных
+            _transactions.value = transactions
+            
             // Обновляем данные для всех графиков
             getExpensesByCategory()
             getIncomeByCategory()

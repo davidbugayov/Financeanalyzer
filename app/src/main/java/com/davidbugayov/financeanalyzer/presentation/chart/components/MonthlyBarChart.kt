@@ -51,7 +51,6 @@ fun MonthlyBarChart(
     val spaceBetweenBars = 24.dp
     val monthYearFormatter = DateTimeFormatter.ofPattern("MM.yyyy")
     val fullDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-    val shortDateFormatter = DateTimeFormatter.ofPattern("dd.MM")
     
     fun parseDate(dateStr: String): YearMonth {
         return try {

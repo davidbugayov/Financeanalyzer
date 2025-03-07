@@ -6,6 +6,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.ksp)
 }
 
 fun getKeystoreProperties(): Properties {
@@ -154,6 +155,10 @@ android {
             useLegacyPackaging = false
         }
     }
+
+    lint {
+        disable += "FlowOperatorInvokedInComposition"
+    }
 }
 
 dependencies {
@@ -191,6 +196,11 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
+
+    // Room
+    implementation(libs.room.runtime)
+    implementation(libs.room.ktx)
+    ksp(libs.room.compiler)
 
     // Testing
     testImplementation(libs.junit)

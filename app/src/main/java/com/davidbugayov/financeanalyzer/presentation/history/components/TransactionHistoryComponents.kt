@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.history.components
 
-import androidx.compose.animation.*
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -219,11 +219,12 @@ fun GroupHeader(
  */
 @Composable
 fun TransactionHistoryItem(
-    transaction: Transaction
+    transaction: Transaction,
+    onClick: () -> Unit
 ) {
     TransactionItem(
         transaction = transaction,
-        onClick = {}
+        onClick = onClick
     )
 }
 
@@ -250,7 +251,10 @@ fun TransactionGroup(
         )
 
         transactions.forEach { transaction ->
-            TransactionHistoryItem(transaction = transaction)
+            TransactionHistoryItem(
+                transaction = transaction,
+                onClick = { onTransactionClick(transaction) }
+            )
         }
     }
 }

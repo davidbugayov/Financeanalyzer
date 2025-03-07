@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.di
 
+import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
@@ -23,6 +24,10 @@ import org.koin.dsl.module
  * Следует принципу инверсии зависимостей (Dependency Inversion Principle).
  */
 val appModule = module {
+    // Database
+    single { AppDatabase.getInstance(androidContext()) }
+    single { get<AppDatabase>().transactionDao() }
+    
     // Repositories
     single<ITransactionRepository> { TransactionRepositoryImpl(androidContext()) }
 
