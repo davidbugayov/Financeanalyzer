@@ -25,8 +25,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartMonthlyData
-import com.davidbugayov.financeanalyzer.util.formatNumber
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -45,7 +46,7 @@ fun MonthlyBarChart(
     data: Map<String, ChartMonthlyData>,
     modifier: Modifier = Modifier
 ) {
-    val maxAmount = data.values.maxOf { maxOf(it.totalIncome, it.totalExpense) }
+    val maxAmount = data.values.maxOf { maxOf(it.totalIncome.amount.toDouble(), it.totalExpense.amount.toDouble()) }
     val barWidth = 24.dp
     val chartHeight = 200.dp
     val spaceBetweenBars = 24.dp
@@ -106,7 +107,7 @@ fun MonthlyBarChart(
                     val amount = (maxAmount * i / gridLines)
                     drawIntoCanvas { canvas ->
                         canvas.nativeCanvas.drawText(
-                            formatNumber(amount.toDouble()),
+                            formatTransactionAmount(Money(amount)),
                             8.dp.toPx(),
                             y - 4.dp.toPx(),
                             android.graphics.Paint().apply {
@@ -123,7 +124,7 @@ fun MonthlyBarChart(
                     val x = index * barSpace + barWidthPx
                     
                     // Расходы (красный столбец)
-                    val expenseHeight = (monthData.totalExpense / maxAmount * availableHeight).toFloat()
+                    val expenseHeight = (monthData.totalExpense.amount.toDouble() / maxAmount * availableHeight).toFloat()
                     drawRect(
                         color = Color(0xFFF44336),
                         topLeft = Offset(x, availableHeight - expenseHeight),
@@ -131,7 +132,7 @@ fun MonthlyBarChart(
                     )
                     
                     // Доходы (зеленый столбец)
-                    val incomeHeight = (monthData.totalIncome / maxAmount * availableHeight).toFloat()
+                    val incomeHeight = (monthData.totalIncome.amount.toDouble() / maxAmount * availableHeight).toFloat()
                     drawRect(
                         color = Color(0xFF4CAF50),
                         topLeft = Offset(x + barWidthPx + 2.dp.toPx(), availableHeight - incomeHeight),

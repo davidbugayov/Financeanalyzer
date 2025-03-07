@@ -25,14 +25,15 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.util.formatNumber
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 
 @Composable
 fun CategoryStatsCard(
     category: String,
-    currentTotal: Double,
-    previousTotal: Double,
+    currentTotal: Money,
+    previousTotal: Money,
     percentChange: Int?
 ) {
     Surface(
@@ -61,7 +62,7 @@ fun CategoryStatsCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = formatNumber(currentTotal),
+                        text = formatTransactionAmount(currentTotal),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -72,7 +73,7 @@ fun CategoryStatsCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = formatNumber(previousTotal),
+                        text = formatTransactionAmount(previousTotal),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -168,8 +169,8 @@ fun TransactionsList(
 
 @Composable
 fun ComparisonCard(
-    currentTotal: Double,
-    previousTotal: Double
+    currentTotal: Money,
+    previousTotal: Money
 ) {
     Card(
         modifier = Modifier
@@ -182,13 +183,13 @@ fun ComparisonCard(
                 .padding(12.dp)
         ) {
             Text(
-                text = formatNumber(currentTotal),
+                text = formatTransactionAmount(currentTotal),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = formatNumber(previousTotal),
+                text = formatTransactionAmount(previousTotal),
                 fontSize = 14.sp,
                 color = Color.Gray
             )

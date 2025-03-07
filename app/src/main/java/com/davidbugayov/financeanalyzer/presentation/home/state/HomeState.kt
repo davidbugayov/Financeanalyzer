@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.state
 
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 
@@ -12,14 +13,14 @@ data class HomeState(
     val filteredTransactions: List<Transaction> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val balance: Double = 0.0,
-    val income: Double = 0.0,
-    val expense: Double = 0.0,
-    val dailyIncome: Double = 0.0,
-    val dailyExpense: Double = 0.0,
+    val balance: Money = Money.zero(),
+    val income: Money = Money.zero(),
+    val expense: Money = Money.zero(),
+    val dailyIncome: Money = Money.zero(),
+    val dailyExpense: Money = Money.zero(),
     val currentFilter: TransactionFilter = TransactionFilter.MONTH,
     val showGroupSummary: Boolean = true,
-    val filteredIncome: Double = 0.0,
-    val filteredExpense: Double = 0.0,
-    val filteredBalance: Double = 0.0
+    val filteredIncome: Money = Money.zero(),
+    val filteredExpense: Money = Money.zero(),
+    val filteredBalance: Money = Money.zero()
 ) 

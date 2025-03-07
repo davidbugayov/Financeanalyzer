@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.util
 
+import com.davidbugayov.financeanalyzer.domain.model.Currency
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import kotlin.math.abs
 
 /**
@@ -56,26 +58,20 @@ fun formatNumber(
  * - -1234.56 -> "-1234.56"
  *
  * @param amount Сумма транзакции
+ * @param currency Валюта (по умолчанию RUB)
  * @return Отформатированная сумма в виде строки
  */
-fun formatTransactionAmount(amount: Double): String {
-    val absAmount = abs(amount)
-    val prefix = if (amount < 0) "-" else ""
-    val hasDecimals = absAmount % 1 != 0.0
+fun formatTransactionAmount(amount: Double, currency: Currency = Currency.RUB): String {
+    return CurrencyFormatter.format(amount, currency, false)
+}
 
-    // Пробуем отформатировать полное число
-    val fullNumber = if (hasDecimals) {
-        "${prefix}${String.format("%.2f", absAmount)}"
-    } else {
-        "${prefix}${String.format("%.0f", absAmount)}"
-    }
-
-    // Если число большое, используем сокращенный формат
-    return when {
-        absAmount >= 1_000_000 -> "${prefix}${String.format("%.1fM", absAmount / 1_000_000)}"
-        absAmount >= 1_000_000_000 -> "${prefix}${String.format("%.1fB", absAmount / 1_000_000_000)}"
-        else -> fullNumber
-    }
+/**
+ * Форматирует сумму транзакции для отображения в списках и графиках.
+ * @param money Денежное значение
+ * @return Отформатированная сумма в виде строки
+ */
+fun formatTransactionAmount(money: Money): String {
+    return CurrencyFormatter.format(money.amount, money.currency, false)
 }
 
 /**
@@ -84,38 +80,50 @@ fun formatTransactionAmount(amount: Double): String {
  * Автоматически определяет необходимость десятичных знаков.
  * Добавляет символ валюты после числа.
  *
- * Примеры:
- * - 1234.56, "₽" -> "1.2К₽"
- * - 1000000, "$" -> "1.0М$"
- * - 123.00, "€" -> "123€"
- * 
  * @param number Число для форматирования
- * @param currencySymbol Символ валюты (по умолчанию "₽")
+ * @param currency Валюта (по умолчанию RUB)
  * @return Отформатированное число с символом валюты
  */
 fun formatNumberWithCurrency(
     number: Double,
-    currencySymbol: String = "₽"
+    currency: Currency = Currency.RUB
 ): String {
-    val absNumber = abs(number)
-    val prefix = if (number < 0) "-" else ""
+    return CurrencyFormatter.formatForDisplay(number, currency)
+}
 
-    return when {
-        absNumber >= 1_000_000 -> {
-            val millions = absNumber / 1_000_000
-            "${prefix}${String.format("%.1f", millions)}М$currencySymbol"
-        }
-        absNumber >= 1_000 -> {
-            val thousands = absNumber / 1_000
-            "${prefix}${String.format("%.1f", thousands)}К$currencySymbol"
-        }
-        else -> {
-            val hasDecimals = absNumber % 1 != 0.0
-            if (hasDecimals) {
-                "${prefix}${String.format("%.2f", absNumber)}$currencySymbol"
-            } else {
-                "${prefix}${String.format("%.0f", absNumber)}$currencySymbol"
-            }
-        }
-    }
+/**
+ * Форматирует денежное значение для отображения с символом валюты.
+ * @param money Денежное значение
+ * @return Отформатированное число с символом валюты
+ */
+fun formatNumberWithCurrency(money: Money): String {
+    return CurrencyFormatter.formatForDisplay(money)
+}
+
+/**
+ * Форматирует денежное значение для отображения со знаком (доход/расход)
+ * @param amount Сумма
+ * @param isExpense Является ли расходом
+ * @param currency Валюта (по умолчанию RUB)
+ * @return Отформатированная строка
+ */
+fun formatWithSign(
+    amount: Double,
+    isExpense: Boolean,
+    currency: Currency = Currency.RUB
+): String {
+    return CurrencyFormatter.formatWithSign(amount, isExpense, currency)
+}
+
+/**
+ * Форматирует денежное значение для отображения со знаком (доход/расход)
+ * @param money Денежное значение
+ * @param isExpense Является ли расходом
+ * @return Отформатированная строка
+ */
+fun formatWithSign(
+    money: Money,
+    isExpense: Boolean
+): String {
+    return CurrencyFormatter.formatWithSign(money, isExpense)
 }

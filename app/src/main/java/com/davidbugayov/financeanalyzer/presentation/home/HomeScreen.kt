@@ -51,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
@@ -375,7 +376,7 @@ fun FilterChips(
  * Карточка с информацией о балансе.
  */
 @Composable
-fun BalanceCard(income: Double, expense: Double, balance: Double) {
+fun BalanceCard(income: Money, expense: Money, balance: Money) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -393,10 +394,10 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
             )
 
             Text(
-                text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
+                text = balance.formatForDisplay(),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336)
+                color = if (!balance.isNegative()) Color(0xFF4CAF50) else Color(0xFFF44336)
             )
 
             Spacer(modifier = Modifier.height(12.dp))
@@ -413,8 +414,9 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
                     )
                     Text(
                         text = stringResource(R.string.currency_format, formatTransactionAmount(income)),
-                        fontSize = 16.sp,
-                        color = Color(0xFF4CAF50)
+                        fontSize = 14.sp,
+                        color = Color(0xFF4CAF50),
+                        fontWeight = FontWeight.Medium
                     )
                 }
 
@@ -426,8 +428,9 @@ fun BalanceCard(income: Double, expense: Double, balance: Double) {
                     )
                     Text(
                         text = stringResource(R.string.currency_format, formatTransactionAmount(expense)),
-                        fontSize = 16.sp,
-                        color = Color(0xFFF44336)
+                        fontSize = 14.sp,
+                        color = Color(0xFFF44336),
+                        fontWeight = FontWeight.Medium
                     )
                 }
             }
@@ -493,8 +496,15 @@ fun TransactionItem(transaction: Transaction) {
  */
 @Composable
 fun GroupSummary(transactions: List<Transaction>) {
-    val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
-    val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
+    val income = transactions
+        .filter { !it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+    val expense = transactions
+        .filter { it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
     val balance = income - expense
 
     Card(
@@ -545,7 +555,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                 Text(
                     text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
                     fontSize = 14.sp,
-                    color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    color = if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
                     fontWeight = FontWeight.Bold
                 )
             }

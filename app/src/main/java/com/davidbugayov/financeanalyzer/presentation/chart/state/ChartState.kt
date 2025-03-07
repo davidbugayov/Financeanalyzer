@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.state
 
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 
 /**
@@ -19,8 +20,8 @@ data class ChartState(
     val transactions: List<Transaction> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val expensesByCategory: Map<String, Double> = emptyMap(),
-    val incomeByCategory: Map<String, Double> = emptyMap(),
+    val expensesByCategory: Map<String, Money> = emptyMap(),
+    val incomeByCategory: Map<String, Money> = emptyMap(),
     val transactionsByMonth: Map<String, ChartMonthlyData> = emptyMap(),
     val expensesByDay: Map<String, ChartMonthlyData> = emptyMap()
 )
@@ -34,7 +35,7 @@ data class ChartState(
  * @property categoryBreakdown Распределение сумм по категориям
  */
 data class ChartMonthlyData(
-    val totalIncome: Double,
-    val totalExpense: Double,
-    val categoryBreakdown: Map<String, Double>
+    val totalIncome: Money,
+    val totalExpense: Money,
+    val categoryBreakdown: Map<String, Money>
 ) 

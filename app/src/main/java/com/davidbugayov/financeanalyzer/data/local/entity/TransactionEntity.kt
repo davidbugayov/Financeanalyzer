@@ -4,6 +4,8 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
+import com.davidbugayov.financeanalyzer.domain.model.Currency
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.util.Date
 
@@ -18,6 +20,7 @@ data class TransactionEntity(
     val id: Long = 0,
     val title: String,
     val amount: Double,
+    val currencyCode: String = Currency.RUB.code,
     val category: String,
     val isExpense: Boolean,
     val date: Date,
@@ -28,10 +31,11 @@ data class TransactionEntity(
      * Преобразует Entity в доменную модель
      */
     fun toDomain(): Transaction {
+        val currency = Currency.fromCode(currencyCode)
         return Transaction(
             id = id,
             title = title,
-            amount = amount,
+            amount = Money(amount, currency),
             category = category,
             isExpense = isExpense,
             date = date,
@@ -48,7 +52,8 @@ data class TransactionEntity(
             return TransactionEntity(
                 id = transaction.id,
                 title = transaction.title,
-                amount = transaction.amount,
+                amount = transaction.amount.amount.toDouble(),
+                currencyCode = transaction.amount.currency.code,
                 category = transaction.category,
                 isExpense = transaction.isExpense,
                 date = transaction.date,

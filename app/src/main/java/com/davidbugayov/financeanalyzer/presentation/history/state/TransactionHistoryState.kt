@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.history.state
 
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
@@ -36,7 +37,7 @@ data class TransactionHistoryState(
     val periodType: PeriodType = PeriodType.MONTH,
     val startDate: Date = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time,
     val endDate: Date = Date(),
-    val categoryStats: Triple<Double, Double, Int?>? = null,
+    val categoryStats: Triple<Money, Money, Int?>? = null,
     val showPeriodDialog: Boolean = false,
     val showCategoryDialog: Boolean = false,
     val showStartDatePicker: Boolean = false,

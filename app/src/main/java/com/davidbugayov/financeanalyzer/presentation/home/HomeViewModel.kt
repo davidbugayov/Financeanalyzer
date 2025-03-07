@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
@@ -142,8 +143,16 @@ class HomeViewModel(
         }
 
         // Рассчитываем суммы для отфильтрованных транзакций
-        val filteredIncome = filtered.filter { !it.isExpense }.sumOf { it.amount }
-        val filteredExpense = filtered.filter { it.isExpense }.sumOf { it.amount }
+        val filteredIncome = filtered
+            .filter { !it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+        val filteredExpense = filtered
+            .filter { it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            
         val filteredBalance = filteredIncome - filteredExpense
 
         _state.update {
@@ -212,11 +221,13 @@ class HomeViewModel(
 
         val totalIncome = transactions
             .filter { !it.isExpense }
-            .sumOf { it.amount }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
         val totalExpense = transactions
             .filter { it.isExpense }
-            .sumOf { it.amount }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
         val balance = totalIncome - totalExpense
 

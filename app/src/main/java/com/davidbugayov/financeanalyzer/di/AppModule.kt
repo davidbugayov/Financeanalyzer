@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
+import com.davidbugayov.financeanalyzer.data.preferences.CurrencyPreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
@@ -27,6 +28,9 @@ val appModule = module {
     // Database
     single { AppDatabase.getInstance(androidContext()) }
     single { get<AppDatabase>().transactionDao() }
+
+    // Preferences
+    single { CurrencyPreferences.getInstance(androidContext()) }
     
     // Repositories
     single<ITransactionRepository> { TransactionRepositoryImpl(androidContext()) }
@@ -51,5 +55,11 @@ val appModule = module {
     }
     viewModel { HomeViewModel(get(), get()) }
     viewModel { ChartViewModel(get()) }
-    viewModel { AddTransactionViewModel(androidApplication(), get()) }
+    viewModel {
+        AddTransactionViewModel(
+            application = androidApplication(),
+            addTransactionUseCase = get(),
+            currencyPreferences = get()
+        )
+    }
 }

@@ -9,10 +9,11 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.util.formatNumberWithCurrency
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -89,20 +90,28 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
         scope.launch {
             loadTransactionsUseCase().fold(
                 onSuccess = { transactions: List<Transaction> ->
-                    val income = transactions.filter { transaction -> !transaction.isExpense }.sumOf { transaction -> transaction.amount }
-                    val expenses = transactions.filter { transaction -> transaction.isExpense }.sumOf { transaction -> transaction.amount }
+                    val income = transactions
+                        .filter { transaction -> !transaction.isExpense }
+                        .map { transaction -> transaction.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                    val expenses = transactions
+                        .filter { transaction -> transaction.isExpense }
+                        .map { transaction -> transaction.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                        
                     val balance = income - expenses
 
                     // Обновляем UI виджета
                     withContext(Dispatchers.Main) {
                         // Форматируем баланс для компактного отображения
-                        val formattedBalance = formatNumberWithCurrency(balance)
+                        val formattedBalance = formatTransactionAmount(balance)
 
                         // Устанавливаем значение в виджет
                         views.setTextViewText(R.id.small_widget_balance, formattedBalance)
 
                         // Устанавливаем цвет баланса в зависимости от значения
-                        val balanceColor = if (balance >= 0) {
+                        val balanceColor = if (balance >= Money.zero()) {
                             0xFF4CAF50.toInt() // Green
                         } else {
                             0xFFF44336.toInt() // Red

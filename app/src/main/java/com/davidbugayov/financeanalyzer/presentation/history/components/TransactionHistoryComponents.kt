@@ -37,9 +37,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
-import com.davidbugayov.financeanalyzer.presentation.components.GroupSummary
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 
@@ -109,13 +109,13 @@ fun TransactionGroupItem(
             ) {
                 val amount = formatTransactionAmount(group.balance)
                 val formattedAmount = stringResource(
-                    if (group.balance >= 0) R.string.income_currency_format else R.string.expense_currency_format,
+                    if (group.balance >= Money.zero()) R.string.income_currency_format else R.string.expense_currency_format,
                     amount
                 )
 
                 Text(
                     text = formattedAmount,
-                    color = if (group.balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    color = if (group.balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
                     modifier = Modifier
@@ -160,8 +160,16 @@ fun GroupHeader(
     transactions: List<Transaction>
 ) {
     var isExpanded by remember { mutableStateOf(true) }
-    val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
-    val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
+
+    // Используем reduce для суммирования Money или создаем нулевое значение, если список пуст
+    val income = transactions.filter { !it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+    val expense = transactions.filter { it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+        
     val balance = income - expense
 
     Surface(
@@ -264,9 +272,9 @@ fun TransactionGroup(
  */
 @Composable
 fun GroupSummary(
-    income: Double,
-    expense: Double,
-    balance: Double,
+    income: Money,
+    expense: Money,
+    balance: Money,
     modifier: Modifier = Modifier
 ) {
     Card(
@@ -316,11 +324,11 @@ fun GroupSummary(
                 )
                 Text(
                     text = stringResource(
-                        if (balance >= 0) R.string.income_currency_format else R.string.expense_currency_format,
+                        if (balance >= Money.zero()) R.string.income_currency_format else R.string.expense_currency_format,
                         formatTransactionAmount(balance)
                     ),
                     fontSize = 14.sp,
-                    color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    color = if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
                     fontWeight = FontWeight.Bold
                 )
             }

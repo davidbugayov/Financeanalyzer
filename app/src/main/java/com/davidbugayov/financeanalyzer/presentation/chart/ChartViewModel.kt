@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.chart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
@@ -105,22 +106,30 @@ class ChartViewModel(
      * Возвращает данные для графика расходов по категориям
      * @return Карта категорий и сумм расходов
      */
-    fun getExpensesByCategory(): Map<String, Double> {
+    fun getExpensesByCategory(): Map<String, Money> {
         return _transactions.value
             .filter { it.isExpense }
             .groupBy { it.category }
-            .mapValues { (_, transactions) -> transactions.sumOf { it.amount } }
+            .mapValues { (_, transactions) ->
+                transactions
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            }
     }
 
     /**
      * Возвращает данные для графика доходов по категориям
      * @return Карта категорий и сумм доходов
      */
-    fun getIncomeByCategory(): Map<String, Double> {
+    fun getIncomeByCategory(): Map<String, Money> {
         return _transactions.value
             .filter { !it.isExpense }
             .groupBy { it.category }
-            .mapValues { (_, transactions) -> transactions.sumOf { it.amount } }
+            .mapValues { (_, transactions) ->
+                transactions
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            }
     }
 
     /**
@@ -133,15 +142,24 @@ class ChartViewModel(
         return _transactions.value
             .groupBy { dateFormat.format(it.date) }
             .mapValues { (_, transactions) ->
-                val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
-                val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
+                val income = transactions
+                    .filter { !it.isExpense }
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                val expense = transactions
+                    .filter { it.isExpense }
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
                 
                 // Группируем расходы по категориям
                 val categoryBreakdown = transactions
                     .filter { it.isExpense }
                     .groupBy { it.category }
                     .mapValues { (_, categoryTransactions) ->
-                        categoryTransactions.sumOf { it.amount }
+                        categoryTransactions
+                            .map { it.amount }
+                            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
                     }
 
                 ChartMonthlyData(
@@ -174,12 +192,18 @@ class ChartViewModel(
                 val categoryBreakdown = dailyExpenses
                     .groupBy { it.category }
                     .mapValues { (_, categoryTransactions) ->
-                        categoryTransactions.sumOf { it.amount }
+                        categoryTransactions
+                            .map { it.amount }
+                            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
                     }
 
                 ChartMonthlyData(
-                    totalIncome = dailyIncome.sumOf { it.amount },
-                    totalExpense = dailyExpenses.sumOf { it.amount },
+                    totalIncome = dailyIncome
+                        .map { it.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero(),
+                    totalExpense = dailyExpenses
+                        .map { it.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero(),
                     categoryBreakdown = categoryBreakdown
                 )
             }

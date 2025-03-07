@@ -50,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
@@ -60,6 +61,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySel
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -344,8 +346,15 @@ fun PeriodRadioButton(
 @Composable
 fun GroupHeader(period: String, transactions: List<Transaction>) {
     var isExpanded by remember { mutableStateOf(true) }
-    val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
-    val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
+    val income = transactions
+        .filter { !it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+    val expense = transactions
+        .filter { it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
     val balance = income - expense
 
     Surface(
@@ -391,23 +400,23 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", income)),
+                        text = stringResource(R.string.currency_format, formatTransactionAmount(income)),
                         fontSize = 14.sp,
                         color = Color(0xFF4CAF50),
                         fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", expense)),
+                        text = stringResource(R.string.currency_format, formatTransactionAmount(expense)),
                         fontSize = 14.sp,
                         color = Color(0xFFF44336),
                         fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(R.string.currency_format, String.format("%.2f", balance)),
+                        text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
                         fontSize = 14.sp,
-                        color = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                        color = if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
                         fontWeight = FontWeight.Bold
                     )
                 }
@@ -467,9 +476,9 @@ fun TransactionHistoryItem(transaction: Transaction) {
 
             Text(
                 text = if (transaction.isExpense)
-                    stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
+                    stringResource(R.string.expense_currency_format, formatTransactionAmount(transaction.amount))
                 else
-                    stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
+                    stringResource(R.string.income_currency_format, formatTransactionAmount(transaction.amount)),
                 color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
                 fontWeight = FontWeight.Bold
             )

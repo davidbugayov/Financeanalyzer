@@ -9,9 +9,10 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.util.formatNumberWithCurrency
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -90,16 +91,24 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
             loadTransactionsUseCase().fold(
                 onSuccess = { transactions ->
                     // Рассчитываем баланс, доходы и расходы
-                    val income = transactions.filter { transaction -> !transaction.isExpense }.sumOf { transaction -> transaction.amount }
-                    val expense = transactions.filter { transaction -> transaction.isExpense }.sumOf { transaction -> transaction.amount }
+                    val income = transactions
+                        .filter { transaction -> !transaction.isExpense }
+                        .map { transaction -> transaction.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                    val expense = transactions
+                        .filter { transaction -> transaction.isExpense }
+                        .map { transaction -> transaction.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                        
                     val balance = income - expense
 
                     // Обновляем UI виджета
                     withContext(Dispatchers.Main) {
                         // Форматируем числа для компактного отображения
-                        val formattedBalance = formatNumberWithCurrency(balance)
-                        val formattedIncome = formatNumberWithCurrency(income)
-                        val formattedExpense = formatNumberWithCurrency(expense)
+                        val formattedBalance = formatTransactionAmount(balance)
+                        val formattedIncome = formatTransactionAmount(income)
+                        val formattedExpense = formatTransactionAmount(expense)
 
                         // Обновляем виджет с новыми данными
                         views.setTextViewText(R.id.widget_balance, formattedBalance)
@@ -107,7 +116,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                         views.setTextViewText(R.id.widget_expense, formattedExpense)
 
                         // Устанавливаем цвет баланса в зависимости от его значения
-                        val balanceColor = if (balance >= 0) {
+                        val balanceColor = if (balance >= Money.zero()) {
                             0xFF4CAF50.toInt() // Green
                         } else {
                             0xFFF44336.toInt() // Red

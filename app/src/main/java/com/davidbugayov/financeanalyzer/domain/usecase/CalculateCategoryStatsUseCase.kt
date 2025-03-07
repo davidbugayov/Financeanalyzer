@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.usecase
 
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Date
@@ -22,7 +23,7 @@ class CalculateCategoryStatsUseCase(
         periodType: PeriodType,
         startDate: Date,
         endDate: Date
-    ): Triple<Double, Double, Int?> {
+    ): Triple<Money, Money, Int?> {
         // Фильтруем транзакции для текущего периода
         val currentPeriodTransactions = filterTransactionsUseCase(
             transactions = transactions,
@@ -31,7 +32,9 @@ class CalculateCategoryStatsUseCase(
             endDate = endDate,
             category = category
         )
-        val currentPeriodTotal = currentPeriodTransactions.sumOf { it.amount }
+        val currentPeriodTotal = currentPeriodTransactions
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
         // Рассчитываем предыдущий период такой же длительности
         val periodDuration = endDate.time - startDate.time
@@ -46,11 +49,14 @@ class CalculateCategoryStatsUseCase(
             endDate = previousEndDate,
             category = category
         )
-        val previousPeriodTotal = previousPeriodTransactions.sumOf { it.amount }
+        val previousPeriodTotal = previousPeriodTransactions
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
         // Рассчитываем процентное изменение
-        val percentChange = if (previousPeriodTotal != 0.0) {
-            ((currentPeriodTotal - previousPeriodTotal) / kotlin.math.abs(previousPeriodTotal) * 100).toInt()
+        val percentChange = if (!previousPeriodTotal.isZero()) {
+            ((currentPeriodTotal.amount.toDouble() - previousPeriodTotal.amount.toDouble()) /
+                    previousPeriodTotal.amount.abs().toDouble() * 100).toInt()
         } else null
 
         return Triple(currentPeriodTotal, previousPeriodTotal, percentChange)

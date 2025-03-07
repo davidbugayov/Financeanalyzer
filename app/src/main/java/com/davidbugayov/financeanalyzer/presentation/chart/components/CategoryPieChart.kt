@@ -23,7 +23,8 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.util.formatNumber
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 
 /**
  * Круговая диаграмма для отображения распределения расходов/доходов по категориям.
@@ -35,11 +36,11 @@ import com.davidbugayov.financeanalyzer.util.formatNumber
  */
 @Composable
 fun CategoryPieChart(
-    data: Map<String, Double>,
+    data: Map<String, Money>,
     isIncome: Boolean = false,
     modifier: Modifier = Modifier
 ) {
-    val total = data.values.sum()
+    val total = data.values.fold(Money.zero()) { acc, value -> acc + value }
     val colors = if (isIncome) {
         listOf(
             Color(0xFF4CAF50), Color(0xFF8BC34A), Color(0xFFCDDC39),
@@ -78,7 +79,7 @@ fun CategoryPieChart(
                 var startAngle = 0f
                 
                 data.forEach { (category, value) ->
-                    val sweepAngle = (value / total * 360).toFloat()
+                    val sweepAngle = (value.amount.toDouble() / total.amount.toDouble() * 360).toFloat()
                     
                     // Рисуем сектор
                     drawArc(
@@ -134,13 +135,13 @@ fun CategoryPieChart(
                     )
                     
                     Text(
-                        text = formatNumber(value),
+                        text = formatTransactionAmount(value),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurface
                     )
                     
                     Text(
-                        text = String.format("(%.1f%%)", value / total * 100),
+                        text = String.format("(%.1f%%)", value.amount.toDouble() / total.amount.toDouble() * 100),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )

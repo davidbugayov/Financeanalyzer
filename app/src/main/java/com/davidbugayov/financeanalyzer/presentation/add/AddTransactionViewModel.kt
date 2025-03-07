@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.data.preferences.CurrencyPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
@@ -44,7 +45,8 @@ import org.koin.core.component.KoinComponent
  */
 class AddTransactionViewModel(
     application: Application,
-    private val addTransactionUseCase: AddTransactionUseCase
+    private val addTransactionUseCase: AddTransactionUseCase,
+    private val currencyPreferences: CurrencyPreferences
 ) : AndroidViewModel(application), KoinComponent {
 
     // Категории для выбора пользователем
