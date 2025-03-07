@@ -41,7 +41,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 
 /**
  * Основной компонент для отображения истории транзакций.
@@ -107,7 +106,7 @@ fun TransactionGroupItem(
             Row(
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                val amount = formatTransactionAmount(group.balance)
+                val amount = group.balance.format(false)
                 val formattedAmount = stringResource(
                     if (group.balance >= Money.zero()) R.string.income_currency_format else R.string.expense_currency_format,
                     amount
@@ -295,7 +294,7 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.income_currency_format, formatTransactionAmount(income)),
+                    text = stringResource(R.string.income_currency_format, income.format(false)),
                     fontSize = 14.sp,
                     color = Color(0xFF4CAF50),
                     fontWeight = FontWeight.Medium
@@ -309,7 +308,7 @@ fun GroupSummary(
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.expense_currency_format, formatTransactionAmount(expense)),
+                    text = stringResource(R.string.expense_currency_format, expense.format(false)),
                     fontSize = 14.sp,
                     color = Color(0xFFF44336),
                     fontWeight = FontWeight.Medium
@@ -325,7 +324,7 @@ fun GroupSummary(
                 Text(
                     text = stringResource(
                         if (balance >= Money.zero()) R.string.income_currency_format else R.string.expense_currency_format,
-                        formatTransactionAmount(balance)
+                        balance.format(false)
                     ),
                     fontSize = 14.sp,
                     color = if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),

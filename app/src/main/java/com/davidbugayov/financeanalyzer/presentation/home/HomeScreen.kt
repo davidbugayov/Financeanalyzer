@@ -55,7 +55,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -413,7 +412,7 @@ fun BalanceCard(income: Money, expense: Money, balance: Money) {
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, formatTransactionAmount(income)),
+                        text = stringResource(R.string.currency_format, income.format(false)),
                         fontSize = 14.sp,
                         color = Color(0xFF4CAF50),
                         fontWeight = FontWeight.Medium
@@ -427,7 +426,7 @@ fun BalanceCard(income: Money, expense: Money, balance: Money) {
                         color = Color.Gray
                     )
                     Text(
-                        text = stringResource(R.string.currency_format, formatTransactionAmount(expense)),
+                        text = stringResource(R.string.currency_format, expense.format(false)),
                         fontSize = 14.sp,
                         color = Color(0xFFF44336),
                         fontWeight = FontWeight.Medium
@@ -482,9 +481,9 @@ fun TransactionItem(transaction: Transaction) {
 
         Text(
             text = if (transaction.isExpense)
-                stringResource(R.string.expense_currency_format, formatTransactionAmount(transaction.amount))
+                stringResource(R.string.expense_currency_format, transaction.amount.format(false))
             else
-                stringResource(R.string.income_currency_format, formatTransactionAmount(transaction.amount)),
+                stringResource(R.string.income_currency_format, transaction.amount.format(false)),
             color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
             fontWeight = FontWeight.Bold
         )
@@ -525,7 +524,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, formatTransactionAmount(income)),
+                    text = stringResource(R.string.currency_format, income.format(false)),
                     fontSize = 14.sp,
                     color = Color(0xFF4CAF50),
                     fontWeight = FontWeight.Medium
@@ -539,7 +538,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, formatTransactionAmount(expense)),
+                    text = stringResource(R.string.currency_format, expense.format(false)),
                     fontSize = 14.sp,
                     color = Color(0xFFF44336),
                     fontWeight = FontWeight.Medium
@@ -553,7 +552,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                     color = Color.Gray
                 )
                 Text(
-                    text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
+                    text = stringResource(R.string.currency_format, balance.format(false)),
                     fontSize = 14.sp,
                     color = if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
                     fontWeight = FontWeight.Bold

@@ -12,7 +12,6 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -106,9 +105,9 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                     // Обновляем UI виджета
                     withContext(Dispatchers.Main) {
                         // Форматируем числа для компактного отображения
-                        val formattedBalance = formatTransactionAmount(balance)
-                        val formattedIncome = formatTransactionAmount(income)
-                        val formattedExpense = formatTransactionAmount(expense)
+                        val formattedBalance = balance.format(false)
+                        val formattedIncome = income.format(false)
+                        val formattedExpense = expense.format(false)
 
                         // Обновляем виджет с новыми данными
                         views.setTextViewText(R.id.widget_balance, formattedBalance)

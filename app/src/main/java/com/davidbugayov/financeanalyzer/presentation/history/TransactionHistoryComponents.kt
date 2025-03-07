@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 
 @Composable
 fun CategoryStatsCard(
@@ -62,7 +61,7 @@ fun CategoryStatsCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = formatTransactionAmount(currentTotal),
+                        text = currentTotal.format(false),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
@@ -73,7 +72,7 @@ fun CategoryStatsCard(
                         style = MaterialTheme.typography.bodyMedium
                     )
                     Text(
-                        text = formatTransactionAmount(previousTotal),
+                        text = previousTotal.format(false),
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.secondary
                     )
@@ -183,13 +182,13 @@ fun ComparisonCard(
                 .padding(12.dp)
         ) {
             Text(
-                text = formatTransactionAmount(currentTotal),
+                text = currentTotal.format(false),
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold
             )
 
             Text(
-                text = formatTransactionAmount(previousTotal),
+                text = previousTotal.format(false),
                 fontSize = 14.sp,
                 color = Color.Gray
             )

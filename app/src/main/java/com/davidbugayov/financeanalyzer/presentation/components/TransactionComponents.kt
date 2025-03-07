@@ -19,7 +19,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -71,14 +70,12 @@ fun TransactionItem(
                 )
             }
 
-            val amount = formatTransactionAmount(transaction.amount)
-            val formattedAmount = stringResource(
-                if (transaction.isExpense) R.string.expense_currency_format else R.string.income_currency_format,
-                amount
-            )
-
+            val amount = transaction.amount.format(false)
             Text(
-                text = formattedAmount,
+                text = if (transaction.isExpense)
+                    stringResource(R.string.expense_currency_format, transaction.amount.format(false))
+                else
+                    stringResource(R.string.income_currency_format, transaction.amount.format(false)),
                 color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
@@ -129,9 +126,9 @@ private fun TransactionItemContent(
 
         Text(
             text = if (transaction.isExpense)
-                stringResource(R.string.expense_currency_format, formatTransactionAmount(transaction.amount))
+                stringResource(R.string.expense_currency_format, transaction.amount.format(false))
             else
-                stringResource(R.string.income_currency_format, formatTransactionAmount(transaction.amount)),
+                stringResource(R.string.income_currency_format, transaction.amount.format(false)),
             color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
             fontWeight = FontWeight.Bold
         )

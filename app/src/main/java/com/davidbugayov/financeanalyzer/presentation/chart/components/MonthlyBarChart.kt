@@ -27,7 +27,6 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartMonthlyData
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
@@ -107,7 +106,7 @@ fun MonthlyBarChart(
                     val amount = (maxAmount * i / gridLines)
                     drawIntoCanvas { canvas ->
                         canvas.nativeCanvas.drawText(
-                            formatTransactionAmount(Money(amount)),
+                            Money(amount).format(false),
                             8.dp.toPx(),
                             y - 4.dp.toPx(),
                             android.graphics.Paint().apply {

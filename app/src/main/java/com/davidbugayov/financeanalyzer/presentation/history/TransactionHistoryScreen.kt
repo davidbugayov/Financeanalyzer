@@ -61,7 +61,6 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySel
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
-import com.davidbugayov.financeanalyzer.util.formatTransactionAmount
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.ktx.Firebase
@@ -400,21 +399,21 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = stringResource(R.string.currency_format, formatTransactionAmount(income)),
+                        text = stringResource(R.string.currency_format, income.format(false)),
                         fontSize = 14.sp,
                         color = Color(0xFF4CAF50),
                         fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(R.string.currency_format, formatTransactionAmount(expense)),
+                        text = stringResource(R.string.currency_format, expense.format(false)),
                         fontSize = 14.sp,
                         color = Color(0xFFF44336),
                         fontWeight = FontWeight.Medium
                     )
 
                     Text(
-                        text = stringResource(R.string.currency_format, formatTransactionAmount(balance)),
+                        text = stringResource(R.string.currency_format, balance.format(false)),
                         fontSize = 14.sp,
                         color = if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336),
                         fontWeight = FontWeight.Bold
@@ -476,9 +475,9 @@ fun TransactionHistoryItem(transaction: Transaction) {
 
             Text(
                 text = if (transaction.isExpense)
-                    stringResource(R.string.expense_currency_format, formatTransactionAmount(transaction.amount))
+                    stringResource(R.string.expense_currency_format, transaction.amount.format(false))
                 else
-                    stringResource(R.string.income_currency_format, formatTransactionAmount(transaction.amount)),
+                    stringResource(R.string.income_currency_format, transaction.amount.format(false)),
                 color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
                 fontWeight = FontWeight.Bold
             )
