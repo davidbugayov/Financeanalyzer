@@ -38,9 +38,9 @@ abstract class AppDatabase : RoomDatabase() {
          * Добавляет поле currencyCode в таблицу transactions
          */
         private val MIGRATION_1_2 = object : Migration(1, 2) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+            override fun migrate(db: SupportSQLiteDatabase) {
                 // Добавляем колонку currencyCode с значением по умолчанию RUB
-                database.execSQL("ALTER TABLE transactions ADD COLUMN currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}'")
+                db.execSQL("ALTER TABLE transactions ADD COLUMN currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}'")
             }
         }
 

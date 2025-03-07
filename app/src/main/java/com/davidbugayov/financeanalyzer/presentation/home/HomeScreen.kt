@@ -1,5 +1,12 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -20,7 +27,6 @@ import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material3.Card
 import androidx.compose.material3.Checkbox
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -55,8 +61,15 @@ import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
+import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
+import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicatorWithMessage
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.utils.isCompact
+import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -75,6 +88,12 @@ fun HomeScreen(
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
+    val windowSize = rememberWindowSize()
+
+    // Состояние для обратной связи
+    var showFeedback by remember { mutableStateOf(false) }
+    var feedbackMessage by remember { mutableStateOf("") }
+    var feedbackType by remember { mutableStateOf(FeedbackType.INFO) }
 
     // Загружаем сохраненное состояние видимости GroupSummary
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
@@ -117,7 +136,12 @@ fun HomeScreen(
                     // Кнопка для генерации тестовых данных
                     if (BuildConfig.DEBUG) {
                         IconButton(
-                            onClick = { viewModel.onEvent(HomeEvent.GenerateTestData) }
+                            onClick = {
+                                viewModel.onEvent(HomeEvent.GenerateTestData)
+                                feedbackMessage = "Тестовые данные сгенерированы"
+                                feedbackType = FeedbackType.SUCCESS
+                                showFeedback = true
+                            }
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
@@ -136,120 +160,428 @@ fun HomeScreen(
                 // Применяем все отступы, включая верхний
                 .padding(paddingValues)
         ) {
-            // Используем LazyColumn для основного контента
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp)
-                    .padding(bottom = 88.dp), // Добавляем отступ снизу для кнопок
-                state = rememberLazyListState()
+            // Адаптивный макет в зависимости от размера экрана
+            if (windowSize.isCompact()) {
+                // Компактный макет для телефонов
+                CompactLayout(
+                    state = state,
+                    showGroupSummary = showGroupSummary,
+                    onShowGroupSummaryChange = { showGroupSummary = it },
+                    onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
+                    onNavigateToHistory = onNavigateToHistory
+                )
+            } else {
+                // Расширенный макет для планшетов
+                ExpandedLayout(
+                    state = state,
+                    showGroupSummary = showGroupSummary,
+                    onShowGroupSummaryChange = { showGroupSummary = it },
+                    onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
+                    onNavigateToHistory = onNavigateToHistory
+                )
+            }
+
+            // Кнопки навигации поверх контента с анимацией
+            AnimatedVisibility(
+                visible = true,
+                enter = fadeIn() + slideInVertically(
+                    initialOffsetY = { it },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                ),
+                exit = fadeOut() + slideOutVertically(
+                    targetOffsetY = { it },
+                    animationSpec = spring(
+                        dampingRatio = Spring.DampingRatioMediumBouncy,
+                        stiffness = Spring.StiffnessLow
+                    )
+                ),
+                modifier = Modifier.align(Alignment.BottomCenter)
             ) {
-                // Карточка с балансом
-                item {
-                    BalanceCard(
-                        income = state.income,
-                        expense = state.expense,
-                        balance = state.balance
-                    )
-                }
-
-                // Сообщение об ошибке
-                state.error?.let {
-                    item {
-                        Text(
-                            text = it,
-                            color = MaterialTheme.colorScheme.error,
-                            modifier = Modifier.padding(vertical = 4.dp)
-                        )
-                    }
-                }
-
-                // Фильтры транзакций
-                item {
-                    FilterChips(
-                        currentFilter = state.currentFilter,
-                        onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) }
-                    )
-                }
-
-                // Заголовок для транзакций с чекбоксом для GroupSummary
-                item {
+                Surface(
+                    modifier = Modifier.fillMaxWidth(),
+                    color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
+                    shadowElevation = 0.dp,
+                    tonalElevation = 4.dp
+                ) {
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(vertical = 8.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween,
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                            .height(80.dp),
+                        horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = when (state.currentFilter) {
-                                TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
-                                TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
-                                TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
-                            },
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-
-                        Row(
-                            verticalAlignment = CenterVertically,
-                            horizontalArrangement = Arrangement.spacedBy(8.dp)
+                        // Кнопка Графики
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.weight(1f)
                         ) {
-                            // Иконка с чекбоксом для управления видимостью GroupSummary
-                            Row(
-                                verticalAlignment = CenterVertically,
-                                modifier = Modifier
-                                    .height(36.dp)
+                            FilledTonalIconButton(
+                                onClick = {
+                                    onNavigateToChart()
+                                    feedbackMessage = "Переход к графикам"
+                                    feedbackType = FeedbackType.INFO
+                                    showFeedback = true
+                                },
+                                modifier = Modifier.size(48.dp)
                             ) {
-                                Checkbox(
-                                    checked = showGroupSummary,
-                                    onCheckedChange = { showGroupSummary = it }
-                                )
                                 Icon(
                                     imageVector = Icons.Default.Summarize,
-                                    contentDescription = stringResource(R.string.show_summary),
-                                    modifier = Modifier.size(20.dp)
+                                    contentDescription = stringResource(R.string.charts)
                                 )
                             }
-
-                            TextButton(
-                                onClick = onNavigateToHistory,
-                                modifier = Modifier.height(36.dp)
-                            ) {
-                                Text(stringResource(R.string.all))
-                            }
-                        }
-                    }
-                }
-
-                // Отображение суммы для выбранного периода
-                if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
-                    item {
-                        GroupSummary(transactions = state.filteredTransactions)
-                    }
-                }
-
-                // Список транзакций
-                if (state.filteredTransactions.isEmpty() && !state.isLoading) {
-                    item {
-                        Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(150.dp),
-                            contentAlignment = Alignment.Center
-                        ) {
                             Text(
-                                text = when (state.currentFilter) {
-                                    TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
-                                    TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
-                                    TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
+                                text = stringResource(R.string.charts),
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(top = 4.dp),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        // Кнопка Добавить
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            FilledIconButton(
+                                onClick = {
+                                    onNavigateToAdd()
+                                    feedbackMessage = "Добавление новой транзакции"
+                                    feedbackType = FeedbackType.INFO
+                                    showFeedback = true
                                 },
-                                color = Color.Gray
+                                modifier = Modifier.size(56.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = stringResource(R.string.add)
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.add),
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(top = 4.dp),
+                                color = MaterialTheme.colorScheme.onSurface
+                            )
+                        }
+
+                        // Кнопка История
+                        Column(
+                            horizontalAlignment = Alignment.CenterHorizontally,
+                            modifier = Modifier.weight(1f)
+                        ) {
+                            FilledTonalIconButton(
+                                onClick = {
+                                    onNavigateToHistory()
+                                    feedbackMessage = "Переход к истории транзакций"
+                                    feedbackType = FeedbackType.INFO
+                                    showFeedback = true
+                                },
+                                modifier = Modifier.size(48.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.History,
+                                    contentDescription = stringResource(R.string.history)
+                                )
+                            }
+                            Text(
+                                text = stringResource(R.string.history),
+                                fontSize = 12.sp,
+                                modifier = Modifier.padding(top = 4.dp),
+                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
                     }
-                } else {
-                    // Используем itemsIndexed для оптимизации списка транзакций
+                }
+            }
+
+            // Индикатор загрузки с анимацией
+            AnimatedVisibility(
+                visible = state.isLoading,
+                enter = fadeIn(),
+                exit = fadeOut()
+            ) {
+                LoadingIndicatorWithMessage(
+                    message = "Загрузка данных...",
+                    modifier = Modifier.align(Alignment.Center)
+                )
+            }
+
+            // Отображение уведомлений обратной связи
+            FeedbackMessage(
+                message = feedbackMessage,
+                type = feedbackType,
+                visible = showFeedback,
+                onDismiss = { showFeedback = false },
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .padding(top = 8.dp)
+            )
+        }
+    }
+}
+
+/**
+ * Компактный макет для телефонов
+ */
+@Composable
+private fun CompactLayout(
+    state: com.davidbugayov.financeanalyzer.presentation.home.state.HomeState,
+    showGroupSummary: Boolean,
+    onShowGroupSummaryChange: (Boolean) -> Unit,
+    onFilterSelected: (TransactionFilter) -> Unit,
+    onNavigateToHistory: () -> Unit
+) {
+    // Используем LazyColumn для основного контента
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 88.dp), // Добавляем отступ снизу для кнопок
+        state = rememberLazyListState()
+    ) {
+        // Карточка с балансом
+        item {
+            BalanceCard(
+                income = state.income,
+                expense = state.expense,
+                balance = state.balance
+            )
+        }
+
+        // Сообщение об ошибке
+        state.error?.let {
+            item {
+                Text(
+                    text = it,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(vertical = 4.dp)
+                )
+            }
+        }
+
+        // Фильтры транзакций
+        item {
+            FilterChips(
+                currentFilter = state.currentFilter,
+                onFilterSelected = onFilterSelected
+            )
+        }
+
+        // Заголовок для транзакций с чекбоксом для GroupSummary
+        item {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = when (state.currentFilter) {
+                        TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
+                        TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
+                        TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
+                    },
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Row(
+                    verticalAlignment = CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Иконка с чекбоксом для управления видимостью GroupSummary
+                    Row(
+                        verticalAlignment = CenterVertically,
+                        modifier = Modifier
+                            .height(36.dp)
+                    ) {
+                        Checkbox(
+                            checked = showGroupSummary,
+                            onCheckedChange = onShowGroupSummaryChange
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Summarize,
+                            contentDescription = stringResource(R.string.show_summary),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    TextButton(
+                        onClick = onNavigateToHistory,
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        Text(stringResource(R.string.all))
+                    }
+                }
+            }
+        }
+
+        // Отображение суммы для выбранного периода
+        if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
+            item {
+                GroupSummary(transactions = state.filteredTransactions)
+            }
+        }
+
+        // Список транзакций
+        if (state.filteredTransactions.isEmpty() && !state.isLoading) {
+            item {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when (state.currentFilter) {
+                            TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
+                            TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
+                            TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
+                        },
+                        color = Color.Gray
+                    )
+                }
+            }
+        } else {
+            // Используем itemsIndexed для оптимизации списка транзакций
+            itemsIndexed(
+                items = state.filteredTransactions,
+                key = { _, transaction -> transaction.id }
+            ) { index, transaction ->
+                TransactionItem(transaction = transaction)
+                if (index < state.filteredTransactions.size - 1) {
+                    HorizontalDivider()
+                }
+            }
+        }
+    }
+}
+
+/**
+ * Расширенный макет для планшетов
+ */
+@Composable
+private fun ExpandedLayout(
+    state: com.davidbugayov.financeanalyzer.presentation.home.state.HomeState,
+    showGroupSummary: Boolean,
+    onShowGroupSummaryChange: (Boolean) -> Unit,
+    onFilterSelected: (TransactionFilter) -> Unit,
+    onNavigateToHistory: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 16.dp)
+            .padding(bottom = 88.dp) // Добавляем отступ снизу для кнопок
+    ) {
+        // Левая панель с балансом и фильтрами
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(end = 8.dp)
+        ) {
+            BalanceCard(
+                income = state.income,
+                expense = state.expense,
+                balance = state.balance
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            FilterChips(
+                currentFilter = state.currentFilter,
+                onFilterSelected = onFilterSelected
+            )
+
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // Отображение суммы для выбранного периода
+            if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
+                GroupSummary(transactions = state.filteredTransactions)
+            }
+        }
+
+        // Правая панель со списком транзакций
+        Column(
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = 8.dp)
+        ) {
+            // Заголовок для транзакций с чекбоксом для GroupSummary
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = when (state.currentFilter) {
+                        TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
+                        TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
+                        TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
+                    },
+                    fontSize = 18.sp,
+                    fontWeight = FontWeight.Medium
+                )
+
+                Row(
+                    verticalAlignment = CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    // Иконка с чекбоксом для управления видимостью GroupSummary
+                    Row(
+                        verticalAlignment = CenterVertically,
+                        modifier = Modifier
+                            .height(36.dp)
+                    ) {
+                        Checkbox(
+                            checked = showGroupSummary,
+                            onCheckedChange = onShowGroupSummaryChange
+                        )
+                        Icon(
+                            imageVector = Icons.Default.Summarize,
+                            contentDescription = stringResource(R.string.show_summary),
+                            modifier = Modifier.size(20.dp)
+                        )
+                    }
+
+                    TextButton(
+                        onClick = onNavigateToHistory,
+                        modifier = Modifier.height(36.dp)
+                    ) {
+                        Text(stringResource(R.string.all))
+                    }
+                }
+            }
+
+            // Список транзакций
+            if (state.filteredTransactions.isEmpty() && !state.isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when (state.currentFilter) {
+                            TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
+                            TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
+                            TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
+                        },
+                        color = Color.Gray
+                    )
+                }
+            } else {
+                // Используем LazyColumn для списка транзакций
+                LazyColumn(
+                    state = rememberLazyListState()
+                ) {
                     itemsIndexed(
                         items = state.filteredTransactions,
                         key = { _, transaction -> transaction.id }
@@ -260,94 +592,6 @@ fun HomeScreen(
                         }
                     }
                 }
-            }
-
-            // Кнопки навигации поверх контента
-            Surface(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .fillMaxWidth(),
-                color = MaterialTheme.colorScheme.surface,
-                shadowElevation = 8.dp
-            ) {
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp)
-                        .height(80.dp),
-                    horizontalArrangement = Arrangement.SpaceEvenly,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Кнопка Графики
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        FilledTonalIconButton(
-                            onClick = onNavigateToChart,
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Summarize,
-                                contentDescription = stringResource(R.string.charts)
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.charts),
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-
-                    // Кнопка Добавить
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        FilledIconButton(
-                            onClick = onNavigateToAdd,
-                            modifier = Modifier.size(56.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = stringResource(R.string.add)
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.add),
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-
-                    // Кнопка История
-                    Column(
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        modifier = Modifier.weight(1f)
-                    ) {
-                        FilledTonalIconButton(
-                            onClick = onNavigateToHistory,
-                            modifier = Modifier.size(48.dp)
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.History,
-                                contentDescription = stringResource(R.string.history)
-                            )
-                        }
-                        Text(
-                            text = stringResource(R.string.history),
-                            fontSize = 12.sp,
-                            modifier = Modifier.padding(top = 4.dp)
-                        )
-                    }
-                }
-            }
-
-            // Индикатор загрузки
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
             }
         }
     }
@@ -392,11 +636,15 @@ fun FilterChips(
  */
 @Composable
 fun BalanceCard(income: Money, expense: Money, balance: Money) {
+    // Получаем цвета из темы
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    
     // Кэшируем форматированные значения, чтобы избежать повторных вычислений при перерисовке
     val formattedBalance = remember(balance) { balance.formatForDisplay() }
     val formattedIncome = remember(income) { income.format(false) }
     val formattedExpense = remember(expense) { expense.format(false) }
-    val balanceColor = remember(balance) { if (!balance.isNegative()) Color(0xFF4CAF50) else Color(0xFFF44336) }
+    val balanceColor = remember(balance) { if (!balance.isNegative()) incomeColor else expenseColor }
 
     Card(
         modifier = Modifier
@@ -411,7 +659,7 @@ fun BalanceCard(income: Money, expense: Money, balance: Money) {
             Text(
                 text = stringResource(R.string.current_balance),
                 fontSize = 16.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Text(
@@ -431,12 +679,12 @@ fun BalanceCard(income: Money, expense: Money, balance: Money) {
                     Text(
                         text = stringResource(R.string.income),
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = stringResource(R.string.currency_format, formattedIncome),
                         fontSize = 14.sp,
-                        color = Color(0xFF4CAF50),
+                        color = incomeColor,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -445,12 +693,12 @@ fun BalanceCard(income: Money, expense: Money, balance: Money) {
                     Text(
                         text = stringResource(R.string.expense),
                         fontSize = 14.sp,
-                        color = Color.Gray
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
                         text = stringResource(R.string.currency_format, formattedExpense),
                         fontSize = 14.sp,
-                        color = Color(0xFFF44336),
+                        color = expenseColor,
                         fontWeight = FontWeight.Medium
                     )
                 }
@@ -464,6 +712,10 @@ fun BalanceCard(income: Money, expense: Money, balance: Money) {
  */
 @Composable
 fun TransactionItem(transaction: Transaction) {
+    // Получаем цвета из темы
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    
     // Кэшируем форматированные значения, чтобы избежать повторных вычислений при перерисовке
     val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
     val formattedDate = remember(transaction.date) { dateFormat.format(transaction.date) }
@@ -471,7 +723,7 @@ fun TransactionItem(transaction: Transaction) {
         transaction.amount.format(false)
     }
     val amountColor = remember(transaction.isExpense) {
-        if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50)
+        if (transaction.isExpense) expenseColor else incomeColor
     }
 
     Row(
@@ -486,19 +738,20 @@ fun TransactionItem(transaction: Transaction) {
         ) {
             Text(
                 text = transaction.title,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
             )
             Text(
                 text = stringResource(R.string.category_date_format, transaction.category, formattedDate),
                 fontSize = 12.sp,
-                color = Color.Gray
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             transaction.note?.let {
                 if (it.isNotEmpty()) {
                     Text(
                         text = it,
                         fontSize = 12.sp,
-                        color = Color.Gray,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                         modifier = Modifier.padding(top = 2.dp)
                     )
                 }
@@ -521,6 +774,10 @@ fun TransactionItem(transaction: Transaction) {
  */
 @Composable
 fun GroupSummary(transactions: List<Transaction>) {
+    // Получаем цвета из темы
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    
     // Кэшируем вычисления, чтобы избежать повторных вычислений при перерисовке
     val financialSummary = remember(transactions) {
         val income = transactions
@@ -544,7 +801,7 @@ fun GroupSummary(transactions: List<Transaction>) {
     val formattedIncome = remember(income) { income.format(false) }
     val formattedExpense = remember(expense) { expense.format(false) }
     val formattedBalance = remember(balance) { balance.format(false) }
-    val balanceColor = remember(balance) { if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336) }
+    val balanceColor = remember(balance) { if (balance >= Money.zero()) incomeColor else expenseColor }
 
     Card(
         modifier = Modifier
@@ -561,12 +818,12 @@ fun GroupSummary(transactions: List<Transaction>) {
                 Text(
                     text = stringResource(R.string.income),
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = stringResource(R.string.currency_format, formattedIncome),
                     fontSize = 14.sp,
-                    color = Color(0xFF4CAF50),
+                    color = incomeColor,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -575,12 +832,12 @@ fun GroupSummary(transactions: List<Transaction>) {
                 Text(
                     text = stringResource(R.string.expense),
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = stringResource(R.string.currency_format, formattedExpense),
                     fontSize = 14.sp,
-                    color = Color(0xFFF44336),
+                    color = expenseColor,
                     fontWeight = FontWeight.Medium
                 )
             }
@@ -589,7 +846,7 @@ fun GroupSummary(transactions: List<Transaction>) {
                 Text(
                     text = stringResource(R.string.balance),
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
                     text = stringResource(R.string.currency_format, formattedBalance),

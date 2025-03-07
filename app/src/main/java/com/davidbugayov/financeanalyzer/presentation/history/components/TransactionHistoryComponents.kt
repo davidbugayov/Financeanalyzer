@@ -46,6 +46,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
 /**
  * Основной компонент для отображения истории транзакций.
@@ -166,10 +168,12 @@ fun TransactionGroupItem(
                 // Используем key для каждой транзакции, чтобы избежать ненужных перерисовок
                 transactions.forEach { transaction ->
                     key(transaction.id) {
-                        TransactionItem(
-                            transaction = transaction,
-                            onClick = { onTransactionClick(transaction) }
-                        )
+                        TransactionItem(transaction = transaction)
+                        Surface(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .clickable { onTransactionClick(transaction) }
+                        ) {}
                     }
                 }
             }
@@ -193,7 +197,6 @@ fun GroupHeader(
 
     // Вычисляем суммы только при изменении списка транзакций
     val financialSummary = remember(transactions) {
-        // Используем reduce для суммирования Money или создаем нулевое значение, если список пуст
         val income = transactions.filter { !it.isExpense }
             .map { it.amount }
             .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
@@ -208,13 +211,6 @@ fun GroupHeader(
     }
 
     val (income, expense, balance) = financialSummary
-
-    // Кэшируем форматированные значения
-    val formattedIncome = remember(income) { income.format(false) }
-    val formattedExpense = remember(expense) { expense.format(false) }
-    val balanceColor = remember(balance) {
-        if (balance >= Money.zero()) Color(0xFF4CAF50) else Color(0xFFF44336)
-    }
 
     Surface(
         modifier = Modifier
@@ -271,15 +267,11 @@ fun GroupHeader(
  */
 @Composable
 fun TransactionHistoryItem(
-    transaction: Transaction,
-    onClick: () -> Unit = {}
+    transaction: Transaction
 ) {
     // Используем key для предотвращения ненужных перерисовок
     key(transaction.id) {
-        TransactionItem(
-            transaction = transaction,
-            onClick = onClick
-        )
+        TransactionItem(transaction = transaction)
     }
 }
 
@@ -310,10 +302,13 @@ fun TransactionGroup(
 
         transactionsList.forEach { transaction ->
             key(transaction.id) {
-                TransactionHistoryItem(
-                    transaction = transaction,
-                    onClick = { onTransactionClick(transaction) }
-                )
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { onTransactionClick(transaction) }
+                ) {
+                    TransactionHistoryItem(transaction = transaction)
+                }
             }
         }
     }
@@ -476,6 +471,87 @@ fun ComparisonCard(
                 fontSize = 14.sp,
                 color = Color.Gray
             )
+        }
+    }
+}
+
+@Composable
+fun TransactionHistoryGroupSummary(transactions: List<Transaction>) {
+    // Получаем цвета из темы
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+
+    // Кэшируем вычисления
+    val financialSummary = remember(transactions) {
+        val income = transactions
+            .filter { !it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+        val expense = transactions
+            .filter { it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+        val balance = income - expense
+
+        Triple(income, expense, balance)
+    }
+
+    val (income, expense, balance) = financialSummary
+
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(12.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            Column(horizontalAlignment = Alignment.Start) {
+                Text(
+                    text = stringResource(R.string.income),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = stringResource(R.string.currency_format, income.format(false)),
+                    fontSize = 14.sp,
+                    color = incomeColor,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.CenterHorizontally) {
+                Text(
+                    text = stringResource(R.string.expense),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = stringResource(R.string.currency_format, expense.format(false)),
+                    fontSize = 14.sp,
+                    color = expenseColor,
+                    fontWeight = FontWeight.Medium
+                )
+            }
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = stringResource(R.string.balance),
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+                Text(
+                    text = stringResource(R.string.currency_format, balance.format(false)),
+                    fontSize = 14.sp,
+                    color = if (balance >= Money.zero()) incomeColor else expenseColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
         }
     }
 } 

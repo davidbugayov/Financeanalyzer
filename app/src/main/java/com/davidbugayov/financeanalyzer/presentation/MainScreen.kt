@@ -2,7 +2,8 @@ package com.davidbugayov.financeanalyzer.presentation
 
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.EaseOut
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -53,11 +54,19 @@ fun MainScreen(startDestination: String = "home") {
                     route = Screen.Home.route,
                     enterTransition = {
                         fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
                         )
                     },
                     exitTransition = {
                         fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    },
+                    popEnterTransition = {
+                        fadeIn(
                             animationSpec = tween(300, easing = EaseInOut)
                         )
                     }
@@ -73,19 +82,47 @@ fun MainScreen(startDestination: String = "home") {
                 composable(
                     route = Screen.History.route,
                     enterTransition = {
-                        fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideIntoContainer(
-                            animationSpec = tween(300, easing = EaseOut),
+                        slideIntoContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
                             towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        ) + fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
                         )
                     },
                     exitTransition = {
-                        fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideOutOfContainer(
-                            animationSpec = tween(300, easing = EaseOut),
+                        slideOutOfContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
                             towards = AnimatedContentTransitionScope.SlideDirection.End
+                        ) + fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        ) + fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        ) + fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
                         )
                     }
                 ) {
@@ -98,19 +135,25 @@ fun MainScreen(startDestination: String = "home") {
                 composable(
                     route = Screen.AddTransaction.route,
                     enterTransition = {
-                        fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideIntoContainer(
-                            animationSpec = tween(300, easing = EaseOut),
+                        slideIntoContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
                             towards = AnimatedContentTransitionScope.SlideDirection.Up
+                        ) + fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
                         )
                     },
                     exitTransition = {
-                        fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideOutOfContainer(
-                            animationSpec = tween(300, easing = EaseOut),
+                        slideOutOfContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
                             towards = AnimatedContentTransitionScope.SlideDirection.Down
+                        ) + fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
                         )
                     }
                 ) {
@@ -131,19 +174,47 @@ fun MainScreen(startDestination: String = "home") {
                 composable(
                     route = Screen.Chart.route,
                     enterTransition = {
-                        fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideIntoContainer(
-                            animationSpec = tween(300, easing = EaseOut),
+                        slideIntoContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
                             towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        ) + fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
                         )
                     },
                     exitTransition = {
-                        fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        ) + slideOutOfContainer(
-                            animationSpec = tween(300, easing = EaseOut),
+                        slideOutOfContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
                             towards = AnimatedContentTransitionScope.SlideDirection.End
+                        ) + fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    },
+                    popEnterTransition = {
+                        slideIntoContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        ) + fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    },
+                    popExitTransition = {
+                        slideOutOfContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        ) + fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
                         )
                     }
                 ) {
