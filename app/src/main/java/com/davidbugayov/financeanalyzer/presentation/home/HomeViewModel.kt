@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.home
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
@@ -89,22 +90,17 @@ class HomeViewModel(
      */
     private fun loadTransactions() {
         viewModelScope.launch {
-            Timber.d("Loading transactions")
-            _state.update { it.copy(isLoading = true, error = null) }
-            
-            try {
-                val result = loadTransactionsUseCase()
-                _state.update { it.copy(transactions = result) }
-                Timber.d("Loaded ${result.size} transactions")
-                calculateTotalStats()
-                calculateDailyStats()
-                updateFilteredTransactions()
-            } catch (e: Exception) {
-                Timber.e(e, "Error loading transactions")
-                _state.update { it.copy(error = e.message) }
-            } finally {
-                _state.update { it.copy(isLoading = false) }
-            }
+            loadTransactionsUseCase().fold(
+                onSuccess = { transactions: List<Transaction> ->
+                    _state.update { it.copy(transactions = transactions) }
+                    updateFilteredTransactions()
+                    calculateTotalStats()
+                },
+                onFailure = { exception: Throwable ->
+                    Timber.e(exception, "Failed to load transactions")
+                    _state.update { it.copy(error = exception.message ?: "Failed to load transactions") }
+                }
+            )
         }
     }
     
@@ -113,20 +109,26 @@ class HomeViewModel(
      */
     private fun generateAndSaveTestData() {
         viewModelScope.launch {
-            try {
-                Timber.d("Generating test data")
-                val testTransactions = TestDataGenerator.generateTransactions(20)
-                
-                testTransactions.forEach { transaction ->
-                    Timber.d("Saving test transaction: ${transaction.title}")
-                    addTransactionUseCase(transaction)
-                }
-                
+            Timber.d("Generating test data")
+            val testTransactions = TestDataGenerator.generateTransactions(20)
+
+            var hasError = false
+            testTransactions.forEach { transaction ->
+                Timber.d("Saving test transaction: ${transaction.title}")
+                addTransactionUseCase(transaction).fold(
+                    onSuccess = { /* Transaction saved successfully */ },
+                    onFailure = { exception: Throwable ->
+                        hasError = true
+                        Timber.e(exception, "Failed to save test transaction: ${transaction.title}")
+                    }
+                )
+            }
+
+            if (!hasError) {
                 EventBus.emit(Event.TransactionAdded)
-                Timber.d("Test data generation completed")
-            } catch (e: Exception) {
-                Timber.e(e, "Error generating test data")
-                _state.update { it.copy(error = "Ошибка при генерации тестовых данных: ${e.message}") }
+                Timber.d("Test data generation completed successfully")
+            } else {
+                _state.update { it.copy(error = "Ошибка при сохранении некоторых тестовых транзакций") }
             }
         }
     }
@@ -256,6 +258,20 @@ class HomeViewModel(
         }
 
         Timber.d("Daily stats calculated: Income=$dailyIncome, Expense=$dailyExpense")
+    }
+
+    fun addTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            addTransactionUseCase(transaction).fold(
+                onSuccess = {
+                    loadTransactions()
+                },
+                onFailure = { exception: Throwable ->
+                    Timber.e(exception, "Failed to add transaction")
+                    _state.update { it.copy(error = exception.message ?: "Failed to add transaction") }
+                }
+            )
+        }
     }
 }
 

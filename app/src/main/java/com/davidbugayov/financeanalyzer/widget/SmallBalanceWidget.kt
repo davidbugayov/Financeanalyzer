@@ -9,6 +9,8 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.util.formatNumberWithCurrency
 import kotlinx.coroutines.CoroutineScope
@@ -19,6 +21,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 /**
  * Компактный виджет для отображения текущего баланса.
@@ -29,6 +32,7 @@ import org.koin.core.component.inject
 class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
 
     private val loadTransactionsUseCase: LoadTransactionsUseCase by inject()
+    private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
     override fun onUpdate(
         context: Context,
@@ -79,44 +83,47 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
         }
 
         // Загружаем данные о транзакциях в фоновом потоке
-        val scope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
         scope.launch {
-            try {
-                val transactions = loadTransactionsUseCase()
-                
-                // Рассчитываем баланс
-                val income = transactions.filter { !it.isExpense }.sumOf { it.amount }
-                val expense = transactions.filter { it.isExpense }.sumOf { it.amount }
-                val balance = income - expense
-                
-                // Обновляем UI виджета
-                withContext(Dispatchers.Main) {
-                    // Форматируем баланс для компактного отображения
-                    val formattedBalance = formatNumberWithCurrency(balance)
-                    
-                    // Устанавливаем значение в виджет
-                    views.setTextViewText(R.id.small_widget_balance, formattedBalance)
-                    
-                    // Устанавливаем цвет баланса в зависимости от значения
-                    val balanceColor = if (balance >= 0) {
-                        0xFF4CAF50.toInt() // Green
-                    } else {
-                        0xFFF44336.toInt() // Red
+            loadTransactionsUseCase().fold(
+                onSuccess = { transactions: List<Transaction> ->
+                    val income = transactions.filter { transaction -> !transaction.isExpense }.sumOf { transaction -> transaction.amount }
+                    val expenses = transactions.filter { transaction -> transaction.isExpense }.sumOf { transaction -> transaction.amount }
+                    val balance = income - expenses
+
+                    // Обновляем UI виджета
+                    withContext(Dispatchers.Main) {
+                        // Форматируем баланс для компактного отображения
+                        val formattedBalance = formatNumberWithCurrency(balance)
+
+                        // Устанавливаем значение в виджет
+                        views.setTextViewText(R.id.small_widget_balance, formattedBalance)
+
+                        // Устанавливаем цвет баланса в зависимости от значения
+                        val balanceColor = if (balance >= 0) {
+                            0xFF4CAF50.toInt() // Green
+                        } else {
+                            0xFFF44336.toInt() // Red
+                        }
+                        views.setTextColor(R.id.small_widget_balance, balanceColor)
+
+                        // Обновляем виджет
+                        appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
-                    views.setTextColor(R.id.small_widget_balance, balanceColor)
-                    
-                    // Обновляем виджет
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
+                },
+                onFailure = { exception: Throwable ->
+                    Timber.e(exception, "Failed to load transactions for widget")
+                    withContext(Dispatchers.Main) {
+                        views.setTextViewText(R.id.small_widget_balance, "?")
+                        appWidgetManager.updateAppWidget(appWidgetId, views)
+                    }
                 }
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    views.setTextViewText(R.id.small_widget_balance, "?")
-                    appWidgetManager.updateAppWidget(appWidgetId, views)
-                }
-            } finally {
-                coroutineContext.cancel()
-            }
+            )
         }
+    }
+
+    override fun onDisabled(context: Context?) {
+        super.onDisabled(context)
+        scope.cancel()
     }
     
     /**

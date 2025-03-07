@@ -24,6 +24,7 @@ import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.event.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
@@ -144,26 +145,27 @@ class AddTransactionViewModel(
      */
     private fun addTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            try {
-                _state.update { it.copy(isLoading = true, error = null) }
-                addTransactionUseCase(transaction)
-                
-                // Отправляем событие о добавлении транзакции
-                EventBus.emit(Event.TransactionAdded)
-                
-                // Обновляем виджет баланса
-                updateBalanceWidget()
-                
-                // Устанавливаем флаг успеха после всех операций
-                _state.update { it.copy(isSuccess = true, isLoading = false) }
-            } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        error = "Ошибка при добавлении транзакции: ${e.message}",
-                        isLoading = false
-                    )
+            _state.update { it.copy(isLoading = true, error = null) }
+            addTransactionUseCase(transaction).fold(
+                onSuccess = {
+                    // Отправляем событие о добавлении транзакции
+                    EventBus.emit(Event.TransactionAdded)
+
+                    // Обновляем виджет баланса
+                    updateBalanceWidget()
+
+                    // Устанавливаем флаг успеха после всех операций
+                    _state.update { it.copy(isSuccess = true, isLoading = false) }
+                },
+                onFailure = { exception ->
+                    _state.update {
+                        it.copy(
+                            error = "Ошибка при добавлении транзакции: ${exception.message}",
+                            isLoading = false
+                        )
+                    }
                 }
-            }
+            )
         }
     }
     

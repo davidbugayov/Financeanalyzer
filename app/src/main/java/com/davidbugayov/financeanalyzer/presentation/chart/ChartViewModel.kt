@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.chart
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartMonthlyData
@@ -10,6 +11,7 @@ import com.davidbugayov.financeanalyzer.utils.EventBus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -55,15 +57,44 @@ class ChartViewModel(
      */
     fun loadTransactions() {
         viewModelScope.launch {
+            _isLoading.value = true
+            _error.value = null
+
             try {
-                _isLoading.value = true
-                _error.value = null
-                _transactions.value = loadTransactionsUseCase()
+                when (val result = loadTransactionsUseCase()) {
+                    is Result.Success -> {
+                        val transactions = result.data
+                        _transactions.value = transactions
+                        updateChartData(transactions)
+                    }
+                    is Result.Error -> {
+                        val exception = result.exception
+                        Timber.e("Failed to load transactions: ${exception.message}")
+                        _error.value = "Ошибка при загрузке транзакций: ${exception.message}"
+                    }
+                }
             } catch (e: Exception) {
+                Timber.e(e, "Error loading transactions")
                 _error.value = "Ошибка при загрузке транзакций: ${e.message}"
             } finally {
                 _isLoading.value = false
             }
+        }
+    }
+
+    /**
+     * Обновляет данные для графиков
+     */
+    private fun updateChartData(transactions: List<Transaction>) {
+        try {
+            // Обновляем данные для всех графиков
+            getExpensesByCategory()
+            getIncomeByCategory()
+            getTransactionsByMonth()
+            getExpensesByDay()
+        } catch (e: Exception) {
+            Timber.e(e, "Error updating chart data")
+            _error.value = "Ошибка при обновлении данных графиков: ${e.message}"
         }
     }
 

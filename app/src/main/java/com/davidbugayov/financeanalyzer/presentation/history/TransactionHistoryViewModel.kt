@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
@@ -15,6 +16,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
+import timber.log.Timber
 
 /**
  * ViewModel для экрана истории транзакций.
@@ -104,25 +106,23 @@ class TransactionHistoryViewModel(
      * Загружает транзакции из репозитория
      */
     private fun loadTransactions() {
-        _state.update { it.copy(isLoading = true) }
         viewModelScope.launch {
             try {
-                val transactions = loadTransactionsUseCase()
-                _state.update {
-                    it.copy(
-                        transactions = transactions,
-                        isLoading = false,
-                        error = null
-                    )
+                when (val result = loadTransactionsUseCase()) {
+                    is Result.Success -> {
+                        val transactions = result.data
+                        _state.update { it.copy(transactions = transactions) }
+                        updateFilteredTransactions()
+                    }
+                    is Result.Error -> {
+                        val exception = result.exception
+                        Timber.e("Failed to load transactions: ${exception.message}")
+                        _state.update { it.copy(error = exception.message ?: "Failed to load transactions") }
+                    }
                 }
-                updateFilteredTransactions()
             } catch (e: Exception) {
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        error = e.message ?: "Неизвестная ошибка"
-                    )
-                }
+                Timber.e(e, "Error loading transactions")
+                _state.update { it.copy(error = "Error loading transactions: ${e.message}") }
             }
         }
     }
