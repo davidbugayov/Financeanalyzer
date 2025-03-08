@@ -148,6 +148,15 @@ class TransactionHistoryViewModel(
             is TransactionHistoryEvent.HideDeleteConfirmDialog -> {
                 _state.update { it.copy(transactionToDelete = null) }
             }
+            is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> {
+                _state.update { it.copy(categoryToDelete = Pair(event.category, event.isExpense)) }
+            }
+            is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> {
+                _state.update { it.copy(categoryToDelete = null) }
+            }
+            is TransactionHistoryEvent.DeleteCategory -> {
+                deleteCategory(event.category, event.isExpense)
+            }
         }
     }
 
@@ -323,6 +332,33 @@ class TransactionHistoryViewModel(
         filteredTransactionsCache.clear()
         groupedTransactionsCache.clear()
         categoryStatsCache.clear()
+    }
+
+    /**
+     * Удаляет категорию
+     */
+    private fun deleteCategory(category: String, isExpense: Boolean) {
+        viewModelScope.launch {
+            try {
+                // Удаляем категорию через CategoriesViewModel
+                categoriesViewModel.removeCategory(category, isExpense)
+
+                // Если удаляемая категория была выбрана, сбрасываем фильтр
+                if (_state.value.selectedCategory == category) {
+                    _state.update { it.copy(selectedCategory = null) }
+                    updateFilteredTransactions()
+                }
+
+                // Скрываем диалог подтверждения
+                _state.update { it.copy(categoryToDelete = null) }
+
+                // Перезагружаем транзакции, чтобы обновить список
+                loadTransactions()
+            } catch (e: Exception) {
+                Timber.e(e, "Error deleting category")
+                _state.update { it.copy(error = "Ошибка при удалении категории: ${e.message}") }
+            }
+        }
     }
 
     /**

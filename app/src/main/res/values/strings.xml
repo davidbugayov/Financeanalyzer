@@ -105,6 +105,8 @@
     <string name="change_increase">На %d%% больше чем в прошлом периоде</string>
     <string name="change_decrease">На %d%% меньше чем в прошлом периоде</string>
     <string name="change_no_change">Без изменений по сравнению с прошлым периодом</string>
+    <string name="delete_category">Удаление категории</string>
+    <string name="delete_category_confirmation">Вы уверены, что хотите удалить категорию "%1$s"?</string>
 
     <!-- AddTransaction strings -->
     <string name="confirm">Подтвердить</string>

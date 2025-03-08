@@ -26,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -57,9 +56,9 @@ import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.PeriodFilterChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionHistory
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.AddCategoryDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -84,12 +83,6 @@ fun TransactionHistoryScreen(
         }
         Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
     }
-
-    // Состояние диалогов
-    var showCategoryDialog by remember { mutableStateOf(false) }
-    var showAddCategoryDialog by remember { mutableStateOf(false) }
-    var newCategoryText by remember { mutableStateOf("") }
-    var isExpenseCategory by remember { mutableStateOf(true) }
 
     // Получаем список всех категорий из CategoriesViewModel
     val expenseCategories by viewModel.expenseCategories.collectAsState()
@@ -135,9 +128,10 @@ fun TransactionHistoryScreen(
                 viewModel.onEvent(TransactionHistoryEvent.SetCategory(category))
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
             },
-            onAddCategory = {
-                viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
-                showAddCategoryDialog = true
+            onCategoryLongClick = { category ->
+                // Определяем, является ли категория расходом или доходом
+                val isExpense = expenseCategories.any { it.name == category }
+                viewModel.onEvent(TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog(category, isExpense))
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
@@ -145,52 +139,17 @@ fun TransactionHistoryScreen(
         )
     }
 
-    // Диалог добавления новой категории
-    if (showAddCategoryDialog) {
-        Column {
-            // Радио-кнопки для выбора типа категории
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                RadioButton(
-                    selected = isExpenseCategory,
-                    onClick = { isExpenseCategory = true }
-                )
-                Text(
-                    text = stringResource(R.string.expense_type),
-                    modifier = Modifier.padding(end = 16.dp)
-                )
-
-                RadioButton(
-                    selected = !isExpenseCategory,
-                    onClick = { isExpenseCategory = false }
-                )
-                Text(
-                    text = stringResource(R.string.income_type)
-                )
+    // Диалог подтверждения удаления категории
+    state.categoryToDelete?.let { (category, isExpense) ->
+        DeleteCategoryConfirmDialog(
+            category = category,
+            onConfirm = {
+                viewModel.onEvent(TransactionHistoryEvent.DeleteCategory(category, isExpense))
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideDeleteCategoryConfirmDialog)
             }
-
-            AddCategoryDialog(
-                categoryText = newCategoryText,
-                onCategoryTextChange = { newCategoryText = it },
-                onConfirm = {
-                    if (newCategoryText.isNotBlank()) {
-                        // Добавляем категорию через CategoriesViewModel
-                        viewModel.categoriesViewModel.addCustomCategory(newCategoryText, isExpenseCategory)
-                        viewModel.onEvent(TransactionHistoryEvent.SetCategory(newCategoryText))
-                        newCategoryText = ""
-                    }
-                    showAddCategoryDialog = false
-                    showCategoryDialog = true
-                },
-                onDismiss = {
-                    newCategoryText = ""
-                    showAddCategoryDialog = false
-                    showCategoryDialog = true
-                }
-            )
-        }
+        )
     }
 
     // Диалог выбора начальной даты

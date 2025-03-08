@@ -14,7 +14,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -265,12 +264,12 @@ fun DatePickerDialog(
 
 /**
  * Диалог выбора категории для фильтрации транзакций.
- * Отображает список доступных категорий и возможность добавить новую.
+ * Отображает список доступных категорий и возможность удалить категорию по долгому нажатию.
  *
  * @param selectedCategory Текущая выбранная категория
  * @param categories Список доступных категорий
  * @param onCategorySelected Callback, вызываемый при выборе категории
- * @param onAddCategory Callback для открытия диалога добавления новой категории
+ * @param onCategoryLongClick Callback, вызываемый при долгом нажатии на категорию
  * @param onDismiss Callback для закрытия диалога
  */
 @Composable
@@ -278,7 +277,7 @@ fun CategorySelectionDialog(
     selectedCategory: String?,
     categories: List<String>,
     onCategorySelected: (String?) -> Unit,
-    onAddCategory: () -> Unit,
+    onCategoryLongClick: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -288,16 +287,6 @@ fun CategorySelectionDialog(
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                Button(
-                    onClick = onAddCategory,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = 8.dp)
-                        .height(56.dp)
-                ) {
-                    Text(stringResource(R.string.add_category))
-                }
-
                 CategoryButton(
                     text = stringResource(R.string.all),
                     selected = selectedCategory == null,
@@ -314,6 +303,10 @@ fun CategorySelectionDialog(
                         onClick = {
                             onCategorySelected(category)
                             onDismiss()
+                        },
+                        onLongClick = {
+                            onCategoryLongClick(category)
+                            onDismiss()
                         }
                     )
                 }
@@ -322,14 +315,6 @@ fun CategorySelectionDialog(
         confirmButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.ok))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = {
-                onCategorySelected(null)
-                onDismiss()
-            }) {
-                Text(stringResource(R.string.cancel))
             }
         }
     )
@@ -373,6 +358,47 @@ fun AddCategoryDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    )
+}
+
+/**
+ * Диалог подтверждения удаления категории.
+ *
+ * @param category Название категории для удаления
+ * @param onConfirm Callback для подтверждения удаления
+ * @param onDismiss Callback для отмены удаления
+ */
+@Composable
+fun DeleteCategoryConfirmDialog(
+    category: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text(stringResource(R.string.delete_category)) },
+        text = {
+            Text(
+                stringResource(
+                    R.string.delete_category_confirmation,
+                    category
+                )
+            )
+        },
+        confirmButton = {
+            TextButton(
+                onClick = onConfirm
+            ) {
+                Text(stringResource(R.string.delete))
+            }
+        },
+        dismissButton = {
+            TextButton(
+                onClick = onDismiss
+            ) {
                 Text(stringResource(R.string.cancel))
             }
         }
