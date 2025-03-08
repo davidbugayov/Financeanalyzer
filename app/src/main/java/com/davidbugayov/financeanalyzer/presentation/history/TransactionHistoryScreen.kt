@@ -128,7 +128,7 @@ fun TransactionHistoryScreen(
                 viewModel.onEvent(TransactionHistoryEvent.SetCategory(category))
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
             },
-            onCategoryLongClick = { category ->
+            onCategoryDelete = { category ->
                 // Определяем, является ли категория расходом или доходом
                 val isExpense = expenseCategories.any { it.name == category }
                 viewModel.onEvent(TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog(category, isExpense))

@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.history.dialogs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -8,16 +9,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Text
@@ -26,12 +31,12 @@ import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryButton
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -264,12 +269,12 @@ fun DatePickerDialog(
 
 /**
  * Диалог выбора категории для фильтрации транзакций.
- * Отображает список доступных категорий и возможность удалить категорию по долгому нажатию.
+ * Отображает список доступных категорий и возможность удалить категорию по нажатию на иконку корзины.
  *
  * @param selectedCategory Текущая выбранная категория
  * @param categories Список доступных категорий
  * @param onCategorySelected Callback, вызываемый при выборе категории
- * @param onCategoryLongClick Callback, вызываемый при долгом нажатии на категорию
+ * @param onCategoryDelete Callback, вызываемый при нажатии на иконку удаления категории
  * @param onDismiss Callback для закрытия диалога
  */
 @Composable
@@ -277,7 +282,7 @@ fun CategorySelectionDialog(
     selectedCategory: String?,
     categories: List<String>,
     onCategorySelected: (String?) -> Unit,
-    onCategoryLongClick: (String) -> Unit,
+    onCategoryDelete: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     AlertDialog(
@@ -287,28 +292,89 @@ fun CategorySelectionDialog(
             Column(
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
-                CategoryButton(
-                    text = stringResource(R.string.all),
-                    selected = selectedCategory == null,
-                    onClick = {
-                        onCategorySelected(null)
-                        onDismiss()
-                    }
-                )
-
-                categories.forEach { category ->
-                    CategoryButton(
-                        text = category,
-                        selected = category == selectedCategory,
-                        onClick = {
-                            onCategorySelected(category)
-                            onDismiss()
-                        },
-                        onLongClick = {
-                            onCategoryLongClick(category)
+                // Кнопка "Все категории"
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 4.dp)
+                        .height(56.dp)
+                        .clip(MaterialTheme.shapes.medium)
+                        .clickable {
+                            onCategorySelected(null)
                             onDismiss()
                         }
+                        .background(
+                            if (selectedCategory == null)
+                                MaterialTheme.colorScheme.primary
+                            else
+                                MaterialTheme.colorScheme.surfaceVariant
+                        )
+                        .padding(horizontal = 16.dp),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Text(
+                        text = stringResource(R.string.all),
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = if (selectedCategory == null)
+                            MaterialTheme.colorScheme.onPrimary
+                        else
+                            MaterialTheme.colorScheme.onSurfaceVariant
                     )
+                    // Для "Все категории" не показываем иконку удаления
+                    Spacer(modifier = Modifier.width(24.dp))
+                }
+
+                // Список категорий
+                categories.forEach { category ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 4.dp)
+                            .height(56.dp)
+                            .clip(MaterialTheme.shapes.medium)
+                            .clickable {
+                                onCategorySelected(category)
+                                onDismiss()
+                            }
+                            .background(
+                                if (category == selectedCategory)
+                                    MaterialTheme.colorScheme.primary
+                                else
+                                    MaterialTheme.colorScheme.surfaceVariant
+                            )
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        Text(
+                            text = category,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = if (category == selectedCategory)
+                                MaterialTheme.colorScheme.onPrimary
+                            else
+                                MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+
+                        // Не показываем иконку удаления для категории "Другое"
+                        if (category != "Другое") {
+                            IconButton(
+                                onClick = { onCategoryDelete(category) },
+                                modifier = Modifier.size(24.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = stringResource(R.string.delete),
+                                    tint = if (category == selectedCategory)
+                                        MaterialTheme.colorScheme.onPrimary
+                                    else
+                                        MaterialTheme.colorScheme.onSurfaceVariant
+                                )
+                            }
+                        } else {
+                            Spacer(modifier = Modifier.width(24.dp))
+                        }
+                    }
                 }
             }
         },
