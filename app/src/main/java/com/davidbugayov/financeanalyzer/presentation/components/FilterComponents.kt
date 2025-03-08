@@ -50,7 +50,8 @@ fun TransactionFilterChips(
 }
 
 /**
- * Общий компонент с фильтрами периодов для экрана истории
+ * Общий компонент с фильтрами периодов для экрана истории.
+ * Отображает периоды в виде чипов с понятными названиями.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -64,23 +65,40 @@ fun PeriodFilterChips(
             .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        PeriodType.values().forEach { periodType ->
-            FilterChip(
-                selected = currentFilter == periodType,
-                onClick = { onFilterSelected(periodType) },
-                label = {
-                    Text(
-                        text = when (periodType) {
-                            PeriodType.ALL -> stringResource(R.string.period_all)
-                            PeriodType.MONTH -> stringResource(R.string.period_month)
-                            PeriodType.QUARTER -> stringResource(R.string.period_quarter)
-                            PeriodType.HALF_YEAR -> stringResource(R.string.period_half_year)
-                            PeriodType.YEAR -> stringResource(R.string.period_year)
-                            PeriodType.CUSTOM -> stringResource(R.string.period_custom)
-                        }
-                    )
-                }
-            )
-        }
+        // Используем более крупные и понятные чипы для каждого периода
+        FilterChip(
+            selected = currentFilter == PeriodType.ALL,
+            onClick = { onFilterSelected(PeriodType.ALL) },
+            label = { Text(stringResource(R.string.period_all)) },
+            modifier = Modifier.weight(1f)
+        )
+
+        FilterChip(
+            selected = currentFilter == PeriodType.DAY,
+            onClick = { onFilterSelected(PeriodType.DAY) },
+            label = { Text(stringResource(R.string.period_day)) },
+            modifier = Modifier.weight(1f)
+        )
+
+        FilterChip(
+            selected = currentFilter == PeriodType.MONTH,
+            onClick = { onFilterSelected(PeriodType.MONTH) },
+            label = { Text(stringResource(R.string.period_month)) },
+            modifier = Modifier.weight(1f)
+        )
+
+        FilterChip(
+            selected = currentFilter == PeriodType.YEAR,
+            onClick = { onFilterSelected(PeriodType.YEAR) },
+            label = { Text(stringResource(R.string.period_year)) },
+            modifier = Modifier.weight(1f)
+        )
+
+        FilterChip(
+            selected = currentFilter == PeriodType.CUSTOM,
+            onClick = { onFilterSelected(PeriodType.CUSTOM) },
+            label = { Text(stringResource(R.string.period_custom)) },
+            modifier = Modifier.weight(1f)
+        )
     }
 } 

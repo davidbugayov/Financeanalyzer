@@ -19,13 +19,13 @@ import java.util.Date
  * @property selectedCategory Выбранная категория для фильтрации (null для всех категорий)
  * @property groupingType Тип группировки транзакций (по дням, неделям, месяцам)
  * @property periodType Тип периода для фильтрации
- * @property startDate Начальная дата выбранного периода
- * @property endDate Конечная дата выбранного периода
+ * @property startDate Начальная дата для кастомного периода
+ * @property endDate Конечная дата для кастомного периода
  * @property categoryStats Статистика по категории: (текущая сумма, предыдущая сумма, процент изменения)
  * @property showPeriodDialog Флаг отображения диалога выбора периода
  * @property showCategoryDialog Флаг отображения диалога выбора категории
- * @property showStartDatePicker Флаг отображения календаря начальной даты
- * @property showEndDatePicker Флаг отображения календаря конечной даты
+ * @property showStartDatePicker Флаг отображения диалога выбора начальной даты
+ * @property showEndDatePicker Флаг отображения диалога выбора конечной даты
  * @property transactionToDelete Транзакция, которую нужно удалить (null, если нет)
  * @property categoryToDelete Пара (название категории, isExpense)
  */
@@ -38,7 +38,7 @@ data class TransactionHistoryState(
     val groupingType: GroupingType = GroupingType.MONTH,
     val periodType: PeriodType = PeriodType.MONTH,
     val startDate: Date = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time,
-    val endDate: Date = Date(),
+    val endDate: Date = Calendar.getInstance().time,
     val categoryStats: Triple<Money, Money, Int?>? = null,
     val showPeriodDialog: Boolean = false,
     val showCategoryDialog: Boolean = false,

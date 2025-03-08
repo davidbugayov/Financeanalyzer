@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.DatePicker
@@ -25,6 +25,7 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.RadioButton
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -33,9 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.text.SimpleDateFormat
@@ -44,9 +43,8 @@ import java.util.Locale
 
 /**
  * Диалог выбора периода для фильтрации транзакций.
- * Позволяет выбрать предустановленный период или указать произвольный диапазон дат.
  *
- * @param selectedPeriod Текущий выбранный период
+ * @param selectedPeriod Выбранный тип периода
  * @param startDate Начальная дата для произвольного периода
  * @param endDate Конечная дата для произвольного периода
  * @param onPeriodSelected Callback, вызываемый при выборе периода
@@ -66,9 +64,18 @@ fun PeriodSelectionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.select_period)) },
+        title = {
+            Text(
+                text = stringResource(R.string.select_period),
+                style = MaterialTheme.typography.titleLarge
+            )
+        },
         text = {
-            Column {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp)
+            ) {
                 PeriodRadioButton(
                     text = stringResource(R.string.period_all),
                     selected = selectedPeriod == PeriodType.ALL,
@@ -78,26 +85,18 @@ fun PeriodSelectionDialog(
                     }
                 )
                 PeriodRadioButton(
+                    text = stringResource(R.string.period_day),
+                    selected = selectedPeriod == PeriodType.DAY,
+                    onClick = {
+                        onPeriodSelected(PeriodType.DAY)
+                        onDismiss()
+                    }
+                )
+                PeriodRadioButton(
                     text = stringResource(R.string.period_month),
                     selected = selectedPeriod == PeriodType.MONTH,
                     onClick = {
                         onPeriodSelected(PeriodType.MONTH)
-                        onDismiss()
-                    }
-                )
-                PeriodRadioButton(
-                    text = stringResource(R.string.period_quarter),
-                    selected = selectedPeriod == PeriodType.QUARTER,
-                    onClick = {
-                        onPeriodSelected(PeriodType.QUARTER)
-                        onDismiss()
-                    }
-                )
-                PeriodRadioButton(
-                    text = stringResource(R.string.period_half_year),
-                    selected = selectedPeriod == PeriodType.HALF_YEAR,
-                    onClick = {
-                        onPeriodSelected(PeriodType.HALF_YEAR)
                         onDismiss()
                     }
                 )
@@ -181,13 +180,11 @@ private fun PeriodRadioButton(
 }
 
 /**
- * Строка выбора даты в диалоге периода.
- * Отображает метку и текущую дату с иконкой календаря.
- * При нажатии открывает диалог выбора даты.
+ * Строка для выбора даты в диалоге кастомного периода.
  *
- * @param label Метка (например, "С" или "По")
+ * @param label Метка (например, "От" или "До")
  * @param date Выбранная дата
- * @param onClick Callback для открытия календаря
+ * @param onClick Callback для открытия диалога выбора даты
  */
 @Composable
 private fun DateSelectionRow(
@@ -195,31 +192,41 @@ private fun DateSelectionRow(
     date: Date,
     onClick: () -> Unit
 ) {
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(vertical = 4.dp)
             .clickable(onClick = onClick),
-        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = label,
-            fontSize = 16.sp,
-            fontWeight = FontWeight.Medium
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.width(40.dp)
         )
-        Row(
-            verticalAlignment = Alignment.CenterVertically
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        Surface(
+            modifier = Modifier
+                .fillMaxWidth()
+                .height(40.dp),
+            shape = MaterialTheme.shapes.small,
+            color = MaterialTheme.colorScheme.surfaceVariant
         ) {
-            Text(
-                text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(date),
-                fontSize = 16.sp
-            )
-            Spacer(modifier = Modifier.width(8.dp))
-            Icon(
-                imageVector = Icons.Default.CalendarMonth,
-                contentDescription = null
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = dateFormat.format(date),
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
         }
     }
 }
@@ -272,7 +279,8 @@ fun DatePickerDialog(
  * Отображает список доступных категорий и возможность удалить категорию по нажатию на иконку корзины.
  *
  * @param selectedCategory Текущая выбранная категория
- * @param categories Список доступных категорий
+ * @param expenseCategories Список доступных категорий расходов
+ * @param incomeCategories Список доступных категорий доходов
  * @param onCategorySelected Callback, вызываемый при выборе категории
  * @param onCategoryDelete Callback, вызываемый при нажатии на иконку удаления категории
  * @param onDismiss Callback для закрытия диалога
@@ -280,7 +288,8 @@ fun DatePickerDialog(
 @Composable
 fun CategorySelectionDialog(
     selectedCategory: String?,
-    categories: List<String>,
+    expenseCategories: List<String>,
+    incomeCategories: List<String>,
     onCategorySelected: (String?) -> Unit,
     onCategoryDelete: (String) -> Unit,
     onDismiss: () -> Unit
@@ -325,55 +334,49 @@ fun CategorySelectionDialog(
                     Spacer(modifier = Modifier.width(24.dp))
                 }
 
-                // Список категорий
-                categories.forEach { category ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 4.dp)
-                            .height(56.dp)
-                            .clip(MaterialTheme.shapes.medium)
-                            .clickable {
+                // Заголовок для расходов
+                if (expenseCategories.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.expense),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.error,
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+                    )
+
+                    // Список категорий расходов
+                    expenseCategories.forEach { category ->
+                        CategoryItem(
+                            category = category,
+                            isSelected = category == selectedCategory,
+                            onCategorySelected = {
                                 onCategorySelected(category)
                                 onDismiss()
-                            }
-                            .background(
-                                if (category == selectedCategory)
-                                    MaterialTheme.colorScheme.primary
-                                else
-                                    MaterialTheme.colorScheme.surfaceVariant
-                            )
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        Text(
-                            text = category,
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = if (category == selectedCategory)
-                                MaterialTheme.colorScheme.onPrimary
-                            else
-                                MaterialTheme.colorScheme.onSurfaceVariant
+                            },
+                            onCategoryDelete = { onCategoryDelete(category) }
                         )
+                    }
+                }
 
-                        // Не показываем иконку удаления для категории "Другое"
-                        if (category != "Другое") {
-                            IconButton(
-                                onClick = { onCategoryDelete(category) },
-                                modifier = Modifier.size(24.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Delete,
-                                    contentDescription = stringResource(R.string.delete),
-                                    tint = if (category == selectedCategory)
-                                        MaterialTheme.colorScheme.onPrimary
-                                    else
-                                        MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                            }
-                        } else {
-                            Spacer(modifier = Modifier.width(24.dp))
-                        }
+                // Заголовок для доходов
+                if (incomeCategories.isNotEmpty()) {
+                    Text(
+                        text = stringResource(R.string.income),
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(start = 16.dp, top = 16.dp, bottom = 8.dp)
+                    )
+
+                    // Список категорий доходов
+                    incomeCategories.forEach { category ->
+                        CategoryItem(
+                            category = category,
+                            isSelected = category == selectedCategory,
+                            onCategorySelected = {
+                                onCategorySelected(category)
+                                onDismiss()
+                            },
+                            onCategoryDelete = { onCategoryDelete(category) }
+                        )
                     }
                 }
             }
@@ -384,6 +387,60 @@ fun CategorySelectionDialog(
             }
         }
     )
+}
+
+@Composable
+private fun CategoryItem(
+    category: String,
+    isSelected: Boolean,
+    onCategorySelected: () -> Unit,
+    onCategoryDelete: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp)
+            .height(56.dp)
+            .clip(MaterialTheme.shapes.medium)
+            .clickable(onClick = onCategorySelected)
+            .background(
+                if (isSelected)
+                    MaterialTheme.colorScheme.primary
+                else
+                    MaterialTheme.colorScheme.surfaceVariant
+            )
+            .padding(horizontal = 16.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = category,
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (isSelected)
+                MaterialTheme.colorScheme.onPrimary
+            else
+                MaterialTheme.colorScheme.onSurfaceVariant
+        )
+
+        // Не показываем иконку удаления для категории "Другое"
+        if (category != "Другое") {
+            IconButton(
+                onClick = onCategoryDelete,
+                modifier = Modifier.size(24.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Delete,
+                    contentDescription = stringResource(R.string.delete),
+                    tint = if (isSelected)
+                        MaterialTheme.colorScheme.onPrimary
+                    else
+                        MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        } else {
+            Spacer(modifier = Modifier.width(24.dp))
+        }
+    }
 }
 
 /**

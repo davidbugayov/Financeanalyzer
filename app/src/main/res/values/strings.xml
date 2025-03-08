@@ -61,11 +61,13 @@
     <string name="balance_label">Баланс: %s</string>
     <string name="select_period">Выбрать период</string>
     <string name="period_all">Все время</string>
+    <string name="period_day">День</string>
     <string name="period_month">Месяц</string>
     <string name="period_quarter">Квартал</string>
     <string name="period_half_year">Полгода</string>
     <string name="period_year">Год</string>
     <string name="period_custom">Произвольный</string>
+    <string name="period_custom_range">%1$s - %2$s</string>
     <string name="from_date">С: %s</string>
     <string name="to_date">По: %s</string>
     <string name="select_start_date">Выберите начальную дату</string>

@@ -53,12 +53,12 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
-import com.davidbugayov.financeanalyzer.presentation.components.PeriodFilterChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionHistory
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.google.firebase.analytics.FirebaseAnalytics
@@ -85,36 +85,66 @@ fun TransactionHistoryScreen(
     }
 
     // Получаем список всех категорий из CategoriesViewModel
-    val expenseCategories by viewModel.expenseCategories.collectAsState()
-    val incomeCategories by viewModel.incomeCategories.collectAsState()
+    val expenseCategories by viewModel.categoriesViewModel.expenseCategories.collectAsState()
+    val incomeCategories by viewModel.categoriesViewModel.incomeCategories.collectAsState()
 
-    // Объединяем все категории для отображения в диалоге
-    val allCategories = remember(expenseCategories, incomeCategories) {
-        val expenseNames = expenseCategories.map { it.name }
-        val incomeNames = incomeCategories.map { it.name }
-        (expenseNames + incomeNames).distinct().filter { it != "Другое" }.sorted()
+    // Преобразуем категории в списки строк для отображения
+    val expenseCategoryNames = remember(expenseCategories) {
+        expenseCategories.map { it.name }.filter { it != "Другое" }.sorted()
+    }
+
+    val incomeCategoryNames = remember(incomeCategories) {
+        incomeCategories.map { it.name }.filter { it != "Другое" }.sorted()
     }
 
     // Диалог выбора периода
     if (state.showPeriodDialog) {
-        AlertDialog(
-            onDismissRequest = { viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog) },
-            title = { Text(stringResource(R.string.select_period)) },
-            text = {
-                PeriodFilterChips(
-                    currentFilter = state.periodType,
-                    onFilterSelected = {
-                        viewModel.onEvent(TransactionHistoryEvent.SetPeriodType(it))
-                        if (it != PeriodType.CUSTOM) {
-                            viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
-                        }
-                    }
-                )
-            },
-            confirmButton = {
-                TextButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog) }) {
-                    Text(stringResource(R.string.done))
+        PeriodSelectionDialog(
+            selectedPeriod = state.periodType,
+            startDate = state.startDate,
+            endDate = state.endDate,
+            onPeriodSelected = {
+                viewModel.onEvent(TransactionHistoryEvent.SetPeriodType(it))
+                if (it != PeriodType.CUSTOM) {
+                    viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
                 }
+            },
+            onStartDateClick = {
+                viewModel.onEvent(TransactionHistoryEvent.ShowStartDatePicker)
+            },
+            onEndDateClick = {
+                viewModel.onEvent(TransactionHistoryEvent.ShowEndDatePicker)
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
+            }
+        )
+    }
+
+    // Диалог выбора начальной даты
+    if (state.showStartDatePicker) {
+        DatePickerDialog(
+            initialDate = state.startDate,
+            onDateSelected = { date ->
+                viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
+                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
+            }
+        )
+    }
+
+    // Диалог выбора конечной даты
+    if (state.showEndDatePicker) {
+        DatePickerDialog(
+            initialDate = state.endDate,
+            onDateSelected = { date ->
+                viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
+                viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
             }
         )
     }
@@ -123,7 +153,8 @@ fun TransactionHistoryScreen(
     if (state.showCategoryDialog) {
         CategorySelectionDialog(
             selectedCategory = state.selectedCategory,
-            categories = allCategories,
+            expenseCategories = expenseCategoryNames,
+            incomeCategories = incomeCategoryNames,
             onCategorySelected = { category ->
                 viewModel.onEvent(TransactionHistoryEvent.SetCategory(category))
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
@@ -157,37 +188,6 @@ fun TransactionHistoryScreen(
                 viewModel.onEvent(TransactionHistoryEvent.HideDeleteCategoryConfirmDialog)
             },
             isDefaultCategory = isDefaultCategory
-        )
-    }
-
-    // Диалог выбора начальной даты
-    if (state.showStartDatePicker) {
-        DatePickerDialog(
-            initialDate = state.startDate,
-            onDateSelected = { date ->
-                viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
-                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
-                viewModel.onEvent(TransactionHistoryEvent.ShowEndDatePicker)
-            },
-            onDismiss = {
-                viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
-                viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog)
-            }
-        )
-    }
-
-    // Диалог выбора конечной даты
-    if (state.showEndDatePicker) {
-        DatePickerDialog(
-            initialDate = state.endDate,
-            onDateSelected = { date ->
-                viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
-                viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
-            },
-            onDismiss = {
-                viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
-                viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog)
-            }
         )
     }
 
@@ -285,34 +285,24 @@ fun TransactionHistoryScreen(
                         .padding(vertical = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                    
                     Text(
-                        text = stringResource(
-                            when (state.periodType) {
-                                PeriodType.ALL -> R.string.period_all
-                                PeriodType.MONTH -> R.string.period_month
-                                PeriodType.QUARTER -> R.string.period_quarter
-                                PeriodType.HALF_YEAR -> R.string.period_half_year
-                                PeriodType.YEAR -> R.string.period_year
-                                PeriodType.CUSTOM -> R.string.period_custom
-                            }
-                        ),
+                        text = when (state.periodType) {
+                            PeriodType.ALL -> stringResource(R.string.period_all)
+                            PeriodType.DAY -> stringResource(R.string.period_day)
+                            PeriodType.MONTH -> stringResource(R.string.period_month)
+                            PeriodType.YEAR -> stringResource(R.string.period_year)
+                            PeriodType.CUSTOM -> stringResource(
+                                R.string.period_custom_range,
+                                dateFormat.format(state.startDate),
+                                dateFormat.format(state.endDate)
+                            )
+                        },
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium
                     )
-
-                    if (state.periodType == PeriodType.CUSTOM) {
-                        Text(
-                            text = " (${
-                                SimpleDateFormat(
-                                    "dd.MM.yyyy",
-                                    Locale.getDefault()
-                                ).format(state.startDate)
-                            } - ${SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(state.endDate)})",
-                            fontSize = 14.sp,
-                            color = Color.Gray
-                        )
-                    }
                 }
 
                 // Показываем статистику по категории
