@@ -17,12 +17,13 @@ import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material.icons.filled.Payments
+import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CurrencyPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.fold
@@ -46,36 +47,69 @@ import org.koin.core.component.KoinComponent
 class AddTransactionViewModel(
     application: Application,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val currencyPreferences: CurrencyPreferences
+    private val currencyPreferences: CurrencyPreferences,
+    private val categoryPreferences: CategoryPreferences
 ) : AndroidViewModel(application), KoinComponent {
 
     // Категории для выбора пользователем
-    val expenseCategories = listOf(
-        CategoryItem("Продукты", Icons.Default.ShoppingCart),
-        CategoryItem("Транспорт", Icons.Default.DirectionsCar),
-        CategoryItem("Развлечения", Icons.Default.Movie),
-        CategoryItem("Рестораны", Icons.Default.Restaurant),
-        CategoryItem("Здоровье", Icons.Default.LocalHospital),
-        CategoryItem("Одежда", Icons.Default.Checkroom),
-        CategoryItem("Жилье", Icons.Default.Home),
-        CategoryItem("Связь", Icons.Default.Phone),
-        CategoryItem("Образование", Icons.Default.School),
-        CategoryItem("Прочее", Icons.Default.MoreHoriz),
-        CategoryItem("Другое", Icons.Default.Add)
-    )
-    
-    val incomeCategories = listOf(
-        CategoryItem("Зарплата", Icons.Default.Payments),
-        CategoryItem("Фриланс", Icons.Default.Computer),
-        CategoryItem("Подарки", Icons.Default.CardGiftcard),
-        CategoryItem("Проценты", Icons.AutoMirrored.Filled.TrendingUp),
-        CategoryItem("Аренда", Icons.Default.HomeWork),
-        CategoryItem("Прочее", Icons.Default.MoreHoriz),
-        CategoryItem("Другое", Icons.Default.Add)
-    )
+    private val _expenseCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
+    val expenseCategories: StateFlow<List<CategoryItem>> = _expenseCategories
+
+    private val _incomeCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
+    val incomeCategories: StateFlow<List<CategoryItem>> = _incomeCategories
 
     private val _state = MutableStateFlow(AddTransactionState())
     val state: StateFlow<AddTransactionState> = _state.asStateFlow()
+
+    init {
+        loadCategories()
+    }
+
+    /**
+     * Загружает категории, включая пользовательские
+     */
+    private fun loadCategories() {
+        // Базовые категории расходов
+        val baseExpenseCategories = listOf(
+            CategoryItem("Продукты", Icons.Default.ShoppingCart),
+            CategoryItem("Транспорт", Icons.Default.DirectionsCar),
+            CategoryItem("Развлечения", Icons.Default.Movie),
+            CategoryItem("Рестораны", Icons.Default.Restaurant),
+            CategoryItem("Здоровье", Icons.Default.LocalHospital),
+            CategoryItem("Одежда", Icons.Default.Checkroom),
+            CategoryItem("Жилье", Icons.Default.Home),
+            CategoryItem("Связь", Icons.Default.Phone),
+            CategoryItem("Питомец", Icons.Default.Pets),
+            CategoryItem("Прочее", Icons.Default.MoreHoriz)
+        )
+
+        // Базовые категории доходов
+        val baseIncomeCategories = listOf(
+            CategoryItem("Зарплата", Icons.Default.Payments),
+            CategoryItem("Фриланс", Icons.Default.Computer),
+            CategoryItem("Подарки", Icons.Default.CardGiftcard),
+            CategoryItem("Проценты", Icons.AutoMirrored.Filled.TrendingUp),
+            CategoryItem("Аренда", Icons.Default.HomeWork),
+            CategoryItem("Прочее", Icons.Default.MoreHoriz)
+        )
+
+        // Добавляем пользовательские категории расходов
+        val customExpenseCategories = categoryPreferences.getCustomExpenseCategories().map {
+            CategoryItem(it, Icons.Default.MoreHoriz)
+        }
+
+        // Добавляем пользовательские категории доходов
+        val customIncomeCategories = categoryPreferences.getCustomIncomeCategories().map {
+            CategoryItem(it, Icons.Default.MoreHoriz)
+        }
+
+        // Объединяем базовые, пользовательские категории и добавляем "Другое" в конец
+        _expenseCategories.value = baseExpenseCategories + customExpenseCategories +
+                listOf(CategoryItem("Другое", Icons.Default.Add))
+
+        _incomeCategories.value = baseIncomeCategories + customIncomeCategories +
+                listOf(CategoryItem("Другое", Icons.Default.Add))
+    }
 
     /**
      * Обрабатывает события экрана добавления транзакции
@@ -131,12 +165,25 @@ class AddTransactionViewModel(
                 _state.update { it.copy(customCategory = event.category) }
             }
             is AddTransactionEvent.AddCustomCategory -> {
-                _state.update {
-                    it.copy(
-                        category = event.category,
-                        customCategory = "",
-                        showCustomCategoryDialog = false
-                    )
+                if (event.category.isNotBlank()) {
+                    // Сохраняем пользовательскую категорию
+                    if (_state.value.isExpense) {
+                        categoryPreferences.addCustomExpenseCategory(event.category)
+                    } else {
+                        categoryPreferences.addCustomIncomeCategory(event.category)
+                    }
+
+                    // Обновляем списки категорий
+                    loadCategories()
+
+                    // Устанавливаем выбранную категорию
+                    _state.update {
+                        it.copy(
+                            category = event.category,
+                            customCategory = "",
+                            showCustomCategoryDialog = false
+                        )
+                    }
                 }
             }
         }

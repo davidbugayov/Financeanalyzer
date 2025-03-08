@@ -185,8 +185,14 @@ fun AddTransactionScreen(
             }
 
             if (state.showCategoryPicker) {
+                val categoriesState = if (state.isExpense) {
+                    viewModel.expenseCategories.collectAsState().value
+                } else {
+                    viewModel.incomeCategories.collectAsState().value
+                }
+                
                 CategoryPickerDialog(
-                    categories = if (state.isExpense) viewModel.expenseCategories else viewModel.incomeCategories,
+                    categories = categoriesState,
                     onCategorySelected = { category ->
                         viewModel.onEvent(AddTransactionEvent.SetCategory(category))
                     },
