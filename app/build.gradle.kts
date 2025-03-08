@@ -203,7 +203,7 @@ dependencies {
     ksp(libs.room.compiler)
 
     // JSON
-    implementation("com.google.code.gson:gson:2.10.1")
+    implementation(libs.gson)
 
     // Testing
     testImplementation(libs.junit)

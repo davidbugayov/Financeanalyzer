@@ -26,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -88,10 +89,17 @@ fun TransactionHistoryScreen(
     var showCategoryDialog by remember { mutableStateOf(false) }
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var newCategoryText by remember { mutableStateOf("") }
+    var isExpenseCategory by remember { mutableStateOf(true) }
 
-    // Получаем список всех категорий
-    val categories = remember(state.transactions) {
-        state.transactions.map { it.category }.distinct().sorted()
+    // Получаем список всех категорий из CategoriesViewModel
+    val expenseCategories by viewModel.expenseCategories.collectAsState()
+    val incomeCategories by viewModel.incomeCategories.collectAsState()
+
+    // Объединяем все категории для отображения в диалоге
+    val allCategories = remember(expenseCategories, incomeCategories) {
+        val expenseNames = expenseCategories.map { it.name }
+        val incomeNames = incomeCategories.map { it.name }
+        (expenseNames + incomeNames).distinct().filter { it != "Другое" }.sorted()
     }
 
     // Диалог выбора периода
@@ -122,7 +130,7 @@ fun TransactionHistoryScreen(
     if (state.showCategoryDialog) {
         CategorySelectionDialog(
             selectedCategory = state.selectedCategory,
-            categories = categories,
+            categories = allCategories,
             onCategorySelected = { category ->
                 viewModel.onEvent(TransactionHistoryEvent.SetCategory(category))
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
@@ -139,23 +147,50 @@ fun TransactionHistoryScreen(
 
     // Диалог добавления новой категории
     if (showAddCategoryDialog) {
-        AddCategoryDialog(
-            categoryText = newCategoryText,
-            onCategoryTextChange = { newCategoryText = it },
-            onConfirm = {
-                if (newCategoryText.isNotBlank()) {
-                    viewModel.onEvent(TransactionHistoryEvent.SetCategory(newCategoryText))
-                    newCategoryText = ""
-                }
-                showAddCategoryDialog = false
-                showCategoryDialog = true
-            },
-            onDismiss = {
-                newCategoryText = ""
-                showAddCategoryDialog = false
-                showCategoryDialog = true
+        Column {
+            // Радио-кнопки для выбора типа категории
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                RadioButton(
+                    selected = isExpenseCategory,
+                    onClick = { isExpenseCategory = true }
+                )
+                Text(
+                    text = stringResource(R.string.expense_type),
+                    modifier = Modifier.padding(end = 16.dp)
+                )
+
+                RadioButton(
+                    selected = !isExpenseCategory,
+                    onClick = { isExpenseCategory = false }
+                )
+                Text(
+                    text = stringResource(R.string.income_type)
+                )
             }
-        )
+
+            AddCategoryDialog(
+                categoryText = newCategoryText,
+                onCategoryTextChange = { newCategoryText = it },
+                onConfirm = {
+                    if (newCategoryText.isNotBlank()) {
+                        // Добавляем категорию через CategoriesViewModel
+                        viewModel.categoriesViewModel.addCustomCategory(newCategoryText, isExpenseCategory)
+                        viewModel.onEvent(TransactionHistoryEvent.SetCategory(newCategoryText))
+                        newCategoryText = ""
+                    }
+                    showAddCategoryDialog = false
+                    showCategoryDialog = true
+                },
+                onDismiss = {
+                    newCategoryText = ""
+                    showAddCategoryDialog = false
+                    showCategoryDialog = true
+                }
+            )
+        }
     }
 
     // Диалог выбора начальной даты

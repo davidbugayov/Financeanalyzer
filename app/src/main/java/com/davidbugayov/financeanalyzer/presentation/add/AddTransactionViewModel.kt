@@ -23,16 +23,12 @@ import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
-import com.davidbugayov.financeanalyzer.data.preferences.CurrencyPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.add.event.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
-import com.davidbugayov.financeanalyzer.presentation.add.state.AddTransactionState
-import com.davidbugayov.financeanalyzer.utils.Event
-import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -47,30 +43,12 @@ import org.koin.core.component.KoinComponent
 class AddTransactionViewModel(
     application: Application,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val currencyPreferences: CurrencyPreferences,
-    private val categoryPreferences: CategoryPreferences
+    private val categoriesViewModel: CategoriesViewModel
 ) : AndroidViewModel(application), KoinComponent {
 
     // Категории для выбора пользователем
-    private val _expenseCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
-    val expenseCategories: StateFlow<List<CategoryItem>> = _expenseCategories
-
-    private val _incomeCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
-    val incomeCategories: StateFlow<List<CategoryItem>> = _incomeCategories
-
-    private val _state = MutableStateFlow(AddTransactionState())
-    val state: StateFlow<AddTransactionState> = _state.asStateFlow()
-
-    init {
-        loadCategories()
-    }
-
-    /**
-     * Загружает категории, включая пользовательские
-     */
-    private fun loadCategories() {
-        // Базовые категории расходов
-        val baseExpenseCategories = listOf(
+    private val _expenseCategories = MutableStateFlow(
+        listOf(
             CategoryItem("Продукты", Icons.Default.ShoppingCart),
             CategoryItem("Транспорт", Icons.Default.DirectionsCar),
             CategoryItem("Развлечения", Icons.Default.Movie),
@@ -80,35 +58,39 @@ class AddTransactionViewModel(
             CategoryItem("Жилье", Icons.Default.Home),
             CategoryItem("Связь", Icons.Default.Phone),
             CategoryItem("Питомец", Icons.Default.Pets),
-            CategoryItem("Прочее", Icons.Default.MoreHoriz)
+            CategoryItem("Прочее", Icons.Default.MoreHoriz),
+            CategoryItem("Другое", Icons.Default.Add)
         )
+    )
+    val expenseCategories = _expenseCategories.asStateFlow()
 
-        // Базовые категории доходов
-        val baseIncomeCategories = listOf(
+    private val _incomeCategories = MutableStateFlow(
+        listOf(
             CategoryItem("Зарплата", Icons.Default.Payments),
             CategoryItem("Фриланс", Icons.Default.Computer),
             CategoryItem("Подарки", Icons.Default.CardGiftcard),
             CategoryItem("Проценты", Icons.AutoMirrored.Filled.TrendingUp),
             CategoryItem("Аренда", Icons.Default.HomeWork),
-            CategoryItem("Прочее", Icons.Default.MoreHoriz)
+            CategoryItem("Прочее", Icons.Default.MoreHoriz),
+            CategoryItem("Другое", Icons.Default.Add)
         )
+    )
+    val incomeCategories = _incomeCategories.asStateFlow()
 
-        // Добавляем пользовательские категории расходов
-        val customExpenseCategories = categoryPreferences.getCustomExpenseCategories().map {
-            CategoryItem(it, Icons.Default.MoreHoriz)
+    private val _state = MutableStateFlow(AddTransactionState())
+    val state: StateFlow<AddTransactionState> = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            categoriesViewModel.expenseCategories.collect { categories ->
+                _state.update { it.copy(expenseCategories = categories) }
+            }
         }
-
-        // Добавляем пользовательские категории доходов
-        val customIncomeCategories = categoryPreferences.getCustomIncomeCategories().map {
-            CategoryItem(it, Icons.Default.MoreHoriz)
+        viewModelScope.launch {
+            categoriesViewModel.incomeCategories.collect { categories ->
+                _state.update { it.copy(incomeCategories = categories) }
+            }
         }
-
-        // Объединяем базовые, пользовательские категории и добавляем "Другое" в конец
-        _expenseCategories.value = baseExpenseCategories + customExpenseCategories +
-                listOf(CategoryItem("Другое", Icons.Default.Add))
-
-        _incomeCategories.value = baseIncomeCategories + customIncomeCategories +
-                listOf(CategoryItem("Другое", Icons.Default.Add))
     }
 
     /**
@@ -123,25 +105,32 @@ class AddTransactionViewModel(
                 _state.update { it.copy(amount = event.amount) }
             }
             is AddTransactionEvent.SetCategory -> {
-                _state.update { it.copy(category = event.category) }
+                _state.update {
+                    it.copy(
+                        category = event.category,
+                        showCategoryPicker = false
+                    )
+                }
             }
             is AddTransactionEvent.SetNote -> {
                 _state.update { it.copy(note = event.note) }
             }
-            is AddTransactionEvent.SetExpenseType -> {
-                _state.update { it.copy(isExpense = event.isExpense) }
-            }
             is AddTransactionEvent.SetDate -> {
-                _state.update { it.copy(selectedDate = event.date) }
+                _state.update {
+                    it.copy(
+                        selectedDate = event.date,
+                        showDatePicker = false
+                    )
+                }
             }
-            is AddTransactionEvent.AddTransaction -> {
-                addTransaction(event.transaction)
+            is AddTransactionEvent.SetCustomCategory -> {
+                _state.update { it.copy(customCategory = event.category) }
             }
-            is AddTransactionEvent.ResetSuccess -> {
-                _state.update { it.copy(isSuccess = false) }
+            is AddTransactionEvent.AddCustomCategory -> {
+                addCustomCategory(event.category)
             }
-            is AddTransactionEvent.ResetError -> {
-                _state.update { it.copy(error = null) }
+            is AddTransactionEvent.ToggleTransactionType -> {
+                _state.update { it.copy(isExpense = !it.isExpense) }
             }
             is AddTransactionEvent.ShowDatePicker -> {
                 _state.update { it.copy(showDatePicker = true) }
@@ -159,65 +148,88 @@ class AddTransactionViewModel(
                 _state.update { it.copy(showCustomCategoryDialog = true) }
             }
             is AddTransactionEvent.HideCustomCategoryDialog -> {
-                _state.update { it.copy(showCustomCategoryDialog = false) }
-            }
-            is AddTransactionEvent.SetCustomCategory -> {
-                _state.update { it.copy(customCategory = event.category) }
-            }
-            is AddTransactionEvent.AddCustomCategory -> {
-                if (event.category.isNotBlank()) {
-                    // Сохраняем пользовательскую категорию
-                    if (_state.value.isExpense) {
-                        categoryPreferences.addCustomExpenseCategory(event.category)
-                    } else {
-                        categoryPreferences.addCustomIncomeCategory(event.category)
-                    }
-
-                    // Обновляем списки категорий
-                    loadCategories()
-
-                    // Устанавливаем выбранную категорию
-                    _state.update {
-                        it.copy(
-                            category = event.category,
-                            customCategory = "",
-                            showCustomCategoryDialog = false
-                        )
-                    }
+                _state.update {
+                    it.copy(
+                        showCustomCategoryDialog = false,
+                        customCategory = ""
+                    )
                 }
+            }
+            is AddTransactionEvent.ShowCancelConfirmation -> {
+                _state.update { it.copy(showCancelConfirmation = true) }
+            }
+            is AddTransactionEvent.HideCancelConfirmation -> {
+                _state.update { it.copy(showCancelConfirmation = false) }
+            }
+            is AddTransactionEvent.Submit -> {
+                submitTransaction()
+            }
+            is AddTransactionEvent.ClearError -> {
+                _state.update { it.copy(error = null) }
+            }
+            is AddTransactionEvent.HideSuccessDialog -> {
+                _state.update { it.copy(isSuccess = false) }
+            }
+        }
+    }
+
+    private fun submitTransaction() {
+        val state = _state.value
+        if (state.title.isBlank() || state.amount.isBlank() || state.category.isBlank()) {
+            _state.update { it.copy(error = "Пожалуйста, заполните все обязательные поля") }
+            return
+        }
+
+        val amount = state.amount.toDoubleOrNull()
+        if (amount == null || amount <= 0) {
+            _state.update { it.copy(error = "Пожалуйста, введите корректную сумму") }
+            return
+        }
+
+        viewModelScope.launch {
+            try {
+                val transaction = Transaction(
+                    title = state.title,
+                    amount = amount,
+                    category = state.category,
+                    isExpense = state.isExpense,
+                    date = state.selectedDate,
+                    note = state.note.takeIf { it.isNotBlank() }
+                )
+                addTransactionUseCase(transaction)
+                _state.update {
+                    it.copy(
+                        isSuccess = true,
+                        error = null,
+                        title = "",
+                        amount = "",
+                        category = "",
+                        note = ""
+                    )
+                }
+                updateBalanceWidget()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Произошла ошибка при сохранении транзакции") }
             }
         }
     }
 
     /**
-     * Добавляет новую транзакцию
+     * Добавляет новую пользовательскую категорию
      */
-    private fun addTransaction(transaction: Transaction) {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true, error = null) }
-            addTransactionUseCase(transaction).fold(
-                onSuccess = {
-                    // Отправляем событие о добавлении транзакции
-                    EventBus.emit(Event.TransactionAdded)
-
-                    // Обновляем виджет баланса
-                    updateBalanceWidget()
-
-                    // Устанавливаем флаг успеха после всех операций
-                    _state.update { it.copy(isSuccess = true, isLoading = false) }
-                },
-                onFailure = { exception ->
-                    _state.update {
-                        it.copy(
-                            error = "Ошибка при добавлении транзакции: ${exception.message}",
-                            isLoading = false
-                        )
-                    }
-                }
+    private fun addCustomCategory(category: String) {
+        if (category.isBlank()) return
+        categoriesViewModel.addCustomCategory(category, _state.value.isExpense)
+        _state.update {
+            it.copy(
+                category = category,
+                showCategoryPicker = false,
+                showCustomCategoryDialog = false,
+                customCategory = ""
             )
         }
     }
-    
+
     /**
      * Обновляет виджет баланса после изменения данных, но только если виджеты добавлены на домашний экран
      */

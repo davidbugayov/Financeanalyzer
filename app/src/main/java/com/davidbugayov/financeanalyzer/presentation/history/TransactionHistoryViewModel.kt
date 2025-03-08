@@ -9,6 +9,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
@@ -33,11 +35,19 @@ class TransactionHistoryViewModel(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
-    private val deleteTransactionUseCase: DeleteTransactionUseCase
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    val categoriesViewModel: CategoriesViewModel
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
+
+    // Категории
+    private val _expenseCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
+    val expenseCategories = _expenseCategories.asStateFlow()
+
+    private val _incomeCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
+    val incomeCategories = _incomeCategories.asStateFlow()
 
     // Кэш для хранения результатов вычислений
     private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, List<Transaction>>()
@@ -47,6 +57,19 @@ class TransactionHistoryViewModel(
 
     init {
         loadTransactions()
+
+        // Подписываемся на изменения категорий
+        viewModelScope.launch {
+            categoriesViewModel.expenseCategories.collect { categories ->
+                _expenseCategories.value = categories
+            }
+        }
+
+        viewModelScope.launch {
+            categoriesViewModel.incomeCategories.collect { categories ->
+                _incomeCategories.value = categories
+            }
+        }
     }
 
     /**

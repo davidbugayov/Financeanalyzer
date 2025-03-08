@@ -35,6 +35,7 @@ timber = "5.0.1"
 commonsCsv = "1.10.0"
 room = "2.6.1"
 roomKsp = "1.9.22-1.0.17"
+gson = "2.10.1"
 
 [libraries]
 # Kotlin
@@ -80,6 +81,9 @@ commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref 
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+
+# JSON
+gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

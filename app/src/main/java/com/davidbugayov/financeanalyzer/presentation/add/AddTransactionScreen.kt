@@ -4,13 +4,14 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -23,13 +24,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.add.components.AddTransactionButton
 import com.davidbugayov.financeanalyzer.presentation.add.components.AmountField
 import com.davidbugayov.financeanalyzer.presentation.add.components.CategoryField
 import com.davidbugayov.financeanalyzer.presentation.add.components.CategoryPickerDialog
@@ -38,11 +36,11 @@ import com.davidbugayov.financeanalyzer.presentation.add.components.DateField
 import com.davidbugayov.financeanalyzer.presentation.add.components.NoteField
 import com.davidbugayov.financeanalyzer.presentation.add.components.TitleField
 import com.davidbugayov.financeanalyzer.presentation.add.components.TransactionTypeSelector
-import com.davidbugayov.financeanalyzer.presentation.add.dialogs.CancelConfirmationDialog
-import com.davidbugayov.financeanalyzer.presentation.add.dialogs.DatePickerDialog
-import com.davidbugayov.financeanalyzer.presentation.add.dialogs.ErrorDialog
-import com.davidbugayov.financeanalyzer.presentation.add.dialogs.SuccessDialog
-import com.davidbugayov.financeanalyzer.presentation.add.event.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
+import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
+import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -54,7 +52,7 @@ fun AddTransactionScreen(
     viewModel: AddTransactionViewModel = koinViewModel(),
     onNavigateBack: () -> Unit
 ) {
-    val state = viewModel.state.collectAsState().value
+    val state by viewModel.state.collectAsState()
     var showCancelConfirmation by remember { mutableStateOf(false) }
     
     Scaffold(
@@ -89,15 +87,13 @@ fun AddTransactionScreen(
                     .padding(16.dp)
                     .verticalScroll(rememberScrollState())
             ) {
-                // Выбор типа транзакции (доход/расход)
                 TransactionTypeSelector(
                     isExpense = state.isExpense,
-                    onTypeSelected = { isExpense ->
-                        viewModel.onEvent(AddTransactionEvent.SetExpenseType(isExpense))
+                    onTypeSelected = {
+                        viewModel.onEvent(AddTransactionEvent.ToggleTransactionType)
                     }
                 )
                 
-                // Поле для ввода названия
                 TitleField(
                     title = state.title,
                     onTitleChange = { title ->
@@ -105,7 +101,6 @@ fun AddTransactionScreen(
                     }
                 )
                 
-                // Поле для ввода суммы
                 AmountField(
                     amount = state.amount,
                     onAmountChange = { amount ->
@@ -113,23 +108,20 @@ fun AddTransactionScreen(
                     }
                 )
                 
-                // Поле для выбора категории
-                CategoryField(
-                    category = state.category,
-                    onClick = {
-                        viewModel.onEvent(AddTransactionEvent.ShowCategoryPicker)
-                    }
-                )
-
-                // Поле для выбора даты
                 DateField(
                     date = state.selectedDate,
                     onClick = {
                         viewModel.onEvent(AddTransactionEvent.ShowDatePicker)
                     }
                 )
+
+                CategoryField(
+                    category = state.category,
+                    onClick = {
+                        viewModel.onEvent(AddTransactionEvent.ShowCategoryPicker)
+                    }
+                )
                 
-                // Поле для ввода примечания
                 NoteField(
                     note = state.note,
                     onNoteChange = { note ->
@@ -137,44 +129,20 @@ fun AddTransactionScreen(
                     }
                 )
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(24.dp))
 
-                // Кнопка добавления транзакции
-                AddTransactionButton(
-                    enabled = state.title.isNotBlank() && state.amount.isNotBlank() && state.category.isNotBlank() && !state.isLoading,
-                    onClick = {
-                        val amount = try {
-                            state.amount.toDouble()
-                        } catch (e: Exception) {
-                            0.0
-                        }
-
-                        val transaction = Transaction(
-                            id = 0, // ID будет сгенерирован базой данных
-                            title = state.title,
-                            amount = amount,
-                            category = state.category,
-                            note = state.note,
-                            isExpense = state.isExpense,
-                            date = state.selectedDate
-                        )
-
-                        viewModel.onEvent(AddTransactionEvent.AddTransaction(transaction))
-                    }
-                )
-            }
-            
-            // Индикатор загрузки
-            if (state.isLoading) {
-                CircularProgressIndicator(
-                    modifier = Modifier.align(Alignment.Center)
-                )
+                Button(
+                    onClick = { viewModel.onEvent(AddTransactionEvent.Submit) },
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    Text(stringResource(R.string.add_button))
+                }
             }
 
             // Диалоги
             if (state.showDatePicker) {
                 DatePickerDialog(
-                    initialDate = state.selectedDate,
+                    selectedDate = state.selectedDate,
                     onDateSelected = { date ->
                         viewModel.onEvent(AddTransactionEvent.SetDate(date))
                     },
@@ -185,19 +153,14 @@ fun AddTransactionScreen(
             }
 
             if (state.showCategoryPicker) {
-                val categoriesState = if (state.isExpense) {
-                    viewModel.expenseCategories.collectAsState().value
-                } else {
-                    viewModel.incomeCategories.collectAsState().value
-                }
-                
                 CategoryPickerDialog(
-                    categories = categoriesState,
+                    categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
                     onCategorySelected = { category ->
                         viewModel.onEvent(AddTransactionEvent.SetCategory(category))
                     },
                     onCustomCategoryClick = {
                         viewModel.onEvent(AddTransactionEvent.ShowCustomCategoryDialog)
+                        viewModel.onEvent(AddTransactionEvent.HideCategoryPicker)
                     },
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideCategoryPicker)
@@ -208,8 +171,8 @@ fun AddTransactionScreen(
             if (state.showCustomCategoryDialog) {
                 CustomCategoryDialog(
                     categoryText = state.customCategory,
-                    onCategoryTextChange = { categoryText ->
-                        viewModel.onEvent(AddTransactionEvent.SetCustomCategory(categoryText))
+                    onCategoryTextChange = { category ->
+                        viewModel.onEvent(AddTransactionEvent.SetCustomCategory(category))
                     },
                     onConfirm = {
                         viewModel.onEvent(AddTransactionEvent.AddCustomCategory(state.customCategory))
@@ -223,20 +186,20 @@ fun AddTransactionScreen(
             if (state.isSuccess) {
                 SuccessDialog(
                     onDismiss = {
-                        viewModel.onEvent(AddTransactionEvent.ResetSuccess)
+                        viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
                         onNavigateBack()
                     },
                     onAddAnother = {
-                        viewModel.onEvent(AddTransactionEvent.ResetSuccess)
+                        viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
                     }
                 )
             }
 
-            if (state.error != null) {
+            state.error?.let { error ->
                 ErrorDialog(
-                    errorMessage = state.error,
+                    message = error,
                     onDismiss = {
-                        viewModel.onEvent(AddTransactionEvent.ResetError)
+                        viewModel.onEvent(AddTransactionEvent.ClearError)
                     }
                 )
             }
