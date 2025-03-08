@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.history.event
 
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Date
@@ -17,6 +18,11 @@ sealed class TransactionHistoryEvent {
     data class SetStartDate(val date: Date) : TransactionHistoryEvent()
     data class SetEndDate(val date: Date) : TransactionHistoryEvent()
     data object ReloadTransactions : TransactionHistoryEvent()
+
+    // События для удаления транзакции
+    data class DeleteTransaction(val transaction: Transaction) : TransactionHistoryEvent()
+    data class ShowDeleteConfirmDialog(val transaction: Transaction) : TransactionHistoryEvent()
+    data object HideDeleteConfirmDialog : TransactionHistoryEvent()
 
     // События для управления диалогами
     data object ShowPeriodDialog : TransactionHistoryEvent()

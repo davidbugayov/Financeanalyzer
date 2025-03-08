@@ -55,12 +55,14 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
  *
  * @param transactionGroups Список групп транзакций для отображения
  * @param onTransactionClick Callback, вызываемый при нажатии на транзакцию
+ * @param onTransactionLongClick Callback, вызываемый при долгом нажатии на транзакцию
  * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
 fun TransactionHistory(
     transactionGroups: List<TransactionGroup>,
     onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     // Используем rememberLazyListState для оптимизации прокрутки
@@ -80,7 +82,8 @@ fun TransactionHistory(
         ) { _, group ->
             TransactionGroupItem(
                 group = group,
-                onTransactionClick = onTransactionClick
+                onTransactionClick = onTransactionClick,
+                onTransactionLongClick = onTransactionLongClick
             )
         }
     }
@@ -92,12 +95,14 @@ fun TransactionHistory(
  *
  * @param group Группа транзакций для отображения
  * @param onTransactionClick Callback, вызываемый при нажатии на транзакцию
+ * @param onTransactionLongClick Callback, вызываемый при долгом нажатии на транзакцию
  * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
 fun TransactionGroupItem(
     group: TransactionGroup,
     onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     var expanded by remember { mutableStateOf(true) }
@@ -138,7 +143,7 @@ fun TransactionGroupItem(
                     text = if (balance >= Money.zero())
                         stringResource(R.string.income_currency_format, amount)
                     else
-                        stringResource(R.string.expense_currency_format, amount),
+                        stringResource(R.string.currency_format, amount),
                     color = amountColor,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
@@ -168,12 +173,11 @@ fun TransactionGroupItem(
                 // Используем key для каждой транзакции, чтобы избежать ненужных перерисовок
                 transactions.forEach { transaction ->
                     key(transaction.id) {
-                        TransactionItem(transaction = transaction)
-                        Surface(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onTransactionClick(transaction) }
-                        ) {}
+                        TransactionLongPressItem(
+                            transaction = transaction,
+                            onClick = { onTransactionClick(transaction) },
+                            onLongClick = { onTransactionLongClick(transaction) }
+                        )
                     }
                 }
             }

@@ -50,7 +50,8 @@ val appModule = module {
             loadTransactionsUseCase = get(),
             filterTransactionsUseCase = get(),
             groupTransactionsUseCase = get(),
-            calculateCategoryStatsUseCase = get()
+            calculateCategoryStatsUseCase = get(),
+            deleteTransactionUseCase = get()
         )
     }
     viewModel { HomeViewModel(get(), get()) }

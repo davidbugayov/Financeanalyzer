@@ -26,6 +26,7 @@ import java.util.Date
  * @property showCategoryDialog Флаг отображения диалога выбора категории
  * @property showStartDatePicker Флаг отображения календаря начальной даты
  * @property showEndDatePicker Флаг отображения календаря конечной даты
+ * @property transactionToDelete Транзакция, которую нужно удалить (null, если нет)
  */
 data class TransactionHistoryState(
     val transactions: List<Transaction> = emptyList(),
@@ -41,5 +42,6 @@ data class TransactionHistoryState(
     val showPeriodDialog: Boolean = false,
     val showCategoryDialog: Boolean = false,
     val showStartDatePicker: Boolean = false,
-    val showEndDatePicker: Boolean = false
+    val showEndDatePicker: Boolean = false,
+    val transactionToDelete: Transaction? = null
 ) 

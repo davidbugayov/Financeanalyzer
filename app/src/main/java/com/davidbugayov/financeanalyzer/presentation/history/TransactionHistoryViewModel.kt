@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
@@ -12,6 +13,8 @@ import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
+import com.davidbugayov.financeanalyzer.utils.Event
+import com.davidbugayov.financeanalyzer.utils.EventBus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -29,7 +32,8 @@ class TransactionHistoryViewModel(
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
-    private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase
+    private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
+    private val deleteTransactionUseCase: DeleteTransactionUseCase
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
@@ -87,6 +91,9 @@ class TransactionHistoryViewModel(
                 clearAllCaches()
                 loadTransactions()
             }
+            is TransactionHistoryEvent.DeleteTransaction -> {
+                deleteTransaction(event.transaction)
+            }
             // События для управления диалогами
             is TransactionHistoryEvent.ShowPeriodDialog -> {
                 _state.update { it.copy(showPeriodDialog = true) }
@@ -111,6 +118,55 @@ class TransactionHistoryViewModel(
             }
             is TransactionHistoryEvent.HideEndDatePicker -> {
                 _state.update { it.copy(showEndDatePicker = false) }
+            }
+            is TransactionHistoryEvent.ShowDeleteConfirmDialog -> {
+                _state.update { it.copy(transactionToDelete = event.transaction) }
+            }
+            is TransactionHistoryEvent.HideDeleteConfirmDialog -> {
+                _state.update { it.copy(transactionToDelete = null) }
+            }
+        }
+    }
+
+    /**
+     * Удаляет транзакцию
+     */
+    private fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            try {
+                when (val result = deleteTransactionUseCase(transaction)) {
+                    is Result.Success -> {
+                        // Отправляем событие об удалении транзакции
+                        EventBus.emit(Event.TransactionDeleted)
+
+                        // Очищаем все кэши и перезагружаем данные
+                        clearAllCaches()
+                        loadTransactions()
+
+                        _state.update { it.copy(transactionToDelete = null) }
+                    }
+                    is Result.Error -> {
+                        val exception = result.exception
+                        Timber.e("Failed to delete transaction: ${exception.message}")
+                        _state.update {
+                            it.copy(
+                                error = exception.message ?: "Failed to delete transaction",
+                                isLoading = false,
+                                transactionToDelete = null
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error deleting transaction")
+                _state.update {
+                    it.copy(
+                        error = "Error deleting transaction: ${e.message}",
+                        isLoading = false,
+                        transactionToDelete = null
+                    )
+                }
             }
         }
     }

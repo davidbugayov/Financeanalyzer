@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
@@ -27,7 +26,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.RadioButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -52,10 +50,12 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.PeriodFilterChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
+import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionHistory
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.AddCategoryDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
@@ -189,6 +189,39 @@ fun TransactionHistoryScreen(
         )
     }
 
+    // Диалог подтверждения удаления транзакции
+    state.transactionToDelete?.let { transaction ->
+        AlertDialog(
+            onDismissRequest = { viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog) },
+            title = { Text(stringResource(R.string.delete_transaction)) },
+            text = {
+                Text(
+                    stringResource(
+                        R.string.delete_transaction_confirmation,
+                        transaction.title,
+                        transaction.amount.format()
+                    )
+                )
+            },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        viewModel.onEvent(TransactionHistoryEvent.DeleteTransaction(transaction))
+                    }
+                ) {
+                    Text(stringResource(R.string.delete))
+                }
+            },
+            dismissButton = {
+                TextButton(
+                    onClick = { viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog) }
+                ) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -298,8 +331,39 @@ fun TransactionHistoryScreen(
                 } else if (state.filteredTransactions.isEmpty() && !state.isLoading) {
                     EmptyContent()
                 } else if (!state.isLoading) {
-                    TransactionsList(
-                        groupedTransactions = viewModel.getGroupedTransactions()
+                    // Отображение сгруппированных транзакций
+                    val groupedTransactions = viewModel.getGroupedTransactions()
+                    val transactionGroups = remember(groupedTransactions) {
+                        groupedTransactions.map { (period, transactions) ->
+                            // Вычисляем баланс для группы транзакций
+                            val income = transactions
+                                .filter { !it.isExpense }
+                                .map { it.amount }
+                                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                            // Для расходов берем абсолютное значение (без минуса)
+                            val expense = transactions
+                                .filter { it.isExpense }
+                                .map { it.amount }
+                                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                            // Для баланса: доходы - расходы
+                            val balance = income - expense
+
+                            TransactionGroup(
+                                date = period,
+                                transactions = transactions,
+                                balance = balance
+                            )
+                        }
+                    }
+
+                    TransactionHistory(
+                        transactionGroups = transactionGroups,
+                        onTransactionClick = { /* Пока ничего не делаем при клике */ },
+                        onTransactionLongClick = { transaction ->
+                            viewModel.onEvent(TransactionHistoryEvent.ShowDeleteConfirmDialog(transaction))
+                        }
                     )
                 }
 
@@ -308,34 +372,6 @@ fun TransactionHistoryScreen(
                 }
             }
         }
-    }
-}
-
-/**
- * Компонент для отображения радиокнопки выбора периода
- */
-@Composable
-fun PeriodRadioButton(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .height(48.dp)
-            .clickable { onClick() },
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        RadioButton(
-            selected = selected,
-            onClick = onClick
-        )
-        Text(
-            text = text,
-            modifier = Modifier.padding(start = 8.dp)
-        )
     }
 }
 
@@ -406,7 +442,7 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
                     )
 
                     Text(
-                        text = stringResource(R.string.currency_format, expense.format(false)),
+                        text = stringResource(R.string.expense_currency_format, expense.abs().format(false)),
                         fontSize = 14.sp,
                         color = Color(0xFFF44336),
                         fontWeight = FontWeight.Medium
@@ -429,7 +465,9 @@ fun GroupHeader(period: String, transactions: List<Transaction>) {
  */
 @Composable
 fun TransactionHistoryItem(transaction: Transaction) {
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+    // Используем локаль устройства для форматирования даты
+    val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
+    val formattedDate = remember(transaction.date) { dateFormat.format(transaction.date) }
 
     Surface(
         modifier = Modifier
@@ -450,23 +488,24 @@ fun TransactionHistoryItem(transaction: Transaction) {
             ) {
                 Text(
                     text = transaction.title,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(
                     text = stringResource(
                         R.string.category_date_format,
                         transaction.category,
-                        dateFormat.format(transaction.date)
+                        formattedDate
                     ),
                     fontSize = 12.sp,
-                    color = Color.Gray
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 transaction.note?.let {
                     if (it.isNotEmpty()) {
                         Text(
                             text = it,
                             fontSize = 12.sp,
-                            color = Color.Gray,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(top = 4.dp)
                         )
                     }
@@ -478,7 +517,7 @@ fun TransactionHistoryItem(transaction: Transaction) {
                     stringResource(R.string.expense_currency_format, transaction.amount.format(false))
                 else
                     stringResource(R.string.income_currency_format, transaction.amount.format(false)),
-                color = if (transaction.isExpense) Color(0xFFF44336) else Color(0xFF4CAF50),
+                color = if (transaction.isExpense) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
                 fontWeight = FontWeight.Bold
             )
         }

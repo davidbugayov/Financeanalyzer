@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -16,12 +17,18 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**
  * Элемент списка транзакций.
  */
 @Composable
 fun TransactionItem(transaction: Transaction) {
+    // Используем локаль устройства для форматирования даты
+    val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
+    val formattedDate = remember(transaction.date) { dateFormat.format(transaction.date) }
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,7 +45,7 @@ fun TransactionItem(transaction: Transaction) {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = stringResource(R.string.category_date_format, transaction.category, transaction.date.toString()),
+                text = stringResource(R.string.category_date_format, transaction.category, formattedDate),
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
