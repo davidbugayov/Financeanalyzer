@@ -20,6 +20,8 @@ class CategoryPreferences private constructor(context: Context) {
         private const val PREFS_NAME = "category_preferences"
         private const val KEY_EXPENSE_CATEGORIES = "expense_categories"
         private const val KEY_INCOME_CATEGORIES = "income_categories"
+        private const val KEY_DELETED_DEFAULT_EXPENSE_CATEGORIES = "deleted_default_expense_categories"
+        private const val KEY_DELETED_DEFAULT_INCOME_CATEGORIES = "deleted_default_income_categories"
 
         @Volatile
         private var instance: CategoryPreferences? = null
@@ -116,6 +118,74 @@ class CategoryPreferences private constructor(context: Context) {
         val categories = loadIncomeCategories().toMutableList()
         if (categories.remove(category)) {
             saveIncomeCategories(categories)
+        }
+    }
+
+    /**
+     * Сохраняет список удаленных дефолтных категорий расходов
+     */
+    fun saveDeletedDefaultExpenseCategories(categories: List<String>) {
+        val json = gson.toJson(categories)
+        prefs.edit {
+            putString(KEY_DELETED_DEFAULT_EXPENSE_CATEGORIES, json)
+        }
+    }
+
+    /**
+     * Загружает список удаленных дефолтных категорий расходов
+     */
+    fun loadDeletedDefaultExpenseCategories(): List<String> {
+        val json = prefs.getString(KEY_DELETED_DEFAULT_EXPENSE_CATEGORIES, null)
+        return if (json != null) {
+            val type = object : TypeToken<List<String>>() {}.type
+            gson.fromJson(json, type)
+        } else {
+            emptyList()
+        }
+    }
+
+    /**
+     * Сохраняет список удаленных дефолтных категорий доходов
+     */
+    fun saveDeletedDefaultIncomeCategories(categories: List<String>) {
+        val json = gson.toJson(categories)
+        prefs.edit {
+            putString(KEY_DELETED_DEFAULT_INCOME_CATEGORIES, json)
+        }
+    }
+
+    /**
+     * Загружает список удаленных дефолтных категорий доходов
+     */
+    fun loadDeletedDefaultIncomeCategories(): List<String> {
+        val json = prefs.getString(KEY_DELETED_DEFAULT_INCOME_CATEGORIES, null)
+        return if (json != null) {
+            val type = object : TypeToken<List<String>>() {}.type
+            gson.fromJson(json, type)
+        } else {
+            emptyList()
+        }
+    }
+
+    /**
+     * Добавляет категорию в список удаленных дефолтных категорий расходов
+     */
+    fun addDeletedDefaultExpenseCategory(category: String) {
+        val categories = loadDeletedDefaultExpenseCategories().toMutableList()
+        if (!categories.contains(category)) {
+            categories.add(category)
+            saveDeletedDefaultExpenseCategories(categories)
+        }
+    }
+
+    /**
+     * Добавляет категорию в список удаленных дефолтных категорий доходов
+     */
+    fun addDeletedDefaultIncomeCategory(category: String) {
+        val categories = loadDeletedDefaultIncomeCategories().toMutableList()
+        if (!categories.contains(category)) {
+            categories.add(category)
+            saveDeletedDefaultIncomeCategories(categories)
         }
     }
 } 

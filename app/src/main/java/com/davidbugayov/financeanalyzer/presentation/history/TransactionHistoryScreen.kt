@@ -141,6 +141,13 @@ fun TransactionHistoryScreen(
 
     // Диалог подтверждения удаления категории
     state.categoryToDelete?.let { (category, isExpense) ->
+        // Определяем, является ли категория стандартной
+        val isDefaultCategory = if (isExpense) {
+            viewModel.categoriesViewModel.isDefaultExpenseCategory(category)
+        } else {
+            viewModel.categoriesViewModel.isDefaultIncomeCategory(category)
+        }
+        
         DeleteCategoryConfirmDialog(
             category = category,
             onConfirm = {
@@ -148,7 +155,8 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideDeleteCategoryConfirmDialog)
-            }
+            },
+            isDefaultCategory = isDefaultCategory
         )
     }
 

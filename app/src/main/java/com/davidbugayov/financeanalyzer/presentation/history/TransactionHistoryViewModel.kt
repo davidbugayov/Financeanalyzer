@@ -338,6 +338,12 @@ class TransactionHistoryViewModel(
      * Удаляет категорию
      */
     private fun deleteCategory(category: String, isExpense: Boolean) {
+        // Не позволяем удалять категорию "Другое"
+        if (category == "Другое") {
+            _state.update { it.copy(categoryToDelete = null) }
+            return
+        }
+        
         viewModelScope.launch {
             try {
                 // Удаляем категорию через CategoriesViewModel

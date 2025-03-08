@@ -80,6 +80,17 @@ class CategoriesViewModel(
         viewModelScope.launch {
             val savedExpenseCategories = categoryPreferences.loadExpenseCategories()
             val savedIncomeCategories = categoryPreferences.loadIncomeCategories()
+            val deletedDefaultExpenseCategories = categoryPreferences.loadDeletedDefaultExpenseCategories()
+            val deletedDefaultIncomeCategories = categoryPreferences.loadDeletedDefaultIncomeCategories()
+
+            // Фильтруем дефолтные категории, исключая удаленные
+            val filteredDefaultExpenseCategories = defaultExpenseCategories.filter {
+                !deletedDefaultExpenseCategories.contains(it.name) && it.name != "Другое"
+            }
+
+            val filteredDefaultIncomeCategories = defaultIncomeCategories.filter {
+                !deletedDefaultIncomeCategories.contains(it.name) && it.name != "Другое"
+            }
 
             // Добавляем пользовательские категории перед "Другое"
             val customExpenseCategories = savedExpenseCategories.map {
@@ -89,13 +100,17 @@ class CategoriesViewModel(
                 CategoryItem(it, Icons.Default.MoreHoriz)
             }
 
-            _expenseCategories.value = defaultExpenseCategories.dropLast(1) +
-                    customExpenseCategories +
-                    defaultExpenseCategories.takeLast(1)
+            // Всегда оставляем категорию "Другое" в конце списка
+            val otherExpenseCategory = defaultExpenseCategories.last()
+            val otherIncomeCategory = defaultIncomeCategories.last()
 
-            _incomeCategories.value = defaultIncomeCategories.dropLast(1) +
+            _expenseCategories.value = filteredDefaultExpenseCategories +
+                    customExpenseCategories +
+                    listOf(otherExpenseCategory)
+
+            _incomeCategories.value = filteredDefaultIncomeCategories +
                     customIncomeCategories +
-                    defaultIncomeCategories.takeLast(1)
+                    listOf(otherIncomeCategory)
         }
     }
 
@@ -130,12 +145,48 @@ class CategoriesViewModel(
     fun removeCategory(category: String, isExpense: Boolean) {
         viewModelScope.launch {
             if (isExpense) {
-                categoryPreferences.removeExpenseCategory(category)
+                // Проверяем, является ли категория дефолтной
+                val isDefaultCategory = defaultExpenseCategories.any { it.name == category && it.name != "Другое" }
+
+                if (isDefaultCategory) {
+                    // Если это дефолтная категория, добавляем ее в список удаленных дефолтных категорий
+                    categoryPreferences.addDeletedDefaultExpenseCategory(category)
+                } else {
+                    // Если это пользовательская категория, удаляем ее из списка пользовательских категорий
+                    categoryPreferences.removeExpenseCategory(category)
+                }
+
+                // Удаляем категорию из текущего списка
                 _expenseCategories.value = _expenseCategories.value.filterNot { it.name == category }
             } else {
-                categoryPreferences.removeIncomeCategory(category)
+                // Проверяем, является ли категория дефолтной
+                val isDefaultCategory = defaultIncomeCategories.any { it.name == category && it.name != "Другое" }
+
+                if (isDefaultCategory) {
+                    // Если это дефолтная категория, добавляем ее в список удаленных дефолтных категорий
+                    categoryPreferences.addDeletedDefaultIncomeCategory(category)
+                } else {
+                    // Если это пользовательская категория, удаляем ее из списка пользовательских категорий
+                    categoryPreferences.removeIncomeCategory(category)
+                }
+
+                // Удаляем категорию из текущего списка
                 _incomeCategories.value = _incomeCategories.value.filterNot { it.name == category }
             }
         }
+    }
+
+    /**
+     * Проверяет, является ли категория расходов стандартной
+     */
+    fun isDefaultExpenseCategory(category: String): Boolean {
+        return defaultExpenseCategories.any { it.name == category }
+    }
+
+    /**
+     * Проверяет, является ли категория доходов стандартной
+     */
+    fun isDefaultIncomeCategory(category: String): Boolean {
+        return defaultIncomeCategories.any { it.name == category }
     }
 } 

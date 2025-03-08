@@ -370,12 +370,14 @@ fun AddCategoryDialog(
  * @param category Название категории для удаления
  * @param onConfirm Callback для подтверждения удаления
  * @param onDismiss Callback для отмены удаления
+ * @param isDefaultCategory Флаг, указывающий, является ли категория стандартной
  */
 @Composable
 fun DeleteCategoryConfirmDialog(
     category: String,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    isDefaultCategory: Boolean
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -383,7 +385,8 @@ fun DeleteCategoryConfirmDialog(
         text = {
             Text(
                 stringResource(
-                    R.string.delete_category_confirmation,
+                    if (isDefaultCategory) R.string.delete_default_category_confirmation
+                    else R.string.delete_custom_category_confirmation,
                     category
                 )
             )
