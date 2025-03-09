@@ -12,27 +12,26 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.text.SimpleDateFormat
 import java.util.Locale
 
-/**
- * Элемент списка транзакций.
- */
 @Composable
-fun TransactionItem(transaction: Transaction) {
-    // Используем локаль устройства для форматирования даты
+fun TransactionItem(
+    transaction: Transaction,
+    modifier: Modifier = Modifier
+) {
     val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
     val formattedDate = remember(transaction.date) { dateFormat.format(transaction.date) }
-    
+
     Row(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -45,17 +44,21 @@ fun TransactionItem(transaction: Transaction) {
                 color = MaterialTheme.colorScheme.onSurface
             )
             Text(
-                text = stringResource(R.string.category_date_format, transaction.category, formattedDate),
-                fontSize = 12.sp,
+                text = stringResource(
+                    R.string.category_date_format,
+                    transaction.category,
+                    formattedDate
+                ),
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             transaction.note?.let {
                 if (it.isNotEmpty()) {
                     Text(
                         text = it,
-                        fontSize = 12.sp,
+                        style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp)
+                        modifier = Modifier.padding(top = 4.dp)
                     )
                 }
             }
@@ -66,8 +69,8 @@ fun TransactionItem(transaction: Transaction) {
                 stringResource(R.string.expense_currency_format, transaction.amount.format(false))
             else
                 stringResource(R.string.income_currency_format, transaction.amount.format(false)),
-            color = if (transaction.isExpense) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.primary,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.bodyLarge,
+            color = if (transaction.isExpense) LocalExpenseColor.current else LocalIncomeColor.current
         )
     }
 } 

@@ -35,6 +35,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
+import java.math.BigDecimal
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -162,7 +163,7 @@ class AddTransactionViewModel(
                 _state.update { it.copy(showCancelConfirmation = false) }
             }
             is AddTransactionEvent.Submit -> {
-                submitTransaction()
+                addTransaction()
             }
             is AddTransactionEvent.ClearError -> {
                 _state.update { it.copy(error = null) }
@@ -173,43 +174,46 @@ class AddTransactionViewModel(
         }
     }
 
-    private fun submitTransaction() {
-        val state = _state.value
-        if (state.title.isBlank() || state.amount.isBlank() || state.category.isBlank()) {
-            _state.update { it.copy(error = "Пожалуйста, заполните все обязательные поля") }
-            return
+    private fun validateInput(): Boolean {
+        val amount = _state.value.amount.toBigDecimalOrNull()
+
+        val hasErrors = amount == null || amount <= BigDecimal.ZERO || _state.value.category.isBlank()
+
+        _state.update {
+            it.copy(
+                amountError = amount == null || amount <= BigDecimal.ZERO,
+                categoryError = _state.value.category.isBlank()
+            )
         }
 
-        val amount = state.amount.toDoubleOrNull()
-        if (amount == null || amount <= 0) {
-            _state.update { it.copy(error = "Пожалуйста, введите корректную сумму") }
+        return !hasErrors
+    }
+
+    private fun addTransaction() {
+        if (!validateInput()) {
             return
         }
 
         viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
             try {
+                val amount = _state.value.amount.toBigDecimal()
                 val transaction = Transaction(
-                    title = state.title,
+                    title = _state.value.title.ifBlank { null },
                     amount = amount,
-                    category = state.category,
-                    isExpense = state.isExpense,
-                    date = state.selectedDate,
-                    note = state.note.takeIf { it.isNotBlank() }
+                    category = _state.value.category,
+                    isExpense = _state.value.isExpense,
+                    date = _state.value.selectedDate,
+                    note = _state.value.note.ifBlank { null }
                 )
+
                 addTransactionUseCase(transaction)
-                _state.update {
-                    it.copy(
-                        isSuccess = true,
-                        error = null,
-                        title = "",
-                        amount = "",
-                        category = "",
-                        note = ""
-                    )
-                }
-                updateBalanceWidget()
+                _state.update { it.copy(isSuccess = true) }
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Произошла ошибка при сохранении транзакции") }
+                _state.update { it.copy(error = e.message) }
+            } finally {
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }

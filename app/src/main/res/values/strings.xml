@@ -18,7 +18,7 @@
     <string name="collapse">Свернуть</string>
     <string name="delete">Удалить</string>
     <string name="delete_transaction">Удаление транзакции</string>
-    <string name="delete_transaction_confirmation">Вы уверены, что хотите удалить транзакцию "%1$s" на сумму %2$s?</string>
+    <string name="delete_transaction_confirmation">Вы уверены, что хотите удалить транзакцию из категории "%1$s" на сумму %2$s?</string>
     
     <!-- Главный экран -->
     <string name="app_title">Финансовый анализатор</string>

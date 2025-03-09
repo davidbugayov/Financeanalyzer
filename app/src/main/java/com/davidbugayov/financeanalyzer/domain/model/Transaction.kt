@@ -10,7 +10,7 @@ import java.util.Date
  * Следует принципу единственной ответственности (SRP) из SOLID.
  *
  * @property id Уникальный идентификатор транзакции (0 для новых транзакций)
- * @property title Название или описание транзакции
+ * @property title Название или описание транзакции (опционально)
  * @property amount Сумма транзакции (Money)
  * @property category Категория транзакции (например, "Продукты", "Зарплата")
  * @property isExpense Тип транзакции (true - расход, false - доход)
@@ -19,7 +19,7 @@ import java.util.Date
  */
 data class Transaction(
     val id: Long = 0,
-    val title: String,
+    val title: String? = null,
     val amount: Money,
     val category: String,
     val isExpense: Boolean,
@@ -32,7 +32,7 @@ data class Transaction(
      */
     constructor(
         id: Long = 0,
-        title: String,
+        title: String? = null,
         amount: Double,
         category: String,
         isExpense: Boolean,
@@ -54,7 +54,7 @@ data class Transaction(
      */
     constructor(
         id: Long = 0,
-        title: String,
+        title: String? = null,
         amount: BigDecimal,
         category: String,
         isExpense: Boolean,

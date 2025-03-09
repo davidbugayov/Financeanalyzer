@@ -3,8 +3,9 @@ package com.davidbugayov.financeanalyzer.data.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
+import com.davidbugayov.financeanalyzer.utils.GsonUtils
 import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
+import timber.log.Timber
 
 /**
  * Класс для управления пользовательскими категориями через SharedPreferences.
@@ -37,9 +38,13 @@ class CategoryPreferences private constructor(context: Context) {
      * Сохраняет пользовательские категории расходов
      */
     fun saveExpenseCategories(categories: List<String>) {
-        val json = gson.toJson(categories)
-        prefs.edit {
-            putString(KEY_EXPENSE_CATEGORIES, json)
+        try {
+            val json = GsonUtils.toJsonFromStringList(gson, categories)
+            prefs.edit {
+                putString(KEY_EXPENSE_CATEGORIES, json)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error saving expense categories")
         }
     }
 
@@ -49,8 +54,12 @@ class CategoryPreferences private constructor(context: Context) {
     fun loadExpenseCategories(): List<String> {
         val json = prefs.getString(KEY_EXPENSE_CATEGORIES, null)
         return if (json != null) {
-            val type = object : TypeToken<List<String>>() {}.type
-            gson.fromJson(json, type)
+            try {
+                GsonUtils.fromJsonToStringList(gson, json)
+            } catch (e: Exception) {
+                Timber.e(e, "Error parsing expense categories")
+                emptyList()
+            }
         } else {
             emptyList()
         }
@@ -60,9 +69,13 @@ class CategoryPreferences private constructor(context: Context) {
      * Сохраняет пользовательские категории доходов
      */
     fun saveIncomeCategories(categories: List<String>) {
-        val json = gson.toJson(categories)
-        prefs.edit {
-            putString(KEY_INCOME_CATEGORIES, json)
+        try {
+            val json = GsonUtils.toJsonFromStringList(gson, categories)
+            prefs.edit {
+                putString(KEY_INCOME_CATEGORIES, json)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error saving income categories")
         }
     }
 
@@ -72,8 +85,12 @@ class CategoryPreferences private constructor(context: Context) {
     fun loadIncomeCategories(): List<String> {
         val json = prefs.getString(KEY_INCOME_CATEGORIES, null)
         return if (json != null) {
-            val type = object : TypeToken<List<String>>() {}.type
-            gson.fromJson(json, type)
+            try {
+                GsonUtils.fromJsonToStringList(gson, json)
+            } catch (e: Exception) {
+                Timber.e(e, "Error parsing income categories")
+                emptyList()
+            }
         } else {
             emptyList()
         }
@@ -125,9 +142,13 @@ class CategoryPreferences private constructor(context: Context) {
      * Сохраняет список удаленных дефолтных категорий расходов
      */
     fun saveDeletedDefaultExpenseCategories(categories: List<String>) {
-        val json = gson.toJson(categories)
-        prefs.edit {
-            putString(KEY_DELETED_DEFAULT_EXPENSE_CATEGORIES, json)
+        try {
+            val json = GsonUtils.toJsonFromStringList(gson, categories)
+            prefs.edit {
+                putString(KEY_DELETED_DEFAULT_EXPENSE_CATEGORIES, json)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error saving deleted default expense categories")
         }
     }
 
@@ -137,8 +158,12 @@ class CategoryPreferences private constructor(context: Context) {
     fun loadDeletedDefaultExpenseCategories(): List<String> {
         val json = prefs.getString(KEY_DELETED_DEFAULT_EXPENSE_CATEGORIES, null)
         return if (json != null) {
-            val type = object : TypeToken<List<String>>() {}.type
-            gson.fromJson(json, type)
+            try {
+                GsonUtils.fromJsonToStringList(gson, json)
+            } catch (e: Exception) {
+                Timber.e(e, "Error parsing deleted default expense categories")
+                emptyList()
+            }
         } else {
             emptyList()
         }
@@ -148,9 +173,13 @@ class CategoryPreferences private constructor(context: Context) {
      * Сохраняет список удаленных дефолтных категорий доходов
      */
     fun saveDeletedDefaultIncomeCategories(categories: List<String>) {
-        val json = gson.toJson(categories)
-        prefs.edit {
-            putString(KEY_DELETED_DEFAULT_INCOME_CATEGORIES, json)
+        try {
+            val json = GsonUtils.toJsonFromStringList(gson, categories)
+            prefs.edit {
+                putString(KEY_DELETED_DEFAULT_INCOME_CATEGORIES, json)
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Error saving deleted default income categories")
         }
     }
 
@@ -160,8 +189,12 @@ class CategoryPreferences private constructor(context: Context) {
     fun loadDeletedDefaultIncomeCategories(): List<String> {
         val json = prefs.getString(KEY_DELETED_DEFAULT_INCOME_CATEGORIES, null)
         return if (json != null) {
-            val type = object : TypeToken<List<String>>() {}.type
-            gson.fromJson(json, type)
+            try {
+                GsonUtils.fromJsonToStringList(gson, json)
+            } catch (e: Exception) {
+                Timber.e(e, "Error parsing deleted default income categories")
+                emptyList()
+            }
         } else {
             emptyList()
         }

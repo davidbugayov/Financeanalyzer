@@ -18,7 +18,7 @@ import java.util.Date
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val title: String,
+    val title: String? = null,
     val amount: Double,
     val currencyCode: String = Currency.RUB.code,
     val category: String,

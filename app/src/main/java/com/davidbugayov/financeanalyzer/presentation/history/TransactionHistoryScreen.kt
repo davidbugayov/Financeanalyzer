@@ -200,7 +200,7 @@ fun TransactionHistoryScreen(
                 Text(
                     stringResource(
                         R.string.delete_transaction_confirmation,
-                        transaction.title,
+                        transaction.category,
                         transaction.amount.format()
                     )
                 )
@@ -479,8 +479,8 @@ fun TransactionHistoryItem(transaction: Transaction) {
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = transaction.title,
-                    fontWeight = FontWeight.Medium,
+                    text = transaction.title ?: transaction.category,
+                    style = MaterialTheme.typography.bodyLarge,
                     color = MaterialTheme.colorScheme.onSurface
                 )
                 Text(

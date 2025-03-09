@@ -22,5 +22,8 @@ data class AddTransactionState(
     val showCancelConfirmation: Boolean = false,
     val customCategory: String = "",
     val expenseCategories: List<CategoryItem> = emptyList(),
-    val incomeCategories: List<CategoryItem> = emptyList()
+    val incomeCategories: List<CategoryItem> = emptyList(),
+    val titleError: Boolean = false,
+    val amountError: Boolean = false,
+    val categoryError: Boolean = false
 ) 

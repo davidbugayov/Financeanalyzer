@@ -26,8 +26,8 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 34
-        versionCode = 3
-        versionName = "1.3"
+        versionCode = 4
+        versionName = "1.3.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -82,6 +82,13 @@ android {
             isDebuggable = true
             versionNameSuffix = "-debug"
             buildConfigField("boolean", "DEBUG", "true")
+            // Добавляем правила ProGuard и для debug сборки
+//            isMinifyEnabled = true
+//            isShrinkResources = true
+//            proguardFiles(
+//                getDefaultProguardFile("proguard-android-optimize.txt"),
+//                "proguard-rules.pro"
+//            )
         }
     }
 
@@ -148,7 +155,15 @@ android {
                 "META-INF/NOTICE.txt",
                 "META-INF/notice.txt",
                 "META-INF/ASL2.0",
-                "META-INF/*.kotlin_module"
+                "META-INF/*.kotlin_module",
+                "META-INF/proguard/**",
+                "META-INF/versions/**",
+                "META-INF/web-fragment.xml",
+                "META-INF/androidx.*",
+                "META-INF/services/kotlin.*"
+            )
+            pickFirsts += listOf(
+                "META-INF/proguard/gson.pro"
             )
         }
         dex {

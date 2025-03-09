@@ -18,7 +18,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
  */
 @Database(
     entities = [TransactionEntity::class],
-    version = 2,
+    version = 3,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -44,6 +44,44 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 2 на версию 3
+         * Делает поле title необязательным
+         */
+        private val MIGRATION_2_3 = object : Migration(2, 3) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Создаем временную таблицу с новой схемой
+                db.execSQL(
+                    """
+                    CREATE TABLE transactions_temp (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        title TEXT,
+                        amount REAL NOT NULL,
+                        currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}',
+                        category TEXT NOT NULL,
+                        isExpense INTEGER NOT NULL,
+                        date INTEGER NOT NULL,
+                        note TEXT
+                    )
+                """
+                )
+
+                // Копируем данные из старой таблицы в новую
+                db.execSQL(
+                    """
+                    INSERT INTO transactions_temp (id, title, amount, currencyCode, category, isExpense, date, note)
+                    SELECT id, title, amount, currencyCode, category, isExpense, date, note FROM transactions
+                """
+                )
+
+                // Удаляем старую таблицу
+                db.execSQL("DROP TABLE transactions")
+
+                // Переименовываем временную таблицу
+                db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -60,7 +98,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DATABASE_NAME
                 )
-                    .addMigrations(MIGRATION_1_2)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3)
                     .build()
                 INSTANCE = instance
                 instance

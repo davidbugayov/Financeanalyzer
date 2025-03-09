@@ -8,13 +8,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -26,10 +29,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.add.components.AmountField
-import com.davidbugayov.financeanalyzer.presentation.add.components.CategoryField
 import com.davidbugayov.financeanalyzer.presentation.add.components.CategoryPickerDialog
 import com.davidbugayov.financeanalyzer.presentation.add.components.CustomCategoryDialog
 import com.davidbugayov.financeanalyzer.presentation.add.components.DateField
@@ -100,12 +102,18 @@ fun AddTransactionScreen(
                         viewModel.onEvent(AddTransactionEvent.SetTitle(title))
                     }
                 )
-                
-                AmountField(
-                    amount = state.amount,
-                    onAmountChange = { amount ->
-                        viewModel.onEvent(AddTransactionEvent.SetAmount(amount))
-                    }
+
+                OutlinedTextField(
+                    value = state.amount,
+                    onValueChange = { viewModel.onEvent(AddTransactionEvent.SetAmount(it)) },
+                    label = { Text("Сумма") },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    singleLine = true,
+                    isError = state.amountError,
+                    supportingText = if (state.amountError) {
+                        { Text("Введите корректную сумму") }
+                    } else null,
+                    modifier = Modifier.fillMaxWidth()
                 )
                 
                 DateField(
@@ -115,11 +123,21 @@ fun AddTransactionScreen(
                     }
                 )
 
-                CategoryField(
-                    category = state.category,
-                    onClick = {
-                        viewModel.onEvent(AddTransactionEvent.ShowCategoryPicker)
-                    }
+                OutlinedTextField(
+                    value = state.category,
+                    onValueChange = { viewModel.onEvent(AddTransactionEvent.SetCategory(it)) },
+                    label = { Text("Категория") },
+                    readOnly = true,
+                    isError = state.categoryError,
+                    supportingText = if (state.categoryError) {
+                        { Text("Выберите категорию") }
+                    } else null,
+                    trailingIcon = {
+                        IconButton(onClick = { viewModel.onEvent(AddTransactionEvent.ShowCategoryPicker) }) {
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Выбрать категорию")
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth()
                 )
                 
                 NoteField(
