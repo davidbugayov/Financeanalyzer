@@ -118,6 +118,22 @@ class ChartViewModel(
     }
 
     /**
+     * Возвращает данные для графика расходов по категориям для указанных транзакций
+     * @param transactions Список транзакций для анализа
+     * @return Карта категорий и сумм расходов
+     */
+    fun getExpensesByCategory(transactions: List<Transaction>): Map<String, Money> {
+        return transactions
+            .filter { it.isExpense }
+            .groupBy { it.category }
+            .mapValues { (_, txs) ->
+                txs
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            }
+    }
+
+    /**
      * Возвращает данные для графика доходов по категориям
      * @return Карта категорий и сумм доходов
      */
@@ -127,6 +143,22 @@ class ChartViewModel(
             .groupBy { it.category }
             .mapValues { (_, transactions) ->
                 transactions
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            }
+    }
+
+    /**
+     * Возвращает данные для графика доходов по категориям для указанных транзакций
+     * @param transactions Список транзакций для анализа
+     * @return Карта категорий и сумм доходов
+     */
+    fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
+        return transactions
+            .filter { !it.isExpense }
+            .groupBy { it.category }
+            .mapValues { (_, txs) ->
+                txs
                     .map { it.amount }
                     .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
             }
@@ -172,6 +204,46 @@ class ChartViewModel(
     }
 
     /**
+     * Возвращает данные для графика транзакций по месяцам с разбивкой по категориям для указанных транзакций
+     * @param transactions Список транзакций для анализа
+     * @return Карта месяцев и транзакций по категориям
+     */
+    fun getTransactionsByMonth(transactions: List<Transaction>): Map<String, ChartMonthlyData> {
+        val dateFormat = SimpleDateFormat("MM.yyyy", Locale.getDefault())
+
+        return transactions
+            .groupBy { dateFormat.format(it.date) }
+            .mapValues { (_, txs) ->
+                val income = txs
+                    .filter { !it.isExpense }
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                val expense = txs
+                    .filter { it.isExpense }
+                    .map { it.amount }
+                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                // Группируем расходы по категориям
+                val categoryBreakdown = txs
+                    .filter { it.isExpense }
+                    .groupBy { it.category }
+                    .mapValues { (_, categoryTransactions) ->
+                        categoryTransactions
+                            .map { it.amount }
+                            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                    }
+
+                ChartMonthlyData(
+                    totalIncome = income,
+                    totalExpense = expense,
+                    categoryBreakdown = categoryBreakdown
+                )
+            }
+            .toSortedMap()
+    }
+
+    /**
      * Возвращает данные для графика расходов по дням
      * @param days Количество дней для отображения
      * @return Карта дней и данных о расходах
@@ -188,6 +260,46 @@ class ChartViewModel(
                 val dailyExpenses = transactions.filter { it.isExpense }
                 val dailyIncome = transactions.filter { !it.isExpense }
                 
+                // Группируем расходы по категориям
+                val categoryBreakdown = dailyExpenses
+                    .groupBy { it.category }
+                    .mapValues { (_, categoryTransactions) ->
+                        categoryTransactions
+                            .map { it.amount }
+                            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                    }
+
+                ChartMonthlyData(
+                    totalIncome = dailyIncome
+                        .map { it.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero(),
+                    totalExpense = dailyExpenses
+                        .map { it.amount }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero(),
+                    categoryBreakdown = categoryBreakdown
+                )
+            }
+            .toSortedMap()
+    }
+
+    /**
+     * Возвращает данные для графика расходов по дням для указанных транзакций
+     * @param days Количество дней для отображения
+     * @param transactions Список транзакций для анализа
+     * @return Карта дней и данных о расходах
+     */
+    fun getExpensesByDay(days: Int = 7, transactions: List<Transaction>): Map<String, ChartMonthlyData> {
+        val dateFormat = SimpleDateFormat("dd.MM", Locale.getDefault())
+        val currentTime = System.currentTimeMillis()
+        val daysInMillis = days * 24 * 60 * 60 * 1000L
+
+        return transactions
+            .filter { (currentTime - it.date.time) <= daysInMillis }
+            .groupBy { dateFormat.format(it.date) }
+            .mapValues { (_, txs) ->
+                val dailyExpenses = txs.filter { it.isExpense }
+                val dailyIncome = txs.filter { !it.isExpense }
+
                 // Группируем расходы по категориям
                 val categoryBreakdown = dailyExpenses
                     .groupBy { it.category }

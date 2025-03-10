@@ -139,4 +139,26 @@
     <string name="chart_income">Доходы</string>
     <string name="chart_expenses">Расходы</string>
     <string name="currency_format_with_percent" formatted="false">%.2f ₽ (%.1f%%)</string>
+
+    <!-- Новые строки для улучшенного экрана финансовой статистики -->
+    <string name="top_expense_categories">Топ категорий расходов</string>
+    <string name="tap_bar_for_details">Нажмите на столбец для подробностей</string>
+    <string name="income_vs_expense">Доходы vs Расходы</string>
+    <string name="expense_trend">Тренд расходов</string>
+    <string name="income_trend">Тренд доходов</string>
+    <string name="monthly_comparison">Сравнение по месяцам</string>
+    <string name="daily_expenses">Ежедневные расходы</string>
+    <string name="weekly_summary">Недельная сводка</string>
+    <string name="monthly_summary">Месячная сводка</string>
+    <string name="yearly_summary">Годовая сводка</string>
+    <string name="category_details">Детали категории</string>
+    <string name="budget_overview">Обзор бюджета</string>
+    <string name="savings_rate">Норма сбережений</string>
+    <string name="spending_by_day">Расходы по дням</string>
+    <string name="spending_by_week">Расходы по неделям</string>
+    <string name="spending_by_month">Расходы по месяцам</string>
+    <string name="spending_by_year">Расходы по годам</string>
+    <string name="average_daily">Среднее за день</string>
+    <string name="average_monthly">Среднее за месяц</string>
+    <string name="average_yearly">Среднее за год</string>
 </resources>
