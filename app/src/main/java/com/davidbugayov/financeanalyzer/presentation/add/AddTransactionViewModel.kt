@@ -99,11 +99,12 @@ class AddTransactionViewModel(
      */
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
+            is AddTransactionEvent.SetAmount -> {
+                // Автоматически заменяем запятую на точку при вводе
+                _state.update { it.copy(amount = event.amount.replace(",", ".")) }
+            }
             is AddTransactionEvent.SetTitle -> {
                 _state.update { it.copy(title = event.title) }
-            }
-            is AddTransactionEvent.SetAmount -> {
-                _state.update { it.copy(amount = event.amount) }
             }
             is AddTransactionEvent.SetCategory -> {
                 _state.update {
@@ -175,7 +176,7 @@ class AddTransactionViewModel(
     }
 
     private fun validateInput(): Boolean {
-        val amount = _state.value.amount.toBigDecimalOrNull()
+        val amount = _state.value.amount.replace(",", ".").toBigDecimalOrNull()
 
         val hasErrors = amount == null || amount <= BigDecimal.ZERO || _state.value.category.isBlank()
 
@@ -198,7 +199,7 @@ class AddTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
             
             try {
-                val amount = _state.value.amount.toBigDecimal()
+                val amount = _state.value.amount.replace(",", ".").toBigDecimal()
                 val transaction = Transaction(
                     title = _state.value.title.ifBlank { null },
                     amount = amount,
