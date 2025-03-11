@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -31,6 +32,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 
 /**
  * Круговая диаграмма для отображения распределения расходов/доходов по категориям.
@@ -51,6 +53,41 @@ fun CategoryPieChart(
     
     val total = data.values.fold(Money.zero()) { acc, value -> acc + value }
     val density = LocalDensity.current
+    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
+    val expenseColor = LocalExpenseColor.current
+
+    // Преобразуем Compose Color в Int для Paint
+    val textColor = if (isIncome) {
+        android.graphics.Color.argb(
+            255,
+            102, // 0x66
+            187, // 0xBB
+            106  // 0x6A
+        )
+    } else {
+        android.graphics.Color.argb(
+            (expenseColor.alpha * 255).toInt(),
+            (expenseColor.red * 255).toInt(),
+            (expenseColor.green * 255).toInt(),
+            (expenseColor.blue * 255).toInt()
+        )
+    }
+
+    val textColorAlpha = if (isIncome) {
+        android.graphics.Color.argb(
+            (255 * 0.7f).toInt(),
+            102, // 0x66
+            187, // 0xBB
+            106  // 0x6A
+        )
+    } else {
+        android.graphics.Color.argb(
+            (expenseColor.alpha * 255 * 0.7f).toInt(),
+            (expenseColor.red * 255).toInt(),
+            (expenseColor.green * 255).toInt(),
+            (expenseColor.blue * 255).toInt()
+        )
+    }
 
     // Цвета для диаграммы
     val colors = if (isIncome) {
@@ -120,7 +157,7 @@ fun CategoryPieChart(
         modifier = modifier
             .fillMaxWidth()
             .aspectRatio(1f)
-            .background(Color(0xFF1C1B1F)),
+            .background(surfaceVariantColor),
         contentAlignment = Alignment.Center
     ) {
         Canvas(
@@ -153,8 +190,13 @@ fun CategoryPieChart(
                     size = Size(
                         radius * 2 + (if (isSelected) 8f else 0f),
                         radius * 2 + (if (isSelected) 8f else 0f)
-                    )
+                    ),
+                    alpha = if (isSelected) 1f else 0.8f
                 )
+
+                if (isSelected) {
+                    onCategorySelected(category)
+                }
 
                 // Рисуем тонкую белую обводку
                 drawArc(
@@ -178,24 +220,30 @@ fun CategoryPieChart(
 
             // Рисуем внутренний круг
             drawCircle(
-                color = Color(0xFF1C1B1F),
+                color = surfaceVariantColor,
                 radius = radius * 0.55f,
                 center = center
             )
 
             // Отображаем общую сумму в центре
+            textPaint.apply {
+                color = textColor
+            }
             drawContext.canvas.nativeCanvas.drawText(
-                total.format(false),
+                total.format(true),
                 center.x,
-                center.y,
+                center.y - with(density) { 10.dp.toPx() },
                 textPaint
             )
 
-            val subText = if (isIncome) "доход" else "расход"
+            // Отображаем "расход" под суммой
+            subTextPaint.apply {
+                color = textColorAlpha
+            }
             drawContext.canvas.nativeCanvas.drawText(
-                subText,
+                if (isIncome) "доход" else "расход",
                 center.x,
-                center.y + with(density) { 30.dp.toPx() },
+                center.y + with(density) { 20.dp.toPx() },
                 subTextPaint
             )
         }
@@ -215,6 +263,7 @@ fun CategoryList(
     if (data.isEmpty()) return
 
     val total = data.values.fold(Money.zero()) { acc, value -> acc + value }
+    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
 
     // Цвета для категорий
     val colors = if (isIncome) {
@@ -251,37 +300,11 @@ fun CategoryList(
         entry.key to colors[index % colors.size]
     }.toMap()
 
-    // Отображаем общую сумму и название
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .background(Color(0xFF1C1B1F))
-            .padding(vertical = 16.dp),
-        contentAlignment = Alignment.Center
-    ) {
-        Column(
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Text(
-                text = total.format(false),
-                color = Color.White,
-                fontSize = 32.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = if (isIncome) "доход" else "расход",
-                color = Color.White.copy(alpha = 0.7f),
-                fontSize = 16.sp
-            )
-        }
-    }
-
     // Отображаем список категорий
     Column(
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
-            .background(Color(0xFF1C1B1F))
+            .background(surfaceVariantColor)
             .padding(horizontal = 16.dp)
     ) {
         sortedData.forEach { (category, amount) ->
@@ -292,8 +315,46 @@ fun CategoryList(
                 amount = amount,
                 percentage = percentage,
                 color = colorMap[category] ?: Color.Gray,
+                isIncome = isIncome,
                 modifier = Modifier.clickable { onCategorySelected(category) }
             )
         }
+    }
+}
+
+/**
+ * Элемент списка категорий
+ */
+@Composable
+fun CategoryListItem(
+    categoryName: String,
+    amount: Money,
+    percentage: Double,
+    color: Color,
+    isIncome: Boolean = false,
+    modifier: Modifier = Modifier
+) {
+    val textColor = MaterialTheme.colorScheme.onSurface
+    val amountColor = color  // Используем тот же цвет, что и в секторе диаграммы
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp)
+            .background(color.copy(alpha = 0.1f))
+            .padding(8.dp)  // Добавляем внутренний отступ для лучшего вида
+    ) {
+        Text(
+            text = categoryName,
+            style = MaterialTheme.typography.bodyLarge,
+            fontWeight = FontWeight.Medium,
+            color = textColor
+        )
+
+        Text(
+            text = "${amount.format(true)} (${String.format("%.1f", percentage)}%)",
+            style = MaterialTheme.typography.bodyMedium,
+            color = amountColor
+        )
     }
 } 

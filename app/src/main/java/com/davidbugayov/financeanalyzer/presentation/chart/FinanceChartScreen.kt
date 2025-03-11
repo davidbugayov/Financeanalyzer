@@ -63,7 +63,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.components.CategoryList
 import com.davidbugayov.financeanalyzer.presentation.chart.components.CategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesChart
-import com.davidbugayov.financeanalyzer.presentation.chart.components.MonthlyComparisonChart
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -419,13 +418,13 @@ fun FinanceChartScreen(
                                     modifier = Modifier
                                         .weight(if (showExpenses) 0.7f else 0.3f)
                                         .fillMaxHeight()
-                                        .background(LocalExpenseColor.current)
+                                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f))
                                 )
                                 Box(
                                     modifier = Modifier
                                         .weight(if (!showExpenses) 0.7f else 0.3f)
                                         .fillMaxHeight()
-                                        .background(LocalIncomeColor.current)
+                                        .background(LocalExpenseColor.current)
                                 )
                             }
 
@@ -476,50 +475,6 @@ fun FinanceChartScreen(
                                 } else {
                                     EmptyDataMessage(stringResource(R.string.no_income_data))
                                 }
-                            }
-                        }
-                    }
-
-                    // Секция с улучшенным графиком баланса по месяцам
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        shape = RoundedCornerShape(16.dp)
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp)
-                        ) {
-                            Text(
-                                text = "Динамика по месяцам",
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = "Сравнение доходов и расходов за последние месяцы",
-                                fontSize = 18.sp,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            val transactionsByMonth = viewModel.getTransactionsByMonth(filteredTransactions)
-                            if (transactionsByMonth.isNotEmpty()) {
-                                MonthlyComparisonChart(
-                                    data = transactionsByMonth,
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .height(350.dp)
-                                )
-                            } else {
-                                EmptyDataMessage(stringResource(R.string.insufficient_data))
                             }
                         }
                     }
@@ -1033,8 +988,9 @@ private fun SummarySection(
     period: String
 ) {
     val balance = income - expense
-    val incomeColor = LocalIncomeColor.current
-    val expenseColor = LocalExpenseColor.current
+    val incomeColor = Color(0xFF66BB6A)  // Зеленый цвет для доходов
+    val expenseColor = LocalExpenseColor.current  // Красный цвет для расходов
+    val balanceColor = if (balance.isNegative()) expenseColor else incomeColor
 
     Card(
         modifier = Modifier
@@ -1060,7 +1016,7 @@ private fun SummarySection(
                 text = stringResource(R.string.currency_format, balance.format(false)),
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = if (balance.isNegative()) expenseColor else incomeColor
+                color = balanceColor
             )
 
             Spacer(modifier = Modifier.height(16.dp))

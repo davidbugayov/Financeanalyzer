@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -63,156 +64,174 @@ fun DailyExpensesChart(
     // Цвета для графика
     val incomeColor = Color(0xFF66BB6A) // Зеленый
     val expenseColor = Color(0xFFEF5350) // Красный
-    val gridColor = Color(0x33FFFFFF) // Полупрозрачный белый
+    val backgroundColor = MaterialTheme.colorScheme.surfaceVariant
+    val gridColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.2f)
 
-    Column(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .background(Color(0xFF1C1B1F))
+            .background(backgroundColor)
     ) {
-        // График
-        Canvas(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(300.dp)
-                .padding(16.dp)
-                .clickable { /* Обработка клика по графику */ }
         ) {
-            val canvasWidth = size.width
-            val canvasHeight = size.height
-            val barWidth = canvasWidth / (sortedData.size * 2) // 2 = столбец + отступ
-            val progress = animatedProgress.value
+            // График
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(backgroundColor)
+            ) {
+                Canvas(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(300.dp)
+                        .padding(16.dp)
+                        .clickable { /* Обработка клика по графику */ }
+                ) {
+                    // Сначала рисуем фон
+                    drawRect(
+                        color = backgroundColor,
+                        size = size
+                    )
 
-            // Рисуем горизонтальные линии сетки
-            val gridLines = 5
-            for (i in 0..gridLines) {
-                val y = canvasHeight * (1 - i.toFloat() / gridLines)
-                drawLine(
-                    color = gridColor,
-                    start = Offset(0f, y),
-                    end = Offset(canvasWidth, y),
-                    strokeWidth = 1.dp.toPx()
-                )
+                    val canvasWidth = size.width
+                    val canvasHeight = size.height
+                    val barWidth = canvasWidth / (sortedData.size * 2) // 2 = столбец + отступ
+                    val progress = animatedProgress.value
 
-                // Значения на оси Y
-                val amount = (maxAmount * i / gridLines)
-                val amountText = Money(amount).format(false)
+                    // Рисуем горизонтальные линии сетки
+                    val gridLines = 5
+                    for (i in 0..gridLines) {
+                        val y = canvasHeight * (1 - i.toFloat() / gridLines)
+                        drawLine(
+                            color = gridColor,
+                            start = Offset(0f, y),
+                            end = Offset(canvasWidth, y),
+                            strokeWidth = 1.dp.toPx()
+                        )
 
-                drawContext.canvas.nativeCanvas.drawText(
-                    amountText,
-                    8.dp.toPx(),
-                    y - 4.dp.toPx(),
-                    Paint().apply {
-                        color = android.graphics.Color.WHITE
-                        textSize = 10.sp.toPx()
-                        textAlign = Paint.Align.LEFT
-                        alpha = 150
+                        // Значения на оси Y
+                        val amount = (maxAmount * i / gridLines)
+                        val amountText = Money(amount).format(false)
+
+                        drawContext.canvas.nativeCanvas.drawText(
+                            amountText,
+                            8.dp.toPx(),
+                            y - 4.dp.toPx(),
+                            Paint().apply {
+                                color = android.graphics.Color.GRAY
+                                textSize = 10.sp.toPx()
+                                textAlign = Paint.Align.LEFT
+                                alpha = 150
+                            }
+                        )
                     }
-                )
+
+                    // Рисуем столбцы
+                    sortedData.forEachIndexed { index, (day, dayData) ->
+                        val x = index * (barWidth * 2)
+
+                        // Определяем цвет столбца в зависимости от типа (доход/расход)
+                        val isIncome = dayData.totalIncome > dayData.totalExpense
+                        val barColor = if (isIncome) incomeColor else expenseColor
+                        val barAmount = if (isIncome) dayData.totalIncome else dayData.totalExpense
+
+                        // Рисуем столбец
+                        val barHeight = (barAmount.amount.toDouble() / maxAmount * canvasHeight * progress).toFloat()
+                        val barRect = Offset(x + barWidth / 2, canvasHeight - barHeight)
+
+                        drawRect(
+                            color = barColor,
+                            topLeft = barRect,
+                            size = Size(barWidth, barHeight)
+                        )
+
+                        // Отображаем метку дня
+                        drawContext.canvas.nativeCanvas.drawText(
+                            day,
+                            x + barWidth,
+                            canvasHeight + 14.dp.toPx(),
+                            Paint().apply {
+                                color = android.graphics.Color.GRAY
+                                textSize = 10.sp.toPx()
+                                textAlign = Paint.Align.CENTER
+                                alpha = 200
+                            }
+                        )
+
+                        // Отображаем сумму над столбцом
+                        if (barHeight > 30.dp.toPx()) {
+                            drawContext.canvas.nativeCanvas.drawText(
+                                barAmount.format(false),
+                                x + barWidth,
+                                canvasHeight - barHeight - 8.dp.toPx(),
+                                Paint().apply {
+                                    color = android.graphics.Color.GRAY
+                                    textSize = 10.sp.toPx()
+                                    textAlign = Paint.Align.CENTER
+                                    alpha = 200
+                                }
+                            )
+                        }
+                    }
+                }
             }
 
-            // Рисуем столбцы
-            sortedData.forEachIndexed { index, (day, dayData) ->
-                val x = index * (barWidth * 2)
+            // Легенда
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.Center,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                // Доходы
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier.padding(end = 16.dp)
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .background(incomeColor)
+                    )
+                    Text(
+                        text = "Доходы",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 4.dp)
+                    )
+                }
 
-                // Определяем цвет столбца в зависимости от типа (доход/расход)
-                val isIncome = dayData.totalIncome > dayData.totalExpense
-                val barColor = if (isIncome) incomeColor else expenseColor
-                val barAmount = if (isIncome) dayData.totalIncome else dayData.totalExpense
-
-                // Рисуем столбец
-                val barHeight = (barAmount.amount.toDouble() / maxAmount * canvasHeight * progress).toFloat()
-                val barRect = Offset(x + barWidth / 2, canvasHeight - barHeight)
-
-                drawRect(
-                    color = barColor,
-                    topLeft = barRect,
-                    size = Size(barWidth, barHeight)
-                )
-
-                // Отображаем метку дня
-                drawContext.canvas.nativeCanvas.drawText(
-                    day,
-                    x + barWidth,
-                    canvasHeight + 14.dp.toPx(),
-                    Paint().apply {
-                        color = android.graphics.Color.WHITE
-                        textSize = 10.sp.toPx()
-                        textAlign = Paint.Align.CENTER
-                        alpha = 200
-                    }
-                )
-
-                // Отображаем сумму над столбцом
-                if (barHeight > 30.dp.toPx()) {
-                    drawContext.canvas.nativeCanvas.drawText(
-                        barAmount.format(false),
-                        x + barWidth,
-                        canvasHeight - barHeight - 8.dp.toPx(),
-                        Paint().apply {
-                            color = android.graphics.Color.WHITE
-                            textSize = 10.sp.toPx()
-                            textAlign = Paint.Align.CENTER
-                            alpha = 200
-                        }
+                // Расходы
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .background(expenseColor)
+                    )
+                    Text(
+                        text = "Расходы",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        fontSize = 14.sp,
+                        modifier = Modifier.padding(start = 4.dp)
                     )
                 }
             }
+
+            // Подсказка
+            Text(
+                text = "Нажмите на столбец для подробностей",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp),
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                fontSize = 12.sp
+            )
         }
-
-        // Легенда
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            horizontalArrangement = Arrangement.Center,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            // Доходы
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(end = 16.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(incomeColor)
-                )
-                Text(
-                    text = "Доходы",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-
-            // Расходы
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Box(
-                    modifier = Modifier
-                        .size(12.dp)
-                        .background(expenseColor)
-                )
-                Text(
-                    text = "Расходы",
-                    color = Color.White,
-                    fontSize = 14.sp,
-                    modifier = Modifier.padding(start = 4.dp)
-                )
-            }
-        }
-
-        // Подсказка
-        Text(
-            text = "Нажмите на столбец для подробностей",
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp),
-            textAlign = TextAlign.Center,
-            color = Color.White.copy(alpha = 0.5f),
-            fontSize = 12.sp
-        )
     }
 } 

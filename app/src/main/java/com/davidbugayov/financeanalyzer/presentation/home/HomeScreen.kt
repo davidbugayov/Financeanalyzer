@@ -23,6 +23,7 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Summarize
 import androidx.compose.material3.Card
@@ -229,7 +230,7 @@ fun HomeScreen(
                                 modifier = Modifier.size(48.dp)
                             ) {
                                 Icon(
-                                    imageVector = Icons.Default.Summarize,
+                                    imageVector = Icons.Default.BarChart,
                                     contentDescription = stringResource(R.string.charts)
                                 )
                             }
