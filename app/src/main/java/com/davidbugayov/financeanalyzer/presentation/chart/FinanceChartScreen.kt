@@ -5,6 +5,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,30 +17,30 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,6 +55,7 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
@@ -69,6 +71,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import kotlin.math.max
 
 /**
  * Улучшенный экран с финансовой аналитикой и графиками.
@@ -89,9 +92,24 @@ fun FinanceChartScreen(
     // Состояние для диалога с информацией о норме сбережений
     var showSavingsRateInfo by remember { mutableStateOf(false) }
 
-    // Состояние для выбора периода
-    var selectedPeriod by remember { mutableStateOf("Месяц") }
-    val periodOptions = listOf("Неделя", "Месяц", "Квартал", "Год", "Все время")
+    // Состояние для диалогов выбора даты
+    var showStartDatePicker by remember { mutableStateOf(false) }
+    var showEndDatePicker by remember { mutableStateOf(false) }
+
+    // Состояние для дат
+    var startDate by remember { mutableStateOf(Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time) }
+    var endDate by remember { mutableStateOf(Calendar.getInstance().time) }
+
+    // Состояние для фильтров
+    var showIncomeTransactions by remember { mutableStateOf(true) }
+    var showExpenseTransactions by remember { mutableStateOf(true) }
+
+    // Состояние для категорий
+    val allCategories = remember {
+        listOf("Продукты", "Транспорт", "Развлечения", "Здоровье", "Одежда", "Жильё", "Связь", "Прочее")
+    }
+    var selectedCategories by remember { mutableStateOf(allCategories.toSet()) }
+    var selectAllCategories by remember { mutableStateOf(true) }
 
     // Состояние для выбора типа данных
     var showExpenses by remember { mutableStateOf(true) }
@@ -99,38 +117,38 @@ fun FinanceChartScreen(
     // Состояние для отображения меню
     var showMenu by remember { mutableStateOf(false) }
 
+    // Состояние для диалога выбора периода
+    var showPeriodDialog by remember { mutableStateOf(false) }
+
     // Форматирование дат
-    val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
-    val currentDate = Date()
-    val formattedDate = dateFormat.format(currentDate)
+    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+    val periodText = remember(startDate, endDate) {
+        "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+    }
 
     // Фильтрация транзакций по выбранному периоду
-    val filteredTransactions = remember(transactions, selectedPeriod) {
-        val calendar = Calendar.getInstance()
-        val currentTime = calendar.timeInMillis
+    val filteredTransactions = remember(transactions, startDate, endDate) {
+        // Устанавливаем начало дня для startDate
+        val startCalendar = Calendar.getInstance()
+        startCalendar.time = startDate
+        startCalendar.set(Calendar.HOUR_OF_DAY, 0)
+        startCalendar.set(Calendar.MINUTE, 0)
+        startCalendar.set(Calendar.SECOND, 0)
+        startCalendar.set(Calendar.MILLISECOND, 0)
+        val start = startCalendar.time
 
-        when (selectedPeriod) {
-            "Неделя" -> {
-                calendar.add(Calendar.DAY_OF_YEAR, -7)
-                val weekAgo = calendar.timeInMillis
-                transactions.filter { it.date.time >= weekAgo }
-            }
-            "Месяц" -> {
-                calendar.add(Calendar.MONTH, -1)
-                val monthAgo = calendar.timeInMillis
-                transactions.filter { it.date.time >= monthAgo }
-            }
-            "Квартал" -> {
-                calendar.add(Calendar.MONTH, -3)
-                val quarterAgo = calendar.timeInMillis
-                transactions.filter { it.date.time >= quarterAgo }
-            }
-            "Год" -> {
-                calendar.add(Calendar.YEAR, -1)
-                val yearAgo = calendar.timeInMillis
-                transactions.filter { it.date.time >= yearAgo }
-            }
-            else -> transactions // "Все время"
+        // Устанавливаем конец дня для endDate
+        val endCalendar = Calendar.getInstance()
+        endCalendar.time = endDate
+        endCalendar.set(Calendar.HOUR_OF_DAY, 23)
+        endCalendar.set(Calendar.MINUTE, 59)
+        endCalendar.set(Calendar.SECOND, 59)
+        endCalendar.set(Calendar.MILLISECOND, 999)
+        val end = endCalendar.time
+
+        transactions.filter {
+            (it.date.after(start) || it.date == start) &&
+                    (it.date.before(end) || it.date == end)
         }
     }
 
@@ -152,7 +170,9 @@ fun FinanceChartScreen(
                     Text(
                         text = stringResource(R.string.charts_title),
                         fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
                     )
                 },
                 navigationIcon = {
@@ -164,40 +184,13 @@ fun FinanceChartScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { /* Открыть диалог выбора даты */ }) {
-                        Icon(
-                            Icons.Default.DateRange,
-                            contentDescription = "Выбрать период"
-                        )
-                    }
-                    IconButton(onClick = { /* Открыть фильтры */ }) {
-                        Icon(
-                            Icons.Default.FilterList,
-                            contentDescription = "Фильтры"
-                        )
-                    }
                     Box {
-                        IconButton(onClick = { showMenu = !showMenu }) {
-                            Icon(
-                                Icons.Default.MoreVert,
-                                contentDescription = "Дополнительные опции"
-                            )
-                        }
-                        DropdownMenu(
-                            expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+                        IconButton(
+                            onClick = { showPeriodDialog = true }
                         ) {
-                            DropdownMenuItem(
-                                text = { Text("Экспорт данных") },
-                                onClick = { showMenu = false }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Настройки графиков") },
-                                onClick = { showMenu = false }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Сравнить периоды") },
-                                onClick = { showMenu = false }
+                            Icon(
+                                Icons.Default.DateRange,
+                                contentDescription = "Выбрать период"
                             )
                         }
                     }
@@ -256,69 +249,87 @@ fun FinanceChartScreen(
                     SummarySection(
                         income = filteredIncome,
                         expense = filteredExpense,
-                        period = when (selectedPeriod) {
-                            "Неделя" -> "За последнюю неделю"
-                            "Месяц" -> "За последний месяц"
-                            "Квартал" -> "За последний квартал"
-                            "Год" -> "За последний год"
-                            else -> "За все время"
-                        }
+                        period = periodText
                     )
 
-                    // Добавляем прогресс-бар в стиле CoinKeeper
-                    val totalAmount = filteredIncome.amount.toDouble() + filteredExpense.amount.toDouble()
-                    val incomeRatio = if (totalAmount > 0) filteredIncome.amount.toDouble() / totalAmount else 0.0
-
-                    Box(
+                    // Улучшенный переключатель периода
+                    Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp)
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp))
-                            .background(Color(0xFF5D4037))
+                            .padding(horizontal = 16.dp, vertical = 8.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
-                        Box(
+                        Row(
                             modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(incomeRatio.toFloat())
-                                .background(Color(0xFF66BB6A))
-                        )
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            horizontalArrangement = Arrangement.SpaceEvenly
+                        ) {
+                            val periodOptions = listOf("Неделя", "Месяц", "Год", "Все")
+                            var selectedPeriod by remember { mutableStateOf(periodOptions[0]) }
 
-                        Box(
-                            modifier = Modifier
-                                .fillMaxHeight()
-                                .fillMaxWidth(1 - incomeRatio.toFloat())
-                                .align(Alignment.TopEnd)
-                                .background(Color(0xFFEF5350))
-                        )
-                    }
-
-                    // Переключатель периода в стиле CoinKeeper
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 16.dp),
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        periodOptions.forEach { period ->
-                            Box(
-                                modifier = Modifier
-                                    .weight(1f)
-                                    .padding(horizontal = 4.dp)
-                                    .clip(RoundedCornerShape(16.dp))
-                                    .background(
-                                        if (period == selectedPeriod) Color(0xFF5D4037) else Color(0xFF1C1B1F).copy(alpha = 0.5f)
+                            periodOptions.forEach { period ->
+                                Box(
+                                    modifier = Modifier
+                                        .weight(1f)
+                                        .padding(horizontal = 4.dp)
+                                        .clip(RoundedCornerShape(8.dp))
+                                        .background(
+                                            if (period == selectedPeriod)
+                                                MaterialTheme.colorScheme.primary
+                                            else
+                                                MaterialTheme.colorScheme.surfaceVariant
+                                        )
+                                        .clickable {
+                                            selectedPeriod = period
+                                            // Обновляем даты в зависимости от выбранного периода
+                                            when (period) {
+                                                "Неделя" -> {
+                                                    endDate = Calendar.getInstance().time
+                                                    startDate = Calendar.getInstance().apply {
+                                                        time = endDate
+                                                        add(Calendar.DAY_OF_YEAR, -7)
+                                                    }.time
+                                                }
+                                                "Месяц" -> {
+                                                    endDate = Calendar.getInstance().time
+                                                    startDate = Calendar.getInstance().apply {
+                                                        time = endDate
+                                                        add(Calendar.MONTH, -1)
+                                                    }.time
+                                                }
+                                                "Год" -> {
+                                                    endDate = Calendar.getInstance().time
+                                                    startDate = Calendar.getInstance().apply {
+                                                        time = endDate
+                                                        add(Calendar.YEAR, -1)
+                                                    }.time
+                                                }
+                                                "Все" -> {
+                                                    endDate = Calendar.getInstance().time
+                                                    startDate = Calendar.getInstance().apply {
+                                                        time = endDate
+                                                        add(Calendar.YEAR, -10) // Условно "все время" - 10 лет
+                                                    }.time
+                                                }
+                                            }
+                                        }
+                                        .padding(vertical = 10.dp, horizontal = 4.dp),
+                                    contentAlignment = Alignment.Center
+                                ) {
+                                    Text(
+                                        text = period,
+                                        color = if (period == selectedPeriod)
+                                            MaterialTheme.colorScheme.onPrimary
+                                        else
+                                            MaterialTheme.colorScheme.onSurfaceVariant,
+                                        fontSize = 13.sp,
+                                        fontWeight = if (period == selectedPeriod) FontWeight.Bold else FontWeight.Normal,
+                                        maxLines = 1,
+                                        textAlign = TextAlign.Center
                                     )
-                                    .clickable { selectedPeriod = period }
-                                    .padding(vertical = 8.dp),
-                                contentAlignment = Alignment.Center
-                            ) {
-                                Text(
-                                    text = period,
-                                    color = Color.White,
-                                    fontSize = 14.sp,
-                                    fontWeight = if (period == selectedPeriod) FontWeight.Bold else FontWeight.Normal
-                                )
+                                }
                             }
                         }
                     }
@@ -327,102 +338,95 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF5D4037)
-                        )
+                            .padding(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
+                            Text(
+                                text = if (showExpenses)
+                                    "Структура расходов"
+                                else
+                                    "Структура доходов",
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = if (showExpenses)
+                                    "Распределение ваших расходов по категориям"
+                                else
+                                    "Распределение ваших доходов по источникам",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            // Переключатель доходы/расходы в стиле CoinKeeper
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
+                                horizontalArrangement = Arrangement.SpaceBetween
                             ) {
                                 Column {
                                     Text(
-                                        text = if (showExpenses)
-                                            "Структура расходов"
-                                        else
-                                            "Структура доходов",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
+                                        text = "Расходы",
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = if (showExpenses)
-                                            "Распределение ваших расходов по категориям"
-                                        else
-                                            "Распределение ваших доходов по источникам",
-                                        fontSize = 14.sp,
-                                        color = Color.White.copy(alpha = 0.7f)
+                                        text = "Показать расходы",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                        modifier = Modifier.clickable { showExpenses = true }
                                     )
                                 }
-                                IconButton(
-                                    onClick = { /* Показать информацию */ }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Info,
-                                        contentDescription = "Информация",
-                                        tint = Color.White
+
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = "Доходы",
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = "Показать доходы",
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                        modifier = Modifier.clickable { showExpenses = false }
                                     )
                                 }
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
 
-                            // Переключатель доходы/расходы в стиле CoinKeeper
+                            // Визуальное представление выбора
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
-                                    .padding(horizontal = 32.dp),
-                                horizontalArrangement = Arrangement.Center
+                                    .height(8.dp)
+                                    .clip(RoundedCornerShape(4.dp))
                             ) {
-                                // Кнопка "Расходы"
                                 Box(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .padding(end = 4.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(
-                                            if (showExpenses) Color(0xFF8D6E63) else Color(0xFF5D4037).copy(alpha = 0.5f)
-                                        )
-                                        .clickable { showExpenses = true }
-                                        .padding(vertical = 12.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "Расходы",
-                                        color = Color.White,
-                                        fontSize = 16.sp,
-                                        fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                }
-
-                                // Кнопка "Доходы"
+                                        .weight(if (showExpenses) 0.7f else 0.3f)
+                                        .fillMaxHeight()
+                                        .background(LocalExpenseColor.current)
+                                )
                                 Box(
                                     modifier = Modifier
-                                        .weight(1f)
-                                        .padding(start = 4.dp)
-                                        .clip(RoundedCornerShape(8.dp))
-                                        .background(
-                                            if (!showExpenses) Color(0xFF8D6E63) else Color(0xFF5D4037).copy(alpha = 0.5f)
-                                        )
-                                        .clickable { showExpenses = false }
-                                        .padding(vertical = 12.dp),
-                                    contentAlignment = Alignment.Center
-                                ) {
-                                    Text(
-                                        text = "Доходы",
-                                        color = Color.White,
-                                        fontSize = 16.sp,
-                                        fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal
-                                    )
-                                }
+                                        .weight(if (!showExpenses) 0.7f else 0.3f)
+                                        .fillMaxHeight()
+                                        .background(LocalIncomeColor.current)
+                                )
                             }
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -480,47 +484,31 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF5D4037)
-                        )
+                            .padding(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Динамика по месяцам",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        text = "Сравнение доходов и расходов за последние месяцы",
-                                        fontSize = 14.sp,
-                                        color = Color.White.copy(alpha = 0.7f)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = { /* Показать информацию */ }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Info,
-                                        contentDescription = "Информация",
-                                        tint = Color.White
-                                    )
-                                }
-                            }
+                            Text(
+                                text = "Динамика по месяцам",
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
 
                             Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = "Сравнение доходов и расходов за последние месяцы",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
 
                             val transactionsByMonth = viewModel.getTransactionsByMonth(filteredTransactions)
                             if (transactionsByMonth.isNotEmpty()) {
@@ -540,56 +528,47 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF5D4037)
-                        )
+                            .padding(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Ежедневные траты",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        text = "График ваших расходов по дням для анализа трат",
-                                        fontSize = 14.sp,
-                                        color = Color.White.copy(alpha = 0.7f)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = { /* Показать информацию */ }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Info,
-                                        contentDescription = "Информация",
-                                        tint = Color.White
-                                    )
-                                }
-                            }
+                            Text(
+                                text = "Ежедневные траты",
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
 
                             Spacer(modifier = Modifier.height(8.dp))
 
+                            Text(
+                                text = "График ваших расходов по дням для анализа трат",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = LocalExpenseColor.current
+                            )
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
                             val expensesByDay = viewModel.getExpensesByDay(30, filteredTransactions)
                             if (expensesByDay.isNotEmpty()) {
-                                DailyExpensesChart(
-                                    data = expensesByDay,
+                                // Добавляем горизонтальную прокрутку
+                                Box(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(350.dp)
-                                )
+                                        .horizontalScroll(rememberScrollState())
+                                ) {
+                                    DailyExpensesChart(
+                                        data = expensesByDay,
+                                        modifier = Modifier
+                                            .width(max(expensesByDay.size * 40, 350).dp)
+                                            .height(350.dp)
+                                    )
+                                }
                             } else {
                                 EmptyDataMessage(stringResource(R.string.no_expenses_recent_days))
                             }
@@ -600,45 +579,29 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFF5D4037)
-                        )
+                            .padding(16.dp),
+                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                        shape = RoundedCornerShape(16.dp)
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(16.dp)
                         ) {
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                Column {
-                                    Text(
-                                        text = "Средние показатели",
-                                        fontSize = 20.sp,
-                                        fontWeight = FontWeight.Bold,
-                                        color = Color.White
-                                    )
-                                    Text(
-                                        text = "Анализ ваших средних трат для планирования бюджета",
-                                        fontSize = 14.sp,
-                                        color = Color.White.copy(alpha = 0.7f)
-                                    )
-                                }
-                                IconButton(
-                                    onClick = { /* Показать информацию */ }
-                                ) {
-                                    Icon(
-                                        Icons.Default.Info,
-                                        contentDescription = "Информация",
-                                        tint = Color.White
-                                    )
-                                }
-                            }
+                            Text(
+                                text = "Средние показатели",
+                                fontSize = 14.sp,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+
+                            Spacer(modifier = Modifier.height(8.dp))
+
+                            Text(
+                                text = "Анализ ваших средних трат для планирования бюджета",
+                                fontSize = 18.sp,
+                                fontWeight = FontWeight.Bold,
+                                color = MaterialTheme.colorScheme.primary
+                            )
 
                             Spacer(modifier = Modifier.height(16.dp))
 
@@ -650,58 +613,7 @@ fun FinanceChartScreen(
                             val avgMonthlyExpense = avgDailyExpense * 30
                             val avgYearlyExpense = avgDailyExpense * 365
 
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.average_daily),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = Money(avgDailyExpense).format(false),
-                                    color = LocalExpenseColor.current,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.average_monthly),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = Money(avgMonthlyExpense).format(false),
-                                    color = LocalExpenseColor.current,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 8.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = stringResource(R.string.average_yearly),
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                                )
-                                Text(
-                                    text = Money(avgYearlyExpense).format(false),
-                                    color = LocalExpenseColor.current,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
-
-                            // Норма сбережений
+                            // Расчет нормы сбережений
                             val totalIncome = filteredTransactions
                                 .filter { !it.isExpense }
                                 .sumOf { it.amount.amount.toDouble() }
@@ -710,65 +622,126 @@ fun FinanceChartScreen(
                                 .filter { it.isExpense }
                                 .sumOf { it.amount.amount.toDouble() }
 
-                            if (totalIncome > 0) {
-                                val savingsRate = ((totalIncome - totalExpense) / totalIncome * 100)
+                            val savingsRate = if (totalIncome > 0) {
+                                ((totalIncome - totalExpense) / totalIncome * 100)
                                     .coerceIn(0.0, 100.0)
+                            } else 0.0
 
-                                Spacer(modifier = Modifier.height(16.dp))
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.average_daily),
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = Money(avgDailyExpense).format(false),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = LocalExpenseColor.current
+                                    )
+                                }
 
-                                Row(
-                                    modifier = Modifier.fillMaxWidth(),
-                                    horizontalArrangement = Arrangement.SpaceBetween,
-                                    verticalAlignment = Alignment.CenterVertically
-                                ) {
-                                    Column {
+                                Column(horizontalAlignment = Alignment.End) {
+                                    Text(
+                                        text = stringResource(R.string.average_monthly),
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = Money(avgMonthlyExpense).format(false),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = LocalExpenseColor.current
+                                    )
+                                }
+                            }
+
+                            Spacer(modifier = Modifier.height(16.dp))
+
+                            Row(
+                                modifier = Modifier.fillMaxWidth(),
+                                horizontalArrangement = Arrangement.SpaceBetween
+                            ) {
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.average_yearly),
+                                        fontSize = 14.sp,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    )
+                                    Text(
+                                        text = Money(avgYearlyExpense).format(false),
+                                        fontSize = 16.sp,
+                                        fontWeight = FontWeight.Medium,
+                                        color = LocalExpenseColor.current
+                                    )
+                                }
+
+                                // Норма сбережений
+                                if (totalIncome > 0) {
+                                    Column(horizontalAlignment = Alignment.End) {
                                         Text(
                                             text = stringResource(R.string.savings_rate),
+                                            fontSize = 14.sp,
                                             color = MaterialTheme.colorScheme.onSurfaceVariant
                                         )
-                                        Text(
-                                            text = "Процент дохода, который вы сохраняете",
-                                            fontSize = 12.sp,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
-                                        )
-                                    }
-                                    Row(
-                                        verticalAlignment = Alignment.CenterVertically
-                                    ) {
-                                        Text(
-                                            text = String.format("%.1f%%", savingsRate),
-                                            color = LocalIncomeColor.current,
-                                            fontWeight = FontWeight.Bold
-                                        )
-                                        IconButton(
-                                            onClick = { showSavingsRateInfo = true }
+                                        Row(
+                                            verticalAlignment = Alignment.CenterVertically
                                         ) {
-                                            Icon(
-                                                Icons.Default.Info,
-                                                contentDescription = "Информация о норме сбережений",
-                                                tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                                modifier = Modifier.size(16.dp)
+                                            Text(
+                                                text = String.format("%.1f%%", savingsRate),
+                                                fontSize = 16.sp,
+                                                fontWeight = FontWeight.Medium,
+                                                color = LocalIncomeColor.current
                                             )
+                                            IconButton(
+                                                onClick = { showSavingsRateInfo = true },
+                                                modifier = Modifier.size(24.dp)
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Info,
+                                                    contentDescription = "Информация о норме сбережений",
+                                                    tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                                                    modifier = Modifier.size(16.dp)
+                                                )
+                                            }
                                         }
                                     }
                                 }
+                            }
+
+                            // Добавляем визуальное представление нормы сбережений
+                            if (totalIncome > 0) {
+                                Spacer(modifier = Modifier.height(16.dp))
+
+                                Text(
+                                    text = "Процент дохода, который вы сохраняете",
+                                    fontSize = 14.sp,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                )
 
                                 Spacer(modifier = Modifier.height(8.dp))
 
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(top = 8.dp),
-                                    verticalAlignment = Alignment.CenterVertically
+                                        .height(8.dp)
+                                        .clip(RoundedCornerShape(4.dp))
                                 ) {
-                                    LinearProgressIndicator(
-                                        progress = { (savingsRate / 100).toFloat() },
+                                    Box(
                                         modifier = Modifier
-                                            .weight(1f)
-                                            .height(8.dp)
-                                            .clip(RoundedCornerShape(4.dp)),
-                                        color = LocalIncomeColor.current,
-                                        trackColor = MaterialTheme.colorScheme.surfaceVariant
+                                            .weight((savingsRate / 100).toFloat().coerceAtLeast(0.01f))
+                                            .fillMaxHeight()
+                                            .background(LocalIncomeColor.current)
+                                    )
+                                    Box(
+                                        modifier = Modifier
+                                            .weight((1 - (savingsRate / 100)).toFloat().coerceAtLeast(0.01f))
+                                            .fillMaxHeight()
+                                            .background(MaterialTheme.colorScheme.surfaceVariant)
                                     )
                                 }
 
@@ -903,6 +876,149 @@ fun FinanceChartScreen(
                     }
                 )
             }
+
+            // Диалог выбора периода
+            if (showPeriodDialog) {
+                AlertDialog(
+                    onDismissRequest = { showPeriodDialog = false },
+                    title = {
+                        Text(
+                            text = "Выберите период",
+                            fontSize = 20.sp,
+                            fontWeight = FontWeight.Bold
+                        )
+                    },
+                    text = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp)
+                        ) {
+                            // Строка выбора начальной даты
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        showPeriodDialog = false
+                                        showStartDatePicker = true
+                                    }
+                                    .padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "От",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.width(40.dp)
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp),
+                                    shape = MaterialTheme.shapes.small,
+                                    color = MaterialTheme.colorScheme.surfaceVariant
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = SimpleDateFormat("dd.MM.yyyy", Locale("ru")).format(startDate),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                }
+                            }
+
+                            // Строка выбора конечной даты
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .clickable {
+                                        showPeriodDialog = false
+                                        showEndDatePicker = true
+                                    }
+                                    .padding(vertical = 8.dp),
+                                verticalAlignment = Alignment.CenterVertically
+                            ) {
+                                Text(
+                                    text = "До",
+                                    style = MaterialTheme.typography.bodyLarge,
+                                    modifier = Modifier.width(40.dp)
+                                )
+
+                                Spacer(modifier = Modifier.width(8.dp))
+
+                                Surface(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .height(40.dp),
+                                    shape = MaterialTheme.shapes.small,
+                                    color = MaterialTheme.colorScheme.surfaceVariant
+                                ) {
+                                    Row(
+                                        modifier = Modifier
+                                            .fillMaxSize()
+                                            .padding(horizontal = 12.dp),
+                                        verticalAlignment = Alignment.CenterVertically
+                                    ) {
+                                        Text(
+                                            text = SimpleDateFormat("dd.MM.yyyy", Locale("ru")).format(endDate),
+                                            style = MaterialTheme.typography.bodyMedium
+                                        )
+                                    }
+                                }
+                            }
+                        }
+                    },
+                    confirmButton = {
+                        TextButton(onClick = { showPeriodDialog = false }) {
+                            Text("Закрыть")
+                        }
+                    }
+                )
+            }
+
+            // Диалог выбора начальной даты
+            if (showStartDatePicker) {
+                DatePickerDialog(
+                    initialDate = startDate,
+                    onDateSelected = { date ->
+                        startDate = date
+                        showStartDatePicker = false
+                        if (endDate.before(startDate)) {
+                            showEndDatePicker = true
+                        }
+                    },
+                    onDismiss = {
+                        showStartDatePicker = false
+                    }
+                )
+            }
+
+            // Диалог выбора конечной даты
+            if (showEndDatePicker) {
+                DatePickerDialog(
+                    initialDate = endDate,
+                    onDateSelected = { date ->
+                        if (date.before(startDate)) {
+                            // Если конечная дата раньше начальной, меняем их местами
+                            endDate = startDate
+                            startDate = date
+                        } else {
+                            endDate = date
+                        }
+                        showEndDatePicker = false
+                    },
+                    onDismiss = {
+                        showEndDatePicker = false
+                    }
+                )
+            }
         }
     }
 }
@@ -996,13 +1112,13 @@ private fun SummarySection(
             ) {
                 Box(
                     modifier = Modifier
-                        .weight(incomeRatio.toFloat())
+                        .weight(incomeRatio.toFloat().coerceAtLeast(0.01f))
                         .fillMaxHeight()
                         .background(incomeColor)
                 )
                 Box(
                     modifier = Modifier
-                        .weight((1 - incomeRatio).toFloat())
+                        .weight((1 - incomeRatio).toFloat().coerceAtLeast(0.01f))
                         .fillMaxHeight()
                         .background(expenseColor)
                 )
@@ -1027,5 +1143,48 @@ private fun EmptyDataMessage(message: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
             textAlign = TextAlign.Center
         )
+    }
+}
+
+/**
+ * Диалог выбора даты.
+ * Использует стандартный DatePicker из Material3.
+ *
+ * @param initialDate Начальная дата для отображения в календаре
+ * @param onDateSelected Callback, вызываемый при выборе даты
+ * @param onDismiss Callback для закрытия диалога
+ */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun DatePickerDialog(
+    initialDate: Date,
+    onDateSelected: (Date) -> Unit,
+    onDismiss: () -> Unit
+) {
+    val datePickerState = rememberDatePickerState(
+        initialSelectedDateMillis = initialDate.time
+    )
+
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let {
+                        onDateSelected(Date(it))
+                    }
+                    onDismiss()
+                }
+            ) {
+                Text(stringResource(R.string.ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.cancel))
+            }
+        }
+    ) {
+        DatePicker(state = datePickerState)
     }
 } 
