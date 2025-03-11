@@ -13,12 +13,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.AlertDialog
-import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -30,8 +27,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
@@ -51,22 +48,25 @@ fun TransactionTypeSelector(
     isExpense: Boolean,
     onTypeSelected: (Boolean) -> Unit
 ) {
+    val spacingLarge = dimensionResource(R.dimen.spacing_large)
+    val spacingSmall = dimensionResource(R.dimen.spacing_small)
+    
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp),
+            .padding(bottom = spacingLarge),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Text(
             text = stringResource(R.string.transaction_type),
-            modifier = Modifier.padding(end = 16.dp)
+            modifier = Modifier.padding(end = spacingLarge)
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
             modifier = Modifier
                 .clickable { onTypeSelected(true) }
-                .padding(end = 16.dp)
+                .padding(end = spacingLarge)
         ) {
             RadioButton(
                 selected = isExpense,
@@ -74,7 +74,7 @@ fun TransactionTypeSelector(
             )
             Text(
                 text = stringResource(R.string.expense_type),
-                modifier = Modifier.padding(start = 4.dp)
+                modifier = Modifier.padding(start = spacingSmall)
             )
         }
 
@@ -88,7 +88,7 @@ fun TransactionTypeSelector(
             )
             Text(
                 text = stringResource(R.string.income_type),
-                modifier = Modifier.padding(start = 4.dp)
+                modifier = Modifier.padding(start = spacingSmall)
             )
         }
     }
@@ -112,31 +112,7 @@ fun TitleField(
         label = { Text(stringResource(R.string.title)) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
-    )
-}
-
-/**
- * Поле для ввода суммы транзакции.
- * Позволяет пользователю ввести сумму транзакции.
- * Поддерживает только числовой ввод.
- *
- * @param amount Текущее значение суммы
- * @param onAmountChange Callback, вызываемый при изменении суммы
- */
-@Composable
-fun AmountField(
-    amount: String,
-    onAmountChange: (String) -> Unit
-) {
-    OutlinedTextField(
-        value = amount,
-        onValueChange = onAmountChange,
-        label = { Text(stringResource(R.string.amount)) },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
+            .padding(bottom = dimensionResource(R.dimen.spacing_medium))
     )
 }
 
@@ -166,36 +142,7 @@ fun DateField(
         },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 8.dp)
-            .clickable(onClick = onClick)
-    )
-}
-
-/**
- * Поле для выбора категории транзакции.
- * При нажатии открывает диалог выбора категории.
- *
- * @param category Текущая выбранная категория
- * @param onClick Callback, вызываемый при нажатии на поле
- */
-@Composable
-fun CategoryField(
-    category: String,
-    onClick: () -> Unit
-) {
-    OutlinedTextField(
-        value = category,
-        onValueChange = { },
-        label = { Text(stringResource(R.string.category)) },
-        readOnly = true,
-        trailingIcon = {
-            IconButton(onClick = onClick) {
-                Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.select_category))
-            }
-        },
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp)
+            .padding(bottom = dimensionResource(R.dimen.spacing_medium))
             .clickable(onClick = onClick)
     )
 }
@@ -218,29 +165,8 @@ fun NoteField(
         label = { Text(stringResource(R.string.note_optional)) },
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = 16.dp)
+            .padding(bottom = dimensionResource(R.dimen.spacing_large))
     )
-}
-
-/**
- * Кнопка для добавления транзакции.
- * Становится активной только когда все обязательные поля заполнены.
- *
- * @param enabled Доступность кнопки
- * @param onClick Callback, вызываемый при нажатии на кнопку
- */
-@Composable
-fun AddTransactionButton(
-    enabled: Boolean,
-    onClick: () -> Unit
-) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.fillMaxWidth(),
-        enabled = enabled
-    ) {
-        Text(stringResource(R.string.add_button))
-    }
 }
 
 /**

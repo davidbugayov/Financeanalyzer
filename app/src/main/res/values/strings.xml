@@ -124,6 +124,21 @@
     <string name="cancel_transaction_confirmation">Вы уверены, что хотите отменить добавление транзакции?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="amount_error">Введите корректную сумму</string>
+    <string name="category_error">Выберите категорию</string>
+    <string name="add_custom_category">Добавить свою категорию</string>
+    <string name="enter_category_name">Введите название категории</string>
+    <string name="income_label_short">Доход</string>
+    <string name="expense_label_short">Расход</string>
+    <string name="tap_for_details">Нажмите для подробностей</string>
+
+    <!-- Chart strings -->
+    <string name="income_color">Цвет доходов</string>
+    <string name="expense_color">Цвет расходов</string>
+    <string name="balance_color">Цвет баланса</string>
+    <string name="grid_color">Цвет сетки</string>
+    <string name="background_color">Цвет фона</string>
+    <string name="dynamics_by_month">Динамика по месяцам</string>
 
     <!-- FinanceChartScreen strings -->
     <string name="error_loading_transactions">Ошибка при загрузке транзакций: %s</string>

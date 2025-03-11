@@ -6,7 +6,6 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
@@ -14,7 +13,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,9 +26,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 
@@ -45,9 +44,8 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 @Composable
 fun CategoryPieChart(
     data: Map<String, Money>,
-    isIncome: Boolean = false,
     modifier: Modifier = Modifier,
-    onCategorySelected: (String) -> Unit = {}
+    isIncome: Boolean = false
 ) {
     if (data.isEmpty()) return
     
@@ -55,6 +53,10 @@ fun CategoryPieChart(
     val density = LocalDensity.current
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
     val expenseColor = LocalExpenseColor.current
+
+    // Получаем строки заранее
+    val incomeText = stringResource(R.string.income_label_short)
+    val expenseText = stringResource(R.string.expense_label_short)
 
     // Преобразуем Compose Color в Int для Paint
     val textColor = if (isIncome) {
@@ -195,7 +197,7 @@ fun CategoryPieChart(
                 )
 
                 if (isSelected) {
-                    onCategorySelected(category)
+                    selectedCategory = category
                 }
 
                 // Рисуем тонкую белую обводку
@@ -241,7 +243,7 @@ fun CategoryPieChart(
                 color = textColorAlpha
             }
             drawContext.canvas.nativeCanvas.drawText(
-                if (isIncome) "доход" else "расход",
+                if (isIncome) incomeText else expenseText,
                 center.x,
                 center.y + with(density) { 20.dp.toPx() },
                 subTextPaint
@@ -256,9 +258,8 @@ fun CategoryPieChart(
 @Composable
 fun CategoryList(
     data: Map<String, Money>,
-    isIncome: Boolean = false,
     modifier: Modifier = Modifier,
-    onCategorySelected: (String) -> Unit = {}
+    isIncome: Boolean = false
 ) {
     if (data.isEmpty()) return
 
@@ -315,46 +316,8 @@ fun CategoryList(
                 amount = amount,
                 percentage = percentage,
                 color = colorMap[category] ?: Color.Gray,
-                isIncome = isIncome,
-                modifier = Modifier.clickable { onCategorySelected(category) }
+                modifier = Modifier
             )
         }
-    }
-}
-
-/**
- * Элемент списка категорий
- */
-@Composable
-fun CategoryListItem(
-    categoryName: String,
-    amount: Money,
-    percentage: Double,
-    color: Color,
-    isIncome: Boolean = false,
-    modifier: Modifier = Modifier
-) {
-    val textColor = MaterialTheme.colorScheme.onSurface
-    val amountColor = color  // Используем тот же цвет, что и в секторе диаграммы
-
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp)
-            .background(color.copy(alpha = 0.1f))
-            .padding(8.dp)  // Добавляем внутренний отступ для лучшего вида
-    ) {
-        Text(
-            text = categoryName,
-            style = MaterialTheme.typography.bodyLarge,
-            fontWeight = FontWeight.Medium,
-            color = textColor
-        )
-
-        Text(
-            text = "${amount.format(true)} (${String.format("%.1f", percentage)}%)",
-            style = MaterialTheme.typography.bodyMedium,
-            color = amountColor
-        )
     }
 } 

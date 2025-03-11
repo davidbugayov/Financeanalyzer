@@ -106,7 +106,7 @@ fun AddTransactionScreen(
                 OutlinedTextField(
                     value = state.amount,
                     onValueChange = { viewModel.onEvent(AddTransactionEvent.SetAmount(it)) },
-                    label = { Text("Сумма") },
+                    label = { Text(stringResource(R.string.amount)) },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                     singleLine = true,
                     isError = state.amountError,
@@ -126,7 +126,7 @@ fun AddTransactionScreen(
                 OutlinedTextField(
                     value = state.category,
                     onValueChange = { viewModel.onEvent(AddTransactionEvent.SetCategory(it)) },
-                    label = { Text("Категория") },
+                    label = { Text(stringResource(R.string.category)) },
                     readOnly = true,
                     isError = state.categoryError,
                     supportingText = if (state.categoryError) {
@@ -134,7 +134,7 @@ fun AddTransactionScreen(
                     } else null,
                     trailingIcon = {
                         IconButton(onClick = { viewModel.onEvent(AddTransactionEvent.ShowCategoryPicker) }) {
-                            Icon(Icons.Default.ArrowDropDown, contentDescription = "Выбрать категорию")
+                            Icon(Icons.Default.ArrowDropDown, contentDescription = stringResource(R.string.select_category))
                         }
                     },
                     modifier = Modifier.fillMaxWidth()

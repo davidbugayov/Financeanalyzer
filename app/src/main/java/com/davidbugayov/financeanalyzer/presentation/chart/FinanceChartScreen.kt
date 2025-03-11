@@ -99,22 +99,8 @@ fun FinanceChartScreen(
     var startDate by remember { mutableStateOf(Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time) }
     var endDate by remember { mutableStateOf(Calendar.getInstance().time) }
 
-    // Состояние для фильтров
-    var showIncomeTransactions by remember { mutableStateOf(true) }
-    var showExpenseTransactions by remember { mutableStateOf(true) }
-
-    // Состояние для категорий
-    val allCategories = remember {
-        listOf("Продукты", "Транспорт", "Развлечения", "Здоровье", "Одежда", "Жильё", "Связь", "Прочее")
-    }
-    var selectedCategories by remember { mutableStateOf(allCategories.toSet()) }
-    var selectAllCategories by remember { mutableStateOf(true) }
-
     // Состояние для выбора типа данных
     var showExpenses by remember { mutableStateOf(true) }
-
-    // Состояние для отображения меню
-    var showMenu by remember { mutableStateOf(false) }
 
     // Состояние для диалога выбора периода
     var showPeriodDialog by remember { mutableStateOf(false) }
@@ -647,7 +633,7 @@ fun FinanceChartScreen(
                                             verticalAlignment = Alignment.CenterVertically
                                         ) {
                                             Text(
-                                                text = String.format("%.1f%%", savingsRate),
+                                                text = String.format(Locale.getDefault(), "%.1f%%", savingsRate),
                                                 fontSize = 16.sp,
                                                 fontWeight = FontWeight.Medium,
                                                 color = LocalIncomeColor.current

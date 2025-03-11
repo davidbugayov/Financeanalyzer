@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -15,6 +16,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import java.util.Locale
 
 /**
  * Элемент списка категорий в стиле CoinKeeper
@@ -43,7 +45,7 @@ fun CategoryListItem(
         // Название категории
         Text(
             text = categoryName,
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             fontWeight = FontWeight.Normal,
             modifier = Modifier
@@ -54,7 +56,7 @@ fun CategoryListItem(
         // Сумма
         Text(
             text = amount.format(false),
-            color = Color.White,
+            color = MaterialTheme.colorScheme.onSurface,
             fontSize = 16.sp,
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(horizontal = 16.dp)
@@ -62,8 +64,8 @@ fun CategoryListItem(
 
         // Процент
         Text(
-            text = String.format("%.1f%%", percentage),
-            color = Color.White.copy(alpha = 0.7f),
+            text = String.format(Locale.getDefault(), "%.1f%%", percentage),
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
             fontSize = 14.sp
         )
     }

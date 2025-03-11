@@ -23,10 +23,11 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartMonthlyData
 
@@ -36,12 +37,9 @@ import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartMonthlyDat
 @Composable
 fun DailyExpensesChart(
     data: Map<String, ChartMonthlyData>,
-    modifier: Modifier = Modifier,
-    onDaySelected: (String) -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     if (data.isEmpty()) return
-
-    val density = LocalDensity.current
 
     // Находим максимальное значение для масштабирования
     val maxAmount = data.values.maxOf {
@@ -193,11 +191,11 @@ fun DailyExpensesChart(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(12.dp)
+                            .size(8.dp)
                             .background(incomeColor)
                     )
                     Text(
-                        text = "Доходы",
+                        text = stringResource(R.string.income),
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 4.dp)
@@ -210,11 +208,11 @@ fun DailyExpensesChart(
                 ) {
                     Box(
                         modifier = Modifier
-                            .size(12.dp)
+                            .size(8.dp)
                             .background(expenseColor)
                     )
                     Text(
-                        text = "Расходы",
+                        text = stringResource(R.string.expense),
                         color = MaterialTheme.colorScheme.onSurface,
                         fontSize = 14.sp,
                         modifier = Modifier.padding(start = 4.dp)
@@ -224,7 +222,7 @@ fun DailyExpensesChart(
 
             // Подсказка
             Text(
-                text = "Нажмите на столбец для подробностей",
+                text = stringResource(R.string.tap_for_details),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 16.dp),
