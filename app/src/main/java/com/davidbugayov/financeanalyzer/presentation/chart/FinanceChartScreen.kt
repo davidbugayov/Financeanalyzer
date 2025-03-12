@@ -51,7 +51,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -87,6 +89,10 @@ fun FinanceChartScreen(
     val error by viewModel.error.collectAsState()
     val scrollState = rememberScrollState()
     val layoutDirection = LocalLayoutDirection.current
+    val density = LocalDensity.current
+
+    // Convert dimension resource to sp
+    val textSizeLarge = 18.sp
 
     // Состояние для диалога с информацией о норме сбережений
     var showSavingsRateInfo by remember { mutableStateOf(false) }
@@ -154,7 +160,7 @@ fun FinanceChartScreen(
                 title = {
                     Text(
                         text = stringResource(R.string.charts_title),
-                        fontSize = 18.sp,
+                        fontSize = textSizeLarge,
                         fontWeight = FontWeight.Medium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis
@@ -197,14 +203,14 @@ fun FinanceChartScreen(
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(dimensionResource(R.dimen.spacing_large)),
                     verticalArrangement = Arrangement.Center,
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
                         text = stringResource(R.string.error_loading_transactions, error ?: ""),
                         color = MaterialTheme.colorScheme.error,
-                        modifier = Modifier.padding(bottom = 16.dp),
+                        modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_large)),
                         textAlign = TextAlign.Center
                     )
                     Button(onClick = { viewModel.loadTransactions() }) {
@@ -215,7 +221,7 @@ fun FinanceChartScreen(
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
-                        .padding(16.dp),
+                        .padding(dimensionResource(R.dimen.spacing_large)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -241,14 +247,14 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-                        shape = RoundedCornerShape(16.dp)
+                            .padding(horizontal = dimensionResource(R.dimen.spacing_large), vertical = dimensionResource(R.dimen.spacing_medium)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
                     ) {
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(8.dp),
+                                .padding(dimensionResource(R.dimen.spacing_medium)),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             val periodOptions = listOf("Неделя", "Месяц", "Год", "Все")
@@ -323,37 +329,38 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        shape = RoundedCornerShape(16.dp)
+                            .padding(dimensionResource(R.dimen.spacing_large)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(dimensionResource(R.dimen.spacing_large))
                         ) {
                             Text(
                                 text = if (showExpenses)
-                                    "Структура расходов"
+                                    stringResource(R.string.chart_expenses)
                                 else
-                                    "Структура доходов",
-                                fontSize = 14.sp,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-
-                            Spacer(modifier = Modifier.height(8.dp))
-
-                            Text(
-                                text = if (showExpenses)
-                                    "Распределение ваших расходов по категориям"
-                                else
-                                    "Распределение ваших доходов по источникам",
-                                fontSize = 18.sp,
+                                    stringResource(R.string.chart_income),
+                                fontSize = textSizeLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+
+                            Text(
+                                text = if (showExpenses)
+                                    stringResource(R.string.expense_type)
+                                else
+                                    stringResource(R.string.income_type),
+                                fontSize = textSizeLarge,
+                                fontWeight = FontWeight.Bold,
+                                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
+                            )
+
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                             // Переключатель доходы/расходы в стиле CoinKeeper
                             Row(
@@ -362,12 +369,12 @@ fun FinanceChartScreen(
                             ) {
                                 Column {
                                     Text(
-                                        text = "Расходы",
+                                        text = stringResource(R.string.expense),
                                         fontSize = 14.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = "Показать расходы",
+                                        text = stringResource(R.string.show_expenses),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
@@ -377,12 +384,12 @@ fun FinanceChartScreen(
 
                                 Column(horizontalAlignment = Alignment.End) {
                                     Text(
-                                        text = "Доходы",
+                                        text = stringResource(R.string.income),
                                         fontSize = 14.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant
                                     )
                                     Text(
-                                        text = "Показать доходы",
+                                        text = stringResource(R.string.show_income),
                                         fontSize = 16.sp,
                                         fontWeight = FontWeight.Medium,
                                         color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
@@ -391,14 +398,14 @@ fun FinanceChartScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                             // Визуальное представление выбора
                             Row(
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .height(8.dp)
-                                    .clip(RoundedCornerShape(4.dp))
+                                    .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
                             ) {
                                 Box(
                                     modifier = Modifier
@@ -414,7 +421,7 @@ fun FinanceChartScreen(
                                 )
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                             // Отображение соответствующей диаграммы
                             if (showExpenses) {
@@ -425,10 +432,10 @@ fun FinanceChartScreen(
                                         data = expensesByCategory,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(280.dp)
+                                            .height(dimensionResource(R.dimen.chart_height_large))
                                     )
 
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                                     // Отображаем список категорий
                                     CategoryList(
@@ -447,10 +454,10 @@ fun FinanceChartScreen(
                                         isIncome = true,
                                         modifier = Modifier
                                             .fillMaxWidth()
-                                            .height(280.dp)
+                                            .height(dimensionResource(R.dimen.chart_height_large))
                                     )
 
-                                    Spacer(modifier = Modifier.height(16.dp))
+                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                                     // Отображаем список категорий
                                     CategoryList(
@@ -469,31 +476,31 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        shape = RoundedCornerShape(16.dp)
+                            .padding(dimensionResource(R.dimen.spacing_large)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(dimensionResource(R.dimen.spacing_large))
                         ) {
                             Text(
-                                text = "Ежедневные траты",
+                                text = stringResource(R.string.daily_expenses),
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                             Text(
-                                text = "График ваших расходов по дням для анализа трат",
-                                fontSize = 18.sp,
+                                text = stringResource(R.string.tap_bar_for_details),
+                                fontSize = textSizeLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = LocalExpenseColor.current
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                             val expensesByDay = viewModel.getExpensesByDay(30, filteredTransactions)
                             if (expensesByDay.isNotEmpty()) {
@@ -507,7 +514,7 @@ fun FinanceChartScreen(
                                         data = expensesByDay,
                                         modifier = Modifier
                                             .width(max(expensesByDay.size * 40, 350).dp)
-                                            .height(350.dp)
+                                            .height(dimensionResource(R.dimen.chart_height_large))
                                     )
                                 }
                             } else {
@@ -520,31 +527,31 @@ fun FinanceChartScreen(
                     Card(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp),
-                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-                        shape = RoundedCornerShape(16.dp)
+                            .padding(dimensionResource(R.dimen.spacing_large)),
+                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(16.dp)
+                                .padding(dimensionResource(R.dimen.spacing_large))
                         ) {
                             Text(
-                                text = "Средние показатели",
+                                text = stringResource(R.string.average_values),
                                 fontSize = 14.sp,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
 
-                            Spacer(modifier = Modifier.height(8.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                             Text(
-                                text = "Анализ ваших средних трат для планирования бюджета",
-                                fontSize = 18.sp,
+                                text = stringResource(R.string.analyze_expenses_for_budget),
+                                fontSize = textSizeLarge,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                             // Расчет средних значений
                             val expensesByDay = viewModel.getExpensesByDay(30, filteredTransactions)
@@ -601,7 +608,7 @@ fun FinanceChartScreen(
                                 }
                             }
 
-                            Spacer(modifier = Modifier.height(16.dp))
+                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
@@ -640,13 +647,13 @@ fun FinanceChartScreen(
                                             )
                                             IconButton(
                                                 onClick = { showSavingsRateInfo = true },
-                                                modifier = Modifier.size(24.dp)
+                                                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
                                             ) {
                                                 Icon(
                                                     Icons.Default.Info,
                                                     contentDescription = "Информация о норме сбережений",
                                                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                                    modifier = Modifier.size(16.dp)
+                                                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small))
                                                 )
                                             }
                                         }
@@ -656,7 +663,7 @@ fun FinanceChartScreen(
 
                             // Добавляем визуальное представление нормы сбережений
                             if (totalIncome > 0) {
-                                Spacer(modifier = Modifier.height(16.dp))
+                                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                                 Text(
                                     text = "Процент дохода, который вы сохраняете",
@@ -664,13 +671,13 @@ fun FinanceChartScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
 
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                                 Row(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .height(8.dp)
-                                        .clip(RoundedCornerShape(4.dp))
+                                        .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
                                 ) {
                                     Box(
                                         modifier = Modifier
@@ -687,7 +694,7 @@ fun FinanceChartScreen(
                                 }
 
                                 // Добавляем подсказки для интерпретации
-                                Spacer(modifier = Modifier.height(8.dp))
+                                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                                 Row(
                                     modifier = Modifier.fillMaxWidth(),
@@ -716,7 +723,7 @@ fun FinanceChartScreen(
                         }
                     }
 
-                    Spacer(modifier = Modifier.height(16.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
                 }
             }
 
@@ -981,14 +988,14 @@ private fun SummarySection(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        shape = RoundedCornerShape(16.dp)
+            .padding(dimensionResource(R.dimen.spacing_large)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.spacing_large))
         ) {
             Text(
                 text = period,
@@ -996,16 +1003,16 @@ private fun SummarySection(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
             Text(
                 text = stringResource(R.string.currency_format, balance.format(false)),
-                fontSize = 24.sp,
+                fontSize = 18.sp,
                 fontWeight = FontWeight.Bold,
                 color = balanceColor
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -1041,7 +1048,7 @@ private fun SummarySection(
             }
 
             // Добавляем визуальное представление соотношения доходов и расходов
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
             val totalAmount = income.amount.toDouble() + expense.amount.toDouble()
             val incomeRatio = if (totalAmount > 0) income.amount.toDouble() / totalAmount else 0.0
@@ -1050,7 +1057,7 @@ private fun SummarySection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(8.dp)
-                    .clip(RoundedCornerShape(4.dp))
+                    .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
             ) {
                 Box(
                     modifier = Modifier

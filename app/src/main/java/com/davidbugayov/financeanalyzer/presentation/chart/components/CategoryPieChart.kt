@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -136,11 +137,15 @@ fun CategoryPieChart(
         label = "PieChartAnimation"
     )
 
+    // Convert dimension resources to TextUnit (sp)
+    val textSizeXXXLarge = with(density) { 32.sp }
+    val textSizeNormal = with(density) { 16.sp }
+
     // Создаем Paint объекты для текста
     val textPaint = remember(density) {
         Paint().apply {
             color = android.graphics.Color.WHITE
-            textSize = with(density) { 32.sp.toPx() }
+            textSize = with(density) { textSizeXXXLarge.toPx() }
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
@@ -149,7 +154,7 @@ fun CategoryPieChart(
     val subTextPaint = remember(density) {
         Paint().apply {
             color = android.graphics.Color.WHITE
-            textSize = with(density) { 16.sp.toPx() }
+            textSize = with(density) { textSizeNormal.toPx() }
             textAlign = Paint.Align.CENTER
             alpha = 180
         }
@@ -164,7 +169,7 @@ fun CategoryPieChart(
     ) {
         Canvas(
             modifier = Modifier
-                .size(280.dp)
+                .size(dimensionResource(R.dimen.chart_height_large))
         ) {
             val canvasWidth = size.width
             val canvasHeight = size.height
@@ -306,7 +311,7 @@ fun CategoryList(
         modifier = modifier
             .fillMaxWidth()
             .background(surfaceVariantColor)
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = dimensionResource(R.dimen.spacing_large))
     ) {
         sortedData.forEach { (category, amount) ->
             val percentage = amount.amount.toDouble() / total.amount.toDouble() * 100

@@ -21,6 +21,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -73,12 +74,12 @@ fun MonthlyBarChart(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(8.dp)
+            .padding(dimensionResource(R.dimen.spacing_large))
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(chartHeight)
+                .height(dimensionResource(R.dimen.chart_height))
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             Canvas(

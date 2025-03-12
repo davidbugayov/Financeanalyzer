@@ -193,4 +193,10 @@
     <string name="cd_search_icon">Поиск</string>
     <string name="cd_close_icon">Закрыть</string>
     <string name="cd_settings_icon">Настройки</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="show_expenses">Показать расходы</string>
+    <string name="show_income">Показать доходы</string>
+    <string name="average_values">Средние показатели</string>
+    <string name="analyze_expenses_for_budget">Анализ ваших средних трат для планирования бюджета</string>
 </resources>
