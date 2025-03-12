@@ -176,4 +176,21 @@
     <string name="average_daily">Среднее за день</string>
     <string name="average_monthly">Среднее за месяц</string>
     <string name="average_yearly">Среднее за год</string>
+
+    <!-- Accessibility strings -->
+    <string name="cd_back_button">Вернуться назад</string>
+    <string name="cd_add_transaction">Добавить новую транзакцию</string>
+    <string name="cd_show_statistics">Показать статистику</string>
+    <string name="cd_show_history">Показать историю транзакций</string>
+    <string name="cd_expand_collapse">Развернуть или свернуть</string>
+    <string name="cd_select_period">Выбрать период</string>
+    <string name="cd_select_category">Выбрать категорию</string>
+    <string name="cd_info_icon">Информация</string>
+    <string name="cd_delete_icon">Удалить</string>
+    <string name="cd_edit_icon">Редактировать</string>
+    <string name="cd_filter_icon">Фильтр</string>
+    <string name="cd_sort_icon">Сортировка</string>
+    <string name="cd_search_icon">Поиск</string>
+    <string name="cd_close_icon">Закрыть</string>
+    <string name="cd_settings_icon">Настройки</string>
 </resources>

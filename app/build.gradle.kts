@@ -25,6 +25,7 @@ android {
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
+        //noinspection EditedTargetSdkVersion
         targetSdk = 35
         versionCode = 6
         versionName = "1.4.1"
@@ -181,6 +182,8 @@ dependencies {
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.splashscreen)
+    implementation(libs.androidx.constraintlayout)
+    implementation(libs.material)
     
     // Compose
     implementation(platform(libs.compose.bom))
@@ -189,6 +192,11 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
+    implementation(libs.compose.material3.window.size)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.runtime.livedata)
+    implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
     

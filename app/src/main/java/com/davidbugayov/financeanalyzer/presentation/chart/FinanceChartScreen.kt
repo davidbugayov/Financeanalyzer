@@ -674,13 +674,13 @@ fun FinanceChartScreen(
                                 ) {
                                     Box(
                                         modifier = Modifier
-                                            .weight((savingsRate / 100).toFloat().coerceAtLeast(0.01f))
+                                            .weight((savingsRate / 100).coerceAtLeast(0.01).toFloat())
                                             .fillMaxHeight()
                                             .background(LocalIncomeColor.current)
                                     )
                                     Box(
                                         modifier = Modifier
-                                            .weight((1 - (savingsRate / 100)).toFloat().coerceAtLeast(0.01f))
+                                            .weight((1 - (savingsRate / 100)).coerceAtLeast(0.01).toFloat())
                                             .fillMaxHeight()
                                             .background(MaterialTheme.colorScheme.surfaceVariant)
                                     )

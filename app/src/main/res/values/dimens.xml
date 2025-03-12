@@ -22,6 +22,11 @@
     <dimen name="height_nav_bar">80dp</dimen>
     <dimen name="height_chart">300dp</dimen>
     <dimen name="height_empty_state">150dp</dimen>
+    <dimen name="height_list_item">72dp</dimen>
+    <dimen name="height_bottom_sheet">350dp</dimen>
+    <dimen name="height_dialog">450dp</dimen>
+    <dimen name="height_progress_indicator">4dp</dimen>
+    <dimen name="height_divider">1dp</dimen>
 
     <!-- Размеры текста -->
     <dimen name="text_size_micro">10sp</dimen>
@@ -37,9 +42,71 @@
     <dimen name="radius_small">4dp</dimen>
     <dimen name="radius_medium">8dp</dimen>
     <dimen name="radius_large">16dp</dimen>
+    <dimen name="radius_xlarge">24dp</dimen>
+    <dimen name="radius_card">12dp</dimen>
+    <dimen name="radius_button">20dp</dimen>
+    <dimen name="radius_fab">28dp</dimen>
 
     <!-- Толщина линий -->
     <dimen name="stroke_thin">1dp</dimen>
     <dimen name="stroke_medium">2dp</dimen>
     <dimen name="stroke_thick">3dp</dimen>
+
+    <!-- Размеры для графиков -->
+    <dimen name="chart_height">200dp</dimen>
+    <dimen name="chart_height_large">300dp</dimen>
+    <dimen name="chart_bar_width">24dp</dimen>
+    <dimen name="chart_line_width">2dp</dimen>
+    <dimen name="chart_dot_radius">4dp</dimen>
+    <dimen name="chart_legend_height">48dp</dimen>
+    <dimen name="chart_axis_text_size">12sp</dimen>
+    <dimen name="chart_label_text_size">14sp</dimen>
+
+    <!-- Размеры для анимаций -->
+    <dimen name="anim_offset_small">20dp</dimen>
+    <dimen name="anim_offset_medium">40dp</dimen>
+    <dimen name="anim_offset_large">60dp</dimen>
+
+    <!-- Размеры для навигации -->
+    <dimen name="nav_header_height">176dp</dimen>
+    <dimen name="nav_drawer_width">280dp</dimen>
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="status_bar_height">24dp</dimen>
+    <dimen name="navigation_bar_height">48dp</dimen>
+
+    <!-- Размеры для карточек -->
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="card_content_padding">16dp</dimen>
+    <dimen name="card_spacing">8dp</dimen>
+    <dimen name="card_image_height">200dp</dimen>
+
+    <!-- Размеры для кнопок -->
+    <dimen name="button_height">48dp</dimen>
+    <dimen name="button_min_width">88dp</dimen>
+    <dimen name="button_padding">16dp</dimen>
+    <dimen name="button_elevation">2dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
+
+    <!-- Размеры для диалогов -->
+    <dimen name="dialog_padding">24dp</dimen>
+    <dimen name="dialog_corner_radius">28dp</dimen>
+    <dimen name="dialog_elevation">24dp</dimen>
+    <dimen name="dialog_min_width">280dp</dimen>
+    <dimen name="dialog_max_width">560dp</dimen>
+
+    <!-- Размеры для полей ввода -->
+    <dimen name="input_height">56dp</dimen>
+    <dimen name="input_padding">16dp</dimen>
+    <dimen name="input_text_size">16sp</dimen>
+    <dimen name="input_helper_text_size">12sp</dimen>
+    <dimen name="input_error_text_size">12sp</dimen>
+
+    <!-- Размеры для списков -->
+    <dimen name="list_item_height">72dp</dimen>
+    <dimen name="list_item_padding">16dp</dimen>
+    <dimen name="list_icon_size">40dp</dimen>
+    <dimen name="list_divider_height">1dp</dimen>
+    <dimen name="list_section_height">48dp</dimen>
 </resources> 

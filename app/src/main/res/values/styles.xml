@@ -1,0 +1,113 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Стили для текста -->
+    <style name="TextAppearance.FinanceAnalyzer.Headline1" parent="TextAppearance.Material3.HeadlineLarge">
+        <item name="android:textSize">@dimen/text_size_xxxlarge</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.FinanceAnalyzer.Headline2" parent="TextAppearance.Material3.HeadlineMedium">
+        <item name="android:textSize">@dimen/text_size_xxlarge</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.FinanceAnalyzer.Title" parent="TextAppearance.Material3.TitleLarge">
+        <item name="android:textSize">@dimen/text_size_xlarge</item>
+        <item name="android:textStyle">bold</item>
+    </style>
+
+    <style name="TextAppearance.FinanceAnalyzer.Subtitle" parent="TextAppearance.Material3.TitleMedium">
+        <item name="android:textSize">@dimen/text_size_large</item>
+    </style>
+
+    <style name="TextAppearance.FinanceAnalyzer.Body" parent="TextAppearance.Material3.BodyMedium">
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="TextAppearance.FinanceAnalyzer.Caption" parent="TextAppearance.Material3.BodySmall">
+        <item name="android:textSize">@dimen/text_size_small</item>
+    </style>
+
+    <!-- Стили для карточек -->
+    <style name="CardView.FinanceAnalyzer" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardCornerRadius">@dimen/card_corner_radius</item>
+        <item name="cardElevation">@dimen/card_elevation</item>
+        <item name="contentPadding">@dimen/card_content_padding</item>
+        <item name="android:layout_margin">@dimen/card_spacing</item>
+    </style>
+
+    <style name="CardView.FinanceAnalyzer.Transaction" parent="CardView.FinanceAnalyzer">
+        <item name="android:minHeight">@dimen/list_item_height</item>
+    </style>
+
+    <!-- Стили для кнопок -->
+    <style name="Button.FinanceAnalyzer" parent="Widget.Material3.Button">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:minWidth">@dimen/button_min_width</item>
+        <item name="android:padding">@dimen/button_padding</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="Button.FinanceAnalyzer.Text" parent="Widget.Material3.Button.TextButton">
+        <item name="android:minHeight">@dimen/button_height</item>
+        <item name="android:textSize">@dimen/text_size_normal</item>
+    </style>
+
+    <style name="Button.FinanceAnalyzer.Icon" parent="Widget.Material3.Button.IconButton">
+        <item name="android:minWidth">@dimen/button_height</item>
+        <item name="android:minHeight">@dimen/button_height</item>
+    </style>
+
+    <!-- Стили для полей ввода -->
+    <style name="TextInputLayout.FinanceAnalyzer" parent="Widget.Material3.TextInputLayout.OutlinedBox">
+        <item name="android:layout_height">@dimen/input_height</item>
+        <item name="android:padding">@dimen/input_padding</item>
+        <item name="android:textSize">@dimen/input_text_size</item>
+        <item name="helperTextTextAppearance">@style/TextAppearance.FinanceAnalyzer.Caption</item>
+        <item name="errorTextAppearance">@style/TextAppearance.FinanceAnalyzer.Caption</item>
+    </style>
+
+    <!-- Стили для диалогов -->
+    <style name="DialogTheme.FinanceAnalyzer" parent="ThemeOverlay.Material3.Dialog.Alert">
+        <item name="android:windowMinWidthMajor">@dimen/dialog_min_width</item>
+        <item name="android:windowMinWidthMinor">@dimen/dialog_min_width</item>
+        <item name="android:padding">@dimen/dialog_padding</item>
+        <item name="cornerRadius">@dimen/dialog_corner_radius</item>
+    </style>
+
+    <!-- Стили для списков -->
+    <style name="ListItem.FinanceAnalyzer" parent="">
+        <item name="android:minHeight">@dimen/list_item_height</item>
+        <item name="android:padding">@dimen/list_item_padding</item>
+    </style>
+
+    <!-- Стили для разделителей -->
+    <style name="Divider.FinanceAnalyzer" parent="">
+        <item name="android:layout_height">@dimen/height_divider</item>
+        <item name="android:background">?attr/colorOutline</item>
+    </style>
+
+    <!-- Стили для графиков -->
+    <style name="Chart.FinanceAnalyzer" parent="">
+        <item name="android:layout_height">@dimen/chart_height</item>
+        <item name="android:padding">@dimen/spacing_medium</item>
+    </style>
+
+    <style name="Chart.FinanceAnalyzer.Large" parent="Chart.FinanceAnalyzer">
+        <item name="android:layout_height">@dimen/chart_height_large</item>
+    </style>
+
+    <!-- Стили для тулбара -->
+    <style name="Toolbar.FinanceAnalyzer" parent="Widget.Material3.Toolbar">
+        <item name="android:layout_height">@dimen/height_toolbar</item>
+        <item name="titleTextAppearance">@style/TextAppearance.FinanceAnalyzer.Title</item>
+        <item name="subtitleTextAppearance">@style/TextAppearance.FinanceAnalyzer.Subtitle</item>
+    </style>
+
+    <!-- Стили для нижней навигации -->
+    <style name="BottomNavigation.FinanceAnalyzer" parent="Widget.Material3.BottomNavigationView">
+        <item name="android:layout_height">@dimen/bottom_nav_height</item>
+        <item name="itemTextAppearanceActive">@style/TextAppearance.FinanceAnalyzer.Caption</item>
+        <item name="itemTextAppearanceInactive">@style/TextAppearance.FinanceAnalyzer.Caption</item>
+    </style>
+</resources> 
