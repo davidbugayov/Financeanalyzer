@@ -50,9 +50,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -88,11 +85,9 @@ fun FinanceChartScreen(
     val isLoading by viewModel.isLoading.collectAsState()
     val error by viewModel.error.collectAsState()
     val scrollState = rememberScrollState()
-    val layoutDirection = LocalLayoutDirection.current
-    val density = LocalDensity.current
 
     // Convert dimension resource to sp
-    val textSizeLarge = 18.sp
+    val textSizeLarge = dimensionResource(id = R.dimen.text_size_large).value.sp
 
     // Состояние для диалога с информацией о норме сбережений
     var showSavingsRateInfo by remember { mutableStateOf(false) }
@@ -116,6 +111,11 @@ fun FinanceChartScreen(
     val periodText = remember(startDate, endDate) {
         "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
     }
+
+    val weekString = stringResource(R.string.week)
+    val monthString = stringResource(R.string.month)
+    val yearString = stringResource(R.string.year)
+    val allTimeString = stringResource(R.string.all_time)
 
     // Фильтрация транзакций по выбранному периоду
     val filteredTransactions = remember(transactions, startDate, endDate) {
@@ -154,6 +154,13 @@ fun FinanceChartScreen(
         .map { it.amount }
         .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
+    val periodOptions = listOf(
+        weekString,
+        monthString,
+        yearString,
+        allTimeString
+    )
+
     Scaffold(
         topBar = {
             TopAppBar(
@@ -181,7 +188,7 @@ fun FinanceChartScreen(
                         ) {
                             Icon(
                                 Icons.Default.DateRange,
-                                contentDescription = "Выбрать период"
+                                contentDescription = stringResource(R.string.cd_select_period)
                             )
                         }
                     }
@@ -193,8 +200,8 @@ fun FinanceChartScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(
-                    start = paddingValues.calculateLeftPadding(layoutDirection),
-                    end = paddingValues.calculateRightPadding(layoutDirection),
+                    start = dimensionResource(id = R.dimen.spacing_normal),
+                    end = dimensionResource(id = R.dimen.spacing_normal),
                     top = paddingValues.calculateTopPadding(),
                     bottom = paddingValues.calculateBottomPadding()
                 )
@@ -257,7 +264,6 @@ fun FinanceChartScreen(
                                 .padding(dimensionResource(R.dimen.spacing_medium)),
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
-                            val periodOptions = listOf("Неделя", "Месяц", "Год", "Все")
                             var selectedPeriod by remember { mutableStateOf(periodOptions[0]) }
 
                             periodOptions.forEach { period ->
@@ -276,28 +282,28 @@ fun FinanceChartScreen(
                                             selectedPeriod = period
                                             // Обновляем даты в зависимости от выбранного периода
                                             when (period) {
-                                                "Неделя" -> {
+                                                weekString -> {
                                                     endDate = Calendar.getInstance().time
                                                     startDate = Calendar.getInstance().apply {
                                                         time = endDate
                                                         add(Calendar.DAY_OF_YEAR, -7)
                                                     }.time
                                                 }
-                                                "Месяц" -> {
+                                                monthString -> {
                                                     endDate = Calendar.getInstance().time
                                                     startDate = Calendar.getInstance().apply {
                                                         time = endDate
                                                         add(Calendar.MONTH, -1)
                                                     }.time
                                                 }
-                                                "Год" -> {
+                                                yearString -> {
                                                     endDate = Calendar.getInstance().time
                                                     startDate = Calendar.getInstance().apply {
                                                         time = endDate
                                                         add(Calendar.YEAR, -1)
                                                     }.time
                                                 }
-                                                "Все" -> {
+                                                allTimeString -> {
                                                     endDate = Calendar.getInstance().time
                                                     startDate = Calendar.getInstance().apply {
                                                         time = endDate
@@ -666,7 +672,7 @@ fun FinanceChartScreen(
                                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
 
                                 Text(
-                                    text = "Процент дохода, который вы сохраняете",
+                                    text = stringResource(R.string.savings_percentage),
                                     fontSize = 14.sp,
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
@@ -702,19 +708,19 @@ fun FinanceChartScreen(
                                 ) {
                                     Text(
                                         text = when {
-                                            savingsRate < 10 -> "Низкая"
-                                            savingsRate < 20 -> "Средняя"
-                                            else -> "Хорошая"
+                                            savingsRate < 10 -> stringResource(R.string.low)
+                                            savingsRate < 20 -> stringResource(R.string.medium)
+                                            else -> stringResource(R.string.good)
                                         },
                                         fontSize = 12.sp,
                                         color = when {
-                                            savingsRate < 10 -> Color(0xFFEF5350)
-                                            savingsRate < 20 -> Color(0xFFFFA726)
-                                            else -> Color(0xFF66BB6A)
+                                            savingsRate < 10 -> MaterialTheme.colorScheme.error
+                                            savingsRate < 20 -> MaterialTheme.colorScheme.tertiary
+                                            else -> LocalIncomeColor.current
                                         }
                                     )
                                     Text(
-                                        text = "Рекомендуется: 20% и выше",
+                                        text = stringResource(R.string.recommended_savings_rate),
                                         fontSize = 12.sp,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                                     )
@@ -761,65 +767,69 @@ fun FinanceChartScreen(
                                 .padding(vertical = 8.dp)
                         ) {
                             Text(
-                                text = "Норма сбережений - это важный финансовый показатель, который показывает, какую часть вашего дохода вы откладываете.",
+                                text = stringResource(R.string.savings_rate_description),
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
 
                             Text(
-                                text = "Как рассчитывается:",
+                                text = stringResource(R.string.how_calculated),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = "Норма сбережений = ((Доходы - Расходы) / Доходы) × 100%",
+                                text = stringResource(R.string.savings_rate_formula),
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
 
                             Text(
-                                text = "Рекомендуемые значения:",
+                                text = stringResource(R.string.recommended_values),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = "• Низкая: менее 10%\n• Средняя: 10-20%\n• Хорошая: 20% и выше",
+                                text = stringResource(R.string.recommended_values_list),
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
 
                             Text(
-                                text = "Почему это важно:",
+                                text = stringResource(R.string.importance),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = "• Помогает создать финансовую подушку безопасности\n" +
-                                        "• Позволяет достигать долгосрочных финансовых целей\n" +
-                                        "• Обеспечивает финансовую стабильность\n" +
-                                        "• Защищает от непредвиденных расходов",
+                                text = stringResource(R.string.importance_list),
                                 fontSize = 14.sp,
                                 modifier = Modifier.padding(bottom = 16.dp)
                             )
 
                             Text(
-                                text = "Совет:",
+                                text = stringResource(R.string.advice),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 16.sp,
                                 modifier = Modifier.padding(bottom = 8.dp)
                             )
                             Text(
-                                text = "Старайтесь поддерживать норму сбережений на уровне 20% и выше. Это поможет вам создать надежный финансовый фундамент и достичь ваших финансовых целей.",
-                                fontSize = 14.sp
+                                text = stringResource(R.string.advice_text),
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(bottom = 16.dp)
+                            )
+
+                            Text(
+                                text = stringResource(R.string.understood),
+                                fontSize = 14.sp,
+                                modifier = Modifier.padding(bottom = 16.dp)
                             )
                         }
                     },
                     confirmButton = {
                         TextButton(onClick = { showSavingsRateInfo = false }) {
-                            Text("Понятно")
+                            Text(stringResource(R.string.understood))
                         }
                     }
                 )
@@ -831,7 +841,7 @@ fun FinanceChartScreen(
                     onDismissRequest = { showPeriodDialog = false },
                     title = {
                         Text(
-                            text = "Выберите период",
+                            text = stringResource(R.string.select_period),
                             fontSize = 20.sp,
                             fontWeight = FontWeight.Bold
                         )
@@ -854,9 +864,9 @@ fun FinanceChartScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "От",
+                                    text = stringResource(R.string.from),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.width(40.dp)
+                                    modifier = Modifier.width(dimensionResource(R.dimen.width_large))
                                 )
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -864,14 +874,14 @@ fun FinanceChartScreen(
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(40.dp),
+                                        .height(dimensionResource(R.dimen.height_small)),
                                     shape = MaterialTheme.shapes.small,
                                     color = MaterialTheme.colorScheme.surfaceVariant
                                 ) {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .padding(horizontal = 12.dp),
+                                            .padding(horizontal = dimensionResource(R.dimen.padding_small)),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
@@ -894,9 +904,9 @@ fun FinanceChartScreen(
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
                                 Text(
-                                    text = "До",
+                                    text = stringResource(R.string.to),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    modifier = Modifier.width(40.dp)
+                                    modifier = Modifier.width(dimensionResource(R.dimen.width_large))
                                 )
 
                                 Spacer(modifier = Modifier.width(8.dp))
@@ -904,14 +914,14 @@ fun FinanceChartScreen(
                                 Surface(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .height(40.dp),
+                                        .height(dimensionResource(R.dimen.height_small)),
                                     shape = MaterialTheme.shapes.small,
                                     color = MaterialTheme.colorScheme.surfaceVariant
                                 ) {
                                     Row(
                                         modifier = Modifier
                                             .fillMaxSize()
-                                            .padding(horizontal = 12.dp),
+                                            .padding(horizontal = dimensionResource(R.dimen.padding_small)),
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
@@ -925,7 +935,7 @@ fun FinanceChartScreen(
                     },
                     confirmButton = {
                         TextButton(onClick = { showPeriodDialog = false }) {
-                            Text("Закрыть")
+                            Text(stringResource(R.string.close))
                         }
                     }
                 )
@@ -981,7 +991,7 @@ private fun SummarySection(
     period: String
 ) {
     val balance = income - expense
-    val incomeColor = Color(0xFF66BB6A)  // Зеленый цвет для доходов
+    val incomeColor = LocalIncomeColor.current  // Зеленый цвет для доходов
     val expenseColor = LocalExpenseColor.current  // Красный цвет для расходов
     val balanceColor = if (balance.isNegative()) expenseColor else incomeColor
 

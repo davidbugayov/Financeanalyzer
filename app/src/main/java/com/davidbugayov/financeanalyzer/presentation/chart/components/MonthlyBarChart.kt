@@ -21,7 +21,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
-import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -42,44 +42,69 @@ import java.util.Locale
  * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
-fun MonthlyBarChart(
-    data: Map<String, ChartMonthlyData>,
-    modifier: Modifier = Modifier
+private fun ChartLegend(
+    monthStr: String,
+    monthYearFormatter: DateTimeFormatter,
+    fullDateFormatter: DateTimeFormatter
 ) {
-    val maxAmount = data.values.maxOf { maxOf(it.totalIncome.amount.toDouble(), it.totalExpense.amount.toDouble()) }
-    val barWidth = 24.dp
-    val chartHeight = 200.dp
-    val spaceBetweenBars = 24.dp
-    val monthYearFormatter = DateTimeFormatter.ofPattern("MM.yyyy")
-    val fullDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-    
     fun parseDate(dateStr: String): YearMonth {
         return try {
-            // Пробуем формат MM.yyyy
             YearMonth.parse(dateStr, monthYearFormatter)
         } catch (e: Exception) {
             try {
-                // Пробуем формат dd.MM.yyyy
                 val date = java.time.LocalDate.parse(dateStr, fullDateFormatter)
                 YearMonth.of(date.year, date.month)
             } catch (e: Exception) {
-                // Пробуем формат dd.MM и добавляем текущий год
                 val currentYear = YearMonth.now().year
                 val date = java.time.LocalDate.parse("$dateStr.$currentYear", fullDateFormatter)
                 YearMonth.of(date.year, date.month)
             }
         }
     }
+
+    val yearMonth = parseDate(monthStr)
+    val monthName = yearMonth.month.getDisplayName(TextStyle.SHORT, Locale("ru"))
+    Text(
+        text = "$monthName ${yearMonth.year}",
+        style = MaterialTheme.typography.bodySmall,
+        color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+    )
+}
+
+@Composable
+fun MonthlyBarChart(
+    data: Map<String, ChartMonthlyData>,
+    modifier: Modifier = Modifier
+) {
+    val maxAmount = data.values.maxOf { maxOf(it.totalIncome.amount.toDouble(), it.totalExpense.amount.toDouble()) }
+    val barWidth = 24.dp
+    val spaceBetweenBars = 24.dp
+    val monthYearFormatter = DateTimeFormatter.ofPattern("MM.yyyy")
+    val fullDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
+    val density = LocalDensity.current
+    val errorColor = MaterialTheme.colorScheme.error
+    val primaryColor = MaterialTheme.colorScheme.primary
+
+    // Получаем значения размеров заранее
+    val spacingNormal = 16.dp
+    val chartHeight = 200.dp
+    val strokeThin = 1.dp
+    val spacingLarge = 8.dp
+    val spacingSmall = 4.dp
+    val textSizeSmall = 10.sp
+    val spacingXXSmall = 2.dp
+    val legendIconSize = 10.dp
+    val spacingMedium = 12.dp
     
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(dimensionResource(R.dimen.spacing_large))
+            .padding(spacingNormal)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .height(dimensionResource(R.dimen.chart_height))
+                .height(chartHeight)
                 .background(MaterialTheme.colorScheme.surface)
         ) {
             Canvas(
@@ -89,8 +114,8 @@ fun MonthlyBarChart(
             ) {
                 val availableWidth = size.width
                 val availableHeight = size.height
-                val barSpace = spaceBetweenBars.toPx()
-                val barWidthPx = barWidth.toPx()
+                val barWidthPx = with(density) { barWidth.toPx() }
+                val barSpace = with(density) { spaceBetweenBars.toPx() }
                 
                 // Горизонтальные линии сетки
                 val gridLines = 5
@@ -100,7 +125,7 @@ fun MonthlyBarChart(
                         color = Color.Gray.copy(alpha = 0.2f),
                         start = Offset(0f, y),
                         end = Offset(availableWidth, y),
-                        strokeWidth = 1.dp.toPx()
+                        strokeWidth = with(density) { strokeThin.toPx() }
                     )
                     
                     // Значения на оси Y
@@ -108,11 +133,11 @@ fun MonthlyBarChart(
                     drawIntoCanvas { canvas ->
                         canvas.nativeCanvas.drawText(
                             Money(amount).format(false),
-                            8.dp.toPx(),
-                            y - 4.dp.toPx(),
+                            with(density) { spacingLarge.toPx() },
+                            y - with(density) { spacingSmall.toPx() },
                             android.graphics.Paint().apply {
                                 color = android.graphics.Color.GRAY
-                                textSize = 10.sp.toPx()
+                                textSize = with(density) { textSizeSmall.toPx() }
                                 textAlign = android.graphics.Paint.Align.LEFT
                             }
                         )
@@ -126,7 +151,7 @@ fun MonthlyBarChart(
                     // Расходы (красный столбец)
                     val expenseHeight = (monthData.totalExpense.amount.toDouble() / maxAmount * availableHeight).toFloat()
                     drawRect(
-                        color = Color(0xFFF44336),
+                        color = errorColor,
                         topLeft = Offset(x, availableHeight - expenseHeight),
                         size = Size(barWidthPx, expenseHeight)
                     )
@@ -134,8 +159,8 @@ fun MonthlyBarChart(
                     // Доходы (зеленый столбец)
                     val incomeHeight = (monthData.totalIncome.amount.toDouble() / maxAmount * availableHeight).toFloat()
                     drawRect(
-                        color = Color(0xFF4CAF50),
-                        topLeft = Offset(x + barWidthPx + 2.dp.toPx(), availableHeight - incomeHeight),
+                        color = primaryColor,
+                        topLeft = Offset(x + barWidthPx + with(density) { spacingXXSmall.toPx() }, availableHeight - incomeHeight),
                         size = Size(barWidthPx, incomeHeight)
                     )
                 }
@@ -146,17 +171,11 @@ fun MonthlyBarChart(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 8.dp),
+                .padding(top = spacingLarge),
             horizontalArrangement = Arrangement.SpaceEvenly
         ) {
             data.entries.toList().reversed().forEach { (monthStr, _) ->
-                val yearMonth = parseDate(monthStr)
-                val monthName = yearMonth.month.getDisplayName(TextStyle.SHORT, Locale("ru"))
-                Text(
-                    text = "$monthName ${yearMonth.year}",
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
-                )
+                ChartLegend(monthStr, monthYearFormatter, fullDateFormatter)
             }
         }
         
@@ -164,29 +183,32 @@ fun MonthlyBarChart(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 4.dp),
+                .padding(top = spacingSmall),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically
         ) {
             Box(
                 modifier = Modifier
-                    .size(10.dp)
-                    .background(Color(0xFF4CAF50))
+                    .size(legendIconSize)
+                    .background(primaryColor)
             )
             Text(
                 text = stringResource(R.string.chart_income),
-                modifier = Modifier.padding(start = 4.dp, end = 12.dp),
+                modifier = Modifier.padding(
+                    start = spacingSmall,
+                    end = spacingMedium
+                ),
                 style = MaterialTheme.typography.bodySmall
             )
             
             Box(
                 modifier = Modifier
-                    .size(10.dp)
-                    .background(Color(0xFFF44336))
+                    .size(legendIconSize)
+                    .background(errorColor)
             )
             Text(
                 text = stringResource(R.string.chart_expenses),
-                modifier = Modifier.padding(start = 4.dp),
+                modifier = Modifier.padding(start = spacingSmall),
                 style = MaterialTheme.typography.bodySmall
             )
         }

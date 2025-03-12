@@ -59,7 +59,6 @@
     <string name="income_label">Доход: %s</string>
     <string name="expense_label">Расход: %s</string>
     <string name="balance_label">Баланс: %s</string>
-    <string name="select_period">Выбрать период</string>
     <string name="period_all">Все время</string>
     <string name="period_day">День</string>
     <string name="period_month">Месяц</string>
@@ -199,4 +198,29 @@
     <string name="show_income">Показать доходы</string>
     <string name="average_values">Средние показатели</string>
     <string name="analyze_expenses_for_budget">Анализ ваших средних трат для планирования бюджета</string>
+
+    <!-- Strings for FinanceChartScreen -->
+    <string name="low">Низкая</string>
+    <string name="medium">Средняя</string>
+    <string name="good">Хорошая</string>
+    <string name="recommended_savings_rate">Рекомендуется: 20% и выше</string>
+    <string name="savings_percentage">Процент дохода, который вы сохраняете</string>
+    <string name="understood">Понятно</string>
+    <string name="from">От</string>
+    <string name="to">До</string>
+    <string name="savings_rate_description">Норма сбережений - это важный финансовый показатель, который показывает, какую часть вашего дохода вы откладываете.</string>
+    <string name="how_calculated">Как рассчитывается:</string>
+    <string name="savings_rate_formula">Норма сбережений = ((Доходы - Расходы) / Доходы) × 100%</string>
+    <string name="recommended_values">Рекомендуемые значения:</string>
+    <string name="recommended_values_list" formatted="false">• Низкая: менее 10%\n• Средняя: 10-20%\n• Хорошая: 20% и выше</string>
+    <string name="importance">Почему это важно:</string>
+    <string name="importance_list">• Помогает создать финансовую подушку безопасности\n• Позволяет достигать долгосрочных финансовых целей\n• Обеспечивает финансовую стабильность\n• Защищает от непредвиденных расходов</string>
+    <string name="advice">Совет:</string>
+    <string name="advice_text">Старайтесь поддерживать норму сбережений на уровне 20% и выше. Это поможет вам создать надежный финансовый фундамент и достичь ваших финансовых целей.</string>
+
+    <!-- Adding missing string resources -->
+    <string name="year">Год</string>
+    <string name="all_time">Все</string>
+    <string name="select_period">Выберите период</string>
+    <string name="close">Закрыть</string>
 </resources>
