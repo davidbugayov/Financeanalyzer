@@ -20,12 +20,12 @@ fun getKeystoreProperties(): Properties {
 
 android {
     namespace = "com.davidbugayov.financeanalyzer"
-    compileSdk = 34
+    compileSdk = 35
 
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
-        targetSdk = 34
+        targetSdk = 35
         versionCode = 6
         versionName = "1.4.1"
 
@@ -39,6 +39,17 @@ android {
             getDefaultProguardFile("proguard-android-optimize.txt"),
             "proguard-rules.pro"
         )
+
+        // Настройка API и логирования для всех версий
+        buildConfigField("String", "API_BASE_URL", "\"https://api.financeanalyzer.com/\"")
+        buildConfigField("boolean", "ENABLE_LOGGING", "false")
+
+        // Firebase для всех версий
+        manifestPlaceholders["crashlyticsCollectionEnabled"] = "true"
+        manifestPlaceholders["analyticsCollectionEnabled"] = "true"
+
+        // Имя приложения по умолчанию
+        resValue("string", "app_name", "Деньги под Контролем")
     }
 
     signingConfigs {
@@ -80,42 +91,17 @@ android {
         }
         debug {
             isDebuggable = true
+            applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             buildConfigField("boolean", "DEBUG", "true")
-            // Добавляем правила ProGuard и для debug сборки
-//            isMinifyEnabled = true
-//            isShrinkResources = true
-//            proguardFiles(
-//                getDefaultProguardFile("proguard-android-optimize.txt"),
-//                "proguard-rules.pro"
-//            )
-        }
-    }
+            resValue("string", "app_name", "Деньги под Контролем Debug")
 
-    flavorDimensions += "environment"
-    
-    productFlavors {
-        create("dev") {
-            dimension = "environment"
-            versionNameSuffix = "-dev"
-            resValue("string", "app_name", "Finance Analyzer Dev")
-            buildConfigField("String", "API_BASE_URL", "\"https://api-dev.financeanalyzer.com/\"")
-            buildConfigField("boolean", "ENABLE_LOGGING", "true")
-            
-            // Дополнительные настройки для dev
+            // Отключаем Firebase для debug-сборки
             manifestPlaceholders["crashlyticsCollectionEnabled"] = "false"
             manifestPlaceholders["analyticsCollectionEnabled"] = "false"
-        }
-        
-        create("prod") {
-            dimension = "environment"
-            resValue("string", "app_name", "Деньги под Контролем")
-            buildConfigField("String", "API_BASE_URL", "\"https://api.financeanalyzer.com/\"")
-            buildConfigField("boolean", "ENABLE_LOGGING", "false")
+            manifestPlaceholders["performanceCollectionEnabled"] = "false"
             
-            // Дополнительные настройки для prod
-            manifestPlaceholders["crashlyticsCollectionEnabled"] = "true"
-            manifestPlaceholders["analyticsCollectionEnabled"] = "true"
+
         }
     }
 
@@ -173,6 +159,13 @@ android {
 
     lint {
         disable += "FlowOperatorInvokedInComposition"
+    }
+}
+
+// Отключаем Google Services для debug-сборки
+tasks.whenTaskAdded {
+    if (name.contains("Debug") && (name.contains("GoogleServices") || name.contains("Crashlytics"))) {
+        enabled = false
     }
 }
 
