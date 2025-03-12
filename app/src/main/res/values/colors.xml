@@ -1,11 +1,77 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="purple_200">#FFBB86FC</color>
-    <color name="purple_500">#FF6200EE</color>
-    <color name="purple_700">#FF3700B3</color>
-    <color name="teal_200">#FF03DAC5</color>
-    <color name="teal_700">#FF018786</color>
-    <color name="black">#FF000000</color>
-    <color name="white">#FFFFFFFF</color>
-    <color name="colorPrimary">#FF6200EE</color>
+    <!-- App compat colors -->
+    <color name="colorPrimary">@color/primary_light</color>
+
+    <!-- Primary colors -->
+    <color name="primary_light">#FF2196F3</color>
+    <color name="on_primary_light">#FFFFFFFF</color>
+    <color name="primary_container_light">#FFBBDEFB</color>
+    <color name="on_primary_container_light">#FF1976D2</color>
+    <color name="primary_dark">#FF90CAF9</color>
+    <color name="on_primary_dark">#FF000000</color>
+    <color name="primary_container_dark">#FF1976D2</color>
+    <color name="on_primary_container_dark">#FFBBDEFB</color>
+
+    <!-- Secondary colors -->
+    <color name="secondary_light">#FF03A9F4</color>
+    <color name="on_secondary_light">#FFFFFFFF</color>
+    <color name="secondary_container_light">#FFB3E5FC</color>
+    <color name="on_secondary_container_light">#FF0288D1</color>
+    <color name="secondary_dark">#FF81D4FA</color>
+    <color name="on_secondary_dark">#FF000000</color>
+    <color name="secondary_container_dark">#FF0288D1</color>
+    <color name="on_secondary_container_dark">#FFB3E5FC</color>
+
+    <!-- Tertiary colors -->
+    <color name="tertiary_light">#FF00BCD4</color>
+    <color name="on_tertiary_light">#FFFFFFFF</color>
+    <color name="tertiary_container_light">#FFB2EBF2</color>
+    <color name="on_tertiary_container_light">#FF0097A7</color>
+    <color name="tertiary_dark">#FF80DEEA</color>
+    <color name="on_tertiary_dark">#FF000000</color>
+    <color name="tertiary_container_dark">#FF0097A7</color>
+    <color name="on_tertiary_container_dark">#FFB2EBF2</color>
+
+    <!-- Error colors -->
+    <color name="error_light">#FFF44336</color>
+    <color name="on_error_light">#FFFFFFFF</color>
+    <color name="error_container_light">#FFFFCDD2</color>
+    <color name="on_error_container_light">#FFD32F2F</color>
+    <color name="error_dark">#FFEF9A9A</color>
+    <color name="on_error_dark">#FF000000</color>
+    <color name="error_container_dark">#FFD32F2F</color>
+    <color name="on_error_container_dark">#FFFFCDD2</color>
+
+    <!-- Background colors -->
+    <color name="background_light">#FFFAFAFA</color>
+    <color name="on_background_light">#FF212121</color>
+    <color name="background_dark">#FF121212</color>
+    <color name="on_background_dark">#FFFFFFFF</color>
+
+    <!-- Surface colors -->
+    <color name="surface_light">#FFFFFFFF</color>
+    <color name="on_surface_light">#FF212121</color>
+    <color name="surface_variant_light">#FFF5F5F5</color>
+    <color name="on_surface_variant_light">#FF757575</color>
+    <color name="surface_dark">#FF1E1E1E</color>
+    <color name="on_surface_dark">#FFFFFFFF</color>
+    <color name="surface_variant_dark">#FF2D2D2D</color>
+    <color name="on_surface_variant_dark">#FFBDBDBD</color>
+
+    <!-- Outline -->
+    <color name="outline_light">#FFBDBDBD</color>
+    <color name="outline_dark">#FF757575</color>
+
+    <!-- Income and Expense colors -->
+    <color name="income_light">#FF4CAF50</color>
+    <color name="income_dark">#FF81C784</color>
+    <color name="expense_light">#FFF44336</color>
+    <color name="expense_dark">#FFE57373</color>
+
+    <!-- Common colors -->
+    <color name="error">#FFD32F2F</color>
+    <color name="success">#FF388E3C</color>
+    <color name="warning">#FFFFA000</color>
+    <color name="info">#FF1976D2</color>
 </resources>
