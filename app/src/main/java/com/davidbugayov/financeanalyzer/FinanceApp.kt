@@ -2,24 +2,33 @@ package com.davidbugayov.financeanalyzer
 
 import android.app.Application
 import com.davidbugayov.financeanalyzer.di.appModule
-import com.davidbugayov.financeanalyzer.utils.TimberInitializer
+import com.davidbugayov.financeanalyzer.di.chartModule
+import com.davidbugayov.financeanalyzer.di.homeModule
+import com.google.firebase.FirebaseApp
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
-import org.koin.core.logger.Level
+import timber.log.Timber
 
 class FinanceApp : Application() {
     override fun onCreate() {
         super.onCreate()
-        
-        // Инициализируем Timber
-        TimberInitializer.init(BuildConfig.DEBUG)
-        
-        // Инициализируем Koin
+
+        if (BuildConfig.DEBUG) {
+            Timber.plant(Timber.DebugTree())
+        }
+
+        // Initialize Firebase
+        FirebaseApp.initializeApp(this)
+
         startKoin {
-            androidLogger(Level.ERROR)
+            androidLogger()
             androidContext(this@FinanceApp)
-            modules(appModule)
+            modules(
+                appModule,
+                chartModule,
+                homeModule
+            )
         }
     }
 } 

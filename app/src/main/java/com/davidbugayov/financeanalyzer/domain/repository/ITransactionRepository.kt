@@ -1,6 +1,8 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 /**
  * Интерфейс репозитория для работы с транзакциями.
@@ -32,4 +34,12 @@ interface ITransactionRepository {
      * @param transaction Обновленная транзакция
      */
     suspend fun updateTransaction(transaction: Transaction)
+
+    /**
+     * Получает транзакции за указанный период
+     * @param startDate Начальная дата периода
+     * @param endDate Конечная дата периода
+     * @return Flow со списком транзакций
+     */
+    suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>>
 } 

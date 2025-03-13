@@ -6,7 +6,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -16,6 +16,8 @@ import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -26,13 +28,13 @@ import java.util.Calendar
  * ViewModel для главного экрана.
  * Следует принципам MVI и Clean Architecture.
  *
- * @property loadTransactionsUseCase UseCase для загрузки транзакций
+ * @property getTransactionsUseCase UseCase для загрузки транзакций
  * @property addTransactionUseCase UseCase для добавления новых транзакций
  * @property _state Внутренний MutableStateFlow для хранения состояния экрана
  * @property state Публичный StateFlow для наблюдения за состоянием экрана
  */
 class HomeViewModel(
-    private val loadTransactionsUseCase: LoadTransactionsUseCase,
+    private val getTransactionsUseCase: GetTransactionsUseCase,
     private val addTransactionUseCase: AddTransactionUseCase
 ) : ViewModel(), KoinComponent {
 
@@ -97,22 +99,47 @@ class HomeViewModel(
     private fun loadTransactions() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
-            loadTransactionsUseCase().fold(
-                onSuccess = { transactions: List<Transaction> ->
-                    _state.update { it.copy(transactions = transactions, isLoading = false) }
-                    updateFilteredTransactions()
-                    calculateTotalStats()
-                },
-                onFailure = { exception: Throwable ->
-                    Timber.e(exception, "Failed to load transactions")
-                    _state.update {
-                        it.copy(
-                            error = exception.message ?: "Failed to load transactions",
-                            isLoading = false
-                        )
+            try {
+                val calendar = Calendar.getInstance()
+                val endDate = calendar.time
+                calendar.add(Calendar.MONTH, -1)
+                val startDate = calendar.time
+
+                getTransactionsUseCase(startDate, endDate)
+                    .catch { exception ->
+                        Timber.e(exception, "Failed to load transactions")
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = exception.message ?: "Failed to load transactions"
+                            )
+                        }
                     }
+                    .collectLatest { transactions ->
+                        val income = calculateTotalIncome(transactions)
+                        val expense = calculateTotalExpenses(transactions)
+                        val balance = income - expense
+
+                        _state.update {
+                            it.copy(
+                                transactions = transactions,
+                                isLoading = false,
+                                income = income,
+                                expense = expense,
+                                balance = balance
+                            )
+                        }
+                        updateFilteredTransactions()
+                    }
+            } catch (e: Exception) {
+                Timber.e(e, "Error loading transactions")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message ?: "Error loading transactions"
+                    )
                 }
-            )
+            }
         }
     }
     
@@ -156,7 +183,7 @@ class HomeViewModel(
         // Создаем ключ для кэша
         val cacheKey = FilterCacheKey(
             transactions = currentState.transactions,
-            filter = currentState.currentFilter
+            filter = currentState.currentFilter.toString()
         )
 
         // Получаем отфильтрованные транзакции из кэша или вычисляем их
@@ -244,61 +271,6 @@ class HomeViewModel(
     }
 
     /**
-     * Рассчитывает общую статистику по всем транзакциям
-     */
-    private fun calculateTotalStats() {
-        Timber.d("Calculating total stats")
-        val transactions = _state.value.transactions
-
-        // Получаем статистику из кэша или вычисляем её
-        val (totalIncome, totalExpense, balance) = statsCache.getOrPut(transactions) {
-            val income = transactions
-                .filter { !it.isExpense }
-                .map { it.amount }
-                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
-
-            val expense = transactions
-                .filter { it.isExpense }
-                .map { it.amount }
-                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
-
-            val balance = income - expense
-
-            Triple(income, expense, balance)
-        }
-
-        _state.update {
-            it.copy(
-                income = totalIncome,
-                expense = totalExpense,
-                balance = balance
-            )
-        }
-
-        Timber.d("Total stats calculated: Income=$totalIncome, Expense=$totalExpense, Balance=$balance")
-    }
-
-    /**
-     * Добавляет новую транзакцию
-     * @param transaction Транзакция для добавления
-     */
-    fun addTransaction(transaction: Transaction) {
-        viewModelScope.launch {
-            addTransactionUseCase(transaction).fold(
-                onSuccess = {
-                    // Очищаем кэши при добавлении новой транзакции
-                    clearCaches()
-                    loadTransactions()
-                },
-                onFailure = { exception: Throwable ->
-                    Timber.e(exception, "Failed to add transaction")
-                    _state.update { it.copy(error = exception.message ?: "Failed to add transaction") }
-                }
-            )
-        }
-    }
-
-    /**
      * Очищает все кэши
      */
     private fun clearCaches() {
@@ -311,21 +283,20 @@ class HomeViewModel(
      */
     private data class FilterCacheKey(
         val transactions: List<Transaction>,
-        val filter: TransactionFilter
+        val filter: String
     )
-}
 
-/**
- * Перечисление для фильтров транзакций
- */
-enum class TransactionFilter {
+    private fun calculateTotalIncome(transactions: List<Transaction>): Money {
+        return transactions
+            .filter { !it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+    }
 
-    /** Фильтр для отображения транзакций за сегодня */
-    TODAY,
-
-    /** Фильтр для отображения транзакций за неделю */
-    WEEK,
-
-    /** Фильтр для отображения транзакций за месяц */
-    MONTH
+    private fun calculateTotalExpenses(transactions: List<Transaction>): Money {
+        return transactions
+            .filter { it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+    }
 } 

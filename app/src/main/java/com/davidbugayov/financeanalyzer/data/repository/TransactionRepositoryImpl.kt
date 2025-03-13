@@ -6,7 +6,10 @@ import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import java.util.Date
 
 /**
  * Реализация репозитория для работы с транзакциями.
@@ -57,5 +60,20 @@ class TransactionRepositoryImpl(context: Context) : ITransactionRepository {
     override suspend fun updateTransaction(transaction: Transaction): Unit = withContext(Dispatchers.IO) {
         val entity = TransactionEntity.fromDomain(transaction)
         transactionDao.updateTransaction(entity)
+    }
+
+    /**
+     * Получает транзакции за указанный период
+     * @param startDate Начальная дата периода
+     * @param endDate Конечная дата периода
+     * @return Flow со списком транзакций
+     */
+    override suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>> = flow {
+        val transactions = withContext(Dispatchers.IO) {
+            transactionDao.getAllTransactions()
+                .map { it.toDomain() }
+                .filter { it.date >= startDate && it.date <= endDate }
+        }
+        emit(transactions)
     }
 } 

@@ -95,7 +95,7 @@ android {
             applicationIdSuffix = ".debug"
             versionNameSuffix = "-debug"
             buildConfigField("boolean", "DEBUG", "true")
-            resValue("string", "app_name", "Деньги под Контролем Debug")
+            resValue("string", "app_name", "Finanalyzer Debug")
 
             // Отключаем Firebase для debug-сборки
             manifestPlaceholders["crashlyticsCollectionEnabled"] = "false"

@@ -36,7 +36,7 @@ val appModule = module {
     single { CategoryPreferences.getInstance(androidContext()) }
     
     // Repositories
-    single<ITransactionRepository> { TransactionRepositoryImpl(androidContext()) }
+    single<ITransactionRepository> { TransactionRepositoryImpl(get()) }
 
     // Use cases
     single { LoadTransactionsUseCase(get()) }

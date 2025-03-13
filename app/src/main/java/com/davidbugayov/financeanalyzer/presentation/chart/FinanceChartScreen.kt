@@ -59,6 +59,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.chart.components.CategoryList
 import com.davidbugayov.financeanalyzer.presentation.chart.components.CategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesChart
@@ -81,9 +82,7 @@ fun FinanceChartScreen(
     viewModel: ChartViewModel,
     onNavigateBack: () -> Unit
 ) {
-    val transactions by viewModel.transactions.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val error by viewModel.error.collectAsState()
+    val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
 
     // Convert dimension resource to sp
@@ -96,20 +95,13 @@ fun FinanceChartScreen(
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
 
-    // Состояние для дат
-    var startDate by remember { mutableStateOf(Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time) }
-    var endDate by remember { mutableStateOf(Calendar.getInstance().time) }
-
-    // Состояние для выбора типа данных
-    var showExpenses by remember { mutableStateOf(true) }
-
     // Состояние для диалога выбора периода
     var showPeriodDialog by remember { mutableStateOf(false) }
 
     // Форматирование дат
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-    val periodText = remember(startDate, endDate) {
-        "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+    val periodText = remember(state.startDate, state.endDate) {
+        "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
     }
 
     val weekString = stringResource(R.string.week)
@@ -118,10 +110,10 @@ fun FinanceChartScreen(
     val allTimeString = stringResource(R.string.all_time)
 
     // Фильтрация транзакций по выбранному периоду
-    val filteredTransactions = remember(transactions, startDate, endDate) {
+    val filteredTransactions = remember(state.transactions, state.startDate, state.endDate) {
         // Устанавливаем начало дня для startDate
         val startCalendar = Calendar.getInstance()
-        startCalendar.time = startDate
+        startCalendar.time = state.startDate
         startCalendar.set(Calendar.HOUR_OF_DAY, 0)
         startCalendar.set(Calendar.MINUTE, 0)
         startCalendar.set(Calendar.SECOND, 0)
@@ -130,14 +122,14 @@ fun FinanceChartScreen(
 
         // Устанавливаем конец дня для endDate
         val endCalendar = Calendar.getInstance()
-        endCalendar.time = endDate
+        endCalendar.time = state.endDate
         endCalendar.set(Calendar.HOUR_OF_DAY, 23)
         endCalendar.set(Calendar.MINUTE, 59)
         endCalendar.set(Calendar.SECOND, 59)
         endCalendar.set(Calendar.MILLISECOND, 999)
         val end = endCalendar.time
 
-        transactions.filter {
+        state.transactions.filter {
             (it.date.after(start) || it.date == start) &&
                     (it.date.before(end) || it.date == end)
         }
@@ -206,7 +198,7 @@ fun FinanceChartScreen(
                     bottom = paddingValues.calculateBottomPadding()
                 )
         ) {
-            if (error != null) {
+            if (state.error != null) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -215,16 +207,16 @@ fun FinanceChartScreen(
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Text(
-                        text = stringResource(R.string.error_loading_transactions, error ?: ""),
+                        text = stringResource(R.string.error_loading_transactions, state.error ?: ""),
                         color = MaterialTheme.colorScheme.error,
                         modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_large)),
                         textAlign = TextAlign.Center
                     )
-                    Button(onClick = { viewModel.loadTransactions() }) {
+                    Button(onClick = { viewModel.handleIntent(ChartIntent.LoadTransactions) }) {
                         Text(stringResource(R.string.retry))
                     }
                 }
-            } else if (transactions.isEmpty() && !isLoading) {
+            } else if (state.transactions.isEmpty() && !state.isLoading) {
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
@@ -237,7 +229,7 @@ fun FinanceChartScreen(
                         textAlign = TextAlign.Center
                     )
                 }
-            } else if (!isLoading) {
+            } else if (!state.isLoading) {
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
@@ -283,32 +275,36 @@ fun FinanceChartScreen(
                                             // Обновляем даты в зависимости от выбранного периода
                                             when (period) {
                                                 weekString -> {
-                                                    endDate = Calendar.getInstance().time
-                                                    startDate = Calendar.getInstance().apply {
+                                                    val endDate = Calendar.getInstance().time
+                                                    val startDate = Calendar.getInstance().apply {
                                                         time = endDate
                                                         add(Calendar.DAY_OF_YEAR, -7)
                                                     }.time
+                                                    viewModel.handleIntent(ChartIntent.UpdateDateRange(startDate, endDate))
                                                 }
                                                 monthString -> {
-                                                    endDate = Calendar.getInstance().time
-                                                    startDate = Calendar.getInstance().apply {
+                                                    val endDate = Calendar.getInstance().time
+                                                    val startDate = Calendar.getInstance().apply {
                                                         time = endDate
                                                         add(Calendar.MONTH, -1)
                                                     }.time
+                                                    viewModel.handleIntent(ChartIntent.UpdateDateRange(startDate, endDate))
                                                 }
                                                 yearString -> {
-                                                    endDate = Calendar.getInstance().time
-                                                    startDate = Calendar.getInstance().apply {
+                                                    val endDate = Calendar.getInstance().time
+                                                    val startDate = Calendar.getInstance().apply {
                                                         time = endDate
                                                         add(Calendar.YEAR, -1)
                                                     }.time
+                                                    viewModel.handleIntent(ChartIntent.UpdateDateRange(startDate, endDate))
                                                 }
                                                 allTimeString -> {
-                                                    endDate = Calendar.getInstance().time
-                                                    startDate = Calendar.getInstance().apply {
+                                                    val endDate = Calendar.getInstance().time
+                                                    val startDate = Calendar.getInstance().apply {
                                                         time = endDate
-                                                        add(Calendar.YEAR, -10) // Условно "все время" - 10 лет
+                                                        add(Calendar.YEAR, -10)
                                                     }.time
+                                                    viewModel.handleIntent(ChartIntent.UpdateDateRange(startDate, endDate))
                                                 }
                                             }
                                         }
@@ -332,151 +328,12 @@ fun FinanceChartScreen(
                     }
 
                     // Секция с круговой диаграммой
-                    Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.spacing_large)),
-                        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
-                    ) {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.spacing_large))
-                        ) {
-                            Text(
-                                text = if (showExpenses)
-                                    stringResource(R.string.chart_expenses)
-                                else
-                                    stringResource(R.string.chart_income),
-                                fontSize = textSizeLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
-                            )
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-                            Text(
-                                text = if (showExpenses)
-                                    stringResource(R.string.expense_type)
-                                else
-                                    stringResource(R.string.income_type),
-                                fontSize = textSizeLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
-                            )
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-                            // Переключатель доходы/расходы в стиле CoinKeeper
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Column {
-                                    Text(
-                                        text = stringResource(R.string.expense),
-                                        fontSize = 14.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.show_expenses),
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                        modifier = Modifier.clickable { showExpenses = true }
-                                    )
-                                }
-
-                                Column(horizontalAlignment = Alignment.End) {
-                                    Text(
-                                        text = stringResource(R.string.income),
-                                        fontSize = 14.sp,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    Text(
-                                        text = stringResource(R.string.show_income),
-                                        fontSize = 16.sp,
-                                        fontWeight = FontWeight.Medium,
-                                        color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                                        modifier = Modifier.clickable { showExpenses = false }
-                                    )
-                                }
-                            }
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-                            // Визуальное представление выбора
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .height(8.dp)
-                                    .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
-                            ) {
-                                Box(
-                                    modifier = Modifier
-                                        .weight(if (showExpenses) 0.7f else 0.3f)
-                                        .fillMaxHeight()
-                                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f))
-                                )
-                                Box(
-                                    modifier = Modifier
-                                        .weight(if (!showExpenses) 0.7f else 0.3f)
-                                        .fillMaxHeight()
-                                        .background(LocalExpenseColor.current)
-                                )
-                            }
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-                            // Отображение соответствующей диаграммы
-                            if (showExpenses) {
-                                val expensesByCategory = viewModel.getExpensesByCategory(filteredTransactions)
-                                if (expensesByCategory.isNotEmpty()) {
-                                    // Отображаем круговую диаграмму
-                                    CategoryPieChart(
-                                        data = expensesByCategory,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(dimensionResource(R.dimen.chart_height_large))
-                                    )
-
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-                                    // Отображаем список категорий
-                                    CategoryList(
-                                        data = expensesByCategory,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                } else {
-                                    EmptyDataMessage(stringResource(R.string.no_expense_data))
-                                }
-                            } else {
-                                val incomeByCategory = viewModel.getIncomeByCategory(filteredTransactions)
-                                if (incomeByCategory.isNotEmpty()) {
-                                    // Отображаем круговую диаграмму
-                                    CategoryPieChart(
-                                        data = incomeByCategory,
-                                        isIncome = true,
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .height(dimensionResource(R.dimen.chart_height_large))
-                                    )
-
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-                                    // Отображаем список категорий
-                                    CategoryList(
-                                        data = incomeByCategory,
-                                        isIncome = true,
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-                                } else {
-                                    EmptyDataMessage(stringResource(R.string.no_income_data))
-                                }
-                            }
-                        }
-                    }
+                    PieChartSection(
+                        showExpenses = state.showExpenses,
+                        onShowExpensesChange = { viewModel.handleIntent(ChartIntent.ToggleExpenseView(it)) },
+                        filteredTransactions = filteredTransactions,
+                        viewModel = viewModel
+                    )
 
                     // Секция с графиком расходов по дням
                     Card(
@@ -735,7 +592,7 @@ fun FinanceChartScreen(
 
             // Индикатор загрузки
             AnimatedVisibility(
-                visible = isLoading,
+                visible = state.isLoading,
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
@@ -885,7 +742,7 @@ fun FinanceChartScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = SimpleDateFormat("dd.MM.yyyy", Locale("ru")).format(startDate),
+                                            text = SimpleDateFormat("dd.MM.yyyy", Locale("ru")).format(state.startDate),
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -925,7 +782,7 @@ fun FinanceChartScreen(
                                         verticalAlignment = Alignment.CenterVertically
                                     ) {
                                         Text(
-                                            text = SimpleDateFormat("dd.MM.yyyy", Locale("ru")).format(endDate),
+                                            text = SimpleDateFormat("dd.MM.yyyy", Locale("ru")).format(state.endDate),
                                             style = MaterialTheme.typography.bodyMedium
                                         )
                                     }
@@ -944,37 +801,32 @@ fun FinanceChartScreen(
             // Диалог выбора начальной даты
             if (showStartDatePicker) {
                 DatePickerDialog(
-                    initialDate = startDate,
+                    initialDate = state.startDate,
                     onDateSelected = { date ->
-                        startDate = date
+                        viewModel.handleIntent(ChartIntent.UpdateStartDate(date))
                         showStartDatePicker = false
-                        if (endDate.before(startDate)) {
+                        if (state.endDate.before(date)) {
                             showEndDatePicker = true
                         }
                     },
-                    onDismiss = {
-                        showStartDatePicker = false
-                    }
+                    onDismissRequest = { showStartDatePicker = false }
                 )
             }
 
             // Диалог выбора конечной даты
             if (showEndDatePicker) {
                 DatePickerDialog(
-                    initialDate = endDate,
+                    initialDate = state.endDate,
                     onDateSelected = { date ->
-                        if (date.before(startDate)) {
+                        if (date.before(state.startDate)) {
                             // Если конечная дата раньше начальной, меняем их местами
-                            endDate = startDate
-                            startDate = date
+                            viewModel.handleIntent(ChartIntent.UpdateDateRange(date, state.startDate))
                         } else {
-                            endDate = date
+                            viewModel.handleIntent(ChartIntent.UpdateEndDate(date))
                         }
                         showEndDatePicker = false
                     },
-                    onDismiss = {
-                        showEndDatePicker = false
-                    }
+                    onDismissRequest = { showEndDatePicker = false }
                 )
             }
         }
@@ -1118,32 +970,190 @@ private fun EmptyDataMessage(message: String) {
 private fun DatePickerDialog(
     initialDate: Date,
     onDateSelected: (Date) -> Unit,
-    onDismiss: () -> Unit
+    onDismissRequest: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialDate.time
     )
 
     DatePickerDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = onDismissRequest,
         confirmButton = {
             TextButton(
                 onClick = {
                     datePickerState.selectedDateMillis?.let {
                         onDateSelected(Date(it))
                     }
-                    onDismiss()
+                    onDismissRequest()
                 }
             ) {
                 Text(stringResource(R.string.ok))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = onDismissRequest) {
                 Text(stringResource(R.string.cancel))
             }
         }
     ) {
         DatePicker(state = datePickerState)
+    }
+}
+
+/**
+ * Секция с круговой диаграммой, отображающая распределение доходов или расходов по категориям
+ */
+@Composable
+private fun PieChartSection(
+    showExpenses: Boolean,
+    onShowExpensesChange: (Boolean) -> Unit,
+    filteredTransactions: List<Transaction>,
+    viewModel: ChartViewModel,
+    modifier: Modifier = Modifier
+) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(dimensionResource(R.dimen.spacing_large)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.spacing_large))
+        ) {
+            Text(
+                text = if (showExpenses)
+                    stringResource(R.string.chart_expenses)
+                else
+                    stringResource(R.string.chart_income),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
+            )
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+
+            Text(
+                text = if (showExpenses)
+                    stringResource(R.string.expense_type)
+                else
+                    stringResource(R.string.income_type),
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
+            )
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+
+            // Переключатель доходы/расходы в стиле CoinKeeper
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Column {
+                    Text(
+                        text = stringResource(R.string.expense),
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = stringResource(R.string.show_expenses),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        modifier = Modifier.clickable { onShowExpensesChange(true) }
+                    )
+                }
+
+                Column(horizontalAlignment = Alignment.End) {
+                    Text(
+                        text = stringResource(R.string.income),
+                        fontSize = 14.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                    Text(
+                        text = stringResource(R.string.show_income),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Medium,
+                        color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
+                        modifier = Modifier.clickable { onShowExpensesChange(false) }
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+
+            // Визуальное представление выбора
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(8.dp)
+                    .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(if (showExpenses) 0.7f else 0.3f)
+                        .fillMaxHeight()
+                        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f))
+                )
+                Box(
+                    modifier = Modifier
+                        .weight(if (!showExpenses) 0.7f else 0.3f)
+                        .fillMaxHeight()
+                        .background(LocalExpenseColor.current)
+                )
+            }
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+
+            // Отображение соответствующей диаграммы
+            if (showExpenses) {
+                val expensesByCategory = viewModel.getExpensesByCategory(filteredTransactions)
+                if (expensesByCategory.isNotEmpty()) {
+                    // Отображаем круговую диаграмму
+                    CategoryPieChart(
+                        data = expensesByCategory,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.chart_height_large))
+                    )
+
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+
+                    // Отображаем список категорий
+                    CategoryList(
+                        data = expensesByCategory,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    EmptyDataMessage(stringResource(R.string.no_expense_data))
+                }
+            } else {
+                val incomeByCategory = viewModel.getIncomeByCategory(filteredTransactions)
+                if (incomeByCategory.isNotEmpty()) {
+                    // Отображаем круговую диаграмму
+                    CategoryPieChart(
+                        data = incomeByCategory,
+                        isIncome = true,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.chart_height_large))
+                    )
+
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+
+                    // Отображаем список категорий
+                    CategoryList(
+                        data = incomeByCategory,
+                        isIncome = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                } else {
+                    EmptyDataMessage(stringResource(R.string.no_income_data))
+                }
+            }
+        }
     }
 } 

@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -75,13 +76,15 @@ fun TransactionHistoryScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    // Логируем открытие экрана истории
+    // Логируем открытие экрана истории только в релизной версии
     LaunchedEffect(Unit) {
-        val bundle = Bundle().apply {
-            putString(FirebaseAnalytics.Param.SCREEN_NAME, "transaction_history")
-            putString(FirebaseAnalytics.Param.SCREEN_CLASS, "TransactionHistoryScreen")
+        if (!BuildConfig.DEBUG) {
+            val bundle = Bundle().apply {
+                putString(FirebaseAnalytics.Param.SCREEN_NAME, "transaction_history")
+                putString(FirebaseAnalytics.Param.SCREEN_CLASS, "TransactionHistoryScreen")
+            }
+            Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
         }
-        Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
     }
 
     // Получаем список всех категорий из CategoriesViewModel
