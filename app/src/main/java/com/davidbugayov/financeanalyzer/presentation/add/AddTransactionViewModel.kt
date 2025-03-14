@@ -36,6 +36,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import java.math.BigDecimal
+import java.util.Date
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -172,6 +173,28 @@ class AddTransactionViewModel(
             is AddTransactionEvent.HideSuccessDialog -> {
                 _state.update { it.copy(isSuccess = false) }
             }
+            is AddTransactionEvent.ResetFields -> {
+                resetFields()
+            }
+        }
+    }
+
+    /**
+     * Сбрасывает все поля формы к начальным значениям
+     */
+    private fun resetFields() {
+        _state.update {
+            it.copy(
+                title = "",
+                amount = "",
+                category = "",
+                note = "",
+                isExpense = true,
+                selectedDate = Date(),
+                amountError = false,
+                categoryError = false,
+                titleError = false
+            )
         }
     }
 
@@ -211,6 +234,12 @@ class AddTransactionViewModel(
 
                 addTransactionUseCase(transaction)
                 _state.update { it.copy(isSuccess = true) }
+
+                // Сбрасываем поля после успешного добавления транзакции
+                resetFields()
+
+                // Обновляем виджеты
+                updateBalanceWidget()
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message) }
             } finally {

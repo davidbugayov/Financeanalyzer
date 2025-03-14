@@ -228,4 +228,5 @@
     <string name="amount_format">%.2f ₽</string>
     <string name="day">День</string>
     <string name="custom">Произвольный</string>
+    <string name="more_items_format">Ещё %d…</string>
 </resources>
