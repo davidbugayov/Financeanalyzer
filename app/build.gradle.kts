@@ -27,7 +27,7 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 35
-        versionCode = 6
+        versionCode = 7
         versionName = "1.4.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -50,7 +50,7 @@ android {
         manifestPlaceholders["analyticsCollectionEnabled"] = "true"
 
         // Имя приложения по умолчанию
-        resValue("string", "app_name", "Деньги под Контролем")
+        resValue("string", "app_name", "Финансовый Стиль")
     }
 
     signingConfigs {
