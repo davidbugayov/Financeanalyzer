@@ -41,16 +41,16 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
  * @param income The total income amount
  * @param expense The total expense amount
  * @param period The time period description (e.g., "01.01.2023 - 31.01.2023")
- * @param onPeriodClick Callback when the period text is clicked
  * @param modifier Optional modifier for customizing the layout
+ * @param onPeriodClick Callback when the period text is clicked
  */
 @Composable
 fun SummarySection(
     income: Money,
     expense: Money,
     period: String,
-    onPeriodClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    onPeriodClick: () -> Unit = {}
 ) {
     val balance = income - expense
     val incomeColor = LocalIncomeColor.current
