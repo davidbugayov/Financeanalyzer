@@ -1,8 +1,8 @@
 [versions]
 # Plugins
-androidGradlePlugin = "8.8.1"
+androidGradlePlugin = "8.8.2"
 kotlin = "1.9.22"
-googleServices = "4.4.1"
+googleServices = "4.4.2"
 firebaseCrashlytics = "2.9.9"
 coroutines = "1.7.3"
 
@@ -36,7 +36,6 @@ espressoCore = "3.6.1"
 timber = "5.0.1"
 
 # Other
-commonsCsv = "1.10.0"
 room = "2.6.1"
 roomKsp = "1.9.22-1.0.17"
 gson = "2.10.1"

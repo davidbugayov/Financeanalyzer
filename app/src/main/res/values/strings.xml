@@ -208,11 +208,11 @@
     <string name="understood">Понятно</string>
     <string name="from">От</string>
     <string name="to">До</string>
-    <string name="savings_rate_description">Норма сбережений - это важный финансовый показатель, который показывает, какую часть вашего дохода вы откладываете.</string>
+    <string name="savings_rate_description">Норма сбережений – это важный финансовый показатель, который показывает, какую часть вашего дохода вы откладываете.</string>
     <string name="how_calculated">Как рассчитывается:</string>
-    <string name="savings_rate_formula">Норма сбережений = ((Доходы - Расходы) / Доходы) × 100%</string>
+    <string name="savings_rate_formula">Норма сбережений = ((Доходы – Расходы) / Доходы) × 100%</string>
     <string name="recommended_values">Рекомендуемые значения:</string>
-    <string name="recommended_values_list" formatted="false">• Низкая: менее 10%\n• Средняя: 10-20%\n• Хорошая: 20% и выше</string>
+    <string name="recommended_values_list" formatted="false">• Низкая: менее 10%\n• Средняя: 10–20%\n• Хорошая: 20% и выше</string>
     <string name="importance">Почему это важно:</string>
     <string name="importance_list">• Помогает создать финансовую подушку безопасности\n• Позволяет достигать долгосрочных финансовых целей\n• Обеспечивает финансовую стабильность\n• Защищает от непредвиденных расходов</string>
     <string name="advice">Совет:</string>
