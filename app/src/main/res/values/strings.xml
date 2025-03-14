@@ -223,4 +223,7 @@
     <string name="all_time">Все</string>
     <string name="select_period">Выберите период</string>
     <string name="close">Закрыть</string>
+    <string name="start_date">Начальная дата</string>
+    <string name="end_date">Конечная дата</string>
+    <string name="amount_format">%.2f ₽</string>
 </resources>

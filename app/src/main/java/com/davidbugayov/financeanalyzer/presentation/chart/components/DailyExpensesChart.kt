@@ -29,7 +29,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartMonthlyData
+import com.davidbugayov.financeanalyzer.presentation.chart.model.ChartMonthlyData
 
 /**
  * Компонент для отображения расходов и доходов по дням в стиле CoinKeeper

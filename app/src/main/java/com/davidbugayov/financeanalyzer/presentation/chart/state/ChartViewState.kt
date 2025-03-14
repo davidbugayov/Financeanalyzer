@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart
+package com.davidbugayov.financeanalyzer.presentation.chart.state
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.util.Calendar

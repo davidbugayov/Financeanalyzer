@@ -160,7 +160,7 @@ fun AddTransactionScreen(
             // Диалоги
             if (state.showDatePicker) {
                 DatePickerDialog(
-                    selectedDate = state.selectedDate,
+                    initialDate = state.selectedDate,
                     onDateSelected = { date ->
                         viewModel.onEvent(AddTransactionEvent.SetDate(date))
                     },

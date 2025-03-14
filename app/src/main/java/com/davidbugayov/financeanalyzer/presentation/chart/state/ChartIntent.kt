@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart
+package com.davidbugayov.financeanalyzer.presentation.chart.state
 
 import java.util.Date
 

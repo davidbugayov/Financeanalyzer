@@ -11,32 +11,40 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
 import java.util.Date
 
+/**
+ * Диалог выбора даты.
+ *
+ * @param initialDate Начальная дата для отображения в календаре
+ * @param onDateSelected Callback, вызываемый при выборе даты
+ * @param onDismiss Callback, вызываемый при закрытии диалога
+ */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DatePickerDialog(
-    selectedDate: Date,
+    initialDate: Date,
     onDateSelected: (Date) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = selectedDate.time
+        initialSelectedDateMillis = initialDate.time
     )
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
         confirmButton = {
-            TextButton(onClick = {
-                datePickerState.selectedDateMillis?.let { millis ->
-                    val date = Date(millis)
-                    onDateSelected(date)
+            TextButton(
+                onClick = {
+                    datePickerState.selectedDateMillis?.let { millis ->
+                        onDateSelected(Date(millis))
+                    }
                 }
-            }) {
-                Text(text = stringResource(R.string.ok))
+            ) {
+                Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(text = stringResource(R.string.cancel))
+                Text(stringResource(R.string.cancel))
             }
         }
     ) {

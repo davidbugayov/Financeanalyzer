@@ -60,7 +60,7 @@ val appModule = module {
         )
     }
     viewModel { HomeViewModel(get(), get()) }
-    viewModel { ChartViewModel(get()) }
+    viewModel { ChartViewModel() }
     viewModel {
         AddTransactionViewModel(
             application = androidApplication(),

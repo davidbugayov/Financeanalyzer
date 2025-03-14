@@ -261,7 +261,7 @@ fun CategoryPieChart(
  * Компонент для отображения списка категорий
  */
 @Composable
-fun CategoryList(
+fun CategoryPieChartList(
     data: Map<String, Money>,
     modifier: Modifier = Modifier,
     isIncome: Boolean = false
@@ -325,4 +325,73 @@ fun CategoryList(
             )
         }
     }
+}
+
+/**
+ * Generates a list of colors for the pie chart segments.
+ *
+ * @param count Number of colors needed
+ * @param isIncome Whether the data represents income (true) or expenses (false)
+ * @return List of colors
+ */
+private fun generateCategoryColors(count: Int, isIncome: Boolean): List<Color> {
+    val baseColor = if (isIncome) {
+        Color(0xFF66BB6A) // Green for income
+    } else {
+        Color(0xFFEF5350) // Red for expenses
+    }
+
+    return List(count) { index ->
+        val hue = (baseColor.hue + index * 30f) % 360f
+        Color.hsv(
+            hue = hue,
+            saturation = 0.7f,
+            value = 0.9f
+        )
+    }
+}
+
+/**
+ * Extension function to get the hue component of a Color.
+ */
+private val Color.hue: Float
+    get() {
+        val min = minOf(red, green, blue)
+        val max = maxOf(red, green, blue)
+
+        if (min == max) return 0f
+
+        val hue = when (max) {
+            red -> (green - blue) / (max - min) * 60f
+            green -> (blue - red) / (max - min) * 60f + 120f
+            blue -> (red - green) / (max - min) * 60f + 240f
+            else -> 0f
+        }
+
+        return (hue + 360f) % 360f
+    }
+
+/**
+ * Creates a color from HSV values.
+ */
+private fun Color.Companion.hsv(hue: Float, saturation: Float, value: Float): Color {
+    val c = value * saturation
+    val x = c * (1 - kotlin.math.abs((hue / 60f) % 2 - 1))
+    val m = value - c
+
+    val (r, g, b) = when {
+        hue < 60 -> Triple(c, x, 0f)
+        hue < 120 -> Triple(x, c, 0f)
+        hue < 180 -> Triple(0f, c, x)
+        hue < 240 -> Triple(0f, x, c)
+        hue < 300 -> Triple(x, 0f, c)
+        else -> Triple(c, 0f, x)
+    }
+
+    return Color(
+        red = r + m,
+        green = g + m,
+        blue = b + m,
+        alpha = 1f
+    )
 } 
