@@ -30,7 +30,11 @@ class FilterTransactionsUseCase {
         endDate: Date? = null,
         category: String? = null
     ): List<Transaction> {
-        val filteredByPeriod = filterByPeriod(transactions, periodType, startDate, endDate)
+        val filteredByPeriod = if (periodType == PeriodType.CUSTOM && startDate != null && endDate != null) {
+            filterByDateRange(transactions, startDate, endDate)
+        } else {
+            filterByPeriod(transactions, periodType)
+        }
         return filterByCategory(filteredByPeriod, category)
     }
 
@@ -41,78 +45,44 @@ class FilterTransactionsUseCase {
      *
      * @param transactions Список транзакций для фильтрации
      * @param periodType Тип периода
-     * @param startDate Начальная дата для кастомного периода
-     * @param endDate Конечная дата для кастомного периода
      * @return Отфильтрованный по периоду список транзакций
      */
-    private fun filterByPeriod(
-        transactions: List<Transaction>,
-        periodType: PeriodType,
-        startDate: Date? = null,
-        endDate: Date? = null
-    ): List<Transaction> {
+    fun filterByPeriod(transactions: List<Transaction>, periodType: PeriodType): List<Transaction> {
         val calendar = Calendar.getInstance()
+        val endDate = calendar.time
 
-        return when (periodType) {
-            PeriodType.ALL -> transactions
-            PeriodType.DAY -> {
-                // Начало текущего дня
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                val startOfDay = calendar.time
-
-                // Конец текущего дня
-                calendar.set(Calendar.HOUR_OF_DAY, 23)
-                calendar.set(Calendar.MINUTE, 59)
-                calendar.set(Calendar.SECOND, 59)
-                calendar.set(Calendar.MILLISECOND, 999)
-                val endOfDay = calendar.time
-
-                transactions.filter {
-                    (it.date.after(startOfDay) || it.date == startOfDay) &&
-                            (it.date.before(endOfDay) || it.date == endOfDay)
-                }
+        val startDate = calendar.apply {
+            when (periodType) {
+                PeriodType.ALL -> add(Calendar.YEAR, -10)
+                PeriodType.DAY -> add(Calendar.DAY_OF_MONTH, -1)
+                PeriodType.WEEK -> add(Calendar.WEEK_OF_YEAR, -1)
+                PeriodType.MONTH -> add(Calendar.MONTH, -1)
+                PeriodType.QUARTER -> add(Calendar.MONTH, -3)
+                PeriodType.YEAR -> add(Calendar.YEAR, -1)
+                PeriodType.CUSTOM -> Unit // Не меняем даты для пользовательского периода
             }
-            PeriodType.MONTH -> {
-                calendar.add(Calendar.MONTH, -1)
-                val monthAgo = calendar.time
-                transactions.filter { it.date.after(monthAgo) || it.date == monthAgo }
-            }
-            PeriodType.YEAR -> {
-                calendar.add(Calendar.YEAR, -1)
-                val yearAgo = calendar.time
-                transactions.filter { it.date.after(yearAgo) || it.date == yearAgo }
-            }
-            PeriodType.CUSTOM -> {
-                if (startDate != null && endDate != null) {
-                    // Устанавливаем начало дня для startDate
-                    val startCalendar = Calendar.getInstance()
-                    startCalendar.time = startDate
-                    startCalendar.set(Calendar.HOUR_OF_DAY, 0)
-                    startCalendar.set(Calendar.MINUTE, 0)
-                    startCalendar.set(Calendar.SECOND, 0)
-                    startCalendar.set(Calendar.MILLISECOND, 0)
-                    val start = startCalendar.time
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
 
-                    // Устанавливаем конец дня для endDate
-                    val endCalendar = Calendar.getInstance()
-                    endCalendar.time = endDate
-                    endCalendar.set(Calendar.HOUR_OF_DAY, 23)
-                    endCalendar.set(Calendar.MINUTE, 59)
-                    endCalendar.set(Calendar.SECOND, 59)
-                    endCalendar.set(Calendar.MILLISECOND, 999)
-                    val end = endCalendar.time
+        return transactions.filter { transaction ->
+            transaction.date >= startDate && transaction.date <= endDate
+        }
+    }
 
-                    transactions.filter {
-                        (it.date.after(start) || it.date == start) &&
-                                (it.date.before(end) || it.date == end)
-                    }
-                } else {
-                    transactions
-                }
-            }
+    /**
+     * Фильтрует транзакции по дате.
+     *
+     * @param transactions Список транзакций для фильтрации
+     * @param startDate Начальная дата для фильтрации
+     * @param endDate Конечная дата для фильтрации
+     * @return Отфильтрованный по дате список транзакций
+     */
+    fun filterByDateRange(transactions: List<Transaction>, startDate: Date, endDate: Date): List<Transaction> {
+        return transactions.filter { transaction ->
+            transaction.date >= startDate && transaction.date <= endDate
         }
     }
 

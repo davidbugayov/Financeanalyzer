@@ -6,12 +6,15 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.DailyExpense
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.model.ChartMonthlyData
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartScreenState
+import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -23,7 +26,7 @@ import java.util.Locale
 
 class ChartViewModel : ViewModel(), KoinComponent {
 
-    private val repository: ITransactionRepository by inject()
+    private val getTransactionsUseCase: GetTransactionsUseCase by inject()
     private val _state = MutableStateFlow(
         ChartScreenState(
             startDate = Calendar.getInstance().apply {
@@ -38,13 +41,15 @@ class ChartViewModel : ViewModel(), KoinComponent {
                 set(Calendar.MINUTE, 59)
                 set(Calendar.SECOND, 59)
                 set(Calendar.MILLISECOND, 999)
-            }.time
+            }.time,
+            periodType = PeriodType.MONTH
         )
     )
     val state: StateFlow<ChartScreenState> = _state
 
     init {
         Log.d("ChartViewModel", "Initializing with date range: ${formatDate(_state.value.startDate)} - ${formatDate(_state.value.endDate)}")
+        resetDateFilter()
         handleIntent(ChartIntent.LoadTransactions)
     }
 
@@ -59,23 +64,82 @@ class ChartViewModel : ViewModel(), KoinComponent {
             is ChartIntent.UpdateEndDate -> updateEndDate(intent.date)
             is ChartIntent.UpdateDateRange -> updateDateRange(intent.startDate, intent.endDate)
             is ChartIntent.ToggleExpenseView -> toggleExpenseView(intent.showExpenses)
+            is ChartIntent.SetPeriodType -> setPeriodType(intent.periodType)
+            is ChartIntent.ShowPeriodDialog -> _state.update { it.copy(showPeriodDialog = true) }
+            is ChartIntent.HidePeriodDialog -> _state.update { it.copy(showPeriodDialog = false) }
+            is ChartIntent.ShowStartDatePicker -> _state.update { it.copy(showStartDatePicker = true) }
+            is ChartIntent.HideStartDatePicker -> _state.update { it.copy(showStartDatePicker = false) }
+            is ChartIntent.ShowEndDatePicker -> _state.update { it.copy(showEndDatePicker = true) }
+            is ChartIntent.HideEndDatePicker -> _state.update { it.copy(showEndDatePicker = false) }
+            is ChartIntent.ResetDateFilter -> {
+                Log.d("ChartViewModel", "Explicitly resetting date filter")
+                resetDateFilter()
+                loadTransactions()
+            }
         }
+    }
+
+    private fun setPeriodType(periodType: PeriodType) {
+        val calendar = Calendar.getInstance()
+        val endDate = calendar.apply {
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }.time
+
+        val startDate = calendar.apply {
+            when (periodType) {
+                PeriodType.ALL -> add(Calendar.YEAR, -10)
+                PeriodType.DAY -> add(Calendar.DAY_OF_MONTH, -1)
+                PeriodType.WEEK -> add(Calendar.WEEK_OF_YEAR, -1)
+                PeriodType.MONTH -> add(Calendar.MONTH, -1)
+                PeriodType.QUARTER -> add(Calendar.MONTH, -3)
+                PeriodType.YEAR -> add(Calendar.YEAR, -1)
+                PeriodType.CUSTOM -> Unit // Не меняем даты для пользовательского периода
+            }
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
+
+        _state.update {
+            it.copy(
+                startDate = startDate,
+                endDate = endDate,
+                periodType = periodType
+            )
+        }
+
+        loadTransactions()
     }
 
     fun loadTransactions() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                val transactions = repository.loadTransactions()
-                Log.d("ChartViewModel", "Loaded ${transactions.size} transactions")
-                _state.update { currentState ->
-                    currentState.copy(
-                        isLoading = false,
-                        error = null,
-                        transactions = transactions,
-                        dailyExpenses = calculateDailyExpenses(transactions)
-                    )
-                }
+                getTransactionsUseCase(_state.value.startDate, _state.value.endDate)
+                    .catch { e ->
+                        Log.e("ChartViewModel", "Error loading transactions", e)
+                        _state.update {
+                            it.copy(
+                                isLoading = false,
+                                error = e.message
+                            )
+                        }
+                    }
+                    .collectLatest { transactions ->
+                        Log.d("ChartViewModel", "Loaded ${transactions.size} transactions")
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isLoading = false,
+                                error = null,
+                                transactions = transactions,
+                                dailyExpenses = calculateDailyExpenses(transactions)
+                            )
+                        }
+                    }
             } catch (e: Exception) {
                 Log.e("ChartViewModel", "Error loading transactions", e)
                 _state.update {
@@ -229,10 +293,6 @@ class ChartViewModel : ViewModel(), KoinComponent {
                 }.time
             }
             .map { (date, transactionsForDate) ->
-                val income = transactionsForDate
-                    .filter { !it.isExpense }
-                    .map { it.amount }
-                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
                 val expense = transactionsForDate
                     .filter { it.isExpense }
                     .map { it.amount }
@@ -250,5 +310,44 @@ class ChartViewModel : ViewModel(), KoinComponent {
                     Log.d("ChartViewModel", "Daily expense: ${formatDate(expense.date)} - Amount: ${expense.amount}")
                 }
             }
+    }
+
+    /**
+     * Сбрасывает фильтр дат на значение по умолчанию (месяц)
+     */
+    private fun resetDateFilter() {
+        val calendar = Calendar.getInstance()
+        val endDate = calendar.apply {
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }.time
+
+        val startDate = calendar.apply {
+            add(Calendar.MONTH, -1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time
+
+        _state.update {
+            it.copy(
+                startDate = startDate,
+                endDate = endDate,
+                periodType = PeriodType.MONTH
+            )
+        }
+    }
+
+    /**
+     * Вызывается при уничтожении ViewModel (когда пользователь выходит с экрана)
+     * Сбрасывает выбор даты к значениям по умолчанию
+     */
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("ChartViewModel", "onCleared: Resetting date filter")
+        resetDateFilter()
     }
 } 

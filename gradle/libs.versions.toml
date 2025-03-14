@@ -14,6 +14,8 @@ androidxNavigation = "2.7.7"
 androidxSplashscreen = "1.0.1"
 material = "1.11.0"
 constraintLayout = "2.1.4"
+customView = "1.1.0"
+customViewPoolingContainer = "1.0.0"
 
 # Compose
 composeBom = "2024.02.00"
@@ -52,6 +54,8 @@ androidx-activity-compose = { group = "androidx.activity", name = "activity-comp
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxSplashscreen" }
 androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayout" }
+androidx-customview = { group = "androidx.customview", name = "customview", version.ref = "customView" }
+androidx-customview-poolingcontainer = { group = "androidx.customview", name = "customview-poolingcontainer", version.ref = "customViewPoolingContainer" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 
 # Compose

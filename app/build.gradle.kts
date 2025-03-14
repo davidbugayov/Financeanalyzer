@@ -117,7 +117,12 @@ android {
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
             "-Xjvm-default=all",
-            "-Xcontext-receivers"
+            "-Xcontext-receivers",
+            // Добавляем флаги для улучшения работы Compose
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.asFile.get()}/compose_metrics",
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.asFile.get()}/compose_reports"
         )
     }
 
@@ -199,6 +204,9 @@ dependencies {
     implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
+    // Добавляем инструменты для отладки Compose
+    debugImplementation(libs.androidx.customview)
+    debugImplementation(libs.androidx.customview.poolingcontainer)
     
     // Koin
     implementation(libs.koin.android)

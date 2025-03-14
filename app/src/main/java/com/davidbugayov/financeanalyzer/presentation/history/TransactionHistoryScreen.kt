@@ -292,15 +292,17 @@ fun TransactionHistoryScreen(
                     
                     Text(
                         text = when (state.periodType) {
-                            PeriodType.ALL -> stringResource(R.string.period_all)
-                            PeriodType.DAY -> stringResource(R.string.period_day)
-                            PeriodType.MONTH -> stringResource(R.string.period_month)
-                            PeriodType.YEAR -> stringResource(R.string.period_year)
-                            PeriodType.CUSTOM -> stringResource(
-                                R.string.period_custom_range,
-                                dateFormat.format(state.startDate),
-                                dateFormat.format(state.endDate)
-                            )
+                            PeriodType.ALL -> stringResource(R.string.all_time)
+                            PeriodType.DAY -> stringResource(R.string.day)
+                            PeriodType.WEEK -> stringResource(R.string.week)
+                            PeriodType.MONTH -> stringResource(R.string.month)
+                            PeriodType.QUARTER -> stringResource(R.string.period_quarter)
+                            PeriodType.YEAR -> stringResource(R.string.year)
+                            PeriodType.CUSTOM -> {
+                                val startDate = state.startDate
+                                val endDate = state.endDate
+                                "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
+                            }
                         },
                         fontSize = 14.sp,
                         color = MaterialTheme.colorScheme.primary,

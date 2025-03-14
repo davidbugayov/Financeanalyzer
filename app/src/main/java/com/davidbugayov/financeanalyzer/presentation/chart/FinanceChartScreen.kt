@@ -2,13 +2,15 @@ package com.davidbugayov.financeanalyzer.presentation.chart
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -21,16 +23,16 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesSection
-import com.davidbugayov.financeanalyzer.presentation.chart.components.PeriodSelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.chart.components.PeriodSelector
 import com.davidbugayov.financeanalyzer.presentation.chart.components.PieChartSection
 import com.davidbugayov.financeanalyzer.presentation.chart.components.SavingsRateDialog
 import com.davidbugayov.financeanalyzer.presentation.chart.components.StatisticsSection
@@ -40,9 +42,10 @@ import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import timber.log.Timber
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
 import kotlin.math.max
 
@@ -58,27 +61,23 @@ fun FinanceChartScreen(
 
     // UI state
     var showSavingsRateInfo by remember { mutableStateOf(false) }
-    var showStartDatePicker by remember { mutableStateOf(false) }
-    var showEndDatePicker by remember { mutableStateOf(false) }
-    var showPeriodSelection by remember { mutableStateOf(false) }
-
-    // Track the currently selected period
-    val defaultPeriod = stringResource(R.string.month)
-    var selectedPeriod by remember { mutableStateOf(defaultPeriod) }
 
     // Format dates for display
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-    val periodText = "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
-
-    // Define period options
-    val periodOptions = listOf(
-        stringResource(R.string.week),
-        stringResource(R.string.month),
-        stringResource(R.string.period_quarter),
-        stringResource(R.string.year),
-        stringResource(R.string.all_time)
-    )
-
+    val periodText = when (state.periodType) {
+        PeriodType.ALL -> stringResource(R.string.period_all)
+        PeriodType.DAY -> stringResource(R.string.period_day)
+        PeriodType.WEEK -> stringResource(R.string.week)
+        PeriodType.MONTH -> stringResource(R.string.period_month)
+        PeriodType.QUARTER -> stringResource(R.string.period_quarter)
+        PeriodType.YEAR -> stringResource(R.string.period_year)
+        PeriodType.CUSTOM -> stringResource(
+            R.string.period_custom_range,
+            dateFormat.format(state.startDate),
+            dateFormat.format(state.endDate)
+        )
+    }
+    
     // Filter transactions based on selected date range
     val filteredTransactions = state.transactions.filter { transaction ->
         val isInRange = transaction.date >= state.startDate && transaction.date <= state.endDate
@@ -120,35 +119,52 @@ fun FinanceChartScreen(
         SavingsRateDialog(onDismiss = { showSavingsRateInfo = false })
     }
 
-    if (showPeriodSelection) {
+    if (state.showPeriodDialog) {
         PeriodSelectionDialog(
+            selectedPeriod = state.periodType,
             startDate = state.startDate,
             endDate = state.endDate,
-            onStartDateClick = { showStartDatePicker = true },
-            onEndDateClick = { showEndDatePicker = true },
-            onDismiss = { showPeriodSelection = false }
+            onPeriodSelected = { periodType ->
+                viewModel.handleIntent(ChartIntent.SetPeriodType(periodType))
+                if (periodType != PeriodType.CUSTOM) {
+                    viewModel.handleIntent(ChartIntent.HidePeriodDialog)
+                }
+            },
+            onStartDateClick = {
+                viewModel.handleIntent(ChartIntent.ShowStartDatePicker)
+            },
+            onEndDateClick = {
+                viewModel.handleIntent(ChartIntent.ShowEndDatePicker)
+            },
+            onDismiss = {
+                viewModel.handleIntent(ChartIntent.HidePeriodDialog)
+            }
         )
     }
 
-    if (showStartDatePicker) {
+    if (state.showStartDatePicker) {
         DatePickerDialog(
             initialDate = state.startDate,
             onDateSelected = { date ->
                 viewModel.handleIntent(ChartIntent.UpdateStartDate(date))
-                showStartDatePicker = false
+                viewModel.handleIntent(ChartIntent.HideStartDatePicker)
             },
-            onDismiss = { showStartDatePicker = false }
+            onDismiss = {
+                viewModel.handleIntent(ChartIntent.HideStartDatePicker)
+            }
         )
     }
 
-    if (showEndDatePicker) {
+    if (state.showEndDatePicker) {
         DatePickerDialog(
             initialDate = state.endDate,
             onDateSelected = { date ->
                 viewModel.handleIntent(ChartIntent.UpdateEndDate(date))
-                showEndDatePicker = false
+                viewModel.handleIntent(ChartIntent.HideEndDatePicker)
             },
-            onDismiss = { showEndDatePicker = false }
+            onDismiss = {
+                viewModel.handleIntent(ChartIntent.HideEndDatePicker)
+            }
         )
     }
 
@@ -156,14 +172,25 @@ fun FinanceChartScreen(
         topBar = {
             TopAppBar(
                 title = {
-                    Text(
-                        text = stringResource(R.string.charts_title),
-                        maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
-                    )
+                    Box(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .fillMaxHeight(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.charts_title),
+                            fontSize = 18.sp,
+                            fontWeight = FontWeight.Medium
+                        )
+                    }
                 },
                 navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+                    IconButton(onClick = {
+                        // Сбрасываем даты перед выходом с экрана
+                        viewModel.handleIntent(ChartIntent.ResetDateFilter)
+                        onNavigateBack()
+                    }) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back)
@@ -171,9 +198,10 @@ fun FinanceChartScreen(
                     }
                 },
                 actions = {
-                    IconButton(onClick = { showPeriodSelection = true }) {
+                    // Оставляем только кнопку выбора периода, убираем кнопку фильтра
+                    IconButton(onClick = { viewModel.handleIntent(ChartIntent.ShowPeriodDialog) }) {
                         Icon(
-                            imageVector = Icons.Default.DateRange,
+                            imageVector = Icons.Filled.FilterList,
                             contentDescription = stringResource(R.string.select_period)
                         )
                     }
@@ -210,24 +238,12 @@ fun FinanceChartScreen(
                         .verticalScroll(scrollState)
                         .padding(bottom = dimensionResource(R.dimen.spacing_large))
                 ) {
-                    // Period selector
-                    PeriodSelector(
-                        periodOptions = periodOptions,
-                        selectedPeriod = selectedPeriod,
-                        onPeriodSelected = { period, startDate, endDate ->
-                            selectedPeriod = period
-                            val startDateJava = Date.from(startDate.atStartOfDay().toInstant(java.time.ZoneOffset.UTC))
-                            val endDateJava = Date.from(endDate.atStartOfDay().toInstant(java.time.ZoneOffset.UTC))
-                            viewModel.handleIntent(ChartIntent.UpdateDateRange(startDateJava, endDateJava))
-                        },
-                        modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.spacing_large))
-                    )
-
                     // Summary section
                     SummarySection(
                         income = totalIncome,
                         expense = totalExpense,
-                        period = periodText
+                        period = periodText,
+                        onPeriodClick = { viewModel.handleIntent(ChartIntent.ShowPeriodDialog) }
                     )
 
                     // Pie chart section

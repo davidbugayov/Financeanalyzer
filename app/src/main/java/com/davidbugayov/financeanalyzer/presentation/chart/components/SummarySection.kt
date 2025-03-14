@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -10,9 +11,13 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -36,6 +41,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
  * @param income The total income amount
  * @param expense The total expense amount
  * @param period The time period description (e.g., "01.01.2023 - 31.01.2023")
+ * @param onPeriodClick Callback when the period text is clicked
  * @param modifier Optional modifier for customizing the layout
  */
 @Composable
@@ -43,6 +49,7 @@ fun SummarySection(
     income: Money,
     expense: Money,
     period: String,
+    onPeriodClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val balance = income - expense
@@ -62,11 +69,29 @@ fun SummarySection(
                 .fillMaxWidth()
                 .padding(dimensionResource(R.dimen.spacing_large))
         ) {
-            Text(
-                text = period,
-                fontSize = 14.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(8.dp))
+                    .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f))
+                    .clickable { onPeriodClick() }
+                    .padding(horizontal = 12.dp, vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = period,
+                    fontSize = 16.sp,
+                    fontWeight = FontWeight.Medium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                Icon(
+                    imageVector = Icons.Default.CalendarMonth,
+                    contentDescription = stringResource(R.string.select_period),
+                    modifier = Modifier.size(20.dp),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 

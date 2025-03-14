@@ -226,4 +226,6 @@
     <string name="start_date">Начальная дата</string>
     <string name="end_date">Конечная дата</string>
     <string name="amount_format">%.2f ₽</string>
+    <string name="day">День</string>
+    <string name="custom">Произвольный</string>
 </resources>
