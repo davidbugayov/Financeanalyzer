@@ -66,16 +66,9 @@ fun FinanceChartScreen(
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
     val periodText = when (state.periodType) {
         PeriodType.ALL -> stringResource(R.string.period_all)
-        PeriodType.DAY -> stringResource(R.string.period_day)
-        PeriodType.WEEK -> stringResource(R.string.week)
-        PeriodType.MONTH -> stringResource(R.string.period_month)
-        PeriodType.QUARTER -> stringResource(R.string.period_quarter)
-        PeriodType.YEAR -> stringResource(R.string.period_year)
-        PeriodType.CUSTOM -> stringResource(
-            R.string.period_custom_range,
-            dateFormat.format(state.startDate),
-            dateFormat.format(state.endDate)
-        )
+        PeriodType.DAY -> dateFormat.format(state.startDate)
+        PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
+            "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
     }
     
     // Filter transactions based on selected date range

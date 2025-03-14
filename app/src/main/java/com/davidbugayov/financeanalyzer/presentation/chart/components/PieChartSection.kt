@@ -1,13 +1,11 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.components
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,7 +17,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -50,90 +47,42 @@ fun PieChartSection(
                 .fillMaxWidth()
                 .padding(dimensionResource(R.dimen.spacing_large))
         ) {
-            Text(
-                text = if (showExpenses)
-                    stringResource(R.string.chart_expenses)
-                else
-                    stringResource(R.string.chart_income),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
-            )
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-            Text(
-                text = if (showExpenses)
-                    stringResource(R.string.expense_type)
-                else
-                    stringResource(R.string.income_type),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = if (showExpenses) LocalExpenseColor.current else LocalIncomeColor.current
-            )
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-            // Переключатель доходы/расходы
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Column {
-                    Text(
-                        text = stringResource(R.string.expense),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = stringResource(R.string.show_expenses),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        modifier = Modifier.clickable { onShowExpensesChange(true) }
-                    )
-                }
-
-                Column(horizontalAlignment = Alignment.End) {
-                    Text(
-                        text = stringResource(R.string.income),
-                        fontSize = 14.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Text(
-                        text = stringResource(R.string.show_income),
-                        fontSize = 16.sp,
-                        fontWeight = FontWeight.Medium,
-                        color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f),
-                        modifier = Modifier.clickable { onShowExpensesChange(false) }
-                    )
-                }
-            }
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-
-            // Визуальное представление выбора
+            // Переключатель доходы/расходы - делаю его больше и заметнее
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.height_small))
-                    .clip(RoundedCornerShape(dimensionResource(R.dimen.radius_medium)))
+                    .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Box(
+                Text(
+                    text = stringResource(R.string.expense),
+                    fontSize = 18.sp,
+                    fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal,
+                    color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
-                        .weight(if (showExpenses) 0.7f else 0.3f)
-                        .fillMaxHeight()
-                        .background(LocalExpenseColor.current)
+                        .clickable { onShowExpensesChange(true) }
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_medium), vertical = dimensionResource(R.dimen.spacing_small))
                 )
-                Box(
+
+                Text(
+                    text = "|",
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+
+                Text(
+                    text = stringResource(R.string.income),
+                    fontSize = 18.sp,
+                    fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal,
+                    color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
-                        .weight(if (!showExpenses) 0.7f else 0.3f)
-                        .fillMaxHeight()
-                        .background(LocalIncomeColor.current)
+                        .clickable { onShowExpensesChange(false) }
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_medium), vertical = dimensionResource(R.dimen.spacing_small))
                 )
             }
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
             // Отображение соответствующей диаграммы
             if (showExpenses) {

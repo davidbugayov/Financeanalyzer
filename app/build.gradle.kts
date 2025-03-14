@@ -101,8 +101,9 @@ android {
             manifestPlaceholders["crashlyticsCollectionEnabled"] = "false"
             manifestPlaceholders["analyticsCollectionEnabled"] = "false"
             manifestPlaceholders["performanceCollectionEnabled"] = "false"
-            
 
+            // Включаем инспекцию Compose
+            manifestPlaceholders["enableComposeCompilerReports"] = "true"
         }
     }
 
@@ -122,7 +123,10 @@ android {
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.asFile.get()}/compose_metrics",
             "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.asFile.get()}/compose_reports"
+            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.asFile.get()}/compose_reports",
+            // Добавляем флаги для Layout Inspector
+            "-P",
+            "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=${layout.buildDirectory.asFile.get()}/compose_stability.conf"
         )
     }
 
@@ -133,6 +137,8 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
+        // Включаем отладочную информацию для Compose
+        useLiveLiterals = true
     }
 
     packaging {
@@ -165,6 +171,12 @@ android {
 
     lint {
         disable += "FlowOperatorInvokedInComposition"
+    }
+}
+
+androidComponents {
+    onVariants(selector().withBuildType("release")) {
+        it.packaging.resources.excludes.add("META-INF/**")
     }
 }
 
@@ -204,7 +216,8 @@ dependencies {
     implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
-    // Добавляем инструменты для отладки Compose
+    // Явная зависимость для Layout Inspector
+    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
     debugImplementation(libs.androidx.customview)
     debugImplementation(libs.androidx.customview.poolingcontainer)
     

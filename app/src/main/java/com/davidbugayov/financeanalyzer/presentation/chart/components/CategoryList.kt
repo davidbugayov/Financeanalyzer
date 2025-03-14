@@ -22,8 +22,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.util.Locale
 
 /**
@@ -44,8 +42,32 @@ fun CategoryList(
     // Calculate total amount
     val total = data.values.fold(0.0) { acc, money -> acc + money.amount.toDouble() }
 
-    // Generate colors for each category
-    val colors = generateCategoryColors(data.size, isIncome)
+    // Используем фиксированные цвета, как в CategoryPieChart
+    val colors = if (isIncome) {
+        listOf(
+            Color(0xFF66BB6A), // Зеленый
+            Color(0xFF81C784),
+            Color(0xFF4CAF50),
+            Color(0xFF2E7D32),
+            Color(0xFF43A047),
+            Color(0xFF388E3C),
+            Color(0xFF1B5E20),
+            Color(0xFF00C853),
+            Color(0xFF00E676)
+        )
+    } else {
+        listOf(
+            Color(0xFFEF5350), // Красный
+            Color(0xFFE57373),
+            Color(0xFFEF9A9A),
+            Color(0xFFD32F2F),
+            Color(0xFFC62828),
+            Color(0xFFB71C1C),
+            Color(0xFFFF8A80),
+            Color(0xFFFF5252),
+            Color(0xFFFF1744)
+        )
+    }
 
     // Sort categories by amount (descending)
     val sortedData = data.entries.sortedByDescending { it.value.amount.toDouble() }
@@ -60,42 +82,46 @@ fun CategoryList(
                     .padding(vertical = 4.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
+                // Получаем цвет для текущей категории
+                val categoryColor = colors[index % colors.size]
+                
                 // Color indicator
                 Box(
                     modifier = Modifier
                         .size(12.dp)
                         .clip(CircleShape)
-                        .background(colors[index % colors.size])
+                        .background(categoryColor)
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Category name
+                // Category name - используем цвет категории
                 Text(
                     text = category,
                     style = MaterialTheme.typography.bodyMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
+                    color = categoryColor
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Amount
+                // Amount - используем цвет категории
                 Text(
                     text = amount.format(),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = if (isIncome) LocalIncomeColor.current else LocalExpenseColor.current
+                    color = categoryColor
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
 
-                // Percentage
+                // Percentage - используем цвет категории
                 Text(
                     text = String.format(Locale.getDefault(), "%.1f%%", percentage),
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = categoryColor
                 )
             }
 
@@ -104,73 +130,4 @@ fun CategoryList(
             }
         }
     }
-}
-
-/**
- * Generates a list of colors for the category list.
- *
- * @param count Number of colors needed
- * @param isIncome Whether the data represents income (true) or expenses (false)
- * @return List of colors
- */
-private fun generateCategoryColors(count: Int, isIncome: Boolean): List<Color> {
-    val baseColor = if (isIncome) {
-        Color(0xFF66BB6A) // Green for income
-    } else {
-        Color(0xFFEF5350) // Red for expenses
-    }
-
-    return List(count) { index ->
-        val hue = (baseColor.hue + index * 30f) % 360f
-        Color.hsv(
-            hue = hue,
-            saturation = 0.7f,
-            value = 0.9f
-        )
-    }
-}
-
-/**
- * Extension function to get the hue component of a Color.
- */
-private val Color.hue: Float
-    get() {
-        val min = minOf(red, green, blue)
-        val max = maxOf(red, green, blue)
-
-        if (min == max) return 0f
-
-        val hue = when (max) {
-            red -> (green - blue) / (max - min) * 60f
-            green -> (blue - red) / (max - min) * 60f + 120f
-            blue -> (red - green) / (max - min) * 60f + 240f
-            else -> 0f
-        }
-
-        return (hue + 360f) % 360f
-    }
-
-/**
- * Creates a color from HSV values.
- */
-private fun Color.Companion.hsv(hue: Float, saturation: Float, value: Float): Color {
-    val c = value * saturation
-    val x = c * (1 - kotlin.math.abs((hue / 60f) % 2 - 1))
-    val m = value - c
-
-    val (r, g, b) = when {
-        hue < 60 -> Triple(c, x, 0f)
-        hue < 120 -> Triple(x, c, 0f)
-        hue < 180 -> Triple(0f, c, x)
-        hue < 240 -> Triple(0f, x, c)
-        hue < 300 -> Triple(x, 0f, c)
-        else -> Triple(c, 0f, x)
-    }
-
-    return Color(
-        red = r + m,
-        green = g + m,
-        blue = b + m,
-        alpha = 1f
-    )
 } 
