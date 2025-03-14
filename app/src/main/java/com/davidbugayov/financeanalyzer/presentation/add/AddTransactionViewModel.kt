@@ -23,12 +23,14 @@ import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +38,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import java.math.BigDecimal
-import java.util.Date
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -79,6 +80,10 @@ class AddTransactionViewModel(
     )
     val incomeCategories = _incomeCategories.asStateFlow()
 
+    // Источники средств
+    private val _sources = MutableStateFlow<List<Source>>(ColorUtils.defaultSources)
+    val sources = _sources.asStateFlow()
+
     private val _state = MutableStateFlow(AddTransactionState())
     val state: StateFlow<AddTransactionState> = _state.asStateFlow()
 
@@ -93,6 +98,8 @@ class AddTransactionViewModel(
                 _state.update { it.copy(incomeCategories = categories) }
             }
         }
+        // Инициализируем список источников
+        _state.update { it.copy(sources = _sources.value) }
     }
 
     /**
@@ -173,28 +180,46 @@ class AddTransactionViewModel(
             is AddTransactionEvent.HideSuccessDialog -> {
                 _state.update { it.copy(isSuccess = false) }
             }
-            is AddTransactionEvent.ResetFields -> {
-                resetFields()
+            is AddTransactionEvent.ShowSourcePicker -> {
+                _state.update { it.copy(showSourcePicker = true) }
             }
-        }
-    }
-
-    /**
-     * Сбрасывает все поля формы к начальным значениям
-     */
-    private fun resetFields() {
-        _state.update {
-            it.copy(
-                title = "",
-                amount = "",
-                category = "",
-                note = "",
-                isExpense = true,
-                selectedDate = Date(),
-                amountError = false,
-                categoryError = false,
-                titleError = false
-            )
+            is AddTransactionEvent.HideSourcePicker -> {
+                _state.update { it.copy(showSourcePicker = false) }
+            }
+            is AddTransactionEvent.ShowCustomSourceDialog -> {
+                _state.update { it.copy(showCustomSourceDialog = true) }
+            }
+            is AddTransactionEvent.HideCustomSourceDialog -> {
+                _state.update {
+                    it.copy(
+                        showCustomSourceDialog = false,
+                        customSource = ""
+                    )
+                }
+            }
+            is AddTransactionEvent.ShowColorPicker -> {
+                _state.update { it.copy(showColorPicker = true) }
+            }
+            is AddTransactionEvent.HideColorPicker -> {
+                _state.update { it.copy(showColorPicker = false) }
+            }
+            is AddTransactionEvent.SetSource -> {
+                _state.update {
+                    it.copy(
+                        source = event.source,
+                        showSourcePicker = false
+                    )
+                }
+            }
+            is AddTransactionEvent.SetCustomSource -> {
+                _state.update { it.copy(customSource = event.source) }
+            }
+            is AddTransactionEvent.AddCustomSource -> {
+                addCustomSource(event.source, event.color)
+            }
+            is AddTransactionEvent.SetSourceColor -> {
+                _state.update { it.copy(sourceColor = event.color) }
+            }
         }
     }
 
@@ -234,12 +259,6 @@ class AddTransactionViewModel(
 
                 addTransactionUseCase(transaction)
                 _state.update { it.copy(isSuccess = true) }
-
-                // Сбрасываем поля после успешного добавления транзакции
-                resetFields()
-
-                // Обновляем виджеты
-                updateBalanceWidget()
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message) }
             } finally {
@@ -261,6 +280,43 @@ class AddTransactionViewModel(
                 showCustomCategoryDialog = false,
                 customCategory = ""
             )
+        }
+    }
+
+    /**
+     * Добавляет новый пользовательский источник
+     */
+    private fun addCustomSource(source: String, color: Int) {
+        if (source.isBlank()) return
+        viewModelScope.launch {
+            try {
+                // Создаем новый источник
+                val newSource = Source(
+                    id = System.currentTimeMillis(), // Используем текущее время как ID
+                    name = source,
+                    color = color,
+                    isCustom = true
+                )
+
+                // Добавляем источник в список
+                val updatedSources = _sources.value.toMutableList()
+                updatedSources.add(newSource)
+                _sources.value = updatedSources
+
+                // Обновляем состояние
+                _state.update {
+                    it.copy(
+                        source = source,
+                        sourceColor = color,
+                        sources = updatedSources,
+                        showSourcePicker = false,
+                        showCustomSourceDialog = false,
+                        customSource = ""
+                    )
+                }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message) }
+            }
         }
     }
 

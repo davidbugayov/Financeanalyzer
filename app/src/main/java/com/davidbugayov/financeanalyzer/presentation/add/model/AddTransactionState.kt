@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.add.model
 
+import com.davidbugayov.financeanalyzer.domain.model.Source
 import java.util.Date
 
 /**
@@ -25,5 +26,13 @@ data class AddTransactionState(
     val incomeCategories: List<CategoryItem> = emptyList(),
     val titleError: Boolean = false,
     val amountError: Boolean = false,
-    val categoryError: Boolean = false
+    val categoryError: Boolean = false,
+    val source: String = "",
+    val sourceColor: Int = 0xFF2196F3.toInt(),
+    val sourceError: Boolean = false,
+    val showSourcePicker: Boolean = false,
+    val showCustomSourceDialog: Boolean = false,
+    val showColorPicker: Boolean = false,
+    val customSource: String = "",
+    val sources: List<Source> = emptyList()
 ) 

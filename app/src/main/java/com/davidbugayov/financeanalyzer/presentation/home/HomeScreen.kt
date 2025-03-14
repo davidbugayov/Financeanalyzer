@@ -258,11 +258,11 @@ fun HomeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Add,
-                                    contentDescription = stringResource(R.string.add)
+                                    contentDescription = stringResource(R.string.add_button)
                                 )
                             }
                             Text(
-                                text = stringResource(R.string.add),
+                                text = stringResource(R.string.add_button),
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp),
                                 color = MaterialTheme.colorScheme.onSurface
