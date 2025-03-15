@@ -47,16 +47,16 @@ object TestDataGenerator {
     fun generateTransactions(count: Int): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         val calendar = Calendar.getInstance()
-        
-        // Устанавливаем начальную дату (30 дней назад)
-        calendar.add(Calendar.DAY_OF_MONTH, -30)
+
+        // Устанавливаем начальную дату (365 дней назад вместо 30)
+        calendar.add(Calendar.DAY_OF_MONTH, -365)
         val startDate = calendar.timeInMillis
         
         // Текущая дата
         val endDate = System.currentTimeMillis()
         
         for (i in 0 until count) {
-            // Генерируем случайную дату в диапазоне последних 30 дней
+            // Генерируем случайную дату в диапазоне последних 365 дней
             val randomDate = Random.nextLong(startDate, endDate)
             val date = Date(randomDate)
             
