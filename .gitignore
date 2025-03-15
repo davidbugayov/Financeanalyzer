@@ -1,12 +1,10 @@
 *.iml
 .gradle
 /local.properties
-/.idea/caches
-/.idea/libraries
-/.idea/modules.xml
-/.idea/workspace.xml
-/.idea/navEditor.xml
-/.idea/assetWizardSettings.xml
+# Исключаем всю папку .idea и все файлы в ней
+.idea/
+.idea/*
+.idea/**/*
 .DS_Store
 /build
 /captures
@@ -35,11 +33,6 @@ Thumbs.db
 output.json
 output-metadata.json
 
-# IntelliJ
-misc.xml
-deploymentTargetDropDown.xml
-render.experimental.xml
-
 # Google Services (e.g. APIs or Firebase)
 google-services.json
 
@@ -50,3 +43,30 @@ google-services.json
 **/baselineProfiles/
 *.dm
 *.ap_
+
+# Gradle files
+.gradle/
+build/
+
+# Local configuration file
+local.properties
+
+# Proguard files
+proguard/
+
+# Generated files
+bin/
+gen/
+out/
+
+# NDK
+obj/
+
+# Version control
+vcs.xml
+
+# lint
+lint/intermediates/
+lint/generated/
+lint/outputs/
+lint/tmp/
