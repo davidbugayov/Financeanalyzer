@@ -27,8 +27,8 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 35
-        versionCode = 6
-        versionName = "1.4.1"
+        versionCode = 8
+        versionName = "1.4.3"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -48,6 +48,7 @@ android {
         // Firebase для всех версий
         manifestPlaceholders["crashlyticsCollectionEnabled"] = "true"
         manifestPlaceholders["analyticsCollectionEnabled"] = "true"
+        manifestPlaceholders["performanceCollectionEnabled"] = "true"
 
         // Имя приложения по умолчанию
         resValue("string", "app_name", "Деньги под Контролем")
@@ -97,8 +98,8 @@ android {
             buildConfigField("boolean", "DEBUG", "true")
             resValue("string", "app_name", "Finanalyzer Debug")
 
-            // Отключаем Firebase для debug-сборки
-            manifestPlaceholders["crashlyticsCollectionEnabled"] = "false"
+            // Включаем Firebase Crashlytics для debug-сборки, но отключаем аналитику
+            manifestPlaceholders["crashlyticsCollectionEnabled"] = "true"
             manifestPlaceholders["analyticsCollectionEnabled"] = "false"
             manifestPlaceholders["performanceCollectionEnabled"] = "false"
 

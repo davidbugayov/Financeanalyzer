@@ -1,20 +1,23 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import android.util.Log
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.davidbugayov.financeanalyzer.BuildConfig
 import timber.log.Timber
 
 /**
  * Инициализатор для настройки логирования
  */
 object TimberInitializer {
-    fun init(isDebug: Boolean) {
-        if (isDebug) {
+
+    fun init() {
+        if (BuildConfig.DEBUG) {
             // Для отладочной сборки используем расширенное логирование через Timber
             Timber.plant(Timber.DebugTree())
+            Timber.d("Timber initialized with DebugTree")
         } else {
             // Для релизной сборки используем Firebase Crashlytics
             Timber.plant(CrashReportingTree())
+            Timber.i("Timber initialized with CrashReportingTree")
         }
     }
 }
@@ -25,22 +28,31 @@ object TimberInitializer {
  */
 private class CrashReportingTree : Timber.Tree() {
     override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
-        if (priority == Log.VERBOSE || priority == Log.DEBUG || priority == Log.INFO) {
+        // Игнорируем низкоприоритетные логи
+        if (priority == Log.VERBOSE || priority == Log.DEBUG) {
             return
         }
 
-        if (t != null) {
-            if (priority == Log.ERROR) {
-                FirebaseCrashlytics.getInstance().recordException(t)
-            }
+        // Для информационных логов только записываем сообщение
+        if (priority == Log.INFO) {
+            CrashlyticsUtils.log(message)
+            return
         }
 
+        // Для ошибок и предупреждений добавляем больше контекста
+        val logMessage = if (tag != null) "[$tag] $message" else message
+        CrashlyticsUtils.log(logMessage)
+
         // Добавляем дополнительные данные для отслеживания
-        FirebaseCrashlytics.getInstance().apply {
-            setCustomKey("priority", priority)
-            setCustomKey("tag", tag ?: "NO_TAG")
-            setCustomKey("message", message)
-            log(message)
+        CrashlyticsUtils.setCustomKey("log_priority", priority)
+        CrashlyticsUtils.setCustomKey("log_tag", tag ?: "NO_TAG")
+
+        // Для ошибок записываем исключение
+        if (t != null) {
+            CrashlyticsUtils.recordException(t, logMessage)
+        } else if (priority == Log.ERROR || priority == Log.ASSERT) {
+            // Если исключения нет, но это ошибка, создаем исключение из сообщения
+            CrashlyticsUtils.recordException(Exception(logMessage))
         }
     }
 } 

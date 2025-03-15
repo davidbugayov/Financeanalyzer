@@ -32,7 +32,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesSection
+import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesChart
 import com.davidbugayov.financeanalyzer.presentation.chart.components.PieChartSection
 import com.davidbugayov.financeanalyzer.presentation.chart.components.SavingsRateDialog
 import com.davidbugayov.financeanalyzer.presentation.chart.components.StatisticsSection
@@ -250,7 +250,7 @@ fun FinanceChartScreen(
                     )
 
                     // Daily expenses section
-                    DailyExpensesSection(
+                    DailyExpensesChart(
                         dailyExpenses = state.dailyExpenses,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )

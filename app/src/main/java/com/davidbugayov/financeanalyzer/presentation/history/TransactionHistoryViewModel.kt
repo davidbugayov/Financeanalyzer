@@ -15,6 +15,8 @@ import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.Event
 import com.davidbugayov.financeanalyzer.utils.EventBus
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -172,6 +174,14 @@ class TransactionHistoryViewModel(
                         // Отправляем событие об удалении транзакции
                         EventBus.emit(Event.TransactionDeleted)
 
+                        // Логируем событие в аналитику
+                        AnalyticsUtils.Transaction.delete(
+                            transactionId = transaction.id,
+                            category = transaction.category,
+                            amount = transaction.amount,
+                            isExpense = transaction.isExpense
+                        )
+
                         // Очищаем все кэши и перезагружаем данные
                         clearAllCaches()
                         loadTransactions()
@@ -181,6 +191,13 @@ class TransactionHistoryViewModel(
                     is Result.Error -> {
                         val exception = result.exception
                         Timber.e("Failed to delete transaction: ${exception.message}")
+
+                        // Логируем ошибку в Crashlytics
+                        CrashlyticsUtils.recordException(
+                            exception,
+                            "Failed to delete transaction: ${transaction.id}, category: ${transaction.category}"
+                        )
+                        
                         _state.update {
                             it.copy(
                                 error = exception.message ?: "Failed to delete transaction",
@@ -192,6 +209,13 @@ class TransactionHistoryViewModel(
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error deleting transaction")
+
+                // Логируем ошибку в Crashlytics
+                CrashlyticsUtils.recordException(
+                    e,
+                    "Error deleting transaction: ${transaction.id}, category: ${transaction.category}"
+                )
+                
                 _state.update {
                     it.copy(
                         error = "Error deleting transaction: ${e.message}",
@@ -346,8 +370,22 @@ class TransactionHistoryViewModel(
         
         viewModelScope.launch {
             try {
+                // Определяем, является ли категория стандартной
+                val isDefaultCategory = if (isExpense) {
+                    categoriesViewModel.isDefaultExpenseCategory(category)
+                } else {
+                    categoriesViewModel.isDefaultIncomeCategory(category)
+                }
+                
                 // Удаляем категорию через CategoriesViewModel
                 categoriesViewModel.removeCategory(category, isExpense)
+
+                // Логируем событие в аналитику
+                AnalyticsUtils.Category.delete(
+                    categoryName = category,
+                    isExpense = isExpense,
+                    isCustom = !isDefaultCategory
+                )
 
                 // Если удаляемая категория была выбрана, сбрасываем фильтр
                 if (_state.value.selectedCategory == category) {
@@ -362,6 +400,13 @@ class TransactionHistoryViewModel(
                 loadTransactions()
             } catch (e: Exception) {
                 Timber.e(e, "Error deleting category")
+
+                // Логируем ошибку в Crashlytics
+                CrashlyticsUtils.recordException(
+                    e,
+                    "Error deleting category: $category, isExpense: $isExpense"
+                )
+                
                 _state.update { it.copy(error = "Ошибка при удалении категории: ${e.message}") }
             }
         }

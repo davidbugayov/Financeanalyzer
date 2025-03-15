@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.history
 
-import android.os.Bundle
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
@@ -47,7 +46,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -62,9 +60,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCateg
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
-import com.google.firebase.analytics.FirebaseAnalytics
-import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.ktx.Firebase
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -76,15 +72,12 @@ fun TransactionHistoryScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    // Логируем открытие экрана истории только в релизной версии
+    // Логируем открытие экрана истории
     LaunchedEffect(Unit) {
-        if (!BuildConfig.DEBUG) {
-            val bundle = Bundle().apply {
-                putString(FirebaseAnalytics.Param.SCREEN_NAME, "transaction_history")
-                putString(FirebaseAnalytics.Param.SCREEN_CLASS, "TransactionHistoryScreen")
-            }
-            Firebase.analytics.logEvent(FirebaseAnalytics.Event.SCREEN_VIEW, bundle)
-        }
+        AnalyticsUtils.Screen.view(
+            screenName = "transaction_history",
+            screenClass = "TransactionHistoryScreen"
+        )
     }
 
     // Получаем список всех категорий из CategoriesViewModel
@@ -98,6 +91,26 @@ fun TransactionHistoryScreen(
 
     val incomeCategoryNames = remember(incomeCategories) {
         incomeCategories.map { it.name }.filter { it != "Другое" }.sorted()
+    }
+
+    // Отслеживаем изменение периода
+    LaunchedEffect(state.periodType, state.startDate, state.endDate) {
+        AnalyticsUtils.Filter.changePeriod(
+            periodType = state.periodType.name,
+            startDate = state.startDate.time,
+            endDate = state.endDate.time
+        )
+    }
+
+    // Отслеживаем изменение категории
+    LaunchedEffect(state.selectedCategory) {
+        state.selectedCategory?.let { category ->
+            val isExpense = expenseCategoryNames.contains(category)
+            AnalyticsUtils.Filter.applyCategory(
+                categoryName = category,
+                isExpense = isExpense
+            )
+        }
     }
 
     // Диалог выбора периода
