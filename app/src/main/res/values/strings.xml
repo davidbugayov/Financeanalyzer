@@ -239,7 +239,4 @@
     <string name="change_color">Изменить цвет</string>
     <string name="source_error">Выберите источник</string>
 
-    <string name="show_all_transactions">Показать еще %d</string>
-    <string name="show_less">Свернуть</string>
-
 </resources>
