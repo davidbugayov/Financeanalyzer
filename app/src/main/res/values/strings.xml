@@ -19,6 +19,9 @@
     <string name="delete">Удалить</string>
     <string name="delete_transaction">Удаление транзакции</string>
     <string name="delete_transaction_confirmation">Вы уверены, что хотите удалить транзакцию из категории "%1$s" на сумму %2$s?</string>
+    <string name="show_all_transactions">Показать еще %d</string>
+    <string name="show_less">Свернуть</string>
+    <string name="daily_expenses">Ежедневные расходы</string>
     
     <!-- Главный экран -->
     <string name="app_title">Финансовый анализатор</string>
@@ -160,7 +163,6 @@
     <string name="expense_trend">Тренд расходов</string>
     <string name="income_trend">Тренд доходов</string>
     <string name="monthly_comparison">Сравнение по месяцам</string>
-    <string name="daily_expenses">Ежедневные расходы</string>
     <string name="weekly_summary">Недельная сводка</string>
     <string name="monthly_summary">Месячная сводка</string>
     <string name="yearly_summary">Годовая сводка</string>
