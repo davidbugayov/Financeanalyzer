@@ -51,7 +51,7 @@ android {
         manifestPlaceholders["performanceCollectionEnabled"] = "true"
 
         // Имя приложения по умолчанию
-        resValue("string", "app_name", "Деньги под Контролем")
+        resValue("string", "app_name", "Финансовый Стиль")
     }
 
     signingConfigs {

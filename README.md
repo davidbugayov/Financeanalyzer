@@ -3,6 +3,7 @@
 Современное приложение для отслеживания доходов и расходов с красивым Material Design интерфейсом.
 
 ## Features / Возможности
+
 - Track income and expenses / Отслеживание доходов и расходов
 - Beautiful material design interface / Красивый интерфейс в стиле Material Design
 - Categories for transactions / Категории для транзакций
@@ -10,6 +11,7 @@
 - Dark/Light theme support / Поддержка тёмной и светлой темы
 
 ## Tech Stack / Технологии
+
 - Kotlin
 - Jetpack Compose
 - Material Design 3
@@ -19,6 +21,7 @@
 - Hilt (Dependency Injection)
 
 ## Setup / Установка
+
 1. Clone the repository / Клонируйте репозиторий
 2. Open in Android Studio / Откройте в Android Studio
 3. Sync Gradle files / Синхронизируйте файлы Gradle
