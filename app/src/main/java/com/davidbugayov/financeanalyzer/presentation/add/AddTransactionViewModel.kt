@@ -4,23 +4,6 @@ import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CardGiftcard
-import androidx.compose.material.icons.filled.Checkroom
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.HomeWork
-import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Source
@@ -28,9 +11,11 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionState
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.utils.Event
+import com.davidbugayov.financeanalyzer.utils.EventBus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -49,41 +34,6 @@ class AddTransactionViewModel(
     private val categoriesViewModel: CategoriesViewModel
 ) : AndroidViewModel(application), KoinComponent {
 
-    // Категории для выбора пользователем
-    private val _expenseCategories = MutableStateFlow(
-        listOf(
-            CategoryItem("Продукты", Icons.Default.ShoppingCart),
-            CategoryItem("Транспорт", Icons.Default.DirectionsCar),
-            CategoryItem("Развлечения", Icons.Default.Movie),
-            CategoryItem("Рестораны", Icons.Default.Restaurant),
-            CategoryItem("Здоровье", Icons.Default.LocalHospital),
-            CategoryItem("Одежда", Icons.Default.Checkroom),
-            CategoryItem("Жилье", Icons.Default.Home),
-            CategoryItem("Связь", Icons.Default.Phone),
-            CategoryItem("Питомец", Icons.Default.Pets),
-            CategoryItem("Прочее", Icons.Default.MoreHoriz),
-            CategoryItem("Другое", Icons.Default.Add)
-        )
-    )
-    val expenseCategories = _expenseCategories.asStateFlow()
-
-    private val _incomeCategories = MutableStateFlow(
-        listOf(
-            CategoryItem("Зарплата", Icons.Default.Payments),
-            CategoryItem("Фриланс", Icons.Default.Computer),
-            CategoryItem("Подарки", Icons.Default.CardGiftcard),
-            CategoryItem("Проценты", Icons.AutoMirrored.Filled.TrendingUp),
-            CategoryItem("Аренда", Icons.Default.HomeWork),
-            CategoryItem("Прочее", Icons.Default.MoreHoriz),
-            CategoryItem("Другое", Icons.Default.Add)
-        )
-    )
-    val incomeCategories = _incomeCategories.asStateFlow()
-
-    // Источники средств
-    private val _sources = MutableStateFlow<List<Source>>(ColorUtils.defaultSources)
-    val sources = _sources.asStateFlow()
-
     private val _state = MutableStateFlow(AddTransactionState())
     val state: StateFlow<AddTransactionState> = _state.asStateFlow()
 
@@ -99,7 +49,7 @@ class AddTransactionViewModel(
             }
         }
         // Инициализируем список источников
-        _state.update { it.copy(sources = _sources.value) }
+        _state.update { it.copy(sources = ColorUtils.defaultSources) }
     }
 
     /**
@@ -258,9 +208,29 @@ class AddTransactionViewModel(
                 )
 
                 addTransactionUseCase(transaction)
+
+                // Логируем добавление транзакции в аналитику
+                AnalyticsUtils.logTransactionAdded(
+                    type = if (_state.value.isExpense) "expense" else "income",
+                    amount = amount.toDouble(),
+                    category = _state.value.category
+                )
+                
                 _state.update { it.copy(isSuccess = true) }
+
+                // Уведомляем другие компоненты о добавлении транзакции
+                EventBus.emit(Event.TransactionAdded)
+
+                // Обновляем виджеты баланса
+                updateBalanceWidget()
             } catch (e: Exception) {
                 _state.update { it.copy(error = e.message) }
+
+                // Логируем ошибку в аналитику
+                AnalyticsUtils.logError(
+                    errorType = "transaction_add_error",
+                    errorMessage = e.message ?: "Unknown error"
+                )
             } finally {
                 _state.update { it.copy(isLoading = false) }
             }
@@ -299,16 +269,15 @@ class AddTransactionViewModel(
                 )
 
                 // Добавляем источник в список
-                val updatedSources = _sources.value.toMutableList()
+                val updatedSources = ColorUtils.defaultSources.toMutableList()
                 updatedSources.add(newSource)
-                _sources.value = updatedSources
+                _state.update { it.copy(sources = updatedSources) }
 
                 // Обновляем состояние
                 _state.update {
                     it.copy(
                         source = source,
                         sourceColor = color,
-                        sources = updatedSources,
                         showSourcePicker = false,
                         showCustomSourceDialog = false,
                         customSource = ""
@@ -328,7 +297,7 @@ class AddTransactionViewModel(
         val widgetManager = AppWidgetManager.getInstance(context)
         val widgetComponent = ComponentName(context, "com.davidbugayov.financeanalyzer.widget.BalanceWidget")
         val widgetIds = widgetManager.getAppWidgetIds(widgetComponent)
-        
+
         if (widgetIds.isNotEmpty()) {
             val intent = Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.BalanceWidget"))
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
@@ -345,18 +314,6 @@ class AddTransactionViewModel(
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallWidgetIds)
             context.sendBroadcast(intent)
-        }
-    }
-
-    /**
-     * Проверяет, является ли введенная сумма валидной
-     */
-    fun isAmountValid(amount: String): Boolean {
-        return try {
-            val value = amount.toDouble()
-            value > 0
-        } catch (e: Exception) {
-            false
         }
     }
 } 

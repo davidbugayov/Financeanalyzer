@@ -268,9 +268,10 @@ class ChartViewModel : ViewModel(), KoinComponent {
                     amount = expense.amount.toDouble()
                 )
             }
+            .filter { it.amount.amount.toDouble() > 0 }
             .sortedBy { it.date }
             .also { dailyExpenses ->
-                Timber.d("Generated ${dailyExpenses.size} daily expenses")
+                Timber.d("Generated ${dailyExpenses.size} daily expenses (after filtering zero expenses)")
                 dailyExpenses.forEach { expense ->
                     Timber.d("Daily expense: ${formatDate(expense.date)} - Amount: ${expense.amount}")
                 }

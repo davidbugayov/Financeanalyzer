@@ -18,6 +18,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,7 +33,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesSection
+import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesChart
 import com.davidbugayov.financeanalyzer.presentation.chart.components.PieChartSection
 import com.davidbugayov.financeanalyzer.presentation.chart.components.SavingsRateDialog
 import com.davidbugayov.financeanalyzer.presentation.chart.components.StatisticsSection
@@ -44,6 +45,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -58,6 +60,22 @@ fun FinanceChartScreen(
     // Collect state from ViewModel
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
+
+    // Логируем открытие экрана графиков
+    LaunchedEffect(Unit) {
+        AnalyticsUtils.logScreenView(
+            screenName = "finance_chart",
+            screenClass = "FinanceChartScreen"
+        )
+    }
+
+    // Логируем изменение периода
+    LaunchedEffect(state.periodType, state.startDate, state.endDate) {
+        AnalyticsUtils.logChartViewed(
+            chartType = "finance_chart",
+            periodType = state.periodType.name.lowercase()
+        )
+    }
 
     // UI state
     var showSavingsRateInfo by remember { mutableStateOf(false) }
@@ -250,7 +268,7 @@ fun FinanceChartScreen(
                     )
 
                     // Daily expenses section
-                    DailyExpensesSection(
+                    DailyExpensesChart(
                         dailyExpenses = state.dailyExpenses,
                         modifier = Modifier.padding(vertical = 8.dp)
                     )

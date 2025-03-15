@@ -40,6 +40,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -72,6 +73,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
 import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -87,6 +89,14 @@ fun AddTransactionScreen(
 ) {
     val state by viewModel.state.collectAsState()
     var showCancelConfirmation by remember { mutableStateOf(false) }
+
+    // Логируем открытие экрана добавления транзакции
+    LaunchedEffect(Unit) {
+        AnalyticsUtils.logScreenView(
+            screenName = "add_transaction",
+            screenClass = "AddTransactionScreen"
+        )
+    }
 
     // Цвета для типов транзакций
     val incomeColor = LocalIncomeColor.current

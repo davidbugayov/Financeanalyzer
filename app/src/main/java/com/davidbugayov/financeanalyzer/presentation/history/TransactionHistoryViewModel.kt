@@ -9,14 +9,12 @@ import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.utils.Event
-import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -42,13 +40,6 @@ class TransactionHistoryViewModel(
     private val _state = MutableStateFlow(TransactionHistoryState())
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
 
-    // Категории
-    private val _expenseCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
-    val expenseCategories = _expenseCategories.asStateFlow()
-
-    private val _incomeCategories = MutableStateFlow<List<CategoryItem>>(emptyList())
-    val incomeCategories = _incomeCategories.asStateFlow()
-
     // Кэш для хранения результатов вычислений
     private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, List<Transaction>>()
     private val groupedTransactionsCache = mutableMapOf<GroupCacheKey, Map<String, List<Transaction>>>()
@@ -61,13 +52,13 @@ class TransactionHistoryViewModel(
         // Подписываемся на изменения категорий
         viewModelScope.launch {
             categoriesViewModel.expenseCategories.collect { categories ->
-                _expenseCategories.value = categories
+                _state.update { it.copy(expenseCategories = categories) }
             }
         }
 
         viewModelScope.launch {
             categoriesViewModel.incomeCategories.collect { categories ->
-                _incomeCategories.value = categories
+                _state.update { it.copy(incomeCategories = categories) }
             }
         }
     }
@@ -165,40 +156,40 @@ class TransactionHistoryViewModel(
      */
     private fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
             try {
                 when (val result = deleteTransactionUseCase(transaction)) {
                     is Result.Success -> {
-                        // Отправляем событие об удалении транзакции
-                        EventBus.emit(Event.TransactionDeleted)
+                        // Логируем удаление транзакции в аналитику
+                        AnalyticsUtils.logTransactionDeleted(
+                            type = if (transaction.isExpense) "expense" else "income",
+                            category = transaction.category
+                        )
 
-                        // Очищаем все кэши и перезагружаем данные
-                        clearAllCaches()
+                        // Обновляем список транзакций
                         loadTransactions()
 
+                        // Скрываем диалог подтверждения
                         _state.update { it.copy(transactionToDelete = null) }
                     }
                     is Result.Error -> {
-                        val exception = result.exception
-                        Timber.e("Failed to delete transaction: ${exception.message}")
-                        _state.update {
-                            it.copy(
-                                error = exception.message ?: "Failed to delete transaction",
-                                isLoading = false,
-                                transactionToDelete = null
-                            )
-                        }
+                        _state.update { it.copy(error = result.exception.message) }
+
+                        // Логируем ошибку в аналитику
+                        AnalyticsUtils.logError(
+                            errorType = "transaction_delete_error",
+                            errorMessage = result.exception.message ?: "Unknown error"
+                        )
                     }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Error deleting transaction")
-                _state.update {
-                    it.copy(
-                        error = "Error deleting transaction: ${e.message}",
-                        isLoading = false,
-                        transactionToDelete = null
-                    )
-                }
+                _state.update { it.copy(error = "Ошибка при удалении транзакции: ${e.message}") }
+
+                // Логируем исключение в аналитику
+                AnalyticsUtils.logError(
+                    errorType = "transaction_delete_exception",
+                    errorMessage = e.message ?: "Unknown exception"
+                )
             }
         }
     }
@@ -349,6 +340,9 @@ class TransactionHistoryViewModel(
                 // Удаляем категорию через CategoriesViewModel
                 categoriesViewModel.removeCategory(category, isExpense)
 
+                // Логируем удаление категории в аналитику
+                AnalyticsUtils.logCategoryDeleted(category, isExpense)
+
                 // Если удаляемая категория была выбрана, сбрасываем фильтр
                 if (_state.value.selectedCategory == category) {
                     _state.update { it.copy(selectedCategory = null) }
@@ -363,6 +357,12 @@ class TransactionHistoryViewModel(
             } catch (e: Exception) {
                 Timber.e(e, "Error deleting category")
                 _state.update { it.copy(error = "Ошибка при удалении категории: ${e.message}") }
+
+                // Логируем ошибку в аналитику
+                AnalyticsUtils.logError(
+                    errorType = "category_delete_error",
+                    errorMessage = e.message ?: "Unknown exception"
+                )
             }
         }
     }

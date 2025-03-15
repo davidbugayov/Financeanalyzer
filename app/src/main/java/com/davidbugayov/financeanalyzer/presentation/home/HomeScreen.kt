@@ -69,6 +69,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import java.text.SimpleDateFormat
@@ -91,6 +92,14 @@ fun HomeScreen(
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
 
+    // Логируем открытие главного экрана
+    LaunchedEffect(Unit) {
+        AnalyticsUtils.logScreenView(
+            screenName = "home",
+            screenClass = "HomeScreen"
+        )
+    }
+
     // Состояние для обратной связи
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
@@ -111,7 +120,9 @@ fun HomeScreen(
 
     // Сохраняем настройку при изменении
     LaunchedEffect(showGroupSummary) {
-        sharedPreferences.edit().putBoolean("show_group_summary", showGroupSummary).apply()
+        sharedPreferences.edit {
+            putBoolean("show_group_summary", showGroupSummary)
+        }
         // Обновляем состояние в ViewModel
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
     }

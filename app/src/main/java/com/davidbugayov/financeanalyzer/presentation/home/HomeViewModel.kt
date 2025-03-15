@@ -48,6 +48,9 @@ class HomeViewModel(
     init {
         Timber.d("HomeViewModel initialized")
         loadTransactions()
+
+        // TODO: УДАЛИТЬ ПЕРЕД РЕЛИЗОМ - Тестовый код для проверки Crashlytics
+        // testCrashlytics()
         subscribeToEvents()
     }
 
