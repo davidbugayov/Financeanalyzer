@@ -26,6 +26,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.AttachFile
+import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -65,6 +66,7 @@ import com.davidbugayov.financeanalyzer.presentation.add.components.CustomSource
 import com.davidbugayov.financeanalyzer.presentation.add.components.DateField
 import com.davidbugayov.financeanalyzer.presentation.add.components.NoteField
 import com.davidbugayov.financeanalyzer.presentation.add.components.SourcePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.add.components.SourceField
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
@@ -148,7 +150,13 @@ fun AddTransactionScreen(
                     Text(
                         text = formattedDate,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier
+                            .clip(RoundedCornerShape(8.dp))
+                            .clickable {
+                                viewModel.onEvent(AddTransactionEvent.ShowDatePicker)
+                            }
+                            .padding(vertical = 4.dp, horizontal = 8.dp)
                     )
 
                     Row(
@@ -197,7 +205,8 @@ fun AddTransactionScreen(
                         },
                         onAddSourceClick = {
                             viewModel.onEvent(AddTransactionEvent.ShowCustomSourceDialog)
-                        }
+                        },
+                        isError = state.sourceError
                     )
                 }
 
@@ -235,15 +244,15 @@ fun AddTransactionScreen(
                             modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            OutlinedTextField(
-                                value = state.amount,
-                                onValueChange = { viewModel.onEvent(AddTransactionEvent.SetAmount(it)) },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                                singleLine = true,
-                                isError = state.amountError,
-                                supportingText = if (state.amountError) {
-                                    { Text("Введите корректную сумму") }
-                                } else null,
+                OutlinedTextField(
+                    value = state.amount,
+                    onValueChange = { viewModel.onEvent(AddTransactionEvent.SetAmount(it)) },
+                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+                    singleLine = true,
+                    isError = state.amountError,
+                    supportingText = if (state.amountError) {
+                        { Text("Введите корректную сумму") }
+                    } else null,
                                 modifier = Modifier.weight(1f),
                                 textStyle = MaterialTheme.typography.headlineMedium.copy(
                                     textAlign = TextAlign.End,
@@ -298,15 +307,15 @@ fun AddTransactionScreen(
                             .padding(horizontal = 16.dp, vertical = 8.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        NoteField(
-                            note = state.note,
-                            onNoteChange = { note ->
-                                viewModel.onEvent(AddTransactionEvent.SetNote(note))
+                NoteField(
+                    note = state.note,
+                    onNoteChange = { note ->
+                        viewModel.onEvent(AddTransactionEvent.SetNote(note))
                             },
                             modifier = Modifier.weight(1f)
                         )
 
-                        IconButton(onClick = { /* Действие для прикрепления файла */ }) {
+                        IconButton(onClick = { viewModel.onEvent(AddTransactionEvent.AttachReceipt) }) {
                             Icon(
                                 imageVector = Icons.Default.AttachFile,
                                 contentDescription = "Прикрепить чек",
@@ -346,6 +355,7 @@ fun AddTransactionScreen(
                     initialDate = state.selectedDate,
                     onDateSelected = { date ->
                         viewModel.onEvent(AddTransactionEvent.SetDate(date))
+                        viewModel.onEvent(AddTransactionEvent.HideDatePicker)
                     },
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideDatePicker)
@@ -417,6 +427,7 @@ fun AddTransactionScreen(
                 )
             }
 
+            /* Диалоги, связанные с источником, временно скрыты из-за проблем с импортами */
             if (state.showSourcePicker) {
                 SourcePickerDialog(
                     sources = state.sources,
@@ -464,6 +475,7 @@ fun AddTransactionScreen(
                     }
                 )
             }
+            /* */
         }
     }
 }
@@ -473,22 +485,50 @@ fun SourceSection(
     sources: List<Source>,
     selectedSource: String,
     onSourceSelected: (Source) -> Unit,
-    onAddSourceClick: () -> Unit
+    onAddSourceClick: () -> Unit,
+    isError: Boolean = false
 ) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(sources) { source ->
-            SourceItem(
-                source = source,
-                isSelected = source.name == selectedSource,
-                onClick = { onSourceSelected(source) }
-            )
-        }
+    Column {
+        // Добавляем поле для отображения выбранного источника
+        SourceField(
+            source = selectedSource,
+            color = sources.find { it.name == selectedSource }?.color ?: 0xFF21A038.toInt(),
+            isError = isError,
+            onClick = { onAddSourceClick() },
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+        )
+        
+        Text(
+            text = stringResource(R.string.select_source_or_add),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
+        )
+        
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(sources) { source ->
+                SourceItem(
+                    source = source,
+                    isSelected = source.name == selectedSource,
+                    onClick = { onSourceSelected(source) }
+                )
+            }
 
-        item {
-            AddSourceItem(onClick = onAddSourceClick)
+            item {
+                AddSourceItem(onClick = onAddSourceClick)
+            }
+        }
+        
+        if (isError) {
+            Text(
+                text = stringResource(R.string.source_error),
+                color = MaterialTheme.colorScheme.error,
+                style = MaterialTheme.typography.bodySmall,
+                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+            )
         }
     }
 }

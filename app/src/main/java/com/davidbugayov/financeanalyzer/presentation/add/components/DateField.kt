@@ -1,9 +1,11 @@
 package com.davidbugayov.financeanalyzer.presentation.add.components
 
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -29,12 +31,15 @@ fun DateField(
         readOnly = true,
         label = { Text(stringResource(R.string.date)) },
         trailingIcon = {
-            Icon(
-                imageVector = Icons.Default.DateRange,
-                contentDescription = stringResource(R.string.select_date_button)
-            )
+            IconButton(onClick = onClick) {
+                Icon(
+                    imageVector = Icons.Default.DateRange,
+                    contentDescription = stringResource(R.string.select_date_button)
+                )
+            }
         },
         modifier = modifier
+            .fillMaxWidth()
             .clickable(onClick = onClick)
     )
 } 

@@ -37,6 +37,7 @@ fun DatePickerDialog(
                     datePickerState.selectedDateMillis?.let { millis ->
                         onDateSelected(Date(millis))
                     }
+                    onDismiss()
                 }
             ) {
                 Text(stringResource(R.string.confirm))

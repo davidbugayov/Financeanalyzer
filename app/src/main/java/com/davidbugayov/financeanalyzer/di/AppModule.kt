@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -34,6 +35,7 @@ val appModule = module {
     // Preferences
     single { CurrencyPreferences.getInstance(androidContext()) }
     single { CategoryPreferences.getInstance(androidContext()) }
+    single { PreferencesManager(androidContext()) }
     
     // Repositories
     single<ITransactionRepository> { TransactionRepositoryImpl(get()) }
@@ -65,7 +67,8 @@ val appModule = module {
         AddTransactionViewModel(
             application = androidApplication(),
             addTransactionUseCase = get(),
-            categoriesViewModel = get()
+            categoriesViewModel = get(),
+            preferencesManager = get()
         )
     }
 }

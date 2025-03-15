@@ -27,8 +27,8 @@ data class AddTransactionState(
     val titleError: Boolean = false,
     val amountError: Boolean = false,
     val categoryError: Boolean = false,
-    val source: String = "",
-    val sourceColor: Int = 0xFF2196F3.toInt(),
+    val source: String = "Сбер",
+    val sourceColor: Int = 0xFF21A038.toInt(), // Цвет Сбера
     val sourceError: Boolean = false,
     val showSourcePicker: Boolean = false,
     val showCustomSourceDialog: Boolean = false,

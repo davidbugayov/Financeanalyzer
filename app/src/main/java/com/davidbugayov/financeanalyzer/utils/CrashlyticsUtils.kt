@@ -16,12 +16,8 @@ object CrashlyticsUtils {
      */
     private fun getCrashlyticsInstance(): FirebaseCrashlytics? {
         return try {
-            if (FinanceApp.isFirebaseInitialized) {
-                FirebaseCrashlytics.getInstance()
-            } else {
-                Timber.w("Firebase не инициализирован, Crashlytics недоступен")
-                null
-            }
+            // Всегда пытаемся получить экземпляр напрямую, независимо от флага
+            FirebaseCrashlytics.getInstance()
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при получении экземпляра Crashlytics")
             null

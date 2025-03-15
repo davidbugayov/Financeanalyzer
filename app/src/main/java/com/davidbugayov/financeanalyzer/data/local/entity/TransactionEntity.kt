@@ -24,7 +24,8 @@ data class TransactionEntity(
     val category: String,
     val isExpense: Boolean,
     val date: Date,
-    val note: String?
+    val note: String?,
+    val source: String = "Сбер"
 ) {
 
     /**
@@ -39,7 +40,8 @@ data class TransactionEntity(
             category = category,
             isExpense = isExpense,
             date = date,
-            note = note
+            note = note,
+            source = source
         )
     }
 
@@ -57,7 +59,8 @@ data class TransactionEntity(
                 category = transaction.category,
                 isExpense = transaction.isExpense,
                 date = transaction.date,
-                note = transaction.note
+                note = transaction.note,
+                source = transaction.source
             )
         }
     }

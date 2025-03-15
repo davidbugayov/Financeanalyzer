@@ -232,11 +232,12 @@
 
     <!-- Источники средств -->
     <string name="source">Откуда</string>
-    <string name="select_source">Выберите источник</string>
-    <string name="add_custom_source">Добавить свой источник</string>
     <string name="source_name">Название источника</string>
+    <string name="select_source">Выберите источник</string>
+    <string name="add_custom_source">Добавить источник</string>
     <string name="select_color">Выберите цвет</string>
     <string name="change_color">Изменить цвет</string>
     <string name="source_error">Выберите источник</string>
+    <string name="select_source_or_add">Выберите источник или добавьте новый</string>
 
 </resources>

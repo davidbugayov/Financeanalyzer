@@ -46,6 +46,7 @@ android {
         buildConfigField("boolean", "ENABLE_LOGGING", "false")
 
         // Firebase для всех версий
+        buildConfigField("boolean", "FIREBASE_ENABLED", "true")
         manifestPlaceholders["crashlyticsCollectionEnabled"] = "true"
         manifestPlaceholders["analyticsCollectionEnabled"] = "true"
         manifestPlaceholders["performanceCollectionEnabled"] = "true"
@@ -97,11 +98,6 @@ android {
             versionNameSuffix = "-debug"
             buildConfigField("boolean", "DEBUG", "true")
             resValue("string", "app_name", "Finanalyzer Debug")
-
-            // Включаем Firebase Crashlytics для debug-сборки, но отключаем аналитику
-            manifestPlaceholders["crashlyticsCollectionEnabled"] = "true"
-            manifestPlaceholders["analyticsCollectionEnabled"] = "false"
-            manifestPlaceholders["performanceCollectionEnabled"] = "false"
 
             // Включаем инспекцию Compose
             manifestPlaceholders["enableComposeCompilerReports"] = "true"
@@ -218,7 +214,7 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
     // Явная зависимость для Layout Inspector
-    debugImplementation("androidx.compose.ui:ui-tooling:1.6.1")
+    debugImplementation("androidx.compose.ui:ui-tooling:1.7.8")
     debugImplementation(libs.androidx.customview)
     debugImplementation(libs.androidx.customview.poolingcontainer)
     

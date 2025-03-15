@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer
 
 import android.app.Application
+import android.os.Bundle
 import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.homeModule
@@ -35,16 +36,20 @@ class FinanceApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Сначала инициализируем Firebase
-        initializeFirebase()
-
-        // Затем инициализируем логирование, когда Firebase уже доступен
+        // Инициализируем логирование перед всем остальным
         TimberInitializer.init(BuildConfig.DEBUG)
+        
+        // Логируем начало инициализации
+        Timber.i("Application initialization started")
+
+        // Инициализируем Firebase
+        initializeFirebase()
 
         // Инициализируем аналитику и Crashlytics
         initializeAnalytics()
         initializeCrashlytics()
 
+        // Инициализируем Koin
         startKoin {
             androidLogger()
             androidContext(this@FinanceApp)
@@ -56,19 +61,33 @@ class FinanceApp : Application() {
         }
 
         // Логируем через Timber для проверки отправки в Crashlytics
-        Timber.i("Application initialized")
+        Timber.i("Application initialized successfully")
 
         // Логируем информацию о запуске приложения
         CrashlyticsUtils.setCustomKey("app_start_time", System.currentTimeMillis())
         CrashlyticsUtils.setCustomKey("device_memory", getAvailableMemory())
         CrashlyticsUtils.setCustomKey("device_language", resources.configuration.locales[0].language)
+        
+        // Принудительно вызываем сбор и отправку данных
+        if (isFirebaseInitialized) {
+            try {
+                crashlytics.sendUnsentReports()
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to send unsent reports")
+            }
+        }
     }
 
     private fun initializeFirebase() {
         try {
-            FirebaseApp.initializeApp(this)
+            // Проверяем, что Firebase еще не инициализирован
+            if (FirebaseApp.getApps(this).isEmpty()) {
+                FirebaseApp.initializeApp(this)
+                Timber.d("Firebase initialized successfully")
+            } else {
+                Timber.d("Firebase already initialized")
+            }
             isFirebaseInitialized = true
-            Timber.d("Firebase initialized successfully")
         } catch (e: Exception) {
             Timber.e(e, "Failed to initialize Firebase")
             isFirebaseInitialized = false
@@ -76,12 +95,8 @@ class FinanceApp : Application() {
     }
 
     private fun initializeAnalytics() {
-        if (!isFirebaseInitialized) {
-            Timber.w("Skipping Analytics initialization as Firebase is not initialized")
-            return
-        }
-
         try {
+            // Получаем экземпляр Analytics независимо от флага isFirebaseInitialized
             firebaseAnalytics = Firebase.analytics
             analytics = firebaseAnalytics
 
@@ -91,26 +106,28 @@ class FinanceApp : Application() {
             firebaseAnalytics.setUserProperty("device_model", android.os.Build.MODEL)
             firebaseAnalytics.setUserProperty("android_version", android.os.Build.VERSION.RELEASE)
 
-            // TODO: Вернуть отключение аналитики для debug-сборок перед релизом
-            // Включаем аналитику для всех сборок (временно)
+            // Включаем аналитику для всех сборок
             firebaseAnalytics.setAnalyticsCollectionEnabled(true)
 
+            // Отправляем тестовое событие
+            val params = Bundle().apply {
+                putString("test_param", "test_value")
+            }
+            firebaseAnalytics.logEvent("app_initialized", params)
+
             Timber.d("Analytics initialized successfully, collection enabled: true")
+            isFirebaseInitialized = true
         } catch (e: Exception) {
             Timber.e(e, "Failed to initialize Analytics")
         }
     }
 
     private fun initializeCrashlytics() {
-        if (!isFirebaseInitialized) {
-            Timber.w("Skipping Crashlytics initialization as Firebase is not initialized")
-            return
-        }
-
         try {
+            // Получаем экземпляр Crashlytics независимо от флага isFirebaseInitialized
             crashlytics = FirebaseCrashlytics.getInstance()
 
-            // Включаем Crashlytics для всех сборок
+            // Всегда включаем сбор данных о крешах
             crashlytics.setCrashlyticsCollectionEnabled(true)
 
             // Добавляем ключевую информацию для отладки
@@ -120,8 +137,15 @@ class FinanceApp : Application() {
             crashlytics.setCustomKey("android_version", android.os.Build.VERSION.RELEASE)
             crashlytics.setCustomKey("device_manufacturer", android.os.Build.MANUFACTURER)
             crashlytics.setCustomKey("device_brand", android.os.Build.BRAND)
+            
+            // Отправляем тестовый креш при запуске в отладочной сборке
+            if (BuildConfig.DEBUG) {
+                crashlytics.log("Sending test crash from FinanceApp.initializeCrashlytics")
+                crashlytics.recordException(Exception("Test exception from FinanceApp.initializeCrashlytics"))
+            }
 
             Timber.d("Crashlytics initialized successfully")
+            isFirebaseInitialized = true
         } catch (e: Exception) {
             Timber.e(e, "Failed to initialize Crashlytics")
         }

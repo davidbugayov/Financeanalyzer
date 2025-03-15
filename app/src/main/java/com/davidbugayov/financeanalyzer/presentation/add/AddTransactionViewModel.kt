@@ -16,6 +16,7 @@ import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.davidbugayov.financeanalyzer.utils.Event
 import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -23,6 +24,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import java.math.BigDecimal
+import timber.log.Timber
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -31,13 +33,43 @@ import java.math.BigDecimal
 class AddTransactionViewModel(
     application: Application,
     private val addTransactionUseCase: AddTransactionUseCase,
-    private val categoriesViewModel: CategoriesViewModel
+    private val categoriesViewModel: CategoriesViewModel,
+    private val preferencesManager: PreferencesManager
 ) : AndroidViewModel(application), KoinComponent {
 
     private val _state = MutableStateFlow(AddTransactionState())
     val state: StateFlow<AddTransactionState> = _state.asStateFlow()
 
     init {
+        // Загружаем категории
+        loadCategories()
+        
+        // Инициализируем список источников
+        initSources()
+    }
+
+    /**
+     * Инициализирует список источников
+     */
+    private fun initSources() {
+        // Загружаем сохраненные источники из SharedPreferences
+        val savedSources = preferencesManager.getCustomSources()
+        
+        // Если есть сохраненные источники, используем их
+        // Иначе используем стандартные источники
+        val sources = if (savedSources.isNotEmpty()) {
+            savedSources
+        } else {
+            ColorUtils.defaultSources
+        }
+        
+        _state.update { it.copy(sources = sources) }
+    }
+
+    /**
+     * Загружает категории из CategoriesViewModel
+     */
+    private fun loadCategories() {
         viewModelScope.launch {
             categoriesViewModel.expenseCategories.collect { categories ->
                 _state.update { it.copy(expenseCategories = categories) }
@@ -48,8 +80,6 @@ class AddTransactionViewModel(
                 _state.update { it.copy(incomeCategories = categories) }
             }
         }
-        // Инициализируем список источников
-        _state.update { it.copy(sources = ColorUtils.defaultSources) }
     }
 
     /**
@@ -170,6 +200,9 @@ class AddTransactionViewModel(
             is AddTransactionEvent.SetSourceColor -> {
                 _state.update { it.copy(sourceColor = event.color) }
             }
+            is AddTransactionEvent.AttachReceipt -> {
+                attachReceipt()
+            }
         }
     }
 
@@ -204,7 +237,8 @@ class AddTransactionViewModel(
                     category = _state.value.category,
                     isExpense = _state.value.isExpense,
                     date = _state.value.selectedDate,
-                    note = _state.value.note.ifBlank { null }
+                    note = _state.value.note.ifBlank { null },
+                    source = _state.value.source.ifBlank { "Сбер" }
                 )
 
                 addTransactionUseCase(transaction)
@@ -257,35 +291,41 @@ class AddTransactionViewModel(
      * Добавляет новый пользовательский источник
      */
     private fun addCustomSource(source: String, color: Int) {
-        if (source.isBlank()) return
-        viewModelScope.launch {
-            try {
-                // Создаем новый источник
-                val newSource = Source(
-                    id = System.currentTimeMillis(), // Используем текущее время как ID
-                    name = source,
-                    color = color,
-                    isCustom = true
-                )
-
-                // Добавляем источник в список
-                val updatedSources = ColorUtils.defaultSources.toMutableList()
-                updatedSources.add(newSource)
-                _state.update { it.copy(sources = updatedSources) }
-
-                // Обновляем состояние
-                _state.update {
-                    it.copy(
-                        source = source,
-                        sourceColor = color,
-                        showSourcePicker = false,
-                        showCustomSourceDialog = false,
-                        customSource = ""
-                    )
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
+        try {
+            if (source.isBlank()) {
+                _state.update { it.copy(error = "Название источника не может быть пустым") }
+                return
             }
+
+            // Создаем новый источник
+            val newSource = Source(
+                name = source,
+                color = color,
+                isCustom = true
+            )
+
+            // Добавляем источник в список
+            val currentSources = _state.value.sources.toMutableList()
+            currentSources.add(newSource)
+            
+            // Сохраняем обновленный список источников в SharedPreferences
+            preferencesManager.saveCustomSources(currentSources)
+            
+            // Обновляем состояние
+            _state.update { it.copy(sources = currentSources) }
+
+            // Обновляем состояние
+            _state.update {
+                it.copy(
+                    source = source,
+                    sourceColor = color,
+                    showSourcePicker = false,
+                    showCustomSourceDialog = false,
+                    customSource = ""
+                )
+            }
+        } catch (e: Exception) {
+            _state.update { it.copy(error = e.message) }
         }
     }
 
@@ -314,6 +354,22 @@ class AddTransactionViewModel(
             intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
             intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallWidgetIds)
             context.sendBroadcast(intent)
+        }
+    }
+
+    /**
+     * Обрабатывает прикрепление чека
+     */
+    private fun attachReceipt() {
+        // Здесь будет логика прикрепления чека
+        // Пока просто логируем действие
+        Timber.d("Прикрепление чека")
+        
+        // Можно показать сообщение пользователю
+        _state.update { 
+            it.copy(
+                note = if (it.note.isBlank()) "Чек прикреплен" else "${it.note} (Чек прикреплен)"
+            ) 
         }
     }
 } 

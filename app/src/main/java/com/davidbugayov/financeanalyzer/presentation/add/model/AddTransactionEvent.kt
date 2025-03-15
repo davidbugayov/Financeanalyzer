@@ -37,4 +37,5 @@ sealed class AddTransactionEvent {
     object Submit : AddTransactionEvent()
     object ClearError : AddTransactionEvent()
     object HideSuccessDialog : AddTransactionEvent()
+    object AttachReceipt : AddTransactionEvent()
 } 
