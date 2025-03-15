@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.state
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Calendar
@@ -28,6 +29,8 @@ import java.util.Date
  * @property showEndDatePicker Флаг отображения диалога выбора конечной даты
  * @property transactionToDelete Транзакция, которую нужно удалить (null, если нет)
  * @property categoryToDelete Пара (название категории, isExpense)
+ * @property expenseCategories Список категорий расходов
+ * @property incomeCategories Список категорий доходов
  */
 data class TransactionHistoryState(
     val transactions: List<Transaction> = emptyList(),
@@ -45,5 +48,7 @@ data class TransactionHistoryState(
     val showStartDatePicker: Boolean = false,
     val showEndDatePicker: Boolean = false,
     val transactionToDelete: Transaction? = null,
-    val categoryToDelete: Pair<String, Boolean>? = null
+    val categoryToDelete: Pair<String, Boolean>? = null,
+    val expenseCategories: List<CategoryItem> = emptyList(),
+    val incomeCategories: List<CategoryItem> = emptyList()
 ) 

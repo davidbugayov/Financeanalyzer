@@ -80,32 +80,6 @@ object CrashlyticsUtils {
      * @param key Ключ
      * @param value Значение
      */
-    fun setCustomKey(key: String, value: Boolean) {
-        try {
-            getCrashlyticsInstance()?.setCustomKey(key, value) ?: Timber.d("Ключ не установлен в Crashlytics: $key = $value")
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке ключа в Crashlytics: $key = $value")
-        }
-    }
-
-    /**
-     * Устанавливает пользовательский ключ для Crashlytics
-     * @param key Ключ
-     * @param value Значение
-     */
-    fun setCustomKey(key: String, value: Int) {
-        try {
-            getCrashlyticsInstance()?.setCustomKey(key, value) ?: Timber.d("Ключ не установлен в Crashlytics: $key = $value")
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке ключа в Crashlytics: $key = $value")
-        }
-    }
-
-    /**
-     * Устанавливает пользовательский ключ для Crashlytics
-     * @param key Ключ
-     * @param value Значение
-     */
     fun setCustomKey(key: String, value: Long) {
         try {
             getCrashlyticsInstance()?.setCustomKey(key, value) ?: Timber.d("Ключ не установлен в Crashlytics: $key = $value")
@@ -119,20 +93,7 @@ object CrashlyticsUtils {
      * @param key Ключ
      * @param value Значение
      */
-    fun setCustomKey(key: String, value: Float) {
-        try {
-            getCrashlyticsInstance()?.setCustomKey(key, value) ?: Timber.d("Ключ не установлен в Crashlytics: $key = $value")
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке ключа в Crashlytics: $key = $value")
-        }
-    }
-
-    /**
-     * Устанавливает пользовательский ключ для Crashlytics
-     * @param key Ключ
-     * @param value Значение
-     */
-    fun setCustomKey(key: String, value: Double) {
+    fun setCustomKey(key: String, value: Int) {
         try {
             getCrashlyticsInstance()?.setCustomKey(key, value) ?: Timber.d("Ключ не установлен в Crashlytics: $key = $value")
         } catch (e: Exception) {

@@ -67,6 +67,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicatorWithMessage
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -120,9 +121,9 @@ fun HomeScreen(
 
     // Сохраняем настройку при изменении
     LaunchedEffect(showGroupSummary) {
-        sharedPreferences.edit {
-            putBoolean("show_group_summary", showGroupSummary)
-        }
+        val editor = sharedPreferences.edit()
+        editor.putBoolean("show_group_summary", showGroupSummary)
+        editor.apply()
         // Обновляем состояние в ViewModel
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
     }
@@ -224,7 +225,7 @@ fun HomeScreen(
                             .padding(horizontal = 16.dp, vertical = 8.dp)
                             .height(80.dp),
                         horizontalArrangement = Arrangement.SpaceEvenly,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = CenterVertically
                     ) {
                         // Кнопка Графики
                         Column(
@@ -341,7 +342,7 @@ fun HomeScreen(
  */
 @Composable
 private fun CompactLayout(
-    state: com.davidbugayov.financeanalyzer.presentation.home.state.HomeState,
+    state: HomeState,
     showGroupSummary: Boolean,
     onShowGroupSummaryChange: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -390,7 +391,7 @@ private fun CompactLayout(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = CenterVertically
             ) {
                 Text(
                     text = when (state.currentFilter) {
@@ -479,7 +480,7 @@ private fun CompactLayout(
  */
 @Composable
 private fun ExpandedLayout(
-    state: com.davidbugayov.financeanalyzer.presentation.home.state.HomeState,
+    state: HomeState,
     showGroupSummary: Boolean,
     onShowGroupSummaryChange: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -530,7 +531,7 @@ private fun ExpandedLayout(
                     .fillMaxWidth()
                     .padding(vertical = 8.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = CenterVertically
             ) {
                 Text(
                     text = when (state.currentFilter) {
@@ -656,7 +657,7 @@ fun BalanceCard(income: Money, expense: Money, balance: Money) {
     val formattedBalance = remember(balance) { balance.formatForDisplay() }
     val formattedIncome = remember(income) { income.format(false) }
     val formattedExpense = remember(expense) { expense.format(false) }
-    val balanceColor = remember(balance) { if (!balance.isNegative()) incomeColor else expenseColor }
+    val balanceColor = remember(balance) { if (balance >= Money.zero()) incomeColor else expenseColor }
 
     Card(
         modifier = Modifier

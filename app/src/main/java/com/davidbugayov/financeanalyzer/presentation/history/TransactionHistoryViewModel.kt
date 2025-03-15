@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
@@ -43,8 +44,7 @@ class TransactionHistoryViewModel(
     // Кэш для хранения результатов вычислений
     private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, List<Transaction>>()
     private val groupedTransactionsCache = mutableMapOf<GroupCacheKey, Map<String, List<Transaction>>>()
-    private val categoryStatsCache =
-        mutableMapOf<StatsCacheKey, Triple<com.davidbugayov.financeanalyzer.domain.model.Money, com.davidbugayov.financeanalyzer.domain.model.Money, Int?>>()
+    private val categoryStatsCache = mutableMapOf<StatsCacheKey, Triple<Money, Money, Int?>>()
 
     init {
         loadTransactions()

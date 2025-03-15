@@ -17,10 +17,8 @@ object AnalyticsUtils {
         const val TRANSACTION_ADDED = "transaction_added"
         const val TRANSACTION_DELETED = "transaction_deleted"
         const val CATEGORY_DELETED = "category_deleted"
-        const val FILTER_APPLIED = "filter_applied"
         const val CHART_VIEWED = "chart_viewed"
         const val ERROR_OCCURRED = "error_occurred"
-        const val FEATURE_USED = "feature_used"
     }
 
     // Константы для параметров событий
@@ -29,12 +27,10 @@ object AnalyticsUtils {
         const val TRANSACTION_TYPE = "transaction_type"
         const val TRANSACTION_AMOUNT = "transaction_amount"
         const val TRANSACTION_CATEGORY = "transaction_category"
-        const val FILTER_TYPE = "filter_type"
         const val CHART_TYPE = "chart_type"
         const val PERIOD_TYPE = "period_type"
         const val ERROR_TYPE = "error_type"
         const val ERROR_MESSAGE = "error_message"
-        const val FEATURE_NAME = "feature_name"
     }
 
     /**
