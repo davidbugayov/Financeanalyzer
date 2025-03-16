@@ -27,8 +27,8 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 35
-        versionCode = 8
-        versionName = "1.4.3"
+        versionCode = 10
+        versionName = "1.5"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -40,16 +40,6 @@ android {
             getDefaultProguardFile("proguard-android-optimize.txt"),
             "proguard-rules.pro"
         )
-
-        // Настройка API и логирования для всех версий
-        buildConfigField("String", "API_BASE_URL", "\"https://api.financeanalyzer.com/\"")
-        buildConfigField("boolean", "ENABLE_LOGGING", "false")
-
-        // Firebase для всех версий
-        buildConfigField("boolean", "FIREBASE_ENABLED", "true")
-        manifestPlaceholders["crashlyticsCollectionEnabled"] = "true"
-        manifestPlaceholders["analyticsCollectionEnabled"] = "true"
-        manifestPlaceholders["performanceCollectionEnabled"] = "true"
 
         // Имя приложения по умолчанию
         resValue("string", "app_name", "Финансовый Стиль")
@@ -137,50 +127,11 @@ android {
         // Включаем отладочную информацию для Compose
         useLiveLiterals = true
     }
-
-    packaging {
-        resources {
-            excludes += listOf(
-                "/META-INF/{AL2.0,LGPL2.1}",
-                "META-INF/DEPENDENCIES",
-                "META-INF/LICENSE",
-                "META-INF/LICENSE.txt",
-                "META-INF/license.txt",
-                "META-INF/NOTICE",
-                "META-INF/NOTICE.txt",
-                "META-INF/notice.txt",
-                "META-INF/ASL2.0",
-                "META-INF/*.kotlin_module",
-                "META-INF/proguard/**",
-                "META-INF/versions/**",
-                "META-INF/web-fragment.xml",
-                "META-INF/androidx.*",
-                "META-INF/services/kotlin.*"
-            )
-            pickFirsts += listOf(
-                "META-INF/proguard/gson.pro"
-            )
-        }
-        dex {
-            useLegacyPackaging = false
-        }
-    }
-
-    lint {
-        disable += "FlowOperatorInvokedInComposition"
-    }
 }
 
 androidComponents {
     onVariants(selector().withBuildType("release")) {
         it.packaging.resources.excludes.add("META-INF/**")
-    }
-}
-
-// Отключаем Google Services для debug-сборки
-tasks.whenTaskAdded {
-    if (name.contains("Debug") && (name.contains("GoogleServices") || name.contains("Crashlytics"))) {
-        enabled = false
     }
 }
 
@@ -214,7 +165,7 @@ dependencies {
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
     // Явная зависимость для Layout Inspector
-    debugImplementation("androidx.compose.ui:ui-tooling:1.7.8")
+    debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.customview)
     debugImplementation(libs.androidx.customview.poolingcontainer)
     

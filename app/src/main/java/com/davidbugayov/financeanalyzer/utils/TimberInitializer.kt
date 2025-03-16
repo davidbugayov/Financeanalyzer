@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.utils
 import android.util.Log
 import com.davidbugayov.financeanalyzer.FinanceApp
 import timber.log.Timber
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 
 /**
  * Инициализатор для настройки логирования
@@ -13,16 +12,14 @@ object TimberInitializer {
         if (isDebug) {
             // Для отладочной сборки используем расширенное логирование через Timber
             Timber.plant(Timber.DebugTree())
-            Timber.d("Initialized Timber with DebugTree")
         } else {
-            // Для релизной сборки всегда используем CrashReportingTree
-            try {
+            // Для релизной сборки используем Firebase Crashlytics, только если Firebase инициализирован
+            if (FinanceApp.isFirebaseInitialized) {
                 Timber.plant(CrashReportingTree())
-                Timber.d("Initialized Timber with CrashReportingTree")
-            } catch (e: Exception) {
-                // В случае ошибки используем DebugTree
+            } else {
+                // Если Firebase не инициализирован, используем DebugTree
                 Timber.plant(Timber.DebugTree())
-                Log.w("TimberInitializer", "Failed to initialize CrashReportingTree, using DebugTree instead", e)
+                Timber.w("Firebase не инициализирован, используем DebugTree вместо CrashReportingTree")
             }
         }
     }
@@ -40,28 +37,34 @@ private class CrashReportingTree : Timber.Tree() {
                 return
             }
 
-            // Получаем экземпляр Crashlytics напрямую
-            val crashlytics = try {
-                FirebaseCrashlytics.getInstance()
-            } catch (e: Exception) {
-                Log.e("CrashReportingTree", "Failed to get Crashlytics instance", e)
+            // Проверяем, что Firebase инициализирован
+            if (!FinanceApp.isFirebaseInitialized) {
+                // Если Firebase не инициализирован, просто выводим в лог через стандартный механизм
+                // Используем стандартный Log, так как Timber может вызвать рекурсию
+                Log.println(priority, tag ?: "NO_TAG", message)
                 return
             }
 
             // Для информационных логов только записываем сообщение
+            if (priority == Log.INFO) {
+                CrashlyticsUtils.log(message)
+                return
+            }
+
+            // Для ошибок и предупреждений добавляем больше контекста
             val logMessage = if (tag != null) "[$tag] $message" else message
-            crashlytics.log(logMessage)
+            CrashlyticsUtils.log(logMessage)
 
             // Добавляем дополнительные данные для отслеживания
-            crashlytics.setCustomKey("log_priority", priority)
-            crashlytics.setCustomKey("log_tag", tag ?: "NO_TAG")
+            CrashlyticsUtils.setCustomKey("log_priority", priority)
+            CrashlyticsUtils.setCustomKey("log_tag", tag ?: "NO_TAG")
 
             // Для ошибок записываем исключение
             if (t != null) {
-                crashlytics.recordException(t)
+                CrashlyticsUtils.recordException(t, logMessage)
             } else if (priority == Log.ERROR || priority == Log.ASSERT) {
                 // Если исключения нет, но это ошибка, создаем исключение из сообщения
-                crashlytics.recordException(Exception(logMessage))
+                CrashlyticsUtils.recordException(Exception(logMessage))
             }
         } catch (e: Exception) {
             // В случае ошибки при логировании, выводим в стандартный лог

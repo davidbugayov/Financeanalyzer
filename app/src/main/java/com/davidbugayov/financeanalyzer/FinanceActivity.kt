@@ -17,6 +17,7 @@ import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.davidbugayov.financeanalyzer.widget.BalanceWidget
 import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
@@ -31,27 +32,24 @@ class FinanceActivity : ComponentActivity() {
     private var isLaunchedFromShortcut = false
     
     override fun onCreate(savedInstanceState: Bundle?) {
+        // Устанавливаем сплеш-скрин перед вызовом super.onCreate()
+        val splashScreen = installSplashScreen()
+        
         super.onCreate(savedInstanceState)
         
-        // Устанавливаем SplashScreen
-        installSplashScreen()
+        // Обрабатываем deep links
+        handleIntent(intent)
         
-        // Настраиваем отображение на весь экран
+        // Обновляем виджеты при запуске приложения
+        updateWidgets()
+        
+        // Делаем статус бар прозрачным и учитываем системные отступы
         WindowCompat.setDecorFitsSystemWindows(window, false)
         
-        // Тестируем отправку крешей в Crashlytics
-        testCrashlytics()
+        // Настраиваем поведение сплеш-скрина
+        var isReady = false
+        splashScreen.setKeepOnScreenCondition { !isReady }
         
-        // Настраиваем обработку нажатия кнопки "Назад"
-        onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
-            override fun handleOnBackPressed() {
-                // Обработка нажатия кнопки "Назад"
-                // Здесь можно добавить логику для подтверждения выхода
-                finish()
-            }
-        })
-        
-        // Устанавливаем контент
         setContent {
             FinanceAnalyzerTheme {
                 Surface(
@@ -59,45 +57,31 @@ class FinanceActivity : ComponentActivity() {
                     color = MaterialTheme.colorScheme.background
                 ) {
                     MainScreen(startDestination = startDestination)
+                    isReady = true
                 }
             }
         }
-        
-        // Обновляем виджеты
-        updateWidgets()
     }
     
     /**
-     * Тестирует отправку крешей в Crashlytics
+     * Обрабатывает входящий intent и определяет начальный экран
      */
-    private fun testCrashlytics() {
-        try {
-            // Логируем сообщение
-            Timber.d("Testing Crashlytics")
-            
-            // Отправляем тестовое исключение
-            FirebaseCrashlytics.getInstance().log("Test log from FinanceActivity")
-            FirebaseCrashlytics.getInstance().recordException(Exception("Test exception from FinanceActivity"))
-            
-            // Отправляем через утилитарный класс
-            CrashlyticsUtils.log("Test log via CrashlyticsUtils")
-            CrashlyticsUtils.recordException(Exception("Test exception via CrashlyticsUtils"))
-            
-            // Принудительно отправляем отчеты
-            FirebaseCrashlytics.getInstance().sendUnsentReports()
-            
-            Timber.d("Crashlytics test completed")
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to test Crashlytics")
+    private fun handleIntent(intent: Intent?) {
+        intent?.data?.let { uri ->
+            when (uri.toString()) {
+                "financeanalyzer://add" -> {
+                    startDestination = "add"
+                    isLaunchedFromShortcut = true
+                }
+            }
         }
     }
     
     /**
-     * Обновляет виджеты на главном экране
+     * Обновляет все виджеты приложения, но только если они добавлены на домашний экран
      */
     private fun updateWidgets() {
         try {
-            // Обновляем виджет баланса
             val appWidgetManager = AppWidgetManager.getInstance(this)
             
             // Обновляем основной виджет баланса

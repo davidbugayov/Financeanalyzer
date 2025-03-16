@@ -66,7 +66,6 @@ import com.davidbugayov.financeanalyzer.presentation.add.components.CustomSource
 import com.davidbugayov.financeanalyzer.presentation.add.components.DateField
 import com.davidbugayov.financeanalyzer.presentation.add.components.NoteField
 import com.davidbugayov.financeanalyzer.presentation.add.components.SourcePickerDialog
-import com.davidbugayov.financeanalyzer.presentation.add.components.SourceField
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
@@ -205,8 +204,7 @@ fun AddTransactionScreen(
                         },
                         onAddSourceClick = {
                             viewModel.onEvent(AddTransactionEvent.ShowCustomSourceDialog)
-                        },
-                        isError = state.sourceError
+                        }
                     )
                 }
 
@@ -485,50 +483,22 @@ fun SourceSection(
     sources: List<Source>,
     selectedSource: String,
     onSourceSelected: (Source) -> Unit,
-    onAddSourceClick: () -> Unit,
-    isError: Boolean = false
+    onAddSourceClick: () -> Unit
 ) {
-    Column {
-        // Добавляем поле для отображения выбранного источника
-        SourceField(
-            source = selectedSource,
-            color = sources.find { it.name == selectedSource }?.color ?: 0xFF21A038.toInt(),
-            isError = isError,
-            onClick = { onAddSourceClick() },
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-        
-        Text(
-            text = stringResource(R.string.select_source_or_add),
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.padding(start = 16.dp, bottom = 8.dp)
-        )
-        
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(sources) { source ->
-                SourceItem(
-                    source = source,
-                    isSelected = source.name == selectedSource,
-                    onClick = { onSourceSelected(source) }
-                )
-            }
-
-            item {
-                AddSourceItem(onClick = onAddSourceClick)
-            }
-        }
-        
-        if (isError) {
-            Text(
-                text = stringResource(R.string.source_error),
-                color = MaterialTheme.colorScheme.error,
-                style = MaterialTheme.typography.bodySmall,
-                modifier = Modifier.padding(start = 16.dp, top = 4.dp)
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(sources) { source ->
+            SourceItem(
+                source = source,
+                isSelected = source.name == selectedSource,
+                onClick = { onSourceSelected(source) }
             )
+        }
+
+        item {
+            AddSourceItem(onClick = onAddSourceClick)
         }
     }
 }
