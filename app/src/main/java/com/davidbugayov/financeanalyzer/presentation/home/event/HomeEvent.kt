@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.event
 
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 
 /**
@@ -12,4 +13,7 @@ sealed class HomeEvent {
     data object LoadTransactions : HomeEvent()
     data object GenerateTestData : HomeEvent()
     data class SetShowGroupSummary(val show: Boolean) : HomeEvent()
+    data class ShowDeleteConfirmDialog(val transaction: Transaction) : HomeEvent()
+    data object HideDeleteConfirmDialog : HomeEvent()
+    data class DeleteTransaction(val transaction: Transaction) : HomeEvent()
 } 

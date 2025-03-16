@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.home.state
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 
 /**
@@ -11,6 +12,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
 data class HomeState(
     val transactions: List<Transaction> = emptyList(),
     val filteredTransactions: List<Transaction> = emptyList(),
+    val transactionGroups: List<TransactionGroup> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val balance: Money = Money.zero(),
@@ -22,5 +24,6 @@ data class HomeState(
     val showGroupSummary: Boolean = true,
     val filteredIncome: Money = Money.zero(),
     val filteredExpense: Money = Money.zero(),
-    val filteredBalance: Money = Money.zero()
+    val filteredBalance: Money = Money.zero(),
+    val transactionToDelete: Transaction? = null
 ) 

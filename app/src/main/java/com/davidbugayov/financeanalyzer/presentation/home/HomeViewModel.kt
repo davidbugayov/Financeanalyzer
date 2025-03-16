@@ -4,8 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
@@ -30,12 +32,16 @@ import java.util.Calendar
  *
  * @property getTransactionsUseCase UseCase для загрузки транзакций
  * @property addTransactionUseCase UseCase для добавления новых транзакций
+ * @property deleteTransactionUseCase UseCase для удаления транзакций
+ * @property eventBus Шина событий для коммуникации между компонентами
  * @property _state Внутренний MutableStateFlow для хранения состояния экрана
  * @property state Публичный StateFlow для наблюдения за состоянием экрана
  */
 class HomeViewModel(
     private val getTransactionsUseCase: GetTransactionsUseCase,
-    private val addTransactionUseCase: AddTransactionUseCase
+    private val addTransactionUseCase: AddTransactionUseCase,
+    private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val eventBus: EventBus
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(HomeState())
@@ -73,6 +79,55 @@ class HomeViewModel(
             is HomeEvent.SetShowGroupSummary -> {
                 _state.update { it.copy(showGroupSummary = event.show) }
             }
+            is HomeEvent.ShowDeleteConfirmDialog -> {
+                _state.update { it.copy(transactionToDelete = event.transaction) }
+            }
+
+            is HomeEvent.HideDeleteConfirmDialog -> {
+                _state.update { it.copy(transactionToDelete = null) }
+            }
+
+            is HomeEvent.DeleteTransaction -> {
+                deleteTransaction(event.transaction)
+            }
+        }
+    }
+
+    /**
+     * Удаляет транзакцию
+     * @param transaction Транзакция для удаления
+     */
+    private fun deleteTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            try {
+                deleteTransactionUseCase(transaction).fold(
+                    onSuccess = {
+                        // Очищаем кэши при удалении транзакции
+                        clearCaches()
+                        // Уведомляем другие компоненты об удалении транзакции
+                        eventBus.emit(Event.TransactionDeleted)
+                        // Скрываем диалог подтверждения
+                        _state.update { it.copy(transactionToDelete = null) }
+                    },
+                    onFailure = { exception ->
+                        Timber.e(exception, "Failed to delete transaction")
+                        _state.update {
+                            it.copy(
+                                error = exception.message ?: "Failed to delete transaction",
+                                transactionToDelete = null
+                            )
+                        }
+                    }
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "Error deleting transaction")
+                _state.update {
+                    it.copy(
+                        error = e.message ?: "Error deleting transaction",
+                        transactionToDelete = null
+                    )
+                }
+            }
         }
     }
 
@@ -82,7 +137,7 @@ class HomeViewModel(
     private fun subscribeToEvents() {
         viewModelScope.launch {
             Timber.d("Subscribing to transaction events")
-            EventBus.events.collect { event ->
+            eventBus.events.collect { event ->
                 when (event) {
                     is Event.TransactionAdded,
                     is Event.TransactionDeleted,
@@ -169,7 +224,7 @@ class HomeViewModel(
             if (!hasError) {
                 // Очищаем кэши при добавлении тестовых данных
                 clearCaches()
-                EventBus.emit(Event.TransactionAdded)
+                eventBus.emit(Event.TransactionAdded)
                 Timber.d("Test data generation completed successfully")
             } else {
                 _state.update { it.copy(error = "Ошибка при сохранении некоторых тестовых транзакций") }
@@ -216,12 +271,37 @@ class HomeViewModel(
             Triple(income, expense, balance)
         }
 
+        // Формируем группы транзакций по категориям
+        val groups = if (filtered.isNotEmpty()) {
+            // Группируем транзакции по категориям
+            filtered.groupBy { it.category }
+                .map { (category, categoryTransactions) ->
+                    // Рассчитываем общую сумму для категории
+                    val categoryTotal = categoryTransactions.map {
+                        if (it.isExpense) it.amount.abs() * -1 else it.amount.abs()
+                    }.reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+
+                    // Создаем группу транзакций
+                    TransactionGroup(
+                        date = category,
+                        transactions = categoryTransactions,
+                        balance = categoryTotal,
+                        name = category,
+                        total = categoryTotal
+                    )
+                }
+                .sortedByDescending { it.total.amount.abs() }
+        } else {
+            emptyList()
+        }
+
         _state.update {
             it.copy(
                 filteredTransactions = filtered,
                 filteredIncome = filteredIncome,
                 filteredExpense = filteredExpense,
-                filteredBalance = filteredBalance
+                filteredBalance = filteredBalance,
+                transactionGroups = groups
             )
         }
     }

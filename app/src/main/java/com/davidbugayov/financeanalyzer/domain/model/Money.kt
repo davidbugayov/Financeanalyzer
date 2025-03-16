@@ -199,6 +199,16 @@ data class Money(
     }
 
     /**
+     * Алиас для метода format для совместимости
+     * @param showCurrency Показывать ли символ валюты
+     * @param showSign Показывать ли знак + для положительных значений
+     * @return Отформатированная строка
+     */
+    fun formatted(showCurrency: Boolean = true, showSign: Boolean = false): String {
+        return format(showCurrency, showSign)
+    }
+
+    /**
      * Преобразует денежное значение в другую валюту
      * @param targetCurrency Целевая валюта
      * @param exchangeRate Обменный курс

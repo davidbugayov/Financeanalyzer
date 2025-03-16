@@ -243,4 +243,10 @@
     <string name="change_color">Изменить цвет</string>
     <string name="source_error">Выберите источник</string>
 
+    <!-- Строки для сводки групп транзакций -->
+    <string name="summary">Сводка</string>
+    <string name="total_income">Общий доход</string>
+    <string name="total_expense">Общий расход</string>
+    <string name="no_transactions_in_period">Нет транзакций за выбранный период</string>
+
 </resources>
