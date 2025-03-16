@@ -4,9 +4,33 @@ import java.util.Properties
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
-    alias(libs.plugins.ksp)
+}
+
+// Копируем правильный файл google-services.json перед применением плагина
+val appGoogleServicesFile = File(projectDir, "google-services.json")
+val debugGoogleServicesFile = File(rootDir, "google-services.debug.json")
+val releaseGoogleServicesFile = File(rootDir, "google-services.json")
+
+// Определяем, какой файл копировать на основе выбранной задачи
+val isDebugBuild = gradle.startParameter.taskNames.any {
+    it.contains("debug", ignoreCase = true) && !it.contains("clean", ignoreCase = true)
+}
+
+println("Debug build: $isDebugBuild")
+println("Debug file exists: ${debugGoogleServicesFile.exists()}")
+println("Release file exists: ${releaseGoogleServicesFile.exists()}")
+
+if (isDebugBuild && debugGoogleServicesFile.exists()) {
+    println("Using debug google-services.json from ${debugGoogleServicesFile.absolutePath}")
+    debugGoogleServicesFile.copyTo(appGoogleServicesFile, overwrite = true)
+} else if (releaseGoogleServicesFile.exists()) {
+    println("Using release google-services.json from ${releaseGoogleServicesFile.absolutePath}")
+    releaseGoogleServicesFile.copyTo(appGoogleServicesFile, overwrite = true)
+} else {
+    println("No google-services.json file found!")
 }
 
 fun getKeystoreProperties(): Properties {
@@ -91,6 +115,13 @@ android {
 
             // Включаем инспекцию Compose
             manifestPlaceholders["enableComposeCompilerReports"] = "true"
+
+            // Configure debug-specific google-services.json
+            sourceSets {
+                getByName("debug") {
+                    assets.srcDirs("src/debug/assets")
+                }
+            }
         }
     }
 
@@ -124,8 +155,6 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-        // Включаем отладочную информацию для Compose
-        useLiveLiterals = true
     }
 }
 
