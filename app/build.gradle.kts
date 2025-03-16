@@ -132,13 +132,6 @@ android {
 
             // Включаем инспекцию Compose
             manifestPlaceholders["enableComposeCompilerReports"] = "true"
-
-            // Configure debug-specific google-services.json
-            sourceSets {
-                getByName("debug") {
-                    assets.srcDirs("src/debug/assets")
-                }
-            }
         }
     }
 
