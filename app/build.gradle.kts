@@ -9,28 +9,45 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-// Копируем правильный файл google-services.json перед применением плагина
-val appGoogleServicesFile = File(projectDir, "google-services.json")
-val debugGoogleServicesFile = File(rootDir, "google-services.debug.json")
-val releaseGoogleServicesFile = File(rootDir, "google-services.json")
+abstract class GoogleServicesTask : DefaultTask() {
 
-// Определяем, какой файл копировать на основе выбранной задачи
-val isDebugBuild = gradle.startParameter.taskNames.any {
-    it.contains("debug", ignoreCase = true) && !it.contains("clean", ignoreCase = true)
+    @get:Input
+    abstract val variantName: Property<String>
+
+    @get:InputFile
+    abstract val sourceFile: RegularFileProperty
+
+    @get:OutputFile
+    abstract val targetFile: RegularFileProperty
+
+    @TaskAction
+    fun copy() {
+        targetFile.get().asFile.parentFile.mkdirs()
+        sourceFile.get().asFile.copyTo(targetFile.get().asFile, overwrite = true)
+        println("Copied ${sourceFile.get().asFile.name} to google-services.json for ${variantName.get()} variant")
+    }
 }
 
-println("Debug build: $isDebugBuild")
-println("Debug file exists: ${debugGoogleServicesFile.exists()}")
-println("Release file exists: ${releaseGoogleServicesFile.exists()}")
+android.applicationVariants.all {
+    val variant = this
+    val variantName = variant.name
+    val debug = variantName.contains("debug", ignoreCase = true)
 
-if (isDebugBuild && debugGoogleServicesFile.exists()) {
-    println("Using debug google-services.json from ${debugGoogleServicesFile.absolutePath}")
-    debugGoogleServicesFile.copyTo(appGoogleServicesFile, overwrite = true)
-} else if (releaseGoogleServicesFile.exists()) {
-    println("Using release google-services.json from ${releaseGoogleServicesFile.absolutePath}")
-    releaseGoogleServicesFile.copyTo(appGoogleServicesFile, overwrite = true)
-} else {
-    println("No google-services.json file found!")
+    val copyGoogleServices = tasks.register<GoogleServicesTask>("copyGoogleServices${variantName.replaceFirstChar { it.uppercase() }}") {
+        this.variantName.set(variantName)
+        sourceFile.set(
+            if (debug) {
+                project.layout.projectDirectory.file("../google-services.debug.json")
+            } else {
+                project.layout.projectDirectory.file("../google-services.release.json")
+            }
+        )
+        targetFile.set(project.layout.projectDirectory.file("google-services.json"))
+    }
+
+    tasks.named("process${variantName.replaceFirstChar { it.uppercase() }}GoogleServices") {
+        dependsOn(copyGoogleServices)
+    }
 }
 
 fun getKeystoreProperties(): Properties {
