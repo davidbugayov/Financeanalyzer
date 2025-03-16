@@ -1,19 +1,12 @@
-package com.davidbugayov.financeanalyzer.presentation.history
+package com.davidbugayov.financeanalyzer.presentation.history.components
 
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.itemsIndexed
-import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -24,11 +17,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 
+/**
+ * Карточка со статистикой по выбранной категории.
+ * Отображает текущую и предыдущую суммы, а также процент изменения.
+ *
+ * @param category Название категории
+ * @param currentTotal Сумма за текущий период
+ * @param previousTotal Сумма за предыдущий период
+ * @param percentChange Процент изменения между периодами (может быть null)
+ */
 @Composable
 fun CategoryStatsCard(
     category: String,
@@ -39,7 +39,7 @@ fun CategoryStatsCard(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(vertical = 8.dp),
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.medium
     ) {
@@ -97,107 +97,6 @@ fun CategoryStatsCard(
                     color = changeColor
                 )
             }
-        }
-    }
-}
-
-@Composable
-fun ErrorContent(
-    error: String?,
-    onRetry: () -> Unit
-) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 8.dp),
-        verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Text(
-            text = error ?: stringResource(R.string.error_occurred),
-            color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        Button(onClick = onRetry) {
-            Text(stringResource(R.string.retry))
-        }
-    }
-}
-
-@Composable
-fun EmptyContent() {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = stringResource(R.string.no_transactions),
-            color = Color.Gray
-        )
-    }
-}
-
-@Composable
-fun TransactionsList(
-    groupedTransactions: Map<String, List<Transaction>>
-) {
-    val listState = rememberLazyListState()
-    
-    LazyColumn(
-        state = listState,
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 8.dp)
-    ) {
-        groupedTransactions.forEach { (period, transactionsInPeriod) ->
-            item(key = "header_$period") {
-                GroupHeader(
-                    period = period,
-                    transactions = transactionsInPeriod
-                )
-                Spacer(modifier = Modifier.height(4.dp))
-            }
-
-            itemsIndexed(
-                items = transactionsInPeriod,
-                key = { _, transaction -> "transaction_${transaction.id}" }
-            ) { _, transaction ->
-                TransactionHistoryItem(transaction = transaction)
-            }
-
-            item(key = "spacer_$period") {
-                Spacer(modifier = Modifier.height(8.dp))
-            }
-        }
-    }
-}
-
-@Composable
-fun ComparisonCard(
-    currentTotal: Money,
-    previousTotal: Money
-) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(12.dp)
-        ) {
-            Text(
-                text = currentTotal.format(false),
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold
-            )
-
-            Text(
-                text = previousTotal.format(false),
-                fontSize = 14.sp,
-                color = Color.Gray
-            )
         }
     }
 } 

@@ -229,6 +229,10 @@
     <string name="amount_format">%.2f ₽</string>
     <string name="day">День</string>
     <string name="custom">Произвольный</string>
+    <string name="custom_period">Произвольный период</string>
+    <string name="all_categories">Все категории</string>
+    <string name="expenses">Расходы</string>
+    <string name="cannot_delete_default_category">Нельзя удалить стандартную категорию "%1$s"</string>
 
     <!-- Источники средств -->
     <string name="source">Откуда</string>

@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.presentation.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
@@ -16,384 +15,272 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.utils.Event
+import com.davidbugayov.financeanalyzer.utils.EventBus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import java.util.Date
+import javax.inject.Inject
 
-/**
- * ViewModel для экрана истории транзакций.
- * Следует принципам MVI и Clean Architecture.
- */
-class TransactionHistoryViewModel(
+class TransactionHistoryViewModel @Inject constructor(
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val eventBus: EventBus,
+    private val analyticsUtils: AnalyticsUtils,
     val categoriesViewModel: CategoriesViewModel
-) : ViewModel(), KoinComponent {
+) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
 
-    // Кэш для хранения результатов вычислений
-    private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, List<Transaction>>()
-    private val groupedTransactionsCache = mutableMapOf<GroupCacheKey, Map<String, List<Transaction>>>()
-    private val categoryStatsCache = mutableMapOf<StatsCacheKey, Triple<Money, Money, Int?>>()
-
     init {
         loadTransactions()
+        loadCategories()
+    }
 
-        // Подписываемся на изменения категорий
+    private fun loadCategories() {
         viewModelScope.launch {
-            categoriesViewModel.expenseCategories.collect { categories ->
-                _state.update { it.copy(expenseCategories = categories) }
+            categoriesViewModel.expenseCategories.collect { expenseCategories ->
+                _state.update { it.copy(expenseCategories = expenseCategories) }
             }
         }
 
         viewModelScope.launch {
-            categoriesViewModel.incomeCategories.collect { categories ->
-                _state.update { it.copy(incomeCategories = categories) }
+            categoriesViewModel.incomeCategories.collect { incomeCategories ->
+                _state.update { it.copy(incomeCategories = incomeCategories) }
             }
         }
     }
 
-    /**
-     * Обрабатывает события экрана истории транзакций
-     */
     fun onEvent(event: TransactionHistoryEvent) {
         when (event) {
-            is TransactionHistoryEvent.SetGroupingType -> {
-                _state.update { it.copy(groupingType = event.type) }
-                // Очищаем кэш группировки при изменении типа группировки
-                clearGroupingCache()
-            }
-            is TransactionHistoryEvent.SetPeriodType -> {
-                _state.update { it.copy(periodType = event.type) }
-                updateFilteredTransactions()
-            }
-            is TransactionHistoryEvent.SetCategory -> {
-                _state.update { it.copy(selectedCategory = event.category) }
-                updateFilteredTransactions()
-                updateCategoryStats()
-            }
-            is TransactionHistoryEvent.SetDateRange -> {
-                _state.update {
-                    it.copy(
-                        startDate = event.startDate,
-                        endDate = event.endDate,
-                        periodType = PeriodType.CUSTOM
-                    )
-                }
-                updateFilteredTransactions()
-            }
-            is TransactionHistoryEvent.SetStartDate -> {
-                _state.update { it.copy(startDate = event.date) }
-                updateFilteredTransactions()
-            }
-            is TransactionHistoryEvent.SetEndDate -> {
-                _state.update { it.copy(endDate = event.date) }
-                updateFilteredTransactions()
-            }
-            is TransactionHistoryEvent.ReloadTransactions -> {
-                // Очищаем все кэши при перезагрузке транзакций
-                clearAllCaches()
-                loadTransactions()
-            }
-            is TransactionHistoryEvent.DeleteTransaction -> {
-                deleteTransaction(event.transaction)
-            }
-            // События для управления диалогами
-            is TransactionHistoryEvent.ShowPeriodDialog -> {
-                _state.update { it.copy(showPeriodDialog = true) }
-            }
-            is TransactionHistoryEvent.HidePeriodDialog -> {
-                _state.update { it.copy(showPeriodDialog = false) }
-            }
-            is TransactionHistoryEvent.ShowCategoryDialog -> {
-                _state.update { it.copy(showCategoryDialog = true) }
-            }
-            is TransactionHistoryEvent.HideCategoryDialog -> {
-                _state.update { it.copy(showCategoryDialog = false) }
-            }
-            is TransactionHistoryEvent.ShowStartDatePicker -> {
-                _state.update { it.copy(showStartDatePicker = true) }
-            }
-            is TransactionHistoryEvent.HideStartDatePicker -> {
-                _state.update { it.copy(showStartDatePicker = false) }
-            }
-            is TransactionHistoryEvent.ShowEndDatePicker -> {
-                _state.update { it.copy(showEndDatePicker = true) }
-            }
-            is TransactionHistoryEvent.HideEndDatePicker -> {
-                _state.update { it.copy(showEndDatePicker = false) }
-            }
-            is TransactionHistoryEvent.ShowDeleteConfirmDialog -> {
-                _state.update { it.copy(transactionToDelete = event.transaction) }
-            }
-            is TransactionHistoryEvent.HideDeleteConfirmDialog -> {
-                _state.update { it.copy(transactionToDelete = null) }
-            }
-            is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> {
-                _state.update { it.copy(categoryToDelete = Pair(event.category, event.isExpense)) }
-            }
-            is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> {
-                _state.update { it.copy(categoryToDelete = null) }
-            }
-            is TransactionHistoryEvent.DeleteCategory -> {
-                deleteCategory(event.category, event.isExpense)
-            }
+            is TransactionHistoryEvent.DeleteTransaction -> deleteTransaction(event.transaction)
+            is TransactionHistoryEvent.SetGroupingType -> updateGroupingType(event.type)
+            is TransactionHistoryEvent.SetPeriodType -> updatePeriodType(event.type)
+            is TransactionHistoryEvent.SetCategory -> updateCategory(event.category)
+            is TransactionHistoryEvent.SetDateRange -> updateDateRange(event.startDate, event.endDate)
+            is TransactionHistoryEvent.SetStartDate -> updateStartDate(event.date)
+            is TransactionHistoryEvent.SetEndDate -> updateEndDate(event.date)
+            is TransactionHistoryEvent.ReloadTransactions -> loadTransactions()
+            is TransactionHistoryEvent.ShowDeleteConfirmDialog -> showDeleteConfirmDialog(event.transaction)
+            is TransactionHistoryEvent.HideDeleteConfirmDialog -> hideDeleteConfirmDialog()
+            is TransactionHistoryEvent.DeleteCategory -> deleteCategory(event.category, event.isExpense)
+            is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> showDeleteCategoryConfirmDialog(event.category, event.isExpense)
+            is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> hideDeleteCategoryConfirmDialog()
+            is TransactionHistoryEvent.ShowPeriodDialog -> showPeriodDialog()
+            is TransactionHistoryEvent.HidePeriodDialog -> hidePeriodDialog()
+            is TransactionHistoryEvent.ShowCategoryDialog -> showCategoryDialog()
+            is TransactionHistoryEvent.HideCategoryDialog -> hideCategoryDialog()
+            is TransactionHistoryEvent.ShowStartDatePicker -> showStartDatePicker()
+            is TransactionHistoryEvent.HideStartDatePicker -> hideStartDatePicker()
+            is TransactionHistoryEvent.ShowEndDatePicker -> showEndDatePicker()
+            is TransactionHistoryEvent.HideEndDatePicker -> hideEndDatePicker()
         }
     }
 
-    /**
-     * Удаляет транзакцию
-     */
     private fun deleteTransaction(transaction: Transaction) {
         viewModelScope.launch {
-            try {
-                when (val result = deleteTransactionUseCase(transaction)) {
-                    is Result.Success -> {
-                        // Логируем удаление транзакции в аналитику
-                        AnalyticsUtils.logTransactionDeleted(
-                            type = if (transaction.isExpense) "expense" else "income",
-                            category = transaction.category
-                        )
-
-                        // Обновляем список транзакций
-                        loadTransactions()
-
-                        // Скрываем диалог подтверждения
-                        _state.update { it.copy(transactionToDelete = null) }
-                    }
-                    is Result.Error -> {
-                        _state.update { it.copy(error = result.exception.message) }
-
-                        // Логируем ошибку в аналитику
-                        AnalyticsUtils.logError(
-                            errorType = "transaction_delete_error",
-                            errorMessage = result.exception.message ?: "Unknown error"
-                        )
-                    }
+            when (val result = deleteTransactionUseCase(transaction)) {
+                is Result.Success -> {
+                    eventBus.emit(Event.TransactionDeleted)
+                    loadTransactions()
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Error deleting transaction")
-                _state.update { it.copy(error = "Ошибка при удалении транзакции: ${e.message}") }
 
-                // Логируем исключение в аналитику
-                AnalyticsUtils.logError(
-                    errorType = "transaction_delete_exception",
-                    errorMessage = e.message ?: "Unknown exception"
-                )
+                is Result.Error -> {
+                    Timber.e(result.exception, "Failed to delete transaction")
+                    _state.update { it.copy(error = result.exception.message) }
+                }
             }
         }
     }
 
-    /**
-     * Загружает транзакции из репозитория
-     */
     private fun loadTransactions() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            try {
-                when (val result = loadTransactionsUseCase()) {
-                    is Result.Success -> {
-                        val transactions = result.data
-                        _state.update { it.copy(transactions = transactions, isLoading = false) }
-                        updateFilteredTransactions()
+            when (val result = loadTransactionsUseCase()) {
+                is Result.Success -> {
+                    _state.update {
+                        it.copy(
+                            transactions = result.data,
+                            error = null
+                        )
                     }
-                    is Result.Error -> {
-                        val exception = result.exception
-                        Timber.e("Failed to load transactions: ${exception.message}")
-                        _state.update { it.copy(error = exception.message ?: "Failed to load transactions", isLoading = false) }
-                    }
+                    updateFilteredTransactions()
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Error loading transactions")
-                _state.update { it.copy(error = "Error loading transactions: ${e.message}", isLoading = false) }
+
+                is Result.Error -> {
+                    Timber.e(result.exception, "Failed to load transactions")
+                    _state.update { it.copy(error = result.exception.message) }
+                }
             }
         }
     }
 
-    /**
-     * Обновляет отфильтрованные транзакции на основе текущих фильтров
-     */
     private fun updateFilteredTransactions() {
-        val currentState = _state.value
-
-        // Создаем ключ для кэша
-        val cacheKey = FilterCacheKey(
-            transactions = currentState.transactions,
-            periodType = currentState.periodType,
-            startDate = currentState.startDate,
-            endDate = currentState.endDate,
-            category = currentState.selectedCategory
-        )
-
-        // Проверяем, есть ли результат в кэше
-        val filtered = filteredTransactionsCache.getOrPut(cacheKey) {
-            filterTransactionsUseCase(
+        viewModelScope.launch {
+            val currentState = _state.value
+            val filteredTransactions = filterTransactionsUseCase(
                 transactions = currentState.transactions,
                 periodType = currentState.periodType,
                 startDate = currentState.startDate,
                 endDate = currentState.endDate,
                 category = currentState.selectedCategory
             )
+            _state.update {
+                it.copy(
+                    filteredTransactions = filteredTransactions,
+                    error = null
+                )
+            }
+            updateGroupedTransactions()
+            updateCategoryStats()
         }
-        
-        _state.update { it.copy(filteredTransactions = filtered) }
-
-        // Очищаем кэш группировки при изменении фильтрованных транзакций
-        clearGroupingCache()
-        
-        updateCategoryStats()
     }
 
-    /**
-     * Обновляет статистику по выбранной категории
-     */
-    private fun updateCategoryStats() {
-        val currentState = _state.value
-        val selectedCategory = currentState.selectedCategory
+    private fun updateGroupedTransactions() {
+        viewModelScope.launch {
+            val currentState = _state.value
+            val groupedTransactions = groupTransactionsUseCase(
+                transactions = currentState.filteredTransactions,
+                groupingType = currentState.groupingType
+            )
+            _state.update {
+                it.copy(
+                    groupedTransactions = groupedTransactions,
+                    error = null
+                )
+            }
+        }
+    }
 
-        if (selectedCategory != null) {
-            // Создаем ключ для кэша
-            val cacheKey = StatsCacheKey(
-                transactions = currentState.transactions,
-                category = selectedCategory,
+    private fun updateCategoryStats() {
+        viewModelScope.launch {
+            val currentState = _state.value
+            val categoryStats = calculateCategoryStatsUseCase(
+                transactions = currentState.filteredTransactions,
+                category = currentState.selectedCategory ?: "",
                 periodType = currentState.periodType,
                 startDate = currentState.startDate,
                 endDate = currentState.endDate
             )
-
-            // Проверяем, есть ли результат в кэше
-            val stats = categoryStatsCache.getOrPut(cacheKey) {
-                calculateCategoryStatsUseCase(
-                    transactions = currentState.transactions,
-                    category = selectedCategory,
-                    periodType = currentState.periodType,
-                    startDate = currentState.startDate,
-                    endDate = currentState.endDate
+            _state.update {
+                it.copy(
+                    categoryStats = categoryStats,
+                    error = null
                 )
             }
-            
-            _state.update { it.copy(categoryStats = stats) }
-        } else {
-            _state.update { it.copy(categoryStats = null) }
         }
     }
 
-    /**
-     * Возвращает сгруппированные транзакции на основе текущего типа группировки
-     */
-    fun getGroupedTransactions(): Map<String, List<Transaction>> {
-        val currentState = _state.value
+    private fun updatePeriodType(periodType: PeriodType) {
+        _state.update { it.copy(periodType = periodType) }
+        updateFilteredTransactions()
+    }
 
-        // Создаем ключ для кэша
-        val cacheKey = GroupCacheKey(
-            transactions = currentState.filteredTransactions,
-            groupingType = currentState.groupingType
-        )
+    private fun updateGroupingType(groupingType: GroupingType) {
+        _state.update { it.copy(groupingType = groupingType) }
+        updateGroupedTransactions()
+    }
 
-        // Проверяем, есть ли результат в кэше
-        return groupedTransactionsCache.getOrPut(cacheKey) {
-            groupTransactionsUseCase(
-                transactions = currentState.filteredTransactions,
-                groupingType = currentState.groupingType
+    private fun updateCategory(category: String?) {
+        _state.update { it.copy(selectedCategory = category) }
+        updateFilteredTransactions()
+    }
+
+    private fun updateDateRange(startDate: Date, endDate: Date) {
+        _state.update {
+            it.copy(
+                startDate = startDate,
+                endDate = endDate,
+                periodType = PeriodType.CUSTOM
             )
         }
+        updateFilteredTransactions()
     }
 
-    /**
-     * Очищает кэш группировки
-     */
-    private fun clearGroupingCache() {
-        groupedTransactionsCache.clear()
+    private fun updateStartDate(date: Date) {
+        _state.update { it.copy(startDate = date) }
+        updateFilteredTransactions()
     }
 
-    /**
-     * Очищает все кэши
-     */
-    private fun clearAllCaches() {
-        filteredTransactionsCache.clear()
-        groupedTransactionsCache.clear()
-        categoryStatsCache.clear()
+    private fun updateEndDate(date: Date) {
+        _state.update { it.copy(endDate = date) }
+        updateFilteredTransactions()
     }
 
-    /**
-     * Удаляет категорию
-     */
+    private fun showDeleteConfirmDialog(transaction: Transaction) {
+        _state.update { it.copy(transactionToDelete = transaction) }
+    }
+
+    private fun hideDeleteConfirmDialog() {
+        _state.update { it.copy(transactionToDelete = null) }
+    }
+
     private fun deleteCategory(category: String, isExpense: Boolean) {
-        // Не позволяем удалять категорию "Другое"
         if (category == "Другое") {
             _state.update { it.copy(categoryToDelete = null) }
             return
         }
         
         viewModelScope.launch {
-            try {
-                // Удаляем категорию через CategoriesViewModel
-                categoriesViewModel.removeCategory(category, isExpense)
+            // Логируем удаление категории
+            analyticsUtils.logCategoryDeleted(category, isExpense)
 
-                // Логируем удаление категории в аналитику
-                AnalyticsUtils.logCategoryDeleted(category, isExpense)
-
-                // Если удаляемая категория была выбрана, сбрасываем фильтр
-                if (_state.value.selectedCategory == category) {
-                    _state.update { it.copy(selectedCategory = null) }
-                    updateFilteredTransactions()
-                }
-
-                // Скрываем диалог подтверждения
-                _state.update { it.copy(categoryToDelete = null) }
-
-                // Перезагружаем транзакции, чтобы обновить список
-                loadTransactions()
-            } catch (e: Exception) {
-                Timber.e(e, "Error deleting category")
-                _state.update { it.copy(error = "Ошибка при удалении категории: ${e.message}") }
-
-                // Логируем ошибку в аналитику
-                AnalyticsUtils.logError(
-                    errorType = "category_delete_error",
-                    errorMessage = e.message ?: "Unknown exception"
-                )
-            }
+            // Обновляем состояние
+            _state.update { it.copy(categoryToDelete = null) }
         }
     }
 
-    /**
-     * Ключ для кэша фильтрованных транзакций
-     */
-    private data class FilterCacheKey(
-        val transactions: List<Transaction>,
-        val periodType: PeriodType,
-        val startDate: Date,
-        val endDate: Date,
-        val category: String?
-    )
+    private fun showDeleteCategoryConfirmDialog(category: String, isExpense: Boolean) {
+        _state.update { it.copy(categoryToDelete = Pair(category, isExpense)) }
+    }
+
+    private fun hideDeleteCategoryConfirmDialog() {
+        _state.update { it.copy(categoryToDelete = null) }
+    }
+
+    private fun showPeriodDialog() {
+        _state.update { it.copy(showPeriodDialog = true) }
+    }
+
+    private fun hidePeriodDialog() {
+        _state.update { it.copy(showPeriodDialog = false) }
+    }
+
+    private fun showCategoryDialog() {
+        _state.update { it.copy(showCategoryDialog = true) }
+    }
+
+    private fun hideCategoryDialog() {
+        _state.update { it.copy(showCategoryDialog = false) }
+    }
+
+    private fun showStartDatePicker() {
+        _state.update { it.copy(showStartDatePicker = true) }
+    }
+
+    private fun hideStartDatePicker() {
+        _state.update { it.copy(showStartDatePicker = false) }
+    }
+
+    private fun showEndDatePicker() {
+        _state.update { it.copy(showEndDatePicker = true) }
+    }
+
+    private fun hideEndDatePicker() {
+        _state.update { it.copy(showEndDatePicker = false) }
+    }
 
     /**
-     * Ключ для кэша сгруппированных транзакций
+     * Возвращает сгруппированные транзакции для отображения в UI
      */
-    private data class GroupCacheKey(
-        val transactions: List<Transaction>,
-        val groupingType: GroupingType
-    )
-
-    /**
-     * Ключ для кэша статистики по категории
-     */
-    private data class StatsCacheKey(
-        val transactions: List<Transaction>,
-        val category: String,
-        val periodType: PeriodType,
-        val startDate: Date,
-        val endDate: Date
-    )
-} 
+    fun getGroupedTransactions(): Map<String, List<Transaction>> {
+        return state.value.groupedTransactions
+    }
+}

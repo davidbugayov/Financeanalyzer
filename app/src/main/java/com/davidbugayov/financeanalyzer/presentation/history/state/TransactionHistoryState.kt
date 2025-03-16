@@ -15,6 +15,7 @@ import java.util.Date
  *
  * @property transactions Полный список всех транзакций
  * @property filteredTransactions Отфильтрованный список транзакций по выбранным критериям
+ * @property groupedTransactions Группированные транзакции
  * @property isLoading Флаг загрузки данных
  * @property error Текст ошибки (null если ошибок нет)
  * @property selectedCategory Выбранная категория для фильтрации (null для всех категорий)
@@ -35,6 +36,7 @@ import java.util.Date
 data class TransactionHistoryState(
     val transactions: List<Transaction> = emptyList(),
     val filteredTransactions: List<Transaction> = emptyList(),
+    val groupedTransactions: Map<String, List<Transaction>> = emptyMap(),
     val isLoading: Boolean = false,
     val error: String? = null,
     val selectedCategory: String? = null,

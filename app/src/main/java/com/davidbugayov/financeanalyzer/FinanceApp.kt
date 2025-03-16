@@ -4,6 +4,7 @@ import android.app.Application
 import com.davidbugayov.financeanalyzer.di.addTransactionModule
 import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.chartModule
+import com.davidbugayov.financeanalyzer.di.historyModule
 import com.davidbugayov.financeanalyzer.di.homeModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
@@ -53,7 +54,8 @@ class FinanceApp : Application() {
                 appModule,
                 chartModule,
                 homeModule,
-                addTransactionModule
+                addTransactionModule,
+                historyModule
             )
         }
 

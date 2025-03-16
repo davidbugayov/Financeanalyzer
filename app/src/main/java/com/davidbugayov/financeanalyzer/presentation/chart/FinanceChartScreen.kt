@@ -233,7 +233,7 @@ fun FinanceChartScreen(
                 Timber.tag("FinanceChart").d("Error state: ${state.error}")
                 // Show error message if there's an error
                 ErrorContent(
-                    message = state.error ?: stringResource(R.string.unknown_error),
+                    error = state.error ?: stringResource(R.string.unknown_error),
                     onRetry = { viewModel.handleIntent(ChartIntent.LoadTransactions) }
                 )
             } else if (filteredTransactions.isEmpty()) {
