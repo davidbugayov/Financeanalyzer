@@ -256,8 +256,7 @@ class AddTransactionViewModel(
                 val money = parseFormattedAmount(_state.value.amount)
                 
                 val transaction = Transaction(
-                    title = _state.value.title.ifBlank { null },
-                    amount = money,
+                    amount = money.amount.toDouble(),
                     category = _state.value.category,
                     isExpense = _state.value.isExpense,
                     date = _state.value.selectedDate,
@@ -273,7 +272,7 @@ class AddTransactionViewModel(
                 // Логируем добавление транзакции в аналитику
                 AnalyticsUtils.logTransactionAdded(
                     type = if (_state.value.isExpense) "expense" else "income",
-                    amount = money.amount.toDouble(),
+                    amount = money,
                     category = _state.value.category
                 )
                 

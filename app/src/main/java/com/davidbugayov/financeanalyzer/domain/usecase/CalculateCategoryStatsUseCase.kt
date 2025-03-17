@@ -4,6 +4,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Date
+import kotlin.math.abs
 
 /**
  * Юзкейс для расчета статистики по категории.
@@ -32,9 +33,11 @@ class CalculateCategoryStatsUseCase(
             endDate = endDate,
             category = category
         )
-        val currentPeriodTotal = currentPeriodTransactions
+        val currentPeriodTotalDouble = currentPeriodTransactions
             .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+        
+        val currentPeriodTotal = Money(currentPeriodTotalDouble)
 
         // Рассчитываем предыдущий период такой же длительности
         val periodDuration = endDate.time - startDate.time
@@ -49,14 +52,16 @@ class CalculateCategoryStatsUseCase(
             endDate = previousEndDate,
             category = category
         )
-        val previousPeriodTotal = previousPeriodTransactions
+        val previousPeriodTotalDouble = previousPeriodTransactions
             .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+            
+        val previousPeriodTotal = Money(previousPeriodTotalDouble)
 
         // Рассчитываем процентное изменение
-        val percentChange = if (!previousPeriodTotal.isZero()) {
-            ((currentPeriodTotal.amount.toDouble() - previousPeriodTotal.amount.toDouble()) /
-                    previousPeriodTotal.amount.abs().toDouble() * 100).toInt()
+        val percentChange = if (previousPeriodTotalDouble != 0.0) {
+            ((currentPeriodTotalDouble - previousPeriodTotalDouble) /
+                    abs(previousPeriodTotalDouble) * 100).toInt()
         } else null
 
         return Triple(currentPeriodTotal, previousPeriodTotal, percentChange)

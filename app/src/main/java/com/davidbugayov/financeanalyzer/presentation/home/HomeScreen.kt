@@ -21,6 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -72,7 +73,8 @@ fun HomeScreen(
     viewModel: HomeViewModel,
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
-    onNavigateToChart: () -> Unit
+    onNavigateToChart: () -> Unit,
+    onNavigateToProfile: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -130,8 +132,8 @@ fun HomeScreen(
                         )
                     }
                 },
-                actions = {
-                    // Кнопка для генерации тестовых данных
+                navigationIcon = {
+                    // Кнопка для генерации тестовых данных перемещена влево
                     if (BuildConfig.DEBUG) {
                         IconButton(
                             onClick = {
@@ -146,6 +148,22 @@ fun HomeScreen(
                                 contentDescription = "Сгенерировать тестовые данные"
                             )
                         }
+                    }
+                },
+                actions = {
+                    // Кнопка профиля
+                    IconButton(
+                        onClick = {
+                            onNavigateToProfile()
+                            feedbackMessage = "Переход к профилю"
+                            feedbackType = FeedbackType.INFO
+                            showFeedback = true
+                        }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Person,
+                            contentDescription = stringResource(R.string.profile)
+                        )
                     }
                 },
                 modifier = Modifier.height(56.dp)

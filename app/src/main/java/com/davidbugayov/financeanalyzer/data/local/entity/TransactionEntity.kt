@@ -4,8 +4,6 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import androidx.room.TypeConverters
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
-import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.util.Date
 
@@ -18,32 +16,26 @@ import java.util.Date
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
-    val title: String? = null,
-    val amount: Double,
-    val currencyCode: String = Currency.RUB.code,
+    val amount: String,
     val category: String,
     val isExpense: Boolean,
     val date: Date,
     val note: String?,
-    val source: String = "Сбер",
-    val destination: String = "Наличные"
+    val source: String = "Сбер"
 ) {
 
     /**
      * Преобразует Entity в доменную модель
      */
     fun toDomain(): Transaction {
-        val currency = Currency.fromCode(currencyCode)
         return Transaction(
-            id = id,
-            title = title,
-            amount = Money(amount, currency),
+            id = id.toString(),
+            amount = amount.toDouble(),
             category = category,
             isExpense = isExpense,
             date = date,
             note = note,
-            source = source,
-            destination = destination
+            source = source
         )
     }
 
@@ -53,17 +45,20 @@ data class TransactionEntity(
          * Преобразует доменную модель в Entity
          */
         fun fromDomain(transaction: Transaction): TransactionEntity {
+            val id = try {
+                transaction.id.toLong()
+            } catch (e: NumberFormatException) {
+                0L
+            }
+            
             return TransactionEntity(
-                id = transaction.id,
-                title = transaction.title,
-                amount = transaction.amount.amount.toDouble(),
-                currencyCode = transaction.amount.currency.code,
+                id = id,
+                amount = transaction.amount.toString(),
                 category = transaction.category,
                 isExpense = transaction.isExpense,
                 date = transaction.date,
                 note = transaction.note,
-                source = transaction.source,
-                destination = transaction.destination
+                source = transaction.source ?: "Наличные"
             )
         }
     }

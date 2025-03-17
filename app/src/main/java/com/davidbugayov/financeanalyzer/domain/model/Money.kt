@@ -230,6 +230,62 @@ data class Money(
         return convertTo(targetCurrency, BigDecimal.valueOf(exchangeRate))
     }
 
+    /**
+     * Вычисляет процентное соотношение между текущим значением и другим
+     * @param other Другое денежное значение
+     * @return Процентное соотношение (текущее / другое * 100)
+     * @throws IllegalArgumentException если валюты не совпадают
+     */
+    fun percentageOf(other: Money): Double {
+        require(currency == other.currency) { "Cannot calculate percentage with different currencies" }
+        if (other.isZero()) return 0.0
+        return (amount.toDouble() / other.amount.toDouble()) * 100.0
+    }
+
+    /**
+     * Вычисляет процентную разницу между текущим значением и другим
+     * @param other Другое денежное значение
+     * @return Процентная разница ((текущее - другое) / другое * 100)
+     * @throws IllegalArgumentException если валюты не совпадают
+     */
+    fun percentageDifference(other: Money): Double {
+        require(currency == other.currency) { "Cannot calculate percentage difference with different currencies" }
+        if (other.isZero()) return if (isZero()) 0.0 else 100.0
+        return ((amount.toDouble() - other.amount.toDouble()) / other.amount.toDouble()) * 100.0
+    }
+
+    /**
+     * Вычисляет процент от текущего значения
+     * @param percentage Процент (0-100)
+     * @return Денежное значение, представляющее указанный процент от текущего
+     */
+    fun percentage(percentage: Double): Money {
+        val factor = BigDecimal.valueOf(percentage / 100.0)
+        return this * factor
+    }
+
+    /**
+     * Вычисляет долю от общей суммы
+     * @param total Общая сумма
+     * @return Доля от 0.0 до 1.0
+     * @throws IllegalArgumentException если валюты не совпадают
+     */
+    fun ratioOf(total: Money): Double {
+        require(currency == total.currency) { "Cannot calculate ratio with different currencies" }
+        if (total.isZero()) return 0.0
+        return amount.toDouble() / total.amount.toDouble()
+    }
+
+    /**
+     * Вычисляет угол для круговой диаграммы
+     * @param total Общая сумма
+     * @return Угол в градусах (0-360)
+     * @throws IllegalArgumentException если валюты не совпадают
+     */
+    fun angleOf(total: Money): Float {
+        return (ratioOf(total) * 360.0).toFloat()
+    }
+
     override fun toString(): String {
         return format()
     }

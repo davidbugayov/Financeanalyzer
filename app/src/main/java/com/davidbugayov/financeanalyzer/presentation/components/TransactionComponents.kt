@@ -153,11 +153,11 @@ fun TransactionItem(transaction: Transaction) {
     val categoryIcon = getCategoryIcon(transaction.category, transaction.isExpense)
 
     // Получаем иконки и цвета для банков
-    val (sourceIcon, sourceColor) = getBankIcon(transaction.source)
-    val (destinationIcon, destinationColor) = getBankIcon(transaction.destination)
+    val (sourceIcon, sourceColor) = getBankIcon(transaction.source ?: "")
+    val (destinationIcon, destinationColor) = getBankIcon("Наличные")
 
     // Проверяем, является ли получатель "Наличными"
-    val isDestinationCash = transaction.destination.contains("Наличные", ignoreCase = true)
+    val isDestinationCash = true // По умолчанию считаем, что получатель - наличные
     
     Row(
         modifier = Modifier
@@ -199,7 +199,7 @@ fun TransactionItem(transaction: Transaction) {
             modifier = Modifier.weight(1f)
         ) {
             Text(
-                text = transaction.title ?: transaction.category,
+                text = transaction.category,
                 style = MaterialTheme.typography.bodyLarge,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -228,7 +228,7 @@ fun TransactionItem(transaction: Transaction) {
 
                 // Название банка-источника
                 Text(
-                    text = transaction.source,
+                    text = transaction.source ?: "",
                     fontSize = 11.sp,
                     color = sourceColor,
                     fontWeight = FontWeight.Medium
@@ -249,7 +249,7 @@ fun TransactionItem(transaction: Transaction) {
                     // Иконка банка-получателя
                     Icon(
                         imageVector = destinationIcon,
-                        contentDescription = transaction.destination,
+                        contentDescription = "Наличные",
                         tint = destinationColor,
                         modifier = Modifier.size(12.dp)
                     )
@@ -258,7 +258,7 @@ fun TransactionItem(transaction: Transaction) {
 
                     // Название банка-получателя
                     Text(
-                        text = transaction.destination,
+                        text = "Наличные",
                         fontSize = 11.sp,
                         color = destinationColor,
                         fontWeight = FontWeight.Medium
@@ -297,9 +297,9 @@ fun TransactionItem(transaction: Transaction) {
         // Сумма транзакции
         Text(
             text = if (transaction.isExpense)
-                stringResource(R.string.expense_currency_format, transaction.amount.format(false))
+                stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
             else
-                stringResource(R.string.income_currency_format, transaction.amount.format(false)),
+                stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
             color = indicatorColor,
             fontWeight = FontWeight.Bold
         )
@@ -366,11 +366,11 @@ fun DeleteTransactionDialog(
     val formattedDate = remember(transaction.date) { dateFormat.format(transaction.date) }
 
     // Получаем иконки и цвета для банков
-    val (sourceIcon, sourceColor) = getBankIcon(transaction.source)
-    val (destinationIcon, destinationColor) = getBankIcon(transaction.destination)
+    val (sourceIcon, sourceColor) = getBankIcon(transaction.source ?: "")
+    val (destinationIcon, destinationColor) = getBankIcon("Наличные")
 
     // Проверяем, является ли получатель "Наличными"
-    val isDestinationCash = transaction.destination.contains("Наличные", ignoreCase = true)
+    val isDestinationCash = true // По умолчанию считаем, что получатель - наличные
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -391,7 +391,7 @@ fun DeleteTransactionDialog(
         text = {
             Column {
                 Text(
-                    text = transaction.title ?: transaction.category,
+                    text = transaction.category,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
@@ -426,7 +426,7 @@ fun DeleteTransactionDialog(
 
                     // Название банка-источника
                     Text(
-                        text = transaction.source,
+                        text = transaction.source ?: "",
                         fontSize = 14.sp,
                         color = sourceColor,
                         fontWeight = FontWeight.Medium
@@ -447,7 +447,7 @@ fun DeleteTransactionDialog(
                         // Иконка банка-получателя
                         Icon(
                             imageVector = destinationIcon,
-                            contentDescription = transaction.destination,
+                            contentDescription = "Наличные",
                             tint = destinationColor,
                             modifier = Modifier.size(16.dp)
                         )
@@ -456,7 +456,7 @@ fun DeleteTransactionDialog(
 
                         // Название банка-получателя
                         Text(
-                            text = transaction.destination,
+                            text = "Наличные",
                             fontSize = 14.sp,
                             color = destinationColor,
                             fontWeight = FontWeight.Medium
@@ -486,7 +486,7 @@ fun DeleteTransactionDialog(
                     text = stringResource(
                         R.string.delete_transaction_confirmation,
                         transaction.category,
-                        transaction.amount.format()
+                        String.format("%.2f", transaction.amount)
                     ),
                     style = MaterialTheme.typography.bodyMedium
                 )

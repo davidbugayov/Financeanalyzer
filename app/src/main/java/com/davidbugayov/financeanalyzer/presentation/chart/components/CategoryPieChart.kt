@@ -24,6 +24,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
@@ -193,7 +194,7 @@ fun CategoryPieChart(
 
             // Рисуем секторы
             sortedData.forEach { (category, value) ->
-                val sweepAngle = (value.amount.toDouble() / total.amount.toDouble() * 360 * angleProgress).toFloat()
+                val sweepAngle = value.angleOf(total) * angleProgress
                 val isSelected = category == selectedCategory
 
                 // Рисуем сектор
@@ -359,7 +360,7 @@ fun CategoryPieChartList(
             .padding(horizontal = dimensionResource(R.dimen.spacing_large))
     ) {
         sortedData.forEach { (category, amount) ->
-            val percentage = amount.amount.toDouble() / total.amount.toDouble() * 100
+            val percentage = amount.percentageOf(total)
 
             CategoryListItem(
                 categoryName = category,

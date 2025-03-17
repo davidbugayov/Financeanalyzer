@@ -4,6 +4,7 @@ import android.os.Bundle
 import com.davidbugayov.financeanalyzer.FinanceApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Утилитарный класс для работы с Firebase Analytics.
@@ -31,6 +32,7 @@ object AnalyticsUtils {
         const val PERIOD_TYPE = "period_type"
         const val ERROR_TYPE = "error_type"
         const val ERROR_MESSAGE = "error_message"
+        const val TRANSACTION_CURRENCY = "transaction_currency"
     }
 
     /**
@@ -83,10 +85,10 @@ object AnalyticsUtils {
     /**
      * Логирует добавление транзакции
      * @param type Тип транзакции (доход/расход)
-     * @param amount Сумма транзакции
+     * @param amount Сумма транзакции в виде объекта Money
      * @param category Категория транзакции
      */
-    fun logTransactionAdded(type: String, amount: Double, category: String) {
+    fun logTransactionAdded(type: String, amount: Money, category: String) {
         try {
             // TODO: Вернуть проверку на DEBUG перед релизом
             // if (BuildConfig.DEBUG) {
@@ -100,8 +102,9 @@ object AnalyticsUtils {
             // Отправляем событие в Firebase Analytics
             val bundle = Bundle().apply {
                 putString(Params.TRANSACTION_TYPE, type)
-                putDouble(Params.TRANSACTION_AMOUNT, amount)
+                putDouble(Params.TRANSACTION_AMOUNT, amount.amount.toDouble())
                 putString(Params.TRANSACTION_CATEGORY, category)
+                putString(Params.TRANSACTION_CURRENCY, amount.currency.code)
             }
 
             getAnalyticsInstance()?.logEvent(Events.TRANSACTION_ADDED, bundle)
@@ -109,6 +112,15 @@ object AnalyticsUtils {
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при логировании добавления транзакции")
         }
+    }
+
+    /**
+     * Устаревший метод для обратной совместимости
+     * @deprecated Используйте версию с Money
+     */
+    @Deprecated("Используйте версию с Money", ReplaceWith("logTransactionAdded(type, Money(amount), category)"))
+    fun logTransactionAdded(type: String, amount: Double, category: String) {
+        logTransactionAdded(type, Money(amount), category)
     }
 
     /**

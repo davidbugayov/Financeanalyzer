@@ -211,12 +211,12 @@ class HomeViewModel(
 
             var hasError = false
             testTransactions.forEach { transaction ->
-                Timber.d("Saving test transaction: ${transaction.title}")
+                Timber.d("Saving test transaction: ${transaction.category}")
                 addTransactionUseCase(transaction).fold(
                     onSuccess = { /* Transaction saved successfully */ },
                     onFailure = { exception: Throwable ->
                         hasError = true
-                        Timber.e(exception, "Failed to save test transaction: ${transaction.title}")
+                        Timber.e(exception, "Failed to save test transaction: ${transaction.category}")
                     }
                 )
             }
@@ -259,17 +259,34 @@ class HomeViewModel(
             val income = filtered
                 .filter { !it.isExpense }
                 .map { it.amount }
-                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
 
             val expense = filtered
                 .filter { it.isExpense }
                 .map { it.amount }
-                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
 
             val balance = income - expense
 
-            Triple(income, expense, balance)
+            Triple(Money(income), Money(expense), Money(balance))
         }
+
+        // Рассчитываем общие суммы
+        val financialSummary = {
+            val incomeTotal = filtered
+                .filter { !it.isExpense }
+                .map { it.amount }
+                .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+
+            val expenseTotal = filtered
+                .filter { it.isExpense }
+                .map { it.amount }
+                .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+
+            val balanceTotal = incomeTotal - expenseTotal
+
+            Triple(Money(incomeTotal), Money(expenseTotal), Money(balanceTotal))
+        }()
 
         // Формируем группы транзакций по категориям
         val groups = if (filtered.isNotEmpty()) {
@@ -278,19 +295,19 @@ class HomeViewModel(
                 .map { (category, categoryTransactions) ->
                     // Рассчитываем общую сумму для категории
                     val categoryTotal = categoryTransactions.map {
-                        if (it.isExpense) it.amount.abs() * -1 else it.amount.abs()
-                    }.reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                        if (it.isExpense) kotlin.math.abs(it.amount) * -1 else kotlin.math.abs(it.amount)
+                    }.reduceOrNull { acc, amount -> acc + amount } ?: 0.0
 
                     // Создаем группу транзакций
                     TransactionGroup(
                         date = category,
                         transactions = categoryTransactions,
-                        balance = categoryTotal,
+                        balance = Money(categoryTotal),
                         name = category,
-                        total = categoryTotal
+                        total = Money(categoryTotal)
                     )
                 }
-                .sortedByDescending { it.total.amount.abs() }
+                .sortedByDescending { it.total.amount }
         } else {
             emptyList()
         }
@@ -370,16 +387,40 @@ class HomeViewModel(
     )
 
     private fun calculateTotalIncome(transactions: List<Transaction>): Money {
-        return transactions
+        val total = transactions
             .filter { !it.isExpense }
             .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+        return Money(total)
     }
 
     private fun calculateTotalExpenses(transactions: List<Transaction>): Money {
-        return transactions
+        val total = transactions
             .filter { it.isExpense }
             .map { it.amount }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+        return Money(total)
+    }
+
+    /**
+     * Получает общую сумму доходов
+     */
+    fun getTotalIncome(): Money {
+        val total = _state.value.transactions
+            .filter { !it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+        return Money(total)
+    }
+
+    /**
+     * Получает общую сумму расходов
+     */
+    fun getTotalExpense(): Money {
+        val total = _state.value.transactions
+            .filter { it.isExpense }
+            .map { it.amount }
+            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+        return Money(total)
     }
 } 

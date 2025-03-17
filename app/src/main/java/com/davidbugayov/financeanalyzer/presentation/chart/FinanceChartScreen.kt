@@ -102,12 +102,12 @@ fun FinanceChartScreen(
     // Calculate totals
     val totalIncome = filteredTransactions
         .filter { !it.isExpense }
-        .map { it.amount }
+        .map { Money(it.amount) }
         .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
     val totalExpense = filteredTransactions
         .filter { it.isExpense }
-        .map { it.amount }
+        .map { Money(it.amount) }
         .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
     Timber.tag("FinanceChart").d("Total income: $totalIncome, Total expense: $totalExpense")
@@ -119,8 +119,8 @@ fun FinanceChartScreen(
     val avgYearlyExpense = avgDailyExpense * 365
 
     // Calculate savings rate
-    val savingsRate = if (totalIncome.amount.toDouble() > 0) {
-        ((totalIncome.amount.toDouble() - totalExpense.amount.toDouble()) / totalIncome.amount.toDouble()) * 100
+    val savingsRate = if (!totalIncome.isZero()) {
+        (totalIncome.minus(totalExpense)).percentageOf(totalIncome)
     } else {
         0.0
     }

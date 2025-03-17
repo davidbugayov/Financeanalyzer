@@ -292,19 +292,20 @@ fun TransactionHistoryScreen(
                     val transactionGroups = remember(groupedTransactions) {
                         groupedTransactions.map { (period, transactions) ->
                             // Вычисляем баланс для группы транзакций
+                            // Для доходов
                             val income = transactions
                                 .filter { !it.isExpense }
-                                .map { it.amount }
+                                .map { Money(it.amount) }
                                 .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
                             // Для расходов берем абсолютное значение (без минуса)
                             val expense = transactions
                                 .filter { it.isExpense }
-                                .map { it.amount }
+                                .map { Money(it.amount) }
                                 .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
                             // Для баланса: доходы - расходы
-                            val balance = income - expense
+                            val balance = income.minus(expense)
 
                             TransactionGroup(
                                 date = period,

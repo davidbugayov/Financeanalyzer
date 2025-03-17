@@ -9,25 +9,29 @@ import java.util.Locale
 class GetChartDataUseCase {
 
     fun getExpensesByCategory(transactions: List<Transaction>): Map<String, Money> {
-        return transactions
+        val expensesByCategory = transactions
             .filter { it.isExpense }
             .groupBy { it.category }
             .mapValues { (_, transactions) ->
-                transactions.fold(Money.zero()) { acc, transaction ->
+                transactions.fold(0.0) { acc, transaction ->
                     acc + transaction.amount
                 }
             }
+            
+        return expensesByCategory.mapValues { (_, amount) -> Money(amount) }
     }
 
     fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
-        return transactions
+        val incomeByCategory = transactions
             .filter { !it.isExpense }
             .groupBy { it.category }
             .mapValues { (_, transactions) ->
-                transactions.fold(Money.zero()) { acc, transaction ->
+                transactions.fold(0.0) { acc, transaction ->
                     acc + transaction.amount
                 }
             }
+            
+        return incomeByCategory.mapValues { (_, amount) -> Money(amount) }
     }
 
     fun getExpensesByDay(days: Int, transactions: List<Transaction>): Map<String, DailyData> {
@@ -42,21 +46,27 @@ class GetChartDataUseCase {
                 val dailyExpenses = txs.filter { it.isExpense }
                 val dailyIncome = txs.filter { !it.isExpense }
 
-                val categoryBreakdown = dailyExpenses
+                val categoryBreakdownDouble = dailyExpenses
                     .groupBy { it.category }
                     .mapValues { (_, categoryTransactions) ->
                         categoryTransactions
                             .map { it.amount }
-                            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
                     }
+                    
+                val categoryBreakdown = categoryBreakdownDouble.mapValues { (_, amount) -> Money(amount) }
+
+                val incomeTotal = dailyIncome
+                    .map { it.amount }
+                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                    
+                val expenseTotal = dailyExpenses
+                    .map { it.amount }
+                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
 
                 DailyData(
-                    income = dailyIncome
-                        .map { it.amount }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero(),
-                    expense = dailyExpenses
-                        .map { it.amount }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero(),
+                    income = Money(incomeTotal),
+                    expense = Money(expenseTotal),
                     categoryBreakdown = categoryBreakdown
                 )
             }

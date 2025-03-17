@@ -1,10 +1,14 @@
 package com.davidbugayov.financeanalyzer
 
 import android.app.Activity
+import android.app.AlarmManager
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
+import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.Bundle
+import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
@@ -18,6 +22,7 @@ import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.davidbugayov.financeanalyzer.widget.BalanceWidget
 import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
@@ -31,6 +36,9 @@ class FinanceActivity : ComponentActivity() {
     // Флаг, указывающий, что приложение запущено через shortcut
     private var isLaunchedFromShortcut = false
     
+    // Код запроса для разрешения на использование точных будильников
+    private val REQUEST_EXACT_ALARM_PERMISSION = 1001
+    
     override fun onCreate(savedInstanceState: Bundle?) {
         // Устанавливаем сплеш-скрин перед вызовом super.onCreate()
         val splashScreen = installSplashScreen()
@@ -39,6 +47,9 @@ class FinanceActivity : ComponentActivity() {
         
         // Обрабатываем deep links
         handleIntent(intent)
+        
+        // Проверяем разрешение на использование точных будильников
+        checkExactAlarmPermission()
         
         // Обновляем виджеты при запуске приложения
         updateWidgets()
@@ -107,6 +118,29 @@ class FinanceActivity : ComponentActivity() {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error updating widgets")
+        }
+    }
+    
+    /**
+     * Проверяет, есть ли у приложения разрешение на использование точных будильников,
+     * и запрашивает его, если необходимо.
+     */
+    private fun checkExactAlarmPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            if (!alarmManager.canScheduleExactAlarms()) {
+                Timber.d("Requesting SCHEDULE_EXACT_ALARM permission")
+                try {
+                    val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                        data = android.net.Uri.parse("package:$packageName")
+                    }
+                    startActivity(intent)
+                } catch (e: Exception) {
+                    Timber.e(e, "Failed to request SCHEDULE_EXACT_ALARM permission")
+                }
+            } else {
+                Timber.d("SCHEDULE_EXACT_ALARM permission already granted")
+            }
         }
     }
 }

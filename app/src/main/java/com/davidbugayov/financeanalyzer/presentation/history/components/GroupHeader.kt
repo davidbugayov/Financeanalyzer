@@ -52,14 +52,14 @@ fun GroupHeader(
     // Вычисляем суммы только при изменении списка транзакций
     val financialSummary = remember(transactions) {
         val income = transactions.filter { !it.isExpense }
-            .map { it.amount }
+            .map { Money(it.amount) }
             .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
         val expense = transactions.filter { it.isExpense }
-            .map { it.amount }
+            .map { Money(it.amount) }
             .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
-        val balance = income - expense
+        val balance = income.minus(expense)
 
         Triple(income, expense, balance)
     }

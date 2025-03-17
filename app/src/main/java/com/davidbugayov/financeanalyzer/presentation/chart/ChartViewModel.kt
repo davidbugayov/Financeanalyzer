@@ -215,25 +215,29 @@ class ChartViewModel : ViewModel(), KoinComponent {
     }
 
     fun getExpensesByCategory(transactions: List<Transaction>): Map<String, Money> {
-        return transactions
+        val expensesByCategory = transactions
             .filter { it.isExpense }
             .groupBy { it.category }
             .mapValues { (_, transactions) ->
                 transactions
                     .map { it.amount }
-                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
             }
+            
+        return expensesByCategory.mapValues { (_, amount) -> Money(amount) }
     }
 
     fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
-        return transactions
+        val incomeByCategory = transactions
             .filter { !it.isExpense }
             .groupBy { it.category }
             .mapValues { (_, transactions) ->
                 transactions
                     .map { it.amount }
-                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
             }
+            
+        return incomeByCategory.mapValues { (_, amount) -> Money(amount) }
     }
 
     private fun calculateDailyExpenses(transactions: List<Transaction>): List<DailyExpense> {
@@ -258,14 +262,14 @@ class ChartViewModel : ViewModel(), KoinComponent {
                 }.time
             }
             .map { (date, transactionsForDate) ->
-                val expense = transactionsForDate
+                val expenseAmount = transactionsForDate
                     .filter { it.isExpense }
                     .map { it.amount }
-                    .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
 
                 DailyExpense(
                     date = date,
-                    amount = expense.amount.toDouble()
+                    amount = expenseAmount
                 )
             }
             .filter { it.amount.amount.toDouble() > 0 }

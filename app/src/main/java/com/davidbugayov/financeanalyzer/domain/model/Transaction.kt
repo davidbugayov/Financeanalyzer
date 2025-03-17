@@ -1,101 +1,18 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
-import java.math.BigDecimal
 import java.util.Date
+import java.util.UUID
 
 /**
- * Доменная модель транзакции.
- * Представляет собой финансовую операцию (доход или расход).
- * Чистая модель данных, не зависящая от фреймворков и библиотек.
- * Следует принципу единственной ответственности (SRP) из SOLID.
- *
- * @property id Уникальный идентификатор транзакции (0 для новых транзакций)
- * @property title Название или описание транзакции (опционально)
- * @property amount Сумма транзакции (Money)
- * @property category Категория транзакции (например, "Продукты", "Зарплата")
- * @property isExpense Тип транзакции (true - расход, false - доход)
- * @property date Дата совершения транзакции
- * @property note Дополнительное примечание к транзакции (опционально)
- * @property source Источник средств (например, "Сбер", "Тинькофф")
- * @property destination Получатель средств (например, "Альфа", "Наличные")
+ * Модель данных для транзакции.
+ * Представляет финансовую операцию (доход или расход).
  */
 data class Transaction(
-    val id: Long = 0,
-    val title: String? = null,
-    val amount: Money,
+    val id: String = UUID.randomUUID().toString(),
+    val amount: Double,
     val category: String,
+    val date: Date = Date(),
     val isExpense: Boolean,
-    val date: Date,
     val note: String? = null,
-    val source: String = "Сбер",
-    val destination: String = "Наличные"
-) {
-
-    /**
-     * Конструктор для обратной совместимости с Double
-     */
-    constructor(
-        id: Long = 0,
-        title: String? = null,
-        amount: Double,
-        category: String,
-        isExpense: Boolean,
-        date: Date,
-        note: String? = null,
-        currency: Currency = Currency.RUB,
-        source: String = "Сбер",
-        destination: String = "Наличные"
-    ) : this(
-        id = id,
-        title = title,
-        amount = Money(amount, currency),
-        category = category,
-        isExpense = isExpense,
-        date = date,
-        note = note,
-        source = source,
-        destination = destination
-    )
-
-    /**
-     * Конструктор для обратной совместимости с BigDecimal
-     */
-    constructor(
-        id: Long = 0,
-        title: String? = null,
-        amount: BigDecimal,
-        category: String,
-        isExpense: Boolean,
-        date: Date,
-        note: String? = null,
-        currency: Currency = Currency.RUB,
-        source: String = "Сбер",
-        destination: String = "Наличные"
-    ) : this(
-        id = id,
-        title = title,
-        amount = Money(amount, currency),
-        category = category,
-        isExpense = isExpense,
-        date = date,
-        note = note,
-        source = source,
-        destination = destination
-    )
-
-    /**
-     * Получает абсолютное значение суммы транзакции
-     * @return Абсолютное значение суммы
-     */
-    fun getAbsoluteAmount(): Money {
-        return amount.abs()
-    }
-
-    /**
-     * Получает сумму транзакции с учетом знака (положительная для доходов, отрицательная для расходов)
-     * @return Сумма со знаком
-     */
-    fun getSignedAmount(): Money {
-        return if (isExpense) amount.abs() * -1 else amount.abs()
-    }
-} 
+    val source: String? = null
+) 

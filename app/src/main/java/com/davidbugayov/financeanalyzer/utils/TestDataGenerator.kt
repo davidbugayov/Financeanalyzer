@@ -103,8 +103,7 @@ object TestDataGenerator {
             // Создаем транзакцию и добавляем в список
             transactions.add(
                 Transaction(
-                    id = i.toLong(),
-                    title = title,
+                    id = i.toString(),
                     amount = amount.toInt().toDouble(), // Округляем до целых
                     category = category,
                     isExpense = isExpense,

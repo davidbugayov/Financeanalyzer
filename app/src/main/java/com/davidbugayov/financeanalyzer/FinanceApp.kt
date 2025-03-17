@@ -6,6 +6,7 @@ import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.historyModule
 import com.davidbugayov.financeanalyzer.di.homeModule
+import com.davidbugayov.financeanalyzer.di.profileModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
 import com.google.firebase.FirebaseApp
@@ -55,7 +56,8 @@ class FinanceApp : Application() {
                 chartModule,
                 homeModule,
                 addTransactionModule,
-                historyModule
+                historyModule,
+                profileModule
             )
         }
 

@@ -19,4 +19,10 @@ sealed class Screen(val route: String) {
 
     /** Экран с графиками и статистикой */
     data object Chart : Screen("chart")
+    
+    /** Экран профиля пользователя */
+    data object Profile : Screen("profile")
+    
+    /** Экран со списком используемых библиотек */
+    data object Libraries : Screen("libraries")
 } 

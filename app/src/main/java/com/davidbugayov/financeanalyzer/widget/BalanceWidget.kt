@@ -19,6 +19,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import java.math.BigDecimal
 
 /**
  * Виджет для отображения текущего баланса, доходов и расходов.
@@ -92,13 +93,13 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                     // Рассчитываем баланс, доходы и расходы
                     val income = transactions
                         .filter { transaction -> !transaction.isExpense }
-                        .map { transaction -> transaction.amount }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                        .map { transaction -> Money(transaction.amount) }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money(0.0)
 
                     val expense = transactions
                         .filter { transaction -> transaction.isExpense }
-                        .map { transaction -> transaction.amount }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                        .map { transaction -> Money(transaction.amount) }
+                        .reduceOrNull { acc, money -> acc + money } ?: Money(0.0)
                         
                     val balance = income - expense
 
@@ -115,7 +116,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                         views.setTextViewText(R.id.widget_expense, formattedExpense)
 
                         // Устанавливаем цвет баланса в зависимости от его значения
-                        val balanceColor = if (balance >= Money.zero()) {
+                        val balanceColor = if (balance.amount >= BigDecimal.ZERO) {
                             0xFF4CAF50.toInt() // Green
                         } else {
                             0xFFF44336.toInt() // Red

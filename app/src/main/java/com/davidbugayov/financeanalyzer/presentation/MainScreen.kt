@@ -25,7 +25,10 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryS
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
+import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
+import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -37,6 +40,7 @@ fun MainScreen(startDestination: String = "home") {
     val homeViewModel: HomeViewModel = koinViewModel()
     val chartViewModel: ChartViewModel = koinViewModel()
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
+    val profileViewModel: ProfileViewModel = koinViewModel()
 
     FinanceAnalyzerTheme {
         Scaffold(
@@ -75,7 +79,8 @@ fun MainScreen(startDestination: String = "home") {
                         viewModel = homeViewModel,
                         onNavigateToHistory = { navController.navigate(Screen.History.route) },
                         onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
-                        onNavigateToChart = { navController.navigate(Screen.Chart.route) }
+                        onNavigateToChart = { navController.navigate(Screen.Chart.route) },
+                        onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
                     )
                 }
                 
@@ -221,6 +226,68 @@ fun MainScreen(startDestination: String = "home") {
                     FinanceChartScreen(
                         viewModel = chartViewModel,
                         onNavigateBack = { navController.popBackStack() }
+                    )
+                }
+                
+                composable(
+                    route = Screen.Profile.route,
+                    enterTransition = {
+                        slideIntoContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        ) + fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        ) + fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    }
+                ) {
+                    ProfileScreen(
+                        viewModel = profileViewModel,
+                        onNavigateBack = { navController.navigateUp() },
+                        onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) }
+                    )
+                }
+                
+                composable(
+                    route = Screen.Libraries.route,
+                    enterTransition = {
+                        slideIntoContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.Start
+                        ) + fadeIn(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    },
+                    exitTransition = {
+                        slideOutOfContainer(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            ),
+                            towards = AnimatedContentTransitionScope.SlideDirection.End
+                        ) + fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    }
+                ) {
+                    LibrariesScreen(
+                        onNavigateBack = { navController.navigateUp() }
                     )
                 }
             }

@@ -44,6 +44,8 @@
     <string name="month">Месяц</string>
     <string name="recent_transactions">Последние транзакции</string>
     <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="profile">Профиль</string>
+    <string name="profile_title">Профиль пользователя</string>
     
     <!-- Фильтры -->
     <string name="filter_today">Сегодня</string>
@@ -251,5 +253,51 @@
     <string name="total_income">Общий доход</string>
     <string name="total_expense">Общий расход</string>
     <string name="no_transactions_in_period">Нет транзакций за выбранный период</string>
+
+    <!-- Профиль -->
+    <string name="export_to_csv">Экспорт данных в CSV</string>
+    <string name="export_description">Экспортирует все ваши транзакции в CSV файл, который можно открыть в Excel или Google Таблицах.</string>
+    <string name="export_success">Данные успешно экспортированы</string>
+    <string name="export_error">Ошибка при экспорте данных</string>
+    
+    <!-- Финансовые цели -->
+    <string name="financial_goals">Финансовые цели</string>
+    <string name="active_goals">Активные цели</string>
+    <string name="completed_goals">Завершенные цели</string>
+    <string name="add_goal">Добавить цель</string>
+    <string name="edit_goal">Редактировать цель</string>
+    <string name="delete_goal">Удалить цель</string>
+    <string name="goal_name">Название цели</string>
+    <string name="goal_target_amount">Целевая сумма</string>
+    <string name="goal_current_amount">Текущая сумма</string>
+    <string name="goal_deadline">Срок достижения</string>
+    <string name="goal_category">Категория</string>
+    <string name="goal_description">Описание</string>
+    <string name="goal_progress">Прогресс</string>
+    <string name="goal_remaining">Осталось</string>
+    <string name="goal_add_amount">Добавить сумму</string>
+    <string name="goal_amount_to_add">Сумма для добавления</string>
+    <string name="goal_completed">Цель достигнута!</string>
+    <string name="goal_delete_confirmation">Вы уверены, что хотите удалить цель "%1$s"?</string>
+    <string name="no_goals">У вас пока нет финансовых целей</string>
+    <string name="add_your_first_goal">Добавьте свою первую финансовую цель</string>
+
+    <!-- Уведомления о транзакциях -->
+    <string name="transaction_reminder_channel_name">Напоминания о транзакциях</string>
+    <string name="transaction_reminder_channel_description">Уведомления о необходимости внести транзакции</string>
+    <string name="transaction_reminder_title">Не забудьте внести транзакции</string>
+    <string name="transaction_reminder_text">Пора внести ваши сегодняшние доходы и расходы</string>
+    <string name="transaction_reminders">Напоминания о транзакциях</string>
+    <string name="transaction_reminder_settings">Настройки напоминаний</string>
+    <string name="reminder_time">Время напоминания</string>
+    
+    <!-- Информация о приложении -->
+    <string name="app_info">О приложении</string>
+    <string name="app_version">Версия приложения</string>
+    <string name="build_version">Версия кода</string>
+    <string name="libraries">Используемые библиотеки</string>
+    <string name="libraries_title">Используемые библиотеки</string>
+    <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
+    <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
 
 </resources>
