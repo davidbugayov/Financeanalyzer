@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -16,6 +17,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.TrendingUp
@@ -41,6 +43,7 @@ import java.util.Locale
  * @param totalExpense Общий расход.
  * @param balance Текущий баланс.
  * @param savingsRate Процент сбережений.
+ * @param onNavigateToChart Обработчик нажатия для перехода на экран статистики.
  * @param modifier Модификатор для настройки внешнего вида.
  */
 @Composable
@@ -49,6 +52,7 @@ fun AnalyticsSection(
     totalExpense: Double,
     balance: Double,
     savingsRate: Double,
+    onNavigateToChart: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
     val currencyFormat = NumberFormat.getCurrencyInstance(Locale("ru", "RU"))
@@ -83,7 +87,7 @@ fun AnalyticsSection(
                     icon = Icons.Default.ArrowUpward,
                     backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
-                    iconTint = Color(0xFF4CAF50),
+                    iconTint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier.weight(1f)
                 )
                 
@@ -96,7 +100,7 @@ fun AnalyticsSection(
                     icon = Icons.Default.ArrowDownward,
                     backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
-                    iconTint = Color(0xFFF44336),
+                    iconTint = MaterialTheme.colorScheme.error,
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -127,19 +131,35 @@ fun AnalyticsSection(
                     icon = if (savingsRate > 0) Icons.Default.TrendingUp else Icons.Default.TrendingDown,
                     backgroundColor = MaterialTheme.colorScheme.surfaceVariant,
                     contentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-                    iconTint = if (savingsRate > 0) Color(0xFF4CAF50) else Color(0xFFF44336),
+                    iconTint = if (savingsRate > 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                     modifier = Modifier.weight(1f)
                 )
             }
             
             Spacer(modifier = Modifier.height(16.dp))
             
-            // Дополнительная информация
-            Text(
-                text = "Подробная аналитика доступна в разделе \"Статистика\"",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Дополнительная информация с возможностью перехода на экран статистики
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onNavigateToChart)
+                    .padding(vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Подробная аналитика доступна в разделе \"Статистика\"",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
+                )
+                
+                Icon(
+                    imageVector = Icons.Default.ChevronRight,
+                    contentDescription = "Перейти к статистике",
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(16.dp)
+                )
+            }
         }
     }
 }

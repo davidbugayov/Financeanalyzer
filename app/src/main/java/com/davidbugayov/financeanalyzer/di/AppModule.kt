@@ -75,7 +75,16 @@ val appModule = module {
             preferencesManager = get()
         )
     }
-    viewModel { ProfileViewModel(get(), get(), get(), get()) }
+    viewModel {
+        ProfileViewModel(
+            exportTransactionsToCSVUseCase = get(),
+            getFinancialGoalsUseCase = get(),
+            manageFinancialGoalUseCase = get(),
+            loadTransactionsUseCase = get(),
+            notificationScheduler = get(),
+            preferencesManager = get()
+        )
+    }
 
     // Утилиты
     single { NotificationScheduler() }

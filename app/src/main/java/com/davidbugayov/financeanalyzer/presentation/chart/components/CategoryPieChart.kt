@@ -34,6 +34,24 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_1
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_2
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_3
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_4
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_5
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_6
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_7
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_8
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_9
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_1
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_2
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_3
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_4
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_5
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_6
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_7
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_8
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_9
 
 /**
  * Круговая диаграмма для отображения распределения расходов/доходов по категориям.
@@ -440,4 +458,34 @@ private fun Color.Companion.hsv(hue: Float, saturation: Float, value: Float): Co
         blue = b + m,
         alpha = 1f
     )
+}
+
+private val greenColors = listOf(
+    md_theme_chart_green_1,
+    md_theme_chart_green_2,
+    md_theme_chart_green_3,
+    md_theme_chart_green_4,
+    md_theme_chart_green_5,
+    md_theme_chart_green_6,
+    md_theme_chart_green_7,
+    md_theme_chart_green_8,
+    md_theme_chart_green_9
+)
+
+private val redColors = listOf(
+    md_theme_chart_red_1,
+    md_theme_chart_red_2,
+    md_theme_chart_red_3,
+    md_theme_chart_red_4,
+    md_theme_chart_red_5,
+    md_theme_chart_red_6,
+    md_theme_chart_red_7,
+    md_theme_chart_red_8,
+    md_theme_chart_red_9
+)
+
+private fun getColorForCategory(category: String, isExpense: Boolean): Color {
+    val colors = if (isExpense) redColors else greenColors
+    val index = category.hashCode() % colors.size
+    return colors[if (index < 0) -index else index]
 } 

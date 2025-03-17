@@ -45,15 +45,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
-import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
 import com.davidbugayov.financeanalyzer.presentation.profile.components.AnalyticsSection
 import com.davidbugayov.financeanalyzer.presentation.profile.components.AppInfoSection
-import com.davidbugayov.financeanalyzer.presentation.profile.components.EditProfileDialog
 import com.davidbugayov.financeanalyzer.presentation.profile.components.FinancialGoalsList
 import com.davidbugayov.financeanalyzer.presentation.profile.components.NotificationSettingsDialog
 import com.davidbugayov.financeanalyzer.presentation.profile.components.SettingsSection
-import com.davidbugayov.financeanalyzer.presentation.profile.components.UserInfoSection
+import com.davidbugayov.financeanalyzer.presentation.profile.components.ThemeSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
@@ -68,7 +65,8 @@ import org.koin.androidx.compose.koinViewModel
 fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToLibraries: () -> Unit
+    onNavigateToLibraries: () -> Unit,
+    onNavigateToChart: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -145,24 +143,13 @@ fun ProfileScreen(
                 .padding(paddingValues)
                 .verticalScroll(rememberScrollState())
         ) {
-            // Секция информации о пользователе
-            UserInfoSection(
-                userName = state.userName,
-                userEmail = state.userEmail,
-                userPhone = state.userPhone,
-                onEditClick = { viewModel.onEvent(ProfileEvent.ShowEditProfileDialog) },
-                onAvatarClick = { viewModel.onEvent(ProfileEvent.ShowEditProfileDialog) },
-                modifier = Modifier.padding(16.dp)
-            )
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
             // Секция финансовой аналитики
             AnalyticsSection(
                 totalIncome = state.totalIncome,
                 totalExpense = state.totalExpense,
                 balance = state.balance,
                 savingsRate = state.savingsRate,
+                onNavigateToChart = onNavigateToChart,
                 modifier = Modifier.padding(horizontal = 16.dp)
             )
             
@@ -170,14 +157,14 @@ fun ProfileScreen(
             
             // Секция настроек
             SettingsSection(
-                onThemeChange = { viewModel.onEvent(ProfileEvent.ChangeTheme(it)) },
+                onThemeClick = { viewModel.onEvent(ProfileEvent.ShowThemeDialog) },
                 onLanguageClick = { /* Открыть диалог выбора языка */ },
                 onCurrencyClick = { /* Открыть диалог выбора валюты */ },
                 onNotificationsClick = { /* Открыть настройки уведомлений */ },
                 onTransactionReminderClick = { viewModel.onEvent(ProfileEvent.ShowNotificationSettingsDialog) },
                 onSecurityClick = { /* Открыть настройки безопасности */ },
                 onAdvancedSettingsClick = { /* Открыть расширенные настройки */ },
-                isDarkTheme = state.isDarkTheme,
+                themeMode = state.themeMode,
                 isTransactionReminderEnabled = state.isTransactionReminderEnabled,
                 transactionReminderTime = state.transactionReminderTime,
                 modifier = Modifier.padding(horizontal = 16.dp)
@@ -263,14 +250,14 @@ fun ProfileScreen(
                 Text(
                     text = stringResource(R.string.financial_goals),
                     style = MaterialTheme.typography.titleLarge,
-                    fontWeight = FontWeight.Bold
+                    color = MaterialTheme.colorScheme.onSurface
                 )
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Вкладки для активных и завершенных целей
                 TabRow(
-                    selectedTabIndex = selectedTabIndex
+                    selectedTabIndex = selectedTabIndex,
+                    modifier = Modifier.fillMaxWidth()
                 ) {
                     tabs.forEachIndexed { index, title ->
                         Tab(
@@ -283,84 +270,40 @@ fun ProfileScreen(
                 
                 Spacer(modifier = Modifier.height(16.dp))
                 
-                // Отображаем соответствующий список целей в зависимости от выбранной вкладки
                 when (selectedTabIndex) {
-                    0 -> {
-                        // Активные цели
-                        FinancialGoalsList(
-                            goals = state.activeGoals,
-                            onGoalClick = { goal ->
-                                viewModel.onEvent(ProfileEvent.SelectGoal(goal.id))
-                                // Здесь можно добавить открытие диалога с деталями цели
-                            },
-                            onAddGoalClick = {
-                                viewModel.onEvent(ProfileEvent.ShowAddGoalDialog)
-                                // Здесь можно добавить открытие диалога добавления цели
-                            },
-                            modifier = Modifier.height(400.dp)
-                        )
-                    }
-                    1 -> {
-                        // Завершенные цели
-                        FinancialGoalsList(
-                            goals = state.completedGoals,
-                            onGoalClick = { goal ->
-                                viewModel.onEvent(ProfileEvent.SelectGoal(goal.id))
-                                // Здесь можно добавить открытие диалога с деталями цели
-                            },
-                            onAddGoalClick = {
-                                viewModel.onEvent(ProfileEvent.ShowAddGoalDialog)
-                                // Здесь можно добавить открытие диалога добавления цели
-                            },
-                            modifier = Modifier.height(400.dp)
-                        )
-                    }
+                    0 -> FinancialGoalsList(
+                        goals = state.activeGoals,
+                        onGoalClick = { goal -> viewModel.onEvent(ProfileEvent.SelectGoal(goal.id)) },
+                        onAddGoalClick = { viewModel.onEvent(ProfileEvent.ShowAddGoalDialog) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                    1 -> FinancialGoalsList(
+                        goals = state.completedGoals,
+                        onGoalClick = { goal -> viewModel.onEvent(ProfileEvent.SelectGoal(goal.id)) },
+                        onAddGoalClick = { viewModel.onEvent(ProfileEvent.ShowAddGoalDialog) },
+                        modifier = Modifier.fillMaxWidth()
+                    )
                 }
             }
-            
-            // Индикатор загрузки
-            if (state.isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-            
-            // Нижний отступ для прокрутки
-            Spacer(modifier = Modifier.height(32.dp))
         }
-        
-        // Диалог редактирования профиля
-        if (state.isEditingProfile) {
-            EditProfileDialog(
-                userName = state.userName,
-                userEmail = state.userEmail,
-                userPhone = state.userPhone ?: "",
-                onSave = { name, email, phone ->
-                    viewModel.onEvent(ProfileEvent.UpdateUserInfo(name, email, phone ?: ""))
-                },
-                onDismiss = {
-                    viewModel.onEvent(ProfileEvent.HideEditProfileDialog)
-                }
-            )
-        }
-        
-        // Диалог настройки уведомлений о транзакциях
-        if (state.isEditingNotifications) {
-            NotificationSettingsDialog(
-                isEnabled = state.isTransactionReminderEnabled,
-                reminderTime = state.transactionReminderTime,
-                onSave = { enabled, reminderTime ->
-                    viewModel.onEvent(ProfileEvent.UpdateTransactionReminder(enabled, reminderTime), context)
-                },
-                onDismiss = {
-                    viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog)
-                }
-            )
-        }
+    }
+    
+    // Диалог выбора темы
+    if (state.isEditingTheme) {
+        ThemeSelectionDialog(
+            selectedTheme = state.themeMode,
+            onThemeSelected = { theme -> viewModel.onEvent(ProfileEvent.ChangeTheme(theme)) },
+            onDismiss = { viewModel.onEvent(ProfileEvent.HideThemeDialog) }
+        )
+    }
+    
+    // Диалог настроек уведомлений
+    if (state.isEditingNotifications) {
+        NotificationSettingsDialog(
+            isEnabled = state.isTransactionReminderEnabled,
+            reminderTime = state.transactionReminderTime,
+            onSave = { isEnabled, time -> viewModel.onEvent(ProfileEvent.UpdateTransactionReminder(isEnabled, time), context) },
+            onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) }
+        )
     }
 } 

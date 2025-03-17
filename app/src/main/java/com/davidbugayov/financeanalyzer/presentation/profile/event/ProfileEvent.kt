@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.event
 
 import com.davidbugayov.financeanalyzer.domain.model.FinancialGoal
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
 /**
  * События экрана профиля.
@@ -77,28 +78,20 @@ sealed class ProfileEvent {
     data class AddAmountToGoal(val goalId: String, val amount: Double) : ProfileEvent()
     
     /**
-     * Событие открытия редактирования профиля.
-     */
-    data object ShowEditProfileDialog : ProfileEvent()
-    
-    /**
-     * Событие закрытия редактирования профиля.
-     */
-    data object HideEditProfileDialog : ProfileEvent()
-    
-    /**
-     * Событие обновления информации о пользователе.
-     * @param name Имя пользователя.
-     * @param email Email пользователя.
-     * @param phone Телефон пользователя.
-     */
-    data class UpdateUserInfo(val name: String, val email: String, val phone: String) : ProfileEvent()
-    
-    /**
      * Событие изменения темы приложения.
-     * @param isDark Использовать темную тему.
+     * @param themeMode Выбранный режим темы (светлая, темная или системная).
      */
-    data class ChangeTheme(val isDarkTheme: Boolean) : ProfileEvent()
+    data class ChangeTheme(val themeMode: ThemeMode) : ProfileEvent()
+    
+    /**
+     * Событие отображения диалога выбора темы.
+     */
+    object ShowThemeDialog : ProfileEvent()
+    
+    /**
+     * Событие скрытия диалога выбора темы.
+     */
+    object HideThemeDialog : ProfileEvent()
     
     /**
      * Событие изменения языка приложения.

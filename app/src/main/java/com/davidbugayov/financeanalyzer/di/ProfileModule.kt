@@ -4,9 +4,11 @@ import com.davidbugayov.financeanalyzer.data.repository.FinancialGoalRepositoryI
 import com.davidbugayov.financeanalyzer.domain.repository.FinancialGoalRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetFinancialGoalsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ManageFinancialGoalUseCase
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -24,5 +26,14 @@ val profileModule = module {
     factory { ManageFinancialGoalUseCase(get()) }
     
     // ViewModel
-    viewModel { ProfileViewModel(get(), get(), get(), get<NotificationScheduler>()) }
+    viewModel { 
+        ProfileViewModel(
+            exportTransactionsToCSVUseCase = get(),
+            getFinancialGoalsUseCase = get(),
+            manageFinancialGoalUseCase = get(),
+            loadTransactionsUseCase = get(),
+            notificationScheduler = get(),
+            preferencesManager = get()
+        ) 
+    }
 } 

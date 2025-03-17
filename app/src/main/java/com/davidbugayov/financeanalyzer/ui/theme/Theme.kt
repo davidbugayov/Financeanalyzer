@@ -10,11 +10,13 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
 // Цвета для светлой темы
 private val LightColors = lightColorScheme(
@@ -76,11 +78,17 @@ val LocalExpenseColor = staticCompositionLocalOf { md_theme_light_expense }
 
 @Composable
 fun FinanceAnalyzerTheme(
-    darkTheme: Boolean = isSystemInDarkTheme(),
+    themeMode: ThemeMode = ThemeMode.SYSTEM,
     // Dynamic color is available on Android 12+
     dynamicColor: Boolean = true,
     content: @Composable () -> Unit
 ) {
+    val darkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
+    
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -89,15 +97,13 @@ fun FinanceAnalyzerTheme(
         darkTheme -> DarkColors
         else -> LightColors
     }
+    
     val view = LocalView.current
     if (!view.isInEditMode) {
-        SideEffect {
+        // Обновляем системный UI при изменении темы
+        LaunchedEffect(darkTheme) {
             val window = (view.context as Activity).window
-
-            // Устанавливаем прозрачный статус бар
             WindowCompat.setDecorFitsSystemWindows(window, false)
-
-            // Настраиваем цвет иконок статус бара в зависимости от темы
             WindowCompat.getInsetsController(window, view).apply {
                 isAppearanceLightStatusBars = !darkTheme
                 isAppearanceLightNavigationBars = !darkTheme

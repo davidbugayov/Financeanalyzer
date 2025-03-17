@@ -5,13 +5,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.FinancialGoal
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetFinancialGoalsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ManageFinancialGoalUseCase
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -27,7 +32,9 @@ class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
     private val getFinancialGoalsUseCase: GetFinancialGoalsUseCase,
     private val manageFinancialGoalUseCase: ManageFinancialGoalUseCase,
-    private val notificationScheduler: NotificationScheduler
+    private val loadTransactionsUseCase: LoadTransactionsUseCase,
+    private val notificationScheduler: NotificationScheduler,
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -40,11 +47,19 @@ class ProfileViewModel(
         // Загружаем настройки уведомлений
         loadNotificationSettings()
         
-        // Загружаем информацию о пользователе
-        loadUserInfo()
-        
         // Загружаем финансовую статистику
         loadFinancialStatistics()
+        
+        // Загружаем тему из настроек
+        loadThemeMode()
+    }
+
+    /**
+     * Загружает режим темы из настроек
+     */
+    private fun loadThemeMode() {
+        val themeMode = preferencesManager.getThemeMode()
+        _state.update { it.copy(themeMode = themeMode) }
     }
 
     /**
@@ -68,25 +83,21 @@ class ProfileViewModel(
                     exportError = event.message
                 ) }
             }
-            is ProfileEvent.SelectGoal -> {
-                // Обработка выбора финансовой цели
-                // Здесь можно добавить логику для отображения деталей цели
-            }
             is ProfileEvent.ShowAddGoalDialog -> {
-                // Показать диалог добавления цели
+                _state.update { it.copy(isAddingGoal = true, isEditingGoal = false, selectedGoal = null) }
             }
             is ProfileEvent.ChangeTheme -> {
-                _state.update { it.copy(isDarkTheme = event.isDarkTheme) }
-                // Здесь можно добавить сохранение настройки темы
+                viewModelScope.launch {
+                    _state.update { it.copy(themeMode = event.themeMode) }
+                    preferencesManager.saveThemeMode(event.themeMode)
+                    AnalyticsUtils.logScreenView("theme_changed", event.themeMode.name)
+                }
             }
-            is ProfileEvent.ShowEditProfileDialog -> {
-                _state.update { it.copy(isEditingProfile = true) }
+            is ProfileEvent.ShowThemeDialog -> {
+                _state.update { it.copy(isEditingTheme = true) }
             }
-            is ProfileEvent.HideEditProfileDialog -> {
-                _state.update { it.copy(isEditingProfile = false) }
-            }
-            is ProfileEvent.UpdateUserInfo -> {
-                updateUserInfo(event.name, event.email, event.phone)
+            is ProfileEvent.HideThemeDialog -> {
+                _state.update { it.copy(isEditingTheme = false) }
             }
             is ProfileEvent.ShowNotificationSettingsDialog -> {
                 _state.update { it.copy(isEditingNotifications = true) }
@@ -109,9 +120,6 @@ class ProfileViewModel(
             }
             is ProfileEvent.SelectGoal -> {
                 selectGoal(event.goalId)
-            }
-            is ProfileEvent.ShowAddGoalDialog -> {
-                _state.update { it.copy(isAddingGoal = true, isEditingGoal = false, selectedGoal = null) }
             }
             is ProfileEvent.ShowEditGoalDialog -> {
                 viewModelScope.launch {
@@ -285,45 +293,62 @@ class ProfileViewModel(
     }
 
     /**
-     * Загрузка информации о пользователе.
-     */
-    private fun loadUserInfo() {
-        // В реальном приложении здесь будет загрузка из хранилища или API
-        // Для примера используем заглушку
-        _state.update { it.copy(
-            userName = "Иван Иванов",
-            userEmail = "ivan@example.com",
-            userPhone = "+7 (999) 123-45-67"
-        ) }
-    }
-
-    /**
-     * Обновление информации о пользователе.
-     */
-    private fun updateUserInfo(name: String, email: String, phone: String) {
-        _state.update { it.copy(
-            userName = name,
-            userEmail = email,
-            userPhone = phone,
-            isEditingProfile = false
-        ) }
-        
-        // Сохраняем информацию о пользователе
-        // В реальном приложении здесь будет сохранение в хранилище или API
-    }
-
-    /**
-     * Загрузка финансовой статистики.
+     * Загрузка финансовой статистики на основе реальных данных из базы данных.
      */
     private fun loadFinancialStatistics() {
-        // В реальном приложении здесь будет загрузка из хранилища или API
-        // Для примера используем заглушку
-        _state.update { it.copy(
-            totalIncome = 150000.0,
-            totalExpense = 100000.0,
-            balance = 50000.0,
-            savingsRate = 33.33
-        ) }
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
+            when (val result = loadTransactionsUseCase()) {
+                is com.davidbugayov.financeanalyzer.domain.model.Result.Success -> {
+                    val transactions = result.data
+                    
+                    // Рассчитываем общий доход
+                    val totalIncome = transactions
+                        .filter { !it.isExpense }
+                        .map { it.amount }
+                        .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                    
+                    // Рассчитываем общие расходы
+                    val totalExpense = transactions
+                        .filter { it.isExpense }
+                        .map { it.amount }
+                        .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                    
+                    // Рассчитываем баланс
+                    val balance = totalIncome - totalExpense
+                    
+                    // Рассчитываем норму сбережений (если доход не равен 0)
+                    val savingsRate = if (totalIncome > 0) {
+                        (balance / totalIncome) * 100
+                    } else {
+                        0.0
+                    }
+                    
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            totalIncome = totalIncome,
+                            totalExpense = totalExpense,
+                            balance = balance,
+                            savingsRate = savingsRate
+                        )
+                    }
+                }
+                is com.davidbugayov.financeanalyzer.domain.model.Result.Error -> {
+                    // В случае ошибки используем нулевые значения
+                    _state.update { 
+                        it.copy(
+                            isLoading = false,
+                            totalIncome = 0.0,
+                            totalExpense = 0.0,
+                            balance = 0.0,
+                            savingsRate = 0.0
+                        )
+                    }
+                }
+            }
+        }
     }
 
     /**

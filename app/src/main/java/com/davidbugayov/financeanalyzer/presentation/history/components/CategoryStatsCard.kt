@@ -86,15 +86,15 @@ fun CategoryStatsCard(
                     percentChange < 0 -> stringResource(R.string.change_decrease, kotlin.math.abs(percentChange))
                     else -> stringResource(R.string.change_no_change)
                 }
-                val changeColor = when {
-                    percentChange > 0 -> Color(0xFFE57373) // Красный для увеличения расходов
-                    percentChange < 0 -> Color(0xFF81C784) // Зеленый для уменьшения расходов
+                val percentChangeColor = when {
+                    percentChange > 0 -> MaterialTheme.colorScheme.error // Красный для увеличения расходов
+                    percentChange < 0 -> MaterialTheme.colorScheme.primary // Зеленый для уменьшения расходов
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
                 Text(
                     text = changeText,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = changeColor
+                    color = percentChangeColor
                 )
             }
         }

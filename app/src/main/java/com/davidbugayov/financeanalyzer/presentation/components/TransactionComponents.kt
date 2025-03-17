@@ -54,6 +54,12 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_alfa
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_gazprombank
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_raiffeisen
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_sber
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_tinkoff
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_vtb
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -110,22 +116,22 @@ fun getCategoryIcon(category: String, isExpense: Boolean): ImageVector {
 fun getBankIcon(bankName: String): Pair<ImageVector, Color> {
     return when {
         bankName.contains("Сбер", ignoreCase = true) ->
-            Pair(Icons.Default.AccountBalance, Color(0xFF1A9F29)) // Зеленый цвет Сбера
+            Pair(Icons.Default.AccountBalance, md_theme_sber)
 
         bankName.contains("Альфа", ignoreCase = true) ->
-            Pair(Icons.Default.AccountBalance, Color(0xFFEC3239)) // Красный цвет Альфа-банка
+            Pair(Icons.Default.AccountBalance, md_theme_alfa)
 
         bankName.contains("Тинькофф", ignoreCase = true) ->
-            Pair(Icons.Default.CreditCard, Color(0xFFFFDD2D)) // Желтый цвет Тинькофф
+            Pair(Icons.Default.CreditCard, md_theme_tinkoff)
 
         bankName.contains("ВТБ", ignoreCase = true) ->
-            Pair(Icons.Default.AccountBalance, Color(0xFF009FDF)) // Синий цвет ВТБ
+            Pair(Icons.Default.AccountBalance, md_theme_vtb)
 
         bankName.contains("Газпром", ignoreCase = true) ->
-            Pair(Icons.Default.AccountBalance, Color(0xFF0079C1)) // Синий цвет Газпромбанка
+            Pair(Icons.Default.AccountBalance, md_theme_gazprombank)
 
         bankName.contains("Райффайзен", ignoreCase = true) ->
-            Pair(Icons.Default.AccountBalance, Color(0xFFFFED00)) // Желтый цвет Райффайзенбанка
+            Pair(Icons.Default.AccountBalance, md_theme_raiffeisen)
 
         bankName.contains("Наличные", ignoreCase = true) ->
             Pair(Icons.Default.LocalAtm, MaterialTheme.colorScheme.tertiary)

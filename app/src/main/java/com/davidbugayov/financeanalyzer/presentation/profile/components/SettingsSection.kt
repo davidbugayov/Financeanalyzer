@@ -12,12 +12,14 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
+import androidx.compose.material.icons.filled.LightMode
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timer
+import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
@@ -36,31 +38,32 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
- * @param onThemeChange Обработчик изменения темы приложения.
+ * @param onThemeClick Обработчик нажатия на настройку темы.
  * @param onLanguageClick Обработчик нажатия на настройку языка.
  * @param onCurrencyClick Обработчик нажатия на настройку валюты.
  * @param onNotificationsClick Обработчик нажатия на настройку уведомлений.
  * @param onTransactionReminderClick Обработчик нажатия на настройку напоминаний о транзакциях.
  * @param onSecurityClick Обработчик нажатия на настройку безопасности.
  * @param onAdvancedSettingsClick Обработчик нажатия на расширенные настройки.
- * @param isDarkTheme Текущая тема приложения (темная/светлая).
+ * @param themeMode Текущий режим темы приложения.
  * @param isTransactionReminderEnabled Включены ли напоминания о транзакциях.
  * @param transactionReminderTime Время напоминания о транзакциях (часы и минуты) или null, если отключено.
  * @param modifier Модификатор для настройки внешнего вида.
  */
 @Composable
 fun SettingsSection(
-    onThemeChange: (Boolean) -> Unit,
+    onThemeClick: () -> Unit,
     onLanguageClick: () -> Unit,
     onCurrencyClick: () -> Unit,
     onNotificationsClick: () -> Unit,
     onTransactionReminderClick: () -> Unit,
     onSecurityClick: () -> Unit,
     onAdvancedSettingsClick: () -> Unit,
-    isDarkTheme: Boolean,
+    themeMode: ThemeMode,
     isTransactionReminderEnabled: Boolean = false,
     transactionReminderTime: Pair<Int, Int>? = null,
     modifier: Modifier = Modifier
@@ -83,15 +86,18 @@ fun SettingsSection(
             
             // Настройка темы
             SettingsItem(
-                icon = Icons.Default.DarkMode,
-                title = "Темная тема",
-                onClick = {},
-                trailingContent = {
-                    Switch(
-                        checked = isDarkTheme,
-                        onCheckedChange = onThemeChange
-                    )
-                }
+                icon = when(themeMode) {
+                    ThemeMode.LIGHT -> Icons.Default.LightMode
+                    ThemeMode.DARK -> Icons.Default.DarkMode
+                    ThemeMode.SYSTEM -> Icons.Default.Brightness6
+                },
+                title = "Тема",
+                subtitle = when(themeMode) {
+                    ThemeMode.LIGHT -> "Светлая"
+                    ThemeMode.DARK -> "Темная"
+                    ThemeMode.SYSTEM -> "Системная"
+                },
+                onClick = onThemeClick
             )
             
             Divider(modifier = Modifier.padding(vertical = 8.dp))

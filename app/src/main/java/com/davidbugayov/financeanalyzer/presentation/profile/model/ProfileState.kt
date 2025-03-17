@@ -10,12 +10,6 @@ data class ProfileState(
     // Общие состояния
     val isLoading: Boolean = false,
     
-    // Информация о пользователе
-    val userName: String = "Пользователь",
-    val userEmail: String = "user@example.com",
-    val userPhone: String? = null,
-    val isEditingProfile: Boolean = false,
-    
     // Состояния экспорта
     val exportSuccess: String? = null,
     val exportError: String? = null,
@@ -31,7 +25,8 @@ data class ProfileState(
     val goalError: String? = null,
     
     // Настройки приложения
-    val isDarkTheme: Boolean = false,
+    val themeMode: ThemeMode = ThemeMode.SYSTEM,
+    val isEditingTheme: Boolean = false,
     val selectedLanguage: String = "Русский",
     val selectedCurrency: String = "Рубль (₽)",
     val isNotificationsEnabled: Boolean = true,

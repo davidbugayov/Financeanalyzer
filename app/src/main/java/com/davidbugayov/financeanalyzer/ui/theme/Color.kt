@@ -66,7 +66,36 @@ val md_theme_dark_outline = Color(0xFF757575)
 val md_theme_light_income = Color(0xFF4CAF50)
 val md_theme_dark_income = Color(0xFF81C784)
 val md_theme_light_expense = Color(0xFFF44336)
-val md_theme_dark_expense = Color(0xFFE57373)
+val md_theme_dark_expense = Color(0xFFEF5350)
+
+// Цвета банков
+val md_theme_sber = Color(0xFF1A9F29)
+val md_theme_alfa = Color(0xFFEC3239)
+val md_theme_tinkoff = Color(0xFFFFDD2D)
+val md_theme_vtb = Color(0xFF009FDF)
+val md_theme_gazprombank = Color(0xFF0079C1)
+val md_theme_raiffeisen = Color(0xFFFFED00)
+
+// Цвета для графиков
+val md_theme_chart_green_1 = Color(0xFF66BB6A)
+val md_theme_chart_green_2 = Color(0xFF81C784)
+val md_theme_chart_green_3 = Color(0xFF4CAF50)
+val md_theme_chart_green_4 = Color(0xFF2E7D32)
+val md_theme_chart_green_5 = Color(0xFF43A047)
+val md_theme_chart_green_6 = Color(0xFF388E3C)
+val md_theme_chart_green_7 = Color(0xFF1B5E20)
+val md_theme_chart_green_8 = Color(0xFF00C853)
+val md_theme_chart_green_9 = Color(0xFF00E676)
+
+val md_theme_chart_red_1 = Color(0xFFEF5350)
+val md_theme_chart_red_2 = Color(0xFFE57373)
+val md_theme_chart_red_3 = Color(0xFFEF9A9A)
+val md_theme_chart_red_4 = Color(0xFFD32F2F)
+val md_theme_chart_red_5 = Color(0xFFC62828)
+val md_theme_chart_red_6 = Color(0xFFB71C1C)
+val md_theme_chart_red_7 = Color(0xFFFF8A80)
+val md_theme_chart_red_8 = Color(0xFFFF5252)
+val md_theme_chart_red_9 = Color(0xFFFF1744)
 
 // Светлая тема
 val PrimaryLight = Color(0xFF1E88E5) // Синий
@@ -90,7 +119,7 @@ val SurfaceDark = Color(0xFF1E1E1E)
 val OnSurfaceDark = Color(0xFFEEEEEE)
 
 val IncomeColorDark = Color(0xFF81C784) // Светло-зеленый для доходов
-val ExpenseColorDark = Color(0xFFE57373) // Светло-красный для расходов
+val ExpenseColorDark = Color(0xFFEF5350) // Светло-красный для расходов
 
 // Общие цвета
 val ErrorColor = Color(0xFFD32F2F)

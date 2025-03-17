@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation
 
+import android.app.Activity
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.Spring
@@ -12,11 +13,15 @@ import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalView
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
@@ -29,6 +34,7 @@ import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -41,8 +47,25 @@ fun MainScreen(startDestination: String = "home") {
     val chartViewModel: ChartViewModel = koinViewModel()
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
+    
+    // Получаем текущую тему из ProfileViewModel
+    val profileState = profileViewModel.state.collectAsState()
+    val themeMode = profileState.value.themeMode
 
-    FinanceAnalyzerTheme {
+    // Отслеживаем изменения темы
+    LaunchedEffect(themeMode) {
+        // Обновляем UI при изменении темы
+        WindowCompat.getInsetsController(
+            (LocalView.current.context as Activity).window,
+            LocalView.current
+        ).apply {
+            isAppearanceLightStatusBars = themeMode != ThemeMode.DARK
+            isAppearanceLightNavigationBars = themeMode != ThemeMode.DARK
+        }
+    }
+
+    // Применяем тему к всему приложению
+    FinanceAnalyzerTheme(themeMode = themeMode) {
         Scaffold(
             modifier = Modifier.systemBarsPadding()
         ) { paddingValues ->
@@ -232,32 +255,23 @@ fun MainScreen(startDestination: String = "home") {
                 composable(
                     route = Screen.Profile.route,
                     enterTransition = {
-                        slideIntoContainer(
+                        fadeIn(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
                                 stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        ) + fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
+                            )
                         )
                     },
                     exitTransition = {
-                        slideOutOfContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        ) + fadeOut(
+                        fadeOut(
                             animationSpec = tween(300, easing = EaseInOut)
                         )
                     }
                 ) {
                     ProfileScreen(
-                        viewModel = profileViewModel,
-                        onNavigateBack = { navController.navigateUp() },
-                        onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) }
+                        onNavigateBack = { navController.popBackStack() },
+                        onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
+                        onNavigateToChart = { navController.navigate(Screen.Chart.route) }
                     )
                 }
                 

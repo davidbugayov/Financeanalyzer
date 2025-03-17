@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.utils
 import android.content.Context
 import android.content.SharedPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 
@@ -40,9 +41,31 @@ class PreferencesManager(context: Context) {
         }
     }
 
+    /**
+     * Сохраняет тему приложения в SharedPreferences
+     * @param themeMode Режим темы для сохранения
+     */
+    fun saveThemeMode(themeMode: ThemeMode) {
+        sharedPreferences.edit().putString(KEY_THEME_MODE, themeMode.name).apply()
+    }
+
+    /**
+     * Загружает тему приложения из SharedPreferences
+     * @return Режим темы или SYSTEM, если ничего не сохранено
+     */
+    fun getThemeMode(): ThemeMode {
+        val themeName = sharedPreferences.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
+        return try {
+            ThemeMode.valueOf(themeName ?: ThemeMode.SYSTEM.name)
+        } catch (e: Exception) {
+            ThemeMode.SYSTEM
+        }
+    }
+
     companion object {
 
         private const val PREFERENCES_NAME = "finance_analyzer_prefs"
         private const val KEY_CUSTOM_SOURCES = "custom_sources"
+        private const val KEY_THEME_MODE = "theme_mode"
     }
 } 
