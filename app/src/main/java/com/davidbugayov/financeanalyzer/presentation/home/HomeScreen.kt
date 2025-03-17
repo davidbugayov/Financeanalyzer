@@ -47,6 +47,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
@@ -59,7 +60,6 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
-import androidx.core.content.edit
 
 /**
  * Главный экран приложения.
@@ -311,7 +311,7 @@ fun HomeScreen(
                 exit = fadeOut()
             ) {
                 LoadingIndicatorWithMessage(
-                    message = "Загрузка данных...",
+                    message = stringResource(R.string.loading_data),
                     modifier = Modifier
                 )
             }

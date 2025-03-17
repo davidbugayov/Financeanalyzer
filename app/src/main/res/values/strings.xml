@@ -24,6 +24,8 @@
     <string name="daily_expenses">Ежедневные расходы</string>
     <string name="cash_withdrawal">снятие</string>
     <string name="cash_deposit">пополнение</string>
+    <string name="loading_data">Загрузка данных...</string>
+    <string name="error">Ошибка</string>
     
     <!-- Главный экран -->
     <string name="app_title">Деньги под Контролем</string>
@@ -122,7 +124,6 @@
     <string name="transaction_added_successfully">Транзакция успешно добавлена</string>
     <string name="add_another">Добавить еще</string>
     <string name="done">Готово</string>
-    <string name="error">Ошибка</string>
     <string name="cancel_transaction">Отменить транзакцию</string>
     <string name="cancel_transaction_confirmation">Вы уверены, что хотите отменить добавление транзакции?</string>
     <string name="yes">Да</string>

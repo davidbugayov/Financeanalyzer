@@ -35,7 +35,7 @@ import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
-import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
+import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicatorWithMessage
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionHistory
@@ -324,7 +324,7 @@ fun TransactionHistoryScreen(
                 }
 
                 if (state.isLoading) {
-                    LoadingIndicator()
+                    LoadingIndicatorWithMessage(message = stringResource(R.string.loading_data))
                 }
             }
         }
