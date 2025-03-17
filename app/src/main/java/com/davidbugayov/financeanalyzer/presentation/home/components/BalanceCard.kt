@@ -12,11 +12,15 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.ui.theme.LocalBalanceCardColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalBalanceTextColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import java.math.BigDecimal
 
 /**
@@ -30,13 +34,31 @@ fun BalanceCard(
     balance: Money,
     modifier: Modifier = Modifier
 ) {
+    // Определяем цвет карточки в зависимости от баланса
+    val cardColor = if (balance.amount >= BigDecimal.ZERO) 
+        Color(0xFFE0F7E0) // Светло-зеленый для положительного баланса
+    else 
+        Color(0xFFFFE0E0) // Светло-красный для отрицательного баланса
+    
+    // Получаем цвета из локального контекста для текста
+    val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) 
+        Color(0xFF2E7D32) // Темно-зеленый текст для положительного баланса
+    else 
+        Color(0xFFB71C1C) // Темно-красный текст для отрицательного баланса
+    
+    // Цвет заголовка (немного светлее основного цвета текста)
+    val titleColor = if (balance.amount >= BigDecimal.ZERO) 
+        Color(0xFF388E3C) // Зеленый для положительного баланса
+    else 
+        Color(0xFFC62828) // Красный для отрицательного баланса
+    
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.primaryContainer
+            containerColor = cardColor
         )
     ) {
         Column(
@@ -47,7 +69,8 @@ fun BalanceCard(
         ) {
             Text(
                 text = stringResource(R.string.current_balance),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = titleColor
             )
 
             Spacer(modifier = Modifier.height(8.dp))
@@ -56,8 +79,7 @@ fun BalanceCard(
                 text = balance.formatted(),
                 style = MaterialTheme.typography.headlineMedium,
                 fontWeight = FontWeight.Bold,
-                color = if (balance.amount >= BigDecimal.ZERO) MaterialTheme.colorScheme.primary
-                else MaterialTheme.colorScheme.error
+                color = balanceTextColor
             )
         }
     }

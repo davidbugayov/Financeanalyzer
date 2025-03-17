@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation
 
 import android.app.Activity
+import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.Spring
@@ -8,6 +9,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -48,26 +51,32 @@ fun MainScreen(startDestination: String = "home") {
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
     
-    // Получаем текущую тему из ProfileViewModel
-    val profileState = profileViewModel.state.collectAsState()
-    val themeMode = profileState.value.themeMode
+    // Подписываемся напрямую на поток темы из ProfileViewModel
+    val themeState = profileViewModel.themeMode.collectAsState()
+    val themeMode = themeState.value
+    
+    val view = LocalView.current
 
     // Отслеживаем изменения темы
     LaunchedEffect(themeMode) {
         // Обновляем UI при изменении темы
-        WindowCompat.getInsetsController(
-            (LocalView.current.context as Activity).window,
-            LocalView.current
-        ).apply {
-            isAppearanceLightStatusBars = themeMode != ThemeMode.DARK
-            isAppearanceLightNavigationBars = themeMode != ThemeMode.DARK
+        val window = (view.context as? Activity)?.window
+        if (window != null) {
+            // Устанавливаем прозрачные цвета для статус бара и навигационной панели
+            window.statusBarColor = android.graphics.Color.TRANSPARENT
+            window.navigationBarColor = android.graphics.Color.TRANSPARENT
+            
+            // Обновляем декорации окна для корректной отрисовки
+            WindowCompat.setDecorFitsSystemWindows(window, false)
         }
     }
 
-    // Применяем тему к всему приложению
+    // Применяем тему к всему приложению - теперь изменения themeMode будут автоматически
+    // вызывать перерисовку всей композиции с новой темой
     FinanceAnalyzerTheme(themeMode = themeMode) {
         Scaffold(
-            modifier = Modifier.systemBarsPadding()
+            modifier = Modifier
+                .fillMaxSize() // Растягиваем фон на весь экран
         ) { paddingValues ->
             NavHost(
                 navController = navController, 
@@ -190,6 +199,7 @@ fun MainScreen(startDestination: String = "home") {
                         onNavigateBack = {
                             homeViewModel.onEvent(com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent.LoadTransactions)
                             chartViewModel.loadTransactions()
+                            profileViewModel.updateFinancialStatistics()
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(Screen.Home.route) {
                                     inclusive = true

@@ -82,7 +82,8 @@ val appModule = module {
             manageFinancialGoalUseCase = get(),
             loadTransactionsUseCase = get(),
             notificationScheduler = get(),
-            preferencesManager = get()
+            preferencesManager = get(),
+            transactionRepository = get<TransactionRepository>()
         )
     }
 

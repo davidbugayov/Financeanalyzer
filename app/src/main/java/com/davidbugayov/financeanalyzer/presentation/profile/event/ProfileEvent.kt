@@ -79,9 +79,9 @@ sealed class ProfileEvent {
     
     /**
      * Событие изменения темы приложения.
-     * @param themeMode Выбранный режим темы (светлая, темная или системная).
+     * @param theme Выбранный режим темы (светлая, темная или системная).
      */
-    data class ChangeTheme(val themeMode: ThemeMode) : ProfileEvent()
+    data class ChangeTheme(val theme: ThemeMode) : ProfileEvent()
     
     /**
      * Событие отображения диалога выбора темы.

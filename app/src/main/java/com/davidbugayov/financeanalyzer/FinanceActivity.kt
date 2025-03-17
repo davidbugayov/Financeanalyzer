@@ -18,7 +18,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
+import androidx.core.view.WindowInsetsControllerCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -27,6 +29,7 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.davidbugayov.financeanalyzer.widget.BalanceWidget
 import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 
 class FinanceActivity : ComponentActivity() {
     
@@ -54,8 +57,27 @@ class FinanceActivity : ComponentActivity() {
         // Обновляем виджеты при запуске приложения
         updateWidgets()
         
-        // Делаем статус бар прозрачным и учитываем системные отступы
+        // Делаем статус бар прозрачным
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        window.statusBarColor = android.graphics.Color.TRANSPARENT
+        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+
+        // Устанавливаем цвет иконок в статус-баре в зависимости от темы
+        val isDarkTheme = when (PreferencesManager(this).getThemeMode()) {
+            ThemeMode.DARK -> true
+            ThemeMode.LIGHT -> false
+            ThemeMode.SYSTEM -> resources.configuration.uiMode and 
+                                 android.content.res.Configuration.UI_MODE_NIGHT_MASK == 
+                                 android.content.res.Configuration.UI_MODE_NIGHT_YES
+        }
+
+        // Применяем настройки иконок статус-бара
+        WindowInsetsControllerCompat(window, window.decorView).apply {
+            // true = темные иконки (для светлого фона)
+            // false = светлые иконки (для темного фона)
+            isAppearanceLightStatusBars = !isDarkTheme
+            isAppearanceLightNavigationBars = !isDarkTheme
+        }
         
         // Настраиваем поведение сплеш-скрина
         var isReady = false

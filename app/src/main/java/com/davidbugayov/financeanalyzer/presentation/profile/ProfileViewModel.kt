@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -34,11 +35,16 @@ class ProfileViewModel(
     private val manageFinancialGoalUseCase: ManageFinancialGoalUseCase,
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
     private val notificationScheduler: NotificationScheduler,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
     val state: StateFlow<ProfileState> = _state.asStateFlow()
+
+    // Отдельный StateFlow для темы, который можно наблюдать из MainScreen
+    private val _themeMode = MutableStateFlow<ThemeMode>(ThemeMode.SYSTEM)
+    val themeMode: StateFlow<ThemeMode> = _themeMode
 
     init {
         // Загружаем финансовые цели при инициализации
@@ -50,16 +56,10 @@ class ProfileViewModel(
         // Загружаем финансовую статистику
         loadFinancialStatistics()
         
-        // Загружаем тему из настроек
-        loadThemeMode()
-    }
-
-    /**
-     * Загружает режим темы из настроек
-     */
-    private fun loadThemeMode() {
-        val themeMode = preferencesManager.getThemeMode()
-        _state.update { it.copy(themeMode = themeMode) }
+        // Инициализируем тему из настроек
+        val savedTheme = preferencesManager.getThemeMode()
+        _state.update { it.copy(themeMode = savedTheme) }
+        _themeMode.value = savedTheme
     }
 
     /**
@@ -88,9 +88,20 @@ class ProfileViewModel(
             }
             is ProfileEvent.ChangeTheme -> {
                 viewModelScope.launch {
-                    _state.update { it.copy(themeMode = event.themeMode) }
-                    preferencesManager.saveThemeMode(event.themeMode)
-                    AnalyticsUtils.logScreenView("theme_changed", event.themeMode.name)
+                    preferencesManager.saveThemeMode(event.theme)
+                    _state.update { it.copy(themeMode = event.theme, isEditingTheme = false) }
+                    
+                    // Обновляем отдельный StateFlow темы
+                    _themeMode.value = event.theme
+                    
+                    // Принудительное оповещение всех наблюдателей о смене темы
+                    // Это поможет быстрее обновить системный UI
+                    viewModelScope.launch {
+                        _themeMode.emit(event.theme)
+                    }
+                    
+                    // Логируем изменение темы
+                    AnalyticsUtils.logScreenView("theme_changed", event.theme.name)
                 }
             }
             is ProfileEvent.ShowThemeDialog -> {
@@ -290,6 +301,14 @@ class ProfileViewModel(
                 notificationScheduler.cancelTransactionReminder(context)
             }
         }
+    }
+
+    /**
+     * Загрузка финансовой статистики на основе реальных данных из базы данных.
+     * Публичный метод, чтобы можно было обновить статистику после добавления новой транзакции.
+     */
+    fun updateFinancialStatistics() {
+        loadFinancialStatistics()
     }
 
     /**

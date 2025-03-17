@@ -33,6 +33,7 @@ fun CompactLayout(
     onShowGroupSummaryChange: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
     onNavigateToHistory: () -> Unit,
+    onNavigateToAdd: () -> Unit,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit
 ) {

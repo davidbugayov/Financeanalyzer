@@ -7,10 +7,12 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -22,6 +24,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -61,6 +64,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
+import com.davidbugayov.financeanalyzer.presentation.home.components.AddTransactionButton
 
 /**
  * Главный экран приложения.
@@ -185,6 +189,7 @@ fun HomeScreen(
                     onShowGroupSummaryChange = { showGroupSummary = it },
                     onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
                     onNavigateToHistory = onNavigateToHistory,
+                    onNavigateToAdd = onNavigateToAdd,
                     onTransactionClick = { /* Пока ничего не делаем */ },
                     onTransactionLongClick = { transaction ->
                         viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
@@ -204,6 +209,9 @@ fun HomeScreen(
                     }
                 )
             }
+
+            // Add a Spacer to push content above the navigation buttons
+            Spacer(modifier = Modifier.height(80.dp))
 
             // Кнопки навигации поверх контента с анимацией
             AnimatedVisibility(
@@ -238,7 +246,6 @@ fun HomeScreen(
                         horizontalArrangement = Arrangement.SpaceEvenly,
                         verticalAlignment = CenterVertically
                     ) {
-                        // Кнопка Графики
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.weight(1f)
@@ -254,36 +261,28 @@ fun HomeScreen(
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.BarChart,
-                                    contentDescription = stringResource(R.string.charts)
+                                    contentDescription = stringResource(R.string.charts),
                                 )
                             }
                             Text(
                                 text = stringResource(R.string.charts),
                                 fontSize = 12.sp,
                                 modifier = Modifier.padding(top = 4.dp),
-                                color = MaterialTheme.colorScheme.onSurface
                             )
                         }
 
-                        // Кнопка Добавить
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.weight(1f)
                         ) {
-                            FilledIconButton(
+                            AddTransactionButton(
                                 onClick = {
                                     onNavigateToAdd()
                                     feedbackMessage = "Добавление новой транзакции"
                                     feedbackType = FeedbackType.INFO
                                     showFeedback = true
-                                },
-                                modifier = Modifier.size(56.dp)
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = stringResource(R.string.add_button)
-                                )
-                            }
+                                }
+                            )
                             Text(
                                 text = stringResource(R.string.add_button),
                                 fontSize = 12.sp,
@@ -292,7 +291,6 @@ fun HomeScreen(
                             )
                         }
 
-                        // Кнопка История
                         Column(
                             horizontalAlignment = Alignment.CenterHorizontally,
                             modifier = Modifier.weight(1f)

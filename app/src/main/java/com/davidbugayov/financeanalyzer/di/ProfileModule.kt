@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.data.repository.FinancialGoalRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.FinancialGoalRepository
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetFinancialGoalsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
@@ -33,7 +34,8 @@ val profileModule = module {
             manageFinancialGoalUseCase = get(),
             loadTransactionsUseCase = get(),
             notificationScheduler = get(),
-            preferencesManager = get()
+            preferencesManager = get(),
+            transactionRepository = get<TransactionRepository>()
         ) 
     }
 } 

@@ -54,6 +54,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_alfa
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_gazprombank
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_raiffeisen
@@ -151,20 +153,21 @@ fun TransactionItem(transaction: Transaction) {
 
     // Определяем цвета в зависимости от типа транзакции
     val indicatorColor = if (transaction.isExpense)
-        MaterialTheme.colorScheme.error
+        Color(0xFFB71C1C) // Темно-красный для расходов
     else
-        MaterialTheme.colorScheme.primary
+        Color(0xFF2E7D32) // Темно-зеленый для доходов
+        
+    val backgroundTint = if (transaction.isExpense)
+        Color(0xFFFFE0E0) // Светло-красный фон для расходов
+    else
+        Color(0xFFE0F7E0) // Светло-зеленый фон для доходов
 
     // Получаем иконку для категории
     val categoryIcon = getCategoryIcon(transaction.category, transaction.isExpense)
 
     // Получаем иконки и цвета для банков
     val (sourceIcon, sourceColor) = getBankIcon(transaction.source ?: "")
-    val (destinationIcon, destinationColor) = getBankIcon("Наличные")
 
-    // Проверяем, является ли получатель "Наличными"
-    val isDestinationCash = true // По умолчанию считаем, что получатель - наличные
-    
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -175,7 +178,7 @@ fun TransactionItem(transaction: Transaction) {
         Box(
             modifier = Modifier
                 .width(4.dp)
-                .fillMaxHeight()
+                .height(60.dp)
                 .clip(MaterialTheme.shapes.small)
                 .background(indicatorColor)
         )
@@ -187,7 +190,7 @@ fun TransactionItem(transaction: Transaction) {
             modifier = Modifier
                 .size(36.dp)
                 .clip(CircleShape)
-                .background(indicatorColor.copy(alpha = 0.1f)),
+                .background(backgroundTint),
             contentAlignment = Alignment.Center
         ) {
             Icon(
@@ -212,7 +215,7 @@ fun TransactionItem(transaction: Transaction) {
 
             // Информация о категории и дате
             Text(
-                text = stringResource(R.string.category_date_format, transaction.category, formattedDate),
+                text = formattedDate,
                 fontSize = 12.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
@@ -240,51 +243,20 @@ fun TransactionItem(transaction: Transaction) {
                     fontWeight = FontWeight.Medium
                 )
 
-                // Отображаем стрелку и получателя только если получатель не "Наличные"
-                if (!isDestinationCash) {
-                    // Стрелка между банками
-                    Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                        contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier
-                            .size(12.dp)
-                            .padding(horizontal = 2.dp)
-                    )
+                // Если получатель "Трата", показываем текст "снятие" или "пополнение"
+                Spacer(modifier = Modifier.width(4.dp))
 
-                    // Иконка банка-получателя
-                    Icon(
-                        imageVector = destinationIcon,
-                        contentDescription = "Наличные",
-                        tint = destinationColor,
-                        modifier = Modifier.size(12.dp)
-                    )
+                val operationText = if (transaction.isExpense)
+                    stringResource(R.string.cash_withdrawal)
+                else
+                    stringResource(R.string.cash_deposit)
 
-                    Spacer(modifier = Modifier.width(2.dp))
-
-                    // Название банка-получателя
-                    Text(
-                        text = "Наличные",
-                        fontSize = 11.sp,
-                        color = destinationColor,
-                        fontWeight = FontWeight.Medium
-                    )
-                } else {
-                    // Если получатель "Наличные", показываем текст "снятие" или "пополнение"
-                    Spacer(modifier = Modifier.width(4.dp))
-
-                    val operationText = if (transaction.isExpense)
-                        stringResource(R.string.cash_withdrawal)
-                    else
-                        stringResource(R.string.cash_deposit)
-
-                    Text(
-                        text = "• $operationText",
-                        fontSize = 11.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                    )
-                }
+                Text(
+                    text = "• $operationText",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                )
             }
 
             // Примечание к транзакции
@@ -301,11 +273,12 @@ fun TransactionItem(transaction: Transaction) {
         }
 
         // Сумма транзакции
+        val money = Money(transaction.amount, Currency.RUB)
         Text(
             text = if (transaction.isExpense)
-                stringResource(R.string.expense_currency_format, String.format("%.2f", transaction.amount))
+                "-${money.formatted()}"
             else
-                stringResource(R.string.income_currency_format, String.format("%.2f", transaction.amount)),
+                "+${money.formatted()}",
             color = indicatorColor,
             fontWeight = FontWeight.Bold
         )
@@ -375,9 +348,6 @@ fun DeleteTransactionDialog(
     val (sourceIcon, sourceColor) = getBankIcon(transaction.source ?: "")
     val (destinationIcon, destinationColor) = getBankIcon("Наличные")
 
-    // Проверяем, является ли получатель "Наличными"
-    val isDestinationCash = true // По умолчанию считаем, что получатель - наличные
-
     AlertDialog(
         onDismissRequest = onDismiss,
         icon = {
@@ -438,37 +408,7 @@ fun DeleteTransactionDialog(
                         fontWeight = FontWeight.Medium
                     )
 
-                    // Отображаем стрелку и получателя только если получатель не "Наличные"
-                    if (!isDestinationCash) {
-                        // Стрелка между банками
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-                            contentDescription = null,
-                            tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .size(16.dp)
-                                .padding(horizontal = 4.dp)
-                        )
-
-                        // Иконка банка-получателя
-                        Icon(
-                            imageVector = destinationIcon,
-                            contentDescription = "Наличные",
-                            tint = destinationColor,
-                            modifier = Modifier.size(16.dp)
-                        )
-
-                        Spacer(modifier = Modifier.width(4.dp))
-
-                        // Название банка-получателя
-                        Text(
-                            text = "Наличные",
-                            fontSize = 14.sp,
-                            color = destinationColor,
-                            fontWeight = FontWeight.Medium
-                        )
-                    } else {
-                        // Если получатель "Наличные", показываем текст "снятие" или "пополнение"
+                        // Если трата то "снятие" или "пополнение"
                         Spacer(modifier = Modifier.width(8.dp))
 
                         val operationText = if (transaction.isExpense)
@@ -482,7 +422,6 @@ fun DeleteTransactionDialog(
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                         )
-                    }
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))

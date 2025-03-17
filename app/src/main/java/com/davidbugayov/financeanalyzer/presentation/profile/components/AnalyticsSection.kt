@@ -14,11 +14,13 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.TrendingDown
 import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material3.Card
@@ -31,9 +33,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.R
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -84,7 +88,7 @@ fun AnalyticsSection(
                 AnalyticsCard(
                     title = "Доходы",
                     value = currencyFormat.format(totalIncome),
-                    icon = Icons.Default.ArrowUpward,
+                    icon = Icons.Default.KeyboardArrowUp,
                     backgroundColor = MaterialTheme.colorScheme.primaryContainer,
                     contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
                     iconTint = MaterialTheme.colorScheme.primary,
@@ -97,7 +101,7 @@ fun AnalyticsSection(
                 AnalyticsCard(
                     title = "Расходы",
                     value = currencyFormat.format(totalExpense),
-                    icon = Icons.Default.ArrowDownward,
+                    icon = Icons.Default.KeyboardArrowDown,
                     backgroundColor = MaterialTheme.colorScheme.secondaryContainer,
                     contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
                     iconTint = MaterialTheme.colorScheme.error,
@@ -224,4 +228,4 @@ fun AnalyticsCard(
             )
         }
     }
-} 
+}

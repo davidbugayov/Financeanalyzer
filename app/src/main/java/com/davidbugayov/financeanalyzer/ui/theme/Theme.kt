@@ -72,15 +72,18 @@ private val DarkColors = darkColorScheme(
     outline = md_theme_dark_outline
 )
 
-// Цвета для доходов и расходов
+// Цвета для доходов и расходов, и цвета баланса
 val LocalIncomeColor = staticCompositionLocalOf { md_theme_light_income }
 val LocalExpenseColor = staticCompositionLocalOf { md_theme_light_expense }
+val LocalBalanceCardColor = staticCompositionLocalOf { md_theme_light_primaryContainer }
+val LocalBalanceTextColor = staticCompositionLocalOf { md_theme_light_balance_text }
+val LocalFabColor = staticCompositionLocalOf { md_theme_light_fab }
 
 @Composable
 fun FinanceAnalyzerTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = true,
+    dynamicColor: Boolean = false, // Выключаем динамические цвета по умолчанию
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (themeMode) {
@@ -98,26 +101,23 @@ fun FinanceAnalyzerTheme(
         else -> LightColors
     }
     
-    val view = LocalView.current
-    if (!view.isInEditMode) {
-        // Обновляем системный UI при изменении темы
-        LaunchedEffect(darkTheme) {
-            val window = (view.context as Activity).window
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            WindowCompat.getInsetsController(window, view).apply {
-                isAppearanceLightStatusBars = !darkTheme
-                isAppearanceLightNavigationBars = !darkTheme
-            }
-        }
-    }
-
     // Определяем цвета для доходов и расходов в зависимости от темы
     val incomeColor = if (darkTheme) md_theme_dark_income else md_theme_light_income
     val expenseColor = if (darkTheme) md_theme_dark_expense else md_theme_light_expense
+    
+    // Цвета для баланса
+    val balanceCardColor = if (darkTheme) md_theme_dark_primaryContainer else md_theme_light_primaryContainer
+    val balanceTextColor = if (darkTheme) md_theme_dark_balance_text else md_theme_light_balance_text
+    
+    // Цвет кнопки добавления
+    val fabColor = if (darkTheme) md_theme_dark_fab else md_theme_light_fab
 
     CompositionLocalProvider(
         LocalIncomeColor provides incomeColor,
-        LocalExpenseColor provides expenseColor
+        LocalExpenseColor provides expenseColor,
+        LocalBalanceCardColor provides balanceCardColor,
+        LocalBalanceTextColor provides balanceTextColor,
+        LocalFabColor provides fabColor
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

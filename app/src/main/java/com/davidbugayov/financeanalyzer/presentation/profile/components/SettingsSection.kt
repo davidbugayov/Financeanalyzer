@@ -22,7 +22,7 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -100,7 +100,7 @@ fun SettingsSection(
                 onClick = onThemeClick
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Настройка языка
             SettingsItem(
@@ -110,7 +110,7 @@ fun SettingsSection(
                 onClick = onLanguageClick
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Настройка валюты
             SettingsItem(
@@ -120,7 +120,7 @@ fun SettingsSection(
                 onClick = onCurrencyClick
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Настройка уведомлений
             SettingsItem(
@@ -129,7 +129,7 @@ fun SettingsSection(
                 onClick = onNotificationsClick
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Настройка напоминаний о транзакциях
             SettingsItem(
@@ -144,7 +144,7 @@ fun SettingsSection(
                 onClick = onTransactionReminderClick
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Настройка безопасности
             SettingsItem(
@@ -154,7 +154,7 @@ fun SettingsSection(
                 onClick = onSecurityClick
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Расширенные настройки
             SettingsItem(
