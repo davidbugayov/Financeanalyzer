@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CurrencyPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
@@ -32,6 +33,7 @@ val appModule = module {
     // Preferences
     single { CurrencyPreferences.getInstance(androidContext()) }
     single { CategoryPreferences.getInstance(androidContext()) }
+    single { CategoryUsagePreferences.getInstance(androidContext()) }
     single { PreferencesManager(androidContext()) }
 
     // Utils

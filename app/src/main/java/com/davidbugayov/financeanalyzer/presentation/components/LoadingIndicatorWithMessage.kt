@@ -24,7 +24,7 @@ import androidx.compose.ui.unit.dp
  * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
-fun LoadingIndicatorWithMessage(
+fun CenteredLoadingIndicator(
     message: String,
     modifier: Modifier = Modifier
 ) {

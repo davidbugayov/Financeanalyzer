@@ -42,7 +42,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
-import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicatorWithMessage
+import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -228,7 +228,7 @@ fun FinanceChartScreen(
             // Show loading indicator if data is loading
             if (state.isLoading) {
                 Timber.tag("FinanceChart").d("Loading state")
-                LoadingIndicatorWithMessage(message = stringResource(R.string.loading_data))
+                CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
             } else if (state.error != null) {
                 Timber.tag("FinanceChart").d("Error state: ${state.error}")
                 // Show error message if there's an error

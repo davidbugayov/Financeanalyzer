@@ -21,6 +21,7 @@ import androidx.compose.material.icons.filled.Work
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,6 +39,7 @@ class CategoriesViewModel(
 ) : AndroidViewModel(application), KoinComponent {
 
     private val categoryPreferences: CategoryPreferences by inject()
+    private val categoryUsagePreferences: CategoryUsagePreferences by inject()
 
     private val defaultExpenseCategories = listOf(
         CategoryItem("Продукты", Icons.Default.ShoppingCart),
@@ -76,7 +78,7 @@ class CategoriesViewModel(
     }
 
     /**
-     * Загружает сохраненные категории
+     * Загружает сохраненные категории и сортирует их по частоте использования
      */
     private fun loadCategories() {
         viewModelScope.launch {
@@ -84,6 +86,10 @@ class CategoriesViewModel(
             val savedIncomeCategories = categoryPreferences.loadIncomeCategories()
             val deletedDefaultExpenseCategories = categoryPreferences.loadDeletedDefaultExpenseCategories()
             val deletedDefaultIncomeCategories = categoryPreferences.loadDeletedDefaultIncomeCategories()
+
+            // Загружаем статистику использования категорий
+            val expenseCategoriesUsage = categoryUsagePreferences.loadExpenseCategoriesUsage()
+            val incomeCategoriesUsage = categoryUsagePreferences.loadIncomeCategoriesUsage()
 
             // Фильтруем дефолтные категории, исключая удаленные
             val filteredDefaultExpenseCategories = defaultExpenseCategories.filter {
@@ -94,7 +100,7 @@ class CategoriesViewModel(
                 !deletedDefaultIncomeCategories.contains(it.name) && it.name != "Другое"
             }
 
-            // Добавляем пользовательские категории перед "Другое"
+            // Добавляем пользовательские категории
             val customExpenseCategories = savedExpenseCategories.map {
                 CategoryItem(it, Icons.Default.MoreHoriz)
             }
@@ -106,13 +112,21 @@ class CategoriesViewModel(
             val otherExpenseCategory = defaultExpenseCategories.last()
             val otherIncomeCategory = defaultIncomeCategories.last()
 
-            _expenseCategories.value = filteredDefaultExpenseCategories +
-                    customExpenseCategories +
-                    listOf(otherExpenseCategory)
+            // Объединяем все категории (кроме "Другое")
+            val allExpenseCategories = (filteredDefaultExpenseCategories + customExpenseCategories)
+            val allIncomeCategories = (filteredDefaultIncomeCategories + customIncomeCategories)
 
-            _incomeCategories.value = filteredDefaultIncomeCategories +
-                    customIncomeCategories +
-                    listOf(otherIncomeCategory)
+            // Сортируем категории по частоте использования (по убыванию)
+            val sortedExpenseCategories = allExpenseCategories.sortedByDescending { 
+                expenseCategoriesUsage[it.name] ?: 0 
+            }
+            val sortedIncomeCategories = allIncomeCategories.sortedByDescending { 
+                incomeCategoriesUsage[it.name] ?: 0 
+            }
+
+            // Добавляем "Другое" в конец списка
+            _expenseCategories.value = sortedExpenseCategories + listOf(otherExpenseCategory)
+            _incomeCategories.value = sortedIncomeCategories + listOf(otherIncomeCategory)
         }
     }
 
@@ -175,6 +189,21 @@ class CategoriesViewModel(
                 // Удаляем категорию из текущего списка
                 _incomeCategories.value = _incomeCategories.value.filterNot { it.name == category }
             }
+        }
+    }
+
+    /**
+     * Увеличивает счетчик использования категории и обновляет порядок категорий
+     */
+    fun incrementCategoryUsage(category: String, isExpense: Boolean) {
+        viewModelScope.launch {
+            if (isExpense) {
+                categoryUsagePreferences.incrementExpenseCategoryUsage(category)
+            } else {
+                categoryUsagePreferences.incrementIncomeCategoryUsage(category)
+            }
+            // Перезагружаем категории с новой статистикой использования
+            loadCategories()
         }
     }
 

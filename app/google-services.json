@@ -1,21 +1,21 @@
 {
   "project_info": {
-    "project_number": "989249167657",
-    "project_id": "finaanalyzerdebug",
-    "storage_bucket": "finaanalyzerdebug.firebasestorage.app"
+    "project_number": "22467392880",
+    "project_id": "finanalyser-5d476",
+    "storage_bucket": "finanalyser-5d476.firebasestorage.app"
   },
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:989249167657:android:8c926da9f9933bbc135738",
+        "mobilesdk_app_id": "1:22467392880:android:e76d6d690cf70994180bb5",
         "android_client_info": {
-          "package_name": "com.davidbugayov.financeanalyzer.debug"
+          "package_name": "com.davidbugayov.financeanalyzer"
         }
       },
       "oauth_client": [],
       "api_key": [
         {
-          "current_key": "AIzaSyB9Es8yTZBYhgoyOhmxZvGQv0ohSVBrmS4"
+          "current_key": "AIzaSyDsjAKLBJKf-I-snuiwAOMhbs4pZ-S8QLk"
         }
       ],
       "services": {

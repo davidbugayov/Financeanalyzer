@@ -25,6 +25,9 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import java.math.BigDecimal
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Currency
+import com.davidbugayov.financeanalyzer.presentation.add.components.parseFormattedAmount
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -83,13 +86,27 @@ class AddTransactionViewModel(
     }
 
     /**
+     * Сбрасывает все поля формы до значений по умолчанию
+     */
+    fun resetFields() {
+        _state.update {
+            AddTransactionState(
+                // Сохраняем только списки категорий и источников
+                expenseCategories = it.expenseCategories,
+                incomeCategories = it.incomeCategories,
+                sources = it.sources
+            )
+        }
+    }
+
+    /**
      * Обрабатывает события экрана добавления транзакции
      */
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
             is AddTransactionEvent.SetAmount -> {
-                // Автоматически заменяем запятую на точку при вводе
-                _state.update { it.copy(amount = event.amount.replace(",", ".")) }
+                // Сохраняем нормализованное значение (с точкой вместо запятой)
+                _state.update { it.copy(amount = event.amount) }
             }
             is AddTransactionEvent.SetTitle -> {
                 _state.update { it.copy(title = event.title) }
@@ -101,6 +118,8 @@ class AddTransactionViewModel(
                         showCategoryPicker = false
                     )
                 }
+                // Увеличиваем счетчик использования категории при выборе
+                categoriesViewModel.incrementCategoryUsage(event.category, _state.value.isExpense)
             }
             is AddTransactionEvent.SetNote -> {
                 _state.update { it.copy(note = event.note) }
@@ -159,6 +178,8 @@ class AddTransactionViewModel(
             }
             is AddTransactionEvent.HideSuccessDialog -> {
                 _state.update { it.copy(isSuccess = false) }
+                // Сбрасываем поля при нажатии "Добавить еще"
+                resetFields()
             }
             is AddTransactionEvent.ShowSourcePicker -> {
                 _state.update { it.copy(showSourcePicker = true) }
@@ -207,13 +228,14 @@ class AddTransactionViewModel(
     }
 
     private fun validateInput(): Boolean {
-        val amount = _state.value.amount.replace(",", ".").toBigDecimalOrNull()
-
-        val hasErrors = amount == null || amount <= BigDecimal.ZERO || _state.value.category.isBlank()
+        // Используем parseFormattedAmount для преобразования строки в Money
+        val money = parseFormattedAmount(_state.value.amount)
+        
+        val hasErrors = money.isZero() || _state.value.category.isBlank()
 
         _state.update {
             it.copy(
-                amountError = amount == null || amount <= BigDecimal.ZERO,
+                amountError = money.isZero(),
                 categoryError = _state.value.category.isBlank()
             )
         }
@@ -230,10 +252,12 @@ class AddTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
             
             try {
-                val amount = _state.value.amount.replace(",", ".").toBigDecimal()
+                // Преобразуем строку в объект Money
+                val money = parseFormattedAmount(_state.value.amount)
+                
                 val transaction = Transaction(
                     title = _state.value.title.ifBlank { null },
-                    amount = amount,
+                    amount = money,
                     category = _state.value.category,
                     isExpense = _state.value.isExpense,
                     date = _state.value.selectedDate,
@@ -243,10 +267,13 @@ class AddTransactionViewModel(
 
                 addTransactionUseCase(transaction)
 
+                // Увеличиваем счетчик использования категории
+                categoriesViewModel.incrementCategoryUsage(_state.value.category, _state.value.isExpense)
+
                 // Логируем добавление транзакции в аналитику
                 AnalyticsUtils.logTransactionAdded(
                     type = if (_state.value.isExpense) "expense" else "income",
-                    amount = amount.toDouble(),
+                    amount = money.amount.toDouble(),
                     category = _state.value.category
                 )
                 

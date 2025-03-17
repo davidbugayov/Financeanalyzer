@@ -139,13 +139,25 @@ fun CategoryPieChart(
 
     // Convert dimension resources to TextUnit (sp)
     val textSizeXXXLarge = with(density) { 32.sp }
+    val textSizeXXLarge = with(density) { 28.sp }
+    val textSizeXLarge = with(density) { 24.sp }
+    val textSizeLarge = with(density) { 20.sp }
     val textSizeNormal = with(density) { 16.sp }
 
+    // Определяем размер текста в зависимости от длины суммы
+    val formattedTotal = total.format(true)
+    val selectedTextSize = when {
+        formattedTotal.length > 12 -> textSizeLarge
+        formattedTotal.length > 10 -> textSizeXLarge
+        formattedTotal.length > 8 -> textSizeXXLarge
+        else -> textSizeXXXLarge
+    }
+
     // Создаем Paint объекты для текста
-    val textPaint = remember(density) {
+    val textPaint = remember(density, formattedTotal) {
         Paint().apply {
             color = android.graphics.Color.WHITE
-            textSize = with(density) { textSizeXXXLarge.toPx() }
+            textSize = with(density) { selectedTextSize.toPx() }
             textAlign = Paint.Align.CENTER
             typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
         }
@@ -236,21 +248,54 @@ fun CategoryPieChart(
             textPaint.apply {
                 color = textColor
             }
-            drawContext.canvas.nativeCanvas.drawText(
-                total.format(true),
-                center.x,
-                center.y - with(density) { 10.dp.toPx() },
-                textPaint
-            )
+            
+            // Для очень длинных сумм можно разбить на две строки
+            if (formattedTotal.length > 15) {
+                // Находим позицию для разделения (после пробела или после запятой)
+                val splitIndex = formattedTotal.indexOf(' ').takeIf { it > 0 } 
+                    ?: formattedTotal.indexOf(',').takeIf { it > 0 }
+                    ?: (formattedTotal.length / 2)
+                
+                val firstLine = formattedTotal.substring(0, splitIndex)
+                val secondLine = formattedTotal.substring(splitIndex)
+                
+                drawContext.canvas.nativeCanvas.drawText(
+                    firstLine,
+                    center.x,
+                    center.y - with(density) { 20.dp.toPx() },
+                    textPaint
+                )
+                
+                drawContext.canvas.nativeCanvas.drawText(
+                    secondLine,
+                    center.x,
+                    center.y,
+                    textPaint
+                )
+            } else {
+                drawContext.canvas.nativeCanvas.drawText(
+                    formattedTotal,
+                    center.x,
+                    center.y - with(density) { 10.dp.toPx() },
+                    textPaint
+                )
+            }
 
             // Отображаем "расход" под суммой
             subTextPaint.apply {
                 color = textColorAlpha
             }
+            
+            val labelYOffset = if (formattedTotal.length > 15) {
+                with(density) { 30.dp.toPx() }  // Больший отступ для двухстрочного отображения
+            } else {
+                with(density) { 20.dp.toPx() }  // Стандартный отступ
+            }
+            
             drawContext.canvas.nativeCanvas.drawText(
                 if (isIncome) incomeText else expenseText,
                 center.x,
-                center.y + with(density) { 20.dp.toPx() },
+                center.y + labelYOffset,
                 subTextPaint
             )
         }

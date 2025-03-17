@@ -84,6 +84,8 @@ fun AddTransactionScreen(
                         if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
                             showCancelConfirmation = true
                         } else {
+                            // Сбрасываем поля перед выходом
+                            viewModel.resetFields()
                             onNavigateBack()
                         }
                     }) {
@@ -263,6 +265,8 @@ fun AddTransactionScreen(
                 CancelConfirmationDialog(
                     onConfirm = {
                         showCancelConfirmation = false
+                        // Сбрасываем поля перед выходом
+                        viewModel.resetFields()
                         onNavigateBack()
                     },
                     onDismiss = {

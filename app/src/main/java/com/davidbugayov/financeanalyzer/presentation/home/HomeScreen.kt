@@ -53,7 +53,7 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
-import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicatorWithMessage
+import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
@@ -310,7 +310,7 @@ fun HomeScreen(
                 enter = fadeIn(),
                 exit = fadeOut()
             ) {
-                LoadingIndicatorWithMessage(
+                CenteredLoadingIndicator(
                     message = stringResource(R.string.loading_data),
                     modifier = Modifier
                 )
