@@ -49,16 +49,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicatorWithMessage
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
-import com.davidbugayov.financeanalyzer.presentation.home.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
+import androidx.core.content.edit
 
 /**
  * Главный экран приложения.
@@ -105,9 +106,9 @@ fun HomeScreen(
 
     // Сохраняем настройку при изменении
     LaunchedEffect(showGroupSummary) {
-        val editor = sharedPreferences.edit()
-        editor.putBoolean("show_group_summary", showGroupSummary)
-        editor.apply()
+        sharedPreferences.edit {
+            putBoolean("show_group_summary", showGroupSummary)
+        }
         // Обновляем состояние в ViewModel
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
     }
@@ -311,7 +312,7 @@ fun HomeScreen(
             ) {
                 LoadingIndicatorWithMessage(
                     message = "Загрузка данных...",
-                    modifier = Modifier.align(Alignment.Center)
+                    modifier = Modifier
                 )
             }
 

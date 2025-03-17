@@ -10,7 +10,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -18,7 +17,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,6 +32,7 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.LoadingIndicator
@@ -175,33 +174,13 @@ fun TransactionHistoryScreen(
 
     // Диалог подтверждения удаления транзакции
     state.transactionToDelete?.let { transaction ->
-        AlertDialog(
-            onDismissRequest = { viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog) },
-            title = { Text(stringResource(R.string.delete_transaction)) },
-            text = {
-                Text(
-                    stringResource(
-                        R.string.delete_transaction_confirmation,
-                        transaction.category,
-                        transaction.amount.format()
-                    )
-                )
+        DeleteTransactionDialog(
+            transaction = transaction,
+            onConfirm = {
+                viewModel.onEvent(TransactionHistoryEvent.DeleteTransaction(transaction))
             },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        viewModel.onEvent(TransactionHistoryEvent.DeleteTransaction(transaction))
-                    }
-                ) {
-                    Text(stringResource(R.string.delete))
-                }
-            },
-            dismissButton = {
-                TextButton(
-                    onClick = { viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog) }
-                ) {
-                    Text(stringResource(R.string.cancel))
-                }
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog)
             }
         )
     }

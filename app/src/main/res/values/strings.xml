@@ -22,9 +22,11 @@
     <string name="show_all_transactions">Показать еще %d</string>
     <string name="show_less">Свернуть</string>
     <string name="daily_expenses">Ежедневные расходы</string>
+    <string name="cash_withdrawal">снятие</string>
+    <string name="cash_deposit">пополнение</string>
     
     <!-- Главный экран -->
-    <string name="app_title">Финансовый анализатор</string>
+    <string name="app_title">Деньги под Контролем</string>
     <string name="current_balance">Текущий баланс</string>
     <string name="income">Доходы</string>
     <string name="expense">Расходы</string>

@@ -82,8 +82,6 @@ android {
             "proguard-rules.pro"
         )
 
-        // Имя приложения по умолчанию
-        resValue("string", "app_name", "Финансовый Стиль")
     }
 
     signingConfigs {

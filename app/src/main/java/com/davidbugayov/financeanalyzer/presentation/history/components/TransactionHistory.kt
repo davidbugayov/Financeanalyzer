@@ -15,6 +15,7 @@ import androidx.compose.ui.res.dimensionResource
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionItemWithActions
 
 /**
  * Основной компонент для отображения истории транзакций.
@@ -67,7 +68,7 @@ fun TransactionHistory(
             // Список транзакций в группе, отображаем только если группа развернута
             if (expandedState[group.date] == true) {
                 group.transactions.forEach { transaction ->
-                    TransactionLongPressItem(
+                    TransactionItemWithActions(
                         transaction = transaction,
                         onClick = { onTransactionClick(transaction) },
                         onLongClick = { onTransactionLongClick(transaction) }

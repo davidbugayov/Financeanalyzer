@@ -18,7 +18,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
  */
 @Database(
     entities = [TransactionEntity::class],
-    version = 4,
+    version = 5,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -93,6 +93,17 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 4 на версию 5
+         * Добавляет поле destination в таблицу transactions
+         */
+        private val MIGRATION_4_5 = object : Migration(4, 5) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Добавляем колонку destination с значением по умолчанию "Наличные"
+                db.execSQL("ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -109,7 +120,7 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DATABASE_NAME
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4)
+                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5)
                     .build()
                 INSTANCE = instance
                 instance

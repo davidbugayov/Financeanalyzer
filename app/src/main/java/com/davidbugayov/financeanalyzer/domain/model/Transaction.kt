@@ -17,6 +17,7 @@ import java.util.Date
  * @property date Дата совершения транзакции
  * @property note Дополнительное примечание к транзакции (опционально)
  * @property source Источник средств (например, "Сбер", "Тинькофф")
+ * @property destination Получатель средств (например, "Альфа", "Наличные")
  */
 data class Transaction(
     val id: Long = 0,
@@ -26,7 +27,8 @@ data class Transaction(
     val isExpense: Boolean,
     val date: Date,
     val note: String? = null,
-    val source: String = "Сбер"
+    val source: String = "Сбер",
+    val destination: String = "Наличные"
 ) {
 
     /**
@@ -41,7 +43,8 @@ data class Transaction(
         date: Date,
         note: String? = null,
         currency: Currency = Currency.RUB,
-        source: String = "Сбер"
+        source: String = "Сбер",
+        destination: String = "Наличные"
     ) : this(
         id = id,
         title = title,
@@ -50,7 +53,8 @@ data class Transaction(
         isExpense = isExpense,
         date = date,
         note = note,
-        source = source
+        source = source,
+        destination = destination
     )
 
     /**
@@ -65,7 +69,8 @@ data class Transaction(
         date: Date,
         note: String? = null,
         currency: Currency = Currency.RUB,
-        source: String = "Сбер"
+        source: String = "Сбер",
+        destination: String = "Наличные"
     ) : this(
         id = id,
         title = title,
@@ -74,7 +79,8 @@ data class Transaction(
         isExpense = isExpense,
         date = date,
         note = note,
-        source = source
+        source = source,
+        destination = destination
     )
 
     /**

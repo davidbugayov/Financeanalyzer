@@ -4,12 +4,11 @@ import android.app.Application
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Checkroom
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Movie
@@ -18,6 +17,7 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Work
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
@@ -49,16 +49,18 @@ class CategoriesViewModel(
         CategoryItem("Жилье", Icons.Default.Home),
         CategoryItem("Связь", Icons.Default.Phone),
         CategoryItem("Питомец", Icons.Default.Pets),
-        CategoryItem("Прочее", Icons.Default.MoreHoriz),
+        CategoryItem("Услуги", Icons.Default.Work),
+        CategoryItem("Благотворительность", Icons.Default.Payments),
+        CategoryItem("Кредит", Icons.Default.CreditCard),
         CategoryItem("Другое", Icons.Default.Add)
     )
 
     private val defaultIncomeCategories = listOf(
         CategoryItem("Зарплата", Icons.Default.Payments),
         CategoryItem("Фриланс", Icons.Default.Computer),
-        CategoryItem("Подарки", Icons.Default.CardGiftcard),
+        CategoryItem("Подарки", Icons.Default.Payments),
         CategoryItem("Проценты", Icons.AutoMirrored.Filled.TrendingUp),
-        CategoryItem("Аренда", Icons.Default.HomeWork),
+        CategoryItem("Аренда", Icons.Default.Work),
         CategoryItem("Прочее", Icons.Default.MoreHoriz),
         CategoryItem("Другое", Icons.Default.Add)
     )
