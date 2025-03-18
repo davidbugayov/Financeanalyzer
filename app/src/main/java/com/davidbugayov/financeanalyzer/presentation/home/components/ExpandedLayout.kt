@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
@@ -40,7 +39,6 @@ fun ExpandedLayout(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .padding(bottom = 88.dp) // Добавляем отступ снизу для кнопок
     ) {
         // Левая панель с балансом и фильтрами
         Column(
@@ -116,10 +114,9 @@ fun ExpandedLayout(
                                 onClick = onTransactionClick,
                                 onLongClick = onTransactionLongClick
                             )
-                            if (index < state.filteredTransactions.size - 1) {
-                                HorizontalDivider()
-                            }
+                            Spacer(modifier = Modifier.height(8.dp))
                         }
+                        Spacer(modifier = Modifier.height(120.dp))
                     }
                 }
             }

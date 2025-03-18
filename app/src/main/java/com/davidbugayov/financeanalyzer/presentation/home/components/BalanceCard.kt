@@ -16,11 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.ui.theme.LocalBalanceCardColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalBalanceTextColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import java.math.BigDecimal
 
 /**
@@ -54,8 +52,7 @@ fun BalanceCard(
     
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = cardColor
@@ -64,20 +61,23 @@ fun BalanceCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp),
+                .padding(vertical = 16.dp, horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             Text(
                 text = stringResource(R.string.current_balance),
                 style = MaterialTheme.typography.titleMedium,
+                fontSize = 22.sp,
+                fontWeight = FontWeight.Medium,
                 color = titleColor
             )
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(12.dp))
 
             Text(
                 text = balance.formatted(),
                 style = MaterialTheme.typography.headlineMedium,
+                fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
                 color = balanceTextColor
             )

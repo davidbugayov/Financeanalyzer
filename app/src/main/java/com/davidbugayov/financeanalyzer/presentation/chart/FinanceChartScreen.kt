@@ -2,21 +2,16 @@ package com.davidbugayov.financeanalyzer.presentation.chart
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -24,13 +19,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.components.DailyExpensesChart
@@ -39,10 +31,11 @@ import com.davidbugayov.financeanalyzer.presentation.chart.components.SavingsRat
 import com.davidbugayov.financeanalyzer.presentation.chart.components.StatisticsSection
 import com.davidbugayov.financeanalyzer.presentation.chart.components.SummarySection
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
+import com.davidbugayov.financeanalyzer.presentation.components.AdaptiveAppBar
+import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
-import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -181,32 +174,13 @@ fun FinanceChartScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .fillMaxHeight(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = stringResource(R.string.charts_title),
-                            fontSize = 18.sp,
-                            fontWeight = FontWeight.Medium
-                        )
-                    }
-                },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        // Сбрасываем даты перед выходом с экрана
-                        viewModel.handleIntent(ChartIntent.ResetDateFilter)
-                        onNavigateBack()
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
+            AdaptiveAppBar(
+                title = stringResource(R.string.charts_title),
+                showBackButton = true,
+                onBackClick = {
+                    // Сбрасываем даты перед выходом с экрана
+                    viewModel.handleIntent(ChartIntent.ResetDateFilter)
+                    onNavigateBack()
                 },
                 actions = {
                     // Оставляем только кнопку выбора периода, убираем кнопку фильтра

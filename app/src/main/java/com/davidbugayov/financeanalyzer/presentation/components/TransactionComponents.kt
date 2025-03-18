@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -15,7 +14,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
@@ -54,8 +52,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Currency
+import com.davidbugayov.financeanalyzer.domain.model.amountFormatted
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_alfa
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_gazprombank
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_raiffeisen
@@ -175,13 +172,13 @@ fun TransactionItem(transaction: Transaction) {
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Вертикальная цветовая полоса-индикатор
-        Box(
-            modifier = Modifier
-                .width(4.dp)
-                .height(60.dp)
-                .clip(MaterialTheme.shapes.small)
-                .background(indicatorColor)
-        )
+        // Box(
+        //     modifier = Modifier
+        //         .width(4.dp)
+        //         .height(60.dp)
+        //         .clip(MaterialTheme.shapes.small)
+        //         .background(indicatorColor)
+        // )
 
         Spacer(modifier = Modifier.width(8.dp))
 
@@ -210,6 +207,8 @@ fun TransactionItem(transaction: Transaction) {
             Text(
                 text = transaction.category,
                 style = MaterialTheme.typography.bodyLarge,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface
             )
 
@@ -272,16 +271,19 @@ fun TransactionItem(transaction: Transaction) {
             }
         }
 
+        Spacer(modifier = Modifier.width(8.dp))
+
         // Сумма транзакции
-        val money = Money(transaction.amount, Currency.RUB)
-        Text(
-            text = if (transaction.isExpense)
-                "-${money.formatted()}"
-            else
-                "+${money.formatted()}",
-            color = indicatorColor,
-            fontWeight = FontWeight.Bold
-        )
+        Column(
+            horizontalAlignment = Alignment.End
+        ) {
+            Text(
+                text = transaction.amountFormatted(),
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                color = indicatorColor
+            )
+        }
     }
 }
 
@@ -346,7 +348,6 @@ fun DeleteTransactionDialog(
 
     // Получаем иконки и цвета для банков
     val (sourceIcon, sourceColor) = getBankIcon(transaction.source ?: "")
-    val (destinationIcon, destinationColor) = getBankIcon("Наличные")
 
     AlertDialog(
         onDismissRequest = onDismiss,

@@ -57,6 +57,7 @@ fun HomeGroupSummary(
             Text(
                 text = stringResource(R.string.summary),
                 style = MaterialTheme.typography.titleMedium,
+                fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 8.dp),
                 color = balanceColor // Цвет заголовка соответствует балансу
@@ -71,10 +72,12 @@ fun HomeGroupSummary(
             ) {
                 Text(
                     text = stringResource(R.string.total_income),
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = totalIncome.formatted(false),
+                    fontSize = 14.sp,
                     color = incomeColor,
                     fontWeight = FontWeight.Bold
                 )
@@ -88,10 +91,12 @@ fun HomeGroupSummary(
             ) {
                 Text(
                     text = stringResource(R.string.total_expense),
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = totalExpense.formatted(false),
+                    fontSize = 14.sp,
                     color = expenseColor,
                     fontWeight = FontWeight.Bold
                 )
@@ -106,10 +111,12 @@ fun HomeGroupSummary(
             ) {
                 Text(
                     text = stringResource(R.string.balance),
+                    fontSize = 14.sp,
                     fontWeight = FontWeight.Medium
                 )
                 Text(
                     text = balance.formatted(false),
+                    fontSize = 14.sp,
                     color = balanceColor,
                     fontWeight = FontWeight.Bold
                 )
@@ -143,7 +150,7 @@ fun HomeGroupSummary(
                                     fontSize = 14.sp
                                 )
                                 Text(
-                                    text = group.total.formatted(false),
+                                    text = group.total.abs().formatted(false),
                                     fontSize = 14.sp,
                                     color = if (group.total.amount >= BigDecimal.ZERO) incomeColor else expenseColor,
                                     fontWeight = FontWeight.Medium
