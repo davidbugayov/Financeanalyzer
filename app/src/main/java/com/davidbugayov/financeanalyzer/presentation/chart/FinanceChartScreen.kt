@@ -227,8 +227,7 @@ fun FinanceChartScreen(
                     SummarySection(
                         income = totalIncome,
                         expense = totalExpense,
-                        period = periodText,
-                        onPeriodClick = { viewModel.handleIntent(ChartIntent.ShowPeriodDialog) }
+                        period = periodText
                     )
 
                     // Pie chart section

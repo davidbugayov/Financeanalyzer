@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation
 
 import android.app.Activity
-import android.content.res.Configuration
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.Spring
@@ -9,10 +8,8 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -21,10 +18,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
@@ -37,7 +34,6 @@ import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
-import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -62,12 +58,11 @@ fun MainScreen(startDestination: String = "home") {
         // Обновляем UI при изменении темы
         val window = (view.context as? Activity)?.window
         if (window != null) {
-            // Устанавливаем прозрачные цвета для статус бара и навигационной панели
-            window.statusBarColor = android.graphics.Color.TRANSPARENT
-            window.navigationBarColor = android.graphics.Color.TRANSPARENT
-            
-            // Обновляем декорации окна для корректной отрисовки
+            // Устанавливаем прозрачность через WindowInsetsController вместо устаревших свойств
             WindowCompat.setDecorFitsSystemWindows(window, false)
+            val controller = WindowCompat.getInsetsController(window, window.decorView)
+            controller.isAppearanceLightStatusBars = false
+            controller.isAppearanceLightNavigationBars = false
         }
     }
 

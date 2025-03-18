@@ -271,23 +271,6 @@ class HomeViewModel(
             Triple(Money(income), Money(expense), Money(balance))
         }
 
-        // Рассчитываем общие суммы
-        val financialSummary = {
-            val incomeTotal = filtered
-                .filter { !it.isExpense }
-                .map { it.amount }
-                .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
-
-            val expenseTotal = filtered
-                .filter { it.isExpense }
-                .map { it.amount }
-                .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
-
-            val balanceTotal = incomeTotal - expenseTotal
-
-            Triple(Money(incomeTotal), Money(expenseTotal), Money(balanceTotal))
-        }()
-
         // Формируем группы транзакций по категориям
         val groups = if (filtered.isNotEmpty()) {
             // Группируем транзакции по категориям
@@ -295,7 +278,7 @@ class HomeViewModel(
                 .map { (category, categoryTransactions) ->
                     // Рассчитываем общую сумму для категории
                     val categoryTotal = categoryTransactions.map {
-                        if (it.isExpense) kotlin.math.abs(it.amount) * -1 else kotlin.math.abs(it.amount)
+                        kotlin.math.abs(it.amount)
                     }.reduceOrNull { acc, amount -> acc + amount } ?: 0.0
 
                     // Создаем группу транзакций

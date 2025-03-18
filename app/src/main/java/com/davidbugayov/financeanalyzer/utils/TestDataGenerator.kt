@@ -70,14 +70,6 @@ object TestDataGenerator {
                 incomeCategories.random()
             }
             
-            // Выбираем случайное название в зависимости от категории
-            val titles = if (isExpense) {
-                expenseTitles[category] ?: listOf("Неизвестно")
-            } else {
-                incomeTitles[category] ?: listOf("Неизвестно")
-            }
-            val title = titles.random()
-            
             // Генерируем случайную сумму
             val amount = if (isExpense) {
                 when (category) {

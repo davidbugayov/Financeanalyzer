@@ -10,12 +10,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.List
 import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.List
 import androidx.compose.material.icons.filled.Update
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -63,8 +63,8 @@ fun AppInfoSection(
                 title = "Версия приложения",
                 value = appVersion
             )
-            
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Версия сборки
             AppInfoItem(
@@ -72,8 +72,8 @@ fun AppInfoSection(
                 title = "Версия кода",
                 value = buildVersion
             )
-            
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
             
             // Используемые библиотеки
             Row(
@@ -84,7 +84,7 @@ fun AppInfoSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
-                    imageVector = Icons.Default.List,
+                    imageVector = Icons.AutoMirrored.Filled.List,
                     contentDescription = null,
                     modifier = Modifier.size(24.dp),
                     tint = MaterialTheme.colorScheme.primary

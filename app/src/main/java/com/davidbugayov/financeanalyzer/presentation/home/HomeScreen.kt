@@ -152,7 +152,7 @@ fun HomeScreen(
                     onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
                     onNavigateToHistory = onNavigateToHistory,
                     onNavigateToAdd = onNavigateToAdd,
-                    onTransactionClick = { /* Пока ничего не делаем */ },
+                    onTransactionClick = { },
                     onTransactionLongClick = { transaction ->
                         viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
                     }
@@ -165,7 +165,8 @@ fun HomeScreen(
                     onShowGroupSummaryChange = { showGroupSummary = it },
                     onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
                     onNavigateToHistory = onNavigateToHistory,
-                    onTransactionClick = { /* Пока ничего не делаем */ },
+                    onNavigateToAdd = onNavigateToAdd,
+                    onTransactionClick = { },
                     onTransactionLongClick = { transaction ->
                         viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
                     }

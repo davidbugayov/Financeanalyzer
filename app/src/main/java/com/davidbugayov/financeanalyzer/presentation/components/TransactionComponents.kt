@@ -171,15 +171,6 @@ fun TransactionItem(transaction: Transaction) {
             .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Вертикальная цветовая полоса-индикатор
-        // Box(
-        //     modifier = Modifier
-        //         .width(4.dp)
-        //         .height(60.dp)
-        //         .clip(MaterialTheme.shapes.small)
-        //         .background(indicatorColor)
-        // )
-
         Spacer(modifier = Modifier.width(8.dp))
 
         // Иконка категории транзакции

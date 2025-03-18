@@ -145,14 +145,23 @@ fun HomeGroupSummary(
                                 horizontalArrangement = Arrangement.SpaceBetween,
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                // Определяем, является ли транзакция расходом по признаку isExpense
+                                // а не по значению amount (т.к. amount у расхода может быть > 0)
+                                val isExpense =
+                                    group.transactions.isNotEmpty() && group.transactions.first().isExpense
+                                
                                 Text(
                                     text = group.name,
-                                    fontSize = 14.sp
+                                    fontSize = 14.sp,
+                                    // Определяем цвет текста категории: красный для расходов, зеленый для доходов
+                                    color = if (isExpense) expenseColor else incomeColor,
+                                    // Жирный шрифт для расходов
+                                    fontWeight = FontWeight.Bold
                                 )
                                 Text(
                                     text = group.total.abs().formatted(false),
                                     fontSize = 14.sp,
-                                    color = if (group.total.amount >= BigDecimal.ZERO) incomeColor else expenseColor,
+                                    color = if (isExpense) expenseColor else incomeColor,
                                     fontWeight = FontWeight.Medium
                                 )
                             }

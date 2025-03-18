@@ -9,8 +9,6 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
-import androidx.core.app.NotificationCompat
-import com.davidbugayov.financeanalyzer.FinanceActivity
 import com.davidbugayov.financeanalyzer.R
 import timber.log.Timber
 import java.util.Calendar
@@ -84,18 +82,6 @@ class NotificationScheduler {
     fun scheduleTransactionReminder(context: Context, hour: Int, minute: Int) {
         // Создаем канал уведомлений
         createNotificationChannel(context)
-        
-        // Создаем Intent для запуска приложения при нажатии на уведомление
-        val intent = Intent(context, FinanceActivity::class.java).apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
-        
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            TRANSACTION_REMINDER_REQUEST_CODE,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-        )
         
         // Создаем Intent для BroadcastReceiver, который будет показывать уведомление
         val alarmIntent = Intent(context, TransactionReminderReceiver::class.java)

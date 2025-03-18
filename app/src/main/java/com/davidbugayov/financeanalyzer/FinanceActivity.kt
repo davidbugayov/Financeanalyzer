@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer
 
-import android.app.Activity
 import android.app.AlarmManager
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -10,7 +9,6 @@ import android.os.Build
 import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
@@ -22,14 +20,10 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
-import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
-import com.google.firebase.crashlytics.FirebaseCrashlytics
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.widget.BalanceWidget
 import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 
 class FinanceActivity : ComponentActivity() {
     
@@ -59,8 +53,11 @@ class FinanceActivity : ComponentActivity() {
         
         // Делаем статус бар прозрачным
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        window.statusBarColor = android.graphics.Color.TRANSPARENT
-        window.navigationBarColor = android.graphics.Color.TRANSPARENT
+
+        // Устанавливаем прозрачность через WindowInsetsController вместо устаревших свойств
+        val controller = WindowCompat.getInsetsController(window, window.decorView)
+        controller.isAppearanceLightStatusBars = false  // будет настроено ниже на основе темы
+        controller.isAppearanceLightNavigationBars = false  // будет настроено ниже на основе темы
 
         // Устанавливаем цвет иконок в статус-баре в зависимости от темы
         val isDarkTheme = when (PreferencesManager(this).getThemeMode()) {

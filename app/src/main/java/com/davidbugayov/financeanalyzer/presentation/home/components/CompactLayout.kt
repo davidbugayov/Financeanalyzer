@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -37,6 +38,7 @@ fun CompactLayout(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit
 ) {
+
     // Используем Column вместо LazyColumn для основного контента
     Column(
         modifier = Modifier
@@ -110,7 +112,7 @@ fun CompactLayout(
                     }
                 } else {
                     // Отображаем список транзакций
-                    state.filteredTransactions.forEachIndexed { index, transaction ->
+                    state.filteredTransactions.forEach { transaction ->
                         TransactionItemWithActions(
                             transaction = transaction,
                             onClick = onTransactionClick,
@@ -121,6 +123,15 @@ fun CompactLayout(
                 }
                 Spacer(modifier = Modifier.height(140.dp))
             }
+
+            // Кнопка добавления новой транзакции в правом нижнем углу
+            AddTransactionButton(
+                onClick = onNavigateToAdd,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(16.dp)
+                    .size(56.dp)
+            )
         }
     }
 } 

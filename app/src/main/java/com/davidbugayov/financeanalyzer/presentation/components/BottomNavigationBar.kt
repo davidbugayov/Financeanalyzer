@@ -79,8 +79,8 @@ fun AnimatedBottomNavigationBar(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 16.dp, vertical = 16.dp)
-                    .height(80.dp),
+                    .padding(horizontal = 20.dp, vertical = 16.dp)
+                    .height(90.dp),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -134,7 +134,18 @@ private fun NavButton(
         if (isMain) {
             FilledIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier.size(70.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = text,
+                    modifier = Modifier.size(32.dp)
+                )
+            }
+        } else {
+            FilledTonalIconButton(
+                onClick = onClick,
+                modifier = Modifier.size(62.dp)
             ) {
                 Icon(
                     imageVector = icon,
@@ -142,25 +153,14 @@ private fun NavButton(
                     modifier = Modifier.size(28.dp)
                 )
             }
-        } else {
-            FilledTonalIconButton(
-                onClick = onClick,
-                modifier = Modifier.size(56.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = text,
-                    modifier = Modifier.size(24.dp)
-                )
-            }
         }
 
         Text(
             text = text,
-            fontSize = 12.sp,
+            fontSize = 14.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(top = 4.dp),
+            modifier = Modifier.padding(top = 6.dp),
             color = MaterialTheme.colorScheme.onSurface
         )
     }
