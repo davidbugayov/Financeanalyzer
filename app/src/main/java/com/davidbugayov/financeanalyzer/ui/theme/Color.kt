@@ -7,25 +7,25 @@ val md_theme_light_primary = Color(0xFF2196F3) // Голубой для элем
 val md_theme_light_onPrimary = Color.White
 val md_theme_light_primaryContainer = Color(0xFFE1F5FE) // Очень светлый голубой фон контейнера (для карточки баланса)
 val md_theme_light_onPrimaryContainer = Color(0xFF1976D2)
-val md_theme_dark_primary = Color(0xFFB58E3C) // Золотистый для темной темы
+val md_theme_dark_primary = Color(0xFF81CFEF) // Нежно-голубой для темной темы (был золотистый)
 val md_theme_dark_onPrimary = Color.Black
-val md_theme_dark_primaryContainer = Color(0xFF725626) // Темно-золотистый фон контейнера
-val md_theme_dark_onPrimaryContainer = Color(0xFFFFE082)
+val md_theme_dark_primaryContainer = Color(0xFF60A1C3) // Блекло-голубой фон контейнера (был темно-золотистый)
+val md_theme_dark_onPrimaryContainer = Color(0xFFD6F3FF)
 
 // Цвет текста баланса для светлой темы (более яркий синий)
 val md_theme_light_balance_text = Color(0xFF2196F3) // Яркий синий для текста баланса
 // Цвет текста баланса для темной темы
-val md_theme_dark_balance_text = Color(0xFFDAAF41) // Более яркий золотистый
+val md_theme_dark_balance_text = Color(0xFF81CFEF) // Нежно-голубой (был золотистый)
 
 // Secondary colors
 val md_theme_light_secondary = Color(0xFF5677FC) // Более насыщенный синий для кнопки "Добавить"
 val md_theme_light_onSecondary = Color.White
 val md_theme_light_secondaryContainer = Color(0xFFB3E5FC)
 val md_theme_light_onSecondaryContainer = Color(0xFF0288D1)
-val md_theme_dark_secondary = Color(0xFFD4AF37) // Золотистый для темной темы
+val md_theme_dark_secondary = Color(0xFF64B5E8) // Блекло-голубой для темной темы (был золотистый)
 val md_theme_dark_onSecondary = Color.Black
-val md_theme_dark_secondaryContainer = Color(0xFF936F1D)
-val md_theme_dark_onSecondaryContainer = Color(0xFFFFECB3)
+val md_theme_dark_secondaryContainer = Color(0xFF4D92BC) // Более темный голубой (был золотистый)
+val md_theme_dark_onSecondaryContainer = Color(0xFFCCE9FF)
 
 // Tertiary colors
 val md_theme_light_tertiary = Color(0xFF00BCD4)
@@ -115,9 +115,9 @@ val IncomeColorLight = Color(0xFF4CAF50) // Зеленый для доходов
 val ExpenseColorLight = Color(0xFFF44336) // Красный для расходов
 
 // Темная тема
-val PrimaryDark = Color(0xFFB58E3C) // Золотистый
-val SecondaryDark = Color(0xFFD4AF37) // Светло-золотистый
-val TertiaryDark = Color(0xFFFFD54F) // Янтарный
+val PrimaryDark = Color(0xFF81CFEF) // Нежно-голубой (был золотистый)
+val SecondaryDark = Color(0xFF64B5E8) // Блекло-голубой (был светло-золотистый)
+val TertiaryDark = Color(0xFFADE8F4) // Бледно-голубой (был янтарный)
 
 val BackgroundDark = Color(0xFF121212)
 val SurfaceDark = Color(0xFF1E1E1E)
@@ -142,4 +142,4 @@ val Pink40 = Color(0xFF7D5260)
 
 // Добавляем локальную переменную для цвета кнопки "Добавить"
 val md_theme_light_fab = Color(0xFF5677FC) // Темно-синий для кнопки "Добавить" в светлой теме
-val md_theme_dark_fab = Color(0xFFB58E3C) // Золотистый для темной темы
+val md_theme_dark_fab = Color(0xFF64B5E8) // Блекло-голубой для темной темы (был золотистый)

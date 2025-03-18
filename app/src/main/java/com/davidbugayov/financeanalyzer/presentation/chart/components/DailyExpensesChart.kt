@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -70,8 +71,9 @@ fun DailyExpensesChart(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.spacing_large)),
-        shape = MaterialTheme.shapes.medium
+            .padding(horizontal = dimensionResource(R.dimen.spacing_large), vertical = 8.dp),
+        shape = MaterialTheme.shapes.medium,
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
     ) {
         Column(
             modifier = Modifier

@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,6 +36,14 @@ fun HomeGroupSummary(
     totalIncome: Money,
     totalExpense: Money
 ) {
+    // Определяем цвета для доходов и расходов
+    val incomeColor = Color(0xFF2E7D32) // Темно-зеленый для доходов
+    val expenseColor = Color(0xFFB71C1C) // Темно-красный для расходов
+    
+    // Вычисляем баланс
+    val balance = totalIncome - totalExpense
+    val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+    
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -44,11 +53,13 @@ fun HomeGroupSummary(
         Column(
             modifier = Modifier.padding(16.dp)
         ) {
+            // Отображение заголовка "Сводка"
             Text(
                 text = stringResource(R.string.summary),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp)
+                modifier = Modifier.padding(bottom = 8.dp),
+                color = balanceColor // Цвет заголовка соответствует балансу
             )
 
             // Отображение общего дохода и расхода
@@ -64,7 +75,7 @@ fun HomeGroupSummary(
                 )
                 Text(
                     text = totalIncome.formatted(false),
-                    color = MaterialTheme.colorScheme.primary,
+                    color = incomeColor,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -81,7 +92,25 @@ fun HomeGroupSummary(
                 )
                 Text(
                     text = totalExpense.formatted(false),
-                    color = MaterialTheme.colorScheme.error,
+                    color = expenseColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            // Отображение баланса
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 8.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.balance),
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = balance.formatted(false),
+                    color = balanceColor,
                     fontWeight = FontWeight.Bold
                 )
             }
@@ -116,7 +145,7 @@ fun HomeGroupSummary(
                                 Text(
                                     text = group.total.formatted(false),
                                     fontSize = 14.sp,
-                                    color = if (group.total.amount >= BigDecimal.ZERO) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
+                                    color = if (group.total.amount >= BigDecimal.ZERO) incomeColor else expenseColor,
                                     fontWeight = FontWeight.Medium
                                 )
                             }
