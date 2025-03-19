@@ -2,10 +2,9 @@ package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
-import com.davidbugayov.financeanalyzer.data.preferences.CurrencyPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
+import com.davidbugayov.financeanalyzer.data.preferences.CurrencyPreferences
 import com.davidbugayov.financeanalyzer.data.repository.FinancialGoalRepositoryImpl
-import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryAdapter
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.FinancialGoalRepository
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
@@ -51,8 +50,9 @@ val appModule = module {
     single { AnalyticsUtils }
     
     // Repositories
-    single<TransactionRepository> { TransactionRepositoryImpl(get()) }
-    single<ITransactionRepository> { TransactionRepositoryAdapter(get()) }
+    single<TransactionRepositoryImpl> { TransactionRepositoryImpl(get()) }
+    single<TransactionRepository> { get<TransactionRepositoryImpl>() }
+    single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
     single<FinancialGoalRepository> { FinancialGoalRepositoryImpl(get()) }
 
     // Use cases
@@ -82,8 +82,7 @@ val appModule = module {
             manageFinancialGoalUseCase = get(),
             loadTransactionsUseCase = get(),
             notificationScheduler = get(),
-            preferencesManager = get(),
-            transactionRepository = get<TransactionRepository>()
+            preferencesManager = get()
         )
     }
 

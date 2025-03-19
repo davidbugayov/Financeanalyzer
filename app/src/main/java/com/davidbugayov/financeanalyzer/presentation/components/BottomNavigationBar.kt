@@ -8,8 +8,10 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -73,39 +75,71 @@ fun AnimatedBottomNavigationBar(
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-            shadowElevation = 0.dp,
-            tonalElevation = 4.dp
+            shadowElevation = 4.dp,
+            tonalElevation = 8.dp
         ) {
-            Row(
+            // Высота всего контейнера с учетом отступов
+            val containerHeight = 170.dp
+
+            Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = 20.dp, vertical = 16.dp)
-                    .height(90.dp),
-                horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                    .height(containerHeight)
             ) {
-                // Графики (слева)
-                NavButton(
-                    icon = Icons.Default.BarChart,
-                    text = stringResource(R.string.charts),
-                    onClick = onChartClick,
-                    isMain = false
-                )
+                // Размещаем кнопки в Row с равными отступами
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Center),
+                    horizontalArrangement = Arrangement.Center,
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Используем Box с весом для левой кнопки
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        NavButton(
+                            icon = Icons.Default.BarChart,
+                            text = stringResource(R.string.charts),
+                            onClick = onChartClick,
+                            isMain = false
+                        )
+                    }
 
-                // Добавить (центр)
-                NavButton(
-                    icon = Icons.Default.Add,
-                    text = stringResource(R.string.add_button),
-                    onClick = onAddClick,
-                    isMain = true
-                )
+                    // Используем Box с весом для центральной кнопки
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        NavButton(
+                            icon = Icons.Default.Add,
+                            text = stringResource(R.string.add_button),
+                            onClick = onAddClick,
+                            isMain = true
+                        )
+                    }
 
-                // История (справа)
-                NavButton(
-                    icon = Icons.Default.History,
-                    text = stringResource(R.string.history),
-                    onClick = onHistoryClick,
-                    isMain = false
+                    // Используем Box с весом для правой кнопки
+                    Box(
+                        modifier = Modifier.weight(1f),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        NavButton(
+                            icon = Icons.Default.History,
+                            text = stringResource(R.string.history),
+                            onClick = onHistoryClick,
+                            isMain = false
+                        )
+                    }
+                }
+
+                // Дополнительное пространство внизу для безопасной области
+                Spacer(
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
+                        .height(16.dp)
                 )
             }
         }
@@ -129,12 +163,23 @@ private fun NavButton(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(horizontal = 4.dp)
+        modifier = Modifier.padding(8.dp)
     ) {
         if (isMain) {
             FilledIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(70.dp)
+                modifier = Modifier.size(84.dp)
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = text,
+                    modifier = Modifier.size(38.dp)
+                )
+            }
+        } else {
+            FilledTonalIconButton(
+                onClick = onClick,
+                modifier = Modifier.size(72.dp)
             ) {
                 Icon(
                     imageVector = icon,
@@ -142,26 +187,17 @@ private fun NavButton(
                     modifier = Modifier.size(32.dp)
                 )
             }
-        } else {
-            FilledTonalIconButton(
-                onClick = onClick,
-                modifier = Modifier.size(62.dp)
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = text,
-                    modifier = Modifier.size(28.dp)
-                )
-            }
         }
 
+        Spacer(modifier = Modifier.height(12.dp))
+        
         Text(
             text = text,
-            fontSize = 14.sp,
+            fontSize = 16.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(top = 6.dp),
-            color = MaterialTheme.colorScheme.onSurface
+            color = MaterialTheme.colorScheme.onSurface,
+            modifier = Modifier.padding(bottom = 8.dp)
         )
     }
 }

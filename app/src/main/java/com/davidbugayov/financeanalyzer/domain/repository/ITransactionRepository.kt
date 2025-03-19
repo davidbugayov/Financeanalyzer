@@ -42,4 +42,11 @@ interface ITransactionRepository {
      * @return Flow со списком транзакций
      */
     suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>>
+
+    /**
+     * Получает транзакцию по идентификатору
+     * @param id Идентификатор транзакции
+     * @return Транзакция или null, если транзакция не найдена
+     */
+    suspend fun getTransactionById(id: String): Transaction?
 } 

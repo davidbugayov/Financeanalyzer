@@ -1,15 +1,14 @@
 package com.davidbugayov.financeanalyzer.utils
 
-import android.graphics.Color
+import androidx.core.graphics.toColorInt
 import com.davidbugayov.financeanalyzer.domain.model.Source
-import kotlin.random.Random
 
 object ColorUtils {
 
     // Цвета для банков
-    val SBER_COLOR = Color.parseColor("#21A038")
-    val TINKOFF_COLOR = Color.parseColor("#FFDD2D")
-    val ALFA_COLOR = Color.parseColor("#EF3124")
+    val SBER_COLOR = "#21A038".toColorInt()
+    val TINKOFF_COLOR = "#FFDD2D".toColorInt()
+    val ALFA_COLOR = "#EF3124".toColorInt()
 
     // Предустановленные источники
     val defaultSources = listOf(
@@ -19,31 +18,24 @@ object ColorUtils {
     )
 
     val predefinedColors = listOf(
-        Color.parseColor("#F44336"), // Red
-        Color.parseColor("#E91E63"), // Pink
-        Color.parseColor("#9C27B0"), // Purple
-        Color.parseColor("#673AB7"), // Deep Purple
-        Color.parseColor("#3F51B5"), // Indigo
-        Color.parseColor("#2196F3"), // Blue
-        Color.parseColor("#03A9F4"), // Light Blue
-        Color.parseColor("#00BCD4"), // Cyan
-        Color.parseColor("#009688"), // Teal
-        Color.parseColor("#4CAF50"), // Green
-        Color.parseColor("#8BC34A"), // Light Green
-        Color.parseColor("#CDDC39"), // Lime
-        Color.parseColor("#FFEB3B"), // Yellow
-        Color.parseColor("#FFC107"), // Amber
-        Color.parseColor("#FF9800"), // Orange
-        Color.parseColor("#FF5722"), // Deep Orange
-        Color.parseColor("#795548"), // Brown
-        Color.parseColor("#9E9E9E"), // Grey
-        Color.parseColor("#607D8B")  // Blue Grey
+        "#F44336".toColorInt(), // Red
+        "#E91E63".toColorInt(), // Pink
+        "#9C27B0".toColorInt(), // Purple
+        "#673AB7".toColorInt(), // Deep Purple
+        "#3F51B5".toColorInt(), // Indigo
+        "#2196F3".toColorInt(), // Blue
+        "#03A9F4".toColorInt(), // Light Blue
+        "#00BCD4".toColorInt(), // Cyan
+        "#009688".toColorInt(), // Teal
+        "#4CAF50".toColorInt(), // Green
+        "#8BC34A".toColorInt(), // Light Green
+        "#CDDC39".toColorInt(), // Lime
+        "#FFEB3B".toColorInt(), // Yellow
+        "#FFC107".toColorInt(), // Amber
+        "#FF9800".toColorInt(), // Orange
+        "#FF5722".toColorInt(), // Deep Orange
+        "#795548".toColorInt(), // Brown
+        "#9E9E9E".toColorInt(), // Grey
+        "#607D8B".toColorInt()  // Blue Grey
     )
-
-    /**
-     * Генерирует случайный цвет из предопределенного списка
-     */
-    fun getRandomColor(): Int {
-        return predefinedColors[Random.nextInt(predefinedColors.size)]
-    }
 } 

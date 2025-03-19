@@ -1,7 +1,5 @@
 package com.davidbugayov.financeanalyzer.data.repository
 
-import android.content.Context
-import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -16,11 +14,12 @@ import java.util.Date
 /**
  * Реализация репозитория для работы с транзакциями.
  * Использует Room DAO для доступа к данным.
+ * Реализует оба интерфейса репозитория для обеспечения совместимости.
  * @param dao DAO для работы с транзакциями.
  */
 class TransactionRepositoryImpl(
     private val dao: TransactionDao
-) : TransactionRepository {
+) : TransactionRepository, ITransactionRepository {
     
     /**
      * Получает все транзакции.
@@ -28,6 +27,15 @@ class TransactionRepositoryImpl(
      */
     override suspend fun getAllTransactions(): List<Transaction> = withContext(Dispatchers.IO) {
         dao.getAllTransactions().map { mapEntityToDomain(it) }
+    }
+
+    /**
+     * Загружает все транзакции (метод из ITransactionRepository)
+     * @return Список транзакций
+     */
+    override suspend fun loadTransactions(): List<Transaction> {
+        // Делегируем вызов методу getAllTransactions
+        return getAllTransactions()
     }
     
     /**
@@ -61,7 +69,7 @@ class TransactionRepositoryImpl(
     }
     
     /**
-     * Удаляет транзакцию.
+     * Удаляет транзакцию по ID.
      * @param id Идентификатор транзакции для удаления.
      */
     override suspend fun deleteTransaction(id: String): Unit = withContext(Dispatchers.IO) {
@@ -73,6 +81,42 @@ class TransactionRepositoryImpl(
         } catch (e: NumberFormatException) {
             // Игнорируем ошибку, если id не является числом
         }
+    }
+
+    /**
+     * Удаляет транзакцию (метод из ITransactionRepository)
+     * @param transaction Транзакция для удаления
+     */
+    override suspend fun deleteTransaction(transaction: Transaction) {
+        // Делегируем вызов методу deleteTransaction по ID
+        deleteTransaction(transaction.id)
+    }
+
+    /**
+     * Получает транзакции за указанный период.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Flow со списком транзакций.
+     */
+    override suspend fun getTransactionsByDateRange(
+        startDate: Date,
+        endDate: Date
+    ): Flow<List<Transaction>> = flow {
+        // Получаем все транзакции и фильтруем по дате
+        val transactions = getAllTransactions()
+            .filter { it.date >= startDate && it.date <= endDate }
+        emit(transactions)
+    }
+
+    /**
+     * Получает транзакции за указанный период (метод из ITransactionRepository).
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Flow со списком транзакций.
+     */
+    override suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>> {
+        // Делегируем вызов методу getTransactionsByDateRange
+        return getTransactionsByDateRange(startDate, endDate)
     }
     
     /**

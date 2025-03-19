@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
+import androidx.core.net.toUri
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
@@ -30,12 +31,6 @@ class FinanceActivity : ComponentActivity() {
     // Начальный экран для навигации
     private var startDestination = "home"
     
-    // Флаг, указывающий, что приложение запущено через shortcut
-    private var isLaunchedFromShortcut = false
-    
-    // Код запроса для разрешения на использование точных будильников
-    private val REQUEST_EXACT_ALARM_PERMISSION = 1001
-    
     override fun onCreate(savedInstanceState: Bundle?) {
         // Устанавливаем сплеш-скрин перед вызовом super.onCreate()
         val splashScreen = installSplashScreen()
@@ -50,16 +45,23 @@ class FinanceActivity : ComponentActivity() {
         
         // Обновляем виджеты при запуске приложения
         updateWidgets()
-        
-        // Делаем статус бар прозрачным
+
+        // Делаем контент приложения отображаться под системными панелями
         WindowCompat.setDecorFitsSystemWindows(window, false)
+        
+        // Устанавливаем прозрачные цвета для статус-бара и навигационной панели
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.R) {
+            // Для Android 11+ мы уже установили WindowCompat.setDecorFitsSystemWindows(window, false)
+            // Явная установка цветов не требуется, система сделает их прозрачными
+        } else {
+            // На более старых версиях используем устаревший метод, но с подавлением предупреждения
+            @Suppress("DEPRECATION")
+            window.statusBarColor = android.graphics.Color.TRANSPARENT
+            @Suppress("DEPRECATION")
+            window.navigationBarColor = android.graphics.Color.TRANSPARENT
+        }
 
-        // Устанавливаем прозрачность через WindowInsetsController вместо устаревших свойств
-        val controller = WindowCompat.getInsetsController(window, window.decorView)
-        controller.isAppearanceLightStatusBars = false  // будет настроено ниже на основе темы
-        controller.isAppearanceLightNavigationBars = false  // будет настроено ниже на основе темы
-
-        // Устанавливаем цвет иконок в статус-баре в зависимости от темы
+        // Определяем, какую тему использует приложение
         val isDarkTheme = when (PreferencesManager(this).getThemeMode()) {
             ThemeMode.DARK -> true
             ThemeMode.LIGHT -> false
@@ -68,10 +70,10 @@ class FinanceActivity : ComponentActivity() {
                                  android.content.res.Configuration.UI_MODE_NIGHT_YES
         }
 
-        // Применяем настройки иконок статус-бара
+        // Устанавливаем цвет иконок в зависимости от темы: 
+        // - светлые иконки на темном фоне (isDarkTheme = true)
+        // - темные иконки на светлом фоне (isDarkTheme = false)
         WindowInsetsControllerCompat(window, window.decorView).apply {
-            // true = темные иконки (для светлого фона)
-            // false = светлые иконки (для темного фона)
             isAppearanceLightStatusBars = !isDarkTheme
             isAppearanceLightNavigationBars = !isDarkTheme
         }
@@ -101,7 +103,6 @@ class FinanceActivity : ComponentActivity() {
             when (uri.toString()) {
                 "financeanalyzer://add" -> {
                     startDestination = "add"
-                    isLaunchedFromShortcut = true
                 }
             }
         }
@@ -151,7 +152,7 @@ class FinanceActivity : ComponentActivity() {
                 Timber.d("Requesting SCHEDULE_EXACT_ALARM permission")
                 try {
                     val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
-                        data = android.net.Uri.parse("package:$packageName")
+                        data = "package:$packageName".toUri()
                     }
                     startActivity(intent)
                 } catch (e: Exception) {

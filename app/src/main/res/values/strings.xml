@@ -24,7 +24,7 @@
     <string name="daily_expenses">Ежедневные расходы</string>
     <string name="cash_withdrawal">снятие</string>
     <string name="cash_deposit">пополнение</string>
-    <string name="loading_data">Загрузка данных...</string>
+    <string name="loading_data">Загрузка данных…</string>
     <string name="error">Ошибка</string>
     
     <!-- Главный экран -->
@@ -299,5 +299,10 @@
     <string name="libraries_title">Используемые библиотеки</string>
     <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
     <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
+
+    <!-- Базовые строки -->
+    <string name="loading_error">Ошибка загрузки данных</string>
+    <string name="default_amount">0.00 ₽</string>
+    <string name="default_small_amount">0 ₽</string>
 
 </resources>

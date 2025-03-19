@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.google.gson.Gson
@@ -24,7 +25,7 @@ class PreferencesManager(context: Context) {
      */
     fun saveCustomSources(sources: List<Source>) {
         val sourcesJson = gson.toJson(sources)
-        sharedPreferences.edit().putString(KEY_CUSTOM_SOURCES, sourcesJson).apply()
+        sharedPreferences.edit { putString(KEY_CUSTOM_SOURCES, sourcesJson) }
     }
 
     /**
@@ -46,7 +47,7 @@ class PreferencesManager(context: Context) {
      * @param themeMode Режим темы для сохранения
      */
     fun saveThemeMode(themeMode: ThemeMode) {
-        sharedPreferences.edit().putString(KEY_THEME_MODE, themeMode.name).apply()
+        sharedPreferences.edit { putString(KEY_THEME_MODE, themeMode.name) }
     }
 
     /**

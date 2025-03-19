@@ -9,7 +9,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -47,7 +46,6 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
  * Отображает текущий баланс и последние транзакции.
  * Следует принципам MVI и Clean Architecture.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -151,7 +149,6 @@ fun HomeScreen(
                     onShowGroupSummaryChange = { showGroupSummary = it },
                     onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
                     onNavigateToHistory = onNavigateToHistory,
-                    onNavigateToAdd = onNavigateToAdd,
                     onTransactionClick = { },
                     onTransactionLongClick = { transaction ->
                         viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
@@ -165,7 +162,6 @@ fun HomeScreen(
                     onShowGroupSummaryChange = { showGroupSummary = it },
                     onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
                     onNavigateToHistory = onNavigateToHistory,
-                    onNavigateToAdd = onNavigateToAdd,
                     onTransactionClick = { },
                     onTransactionLongClick = { transaction ->
                         viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))

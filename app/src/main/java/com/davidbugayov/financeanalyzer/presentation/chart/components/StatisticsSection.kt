@@ -78,7 +78,7 @@ fun StatisticsSection(
                 text = stringResource(R.string.analyze_expenses_for_budget),
                 fontSize = dimensionResource(id = R.dimen.text_size_large).value.sp,
                 fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
