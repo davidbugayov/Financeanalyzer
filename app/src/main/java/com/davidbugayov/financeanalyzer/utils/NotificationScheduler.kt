@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import com.davidbugayov.financeanalyzer.R
 import timber.log.Timber
 import java.util.Calendar
@@ -22,20 +21,6 @@ class NotificationScheduler {
     }
 
     /**
-     * Проверяет, есть ли у приложения разрешение на использование точных будильников.
-     * @param context Контекст приложения.
-     * @return true, если разрешение предоставлено, иначе false.
-     */
-    fun canScheduleExactAlarms(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-            alarmManager.canScheduleExactAlarms()
-        } else {
-            true // До Android 12 (API 31) разрешение не требуется
-        }
-    }
-
-    /**
      * Создает канал уведомлений для Android 8.0 (API 26) и выше.
      * @param context Контекст приложения.
      */
@@ -44,9 +29,10 @@ class NotificationScheduler {
         val description = context.getString(R.string.transaction_reminder_channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
 
-        val channel = NotificationChannel(TRANSACTION_REMINDER_CHANNEL_ID, name, importance).apply {
-            this.description = description
-        }
+        val channel =
+            NotificationChannel(TRANSACTION_REMINDER_CHANNEL_ID, name, importance).apply {
+                this.description = description
+            }
 
         val notificationManager =
             context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
@@ -88,26 +74,14 @@ class NotificationScheduler {
         // Получаем AlarmManager и планируем повторяющееся уведомление
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         
-        // Проверяем, есть ли у нас разрешение на использование точных будильников
-        val canScheduleExactAlarms = canScheduleExactAlarms(context)
-        
         try {
-            if (canScheduleExactAlarms) {
-                alarmManager.setExactAndAllowWhileIdle(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    alarmPendingIntent
-                )
-                Timber.d("Scheduled exact alarm with setExactAndAllowWhileIdle")
-            } else {
-                // Если нет разрешения, используем неточный будильник
-                alarmManager.set(
-                    AlarmManager.RTC_WAKEUP,
-                    calendar.timeInMillis,
-                    alarmPendingIntent
-                )
-                Timber.d("Scheduled inexact alarm with set")
-            }
+            // Для Android 6.0 (API 23) и выше используем setExactAndAllowWhileIdle
+            alarmManager.setExactAndAllowWhileIdle(
+                AlarmManager.RTC_WAKEUP,
+                calendar.timeInMillis,
+                alarmPendingIntent
+            )
+            Timber.d("Scheduled exact alarm with setExactAndAllowWhileIdle")
         } catch (e: SecurityException) {
             Timber.e(e, "Failed to schedule alarm due to missing permission")
             // Используем неточный будильник в случае ошибки

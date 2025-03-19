@@ -40,13 +40,15 @@ fun CategorySection(
     categories: List<CategoryItem>,
     selectedCategory: String,
     onCategorySelected: (CategoryItem) -> Unit,
-    onAddCategoryClick: () -> Unit
+    onAddCategoryClick: () -> Unit,
+    isError: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = stringResource(R.string.category),
+            text = stringResource(R.string.category) + " *",
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
         )
 
         LazyRow(
@@ -57,7 +59,8 @@ fun CategorySection(
                 CategoryItem(
                     category = category,
                     isSelected = category.name == selectedCategory,
-                    onClick = { onCategorySelected(category) }
+                    onClick = { onCategorySelected(category) },
+                    isError = isError && selectedCategory.isBlank()
                 )
             }
 
@@ -75,7 +78,8 @@ fun CategorySection(
 fun CategoryItem(
     category: CategoryItem,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
+    isError: Boolean = false
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -90,8 +94,12 @@ fun CategoryItem(
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .border(
-                    width = if (isSelected) 3.dp else 0.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                    width = if (isSelected) 3.dp else if (isError) 2.dp else 0.dp,
+                    color = when {
+                        isSelected -> MaterialTheme.colorScheme.primary
+                        isError -> MaterialTheme.colorScheme.error
+                        else -> Color.Transparent
+                    },
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -99,7 +107,7 @@ fun CategoryItem(
             Icon(
                 imageVector = category.icon,
                 contentDescription = category.name,
-                tint = MaterialTheme.colorScheme.onPrimaryContainer
+                tint = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
 
@@ -109,7 +117,8 @@ fun CategoryItem(
             text = category.name,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
+            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
         )
     }
 }

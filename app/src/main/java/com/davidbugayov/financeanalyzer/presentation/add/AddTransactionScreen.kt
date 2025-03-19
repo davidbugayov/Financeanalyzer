@@ -70,6 +70,16 @@ fun AddTransactionScreen(
         )
     }
 
+    // Функция для обработки выхода с экрана
+    fun handleExit() {
+        // Обновляем позиции категорий перед выходом
+        viewModel.updateCategoryPositions()
+        // Сбрасываем поля
+        viewModel.resetFields()
+        // Возвращаемся назад
+        onNavigateBack()
+    }
+
     // Цвета для типов транзакций
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
@@ -84,9 +94,7 @@ fun AddTransactionScreen(
                         if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
                             showCancelConfirmation = true
                         } else {
-                            // Сбрасываем поля перед выходом
-                            viewModel.resetFields()
-                            onNavigateBack()
+                            handleExit()
                         }
                     }) {
                         Icon(
@@ -142,7 +150,7 @@ fun AddTransactionScreen(
                     )
                 }
 
-                // Секция "Куда" (категории)
+                // Секция категорий с передачей состояния ошибки
                 CategorySection(
                     categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
                     selectedCategory = state.category,
@@ -151,7 +159,8 @@ fun AddTransactionScreen(
                     },
                     onAddCategoryClick = {
                         viewModel.onEvent(AddTransactionEvent.ShowCustomCategoryDialog)
-                    }
+                    },
+                    isError = state.categoryError
                 )
 
                 // Поле ввода суммы
@@ -244,7 +253,7 @@ fun AddTransactionScreen(
                 SuccessDialog(
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
-                        onNavigateBack()
+                        handleExit()
                     },
                     onAddAnother = {
                         viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
@@ -265,9 +274,7 @@ fun AddTransactionScreen(
                 CancelConfirmationDialog(
                     onConfirm = {
                         showCancelConfirmation = false
-                        // Сбрасываем поля перед выходом
-                        viewModel.resetFields()
-                        onNavigateBack()
+                        handleExit()
                     },
                     onDismiss = {
                         showCancelConfirmation = false
