@@ -256,9 +256,9 @@
 
     <!-- Профиль -->
     <string name="export_to_csv">Экспорт данных в CSV</string>
-    <string name="export_description">Экспортирует все ваши транзакции в CSV файл, который можно открыть в Excel или Google Таблицах.</string>
     <string name="export_success">Данные успешно экспортированы</string>
     <string name="export_error">Ошибка при экспорте данных</string>
+    <string name="export_description">Экспортирует все транзакции в CSV файл для использования в Excel или других программах.</string>
     
     <!-- Финансовые цели -->
     <string name="financial_goals">Финансовые цели</string>
@@ -304,5 +304,5 @@
     <string name="loading_error">Ошибка загрузки данных</string>
     <string name="default_amount">0.00 ₽</string>
     <string name="default_small_amount">0 ₽</string>
-
+    <string name="navigation_back">Назад</string>
 </resources>

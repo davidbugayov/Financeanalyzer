@@ -8,6 +8,7 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -34,6 +35,7 @@ import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -47,11 +49,17 @@ fun MainScreen(startDestination: String = "home") {
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
     
-    // Подписываемся напрямую на поток темы из ProfileViewModel
     val themeState = profileViewModel.themeMode.collectAsState()
     val themeMode = themeState.value
     
     val view = LocalView.current
+
+    // Определяем isDarkTheme здесь, за пределами LaunchedEffect
+    val isDarkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
 
     // Отслеживаем изменения темы
     LaunchedEffect(themeMode) {
@@ -61,8 +69,11 @@ fun MainScreen(startDestination: String = "home") {
             // Устанавливаем прозрачность через WindowInsetsController вместо устаревших свойств
             WindowCompat.setDecorFitsSystemWindows(window, false)
             val controller = WindowCompat.getInsetsController(window, window.decorView)
-            controller.isAppearanceLightStatusBars = false
-            controller.isAppearanceLightNavigationBars = false
+
+            // Настраиваем иконки статус-бара и навигационной панели в зависимости от темы
+            // Светлые иконки для темной темы, темные иконки для светлой темы
+            controller.isAppearanceLightStatusBars = !isDarkTheme
+            controller.isAppearanceLightNavigationBars = !isDarkTheme
         }
     }
 

@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -40,19 +39,19 @@ import com.davidbugayov.financeanalyzer.R
 /**
  * Улучшенная нижняя навигационная панель с анимацией и поддержкой произвольного набора пунктов
  *
+ * @param modifier модификатор для управления позиционированием
  * @param visible видима ли панель
  * @param onAddClick обработчик нажатия на кнопку "Добавить"
  * @param onChartClick обработчик нажатия на кнопку "Графики"
  * @param onHistoryClick обработчик нажатия на кнопку "История"
- * @param modifier модификатор для управления позиционированием
  */
 @Composable
 fun AnimatedBottomNavigationBar(
+    modifier: Modifier = Modifier,
     visible: Boolean = true,
     onAddClick: () -> Unit = {},
     onChartClick: () -> Unit = {},
-    onHistoryClick: () -> Unit = {},
-    modifier: Modifier = Modifier
+    onHistoryClick: () -> Unit = {}
 ) {
     AnimatedVisibility(
         visible = visible,
@@ -79,7 +78,7 @@ fun AnimatedBottomNavigationBar(
             tonalElevation = 8.dp
         ) {
             // Высота всего контейнера с учетом отступов
-            val containerHeight = 170.dp
+            val containerHeight = 132.dp
 
             Box(
                 modifier = Modifier
@@ -133,14 +132,6 @@ fun AnimatedBottomNavigationBar(
                         )
                     }
                 }
-
-                // Дополнительное пространство внизу для безопасной области
-                Spacer(
-                    modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
-                        .height(16.dp)
-                )
             }
         }
     }
@@ -163,37 +154,35 @@ private fun NavButton(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier.padding(8.dp)
     ) {
         if (isMain) {
             FilledIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(84.dp)
+                modifier = Modifier.size(64.dp)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = text,
-                    modifier = Modifier.size(38.dp)
+                    modifier = Modifier.size(30.dp)
                 )
             }
         } else {
             FilledTonalIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(72.dp)
+                modifier = Modifier.size(48.dp)
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = text,
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(30.dp)
                 )
             }
         }
 
-        Spacer(modifier = Modifier.height(12.dp))
-        
+
         Text(
             text = text,
-            fontSize = 16.sp,
+            fontSize = 14.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
             color = MaterialTheme.colorScheme.onSurface,

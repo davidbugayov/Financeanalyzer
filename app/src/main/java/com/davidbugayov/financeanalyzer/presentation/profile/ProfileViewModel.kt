@@ -208,15 +208,15 @@ class ProfileViewModel(
             _state.update { it.copy(isExporting = true) }
             
             try {
-                // Создаем директорию для экспорта
-                val directory = context.getExternalFilesDir(null) ?: context.filesDir
-                
-                val result = exportTransactionsToCSVUseCase(directory)
+                // Запускаем экспорт, передавая контекст приложения
+                val result = exportTransactionsToCSVUseCase(context)
                 result.collect { exportResult ->
                     if (exportResult.isSuccess) {
+                        val filePath = exportResult.getOrNull() ?: ""
                         _state.update { it.copy(
                             isExporting = false,
-                            exportSuccess = context.getString(R.string.export_success)
+                            exportSuccess = context.getString(R.string.export_success) +
+                                    "\nФайл сохранен: $filePath"
                         ) }
                     } else {
                         _state.update { it.copy(

@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountCircle
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -24,21 +24,16 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.Tab
-import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -48,7 +43,6 @@ import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.components.AnalyticsSection
 import com.davidbugayov.financeanalyzer.presentation.profile.components.AppInfoSection
-import com.davidbugayov.financeanalyzer.presentation.profile.components.FinancialGoalsList
 import com.davidbugayov.financeanalyzer.presentation.profile.components.NotificationSettingsDialog
 import com.davidbugayov.financeanalyzer.presentation.profile.components.SettingsSection
 import com.davidbugayov.financeanalyzer.presentation.profile.components.ThemeSelectionDialog
@@ -56,7 +50,6 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -74,18 +67,6 @@ fun ProfileScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
-    var selectedTabIndex by remember { mutableIntStateOf(0) }
-    val view = LocalView.current
-
-    // Устанавливаем темные иконки в статус-баре
-    LaunchedEffect(state.themeMode) {
-        val window = (view.context as? Activity)?.window
-        if (window != null) {
-            WindowCompat.setDecorFitsSystemWindows(window, false)
-            val controller = WindowCompat.getInsetsController(window, window.decorView)
-            controller.isAppearanceLightStatusBars = state.themeMode == ThemeMode.LIGHT
-        }
-    }
 
     // Получаем информацию о версии приложения
     val packageInfo = remember {
@@ -98,12 +79,6 @@ fun ProfileScreen(
     
     val appVersion = remember { packageInfo?.versionName ?: "Unknown" }
     val buildVersion = remember { BuildConfig.VERSION_CODE.toString() }
-    
-    // Вкладки для финансовых целей
-    val tabs = listOf(
-        stringResource(R.string.active_goals),
-        stringResource(R.string.completed_goals)
-    )
 
     // Логируем открытие экрана профиля
     LaunchedEffect(Unit) {
@@ -111,6 +86,16 @@ fun ProfileScreen(
             screenName = "profile",
             screenClass = "ProfileScreen"
         )
+    }
+
+    // Устанавливаем темные иконки в статус-баре
+    LaunchedEffect(state.themeMode) {
+        val window = (context as? Activity)?.window
+        if (window != null) {
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            val controller = WindowCompat.getInsetsController(window, window.decorView)
+            controller.isAppearanceLightStatusBars = state.themeMode == ThemeMode.LIGHT
+        }
     }
 
     // Обновляем UI при изменении темы
@@ -141,11 +126,11 @@ fun ProfileScreen(
                             fontWeight = FontWeight.Medium
                         )
                     },
-                    actions = {
-                        IconButton(onClick = { /* Переход к профилю */ }) {
+                    navigationIcon = {
+                        IconButton(onClick = onNavigateBack) {
                             Icon(
-                                imageVector = Icons.Default.AccountCircle,
-                                contentDescription = stringResource(R.string.profile)
+                                imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                                contentDescription = stringResource(R.string.navigation_back)
                             )
                         }
                     }
@@ -176,10 +161,7 @@ fun ProfileScreen(
                     onThemeClick = { viewModel.onEvent(ProfileEvent.ShowThemeDialog) },
                     onLanguageClick = { /* Открыть диалог выбора языка */ },
                     onCurrencyClick = { /* Открыть диалог выбора валюты */ },
-                    onNotificationsClick = { /* Открыть настройки уведомлений */ },
                     onTransactionReminderClick = { viewModel.onEvent(ProfileEvent.ShowNotificationSettingsDialog) },
-                    onSecurityClick = { /* Открыть настройки безопасности */ },
-                    onAdvancedSettingsClick = { /* Открыть расширенные настройки */ },
                     themeMode = state.themeMode,
                     isTransactionReminderEnabled = state.isTransactionReminderEnabled,
                     transactionReminderTime = state.transactionReminderTime,
@@ -201,13 +183,7 @@ fun ProfileScreen(
                 // Кнопка экспорта данных в CSV
                 Button(
                     onClick = {
-                        // Проверяем разрешения перед экспортом
-                        if (PermissionUtils.hasStoragePermission(context)) {
-                            viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV, context)
-                        } else {
-                            // Запрашиваем разрешение
-                            // Обработка будет в RequestStoragePermission
-                        }
+                        viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV, context)
                     },
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
@@ -232,18 +208,6 @@ fun ProfileScreen(
                     Text(text = stringResource(R.string.export_to_csv))
                 }
 
-                // Запрашиваем разрешение на запись во внешнее хранилище
-                PermissionUtils.RequestStoragePermission(
-                    onPermissionGranted = {
-                        // Разрешение получено, можно экспортировать
-                    },
-                    onPermissionDenied = {
-                        // Вместо прямого вызова showSnackbar, устанавливаем состояние
-                        // и показываем сообщение через LaunchedEffect выше
-                        viewModel.onEvent(ProfileEvent.SetExportError("Для экспорта данных необходимо разрешение на запись файлов"))
-                    }
-                )
-
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
@@ -257,78 +221,38 @@ fun ProfileScreen(
 
                 HorizontalDivider(modifier = Modifier.padding(horizontal = 16.dp))
 
-                // Секция финансовых целей
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
-                ) {
-                    Text(
-                        text = stringResource(R.string.financial_goals),
-                        style = MaterialTheme.typography.titleLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    TabRow(
-                        selectedTabIndex = selectedTabIndex,
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        tabs.forEachIndexed { index, title ->
-                            Tab(
-                                selected = selectedTabIndex == index,
-                                onClick = { selectedTabIndex = index },
-                                text = { Text(text = title) }
+                // Диалог выбора темы
+                if (state.isEditingTheme) {
+                    ThemeSelectionDialog(
+                        selectedTheme = state.themeMode,
+                        onThemeSelected = { theme ->
+                            viewModel.onEvent(
+                                ProfileEvent.ChangeTheme(
+                                    theme
+                                )
                             )
-                        }
-                    }
+                        },
+                        onDismiss = { viewModel.onEvent(ProfileEvent.HideThemeDialog) }
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(16.dp))
-
-                    when (selectedTabIndex) {
-                        0 -> FinancialGoalsList(
-                            goals = state.activeGoals,
-                            onGoalClick = { goal -> viewModel.onEvent(ProfileEvent.SelectGoal(goal.id)) },
-                            onAddGoalClick = { viewModel.onEvent(ProfileEvent.ShowAddGoalDialog) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        1 -> FinancialGoalsList(
-                            goals = state.completedGoals,
-                            onGoalClick = { goal -> viewModel.onEvent(ProfileEvent.SelectGoal(goal.id)) },
-                            onAddGoalClick = { viewModel.onEvent(ProfileEvent.ShowAddGoalDialog) },
-                            modifier = Modifier.fillMaxWidth()
-                        )
-                    }
+                // Диалог настроек уведомлений
+                if (state.isEditingNotifications) {
+                    NotificationSettingsDialog(
+                        isEnabled = state.isTransactionReminderEnabled,
+                        reminderTime = state.transactionReminderTime,
+                        onSave = { isEnabled, time ->
+                            viewModel.onEvent(
+                                ProfileEvent.UpdateTransactionReminder(
+                                    isEnabled,
+                                    time
+                                ), context
+                            )
+                        },
+                        onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) }
+                    )
                 }
             }
-        }
-
-        // Диалог выбора темы
-        if (state.isEditingTheme) {
-            ThemeSelectionDialog(
-                selectedTheme = state.themeMode,
-                onThemeSelected = { theme -> viewModel.onEvent(ProfileEvent.ChangeTheme(theme)) },
-                onDismiss = { viewModel.onEvent(ProfileEvent.HideThemeDialog) }
-            )
-        }
-
-        // Диалог настроек уведомлений
-        if (state.isEditingNotifications) {
-            NotificationSettingsDialog(
-                isEnabled = state.isTransactionReminderEnabled,
-                reminderTime = state.transactionReminderTime,
-                onSave = { isEnabled, time ->
-                    viewModel.onEvent(
-                        ProfileEvent.UpdateTransactionReminder(
-                            isEnabled,
-                            time
-                        ), context
-                    )
-                },
-                onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) }
-            )
         }
     }
 } 
