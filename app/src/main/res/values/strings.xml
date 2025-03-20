@@ -239,6 +239,18 @@
     <string name="expenses">Расходы</string>
     <string name="cannot_delete_default_category">Нельзя удалить стандартную категорию "%1$s"</string>
 
+    <!-- Добавленные строковые ресурсы для мультивыбора категорий -->
+    <string name="clear_selection">Сбросить выбор</string>
+    <string name="category_select_multiple">Выберите категории</string>
+    <string name="category_select_prompt">Можно выбрать несколько категорий</string>
+    <string name="select_all_categories">Выбрать все категории</string>
+
+    <!-- Добавленные строковые ресурсы для выбора источников -->
+    <string name="select_sources">Выбрать источники</string>
+    <string name="select_all_sources">Выбрать все источники</string>
+    <string name="all_sources">Все источники</string>
+    <string name="sources">Источники</string>
+
     <!-- Источники средств -->
     <string name="source">Откуда</string>
     <string name="source_name">Название источника</string>

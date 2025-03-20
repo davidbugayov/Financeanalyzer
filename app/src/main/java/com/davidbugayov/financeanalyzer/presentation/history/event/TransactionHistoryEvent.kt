@@ -13,7 +13,8 @@ sealed class TransactionHistoryEvent {
 
     data class SetGroupingType(val type: GroupingType) : TransactionHistoryEvent()
     data class SetPeriodType(val type: PeriodType) : TransactionHistoryEvent()
-    data class SetCategory(val category: String?) : TransactionHistoryEvent()
+    data class SetCategories(val categories: List<String>) : TransactionHistoryEvent()
+    data class SetSources(val sources: List<String>) : TransactionHistoryEvent()
     data class SetDateRange(val startDate: Date, val endDate: Date) : TransactionHistoryEvent()
     data class SetStartDate(val date: Date) : TransactionHistoryEvent()
     data class SetEndDate(val date: Date) : TransactionHistoryEvent()
@@ -34,6 +35,8 @@ sealed class TransactionHistoryEvent {
     data object HidePeriodDialog : TransactionHistoryEvent()
     data object ShowCategoryDialog : TransactionHistoryEvent()
     data object HideCategoryDialog : TransactionHistoryEvent()
+    data object ShowSourceDialog : TransactionHistoryEvent()
+    data object HideSourceDialog : TransactionHistoryEvent()
     data object ShowStartDatePicker : TransactionHistoryEvent()
     data object HideStartDatePicker : TransactionHistoryEvent()
     data object ShowEndDatePicker : TransactionHistoryEvent()

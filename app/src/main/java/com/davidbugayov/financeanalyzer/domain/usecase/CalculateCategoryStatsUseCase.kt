@@ -20,7 +20,7 @@ class CalculateCategoryStatsUseCase(
      */
     operator fun invoke(
         transactions: List<Transaction>,
-        category: String,
+        categories: List<String>,
         periodType: PeriodType,
         startDate: Date,
         endDate: Date
@@ -31,7 +31,7 @@ class CalculateCategoryStatsUseCase(
             periodType = periodType,
             startDate = startDate,
             endDate = endDate,
-            category = category
+            categories = categories
         )
         val currentPeriodTotalDouble = currentPeriodTransactions
             .map { it.amount }
@@ -50,7 +50,7 @@ class CalculateCategoryStatsUseCase(
             periodType = PeriodType.CUSTOM,
             startDate = previousStartDate,
             endDate = previousEndDate,
-            category = category
+            categories = categories
         )
         val previousPeriodTotalDouble = previousPeriodTransactions
             .map { it.amount }

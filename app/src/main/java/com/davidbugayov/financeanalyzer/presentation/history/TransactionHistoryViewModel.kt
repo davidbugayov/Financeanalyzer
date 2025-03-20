@@ -64,7 +64,8 @@ class TransactionHistoryViewModel @Inject constructor(
             is TransactionHistoryEvent.DeleteTransaction -> deleteTransaction(event.transaction)
             is TransactionHistoryEvent.SetGroupingType -> updateGroupingType(event.type)
             is TransactionHistoryEvent.SetPeriodType -> updatePeriodType(event.type)
-            is TransactionHistoryEvent.SetCategory -> updateCategory(event.category)
+            is TransactionHistoryEvent.SetCategories -> updateCategories(event.categories)
+            is TransactionHistoryEvent.SetSources -> updateSources(event.sources)
             is TransactionHistoryEvent.SetDateRange -> updateDateRange(event.startDate, event.endDate)
             is TransactionHistoryEvent.SetStartDate -> updateStartDate(event.date)
             is TransactionHistoryEvent.SetEndDate -> updateEndDate(event.date)
@@ -78,6 +79,8 @@ class TransactionHistoryViewModel @Inject constructor(
             is TransactionHistoryEvent.HidePeriodDialog -> hidePeriodDialog()
             is TransactionHistoryEvent.ShowCategoryDialog -> showCategoryDialog()
             is TransactionHistoryEvent.HideCategoryDialog -> hideCategoryDialog()
+            is TransactionHistoryEvent.ShowSourceDialog -> showSourceDialog()
+            is TransactionHistoryEvent.HideSourceDialog -> hideSourceDialog()
             is TransactionHistoryEvent.ShowStartDatePicker -> showStartDatePicker()
             is TransactionHistoryEvent.HideStartDatePicker -> hideStartDatePicker()
             is TransactionHistoryEvent.ShowEndDatePicker -> showEndDatePicker()
@@ -130,7 +133,8 @@ class TransactionHistoryViewModel @Inject constructor(
                 periodType = currentState.periodType,
                 startDate = currentState.startDate,
                 endDate = currentState.endDate,
-                category = currentState.selectedCategory
+                categories = currentState.selectedCategories,
+                sources = currentState.selectedSources
             )
             _state.update {
                 it.copy(
@@ -162,9 +166,10 @@ class TransactionHistoryViewModel @Inject constructor(
     private fun updateCategoryStats() {
         viewModelScope.launch {
             val currentState = _state.value
+
             val categoryStats = calculateCategoryStatsUseCase(
                 transactions = currentState.filteredTransactions,
-                category = currentState.selectedCategory ?: "",
+                categories = currentState.selectedCategories,
                 periodType = currentState.periodType,
                 startDate = currentState.startDate,
                 endDate = currentState.endDate
@@ -188,8 +193,13 @@ class TransactionHistoryViewModel @Inject constructor(
         updateGroupedTransactions()
     }
 
-    private fun updateCategory(category: String?) {
-        _state.update { it.copy(selectedCategory = category) }
+    private fun updateCategories(categories: List<String>) {
+        _state.update { it.copy(selectedCategories = categories) }
+        updateFilteredTransactions()
+    }
+
+    private fun updateSources(sources: List<String>) {
+        _state.update { it.copy(selectedSources = sources) }
         updateFilteredTransactions()
     }
 
@@ -259,6 +269,14 @@ class TransactionHistoryViewModel @Inject constructor(
 
     private fun hideCategoryDialog() {
         _state.update { it.copy(showCategoryDialog = false) }
+    }
+
+    private fun showSourceDialog() {
+        _state.update { it.copy(showSourceDialog = true) }
+    }
+
+    private fun hideSourceDialog() {
+        _state.update { it.copy(showSourceDialog = false) }
     }
 
     private fun showStartDatePicker() {
