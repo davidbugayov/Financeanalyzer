@@ -29,9 +29,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 
 /**
@@ -86,14 +88,14 @@ fun NotificationSettingsDialog(
                 showSettingsDialog = false
                 notificationsEnabled = false
             },
-            title = { Text("Разрешение отклонено") },
-            text = { Text("Для работы напоминаний необходимо разрешение на уведомления. Вы можете включить их в настройках приложения.") },
+            title = { Text(stringResource(R.string.permission_denied)) },
+            text = { Text(stringResource(R.string.notification_permission_settings_message)) },
             confirmButton = {
                 Button(onClick = {
                     PermissionUtils.openNotificationSettings(context)
                     showSettingsDialog = false
                 }) {
-                    Text("Открыть настройки")
+                    Text(stringResource(R.string.open_settings))
                 }
             },
             dismissButton = {
@@ -101,7 +103,7 @@ fun NotificationSettingsDialog(
                     showSettingsDialog = false
                     notificationsEnabled = false
                 }) {
-                    Text("Отмена")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -114,8 +116,8 @@ fun NotificationSettingsDialog(
                 showPermissionDialog = false
                 notificationsEnabled = false
             },
-            title = { Text("Требуется разрешение") },
-            text = { Text("Для отправки напоминаний о транзакциях необходимо разрешение на уведомления.") },
+            title = { Text(stringResource(R.string.permission_required)) },
+            text = { Text(stringResource(R.string.notification_permission_message)) },
             confirmButton = {
                 Button(onClick = {
                     showPermissionDialog = false
@@ -124,7 +126,7 @@ fun NotificationSettingsDialog(
                         permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
                     }
                 }) {
-                    Text("Запросить разрешение")
+                    Text(stringResource(R.string.request_permission))
                 }
             },
             dismissButton = {
@@ -132,7 +134,7 @@ fun NotificationSettingsDialog(
                     showPermissionDialog = false
                     notificationsEnabled = false
                 }) {
-                    Text("Отмена")
+                    Text(stringResource(R.string.cancel))
                 }
             }
         )
@@ -142,20 +144,20 @@ fun NotificationSettingsDialog(
         Card(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.spacing_normal))
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(dimensionResource(R.dimen.spacing_normal))
             ) {
                 Text(
-                    text = "Настройка напоминаний",
+                    text = stringResource(R.string.transaction_reminder_settings),
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold
                 )
-                
-                Spacer(modifier = Modifier.height(24.dp))
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxlarge)))
                 
                 // Переключатель включения/выключения уведомлений
                 Row(
@@ -163,7 +165,7 @@ fun NotificationSettingsDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = "Напоминания о транзакциях",
+                        text = stringResource(R.string.transaction_reminders),
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier.weight(1f)
                     )
@@ -180,18 +182,18 @@ fun NotificationSettingsDialog(
                         }
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(16.dp))
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
                 
                 if (notificationsEnabled) {
                     if (hasNotificationPermission) {
                         // Если разрешения есть, показываем настройки времени
                         Text(
-                            text = "Выберите время напоминания:",
+                            text = stringResource(R.string.select_reminder_time),
                             style = MaterialTheme.typography.bodyMedium
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                         // Выбор времени
                         TimeInput(
@@ -199,36 +201,35 @@ fun NotificationSettingsDialog(
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                         // Отображение выбранного времени
                         Text(
-                            text = "Выбранное время: ${timePickerState.hour}:${
-                                String.format(
-                                    "%02d",
-                                    timePickerState.minute
-                                )
-                            }",
+                            text = stringResource(
+                                R.string.selected_time,
+                                timePickerState.hour,
+                                String.format("%02d", timePickerState.minute)
+                            ),
                             style = MaterialTheme.typography.bodyMedium,
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         )
 
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                         Text(
-                            text = "Вы будете получать ежедневные напоминания о необходимости внести транзакции в указанное время.",
+                            text = stringResource(R.string.reminder_description),
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     } else {
                         // Если разрешений нет, показываем сообщение и кнопку для запроса разрешений
                         Text(
-                            text = "Для отправки напоминаний необходимо разрешение на уведомления.",
+                            text = stringResource(R.string.notification_permission_required),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.error
                         )
 
-                        Spacer(modifier = Modifier.height(16.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
 
                         Button(
                             onClick = {
@@ -238,7 +239,7 @@ fun NotificationSettingsDialog(
                             },
                             modifier = Modifier.align(Alignment.CenterHorizontally)
                         ) {
-                            Text("Запросить разрешение")
+                            Text(stringResource(R.string.request_permission))
                         }
 
                         // Проверяем состояние разрешения при активации экрана и при возвращении фокуса
@@ -248,41 +249,39 @@ fun NotificationSettingsDialog(
                         }
                     }
                 } else {
+                    // Текст-подсказка, если уведомления отключены
                     Text(
-                        text = "Напоминания отключены. Включите их, чтобы не забывать вносить транзакции.",
+                        text = stringResource(R.string.notifications_disabled_message),
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
-                Spacer(modifier = Modifier.height(24.dp))
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
                 
                 // Кнопки действий
-                Button(
-                    onClick = {
-                        val time = if (notificationsEnabled && hasNotificationPermission) {
-                            Pair(timePickerState.hour, timePickerState.minute)
-                        } else {
-                            null
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End
+                ) {
+                    TextButton(
+                        onClick = onDismiss
+                    ) {
+                        Text(stringResource(R.string.cancel))
+                    }
+
+                    Button(
+                        onClick = {
+                            val time = if (notificationsEnabled) {
+                                Pair(timePickerState.hour, timePickerState.minute)
+                            } else {
+                                null
+                            }
+                            onSave(notificationsEnabled, time)
                         }
-                        onSave(notificationsEnabled && hasNotificationPermission, time)
-                    },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Text("Сохранить")
-                }
-                
-                Spacer(modifier = Modifier.height(8.dp))
-                
-                TextButton(
-                    onClick = onDismiss,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.CenterHorizontally)
-                ) {
-                    Text("Отмена")
+                    ) {
+                        Text(stringResource(R.string.save))
+                    }
                 }
             }
         }

@@ -17,8 +17,10 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
-import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
 /**
@@ -35,7 +37,7 @@ fun ThemeSelectionDialog(
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = "Выберите тему") },
+        title = { Text(text = stringResource(R.string.profile_theme_select)) },
         text = {
             Column(
                 modifier = Modifier
@@ -43,29 +45,29 @@ fun ThemeSelectionDialog(
                     .selectableGroup()
             ) {
                 ThemeOption(
-                    text = "Светлая",
+                    text = stringResource(R.string.profile_theme_light),
                     selected = selectedTheme == ThemeMode.LIGHT,
                     onClick = { 
                         onThemeSelected(ThemeMode.LIGHT)
                         onDismiss()
                     }
                 )
-                
-                Spacer(modifier = Modifier.height(8.dp))
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 
                 ThemeOption(
-                    text = "Темная",
+                    text = stringResource(R.string.profile_theme_dark),
                     selected = selectedTheme == ThemeMode.DARK,
                     onClick = { 
                         onThemeSelected(ThemeMode.DARK)
                         onDismiss()
                     }
                 )
-                
-                Spacer(modifier = Modifier.height(8.dp))
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 
                 ThemeOption(
-                    text = "Системная",
+                    text = stringResource(R.string.profile_theme_system),
                     selected = selectedTheme == ThemeMode.SYSTEM,
                     onClick = { 
                         onThemeSelected(ThemeMode.SYSTEM)
@@ -76,7 +78,7 @@ fun ThemeSelectionDialog(
         },
         confirmButton = {
             TextButton(onClick = onDismiss) {
-                Text("Готово")
+                Text(stringResource(R.string.done))
             }
         }
     )
@@ -102,15 +104,15 @@ private fun ThemeOption(
                 onClick = onClick,
                 role = Role.RadioButton
             )
-            .padding(vertical = 8.dp),
+            .padding(dimensionResource(R.dimen.spacing_medium)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
             selected = selected,
-            onClick = null // null because we're handling the click on the row
+            onClick = null // null, так как обработка происходит внутри Row
         )
-        
-        Spacer(modifier = Modifier.width(8.dp))
+
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
         
         Text(
             text = text,

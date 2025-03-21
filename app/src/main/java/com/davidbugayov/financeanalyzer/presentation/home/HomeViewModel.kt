@@ -207,7 +207,7 @@ class HomeViewModel(
     private fun generateAndSaveTestData() {
         viewModelScope.launch {
             Timber.d("Generating test data")
-            val testTransactions = TestDataGenerator.generateTransactions(20)
+            val testTransactions = TestDataGenerator.generateTransactions(500)
 
             var hasError = false
             testTransactions.forEach { transaction ->

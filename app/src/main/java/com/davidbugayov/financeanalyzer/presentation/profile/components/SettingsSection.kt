@@ -26,8 +26,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
@@ -55,19 +55,19 @@ fun SettingsSection(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.profile_section_padding))
         ) {
             Text(
-                text = "Настройки",
+                text = stringResource(R.string.profile_settings_title),
                 style = MaterialTheme.typography.titleLarge
             )
-            
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
             
             // Настройка темы
             SettingsItem(
@@ -84,8 +84,8 @@ fun SettingsSection(
                 },
                 onClick = onThemeClick
             )
-            
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Настройка языка
             SettingsItem(
@@ -94,28 +94,28 @@ fun SettingsSection(
                 subtitle = "Русский",
                 onClick = onLanguageClick
             )
-            
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Настройка валюты
             SettingsItem(
                 icon = Icons.Default.Payments,
-                title = "Валюта по умолчанию",
+                title = stringResource(R.string.profile_currency_title),
                 subtitle = "Рубль (₽)",
                 onClick = onCurrencyClick
             )
-            
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Настройка напоминаний о транзакциях
             SettingsItem(
                 icon = Icons.Default.Timer,
-                title = stringResource(R.string.transaction_reminders),
+                title = stringResource(R.string.profile_transaction_reminders_title),
                 subtitle = if (isTransactionReminderEnabled && transactionReminderTime != null) {
                     val (hour, minute) = transactionReminderTime
                     "Ежедневно в ${hour}:${String.format("%02d", minute)}"
                 } else {
-                    "Отключено"
+                    stringResource(R.string.off)
                 },
                 onClick = onTransactionReminderClick
             )
@@ -144,17 +144,17 @@ fun SettingsItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(vertical = dimensionResource(R.dimen.spacing_normal)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(dimensionResource(R.dimen.profile_item_icon_size)),
             tint = MaterialTheme.colorScheme.primary
         )
-        
-        Spacer(modifier = Modifier.width(16.dp))
+
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_normal)))
         
         Column(
             modifier = Modifier.weight(1f)
@@ -165,7 +165,7 @@ fun SettingsItem(
             )
             
             if (subtitle != null) {
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxsmall)))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyMedium,

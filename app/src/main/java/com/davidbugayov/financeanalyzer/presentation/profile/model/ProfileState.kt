@@ -1,7 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.model
 
-import com.davidbugayov.financeanalyzer.domain.model.FinancialGoal
-
 /**
  * Состояние экрана профиля.
  * Следует принципам MVI (Model-View-Intent).
@@ -14,15 +12,6 @@ data class ProfileState(
     val exportSuccess: String? = null,
     val exportError: String? = null,
     val isExporting: Boolean = false,
-    
-    // Финансовые цели
-    val financialGoals: List<FinancialGoal> = emptyList(),
-    val activeGoals: List<FinancialGoal> = emptyList(),
-    val completedGoals: List<FinancialGoal> = emptyList(),
-    val selectedGoal: FinancialGoal? = null,
-    val isAddingGoal: Boolean = false,
-    val isEditingGoal: Boolean = false,
-    val goalError: String? = null,
     
     // Настройки приложения
     val themeMode: ThemeMode = ThemeMode.SYSTEM,

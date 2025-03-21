@@ -35,14 +35,12 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
  * @param sources Список всех доступных источников
  * @param onSourcesSelected Callback, вызываемый при выборе источников
  * @param onDismiss Callback, вызываемый при закрытии диалога
- * @param onSourceDelete Callback, вызываемый при удалении источника
  */
 @Composable
 fun SourceSelectionDialog(
     sources: List<Source>,
     selectedSources: List<String>,
     onSourcesSelected: (List<String>) -> Unit,
-    onSourceDelete: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
     var localSelectedSources by remember { mutableStateOf(selectedSources) }
@@ -138,7 +136,6 @@ fun SourceSelectionDialog(
  * @param color Цвет источника
  * @param isSelected Выбран ли источник
  * @param onToggle Callback, вызываемый при выборе/отмене выбора источника
- * @param onLongClick Callback, вызываемый при долгом нажатии на источник
  */
 @Composable
 private fun SourceCheckboxItem(

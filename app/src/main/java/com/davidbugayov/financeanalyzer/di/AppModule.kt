@@ -3,18 +3,12 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
-import com.davidbugayov.financeanalyzer.data.repository.FinancialGoalRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
-import com.davidbugayov.financeanalyzer.domain.repository.FinancialGoalRepository
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.GetFinancialGoalsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.ManageFinancialGoalUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
@@ -36,7 +30,6 @@ val appModule = module {
     // Database
     single { AppDatabase.getInstance(androidContext()) }
     single { get<AppDatabase>().transactionDao() }
-    single { get<AppDatabase>().financialGoalDao() }
 
     // Preferences
     single { CategoryPreferences.getInstance(androidContext()) }
@@ -51,16 +44,11 @@ val appModule = module {
     single<TransactionRepositoryImpl> { TransactionRepositoryImpl(get()) }
     single<TransactionRepository> { get<TransactionRepositoryImpl>() }
     single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
-    single<FinancialGoalRepository> { FinancialGoalRepositoryImpl(get()) }
 
     // Use cases
     single { LoadTransactionsUseCase(get()) }
     single { AddTransactionUseCase(get()) }
     single { DeleteTransactionUseCase(get()) }
-    single { UpdateTransactionUseCase(get()) }
-    factory { ExportTransactionsToCSVUseCase(get()) }
-    factory { GetFinancialGoalsUseCase(get()) }
-    factory { ManageFinancialGoalUseCase(get()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
@@ -76,8 +64,6 @@ val appModule = module {
     viewModel {
         ProfileViewModel(
             exportTransactionsToCSVUseCase = get(),
-            getFinancialGoalsUseCase = get(),
-            manageFinancialGoalUseCase = get(),
             loadTransactionsUseCase = get(),
             notificationScheduler = get(),
             preferencesManager = get()

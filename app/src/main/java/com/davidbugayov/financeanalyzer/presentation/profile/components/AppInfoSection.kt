@@ -23,8 +23,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 
 /**
  * Компонент для отображения информации о приложении.
@@ -42,58 +44,58 @@ fun AppInfoSection(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.profile_section_padding))
         ) {
             Text(
-                text = "О приложении",
+                text = stringResource(R.string.app_info),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold
             )
-            
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
             
             // Версия приложения
             AppInfoItem(
                 icon = Icons.Default.Info,
-                title = "Версия приложения",
+                title = stringResource(R.string.app_version),
                 value = appVersion
             )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Версия сборки
             AppInfoItem(
                 icon = Icons.Default.Update,
-                title = "Версия кода",
+                title = stringResource(R.string.build_version),
                 value = buildVersion
             )
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Используемые библиотеки
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onLibrariesClick)
-                    .padding(vertical = 12.dp),
+                    .padding(vertical = dimensionResource(R.dimen.spacing_normal)),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.List,
                     contentDescription = null,
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(dimensionResource(R.dimen.profile_item_icon_size)),
                     tint = MaterialTheme.colorScheme.primary
                 )
-                
-                Spacer(modifier = Modifier.width(16.dp))
+
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_normal)))
                 
                 Text(
-                    text = "Используемые библиотеки",
+                    text = stringResource(R.string.libraries),
                     style = MaterialTheme.typography.bodyLarge
                 )
             }
@@ -116,17 +118,17 @@ private fun AppInfoItem(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(24.dp),
+            modifier = Modifier.size(dimensionResource(R.dimen.profile_item_icon_size)),
             tint = MaterialTheme.colorScheme.primary
         )
-        
-        Spacer(modifier = Modifier.width(16.dp))
+
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_normal)))
         
         Column {
             Text(

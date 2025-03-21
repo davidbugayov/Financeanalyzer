@@ -146,15 +146,6 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
-            },
-            onCategoryDelete = { category, isExpense ->
-                viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
-                viewModel.onEvent(
-                    TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog(
-                        category,
-                        isExpense
-                    )
-                )
             }
         )
     }
@@ -210,10 +201,6 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
-            },
-            onSourceDelete = { source ->
-                viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
-                viewModel.onEvent(TransactionHistoryEvent.ShowDeleteSourceConfirmDialog(source))
             }
         )
     }

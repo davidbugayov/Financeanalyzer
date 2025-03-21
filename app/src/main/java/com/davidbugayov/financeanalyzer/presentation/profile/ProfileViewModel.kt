@@ -4,11 +4,8 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.FinancialGoal
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.GetFinancialGoalsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.ManageFinancialGoalUseCase
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
@@ -27,8 +24,6 @@ import kotlinx.coroutines.launch
  */
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
-    private val getFinancialGoalsUseCase: GetFinancialGoalsUseCase,
-    private val manageFinancialGoalUseCase: ManageFinancialGoalUseCase,
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
     private val notificationScheduler: NotificationScheduler,
     private val preferencesManager: PreferencesManager
@@ -38,18 +33,15 @@ class ProfileViewModel(
     val state: StateFlow<ProfileState> = _state.asStateFlow()
 
     // Отдельный StateFlow для темы, который можно наблюдать из MainScreen
-    private val _themeMode = MutableStateFlow<ThemeMode>(ThemeMode.SYSTEM)
+    private val _themeMode = MutableStateFlow(ThemeMode.SYSTEM)
     val themeMode: StateFlow<ThemeMode> = _themeMode
 
     init {
-        // Загружаем финансовые цели при инициализации
-        loadFinancialGoals()
-        
         // Загружаем настройки уведомлений
         loadNotificationSettings()
         
         // Загружаем финансовую статистику
-        loadFinancialStatistics()
+        loadFinancialAnalytics()
         
         // Инициализируем тему из настроек
         val savedTheme = preferencesManager.getThemeMode()
@@ -77,9 +69,6 @@ class ProfileViewModel(
                 _state.update { it.copy(
                     exportError = event.message
                 ) }
-            }
-            is ProfileEvent.ShowAddGoalDialog -> {
-                _state.update { it.copy(isAddingGoal = true, isEditingGoal = false, selectedGoal = null) }
             }
             is ProfileEvent.ChangeTheme -> {
                 viewModelScope.launch {
@@ -118,44 +107,6 @@ class ProfileViewModel(
                 // Это событие будет обрабатываться в ProfileScreen
                 // через переданный колбэк onNavigateToLibraries
                 logLibrariesNavigation()
-            }
-            
-            // События финансовых целей
-            is ProfileEvent.LoadFinancialGoals -> {
-                loadFinancialGoals()
-            }
-            is ProfileEvent.SelectGoal -> {
-                selectGoal(event.goalId)
-            }
-            is ProfileEvent.ShowEditGoalDialog -> {
-                viewModelScope.launch {
-                    manageFinancialGoalUseCase.getGoalById(event.goalId).collect { goal ->
-                        goal?.let {
-                            _state.update { state ->
-                                state.copy(
-                                    isEditingGoal = true,
-                                    isAddingGoal = false,
-                                    selectedGoal = it
-                                )
-                            }
-                        }
-                    }
-                }
-            }
-            is ProfileEvent.HideGoalDialog -> {
-                _state.update { it.copy(isAddingGoal = false, isEditingGoal = false, selectedGoal = null, goalError = null) }
-            }
-            is ProfileEvent.AddGoal -> {
-                addGoal(event.goal)
-            }
-            is ProfileEvent.UpdateGoal -> {
-                updateGoal(event.goal)
-            }
-            is ProfileEvent.DeleteGoal -> {
-                deleteGoal(event.goalId)
-            }
-            is ProfileEvent.AddAmountToGoal -> {
-                addAmountToGoal(event.goalId, event.amount)
             }
             
             // События настроек
@@ -235,34 +186,6 @@ class ProfileViewModel(
     }
 
     /**
-     * Загрузка финансовых целей.
-     */
-    private fun loadFinancialGoals() {
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            
-            try {
-                getFinancialGoalsUseCase().collect { goals ->
-                    val activeGoals = goals.filter { !it.isCompleted }
-                    val completedGoals = goals.filter { it.isCompleted }
-                    
-                    _state.update { it.copy(
-                        isLoading = false,
-                        financialGoals = goals,
-                        activeGoals = activeGoals,
-                        completedGoals = completedGoals
-                    ) }
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(
-                    isLoading = false,
-                    goalError = e.message
-                ) }
-            }
-        }
-    }
-
-    /**
      * Загрузка настроек уведомлений.
      */
     private fun loadNotificationSettings() {
@@ -303,13 +226,14 @@ class ProfileViewModel(
      * Публичный метод, чтобы можно было обновить статистику после добавления новой транзакции.
      */
     fun updateFinancialStatistics() {
-        loadFinancialStatistics()
+        loadFinancialAnalytics()
     }
 
     /**
-     * Загрузка финансовой статистики на основе реальных данных из базы данных.
+     * Загружает финансовую аналитику из базы данных.
+     * Рассчитывает общий доход, расходы, баланс и норму сбережений.
      */
-    private fun loadFinancialStatistics() {
+    private fun loadFinancialAnalytics() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             
@@ -362,109 +286,6 @@ class ProfileViewModel(
                     }
                 }
             }
-        }
-    }
-
-    /**
-     * Выбирает финансовую цель по идентификатору.
-     * @param goalId Идентификатор цели
-     */
-    private fun selectGoal(goalId: String) {
-        viewModelScope.launch {
-            manageFinancialGoalUseCase.getGoalById(goalId).collect { goal ->
-                goal?.let {
-                    _state.update { state -> state.copy(selectedGoal = it) }
-                }
-            }
-        }
-    }
-    
-    /**
-     * Добавляет новую финансовую цель.
-     * @param goal Финансовая цель для добавления
-     */
-    private fun addGoal(goal: FinancialGoal) {
-        viewModelScope.launch {
-            try {
-                manageFinancialGoalUseCase.addGoal(goal)
-                _state.update { it.copy(isAddingGoal = false, goalError = null) }
-                loadFinancialGoals()
-            } catch (e: Exception) {
-                _state.update { it.copy(goalError = "Ошибка при добавлении цели: ${e.message}") }
-            }
-        }
-    }
-    
-    /**
-     * Обновляет существующую финансовую цель.
-     * @param goal Финансовая цель для обновления
-     */
-    private fun updateGoal(goal: FinancialGoal) {
-        viewModelScope.launch {
-            try {
-                manageFinancialGoalUseCase.updateGoal(goal)
-                _state.update { it.copy(isEditingGoal = false, goalError = null) }
-                loadFinancialGoals()
-            } catch (e: Exception) {
-                _state.update { it.copy(goalError = "Ошибка при обновлении цели: ${e.message}") }
-            }
-        }
-    }
-    
-    /**
-     * Удаляет финансовую цель.
-     * @param goalId Идентификатор цели для удаления
-     */
-    private fun deleteGoal(goalId: String) {
-        viewModelScope.launch {
-            try {
-                manageFinancialGoalUseCase.deleteGoal(goalId)
-                _state.update { it.copy(selectedGoal = null) }
-                loadFinancialGoals()
-            } catch (e: Exception) {
-                _state.update { it.copy(goalError = "Ошибка при удалении цели: ${e.message}") }
-            }
-        }
-    }
-    
-    /**
-     * Добавляет сумму к текущей сумме финансовой цели.
-     * @param goalId Идентификатор цели
-     * @param amount Сумма для добавления
-     */
-    private fun addAmountToGoal(goalId: String, amount: Double) {
-        viewModelScope.launch {
-            try {
-                manageFinancialGoalUseCase.addAmountToGoal(goalId, amount)
-                loadFinancialGoals()
-                // Обновляем выбранную цель, если она открыта
-                if (_state.value.selectedGoal?.id == goalId) {
-                    selectGoal(goalId)
-                }
-            } catch (e: Exception) {
-                _state.update { it.copy(goalError = "Ошибка при добавлении суммы: ${e.message}") }
-            }
-        }
-    }
-    
-    /**
-     * Загружает финансовую аналитику.
-     */
-    private fun loadFinancialAnalytics() {
-        // В реальном приложении здесь будет вызов соответствующего UseCase
-        // Для демонстрации используем тестовые данные
-        val totalIncome = 210000.0
-        val totalExpense = 160500.0
-        val balance = totalIncome - totalExpense
-        val savingsRate = (balance / totalIncome) * 100
-        
-        _state.update { 
-            it.copy(
-                totalIncome = totalIncome,
-                totalExpense = totalExpense,
-                balance = balance,
-                savingsRate = savingsRate
-            )
         }
     }
 } 

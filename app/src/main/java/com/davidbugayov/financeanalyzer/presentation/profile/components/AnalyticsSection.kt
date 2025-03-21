@@ -28,8 +28,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -70,32 +72,32 @@ fun AnalyticsSection(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp), // Добавляем вертикальный отступ
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp) // Увеличиваем скругление углов
+            .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.spacing_normal))
         ) {
             Text(
-                text = "Финансовая сводка",
+                text = stringResource(R.string.profile_financial_summary),
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = balanceColor // Цвет заголовка соответствует балансу
+                color = balanceColor
             )
-            
-            Spacer(modifier = Modifier.height(20.dp)) // Увеличиваем отступ
-            
-            // Основные показатели
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+
+            // Основные показатели: доходы и расходы
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Доходы
                 AnalyticsCard(
-                    title = "Доходы",
+                    title = stringResource(R.string.income),
                     value = currencyFormat.format(totalIncome),
                     icon = Icons.Default.KeyboardArrowUp,
                     backgroundColor = incomeBackgroundColor,
@@ -103,12 +105,12 @@ fun AnalyticsSection(
                     iconTint = incomeColor,
                     modifier = Modifier.weight(1f)
                 )
-                
-                Spacer(modifier = Modifier.width(12.dp)) // Увеличиваем расстояние между карточками
+
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                 
                 // Расходы
                 AnalyticsCard(
-                    title = "Расходы",
+                    title = stringResource(R.string.expense),
                     value = currencyFormat.format(totalExpense),
                     icon = Icons.Default.KeyboardArrowDown,
                     backgroundColor = expenseBackgroundColor,
@@ -117,60 +119,67 @@ fun AnalyticsSection(
                     modifier = Modifier.weight(1f)
                 )
             }
-            
-            Spacer(modifier = Modifier.height(12.dp)) // Увеличиваем отступ между рядами
-            
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+
+            // Баланс (на всю ширину)
+            AnalyticsCard(
+                title = stringResource(R.string.balance),
+                value = currencyFormat.format(balance),
+                icon = Icons.Default.BarChart,
+                backgroundColor = balanceBackgroundColor,
+                contentColor = Color.Black,
+                iconTint = balanceColor,
+                modifier = Modifier.fillMaxWidth()
+            )
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+
+            // Норма сбережений (отдельно)
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Баланс
+                // Пустой модификатор весом 1f для правильного центрирования
+                Spacer(modifier = Modifier.weight(0.25f))
+
+                // Процент сбережений (по центру с шириной 50%)
                 AnalyticsCard(
-                    title = "Баланс",
-                    value = currencyFormat.format(balance),
-                    icon = Icons.Default.BarChart,
-                    backgroundColor = balanceBackgroundColor,
-                    contentColor = Color.Black,
-                    iconTint = balanceColor,
-                    modifier = Modifier.weight(1f)
-                )
-                
-                Spacer(modifier = Modifier.width(12.dp)) // Увеличиваем расстояние между карточками
-                
-                // Процент сбережений
-                AnalyticsCard(
-                    title = "Сбережения",
+                    title = stringResource(R.string.savings_rate),
                     value = percentFormat.format(savingsRate / 100),
                     icon = if (savingsRate > 0) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
                     backgroundColor = savingsBackgroundColor,
                     contentColor = Color.Black,
                     iconTint = if (savingsRate > 0) incomeColor else expenseColor,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(0.5f)
                 )
+
+                // Пустой модификатор весом 1f для правильного центрирования
+                Spacer(modifier = Modifier.weight(0.25f))
             }
-            
-            Spacer(modifier = Modifier.height(20.dp)) // Увеличиваем отступ
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
             
             // Дополнительная информация с возможностью перехода на экран статистики, без рамки
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(onClick = onNavigateToChart)
-                    .padding(vertical = 4.dp), // Уменьшаем отступ
+                    .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Подробная аналитика доступна в разделе \"Статистика\"",
+                    text = stringResource(R.string.show_summary),
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (isSystemInDarkTheme()) Color(0xFF81CFEF) else MaterialTheme.colorScheme.primary
                 )
                 
                 Icon(
                     imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "Перейти к статистике",
+                    contentDescription = stringResource(R.string.cd_show_statistics),
                     tint = if (isSystemInDarkTheme()) Color(0xFF81CFEF) else MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small))
                 )
             }
         }
@@ -203,12 +212,12 @@ fun AnalyticsCard(
             containerColor = backgroundColor,
             contentColor = contentColor
         ),
-        shape = RoundedCornerShape(12.dp) // Увеличиваем скругление углов карточек
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp) // Увеличиваем внутренние отступы
+                .padding(dimensionResource(R.dimen.spacing_medium))
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -217,26 +226,26 @@ fun AnalyticsCard(
                     imageVector = icon,
                     contentDescription = null,
                     tint = iconTint,
-                    modifier = Modifier.size(22.dp) // Увеличиваем размер иконки
+                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
                 )
-                
-                Spacer(modifier = Modifier.width(8.dp))
+
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                 
                 Text(
                     text = title,
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium,
-                    color = iconTint // Цвет заголовка соответствует цвету иконки
+                    color = iconTint
                 )
             }
-            
-            Spacer(modifier = Modifier.height(10.dp)) // Увеличиваем отступ
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
-                color = iconTint // Цвет значения соответствует цвету иконки
+                color = iconTint
             )
         }
     }

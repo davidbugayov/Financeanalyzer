@@ -130,4 +130,14 @@
     <dimen name="bar_width">24dp</dimen>
     <dimen name="space_between_bars">24dp</dimen>
     <dimen name="legend_icon_size">10dp</dimen>
+
+    <!-- Размеры для профиля -->
+    <dimen name="profile_section_spacing">16dp</dimen>
+    <dimen name="profile_section_padding">16dp</dimen>
+    <dimen name="profile_header_text_size">18sp</dimen>
+    <dimen name="profile_item_height">56dp</dimen>
+    <dimen name="profile_item_icon_size">24dp</dimen>
+    <dimen name="profile_analytics_card_height">120dp</dimen>
+    <dimen name="profile_analytics_item_height">40dp</dimen>
+    <dimen name="profile_export_button_width">80%</dimen>
 </resources> 
