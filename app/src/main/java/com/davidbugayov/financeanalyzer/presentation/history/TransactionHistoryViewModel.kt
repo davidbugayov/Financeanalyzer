@@ -75,6 +75,12 @@ class TransactionHistoryViewModel @Inject constructor(
             is TransactionHistoryEvent.DeleteCategory -> deleteCategory(event.category, event.isExpense)
             is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> showDeleteCategoryConfirmDialog(event.category, event.isExpense)
             is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> hideDeleteCategoryConfirmDialog()
+            is TransactionHistoryEvent.DeleteSource -> deleteSource(event.source)
+            is TransactionHistoryEvent.ShowDeleteSourceConfirmDialog -> showDeleteSourceConfirmDialog(
+                event.source
+            )
+
+            is TransactionHistoryEvent.HideDeleteSourceConfirmDialog -> hideDeleteSourceConfirmDialog()
             is TransactionHistoryEvent.ShowPeriodDialog -> showPeriodDialog()
             is TransactionHistoryEvent.HidePeriodDialog -> hidePeriodDialog()
             is TransactionHistoryEvent.ShowCategoryDialog -> showCategoryDialog()
@@ -233,17 +239,22 @@ class TransactionHistoryViewModel @Inject constructor(
     }
 
     private fun deleteCategory(category: String, isExpense: Boolean) {
-        if (category == "Другое") {
-            _state.update { it.copy(categoryToDelete = null) }
-            return
-        }
-        
         viewModelScope.launch {
             // Логируем удаление категории
             analyticsUtils.logCategoryDeleted(category, isExpense)
 
             // Обновляем состояние
             _state.update { it.copy(categoryToDelete = null) }
+
+            // Удаляем категорию из списка через CategoriesViewModel
+            if (isExpense) {
+                categoriesViewModel.deleteExpenseCategory(category)
+            } else {
+                categoriesViewModel.deleteIncomeCategory(category)
+            }
+
+            // Обновляем отфильтрованные транзакции
+            updateFilteredTransactions()
         }
     }
 
@@ -253,6 +264,36 @@ class TransactionHistoryViewModel @Inject constructor(
 
     private fun hideDeleteCategoryConfirmDialog() {
         _state.update { it.copy(categoryToDelete = null) }
+    }
+
+    private fun deleteSource(source: String) {
+        // Реализовать удаление источника
+        viewModelScope.launch {
+            // Логируем удаление источника
+            analyticsUtils.logCategoryDeleted(source, false)
+
+            // Обновляем состояние
+            _state.update { it.copy(sourceToDelete = null) }
+
+            // В данном приложении нет метода для удаления источников,
+            // но мы можем добавить его позже при необходимости.
+            // На данный момент просто обновляем список выбранных источников
+            _state.update { currentState ->
+                val updatedSources = currentState.selectedSources.filter { it != source }
+                currentState.copy(selectedSources = updatedSources)
+            }
+
+            // Обновляем отфильтрованные транзакции
+            updateFilteredTransactions()
+        }
+    }
+
+    private fun showDeleteSourceConfirmDialog(source: String) {
+        _state.update { it.copy(sourceToDelete = source) }
+    }
+
+    private fun hideDeleteSourceConfirmDialog() {
+        _state.update { it.copy(sourceToDelete = null) }
     }
 
     private fun showPeriodDialog() {

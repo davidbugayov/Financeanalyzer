@@ -30,6 +30,11 @@ sealed class TransactionHistoryEvent {
     data class ShowDeleteCategoryConfirmDialog(val category: String, val isExpense: Boolean) : TransactionHistoryEvent()
     data object HideDeleteCategoryConfirmDialog : TransactionHistoryEvent()
 
+    // События для управления источниками
+    data class DeleteSource(val source: String) : TransactionHistoryEvent()
+    data class ShowDeleteSourceConfirmDialog(val source: String) : TransactionHistoryEvent()
+    data object HideDeleteSourceConfirmDialog : TransactionHistoryEvent()
+
     // События для управления диалогами
     data object ShowPeriodDialog : TransactionHistoryEvent()
     data object HidePeriodDialog : TransactionHistoryEvent()

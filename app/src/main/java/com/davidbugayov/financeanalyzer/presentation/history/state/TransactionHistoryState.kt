@@ -32,6 +32,7 @@ import java.util.Date
  * @property showEndDatePicker Флаг отображения диалога выбора конечной даты
  * @property transactionToDelete Транзакция, которую нужно удалить (null, если нет)
  * @property categoryToDelete Пара (название категории, isExpense)
+ * @property sourceToDelete Источник, который нужно удалить (null, если нет)
  * @property expenseCategories Список категорий расходов
  * @property incomeCategories Список категорий доходов
  * @property protectedCategories Список защищенных категорий
@@ -56,6 +57,7 @@ data class TransactionHistoryState(
     val showEndDatePicker: Boolean = false,
     val transactionToDelete: Transaction? = null,
     val categoryToDelete: Pair<String, Boolean>? = null,
+    val sourceToDelete: String? = null,
     val expenseCategories: List<CategoryItem> = emptyList(),
     val incomeCategories: List<CategoryItem> = emptyList(),
     val protectedCategories: List<String> = listOf("Другое") // Категории, которые нельзя удалить

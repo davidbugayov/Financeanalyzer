@@ -193,6 +193,49 @@ class AddTransactionViewModel(
             is AddTransactionEvent.HideCancelConfirmation -> {
                 _state.update { it.copy(showCancelConfirmation = false) }
             }
+            is AddTransactionEvent.ShowDeleteCategoryConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        categoryToDelete = event.category,
+                        showDeleteCategoryConfirmDialog = true
+                    )
+                }
+            }
+
+            is AddTransactionEvent.HideDeleteCategoryConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        categoryToDelete = null,
+                        showDeleteCategoryConfirmDialog = false
+                    )
+                }
+            }
+
+            is AddTransactionEvent.DeleteCategory -> {
+                deleteCategory(event.category)
+            }
+
+            is AddTransactionEvent.ShowDeleteSourceConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        sourceToDelete = event.source,
+                        showDeleteSourceConfirmDialog = true
+                    )
+                }
+            }
+
+            is AddTransactionEvent.HideDeleteSourceConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        sourceToDelete = null,
+                        showDeleteSourceConfirmDialog = false
+                    )
+                }
+            }
+
+            is AddTransactionEvent.DeleteSource -> {
+                deleteSource(event.source)
+            }
             is AddTransactionEvent.Submit -> {
                 if (!validateInput()) {
                     return
@@ -421,7 +464,73 @@ class AddTransactionViewModel(
         _state.update { 
             it.copy(
                 note = if (it.note.isBlank()) "Чек прикреплен" else "${it.note} (Чек прикреплен)"
-            ) 
+            )
+        }
+    }
+
+    /**
+     * Удаляет категорию
+     */
+    private fun deleteCategory(category: String) {
+        // Проверяем, что категория существует и не равна "Другое"
+        if (category == "Другое") {
+            _state.update { it.copy(error = "Категорию \"Другое\" нельзя удалить") }
+            return
+        }
+
+        viewModelScope.launch {
+            // Удаляем категорию с учетом типа транзакции
+            if (_state.value.isExpense) {
+                categoriesViewModel.deleteExpenseCategory(category)
+            } else {
+                categoriesViewModel.deleteIncomeCategory(category)
+            }
+
+            // Если это была выбранная категория, очищаем выбор
+            if (_state.value.category == category) {
+                _state.update { it.copy(category = "") }
+            }
+
+            // Логируем удаление категории
+            AnalyticsUtils.logCategoryDeleted(category, _state.value.isExpense)
+        }
+    }
+
+    /**
+     * Удаляет источник
+     */
+    private fun deleteSource(source: String) {
+        // Проверяем, что источник существует и не является стандартным
+        if (source == "Сбер" || source == "Наличные" || source == "Тинькофф") {
+            _state.update { it.copy(error = "Стандартные источники удалить нельзя") }
+            return
+        }
+
+        val currentSources = _state.value.sources.toMutableList()
+        val sourceToDelete = currentSources.find { it.name == source }
+
+        if (sourceToDelete != null) {
+            // Удаляем источник из списка
+            currentSources.remove(sourceToDelete)
+
+            // Сохраняем обновленный список источников в SharedPreferences
+            preferencesManager.saveCustomSources(currentSources)
+
+            // Обновляем состояние
+            _state.update { it.copy(sources = currentSources) }
+
+            // Если это был выбранный источник, меняем на "Сбер"
+            if (_state.value.source == source) {
+                _state.update {
+                    it.copy(
+                        source = "Сбер",
+                        sourceColor = 0xFF21A038.toInt() // Цвет Сбера
+                    )
+                }
+            }
+
+            // Логируем удаление источника
+            AnalyticsUtils.logSourceDeleted(source)
         }
     }
 } 

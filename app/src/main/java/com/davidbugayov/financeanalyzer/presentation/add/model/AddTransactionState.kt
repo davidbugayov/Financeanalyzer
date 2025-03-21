@@ -32,5 +32,9 @@ data class AddTransactionState(
     val isSuccess: Boolean = false,
     val expenseCategories: List<CategoryItem> = emptyList(),
     val incomeCategories: List<CategoryItem> = emptyList(),
-    val sources: List<Source> = emptyList()
+    val sources: List<Source> = emptyList(),
+    val categoryToDelete: String? = null,
+    val sourceToDelete: String? = null,
+    val showDeleteCategoryConfirmDialog: Boolean = false,
+    val showDeleteSourceConfirmDialog: Boolean = false
 ) 

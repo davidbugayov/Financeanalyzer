@@ -43,6 +43,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.components.Transact
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
@@ -145,6 +146,15 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
+            },
+            onCategoryDelete = { category, isExpense ->
+                viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
+                viewModel.onEvent(
+                    TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog(
+                        category,
+                        isExpense
+                    )
+                )
             }
         )
     }
@@ -200,6 +210,23 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
+            },
+            onSourceDelete = { source ->
+                viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
+                viewModel.onEvent(TransactionHistoryEvent.ShowDeleteSourceConfirmDialog(source))
+            }
+        )
+    }
+
+    // Диалог подтверждения удаления источника
+    state.sourceToDelete?.let { source ->
+        DeleteSourceConfirmDialog(
+            source = source,
+            onConfirm = {
+                viewModel.onEvent(TransactionHistoryEvent.DeleteSource(source))
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideDeleteSourceConfirmDialog)
             }
         )
     }

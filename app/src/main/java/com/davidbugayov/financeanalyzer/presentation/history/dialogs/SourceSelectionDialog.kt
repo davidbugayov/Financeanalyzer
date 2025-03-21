@@ -8,8 +8,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Checkbox
 import androidx.compose.material3.MaterialTheme
@@ -24,6 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -36,45 +35,34 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
  * @param sources Список всех доступных источников
  * @param onSourcesSelected Callback, вызываемый при выборе источников
  * @param onDismiss Callback, вызываемый при закрытии диалога
+ * @param onSourceDelete Callback, вызываемый при удалении источника
  */
 @Composable
 fun SourceSelectionDialog(
-    selectedSources: List<String>,
     sources: List<Source>,
+    selectedSources: List<String>,
     onSourcesSelected: (List<String>) -> Unit,
+    onSourceDelete: (String) -> Unit,
     onDismiss: () -> Unit
 ) {
-    // Локальное состояние для хранения выбранных источников
-    var localSelectedSources by remember(selectedSources) {
-        mutableStateOf(selectedSources)
-    }
-
-    // Получаем список названий источников
-    val sourceNames = remember(sources) {
-        sources.map { it.name }
-    }
+    var localSelectedSources by remember { mutableStateOf(selectedSources) }
+    val sourceNames = sources.map { it.name }
 
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.select_sources)) },
         text = {
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // Опция "Все источники"
+            Column {
+                // Кнопка "Выбрать все"
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clickable {
-                            // Если не все источники выбраны - выбираем все,
-                            // иначе - очищаем выбор
                             localSelectedSources =
-                                if (localSelectedSources.size != sourceNames.size) {
-                                    sourceNames
-                                } else {
+                                if (localSelectedSources.size == sourceNames.size) {
                                     emptyList()
+                                } else {
+                                    sourceNames
                                 }
                         }
                         .padding(vertical = 8.dp),
@@ -96,7 +84,6 @@ fun SourceSelectionDialog(
                         modifier = Modifier.weight(1f)
                     )
 
-                    // Чекбокс "Выбрать все"
                     Checkbox(
                         checked = localSelectedSources.size == sourceNames.size && sourceNames.isNotEmpty(),
                         onCheckedChange = { isChecked ->
@@ -115,29 +102,13 @@ fun SourceSelectionDialog(
                 sources.forEach { source ->
                     SourceCheckboxItem(
                         sourceName = source.name,
-                        color = source.color,
+                        color = Color(source.color),
                         isSelected = localSelectedSources.contains(source.name),
                         onToggle = { isChecked ->
                             localSelectedSources = if (isChecked) {
                                 localSelectedSources + source.name
                             } else {
                                 localSelectedSources - source.name
-                            }
-                        }
-                    )
-                }
-
-                // Добавляем "Наличные" если его нет в списке
-                if (!sourceNames.contains("Наличные")) {
-                    SourceCheckboxItem(
-                        sourceName = "Наличные",
-                        color = 0xFF9E9E9E.toInt(), // Серый цвет
-                        isSelected = localSelectedSources.contains("Наличные"),
-                        onToggle = { isChecked ->
-                            localSelectedSources = if (isChecked) {
-                                localSelectedSources + "Наличные"
-                            } else {
-                                localSelectedSources - "Наличные"
                             }
                         }
                     )
@@ -167,18 +138,15 @@ fun SourceSelectionDialog(
  * @param color Цвет источника
  * @param isSelected Выбран ли источник
  * @param onToggle Callback, вызываемый при выборе/отмене выбора источника
+ * @param onLongClick Callback, вызываемый при долгом нажатии на источник
  */
 @Composable
 private fun SourceCheckboxItem(
     sourceName: String,
-    color: Int,
+    color: Color,
     isSelected: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
-    val sourceColor = remember(color) {
-        android.graphics.Color.valueOf(color)
-    }
-
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -192,7 +160,7 @@ private fun SourceCheckboxItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onToggle(!isSelected) }
+                .clickable(onClick = { onToggle(!isSelected) })
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -204,7 +172,7 @@ private fun SourceCheckboxItem(
             Text(
                 text = sourceName,
                 color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                else MaterialTheme.colorScheme.onSurface,
+                else color,
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 8.dp)

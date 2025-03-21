@@ -44,6 +44,7 @@ import com.davidbugayov.financeanalyzer.R
  * @param incomeCategories Список категорий доходов
  * @param onCategoriesSelected Callback, вызываемый при выборе категорий
  * @param onDismiss Callback, вызываемый при закрытии диалога
+ * @param onCategoryDelete Callback, вызываемый при удалении категории
  */
 @Composable
 fun CategorySelectionDialog(
@@ -51,7 +52,8 @@ fun CategorySelectionDialog(
     expenseCategories: List<String>,
     incomeCategories: List<String>,
     onCategoriesSelected: (List<String>) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    onCategoryDelete: (String, Boolean) -> Unit = { _, _ -> }
 ) {
     // Состояние для раскрытия/скрытия групп категорий
     var isExpensesExpanded by remember { mutableStateOf(true) }
@@ -301,7 +303,7 @@ private fun CategoryCheckboxItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .clickable { onToggle(!isSelected) }
+                .clickable(onClick = { onToggle(!isSelected) })
                 .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {

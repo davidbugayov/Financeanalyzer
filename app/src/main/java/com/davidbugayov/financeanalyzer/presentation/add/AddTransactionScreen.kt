@@ -41,10 +41,13 @@ import com.davidbugayov.financeanalyzer.presentation.add.components.SourcePicker
 import com.davidbugayov.financeanalyzer.presentation.add.components.SourceSection
 import com.davidbugayov.financeanalyzer.presentation.add.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
 import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -57,6 +60,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddTransactionScreen(
     viewModel: AddTransactionViewModel = koinViewModel(),
+    categoriesViewModel: CategoriesViewModel = koinViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -146,6 +150,13 @@ fun AddTransactionScreen(
                         },
                         onAddSourceClick = {
                             viewModel.onEvent(AddTransactionEvent.ShowCustomSourceDialog)
+                        },
+                        onSourceLongClick = { source ->
+                            viewModel.onEvent(
+                                AddTransactionEvent.ShowDeleteSourceConfirmDialog(
+                                    source.name
+                                )
+                            )
                         }
                     )
                 }
@@ -159,6 +170,13 @@ fun AddTransactionScreen(
                     },
                     onAddCategoryClick = {
                         viewModel.onEvent(AddTransactionEvent.ShowCustomCategoryDialog)
+                    },
+                    onCategoryLongClick = { category ->
+                        viewModel.onEvent(
+                            AddTransactionEvent.ShowDeleteCategoryConfirmDialog(
+                                category.name
+                            )
+                        )
                     },
                     isError = state.categoryError
                 )
@@ -326,6 +344,41 @@ fun AddTransactionScreen(
                     },
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideColorPicker)
+                    }
+                )
+            }
+
+            // Диалог подтверждения удаления категории
+            if (state.showDeleteCategoryConfirmDialog && state.categoryToDelete != null) {
+                val categoryToDelete = state.categoryToDelete ?: ""
+                DeleteCategoryConfirmDialog(
+                    category = categoryToDelete,
+                    onConfirm = {
+                        viewModel.onEvent(AddTransactionEvent.DeleteCategory(categoryToDelete))
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteCategoryConfirmDialog)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteCategoryConfirmDialog)
+                    },
+                    isDefaultCategory = if (state.isExpense) {
+                        categoriesViewModel.isDefaultExpenseCategory(categoryToDelete)
+                    } else {
+                        categoriesViewModel.isDefaultIncomeCategory(categoryToDelete)
+                    }
+                )
+            }
+
+            // Диалог подтверждения удаления источника
+            if (state.showDeleteSourceConfirmDialog && state.sourceToDelete != null) {
+                val sourceToDelete = state.sourceToDelete ?: ""
+                DeleteSourceConfirmDialog(
+                    source = sourceToDelete,
+                    onConfirm = {
+                        viewModel.onEvent(AddTransactionEvent.DeleteSource(sourceToDelete))
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteSourceConfirmDialog)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteSourceConfirmDialog)
                     }
                 )
             }

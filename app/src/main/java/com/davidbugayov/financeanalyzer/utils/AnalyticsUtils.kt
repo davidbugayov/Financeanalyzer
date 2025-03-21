@@ -2,9 +2,9 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.os.Bundle
 import com.davidbugayov.financeanalyzer.FinanceApp
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.google.firebase.analytics.FirebaseAnalytics
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Утилитарный класс для работы с Firebase Analytics.
@@ -235,6 +235,33 @@ object AnalyticsUtils {
             getAnalyticsInstance()?.logEvent(Events.ERROR_OCCURRED, bundle) ?: Timber.d("Событие ошибки не отправлено: $errorType: $errorMessage")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при логировании ошибки")
+        }
+    }
+
+    /**
+     * Логирует удаление источника
+     * @param source Название источника
+     */
+    fun logSourceDeleted(source: String) {
+        try {
+            // TODO: Вернуть проверку на DEBUG перед релизом
+            // if (BuildConfig.DEBUG) {
+            //     Timber.d("Analytics: Source deleted - $source")
+            //     return
+            // }
+
+            // Всегда логируем в Timber для отладки
+            Timber.d("Analytics: Source deleted - $source")
+
+            // Отправляем событие в Firebase Analytics
+            val bundle = Bundle().apply {
+                putString("source", source)
+            }
+
+            getAnalyticsInstance()?.logEvent("source_deleted", bundle)
+                ?: Timber.d("Событие удаления источника не отправлено: $source")
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при логировании удаления источника")
         }
     }
 } 

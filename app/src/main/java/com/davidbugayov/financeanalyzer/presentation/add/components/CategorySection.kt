@@ -25,7 +25,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -41,6 +40,7 @@ fun CategorySection(
     selectedCategory: String,
     onCategorySelected: (CategoryItem) -> Unit,
     onAddCategoryClick: () -> Unit,
+    onCategoryLongClick: (CategoryItem) -> Unit = {},
     isError: Boolean = false
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
@@ -60,6 +60,7 @@ fun CategorySection(
                     category = category,
                     isSelected = category.name == selectedCategory,
                     onClick = { onCategorySelected(category) },
+                    onLongClick = { onCategoryLongClick(category) },
                     isError = isError && selectedCategory.isBlank()
                 )
             }
@@ -68,58 +69,6 @@ fun CategorySection(
                 AddCategoryItem(onClick = onAddCategoryClick)
             }
         }
-    }
-}
-
-/**
- * Элемент категории
- */
-@Composable
-fun CategoryItem(
-    category: CategoryItem,
-    isSelected: Boolean,
-    onClick: () -> Unit,
-    isError: Boolean = false
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(80.dp)
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
-                .border(
-                    width = if (isSelected) 3.dp else if (isError) 2.dp else 0.dp,
-                    color = when {
-                        isSelected -> MaterialTheme.colorScheme.primary
-                        isError -> MaterialTheme.colorScheme.error
-                        else -> Color.Transparent
-                    },
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = category.icon,
-                contentDescription = category.name,
-                tint = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer
-            )
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = category.name,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-        )
     }
 }
 

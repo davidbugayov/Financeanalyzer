@@ -10,10 +10,10 @@ import com.davidbugayov.financeanalyzer.R
 /**
  * Диалог подтверждения удаления категории.
  *
- * @param category Название категории для удаления
+ * @param category Название категории, которую нужно удалить
  * @param onConfirm Callback, вызываемый при подтверждении удаления
  * @param onDismiss Callback, вызываемый при отмене удаления
- * @param isDefaultCategory Является ли категория стандартной (нельзя удалить)
+ * @param isDefaultCategory Является ли категория стандартной
  */
 @Composable
 fun DeleteCategoryConfirmDialog(
@@ -22,26 +22,26 @@ fun DeleteCategoryConfirmDialog(
     onDismiss: () -> Unit,
     isDefaultCategory: Boolean = false
 ) {
+    val messageText = if (isDefaultCategory) {
+        "Вы уверены, что хотите удалить стандартную категорию \"$category\"?\n\n" +
+                "Это скроет её из списка, но она может быть восстановлена при переустановке приложения."
+    } else {
+        "Вы уверены, что хотите удалить категорию \"$category\"?\n\n" +
+                "Она будет полностью удалена и не может быть восстановлена."
+    }
+
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.delete_category)) },
-        text = {
-            if (isDefaultCategory) {
-                Text(stringResource(R.string.cannot_delete_default_category, category))
-            } else {
-                Text(stringResource(R.string.delete_category_confirmation, category))
-            }
-        },
+        title = { Text(text = stringResource(R.string.delete)) },
+        text = { Text(text = messageText) },
         confirmButton = {
-            if (!isDefaultCategory) {
-                TextButton(onClick = onConfirm) {
-                    Text(stringResource(R.string.delete))
-                }
+            TextButton(onClick = onConfirm) {
+                Text(text = stringResource(R.string.delete))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text(text = stringResource(R.string.cancel))
             }
         }
     )
