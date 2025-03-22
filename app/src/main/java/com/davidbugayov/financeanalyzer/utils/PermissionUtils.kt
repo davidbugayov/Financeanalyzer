@@ -54,4 +54,47 @@ object PermissionUtils {
             context.startActivity(intent)
         }
     }
+
+    /**
+     * Проверяет наличие разрешения на чтение внешнего хранилища.
+     * Учитывает различия в API уровнях Android.
+     *
+     * @param context Контекст приложения
+     * @return true, если разрешение предоставлено
+     */
+    fun hasReadExternalStoragePermission(context: Context): Boolean {
+        return when {
+            // Для Android 13 и выше используем READ_MEDIA_* разрешения
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_MEDIA_IMAGES
+                ) == PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_GRANTED
+            }
+            // Для Android 10-12 используем READ_EXTERNAL_STORAGE
+            else -> {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+        }
+    }
+
+    /**
+     * Возвращает необходимое разрешение для чтения файлов в зависимости от версии Android.
+     *
+     * @return Строка с необходимым разрешением
+     */
+    fun getReadStoragePermission(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
+        }
+    }
 } 

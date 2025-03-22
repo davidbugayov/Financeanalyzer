@@ -32,6 +32,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -53,7 +54,12 @@ fun AnalyticsSection(
     onNavigateToChart: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = NumberFormat.getCurrencyInstance(Locale("ru", "RU"))
+    // Преобразуем Double в Money для лучшего форматирования
+    val incomeAmount = Money(totalIncome)
+    val expenseAmount = Money(totalExpense)
+    val balanceAmount = Money(balance)
+
+    // Процентный формат для нормы сбережений
     val percentFormat = NumberFormat.getPercentInstance(Locale("ru", "RU"))
     
     // Определяем цвета для доходов и расходов
@@ -98,7 +104,7 @@ fun AnalyticsSection(
                 // Доходы
                 AnalyticsCard(
                     title = stringResource(R.string.income),
-                    value = currencyFormat.format(totalIncome),
+                    value = incomeAmount.formatted(),
                     icon = Icons.Default.KeyboardArrowUp,
                     backgroundColor = incomeBackgroundColor,
                     contentColor = Color.Black,
@@ -111,7 +117,7 @@ fun AnalyticsSection(
                 // Расходы
                 AnalyticsCard(
                     title = stringResource(R.string.expense),
-                    value = currencyFormat.format(totalExpense),
+                    value = expenseAmount.formatted(),
                     icon = Icons.Default.KeyboardArrowDown,
                     backgroundColor = expenseBackgroundColor,
                     contentColor = Color.Black,
@@ -122,28 +128,25 @@ fun AnalyticsSection(
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
-            // Баланс (на всю ширину)
-            AnalyticsCard(
-                title = stringResource(R.string.balance),
-                value = currencyFormat.format(balance),
-                icon = Icons.Default.BarChart,
-                backgroundColor = balanceBackgroundColor,
-                contentColor = Color.Black,
-                iconTint = balanceColor,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-            // Норма сбережений (отдельно)
+            // Баланс и норма сбережений в одном ряду
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Пустой модификатор весом 1f для правильного центрирования
-                Spacer(modifier = Modifier.weight(0.25f))
+                // Баланс
+                AnalyticsCard(
+                    title = stringResource(R.string.balance),
+                    value = balanceAmount.formatted(),
+                    icon = Icons.Default.BarChart,
+                    backgroundColor = balanceBackgroundColor,
+                    contentColor = Color.Black,
+                    iconTint = balanceColor,
+                    modifier = Modifier.weight(1f)
+                )
 
-                // Процент сбережений (по центру с шириной 50%)
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+
+                // Норма сбережений
                 AnalyticsCard(
                     title = stringResource(R.string.savings_rate),
                     value = percentFormat.format(savingsRate / 100),
@@ -151,11 +154,8 @@ fun AnalyticsSection(
                     backgroundColor = savingsBackgroundColor,
                     contentColor = Color.Black,
                     iconTint = if (savingsRate > 0) incomeColor else expenseColor,
-                    modifier = Modifier.weight(0.5f)
+                    modifier = Modifier.weight(1f)
                 )
-
-                // Пустой модификатор весом 1f для правильного центрирования
-                Spacer(modifier = Modifier.weight(0.25f))
             }
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
@@ -217,7 +217,9 @@ fun AnalyticsCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium))
+                .height(dimensionResource(R.dimen.profile_analytics_card_height))
+                .padding(dimensionResource(R.dimen.spacing_medium)),
+            verticalArrangement = Arrangement.SpaceBetween
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically
@@ -238,8 +240,6 @@ fun AnalyticsCard(
                     color = iconTint
                 )
             }
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             
             Text(
                 text = value,

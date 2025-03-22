@@ -11,10 +11,18 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material3.Button
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -56,7 +64,8 @@ fun ProfileScreen(
     viewModel: ProfileViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
     onNavigateToLibraries: () -> Unit,
-    onNavigateToChart: () -> Unit
+    onNavigateToChart: () -> Unit,
+    onNavigateToImport: () -> Unit
 ) {
     // Получаем текущее состояние из ViewModel
     val state by viewModel.state.collectAsState()
@@ -160,6 +169,54 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
 
                 HorizontalDivider(modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding)))
+
+                // После секции экспорта данных добавляем секцию импорта
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+
+                // Импорт данных
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(R.dimen.profile_section_padding)),
+                    elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(dimensionResource(R.dimen.profile_section_padding))
+                    ) {
+                        Text(
+                            text = "Импорт транзакций",
+                            style = MaterialTheme.typography.titleLarge
+                        )
+
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+
+                        Text(
+                            text = "Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Тинькофф, Альфа-Банк, ВТБ, Газпромбанк и Озон Банк.",
+                            style = MaterialTheme.typography.bodyMedium
+                        )
+
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalAlignment = Alignment.End
+                        ) {
+                            Button(
+                                onClick = onNavigateToImport,
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.FileUpload,
+                                    contentDescription = null,
+                                    modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small))
+                                )
+                                Text(text = "Импортировать транзакции")
+                            }
+                        }
+                    }
+                }
 
                 // Диалоги
                 ShowDialogs(state, viewModel, context)

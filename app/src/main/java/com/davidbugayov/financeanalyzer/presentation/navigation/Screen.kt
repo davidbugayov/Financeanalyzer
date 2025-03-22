@@ -25,4 +25,7 @@ sealed class Screen(val route: String) {
     
     /** Экран со списком используемых библиотек */
     data object Libraries : Screen("libraries")
+
+    /** Экран импорта транзакций */
+    data object ImportTransactions : Screen("import")
 } 

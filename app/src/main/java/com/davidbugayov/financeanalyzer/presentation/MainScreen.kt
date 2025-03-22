@@ -35,6 +35,7 @@ import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.presentation.ui.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
@@ -285,7 +286,29 @@ fun MainScreen(startDestination: String = "home") {
                     ProfileScreen(
                         onNavigateBack = { navController.popBackStack() },
                         onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
-                        onNavigateToChart = { navController.navigate(Screen.Chart.route) }
+                        onNavigateToChart = { navController.navigate(Screen.Chart.route) },
+                        onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
+                    )
+                }
+
+                composable(
+                    route = Screen.ImportTransactions.route,
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    }
+                ) {
+                    ImportTransactionsScreen(
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
                 
