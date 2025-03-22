@@ -64,7 +64,7 @@ fun SettingsSection(
         ) {
             Text(
                 text = stringResource(R.string.profile_settings_title),
-                style = MaterialTheme.typography.titleLarge
+                style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
@@ -149,31 +149,33 @@ fun SettingsItem(
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(dimensionResource(R.dimen.profile_item_icon_size)),
+            contentDescription = title,
+            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
             tint = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_normal)))
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
         
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             if (subtitle != null) {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxsmall)))
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
-        
-        trailingContent?.invoke()
+
+        if (trailingContent != null) {
+            trailingContent()
+        }
     }
 } 

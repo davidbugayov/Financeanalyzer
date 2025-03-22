@@ -47,7 +47,10 @@ fun ExportButton(
                 modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_medium))
             )
         }
-        Text(text = stringResource(R.string.export_to_csv))
+        Text(
+            text = stringResource(R.string.export_to_csv),
+            style = MaterialTheme.typography.labelMedium
+        )
     }
 }
 
@@ -62,7 +65,7 @@ fun ExportDescription(
 ) {
     Text(
         text = stringResource(R.string.export_description),
-        style = MaterialTheme.typography.bodyMedium,
+        style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier
     )

@@ -31,7 +31,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.components.SavingsRat
 import com.davidbugayov.financeanalyzer.presentation.chart.components.StatisticsSection
 import com.davidbugayov.financeanalyzer.presentation.chart.components.SummarySection
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
-import com.davidbugayov.financeanalyzer.presentation.components.AdaptiveAppBar
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
@@ -174,7 +174,7 @@ fun FinanceChartScreen(
 
     Scaffold(
         topBar = {
-            AdaptiveAppBar(
+            AppTopBar(
                 title = stringResource(R.string.charts_title),
                 showBackButton = true,
                 onBackClick = {
@@ -190,7 +190,8 @@ fun FinanceChartScreen(
                             contentDescription = stringResource(R.string.select_period)
                         )
                     }
-                }
+                },
+                titleFontSize = 16
             )
         }
     ) { paddingValues ->

@@ -32,7 +32,7 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
-import com.davidbugayov.financeanalyzer.presentation.components.AdaptiveAppBar
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
@@ -220,7 +220,7 @@ fun TransactionHistoryScreen(
 
     Scaffold(
         topBar = {
-            AdaptiveAppBar(
+            AppTopBar(
                 title = stringResource(R.string.history_title),
                 showBackButton = true,
                 onBackClick = onNavigateBack,
@@ -251,7 +251,8 @@ fun TransactionHistoryScreen(
                             contentDescription = stringResource(R.string.select_period)
                         )
                     }
-                }
+                },
+                titleFontSize = 16
             )
         }
     ) { paddingValues ->

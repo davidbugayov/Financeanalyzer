@@ -25,7 +25,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
 
 /**
@@ -53,8 +52,7 @@ fun AppInfoSection(
         ) {
             Text(
                 text = stringResource(R.string.app_info),
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold
+                style = MaterialTheme.typography.titleMedium
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
@@ -88,15 +86,15 @@ fun AppInfoSection(
                 Icon(
                     imageVector = Icons.AutoMirrored.Filled.List,
                     contentDescription = null,
-                    modifier = Modifier.size(dimensionResource(R.dimen.profile_item_icon_size)),
+                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
                     tint = MaterialTheme.colorScheme.primary
                 )
 
-                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_normal)))
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                 
                 Text(
                     text = stringResource(R.string.libraries),
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyMedium
                 )
             }
         }
@@ -124,11 +122,11 @@ private fun AppInfoItem(
         Icon(
             imageVector = icon,
             contentDescription = null,
-            modifier = Modifier.size(dimensionResource(R.dimen.profile_item_icon_size)),
+            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
             tint = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_normal)))
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
         
         Column {
             Text(
@@ -139,7 +137,7 @@ private fun AppInfoItem(
             
             Text(
                 text = value,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyMedium
             )
         }
     }

@@ -9,14 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -42,6 +37,7 @@ import com.davidbugayov.financeanalyzer.presentation.add.components.SourceSectio
 import com.davidbugayov.financeanalyzer.presentation.add.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
@@ -91,22 +87,17 @@ fun AddTransactionScreen(
     
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.add_transaction)) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
-                            showCancelConfirmation = true
-                        } else {
-                            handleExit()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
+            AppTopBar(
+                title = stringResource(R.string.add_transaction),
+                showBackButton = true,
+                onBackClick = {
+                    if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
+                        showCancelConfirmation = true
+                    } else {
+                        handleExit()
                     }
-                }
+                },
+                titleFontSize = 16
             )
         }
     ) { paddingValues ->

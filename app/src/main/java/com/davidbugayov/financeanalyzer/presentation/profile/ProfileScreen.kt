@@ -187,14 +187,14 @@ fun ProfileScreen(
                     ) {
                         Text(
                             text = "Импорт транзакций",
-                            style = MaterialTheme.typography.titleLarge
+                            style = MaterialTheme.typography.titleMedium
                         )
 
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                         Text(
                             text = "Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Тинькофф, Альфа-Банк, ВТБ, Газпромбанк и Озон Банк.",
-                            style = MaterialTheme.typography.bodyMedium
+                            style = MaterialTheme.typography.bodySmall
                         )
 
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -212,7 +212,10 @@ fun ProfileScreen(
                                     contentDescription = null,
                                     modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small))
                                 )
-                                Text(text = "Импортировать транзакции")
+                                Text(
+                                    text = "Импортировать транзакции",
+                                    style = MaterialTheme.typography.labelMedium
+                                )
                             }
                         }
                     }

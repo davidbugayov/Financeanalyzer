@@ -28,8 +28,8 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.components.AdaptiveAppBar
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
@@ -95,10 +95,10 @@ fun HomeScreen(
 
     Scaffold(
         topBar = {
-            AdaptiveAppBar(
+            AppTopBar(
                 title = stringResource(R.string.app_title),
                 navigationIcon = {
-                    // Кнопка для генерации тестовых данных перемещена влево
+                    // Кнопка для генерации тестовых данных
                     if (BuildConfig.DEBUG) {
                         IconButton(
                             onClick = {
@@ -130,7 +130,8 @@ fun HomeScreen(
                             contentDescription = stringResource(R.string.profile)
                         )
                     }
-                }
+                },
+                titleFontSize = 16
             )
         }
     ) { paddingValues ->
