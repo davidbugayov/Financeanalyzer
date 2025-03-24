@@ -9,14 +9,9 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -41,10 +36,14 @@ import com.davidbugayov.financeanalyzer.presentation.add.components.SourcePicker
 import com.davidbugayov.financeanalyzer.presentation.add.components.SourceSection
 import com.davidbugayov.financeanalyzer.presentation.add.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
 import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -57,6 +56,7 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddTransactionScreen(
     viewModel: AddTransactionViewModel = koinViewModel(),
+    categoriesViewModel: CategoriesViewModel = koinViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -70,6 +70,16 @@ fun AddTransactionScreen(
         )
     }
 
+    // Функция для обработки выхода с экрана
+    fun handleExit() {
+        // Обновляем позиции категорий перед выходом
+        viewModel.updateCategoryPositions()
+        // Сбрасываем поля
+        viewModel.resetFields()
+        // Возвращаемся назад
+        onNavigateBack()
+    }
+
     // Цвета для типов транзакций
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
@@ -77,24 +87,17 @@ fun AddTransactionScreen(
     
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.add_transaction)) },
-                navigationIcon = {
-                    IconButton(onClick = {
-                        if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
-                            showCancelConfirmation = true
-                        } else {
-                            // Сбрасываем поля перед выходом
-                            viewModel.resetFields()
-                            onNavigateBack()
-                        }
-                    }) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
+            AppTopBar(
+                title = stringResource(R.string.add_transaction),
+                showBackButton = true,
+                onBackClick = {
+                    if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
+                        showCancelConfirmation = true
+                    } else {
+                        handleExit()
                     }
-                }
+                },
+                titleFontSize = 16
             )
         }
     ) { paddingValues ->
@@ -138,11 +141,18 @@ fun AddTransactionScreen(
                         },
                         onAddSourceClick = {
                             viewModel.onEvent(AddTransactionEvent.ShowCustomSourceDialog)
+                        },
+                        onSourceLongClick = { source ->
+                            viewModel.onEvent(
+                                AddTransactionEvent.ShowDeleteSourceConfirmDialog(
+                                    source.name
+                                )
+                            )
                         }
                     )
                 }
 
-                // Секция "Куда" (категории)
+                // Секция категорий с передачей состояния ошибки
                 CategorySection(
                     categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
                     selectedCategory = state.category,
@@ -151,7 +161,15 @@ fun AddTransactionScreen(
                     },
                     onAddCategoryClick = {
                         viewModel.onEvent(AddTransactionEvent.ShowCustomCategoryDialog)
-                    }
+                    },
+                    onCategoryLongClick = { category ->
+                        viewModel.onEvent(
+                            AddTransactionEvent.ShowDeleteCategoryConfirmDialog(
+                                category.name
+                            )
+                        )
+                    },
+                    isError = state.categoryError
                 )
 
                 // Поле ввода суммы
@@ -244,7 +262,7 @@ fun AddTransactionScreen(
                 SuccessDialog(
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
-                        onNavigateBack()
+                        handleExit()
                     },
                     onAddAnother = {
                         viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
@@ -265,9 +283,7 @@ fun AddTransactionScreen(
                 CancelConfirmationDialog(
                     onConfirm = {
                         showCancelConfirmation = false
-                        // Сбрасываем поля перед выходом
-                        viewModel.resetFields()
-                        onNavigateBack()
+                        handleExit()
                     },
                     onDismiss = {
                         showCancelConfirmation = false
@@ -319,6 +335,41 @@ fun AddTransactionScreen(
                     },
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideColorPicker)
+                    }
+                )
+            }
+
+            // Диалог подтверждения удаления категории
+            if (state.showDeleteCategoryConfirmDialog && state.categoryToDelete != null) {
+                val categoryToDelete = state.categoryToDelete ?: ""
+                DeleteCategoryConfirmDialog(
+                    category = categoryToDelete,
+                    onConfirm = {
+                        viewModel.onEvent(AddTransactionEvent.DeleteCategory(categoryToDelete))
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteCategoryConfirmDialog)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteCategoryConfirmDialog)
+                    },
+                    isDefaultCategory = if (state.isExpense) {
+                        categoriesViewModel.isDefaultExpenseCategory(categoryToDelete)
+                    } else {
+                        categoriesViewModel.isDefaultIncomeCategory(categoryToDelete)
+                    }
+                )
+            }
+
+            // Диалог подтверждения удаления источника
+            if (state.showDeleteSourceConfirmDialog && state.sourceToDelete != null) {
+                val sourceToDelete = state.sourceToDelete ?: ""
+                DeleteSourceConfirmDialog(
+                    source = sourceToDelete,
+                    onConfirm = {
+                        viewModel.onEvent(AddTransactionEvent.DeleteSource(sourceToDelete))
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteSourceConfirmDialog)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(AddTransactionEvent.HideDeleteSourceConfirmDialog)
                     }
                 )
             }

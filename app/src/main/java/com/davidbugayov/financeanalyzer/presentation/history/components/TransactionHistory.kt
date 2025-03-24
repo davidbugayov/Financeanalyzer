@@ -12,6 +12,7 @@ import androidx.compose.runtime.mutableStateMapOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
@@ -73,6 +74,7 @@ fun TransactionHistory(
                         onClick = { onTransactionClick(transaction) },
                         onLongClick = { onTransactionLongClick(transaction) }
                     )
+                    Spacer(modifier = Modifier.height(8.dp))
                 }
             }
 

@@ -7,7 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -17,7 +17,6 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -31,21 +30,26 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
-import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionHistory
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -133,17 +137,12 @@ fun TransactionHistoryScreen(
     // Диалог выбора категории
     if (state.showCategoryDialog) {
         CategorySelectionDialog(
-            selectedCategory = state.selectedCategory,
+            selectedCategories = state.selectedCategories,
             expenseCategories = expenseCategoryNames,
             incomeCategories = incomeCategoryNames,
-            onCategorySelected = { category ->
-                viewModel.onEvent(TransactionHistoryEvent.SetCategory(category))
+            onCategoriesSelected = { categories ->
+                viewModel.onEvent(TransactionHistoryEvent.SetCategories(categories))
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
-            },
-            onCategoryDelete = { category ->
-                // Определяем, является ли категория расходом или доходом
-                val isExpense = expenseCategories.any { it.name == category }
-                viewModel.onEvent(TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog(category, isExpense))
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
@@ -185,24 +184,62 @@ fun TransactionHistoryScreen(
         )
     }
 
+    // Диалог выбора источника
+    if (state.showSourceDialog) {
+        // Получаем список всех источников из utils
+        val sources = remember {
+            val defaultSources = ColorUtils.defaultSources
+            defaultSources + listOf(Source(name = "Наличные", color = 0xFF9E9E9E.toInt()))
+        }
+
+        SourceSelectionDialog(
+            selectedSources = state.selectedSources,
+            sources = sources,
+            onSourcesSelected = { selectedSources ->
+                viewModel.onEvent(TransactionHistoryEvent.SetSources(selectedSources))
+                viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
+            }
+        )
+    }
+
+    // Диалог подтверждения удаления источника
+    state.sourceToDelete?.let { source ->
+        DeleteSourceConfirmDialog(
+            source = source,
+            onConfirm = {
+                viewModel.onEvent(TransactionHistoryEvent.DeleteSource(source))
+            },
+            onDismiss = {
+                viewModel.onEvent(TransactionHistoryEvent.HideDeleteSourceConfirmDialog)
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = { Text(stringResource(R.string.history_title)) },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
+            AppTopBar(
+                title = stringResource(R.string.history_title),
+                showBackButton = true,
+                onBackClick = onNavigateBack,
+                actions = {
+                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }) {
                         Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            imageVector = Icons.Default.AccountBalance,
+                            contentDescription = stringResource(R.string.select_sources),
+                            tint = if (state.selectedSources.isNotEmpty())
+                                MaterialTheme.colorScheme.primary
+                            else
+                                LocalContentColor.current
                         )
                     }
-                },
-                actions = {
                     IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }) {
                         Icon(
                             imageVector = Icons.Default.FilterAlt,
                             contentDescription = stringResource(R.string.select_category),
-                            tint = if (state.selectedCategory != null)
+                            tint = if (state.selectedCategories.isNotEmpty())
                                 MaterialTheme.colorScheme.primary
                             else
                                 LocalContentColor.current
@@ -214,7 +251,8 @@ fun TransactionHistoryScreen(
                             contentDescription = stringResource(R.string.select_period)
                         )
                     }
-                }
+                },
+                titleFontSize = 16
             )
         }
     ) { paddingValues ->
@@ -269,9 +307,9 @@ fun TransactionHistoryScreen(
 
                 // Показываем статистику по категории
                 state.categoryStats?.let { (currentTotal, previousTotal, percentChange) ->
-                    state.selectedCategory?.let { category ->
+                    if (state.selectedCategories.size == 1) {
                         CategoryStatsCard(
-                            category = category,
+                            category = state.selectedCategories.first(),
                             currentTotal = currentTotal,
                             previousTotal = previousTotal,
                             percentChange = percentChange

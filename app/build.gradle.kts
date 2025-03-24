@@ -9,44 +9,42 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-abstract class GoogleServicesTask : DefaultTask() {
+// Простое решение для копирования google-services.json
+val debugGoogleServices = rootProject.file("google-services.debug.json")
+val releaseGoogleServices = rootProject.file("google-services.release.json")
+val targetGoogleServices = project.file("google-services.json")
 
-    @get:Input
-    abstract val variantName: Property<String>
-
-    @get:InputFile
-    abstract val sourceFile: RegularFileProperty
-
-    @get:OutputFile
-    abstract val targetFile: RegularFileProperty
-
-    @TaskAction
-    fun copy() {
-        targetFile.get().asFile.parentFile.mkdirs()
-        sourceFile.get().asFile.copyTo(targetFile.get().asFile, overwrite = true)
-        println("Copied ${sourceFile.get().asFile.name} to google-services.json for ${variantName.get()} variant")
+tasks.register("copyDebugGoogleServices") {
+    doLast {
+        if (debugGoogleServices.exists()) {
+            debugGoogleServices.copyTo(targetGoogleServices, overwrite = true)
+            println("Copied debug google-services.json")
+        } else {
+            throw GradleException("Debug google-services.json not found at ${debugGoogleServices.absolutePath}")
+        }
     }
 }
 
-android.applicationVariants.all {
-    val variant = this
-    val variantName = variant.name
-    val debug = variantName.contains("debug", ignoreCase = true)
-
-    val copyGoogleServices = tasks.register<GoogleServicesTask>("copyGoogleServices${variantName.replaceFirstChar { it.uppercase() }}") {
-        this.variantName.set(variantName)
-        sourceFile.set(
-            if (debug) {
-                project.layout.projectDirectory.file("../google-services.debug.json")
-            } else {
-                project.layout.projectDirectory.file("../google-services.release.json")
-            }
-        )
-        targetFile.set(project.layout.projectDirectory.file("google-services.json"))
+tasks.register("copyReleaseGoogleServices") {
+    doLast {
+        if (releaseGoogleServices.exists()) {
+            releaseGoogleServices.copyTo(targetGoogleServices, overwrite = true)
+            println("Copied release google-services.json")
+        } else {
+            throw GradleException("Release google-services.json not found at ${releaseGoogleServices.absolutePath}")
+        }
     }
+}
 
-    tasks.named("process${variantName.replaceFirstChar { it.uppercase() }}GoogleServices") {
-        dependsOn(copyGoogleServices)
+// Задачи processGoogleServices создаются плагином google-services,
+// поэтому нам нужно использовать afterEvaluate
+afterEvaluate {
+    tasks.matching { it.name == "processDebugGoogleServices" }.configureEach {
+        dependsOn("copyDebugGoogleServices")
+    }
+    
+    tasks.matching { it.name == "processReleaseGoogleServices" }.configureEach {
+        dependsOn("copyReleaseGoogleServices")
     }
 }
 
@@ -68,8 +66,8 @@ android {
         minSdk = 26
         //noinspection EditedTargetSdkVersion
         targetSdk = 35
-        versionCode = 11
-        versionName = "1.6"
+        versionCode = 14
+        versionName = "2.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -226,6 +224,9 @@ dependencies {
 
     // JSON
     implementation(libs.gson)
+    
+    // PDF
+    implementation(libs.pdfbox.android)
 
     // Testing
     testImplementation(libs.junit)

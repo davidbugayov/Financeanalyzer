@@ -2,17 +2,12 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import android.provider.Settings
 import androidx.core.content.ContextCompat
+import androidx.core.net.toUri
 
 /**
  * Утилитарный класс для работы с разрешениями.
@@ -20,63 +15,102 @@ import androidx.core.content.ContextCompat
 object PermissionUtils {
 
     /**
-     * Проверяет, есть ли у приложения разрешение на запись во внешнее хранилище.
+     * Проверяет, есть ли у приложения разрешение на отправку уведомлений.
      * @param context Контекст приложения
      * @return true, если разрешение есть, иначе false
      */
-    fun hasStoragePermission(context: Context): Boolean {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            // Начиная с Android 10 (API 29), разрешение не требуется для записи в приватную директорию приложения
-            true
-        } else {
+    fun hasNotificationPermission(context: Context): Boolean {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            // Начиная с Android 13 (API 33), требуется специальное разрешение для уведомлений
             ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.WRITE_EXTERNAL_STORAGE
+                Manifest.permission.POST_NOTIFICATIONS
             ) == PackageManager.PERMISSION_GRANTED
+        } else {
+            // До Android 13 отдельное разрешение на уведомления не требуется
+            true
         }
     }
 
     /**
-     * Composable функция для запроса разрешения на запись во внешнее хранилище.
-     * @param onPermissionGranted Callback, вызываемый при предоставлении разрешения
-     * @param onPermissionDenied Callback, вызываемый при отказе в разрешении
+     * Открывает системные настройки уведомлений для приложения.
+     * @param context Контекст приложения
      */
-    @Composable
-    fun RequestStoragePermission(
-        onPermissionGranted: () -> Unit,
-        onPermissionDenied: () -> Unit
-    ) {
-        var hasPermission by remember { mutableStateOf(false) }
-        val context = androidx.compose.ui.platform.LocalContext.current
-        
-        // Проверяем, есть ли уже разрешение
-        LaunchedEffect(Unit) {
-            hasPermission = hasStoragePermission(context)
-            if (hasPermission) {
-                onPermissionGranted()
+    fun openNotificationSettings(context: Context) {
+        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
+
+        if (intent.resolveActivity(context.packageManager) == null) {
+            // Fallback для старых версий или если настройки уведомлений недоступны
+            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                addCategory(Intent.CATEGORY_DEFAULT)
+                data = "package:${context.packageName}".toUri()
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                context.startActivity(this)
+            }
+        } else {
+            context.startActivity(intent)
+        }
+    }
+
+    /**
+     * Открывает системные настройки приложения для управления разрешениями.
+     * Используется, когда пользователь отказал в предоставлении разрешения и нужно направить его
+     * в настройки для ручного включения разрешения.
+     * 
+     * @param context Контекст приложения
+     */
+    fun openApplicationSettings(context: Context) {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            data = "package:${context.packageName}".toUri()
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(this)
+        }
+    }
+
+    /**
+     * Проверяет наличие разрешения на чтение внешнего хранилища.
+     * Учитывает различия в API уровнях Android.
+     *
+     * @param context Контекст приложения
+     * @return true, если разрешение предоставлено
+     */
+    fun hasReadExternalStoragePermission(context: Context): Boolean {
+        return when {
+            // Для Android 13 и выше используем READ_MEDIA_* разрешения
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_MEDIA_IMAGES
+                ) == PackageManager.PERMISSION_GRANTED ||
+                        ContextCompat.checkSelfPermission(
+                            context,
+                            Manifest.permission.READ_EXTERNAL_STORAGE
+                        ) == PackageManager.PERMISSION_GRANTED
+            }
+            // Для Android 10-12 используем READ_EXTERNAL_STORAGE
+            else -> {
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_EXTERNAL_STORAGE
+                ) == PackageManager.PERMISSION_GRANTED
             }
         }
-        
-        // Если разрешение уже есть, ничего не делаем
-        if (hasPermission || Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
-            return
-        }
-        
-        // Создаем launcher для запроса разрешения
-        val launcher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission()
-        ) { isGranted ->
-            if (isGranted) {
-                hasPermission = true
-                onPermissionGranted()
-            } else {
-                onPermissionDenied()
-            }
-        }
-        
-        // Запрашиваем разрешение
-        LaunchedEffect(Unit) {
-            launcher.launch(Manifest.permission.WRITE_EXTERNAL_STORAGE)
+    }
+
+    /**
+     * Возвращает необходимое разрешение для чтения файлов в зависимости от версии Android.
+     *
+     * @return Строка с необходимым разрешением
+     */
+    fun getReadStoragePermission(): String {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            Manifest.permission.READ_MEDIA_IMAGES
+        } else {
+            Manifest.permission.READ_EXTERNAL_STORAGE
         }
     }
 } 

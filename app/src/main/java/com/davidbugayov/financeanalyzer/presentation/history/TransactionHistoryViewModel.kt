@@ -64,7 +64,8 @@ class TransactionHistoryViewModel @Inject constructor(
             is TransactionHistoryEvent.DeleteTransaction -> deleteTransaction(event.transaction)
             is TransactionHistoryEvent.SetGroupingType -> updateGroupingType(event.type)
             is TransactionHistoryEvent.SetPeriodType -> updatePeriodType(event.type)
-            is TransactionHistoryEvent.SetCategory -> updateCategory(event.category)
+            is TransactionHistoryEvent.SetCategories -> updateCategories(event.categories)
+            is TransactionHistoryEvent.SetSources -> updateSources(event.sources)
             is TransactionHistoryEvent.SetDateRange -> updateDateRange(event.startDate, event.endDate)
             is TransactionHistoryEvent.SetStartDate -> updateStartDate(event.date)
             is TransactionHistoryEvent.SetEndDate -> updateEndDate(event.date)
@@ -74,10 +75,18 @@ class TransactionHistoryViewModel @Inject constructor(
             is TransactionHistoryEvent.DeleteCategory -> deleteCategory(event.category, event.isExpense)
             is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> showDeleteCategoryConfirmDialog(event.category, event.isExpense)
             is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> hideDeleteCategoryConfirmDialog()
+            is TransactionHistoryEvent.DeleteSource -> deleteSource(event.source)
+            is TransactionHistoryEvent.ShowDeleteSourceConfirmDialog -> showDeleteSourceConfirmDialog(
+                event.source
+            )
+
+            is TransactionHistoryEvent.HideDeleteSourceConfirmDialog -> hideDeleteSourceConfirmDialog()
             is TransactionHistoryEvent.ShowPeriodDialog -> showPeriodDialog()
             is TransactionHistoryEvent.HidePeriodDialog -> hidePeriodDialog()
             is TransactionHistoryEvent.ShowCategoryDialog -> showCategoryDialog()
             is TransactionHistoryEvent.HideCategoryDialog -> hideCategoryDialog()
+            is TransactionHistoryEvent.ShowSourceDialog -> showSourceDialog()
+            is TransactionHistoryEvent.HideSourceDialog -> hideSourceDialog()
             is TransactionHistoryEvent.ShowStartDatePicker -> showStartDatePicker()
             is TransactionHistoryEvent.HideStartDatePicker -> hideStartDatePicker()
             is TransactionHistoryEvent.ShowEndDatePicker -> showEndDatePicker()
@@ -130,7 +139,8 @@ class TransactionHistoryViewModel @Inject constructor(
                 periodType = currentState.periodType,
                 startDate = currentState.startDate,
                 endDate = currentState.endDate,
-                category = currentState.selectedCategory
+                categories = currentState.selectedCategories,
+                sources = currentState.selectedSources
             )
             _state.update {
                 it.copy(
@@ -162,9 +172,10 @@ class TransactionHistoryViewModel @Inject constructor(
     private fun updateCategoryStats() {
         viewModelScope.launch {
             val currentState = _state.value
+
             val categoryStats = calculateCategoryStatsUseCase(
                 transactions = currentState.filteredTransactions,
-                category = currentState.selectedCategory ?: "",
+                categories = currentState.selectedCategories,
                 periodType = currentState.periodType,
                 startDate = currentState.startDate,
                 endDate = currentState.endDate
@@ -188,8 +199,13 @@ class TransactionHistoryViewModel @Inject constructor(
         updateGroupedTransactions()
     }
 
-    private fun updateCategory(category: String?) {
-        _state.update { it.copy(selectedCategory = category) }
+    private fun updateCategories(categories: List<String>) {
+        _state.update { it.copy(selectedCategories = categories) }
+        updateFilteredTransactions()
+    }
+
+    private fun updateSources(sources: List<String>) {
+        _state.update { it.copy(selectedSources = sources) }
         updateFilteredTransactions()
     }
 
@@ -223,17 +239,22 @@ class TransactionHistoryViewModel @Inject constructor(
     }
 
     private fun deleteCategory(category: String, isExpense: Boolean) {
-        if (category == "Другое") {
-            _state.update { it.copy(categoryToDelete = null) }
-            return
-        }
-        
         viewModelScope.launch {
             // Логируем удаление категории
             analyticsUtils.logCategoryDeleted(category, isExpense)
 
             // Обновляем состояние
             _state.update { it.copy(categoryToDelete = null) }
+
+            // Удаляем категорию из списка через CategoriesViewModel
+            if (isExpense) {
+                categoriesViewModel.deleteExpenseCategory(category)
+            } else {
+                categoriesViewModel.deleteIncomeCategory(category)
+            }
+
+            // Обновляем отфильтрованные транзакции
+            updateFilteredTransactions()
         }
     }
 
@@ -243,6 +264,36 @@ class TransactionHistoryViewModel @Inject constructor(
 
     private fun hideDeleteCategoryConfirmDialog() {
         _state.update { it.copy(categoryToDelete = null) }
+    }
+
+    private fun deleteSource(source: String) {
+        // Реализовать удаление источника
+        viewModelScope.launch {
+            // Логируем удаление источника
+            analyticsUtils.logCategoryDeleted(source, false)
+
+            // Обновляем состояние
+            _state.update { it.copy(sourceToDelete = null) }
+
+            // В данном приложении нет метода для удаления источников,
+            // но мы можем добавить его позже при необходимости.
+            // На данный момент просто обновляем список выбранных источников
+            _state.update { currentState ->
+                val updatedSources = currentState.selectedSources.filter { it != source }
+                currentState.copy(selectedSources = updatedSources)
+            }
+
+            // Обновляем отфильтрованные транзакции
+            updateFilteredTransactions()
+        }
+    }
+
+    private fun showDeleteSourceConfirmDialog(source: String) {
+        _state.update { it.copy(sourceToDelete = source) }
+    }
+
+    private fun hideDeleteSourceConfirmDialog() {
+        _state.update { it.copy(sourceToDelete = null) }
     }
 
     private fun showPeriodDialog() {
@@ -259,6 +310,14 @@ class TransactionHistoryViewModel @Inject constructor(
 
     private fun hideCategoryDialog() {
         _state.update { it.copy(showCategoryDialog = false) }
+    }
+
+    private fun showSourceDialog() {
+        _state.update { it.copy(showSourceDialog = true) }
+    }
+
+    private fun hideSourceDialog() {
+        _state.update { it.copy(showSourceDialog = false) }
     }
 
     private fun showStartDatePicker() {

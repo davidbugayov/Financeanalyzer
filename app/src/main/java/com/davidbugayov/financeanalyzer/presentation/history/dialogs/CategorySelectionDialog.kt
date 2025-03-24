@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.history.dialogs
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -9,45 +11,66 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 
 /**
- * Диалог выбора категории для фильтрации транзакций.
+ * Диалог выбора категорий для фильтрации транзакций.
  *
- * @param selectedCategory Выбранная категория или null, если не выбрана
+ * @param selectedCategories Список выбранных категорий
  * @param expenseCategories Список категорий расходов
  * @param incomeCategories Список категорий доходов
- * @param onCategorySelected Callback, вызываемый при выборе категории
- * @param onCategoryDelete Callback, вызываемый при удалении категории
+ * @param onCategoriesSelected Callback, вызываемый при выборе категорий
  * @param onDismiss Callback, вызываемый при закрытии диалога
  */
 @Composable
 fun CategorySelectionDialog(
-    selectedCategory: String?,
+    selectedCategories: List<String>,
     expenseCategories: List<String>,
     incomeCategories: List<String>,
-    onCategorySelected: (String?) -> Unit,
-    onCategoryDelete: (String) -> Unit,
+    onCategoriesSelected: (List<String>) -> Unit,
     onDismiss: () -> Unit
 ) {
+    // Состояние для раскрытия/скрытия групп категорий
+    var isExpensesExpanded by remember { mutableStateOf(true) }
+    var isIncomeExpanded by remember { mutableStateOf(true) }
+
+    // Локальное состояние для хранения выбранных категорий
+    var localSelectedCategories by remember(selectedCategories) {
+        mutableStateOf(selectedCategories)
+    }
+
+    // Вычисляем список всех категорий
+    val allCategories = remember(expenseCategories, incomeCategories) {
+        expenseCategories + incomeCategories
+    }
+
+    // Цвета для категорий
+    val expenseColor = MaterialTheme.colorScheme.error
+    val incomeColor = Color(0xFF4CAF50) // Зеленый цвет для доходов
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.select_category)) },
@@ -61,61 +84,132 @@ fun CategorySelectionDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { onCategorySelected(null) }
+                        .clickable {
+                            // Если не все категории выбраны - выбираем все,
+                            // иначе - очищаем выбор
+                            localSelectedCategories =
+                                if (localSelectedCategories.size != allCategories.size) {
+                                    allCategories
+                                } else {
+                                    emptyList()
+                                }
+                        }
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = stringResource(R.string.all_categories),
-                        color = if (selectedCategory == null) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                        text = if (localSelectedCategories.isEmpty())
+                            stringResource(R.string.all_categories)
+                        else if (localSelectedCategories.size == allCategories.size)
+                            stringResource(R.string.clear_selection)
+                        else
+                            stringResource(R.string.select_all_categories),
+                        color = if (localSelectedCategories.isEmpty() ||
+                            localSelectedCategories.size == allCategories.size
+                        )
+                            MaterialTheme.colorScheme.primary
+                        else
+                            MaterialTheme.colorScheme.onSurface,
                         modifier = Modifier.weight(1f)
+                    )
+
+                    // Чекбокс "Выбрать все"
+                    Checkbox(
+                        checked = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty(),
+                        onCheckedChange = { isChecked ->
+                            localSelectedCategories = if (isChecked) {
+                                allCategories
+                            } else {
+                                emptyList()
+                            }
+                        }
                     )
                 }
 
                 Spacer(modifier = Modifier.height(8.dp))
 
-                // Заголовок "Расходы"
-                Text(
-                    text = stringResource(R.string.expenses),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.error
+                // Группа "Расходы" с выпадающим списком
+                CategoryGroupHeader(
+                    title = stringResource(R.string.expenses),
+                    isExpanded = isExpensesExpanded,
+                    color = expenseColor,
+                    onToggle = { isExpensesExpanded = !isExpensesExpanded },
+                    onSelectAll = { isChecked ->
+                        localSelectedCategories = if (isChecked) {
+                            allCategories
+                        } else {
+                            emptyList()
+                        }
+                    },
+                    isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty()
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Список категорий расходов
-                expenseCategories.forEach { category ->
-                    CategoryItem(
-                        category = category,
-                        isSelected = selectedCategory == category,
-                        onCategorySelected = { onCategorySelected(category) },
-                        onCategoryDelete = { onCategoryDelete(category) }
-                    )
+                AnimatedVisibility(visible = isExpensesExpanded) {
+                    Column {
+                        expenseCategories.forEach { category ->
+                            CategoryCheckboxItem(
+                                category = category,
+                                isSelected = localSelectedCategories.contains(category),
+                                color = expenseColor,
+                                onToggle = { isChecked ->
+                                    localSelectedCategories = if (isChecked) {
+                                        localSelectedCategories + category
+                                    } else {
+                                        localSelectedCategories - category
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Заголовок "Доходы"
-                Text(
-                    text = stringResource(R.string.income),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.primary
+                // Группа "Доходы" с выпадающим списком
+                CategoryGroupHeader(
+                    title = stringResource(R.string.income),
+                    isExpanded = isIncomeExpanded,
+                    color = incomeColor,
+                    onToggle = { isIncomeExpanded = !isIncomeExpanded },
+                    onSelectAll = { isChecked ->
+                        localSelectedCategories = if (isChecked) {
+                            allCategories
+                        } else {
+                            emptyList()
+                        }
+                    },
+                    isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty()
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
-
-                // Список категорий доходов
-                incomeCategories.forEach { category ->
-                    CategoryItem(
-                        category = category,
-                        isSelected = selectedCategory == category,
-                        onCategorySelected = { onCategorySelected(category) },
-                        onCategoryDelete = { onCategoryDelete(category) }
-                    )
+                AnimatedVisibility(visible = isIncomeExpanded) {
+                    Column {
+                        incomeCategories.forEach { category ->
+                            CategoryCheckboxItem(
+                                category = category,
+                                isSelected = localSelectedCategories.contains(category),
+                                color = incomeColor,
+                                onToggle = { isChecked ->
+                                    localSelectedCategories = if (isChecked) {
+                                        localSelectedCategories + category
+                                    } else {
+                                        localSelectedCategories - category
+                                    }
+                                }
+                            )
+                        }
+                    }
                 }
             }
         },
         confirmButton = {
+            TextButton(onClick = {
+                onCategoriesSelected(localSelectedCategories)
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.apply))
+            }
+        },
+        dismissButton = {
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.close))
             }
@@ -124,19 +218,75 @@ fun CategorySelectionDialog(
 }
 
 /**
- * Элемент списка категорий с возможностью удаления.
+ * Заголовок группы категорий с возможностью раскрытия/скрытия содержимого.
+ */
+@Composable
+private fun CategoryGroupHeader(
+    title: String,
+    isExpanded: Boolean,
+    color: Color,
+    onToggle: () -> Unit,
+    onSelectAll: (Boolean) -> Unit,
+    isAllSelected: Boolean
+) {
+    val rotation by animateFloatAsState(
+        targetValue = if (isExpanded) 180f else 0f,
+        label = "arrow_rotation"
+    )
+
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        // Название группы и иконка раскрытия
+        Row(
+            modifier = Modifier
+                .weight(1f)
+                .clickable(onClick = onToggle),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleMedium,
+                color = color
+            )
+
+            Icon(
+                imageVector = Icons.Default.ArrowDropDown,
+                contentDescription = if (isExpanded)
+                    stringResource(R.string.collapse)
+                else
+                    stringResource(R.string.expand),
+                modifier = Modifier.rotate(rotation),
+                tint = color
+            )
+        }
+
+        // Чекбокс "Выбрать все"
+        Checkbox(
+            checked = isAllSelected,
+            onCheckedChange = onSelectAll
+        )
+    }
+}
+
+/**
+ * Элемент списка категорий с чекбоксом.
  *
  * @param category Название категории
  * @param isSelected Выбрана ли категория
- * @param onCategorySelected Callback, вызываемый при выборе категории
- * @param onCategoryDelete Callback, вызываемый при удалении категории
+ * @param color Цвет категории
+ * @param onToggle Callback, вызываемый при выборе/отмене выбора категории
  */
 @Composable
-private fun CategoryItem(
+private fun CategoryCheckboxItem(
     category: String,
     isSelected: Boolean,
-    onCategorySelected: () -> Unit,
-    onCategoryDelete: () -> Unit
+    color: Color,
+    onToggle: (Boolean) -> Unit
 ) {
     Surface(
         modifier = Modifier
@@ -147,32 +297,27 @@ private fun CategoryItem(
                 if (isSelected) MaterialTheme.colorScheme.primaryContainer
                 else MaterialTheme.colorScheme.surface
             )
-            .clickable { onCategorySelected() }
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .clickable(onClick = { onToggle(!isSelected) })
                 .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
+            verticalAlignment = Alignment.CenterVertically
         ) {
+            Checkbox(
+                checked = isSelected,
+                onCheckedChange = onToggle
+            )
+            
             Text(
                 text = category,
                 color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                else MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.weight(1f)
+                else color,
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp)
             )
-
-            IconButton(
-                onClick = onCategoryDelete,
-                modifier = Modifier.size(24.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Delete,
-                    contentDescription = stringResource(R.string.delete_category),
-                    tint = MaterialTheme.colorScheme.error
-                )
-            }
         }
     }
 } 

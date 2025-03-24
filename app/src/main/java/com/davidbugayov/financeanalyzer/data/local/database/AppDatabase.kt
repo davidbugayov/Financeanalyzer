@@ -8,19 +8,17 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
-import com.davidbugayov.financeanalyzer.data.local.dao.FinancialGoalDao
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
-import com.davidbugayov.financeanalyzer.data.local.entity.FinancialGoalEntity
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 
 /**
  * Класс базы данных Room для приложения.
- * Содержит таблицы транзакций и финансовых целей.
+ * Содержит таблицу транзакций.
  */
 @Database(
-    entities = [TransactionEntity::class, FinancialGoalEntity::class],
-    version = 8,
+    entities = [TransactionEntity::class],
+    version = 9,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -30,11 +28,6 @@ abstract class AppDatabase : RoomDatabase() {
      * Предоставляет доступ к DAO для работы с транзакциями
      */
     abstract fun transactionDao(): TransactionDao
-    
-    /**
-     * Предоставляет доступ к DAO для работы с финансовыми целями
-     */
-    abstract fun financialGoalDao(): FinancialGoalDao
 
     companion object {
 
@@ -95,8 +88,8 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Добавляем колонку source с значением по умолчанию "Сбер"
-                db.execSQL("ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Сбер'")
+                // Добавляем колонку source с значением по умолчанию "Наличные"
+                db.execSQL("ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Наличные'")
             }
         }
 
@@ -153,27 +146,11 @@ abstract class AppDatabase : RoomDatabase() {
 
         /**
          * Миграция с версии 6 на версию 7
-         * Добавляет таблицу financial_goals
+         * Оставляем пустую миграцию, т.к. таблица financial_goals больше не нужна
          */
         private val MIGRATION_6_7 = object : Migration(6, 7) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Создаем таблицу для финансовых целей
-                db.execSQL(
-                    """
-                    CREATE TABLE IF NOT EXISTS financial_goals (
-                        id TEXT PRIMARY KEY NOT NULL,
-                        name TEXT NOT NULL,
-                        target_amount REAL NOT NULL,
-                        current_amount REAL NOT NULL,
-                        deadline INTEGER,
-                        category TEXT,
-                        description TEXT,
-                        created_at INTEGER NOT NULL,
-                        updated_at INTEGER NOT NULL,
-                        is_completed INTEGER NOT NULL
-                    )
-                    """
-                )
+                // Миграция не требуется
             }
         }
 
@@ -214,6 +191,20 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 8 на версию 9
+         * Обновляет схему таблицы после изменения значений по умолчанию для source
+         */
+        private val MIGRATION_8_9 = object : Migration(8, 9) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Эта миграция не изменяет структуру таблицы,
+                // а только синхронизирует схему Room с фактической схемой базы данных
+                // Можно добавить пустой блок или выполнить SQL для обновления данных
+                // Например, обновить источник "Сбер" на "Наличные" если нужно
+                db.execSQL("UPDATE transactions SET source = 'Наличные' WHERE source = 'Сбер'")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -230,7 +221,16 @@ abstract class AppDatabase : RoomDatabase() {
                     AppDatabase::class.java,
                     DATABASE_NAME
                 )
-                    .addMigrations(MIGRATION_1_2, MIGRATION_2_3, MIGRATION_3_4, MIGRATION_4_5, MIGRATION_5_6, MIGRATION_6_7, MIGRATION_7_8)
+                    .addMigrations(
+                        MIGRATION_1_2,
+                        MIGRATION_2_3,
+                        MIGRATION_3_4,
+                        MIGRATION_4_5,
+                        MIGRATION_5_6,
+                        MIGRATION_6_7,
+                        MIGRATION_7_8,
+                        MIGRATION_8_9
+                    )
                     .build()
                 INSTANCE = instance
                 instance

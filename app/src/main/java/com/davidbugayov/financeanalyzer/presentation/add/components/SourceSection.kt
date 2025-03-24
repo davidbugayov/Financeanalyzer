@@ -24,12 +24,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Source
 
@@ -41,7 +38,8 @@ fun SourceSection(
     sources: List<Source>,
     selectedSource: String,
     onSourceSelected: (Source) -> Unit,
-    onAddSourceClick: () -> Unit
+    onAddSourceClick: () -> Unit,
+    onSourceLongClick: (Source) -> Unit = {}
 ) {
     LazyRow(
         contentPadding = PaddingValues(horizontal = 16.dp),
@@ -51,61 +49,14 @@ fun SourceSection(
             SourceItem(
                 source = source,
                 isSelected = source.name == selectedSource,
-                onClick = { onSourceSelected(source) }
+                onClick = { onSourceSelected(source) },
+                onLongClick = { onSourceLongClick(source) }
             )
         }
 
         item {
             AddSourceItem(onClick = onAddSourceClick)
         }
-    }
-}
-
-/**
- * Элемент источника средств
- */
-@Composable
-fun SourceItem(
-    source: Source,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(80.dp)
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp)
-    ) {
-        Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)
-                .background(Color(source.color))
-                .border(
-                    width = if (isSelected) 3.dp else 0.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-                    shape = CircleShape
-                ),
-            contentAlignment = Alignment.Center
-        ) {
-            // Здесь можно добавить иконку для источника
-            Text(
-                text = source.name.first().toString(),
-                color = Color.White,
-                fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
-            )
-        }
-
-        Spacer(modifier = Modifier.height(4.dp))
-
-        Text(
-            text = source.name,
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            maxLines = 1
-        )
     }
 }
 

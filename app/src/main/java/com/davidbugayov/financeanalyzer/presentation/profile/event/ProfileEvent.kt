@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.event
 
-import com.davidbugayov.financeanalyzer.domain.model.FinancialGoal
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
 /**
@@ -26,62 +25,10 @@ sealed class ProfileEvent {
     data class SetExportError(val message: String) : ProfileEvent()
     
     /**
-     * Событие загрузки финансовых целей.
-     */
-    data object LoadFinancialGoals : ProfileEvent()
-    
-    /**
-     * Событие выбора финансовой цели.
-     * @param goalId Идентификатор выбранной цели.
-     */
-    data class SelectGoal(val goalId: String) : ProfileEvent()
-    
-    /**
-     * Событие открытия диалога добавления финансовой цели.
-     */
-    data object ShowAddGoalDialog : ProfileEvent()
-    
-    /**
-     * Событие открытия диалога редактирования финансовой цели.
-     * @param goalId Идентификатор цели для редактирования.
-     */
-    data class ShowEditGoalDialog(val goalId: String) : ProfileEvent()
-    
-    /**
-     * Событие закрытия диалога финансовой цели.
-     */
-    data object HideGoalDialog : ProfileEvent()
-    
-    /**
-     * Событие добавления финансовой цели.
-     * @param goal Финансовая цель для добавления.
-     */
-    data class AddGoal(val goal: FinancialGoal) : ProfileEvent()
-    
-    /**
-     * Событие обновления финансовой цели.
-     * @param goal Финансовая цель для обновления.
-     */
-    data class UpdateGoal(val goal: FinancialGoal) : ProfileEvent()
-    
-    /**
-     * Событие удаления финансовой цели.
-     * @param goalId Идентификатор цели для удаления.
-     */
-    data class DeleteGoal(val goalId: String) : ProfileEvent()
-    
-    /**
-     * Событие добавления суммы к финансовой цели.
-     * @param goalId Идентификатор цели.
-     * @param amount Сумма для добавления.
-     */
-    data class AddAmountToGoal(val goalId: String, val amount: Double) : ProfileEvent()
-    
-    /**
      * Событие изменения темы приложения.
-     * @param themeMode Выбранный режим темы (светлая, темная или системная).
+     * @param theme Выбранный режим темы (светлая, темная или системная).
      */
-    data class ChangeTheme(val themeMode: ThemeMode) : ProfileEvent()
+    data class ChangeTheme(val theme: ThemeMode) : ProfileEvent()
     
     /**
      * Событие отображения диалога выбора темы.

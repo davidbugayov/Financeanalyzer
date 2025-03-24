@@ -10,33 +10,24 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.DarkMode
 import androidx.compose.material.icons.filled.Language
 import androidx.compose.material.icons.filled.LightMode
-import androidx.compose.material.icons.filled.Lock
-import androidx.compose.material.icons.filled.Notifications
 import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Security
-import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material.icons.filled.Timer
-import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
@@ -45,10 +36,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
  * @param onThemeClick Обработчик нажатия на настройку темы.
  * @param onLanguageClick Обработчик нажатия на настройку языка.
  * @param onCurrencyClick Обработчик нажатия на настройку валюты.
- * @param onNotificationsClick Обработчик нажатия на настройку уведомлений.
  * @param onTransactionReminderClick Обработчик нажатия на настройку напоминаний о транзакциях.
- * @param onSecurityClick Обработчик нажатия на настройку безопасности.
- * @param onAdvancedSettingsClick Обработчик нажатия на расширенные настройки.
  * @param themeMode Текущий режим темы приложения.
  * @param isTransactionReminderEnabled Включены ли напоминания о транзакциях.
  * @param transactionReminderTime Время напоминания о транзакциях (часы и минуты) или null, если отключено.
@@ -59,30 +47,27 @@ fun SettingsSection(
     onThemeClick: () -> Unit,
     onLanguageClick: () -> Unit,
     onCurrencyClick: () -> Unit,
-    onNotificationsClick: () -> Unit,
     onTransactionReminderClick: () -> Unit,
-    onSecurityClick: () -> Unit,
-    onAdvancedSettingsClick: () -> Unit,
     themeMode: ThemeMode,
-    isTransactionReminderEnabled: Boolean = false,
-    transactionReminderTime: Pair<Int, Int>? = null,
+    isTransactionReminderEnabled: Boolean,
+    transactionReminderTime: Pair<Int, Int>?,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.profile_section_padding))
         ) {
             Text(
-                text = "Настройки",
-                style = MaterialTheme.typography.titleLarge
+                text = stringResource(R.string.profile_settings_title),
+                style = MaterialTheme.typography.titleMedium
             )
-            
-            Spacer(modifier = Modifier.height(16.dp))
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
             
             // Настройка темы
             SettingsItem(
@@ -99,8 +84,8 @@ fun SettingsSection(
                 },
                 onClick = onThemeClick
             )
-            
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Настройка языка
             SettingsItem(
@@ -109,59 +94,32 @@ fun SettingsSection(
                 subtitle = "Русский",
                 onClick = onLanguageClick
             )
-            
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Настройка валюты
             SettingsItem(
                 icon = Icons.Default.Payments,
-                title = "Валюта по умолчанию",
+                title = stringResource(R.string.profile_currency_title),
                 subtitle = "Рубль (₽)",
                 onClick = onCurrencyClick
             )
-            
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-            
-            // Настройка уведомлений
-            SettingsItem(
-                icon = Icons.Default.Notifications,
-                title = "Уведомления",
-                onClick = onNotificationsClick
-            )
-            
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
+
+            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
             
             // Настройка напоминаний о транзакциях
             SettingsItem(
                 icon = Icons.Default.Timer,
-                title = stringResource(R.string.transaction_reminders),
+                title = stringResource(R.string.profile_transaction_reminders_title),
                 subtitle = if (isTransactionReminderEnabled && transactionReminderTime != null) {
                     val (hour, minute) = transactionReminderTime
                     "Ежедневно в ${hour}:${String.format("%02d", minute)}"
                 } else {
-                    "Отключено"
+                    stringResource(R.string.off)
                 },
                 onClick = onTransactionReminderClick
             )
             
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-            
-            // Настройка безопасности
-            SettingsItem(
-                icon = Icons.Default.Security,
-                title = "Безопасность",
-                subtitle = "Блокировка приложения, резервное копирование",
-                onClick = onSecurityClick
-            )
-            
-            Divider(modifier = Modifier.padding(vertical = 8.dp))
-            
-            // Расширенные настройки
-            SettingsItem(
-                icon = Icons.Default.Settings,
-                title = "Расширенные настройки",
-                onClick = onAdvancedSettingsClick
-            )
         }
     }
 }
@@ -186,36 +144,38 @@ fun SettingsItem(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = 12.dp),
+            .padding(vertical = dimensionResource(R.dimen.spacing_normal)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
-            contentDescription = null,
-            modifier = Modifier.size(24.dp),
+            contentDescription = title,
+            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
             tint = MaterialTheme.colorScheme.primary
         )
-        
-        Spacer(modifier = Modifier.width(16.dp))
+
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
         
         Column(
             modifier = Modifier.weight(1f)
         ) {
             Text(
                 text = title,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
             
             if (subtitle != null) {
-                Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.bodyMedium,
+                    style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
-        
-        trailingContent?.invoke()
+
+        if (trailingContent != null) {
+            trailingContent()
+        }
     }
 } 

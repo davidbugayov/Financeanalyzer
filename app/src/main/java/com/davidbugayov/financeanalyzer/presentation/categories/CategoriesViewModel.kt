@@ -220,4 +220,24 @@ class CategoriesViewModel(
     fun isDefaultIncomeCategory(category: String): Boolean {
         return defaultIncomeCategories.any { it.name == category }
     }
+
+    /**
+     * Удаляет категорию расходов (для использования в TransactionHistoryViewModel)
+     */
+    fun deleteExpenseCategory(category: String) {
+        // Не даем удалить "Другое"
+        if (category == "Другое") return
+
+        removeCategory(category, true)
+    }
+
+    /**
+     * Удаляет категорию доходов (для использования в TransactionHistoryViewModel)
+     */
+    fun deleteIncomeCategory(category: String) {
+        // Не даем удалить "Другое"
+        if (category == "Другое") return
+
+        removeCategory(category, false)
+    }
 } 

@@ -24,7 +24,7 @@
     <string name="daily_expenses">Ежедневные расходы</string>
     <string name="cash_withdrawal">снятие</string>
     <string name="cash_deposit">пополнение</string>
-    <string name="loading_data">Загрузка данных...</string>
+    <string name="loading_data">Загрузка данных…</string>
     <string name="error">Ошибка</string>
     
     <!-- Главный экран -->
@@ -239,6 +239,18 @@
     <string name="expenses">Расходы</string>
     <string name="cannot_delete_default_category">Нельзя удалить стандартную категорию "%1$s"</string>
 
+    <!-- Добавленные строковые ресурсы для мультивыбора категорий -->
+    <string name="clear_selection">Сбросить выбор</string>
+    <string name="category_select_multiple">Выберите категории</string>
+    <string name="category_select_prompt">Можно выбрать несколько категорий</string>
+    <string name="select_all_categories">Выбрать все категории</string>
+
+    <!-- Добавленные строковые ресурсы для выбора источников -->
+    <string name="select_sources">Выбрать источники</string>
+    <string name="select_all_sources">Выбрать все источники</string>
+    <string name="all_sources">Все источники</string>
+    <string name="sources">Источники</string>
+
     <!-- Источники средств -->
     <string name="source">Откуда</string>
     <string name="source_name">Название источника</string>
@@ -256,9 +268,22 @@
 
     <!-- Профиль -->
     <string name="export_to_csv">Экспорт данных в CSV</string>
-    <string name="export_description">Экспортирует все ваши транзакции в CSV файл, который можно открыть в Excel или Google Таблицах.</string>
     <string name="export_success">Данные успешно экспортированы</string>
     <string name="export_error">Ошибка при экспорте данных</string>
+    <string name="export_description">Экспортирует все транзакции в CSV файл для использования в Excel или других программах.</string>
+    <string name="profile_analytics_title">Финансовая аналитика</string>
+    <string name="profile_settings_title">Настройки</string>
+    <string name="profile_theme_title">Тема</string>
+    <string name="profile_language_title">Язык</string>
+    <string name="profile_currency_title">Валюта по умолчанию</string>
+    <string name="profile_transaction_reminders_title">Напоминания о транзакциях</string>
+    <string name="off">Отключено</string>
+    <string name="profile_theme_system">Системная</string>
+    <string name="profile_theme_light">Светлая</string>
+    <string name="profile_theme_dark">Тёмная</string>
+    <string name="profile_theme_select">Выберите тему</string>
+    <string name="profile_financial_summary">Ваша финансовая сводка</string>
+    <string name="profile_savings_rate_format">%.1f%%</string>
     
     <!-- Финансовые цели -->
     <string name="financial_goals">Финансовые цели</string>
@@ -289,7 +314,9 @@
     <string name="transaction_reminder_text">Пора внести ваши сегодняшние доходы и расходы</string>
     <string name="transaction_reminders">Напоминания о транзакциях</string>
     <string name="transaction_reminder_settings">Настройки напоминаний</string>
-    <string name="reminder_time">Время напоминания</string>
+    <string name="select_reminder_time">Выберите время напоминания:</string>
+    <string name="reminder_description">Вы будете получать ежедневные напоминания о необходимости внести транзакции в указанное время.</string>
+    <string name="notifications_disabled_message">Напоминания отключены. Включите их, чтобы не забывать вносить транзакции.</string>
     
     <!-- Информация о приложении -->
     <string name="app_info">О приложении</string>
@@ -300,4 +327,20 @@
     <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
     <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
 
+    <!-- Разрешения и настройки -->
+    <string name="permission_denied">Разрешение отклонено</string>
+    <string name="permission_required">Требуется разрешение</string>
+    <string name="notification_permission_message">Для отправки напоминаний о транзакциях необходимо разрешение на уведомления.</string>
+    <string name="notification_permission_settings_message">Для работы напоминаний необходимо разрешение на уведомления. Вы можете включить их в настройках приложения.</string>
+    <string name="notification_permission_required">Для отправки напоминаний необходимо разрешение на уведомления.</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="request_permission">Запросить разрешение</string>
+    <string name="save">Сохранить</string>
+    <string name="selected_time">Выбранное время: %1$d:%2$s</string>
+
+    <!-- Базовые строки -->
+    <string name="loading_error">Ошибка загрузки данных</string>
+    <string name="default_amount">0.00 ₽</string>
+    <string name="default_small_amount">0 ₽</string>
+    <string name="navigation_back">Назад</string>
 </resources>

@@ -2,13 +2,13 @@ package com.davidbugayov.financeanalyzer.presentation.home.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -41,8 +41,10 @@ fun CompactLayout(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
-            .padding(bottom = 88.dp) // Добавляем отступ снизу для кнопок
     ) {
+        // Добавляем большой отступ сверху для гарантии, что контент не накладывается на TopAppBar
+        Spacer(modifier = Modifier.height(24.dp))
+        
         // Карточка с балансом
         BalanceCard(
             balance = state.balance
@@ -107,17 +109,17 @@ fun CompactLayout(
                     }
                 } else {
                     // Отображаем список транзакций
-                    state.filteredTransactions.forEachIndexed { index, transaction ->
+                    state.filteredTransactions.forEach { transaction ->
                         TransactionItemWithActions(
                             transaction = transaction,
                             onClick = onTransactionClick,
                             onLongClick = onTransactionLongClick
                         )
-                        if (index < state.filteredTransactions.size - 1) {
-                            HorizontalDivider()
-                        }
+                        Spacer(modifier = Modifier.height(8.dp))
                     }
                 }
+                // Увеличиваем нижний отступ для увеличенной нижней панели
+                Spacer(modifier = Modifier.height(140.dp))
             }
         }
     }

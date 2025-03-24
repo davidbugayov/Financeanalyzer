@@ -15,4 +15,17 @@ data class Transaction(
     val isExpense: Boolean,
     val note: String? = null,
     val source: String? = null
-) 
+)
+
+/**
+ * Функция расширения для форматирования суммы транзакции.
+ * Возвращает строку с форматированной суммой, включая знак "+" или "-" в зависимости от типа транзакции.
+ */
+fun Transaction.amountFormatted(): String {
+    val money = Money(this.amount, Currency.RUB)
+    return if (this.isExpense) {
+        "-${money.formatted()}"
+    } else {
+        "+${money.formatted()}"
+    }
+} 

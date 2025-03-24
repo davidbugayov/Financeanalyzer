@@ -2,8 +2,6 @@ package com.davidbugayov.financeanalyzer.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import androidx.room.TypeConverters
-import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.util.Date
 
@@ -12,7 +10,6 @@ import java.util.Date
  * Представляет таблицу transactions в базе данных.
  */
 @Entity(tableName = "transactions")
-@TypeConverters(DateConverter::class)
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
@@ -21,7 +18,7 @@ data class TransactionEntity(
     val isExpense: Boolean,
     val date: Date,
     val note: String?,
-    val source: String = "Сбер"
+    val source: String = "Наличные"
 ) {
 
     /**

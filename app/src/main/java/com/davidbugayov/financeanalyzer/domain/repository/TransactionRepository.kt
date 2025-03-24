@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.domain.repository
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
+import java.util.Date
 
 /**
  * Репозиторий для работы с транзакциями.
@@ -38,4 +39,12 @@ interface TransactionRepository {
      * @param id Идентификатор транзакции для удаления.
      */
     suspend fun deleteTransaction(id: String)
+
+    /**
+     * Получает транзакции за указанный период.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Flow со списком транзакций.
+     */
+    suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): Flow<List<Transaction>>
 } 

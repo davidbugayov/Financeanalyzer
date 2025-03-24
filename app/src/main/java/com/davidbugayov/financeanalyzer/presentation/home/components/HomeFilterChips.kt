@@ -9,7 +9,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 
@@ -33,19 +35,37 @@ fun HomeFilterChips(
         FilterChip(
             selected = currentFilter == TransactionFilter.TODAY,
             onClick = { onFilterSelected(TransactionFilter.TODAY) },
-            label = { Text(stringResource(R.string.filter_today)) }
+            label = {
+                Text(
+                    stringResource(R.string.filter_today),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         )
 
         FilterChip(
             selected = currentFilter == TransactionFilter.WEEK,
             onClick = { onFilterSelected(TransactionFilter.WEEK) },
-            label = { Text(stringResource(R.string.filter_week)) }
+            label = {
+                Text(
+                    stringResource(R.string.filter_week),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         )
 
         FilterChip(
             selected = currentFilter == TransactionFilter.MONTH,
             onClick = { onFilterSelected(TransactionFilter.MONTH) },
-            label = { Text(stringResource(R.string.filter_month)) }
+            label = {
+                Text(
+                    stringResource(R.string.filter_month),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+            }
         )
     }
 } 

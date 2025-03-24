@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.presentation.add.components.parseFormattedAmount
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -23,11 +24,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
-import java.math.BigDecimal
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.presentation.add.components.parseFormattedAmount
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -42,6 +39,9 @@ class AddTransactionViewModel(
 
     private val _state = MutableStateFlow(AddTransactionState())
     val state: StateFlow<AddTransactionState> = _state.asStateFlow()
+
+    // Храним категории, которые были использованы в этой сессии
+    private val usedCategories = mutableSetOf<Pair<String, Boolean>>() // category to isExpense
 
     init {
         // Загружаем категории
@@ -91,11 +91,27 @@ class AddTransactionViewModel(
     fun resetFields() {
         _state.update {
             AddTransactionState(
-                // Сохраняем только списки категорий и источников
+                // Сохраняем списки категорий и источников
                 expenseCategories = it.expenseCategories,
                 incomeCategories = it.incomeCategories,
-                sources = it.sources
+                sources = it.sources,
+                // Устанавливаем значения по умолчанию для источника
+                source = "Сбер",
+                sourceColor = ColorUtils.SBER_COLOR
             )
+        }
+    }
+
+    /**
+     * Обновляет позиции всех использованных категорий
+     */
+    fun updateCategoryPositions() {
+        viewModelScope.launch {
+            usedCategories.forEach { (category, isExpense) ->
+                categoriesViewModel.incrementCategoryUsage(category, isExpense)
+            }
+            // Очищаем список использованных категорий
+            usedCategories.clear()
         }
     }
 
@@ -105,7 +121,6 @@ class AddTransactionViewModel(
     fun onEvent(event: AddTransactionEvent) {
         when (event) {
             is AddTransactionEvent.SetAmount -> {
-                // Сохраняем нормализованное значение (с точкой вместо запятой)
                 _state.update { it.copy(amount = event.amount) }
             }
             is AddTransactionEvent.SetTitle -> {
@@ -115,11 +130,12 @@ class AddTransactionViewModel(
                 _state.update {
                     it.copy(
                         category = event.category,
-                        showCategoryPicker = false
+                        showCategoryPicker = false,
+                        categoryError = false // Сбрасываем ошибку при выборе категории
                     )
                 }
-                // Увеличиваем счетчик использования категории при выборе
-                categoriesViewModel.incrementCategoryUsage(event.category, _state.value.isExpense)
+                // Добавляем категорию в список использованных
+                usedCategories.add(event.category to _state.value.isExpense)
             }
             is AddTransactionEvent.SetNote -> {
                 _state.update { it.copy(note = event.note) }
@@ -139,7 +155,14 @@ class AddTransactionViewModel(
                 addCustomCategory(event.category)
             }
             is AddTransactionEvent.ToggleTransactionType -> {
-                _state.update { it.copy(isExpense = !it.isExpense) }
+                _state.update {
+                    it.copy(
+                        isExpense = !it.isExpense,
+                        // Сбрасываем категорию при переключении типа транзакции
+                        category = "",
+                        categoryError = false
+                    )
+                }
             }
             is AddTransactionEvent.ShowDatePicker -> {
                 _state.update { it.copy(showDatePicker = true) }
@@ -170,7 +193,53 @@ class AddTransactionViewModel(
             is AddTransactionEvent.HideCancelConfirmation -> {
                 _state.update { it.copy(showCancelConfirmation = false) }
             }
+            is AddTransactionEvent.ShowDeleteCategoryConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        categoryToDelete = event.category,
+                        showDeleteCategoryConfirmDialog = true
+                    )
+                }
+            }
+
+            is AddTransactionEvent.HideDeleteCategoryConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        categoryToDelete = null,
+                        showDeleteCategoryConfirmDialog = false
+                    )
+                }
+            }
+
+            is AddTransactionEvent.DeleteCategory -> {
+                deleteCategory(event.category)
+            }
+
+            is AddTransactionEvent.ShowDeleteSourceConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        sourceToDelete = event.source,
+                        showDeleteSourceConfirmDialog = true
+                    )
+                }
+            }
+
+            is AddTransactionEvent.HideDeleteSourceConfirmDialog -> {
+                _state.update {
+                    it.copy(
+                        sourceToDelete = null,
+                        showDeleteSourceConfirmDialog = false
+                    )
+                }
+            }
+
+            is AddTransactionEvent.DeleteSource -> {
+                deleteSource(event.source)
+            }
             is AddTransactionEvent.Submit -> {
+                if (!validateInput()) {
+                    return
+                }
                 addTransaction()
             }
             is AddTransactionEvent.ClearError -> {
@@ -395,7 +464,73 @@ class AddTransactionViewModel(
         _state.update { 
             it.copy(
                 note = if (it.note.isBlank()) "Чек прикреплен" else "${it.note} (Чек прикреплен)"
-            ) 
+            )
+        }
+    }
+
+    /**
+     * Удаляет категорию
+     */
+    private fun deleteCategory(category: String) {
+        // Проверяем, что категория существует и не равна "Другое"
+        if (category == "Другое") {
+            _state.update { it.copy(error = "Категорию \"Другое\" нельзя удалить") }
+            return
+        }
+
+        viewModelScope.launch {
+            // Удаляем категорию с учетом типа транзакции
+            if (_state.value.isExpense) {
+                categoriesViewModel.deleteExpenseCategory(category)
+            } else {
+                categoriesViewModel.deleteIncomeCategory(category)
+            }
+
+            // Если это была выбранная категория, очищаем выбор
+            if (_state.value.category == category) {
+                _state.update { it.copy(category = "") }
+            }
+
+            // Логируем удаление категории
+            AnalyticsUtils.logCategoryDeleted(category, _state.value.isExpense)
+        }
+    }
+
+    /**
+     * Удаляет источник
+     */
+    private fun deleteSource(source: String) {
+        // Проверяем, что источник существует и не является стандартным
+        if (source == "Сбер" || source == "Наличные" || source == "Тинькофф") {
+            _state.update { it.copy(error = "Стандартные источники удалить нельзя") }
+            return
+        }
+
+        val currentSources = _state.value.sources.toMutableList()
+        val sourceToDelete = currentSources.find { it.name == source }
+
+        if (sourceToDelete != null) {
+            // Удаляем источник из списка
+            currentSources.remove(sourceToDelete)
+
+            // Сохраняем обновленный список источников в SharedPreferences
+            preferencesManager.saveCustomSources(currentSources)
+
+            // Обновляем состояние
+            _state.update { it.copy(sources = currentSources) }
+
+            // Если это был выбранный источник, меняем на "Сбер"
+            if (_state.value.source == source) {
+                _state.update {
+                    it.copy(
+                        source = "Сбер",
+                        sourceColor = 0xFF21A038.toInt() // Цвет Сбера
+                    )
+                }
+            }
+
+            // Логируем удаление источника
+            AnalyticsUtils.logSourceDeleted(source)
         }
     }
 } 

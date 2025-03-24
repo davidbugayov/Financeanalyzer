@@ -51,7 +51,7 @@ fun HomeTransactionsHeader(
                 TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
                 TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
             },
-            fontSize = 18.sp,
+            fontSize = 16.sp,
             fontWeight = FontWeight.Medium
         )
 
@@ -75,7 +75,11 @@ fun HomeTransactionsHeader(
                 onClick = onShowAllClick,
                 modifier = Modifier.height(36.dp)
             ) {
-                Text(stringResource(R.string.all))
+                Text(
+                    text = stringResource(R.string.all),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

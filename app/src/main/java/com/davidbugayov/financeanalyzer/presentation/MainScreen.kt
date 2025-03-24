@@ -8,9 +8,9 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBarsPadding
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -18,10 +18,10 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import androidx.core.view.WindowCompat
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
@@ -35,10 +35,10 @@ import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.presentation.ui.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
 
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MainScreen(startDestination: String = "home") {
     val navController = rememberNavController()
@@ -48,26 +48,40 @@ fun MainScreen(startDestination: String = "home") {
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
     
-    // Получаем текущую тему из ProfileViewModel
-    val profileState = profileViewModel.state.collectAsState()
-    val themeMode = profileState.value.themeMode
+    val themeState = profileViewModel.themeMode.collectAsState()
+    val themeMode = themeState.value
+    
+    val view = LocalView.current
+
+    // Определяем isDarkTheme здесь, за пределами LaunchedEffect
+    val isDarkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
 
     // Отслеживаем изменения темы
     LaunchedEffect(themeMode) {
         // Обновляем UI при изменении темы
-        WindowCompat.getInsetsController(
-            (LocalView.current.context as Activity).window,
-            LocalView.current
-        ).apply {
-            isAppearanceLightStatusBars = themeMode != ThemeMode.DARK
-            isAppearanceLightNavigationBars = themeMode != ThemeMode.DARK
+        val window = (view.context as? Activity)?.window
+        if (window != null) {
+            // Устанавливаем прозрачность через WindowInsetsController вместо устаревших свойств
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+            val controller = WindowCompat.getInsetsController(window, window.decorView)
+
+            // Настраиваем иконки статус-бара и навигационной панели в зависимости от темы
+            // Светлые иконки для темной темы, темные иконки для светлой темы
+            controller.isAppearanceLightStatusBars = !isDarkTheme
+            controller.isAppearanceLightNavigationBars = !isDarkTheme
         }
     }
 
-    // Применяем тему к всему приложению
+    // Применяем тему к всему приложению - теперь изменения themeMode будут автоматически
+    // вызывать перерисовку всей композиции с новой темой
     FinanceAnalyzerTheme(themeMode = themeMode) {
         Scaffold(
-            modifier = Modifier.systemBarsPadding()
+            modifier = Modifier
+                .fillMaxSize() // Растягиваем фон на весь экран
         ) { paddingValues ->
             NavHost(
                 navController = navController, 
@@ -190,6 +204,7 @@ fun MainScreen(startDestination: String = "home") {
                         onNavigateBack = {
                             homeViewModel.onEvent(com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent.LoadTransactions)
                             chartViewModel.loadTransactions()
+                            profileViewModel.updateFinancialStatistics()
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(Screen.Home.route) {
                                     inclusive = true
@@ -271,7 +286,29 @@ fun MainScreen(startDestination: String = "home") {
                     ProfileScreen(
                         onNavigateBack = { navController.popBackStack() },
                         onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
-                        onNavigateToChart = { navController.navigate(Screen.Chart.route) }
+                        onNavigateToChart = { navController.navigate(Screen.Chart.route) },
+                        onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
+                    )
+                }
+
+                composable(
+                    route = Screen.ImportTransactions.route,
+                    enterTransition = {
+                        fadeIn(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        )
+                    },
+                    exitTransition = {
+                        fadeOut(
+                            animationSpec = tween(300, easing = EaseInOut)
+                        )
+                    }
+                ) {
+                    ImportTransactionsScreen(
+                        onNavigateBack = { navController.popBackStack() }
                     )
                 }
                 

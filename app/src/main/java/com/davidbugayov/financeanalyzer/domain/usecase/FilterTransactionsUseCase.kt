@@ -7,7 +7,7 @@ import java.util.Date
 
 /**
  * Use case для фильтрации списка транзакций.
- * Позволяет фильтровать транзакции по периоду и категории.
+ * Позволяет фильтровать транзакции по периоду и категориям.
  * Поддерживает различные типы периодов: все, день, месяц, год и кастомный период.
  * Следует принципу единственной ответственности (SRP) из SOLID.
  */
@@ -20,7 +20,8 @@ class FilterTransactionsUseCase {
      * @param periodType Тип периода для фильтрации
      * @param startDate Начальная дата для кастомного периода
      * @param endDate Конечная дата для кастомного периода
-     * @param category Категория для фильтрации (null для всех категорий)
+     * @param categories Список категорий для фильтрации (пустой список для всех категорий)
+     * @param sources Список источников для фильтрации (пустой список для всех источников)
      * @return Отфильтрованный список транзакций
      */
     operator fun invoke(
@@ -28,14 +29,16 @@ class FilterTransactionsUseCase {
         periodType: PeriodType,
         startDate: Date? = null,
         endDate: Date? = null,
-        category: String? = null
+        categories: List<String> = emptyList(),
+        sources: List<String> = emptyList()
     ): List<Transaction> {
         val filteredByPeriod = if (periodType == PeriodType.CUSTOM && startDate != null && endDate != null) {
             filterByDateRange(transactions, startDate, endDate)
         } else {
             filterByPeriod(transactions, periodType)
         }
-        return filterByCategory(filteredByPeriod, category)
+        val filteredByCategories = filterByCategories(filteredByPeriod, categories)
+        return filterBySources(filteredByCategories, sources)
     }
 
     /**
@@ -87,19 +90,40 @@ class FilterTransactionsUseCase {
     }
 
     /**
-     * Фильтрует транзакции по категории.
-     * Если категория не указана, возвращает все транзакции.
+     * Фильтрует транзакции по списку категорий.
+     * Если список категорий пуст, возвращает все транзакции.
      *
      * @param transactions Список транзакций для фильтрации
-     * @param category Категория для фильтрации
-     * @return Отфильтрованный по категории список транзакций
+     * @param categories Список категорий для фильтрации
+     * @return Отфильтрованный по категориям список транзакций
      */
-    private fun filterByCategory(
+    private fun filterByCategories(
         transactions: List<Transaction>,
-        category: String?
+        categories: List<String>
     ): List<Transaction> {
-        return if (category != null) {
-            transactions.filter { it.category == category }
+        return if (categories.isNotEmpty()) {
+            transactions.filter { transaction -> transaction.category in categories }
+        } else {
+            transactions
+        }
+    }
+
+    /**
+     * Фильтрует транзакции по списку источников.
+     * Если список источников пуст, возвращает все транзакции.
+     *
+     * @param transactions Список транзакций для фильтрации
+     * @param sources Список источников для фильтрации
+     * @return Отфильтрованный по источникам список транзакций
+     */
+    private fun filterBySources(
+        transactions: List<Transaction>,
+        sources: List<String>
+    ): List<Transaction> {
+        return if (sources.isNotEmpty()) {
+            transactions.filter { transaction ->
+                transaction.source in sources || (transaction.source == null && "Наличные" in sources)
+            }
         } else {
             transactions
         }
