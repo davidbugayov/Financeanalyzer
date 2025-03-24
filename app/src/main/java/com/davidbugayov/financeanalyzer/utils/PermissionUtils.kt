@@ -56,6 +56,22 @@ object PermissionUtils {
     }
 
     /**
+     * Открывает системные настройки приложения для управления разрешениями.
+     * Используется, когда пользователь отказал в предоставлении разрешения и нужно направить его
+     * в настройки для ручного включения разрешения.
+     * 
+     * @param context Контекст приложения
+     */
+    fun openApplicationSettings(context: Context) {
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            addCategory(Intent.CATEGORY_DEFAULT)
+            data = "package:${context.packageName}".toUri()
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            context.startActivity(this)
+        }
+    }
+
+    /**
      * Проверяет наличие разрешения на чтение внешнего хранилища.
      * Учитывает различия в API уровнях Android.
      *

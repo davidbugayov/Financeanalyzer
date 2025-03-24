@@ -24,8 +24,8 @@ class ImportFactory(
      * @return Подходящий UseCase для импорта транзакций
      */
     fun createImporter(uri: Uri): ImportTransactionsUseCase {
-        // Список всех доступных импортеров
-        val importers = listOf(
+        // Список всех доступных импортеров для CSV
+        val csvImporters = listOf(
             SberbankImportUseCase(repository, context),
             TinkoffImportUseCase(repository, context),
             AlfaBankImportUseCase(repository, context),
@@ -36,13 +36,20 @@ class ImportFactory(
 
         // Проверяем расширение файла
         val fileName = getFileName(uri)
+        val fileExtension = fileName.substringAfterLast('.', "").lowercase()
+
+        // Обработка PDF файлов
+        if (fileExtension == "pdf") {
+            // Для PDF файлов у нас есть только реализация для Сбербанка
+            return SberbankPdfImportUseCase(repository, context)
+        }
 
         // Если это CSV файл, пробуем определить его формат
-        if (fileName.endsWith(".csv", ignoreCase = true)) {
+        if (fileExtension == "csv") {
             // Пытаемся определить банк по содержимому файла
             context.contentResolver.openInputStream(uri)?.use { _ ->
                 // Проверяем каждый импортер на совместимость с файлом
-                for (importer in importers) {
+                for (importer in csvImporters) {
                     try {
                         if (isMatchingFormat(importer, uri)) {
                             return importer

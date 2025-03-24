@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.ui.components
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -25,6 +26,7 @@ import androidx.compose.ui.unit.dp
  * @param bankName Название банка
  * @param iconResId Идентификатор ресурса иконки банка
  * @param description Опциональное описание
+ * @param onClick Обработчик клика по карточке
  * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
@@ -32,10 +34,17 @@ fun BankImportCard(
     bankName: String,
     iconResId: Int,
     description: String? = null,
+    onClick: (() -> Unit)? = null,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier,
+        modifier = modifier.then(
+            if (onClick != null) {
+                Modifier.clickable(onClick = onClick)
+            } else {
+                Modifier
+            }
+        ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         ),

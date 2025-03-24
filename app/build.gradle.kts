@@ -224,6 +224,9 @@ dependencies {
 
     // JSON
     implementation(libs.gson)
+    
+    // PDF
+    implementation(libs.pdfbox.android)
 
     // Testing
     testImplementation(libs.junit)

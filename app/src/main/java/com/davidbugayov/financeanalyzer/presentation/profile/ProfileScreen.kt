@@ -198,7 +198,7 @@ fun ProfileScreen(
                         )
 
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
+                        
                         Column(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalAlignment = Alignment.End
@@ -223,6 +223,9 @@ fun ProfileScreen(
 
                 // Диалоги
                 ShowDialogs(state, viewModel, context)
+                
+                // Отступ внизу экрана для улучшения UX
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing) * 2))
             }
         }
     }

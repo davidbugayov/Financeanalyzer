@@ -40,6 +40,7 @@ timber = "5.0.1"
 room = "2.6.1"
 roomKsp = "1.9.22-1.0.17"
 gson = "2.10.1"
+pdfbox = "2.0.27.0"
 
 [libraries]
 # Kotlin
@@ -94,6 +95,9 @@ room-compiler = { group = "androidx.room", name = "room-compiler", version.ref =
 
 # JSON
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
+
+# PDF
+pdfbox-android = { group = "com.tom-roush", name = "pdfbox-android", version.ref = "pdfbox" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
