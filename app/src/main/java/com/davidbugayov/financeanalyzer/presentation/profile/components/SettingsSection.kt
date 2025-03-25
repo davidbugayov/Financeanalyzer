@@ -134,27 +134,27 @@ fun SettingsSection(
  */
 @Composable
 fun SettingsItem(
-    icon: ImageVector,
     title: String,
-    subtitle: String? = null,
+    icon: ImageVector,
     onClick: () -> Unit,
+    subtitle: String? = null,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable(onClick = onClick)
-            .padding(vertical = dimensionResource(R.dimen.spacing_normal)),
+            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Icon(
             imageVector = icon,
             contentDescription = title,
-            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
+            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small)),
             tint = MaterialTheme.colorScheme.primary
         )
 
-        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
         
         Column(
             modifier = Modifier.weight(1f)

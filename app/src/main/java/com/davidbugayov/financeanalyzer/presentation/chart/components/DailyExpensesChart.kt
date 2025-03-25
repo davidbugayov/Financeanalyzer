@@ -71,22 +71,23 @@ fun DailyExpensesChart(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.spacing_large), vertical = 8.dp),
+            .padding(horizontal = dimensionResource(R.dimen.spacing_medium), vertical = 6.dp),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_large))
+                .padding(dimensionResource(R.dimen.spacing_medium))
         ) {
             Text(
                 text = stringResource(R.string.daily_expenses),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize.times(0.95f)
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
             if (dailyExpenses.isEmpty()) {
                 Text(
@@ -106,16 +107,15 @@ fun DailyExpensesChart(
                     axisColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
                     modifier = Modifier
                         .fillMaxWidth()
-                        // Увеличиваем высоту для размещения подписей дат
-                        .height(240.dp)
+                        .height(220.dp)
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                 // Легенда графика - показываем только выбранные транзакции
                 displayedExpenses.forEach { expense ->
                     DailyExpenseItem(expense = expense, color = expenseColor)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(4.dp))
                 }
 
                 // Кнопка "Показать все", если есть скрытые транзакции
@@ -171,7 +171,7 @@ private fun ExpensesLineChart(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(180.dp)
             ) {
                 // Вертикальная ось с подписями сумм
                 Column(
@@ -216,14 +216,14 @@ private fun ExpensesLineChart(
                         .horizontalScroll(rememberScrollState())
                 ) {
                     // Определяем минимальную ширину для графика в зависимости от количества точек
-                    val minWidth = max(sortedExpenses.size * 30, 300).dp
+                    val minWidth = max(sortedExpenses.size * 25, 250).dp
 
                     Column {
                         // Сам график
                         Canvas(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(180.dp)
+                                .height(160.dp)
                                 .width(minWidth)
                         ) {
                             val width = size.width

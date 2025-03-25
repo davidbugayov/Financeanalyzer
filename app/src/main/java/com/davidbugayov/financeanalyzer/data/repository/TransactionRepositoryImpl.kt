@@ -30,6 +30,79 @@ class TransactionRepositoryImpl(
     }
 
     /**
+     * Получает транзакции с поддержкой пагинации.
+     * @param limit Количество транзакций для загрузки.
+     * @param offset Смещение (количество пропускаемых транзакций).
+     * @return Список транзакций с учетом пагинации.
+     */
+    override suspend fun getTransactionsPaginated(limit: Int, offset: Int): List<Transaction> = withContext(Dispatchers.IO) {
+        dao.getTransactionsPaginated(limit, offset).map { mapEntityToDomain(it) }
+    }
+    
+    /**
+     * Получает транзакции за указанный период с поддержкой пагинации.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @param limit Количество транзакций для загрузки.
+     * @param offset Смещение (количество пропускаемых транзакций).
+     * @return Список транзакций с учетом пагинации и диапазона дат.
+     */
+    override suspend fun getTransactionsByDateRangePaginated(
+        startDate: Date,
+        endDate: Date,
+        limit: Int,
+        offset: Int
+    ): List<Transaction> = withContext(Dispatchers.IO) {
+        dao.getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
+            .map { mapEntityToDomain(it) }
+    }
+
+    /**
+     * Загружает транзакции с пагинацией (метод из ITransactionRepository)
+     * @param limit Количество транзакций для загрузки
+     * @param offset Смещение (количество пропускаемых транзакций)
+     * @return Список транзакций с учетом пагинации
+     */
+    override suspend fun loadTransactionsPaginated(limit: Int, offset: Int): List<Transaction> {
+        return getTransactionsPaginated(limit, offset)
+    }
+
+    /**
+     * Получает транзакции за указанный период с пагинацией (метод из ITransactionRepository)
+     * @param startDate Начальная дата периода
+     * @param endDate Конечная дата периода
+     * @param limit Количество транзакций для загрузки
+     * @param offset Смещение (количество пропускаемых транзакций)
+     * @return Список транзакций с учетом пагинации и диапазона дат
+     */
+    override suspend fun getTransactionsPaginated(
+        startDate: Date, 
+        endDate: Date, 
+        limit: Int, 
+        offset: Int
+    ): List<Transaction> {
+        return getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
+    }
+
+    /**
+     * Получает общее количество транзакций
+     * @return Общее количество транзакций в базе данных
+     */
+    override suspend fun getTransactionsCount(): Int = withContext(Dispatchers.IO) {
+        dao.getTransactionsCount()
+    }
+
+    /**
+     * Получает общее количество транзакций в указанном диапазоне дат
+     * @param startDate Начальная дата периода
+     * @param endDate Конечная дата периода
+     * @return Количество транзакций в указанном диапазоне дат
+     */
+    override suspend fun getTransactionsCountByDateRange(startDate: Date, endDate: Date): Int = withContext(Dispatchers.IO) {
+        dao.getTransactionsCountByDateRange(startDate, endDate)
+    }
+
+    /**
      * Загружает все транзакции (метод из ITransactionRepository)
      * @return Список транзакций
      */

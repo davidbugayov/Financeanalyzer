@@ -4,6 +4,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
@@ -22,6 +24,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -32,6 +35,7 @@ class TransactionHistoryViewModel @Inject constructor(
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
+    private val repository: TransactionRepository,
     private val eventBus: EventBus,
     private val analyticsUtils: AnalyticsUtils,
     val categoriesViewModel: CategoriesViewModel
@@ -41,7 +45,7 @@ class TransactionHistoryViewModel @Inject constructor(
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
 
     init {
-        loadTransactions()
+        loadTransactionsFirstPage()
         loadCategories()
     }
 
@@ -69,7 +73,8 @@ class TransactionHistoryViewModel @Inject constructor(
             is TransactionHistoryEvent.SetDateRange -> updateDateRange(event.startDate, event.endDate)
             is TransactionHistoryEvent.SetStartDate -> updateStartDate(event.date)
             is TransactionHistoryEvent.SetEndDate -> updateEndDate(event.date)
-            is TransactionHistoryEvent.ReloadTransactions -> loadTransactions()
+            is TransactionHistoryEvent.ReloadTransactions -> resetAndReloadTransactions()
+            is TransactionHistoryEvent.LoadMoreTransactions -> loadMoreTransactions()
             is TransactionHistoryEvent.ShowDeleteConfirmDialog -> showDeleteConfirmDialog(event.transaction)
             is TransactionHistoryEvent.HideDeleteConfirmDialog -> hideDeleteConfirmDialog()
             is TransactionHistoryEvent.DeleteCategory -> deleteCategory(event.category, event.isExpense)
@@ -79,7 +84,6 @@ class TransactionHistoryViewModel @Inject constructor(
             is TransactionHistoryEvent.ShowDeleteSourceConfirmDialog -> showDeleteSourceConfirmDialog(
                 event.source
             )
-
             is TransactionHistoryEvent.HideDeleteSourceConfirmDialog -> hideDeleteSourceConfirmDialog()
             is TransactionHistoryEvent.ShowPeriodDialog -> showPeriodDialog()
             is TransactionHistoryEvent.HidePeriodDialog -> hidePeriodDialog()
@@ -99,9 +103,8 @@ class TransactionHistoryViewModel @Inject constructor(
             when (val result = deleteTransactionUseCase(transaction)) {
                 is Result.Success -> {
                     eventBus.emit(Event.TransactionDeleted)
-                    loadTransactions()
+                    resetAndReloadTransactions()
                 }
-
                 is Result.Error -> {
                     Timber.e(result.exception, "Failed to delete transaction")
                     _state.update { it.copy(error = result.exception.message) }
@@ -110,38 +113,176 @@ class TransactionHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun loadTransactions() {
-        viewModelScope.launch {
-            when (val result = loadTransactionsUseCase()) {
-                is Result.Success -> {
-                    _state.update {
-                        it.copy(
-                            transactions = result.data,
-                            error = null
-                        )
-                    }
-                    updateFilteredTransactions()
-                }
+    /**
+     * Сбрасывает состояние пагинации и загружает первую страницу транзакций
+     */
+    private fun resetAndReloadTransactions() {
+        _state.update { 
+            it.copy(
+                currentPage = 0,
+                hasMoreData = true,
+                transactions = emptyList(),
+                filteredTransactions = emptyList(),
+                groupedTransactions = emptyMap()
+            ) 
+        }
+        loadTransactionsFirstPage()
+    }
 
-                is Result.Error -> {
-                    Timber.e(result.exception, "Failed to load transactions")
-                    _state.update { it.copy(error = result.exception.message) }
+    /**
+     * Загружает первую страницу транзакций
+     */
+    private fun loadTransactionsFirstPage() {
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true, error = null) }
+            
+            try {
+                val currentState = _state.value
+                val pageSize = currentState.pageSize
+                
+                // Получаем общее количество транзакций для выбранного периода
+                val totalCount = if (currentState.periodType == PeriodType.CUSTOM || 
+                                     currentState.periodType == PeriodType.ALL) {
+                    repository.getTransactionsCountByDateRange(
+                        currentState.startDate,
+                        currentState.endDate
+                    )
+                } else {
+                    repository.getTransactionsCount()
+                }
+                
+                // Загружаем первую страницу транзакций
+                val transactions = if (currentState.periodType == PeriodType.CUSTOM || 
+                                       currentState.periodType == PeriodType.ALL) {
+                    repository.getTransactionsByDateRangePaginated(
+                        currentState.startDate,
+                        currentState.endDate,
+                        pageSize,
+                        0
+                    )
+                } else {
+                    repository.getTransactionsPaginated(pageSize, 0)
+                }
+                
+                // Обновляем состояние
+                _state.update {
+                    it.copy(
+                        transactions = transactions,
+                        currentPage = 1,
+                        hasMoreData = transactions.size < totalCount,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+                
+                updateFilteredTransactions()
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to load transactions")
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    ) 
                 }
             }
         }
     }
 
+    /**
+     * Загружает следующую страницу транзакций
+     */
+    private fun loadMoreTransactions() {
+        viewModelScope.launch {
+            val currentState = _state.value
+            
+            // Проверяем, есть ли ещё данные для загрузки
+            if (!currentState.hasMoreData || currentState.isLoadingMore) {
+                return@launch
+            }
+            
+            _state.update { it.copy(isLoadingMore = true) }
+            
+            try {
+                val pageSize = currentState.pageSize
+                val currentPage = currentState.currentPage
+                val offset = currentPage * pageSize
+                
+                // Загружаем следующую страницу
+                val nextPageTransactions = if (currentState.periodType == PeriodType.CUSTOM || 
+                                              currentState.periodType == PeriodType.ALL) {
+                    repository.getTransactionsByDateRangePaginated(
+                        currentState.startDate,
+                        currentState.endDate,
+                        pageSize,
+                        offset
+                    )
+                } else {
+                    repository.getTransactionsPaginated(pageSize, offset)
+                }
+                
+                // Если новых транзакций нет - больше нет данных
+                if (nextPageTransactions.isEmpty()) {
+                    _state.update { 
+                        it.copy(
+                            hasMoreData = false,
+                            isLoadingMore = false
+                        ) 
+                    }
+                    return@launch
+                }
+                
+                // Оптимизация: добавляем задержку перед обновлением UI
+                // Это предотвращает заикание при прокрутке большого количества данных
+                delay(100)
+                
+                // Обновляем список транзакций, добавляя новые данные
+                val updatedTransactions = currentState.transactions + nextPageTransactions
+                
+                _state.update {
+                    it.copy(
+                        transactions = updatedTransactions,
+                        currentPage = currentPage + 1,
+                        isLoadingMore = false
+                    )
+                }
+                
+                // Оптимизация: выполняем фильтрацию с задержкой,
+                // чтобы не блокировать UI-поток
+                launch {
+                    updateFilteredTransactions()
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to load more transactions")
+                _state.update { 
+                    it.copy(
+                        isLoadingMore = false,
+                        error = e.message
+                    ) 
+                }
+            }
+        }
+    }
+
+    private fun loadTransactions() {
+        resetAndReloadTransactions()
+    }
+
     private fun updateFilteredTransactions() {
         viewModelScope.launch {
             val currentState = _state.value
-            val filteredTransactions = filterTransactionsUseCase(
-                transactions = currentState.transactions,
-                periodType = currentState.periodType,
-                startDate = currentState.startDate,
-                endDate = currentState.endDate,
-                categories = currentState.selectedCategories,
-                sources = currentState.selectedSources
-            )
+            
+            // Оптимизация: выполняем фильтрацию в IO-контексте
+            val filteredTransactions = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                filterTransactionsUseCase(
+                    transactions = currentState.transactions,
+                    periodType = currentState.periodType,
+                    startDate = currentState.startDate,
+                    endDate = currentState.endDate,
+                    categories = currentState.selectedCategories,
+                    sources = currentState.selectedSources
+                )
+            }
+            
             _state.update {
                 it.copy(
                     filteredTransactions = filteredTransactions,
@@ -156,10 +297,15 @@ class TransactionHistoryViewModel @Inject constructor(
     private fun updateGroupedTransactions() {
         viewModelScope.launch {
             val currentState = _state.value
-            val groupedTransactions = groupTransactionsUseCase(
-                transactions = currentState.filteredTransactions,
-                groupingType = currentState.groupingType
-            )
+            
+            // Оптимизация: выполняем группировку в IO-контексте
+            val groupedTransactions = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                groupTransactionsUseCase(
+                    transactions = currentState.filteredTransactions,
+                    groupingType = currentState.groupingType
+                )
+            }
+            
             _state.update {
                 it.copy(
                     groupedTransactions = groupedTransactions,
@@ -173,13 +319,17 @@ class TransactionHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             val currentState = _state.value
 
-            val categoryStats = calculateCategoryStatsUseCase(
-                transactions = currentState.filteredTransactions,
-                categories = currentState.selectedCategories,
-                periodType = currentState.periodType,
-                startDate = currentState.startDate,
-                endDate = currentState.endDate
-            )
+            // Оптимизация: выполняем расчеты в IO-контексте
+            val categoryStats = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
+                calculateCategoryStatsUseCase(
+                    transactions = currentState.filteredTransactions,
+                    categories = currentState.selectedCategories,
+                    periodType = currentState.periodType,
+                    startDate = currentState.startDate,
+                    endDate = currentState.endDate
+                )
+            }
+            
             _state.update {
                 it.copy(
                     categoryStats = categoryStats,

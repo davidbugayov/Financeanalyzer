@@ -358,11 +358,16 @@ fun TransactionHistoryScreen(
                         onTransactionClick = { /* Пока ничего не делаем при клике */ },
                         onTransactionLongClick = { transaction ->
                             viewModel.onEvent(TransactionHistoryEvent.ShowDeleteConfirmDialog(transaction))
-                        }
+                        },
+                        onLoadMore = {
+                            viewModel.onEvent(TransactionHistoryEvent.LoadMoreTransactions)
+                        },
+                        isLoading = state.isLoadingMore,
+                        hasMoreData = state.hasMoreData
                     )
                 }
 
-                if (state.isLoading) {
+                if (state.isLoading && !state.isLoadingMore) {
                     CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                 }
             }

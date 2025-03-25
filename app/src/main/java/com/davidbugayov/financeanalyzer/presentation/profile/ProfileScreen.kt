@@ -142,7 +142,7 @@ fun ProfileScreen(
                 AppInfoSection(
                     appVersion = appVersion,
                     buildVersion = buildVersion,
-                    onLibrariesClick = onNavigateToLibraries,
+                    onNavigateToLibraries = onNavigateToLibraries,
                     modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                 )
 

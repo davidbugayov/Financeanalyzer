@@ -14,5 +14,17 @@ dependencyResolutionManagement {
     }
 }
 
+// Build cache optimization
+buildCache {
+    local {
+        isEnabled = true
+        directory = File(rootDir, "build-cache")
+    }
+}
+
+// Enable modern Gradle features
+enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
+
+// Set project name
 rootProject.name = "FinanceAnalyzer"
 include(":app")

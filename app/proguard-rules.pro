@@ -239,3 +239,11 @@
     private static synthetic *** lambda$*(...);
 }
 -dontwarn java.lang.invoke.LambdaMetafactory
+
+# Правила для PDFBox
+-keep class com.tom_roush.pdfbox.** { *; }
+-dontwarn com.tom_roush.pdfbox.**
+-keep class org.apache.pdfbox.** { *; }
+-dontwarn org.apache.pdfbox.**
+-keep class com.gemalto.jp2.** { *; }
+-dontwarn com.gemalto.jp2.**

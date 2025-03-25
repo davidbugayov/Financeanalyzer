@@ -41,7 +41,7 @@ fun HomeTransactionsHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
@@ -51,33 +51,33 @@ fun HomeTransactionsHeader(
                 TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
                 TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
             },
-            fontSize = 16.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Medium
         )
 
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
             // Кнопка для управления видимостью сводки
             IconButton(
                 onClick = { onShowGroupSummaryChange(!showGroupSummary) },
-                modifier = Modifier.size(36.dp)
+                modifier = Modifier.size(32.dp)
             ) {
                 Icon(
                     imageVector = if (showGroupSummary) Icons.Default.Visibility else Icons.Default.VisibilityOff,
                     contentDescription = stringResource(R.string.show_summary),
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(20.dp)
                 )
             }
 
             TextButton(
                 onClick = onShowAllClick,
-                modifier = Modifier.height(36.dp)
+                modifier = Modifier.height(32.dp)
             ) {
                 Text(
                     text = stringResource(R.string.all),
-                    fontSize = 14.sp,
+                    fontSize = 13.sp,
                     fontWeight = FontWeight.Medium
                 )
             }

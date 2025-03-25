@@ -168,7 +168,7 @@ fun TransactionItem(transaction: Transaction) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 4.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         Spacer(modifier = Modifier.width(8.dp))
@@ -176,7 +176,7 @@ fun TransactionItem(transaction: Transaction) {
         // Иконка категории транзакции
         Box(
             modifier = Modifier
-                .size(36.dp)
+                .size(32.dp)
                 .clip(CircleShape)
                 .background(backgroundTint),
             contentAlignment = Alignment.Center
@@ -185,11 +185,11 @@ fun TransactionItem(transaction: Transaction) {
                 imageVector = categoryIcon,
                 contentDescription = transaction.category,
                 tint = indicatorColor,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(18.dp)
             )
         }
 
-        Spacer(modifier = Modifier.width(12.dp))
+        Spacer(modifier = Modifier.width(8.dp))
 
         // Информация о транзакции
         Column(
@@ -198,7 +198,7 @@ fun TransactionItem(transaction: Transaction) {
             Text(
                 text = transaction.category,
                 style = MaterialTheme.typography.bodyLarge,
-                fontSize = 14.sp,
+                fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
                 color = MaterialTheme.colorScheme.onSurface
             )
@@ -206,7 +206,7 @@ fun TransactionItem(transaction: Transaction) {
             // Информация о категории и дате
             Text(
                 text = formattedDate,
-                fontSize = 12.sp,
+                fontSize = 11.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
 
@@ -270,7 +270,7 @@ fun TransactionItem(transaction: Transaction) {
         ) {
             Text(
                 text = transaction.amountFormatted(),
-                fontSize = 16.sp,
+                fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = indicatorColor
             )
@@ -294,6 +294,24 @@ fun TransactionItemWithActions(
     onLongClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // Кэшируем форматированные данные, чтобы не пересчитывать их при каждой перерисовке
+    val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
+    val formattedDate = remember(transaction.date) { dateFormat.format(transaction.date) }
+    val formattedAmount = remember(transaction.amount) { transaction.amountFormatted() }
+    
+    // Получаем иконки и цвета (без использования remember с Composable функциями)
+    val categoryIcon = getCategoryIcon(transaction.category, transaction.isExpense)
+    val  sourceIconPair = getBankIcon(transaction.source ?: "")
+    
+    // Кэшируем цвета
+    val indicatorColor = remember(transaction.isExpense) {
+        if (transaction.isExpense) Color(0xFFB71C1C) else Color(0xFF2E7D32)
+    }
+    
+    val backgroundTint = remember(transaction.isExpense) {
+        if (transaction.isExpense) Color(0xFFFFE0E0) else Color(0xFFE0F7E0)
+    }
+    
     Surface(
         modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
@@ -308,10 +326,141 @@ fun TransactionItemWithActions(
                     onClick = { onClick(transaction) },
                     onLongClick = { onLongClick(transaction) }
                 )
-                .padding(horizontal = 8.dp, vertical = 4.dp)
+                .padding(horizontal = 8.dp, vertical = 2.dp)
         ) {
-            TransactionItem(transaction = transaction)
+            // Используем оптимизированную версию TransactionItem
+            OptimizedTransactionItem(
+                transaction = transaction,
+                formattedDate = formattedDate,
+                formattedAmount = formattedAmount,
+                categoryIcon = categoryIcon,
+                sourceIconPair = sourceIconPair,
+                indicatorColor = indicatorColor,
+                backgroundTint = backgroundTint
+            )
         }
+    }
+}
+
+/**
+ * Оптимизированная версия компонента TransactionItem с предварительно вычисленными данными
+ */
+@Composable
+private fun OptimizedTransactionItem(
+    transaction: Transaction,
+    formattedDate: String,
+    formattedAmount: String,
+    categoryIcon: ImageVector,
+    sourceIconPair: Pair<ImageVector, Color>,
+    indicatorColor: Color,
+    backgroundTint: Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Иконка категории транзакции
+        Box(
+            modifier = Modifier
+                .size(32.dp)
+                .clip(CircleShape)
+                .background(backgroundTint),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = categoryIcon,
+                contentDescription = transaction.category,
+                tint = indicatorColor,
+                modifier = Modifier.size(18.dp)
+            )
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Информация о транзакции
+        Column(
+            modifier = Modifier.weight(1f)
+        ) {
+            Text(
+                text = transaction.category,
+                style = MaterialTheme.typography.bodyLarge,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            // Информация о категории и дате
+            Text(
+                text = formattedDate,
+                fontSize = 11.sp,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+
+            // Информация о банках (источник -> получатель)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                modifier = Modifier.padding(top = 2.dp)
+            ) {
+                // Иконка банка-источника
+                Icon(
+                    imageVector = sourceIconPair.first,
+                    contentDescription = transaction.source,
+                    tint = sourceIconPair.second,
+                    modifier = Modifier.size(12.dp)
+                )
+
+                Spacer(modifier = Modifier.width(2.dp))
+
+                // Название банка-источника
+                Text(
+                    text = transaction.source ?: "",
+                    fontSize = 11.sp,
+                    color = sourceIconPair.second,
+                    fontWeight = FontWeight.Medium
+                )
+
+                // Если получатель "Трата", показываем текст "снятие" или "пополнение"
+                Spacer(modifier = Modifier.width(4.dp))
+
+                val operationText = if (transaction.isExpense)
+                    stringResource(R.string.cash_withdrawal)
+                else
+                    stringResource(R.string.cash_deposit)
+
+                Text(
+                    text = "• $operationText",
+                    fontSize = 11.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                )
+            }
+
+            // Примечание к транзакции
+            transaction.note?.let {
+                if (it.isNotEmpty()) {
+                    Text(
+                        text = it,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+            }
+        }
+
+        Spacer(modifier = Modifier.width(8.dp))
+
+        // Сумма транзакции
+        Text(
+            text = formattedAmount,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold,
+            color = indicatorColor
+        )
     }
 }
 

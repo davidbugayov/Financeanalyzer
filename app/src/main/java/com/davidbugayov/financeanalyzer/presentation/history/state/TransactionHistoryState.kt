@@ -17,6 +17,10 @@ import java.util.Date
  * @property filteredTransactions Отфильтрованный список транзакций по выбранным критериям
  * @property groupedTransactions Группированные транзакции
  * @property isLoading Флаг загрузки данных
+ * @property isLoadingMore Флаг загрузки дополнительных данных при пагинации
+ * @property hasMoreData Флаг наличия дополнительных данных для загрузки
+ * @property currentPage Текущая страница при пагинации
+ * @property pageSize Размер страницы при пагинации
  * @property error Текст ошибки (null если ошибок нет)
  * @property selectedCategories Список выбранных категорий для фильтрации (пустой список для всех категорий)
  * @property selectedSources Список выбранных источников для фильтрации (пустой список для всех источников)
@@ -42,6 +46,10 @@ data class TransactionHistoryState(
     val filteredTransactions: List<Transaction> = emptyList(),
     val groupedTransactions: Map<String, List<Transaction>> = emptyMap(),
     val isLoading: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val hasMoreData: Boolean = true,
+    val currentPage: Int = 0,
+    val pageSize: Int = 50,
     val error: String? = null,
     val selectedCategories: List<String> = emptyList(),
     val selectedSources: List<String> = emptyList(),

@@ -14,6 +14,20 @@ interface TransactionRepository {
      * @return Список всех транзакций.
      */
     suspend fun getAllTransactions(): List<Transaction>
+
+    /**
+     * Получает транзакции с пагинацией.
+     * @param limit Количество транзакций для загрузки.
+     * @param offset Смещение (количество пропускаемых транзакций).
+     * @return Список транзакций с учетом пагинации.
+     */
+    suspend fun getTransactionsPaginated(limit: Int, offset: Int): List<Transaction>
+
+    /**
+     * Получает общее количество транзакций.
+     * @return Общее количество транзакций в базе данных.
+     */
+    suspend fun getTransactionsCount(): Int
     
     /**
      * Получает транзакцию по идентификатору.
@@ -47,4 +61,27 @@ interface TransactionRepository {
      * @return Flow со списком транзакций.
      */
     suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): Flow<List<Transaction>>
+
+    /**
+     * Получает транзакции за указанный период с пагинацией.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @param limit Количество транзакций для загрузки.
+     * @param offset Смещение (количество пропускаемых транзакций).
+     * @return Список транзакций с учетом пагинации и диапазона дат.
+     */
+    suspend fun getTransactionsByDateRangePaginated(
+        startDate: Date, 
+        endDate: Date,
+        limit: Int,
+        offset: Int
+    ): List<Transaction>
+
+    /**
+     * Получает общее количество транзакций в указанном диапазоне дат.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Количество транзакций в указанном диапазоне дат.
+     */
+    suspend fun getTransactionsCountByDateRange(startDate: Date, endDate: Date): Int
 } 

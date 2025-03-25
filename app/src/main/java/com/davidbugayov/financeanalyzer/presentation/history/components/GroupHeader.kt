@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
@@ -97,16 +98,16 @@ fun GroupHeader(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 4.dp) // Уменьшаем вертикальные отступы
+            .padding(horizontal = 16.dp, vertical = 2.dp) // Уменьшаем вертикальные отступы
             .clip(MaterialTheme.shapes.medium)
             .clickable { onExpandToggle(!isExpanded) },
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp), // Уменьшаем высоту тени
         colors = CardDefaults.cardColors(containerColor = backgroundColor)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 12.dp) // Уменьшаем вертикальные отступы внутри карточки
+                .padding(horizontal = 12.dp, vertical = 8.dp) // Уменьшаем внутренние отступы
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -115,7 +116,7 @@ fun GroupHeader(
             ) {
                 Text(
                     text = period,
-                    fontSize = 16.sp, // Уменьшаем размер шрифта
+                    fontSize = 15.sp, // Уменьшаем размер шрифта
                     fontWeight = FontWeight.Bold,
                     color = headerTextColor
                 )
@@ -123,7 +124,8 @@ fun GroupHeader(
                 Icon(
                     imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = if (isExpanded) stringResource(R.string.collapse) else stringResource(R.string.expand),
-                    tint = headerTextColor
+                    tint = headerTextColor,
+                    modifier = Modifier.size(20.dp) // Уменьшаем размер иконки
                 )
             }
 
@@ -135,7 +137,7 @@ fun GroupHeader(
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 8.dp) // Уменьшаем верхний отступ
+                        .padding(top = 4.dp) // Уменьшаем верхний отступ
                 ) {
                     // Строка с метками
                     Row(

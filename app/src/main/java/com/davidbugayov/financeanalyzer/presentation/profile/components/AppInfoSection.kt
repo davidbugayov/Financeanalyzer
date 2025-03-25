@@ -26,75 +26,92 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
+import androidx.compose.ui.unit.dp
 
 /**
  * Компонент для отображения информации о приложении.
  * @param appVersion Версия приложения.
  * @param buildVersion Версия сборки (код версии).
- * @param onLibrariesClick Обработчик нажатия на пункт "Используемые библиотеки".
+ * @param onNavigateToLibraries Обработчик нажатия на кнопку "Используемые библиотеки".
  * @param modifier Модификатор для настройки внешнего вида.
  */
 @Composable
 fun AppInfoSection(
     appVersion: String,
     buildVersion: String,
-    onLibrariesClick: () -> Unit,
+    onNavigateToLibraries: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
+        modifier = modifier
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = MaterialTheme.shapes.medium
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.profile_section_padding))
+                .padding(dimensionResource(R.dimen.spacing_medium))
         ) {
             Text(
                 text = stringResource(R.string.app_info),
-                style = MaterialTheme.typography.titleMedium
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             
             // Версия приложения
-            AppInfoItem(
-                icon = Icons.Default.Info,
-                title = stringResource(R.string.app_version),
-                value = appVersion
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
-            
-            // Версия сборки
-            AppInfoItem(
-                icon = Icons.Default.Update,
-                title = stringResource(R.string.build_version),
-                value = buildVersion
-            )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
-            
-            // Используемые библиотеки
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = onLibrariesClick)
-                    .padding(vertical = dimensionResource(R.dimen.spacing_normal)),
-                verticalAlignment = Alignment.CenterVertically
+                    .padding(vertical = dimensionResource(R.dimen.spacing_small))
             ) {
-                Icon(
-                    imageVector = Icons.AutoMirrored.Filled.List,
-                    contentDescription = null,
-                    modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
-                    tint = MaterialTheme.colorScheme.primary
+                Text(
+                    text = stringResource(R.string.app_version),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
                 )
-
-                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                 
                 Text(
-                    text = stringResource(R.string.libraries),
+                    text = appVersion,
                     style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            // Версия сборки
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = dimensionResource(R.dimen.spacing_small))
+            ) {
+                Text(
+                    text = stringResource(R.string.build_version),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                Text(
+                    text = buildVersion,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+
+            HorizontalDivider()
+
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+
+            // Кнопка для перехода к списку использованных библиотек
+            androidx.compose.material3.TextButton(
+                onClick = onNavigateToLibraries,
+                modifier = Modifier.align(Alignment.End)
+            ) {
+                Text(
+                    text = stringResource(R.string.libraries),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.primary
                 )
             }
         }
