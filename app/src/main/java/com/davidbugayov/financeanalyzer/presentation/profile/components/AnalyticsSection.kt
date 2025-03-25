@@ -1,7 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.components
 
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,36 +9,51 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import java.text.NumberFormat
-import java.util.Locale
+import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Компонент для отображения финансовой статистики и аналитики.
- * @param totalIncome Общий доход.
- * @param totalExpense Общий расход.
- * @param balance Текущий баланс.
- * @param savingsRate Процент сбережений.
- * @param onNavigateToChart Обработчик нажатия для перехода на экран статистики.
- * @param modifier Модификатор для настройки внешнего вида.
+ * @param totalIncome Общий доход
+ * @param totalExpense Общий расход
+ * @param balance Текущий баланс
+ * @param savingsRate Норма сбережений
+ * @param totalTransactions Общее количество транзакций
+ * @param totalExpenseCategories Общее количество категорий расходов
+ * @param totalIncomeCategories Общее количество категорий доходов
+ * @param averageExpense Средний расход
+ * @param totalSourcesUsed Общее количество использованных источников
+ * @param dateRange Строка с диапазоном дат для отображения
+ * @param onSavingsRateClick Обработчик нажатия на норму сбережений
+ * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
 fun AnalyticsSection(
@@ -48,196 +61,311 @@ fun AnalyticsSection(
     totalExpense: Double,
     balance: Double,
     savingsRate: Double,
-    onNavigateToChart: () -> Unit = {},
+    totalTransactions: Int,
+    totalExpenseCategories: Int,
+    totalIncomeCategories: Int,
+    averageExpense: String,
+    totalSourcesUsed: Int,
+    dateRange: String = "Все время",
+    onSavingsRateClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
-    val currencyFormat = NumberFormat.getCurrencyInstance(Locale("ru", "RU"))
-    val percentFormat = NumberFormat.getPercentInstance(Locale("ru", "RU"))
-
-    // Определяем цвета для доходов и расходов
-    val incomeColor = Color(0xFF2E7D32) // Темно-зеленый для доходов
-    val expenseColor = Color(0xFFB71C1C) // Темно-красный для расходов
-
-    // Определяем цвет для баланса в зависимости от его значения
-    val balanceColor = if (balance >= 0) incomeColor else expenseColor
-
-    // Цвета фона для карточек
-    val incomeBackgroundColor = Color(0xFFE0F7E0) // Светло-зеленый фон
-    val expenseBackgroundColor = Color(0xFFFFE0E0) // Светло-красный фон
-    val balanceBackgroundColor = if (balance >= 0) incomeBackgroundColor else expenseBackgroundColor
-    val savingsBackgroundColor = Color(0xFFF5F5F5) // Нейтральный серый фон
-
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp), // Добавляем вертикальный отступ
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-        shape = RoundedCornerShape(16.dp) // Увеличиваем скругление углов
+            .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.spacing_normal))
         ) {
-            Text(
-                text = "Финансовая сводка",
-                style = MaterialTheme.typography.titleLarge,
-                fontWeight = FontWeight.Bold,
-                color = balanceColor // Цвет заголовка соответствует балансу
+            // Заголовок секции
+            SectionHeader(
+                title = stringResource(R.string.analytics_title),
+                onClick = onSavingsRateClick
             )
-
-            Spacer(modifier = Modifier.height(20.dp)) // Увеличиваем отступ
-
-            // Основные показатели
+            
+            // Отображение диапазона дат
+            if (dateRange.isNotEmpty()) {
+                Text(
+                    text = dateRange,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_small))
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+            
+            // Финансовый обзор
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Доходы
-                AnalyticsCard(
-                    title = "Доходы",
-                    value = currencyFormat.format(totalIncome),
-                    icon = Icons.Default.KeyboardArrowUp,
-                    backgroundColor = incomeBackgroundColor,
-                    contentColor = Color.Black,
-                    iconTint = incomeColor,
+                // Доход
+                FinancialCard(
+                    title = stringResource(R.string.income),
+                    value = Money(totalIncome).format(),
+                    color = MaterialTheme.colorScheme.primary,
+                    icon = Icons.AutoMirrored.Filled.TrendingUp,
                     modifier = Modifier.weight(1f)
                 )
-
-                Spacer(modifier = Modifier.width(12.dp)) // Увеличиваем расстояние между карточками
-
+                
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+                
                 // Расходы
-                AnalyticsCard(
-                    title = "Расходы",
-                    value = currencyFormat.format(totalExpense),
-                    icon = Icons.Default.KeyboardArrowDown,
-                    backgroundColor = expenseBackgroundColor,
-                    contentColor = Color.Black,
-                    iconTint = expenseColor,
+                FinancialCard(
+                    title = stringResource(R.string.expenses),
+                    value = Money(totalExpense).format(),
+                    color = MaterialTheme.colorScheme.error,
+                    icon = Icons.AutoMirrored.Filled.TrendingDown,
                     modifier = Modifier.weight(1f)
                 )
             }
-
-            Spacer(modifier = Modifier.height(12.dp)) // Увеличиваем отступ между рядами
-
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+            
+            // Баланс и норма сбережений
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 // Баланс
-                AnalyticsCard(
-                    title = "Баланс",
-                    value = currencyFormat.format(balance),
+                FinancialCard(
+                    title = stringResource(R.string.balance),
+                    value = Money(balance).format(),
+                    color = if (balance >= 0) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.error,
                     icon = Icons.Default.BarChart,
-                    backgroundColor = balanceBackgroundColor,
-                    contentColor = Color.Black,
-                    iconTint = balanceColor,
                     modifier = Modifier.weight(1f)
                 )
-
-                Spacer(modifier = Modifier.width(12.dp)) // Увеличиваем расстояние между карточками
-
-                // Процент сбережений
-                AnalyticsCard(
-                    title = "Сбережения",
-                    value = percentFormat.format(savingsRate / 100),
-                    icon = if (savingsRate > 0) Icons.AutoMirrored.Filled.TrendingUp else Icons.AutoMirrored.Filled.TrendingDown,
-                    backgroundColor = savingsBackgroundColor,
-                    contentColor = Color.Black,
-                    iconTint = if (savingsRate > 0) incomeColor else expenseColor,
+                
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+                
+                // Норма сбережений
+                FinancialCard(
+                    title = stringResource(R.string.savings_rate),
+                    value = String.format("%.1f%%", savingsRate),
+                    color = when {
+                        savingsRate >= 20 -> Color(0xFF4CAF50)
+                        savingsRate >= 10 -> Color(0xFFFFC107)
+                        else -> Color(0xFFFF5722)
+                    },
+                    icon = if (savingsRate >= 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    modifier = Modifier
+                        .weight(1f)
+                        .clickable { onSavingsRateClick() }
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+            
+            // Первый ряд с аналитикой
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                AnalyticCard(
+                    icon = Icons.Default.MonetizationOn,
+                    title = stringResource(R.string.total_transactions),
+                    value = totalTransactions.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+                
+                AnalyticCard(
+                    icon = Icons.Default.Category,
+                    title = stringResource(R.string.expense_categories),
+                    value = totalExpenseCategories.toString(),
                     modifier = Modifier.weight(1f)
                 )
             }
-
-            Spacer(modifier = Modifier.height(20.dp)) // Увеличиваем отступ
-
-            // Дополнительная информация с возможностью перехода на экран статистики, без рамки
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+            
+            // Второй ряд с аналитикой
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                AnalyticCard(
+                    icon = Icons.Default.Category,
+                    title = stringResource(R.string.income_categories),
+                    value = totalIncomeCategories.toString(),
+                    modifier = Modifier.weight(1f)
+                )
+                
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+                
+                AnalyticCard(
+                    icon = Icons.Default.Assessment,
+                    title = stringResource(R.string.average_expense),
+                    value = averageExpense,
+                    modifier = Modifier.weight(1f)
+                )
+            }
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+            
+            // Дополнительная информация
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .clickable(onClick = onNavigateToChart)
-                    .padding(vertical = 4.dp), // Уменьшаем отступ
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Подробная аналитика доступна в разделе \"Статистика\"",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = if (isSystemInDarkTheme()) Color(0xFF81CFEF) else MaterialTheme.colorScheme.primary
+                    text = stringResource(R.string.sources_used),
+                    style = MaterialTheme.typography.bodyMedium
                 )
-
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = "Перейти к статистике",
-                    tint = if (isSystemInDarkTheme()) Color(0xFF81CFEF) else MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
-                )
+                
+                Surface(
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    shape = MaterialTheme.shapes.small
+                ) {
+                    Text(
+                        text = totalSourcesUsed.toString(),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
+                    )
+                }
             }
         }
     }
 }
 
 /**
- * Карточка с аналитическими данными.
- * @param title Заголовок карточки.
- * @param value Значение.
- * @param icon Иконка.
- * @param backgroundColor Цвет фона.
- * @param contentColor Цвет содержимого.
- * @param iconTint Цвет иконки.
- * @param modifier Модификатор для настройки внешнего вида.
+ * Карточка с финансовой информацией.
  */
 @Composable
-fun AnalyticsCard(
+private fun FinancialCard(
     title: String,
     value: String,
+    color: Color,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
-    backgroundColor: Color,
-    contentColor: Color,
-    iconTint: Color,
     modifier: Modifier = Modifier
 ) {
-    Card(
+    Surface(
         modifier = modifier,
-        colors = CardDefaults.cardColors(
-            containerColor = backgroundColor,
-            contentColor = contentColor
-        ),
-        shape = RoundedCornerShape(12.dp) // Увеличиваем скругление углов карточек
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(14.dp) // Увеличиваем внутренние отступы
+                .padding(dimensionResource(R.dimen.spacing_medium))
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = null,
-                    tint = iconTint,
-                    modifier = Modifier.size(22.dp) // Увеличиваем размер иконки
-                )
-
-                Spacer(modifier = Modifier.width(8.dp))
-
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium,
-                    color = iconTint // Цвет заголовка соответствует цвету иконки
-                )
-            }
-
-            Spacer(modifier = Modifier.height(10.dp)) // Увеличиваем отступ
-
+            // Иконка
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = color,
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
+            )
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+            
+            // Заголовок
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+            
+            // Значение
             Text(
                 text = value,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
-                color = iconTint // Цвет значения соответствует цвету иконки
+                color = color
             )
         }
+    }
+}
+
+/**
+ * Карточка с аналитической информацией.
+ */
+@Composable
+private fun AnalyticCard(
+    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    title: String,
+    value: String,
+    modifier: Modifier = Modifier
+) {
+    Surface(
+        modifier = modifier,
+        color = MaterialTheme.colorScheme.surfaceVariant,
+        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium))
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.spacing_medium))
+        ) {
+            // Иконка
+            Icon(
+                imageVector = icon,
+                contentDescription = title,
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
+            )
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+            
+            // Заголовок
+            Text(
+                text = title,
+                style = MaterialTheme.typography.titleSmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+            
+            // Значение
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+/**
+ * Заголовок секции.
+ */
+@Composable
+private fun SectionHeader(
+    title: String,
+    onClick: () -> Unit = {},
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onClick),
+        horizontalArrangement = Arrangement.SpaceBetween,
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold
+        )
+        
+        Icon(
+            imageVector = Icons.Default.ChevronRight,
+            contentDescription = null,
+            tint = MaterialTheme.colorScheme.primary
+        )
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -77,24 +78,24 @@ fun MonthlyBarChart(
     modifier: Modifier = Modifier
 ) {
     val maxAmount = data.values.maxOf { maxOf(it.totalIncome.amount.toDouble(), it.totalExpense.amount.toDouble()) }
-    val barWidth = 24.dp
-    val spaceBetweenBars = 24.dp
+    val barWidth = dimensionResource(R.dimen.chart_bar_width)
+    val spaceBetweenBars = dimensionResource(R.dimen.space_between_bars)
     val monthYearFormatter = DateTimeFormatter.ofPattern("MM.yyyy")
     val fullDateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
     val density = LocalDensity.current
     val errorColor = MaterialTheme.colorScheme.error
     val primaryColor = MaterialTheme.colorScheme.primary
 
-    // Получаем значения размеров заранее
-    val spacingNormal = 16.dp
-    val chartHeight = 200.dp
-    val strokeThin = 1.dp
-    val spacingLarge = 8.dp
-    val spacingSmall = 4.dp
-    val textSizeSmall = 10.sp
-    val spacingXXSmall = 2.dp
-    val legendIconSize = 10.dp
-    val spacingMedium = 12.dp
+    // Получаем значения размеров из ресурсов
+    val spacingNormal = dimensionResource(R.dimen.spacing_normal)
+    val chartHeight = dimensionResource(R.dimen.chart_height)
+    val strokeThin = dimensionResource(R.dimen.stroke_thin)
+    val spacingLarge = dimensionResource(R.dimen.spacing_large)
+    val spacingSmall = dimensionResource(R.dimen.spacing_small)
+    val spacingMedium = dimensionResource(R.dimen.spacing_medium)
+    val spacingXXSmall = dimensionResource(R.dimen.spacing_xxsmall)
+    val legendIconSize = dimensionResource(R.dimen.legend_icon_size)
+    val chartAxisTextSize = dimensionResource(R.dimen.chart_axis_text_size)
     
     Column(
         modifier = modifier
@@ -137,7 +138,7 @@ fun MonthlyBarChart(
                             y - with(density) { spacingSmall.toPx() },
                             android.graphics.Paint().apply {
                                 color = android.graphics.Color.GRAY
-                                textSize = with(density) { textSizeSmall.toPx() }
+                                textSize = with(density) { chartAxisTextSize.toPx() }
                                 textAlign = android.graphics.Paint.Align.LEFT
                             }
                         )

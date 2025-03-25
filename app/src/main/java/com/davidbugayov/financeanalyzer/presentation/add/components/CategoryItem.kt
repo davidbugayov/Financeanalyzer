@@ -20,8 +20,10 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 
 /**
@@ -39,20 +41,24 @@ fun CategoryItem(
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .width(80.dp)
+            .width(dimensionResource(R.dimen.category_item_width))
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(vertical = 8.dp)
+            .padding(vertical = dimensionResource(R.dimen.spacing_medium))
     ) {
         Box(
             modifier = Modifier
-                .size(60.dp)
+                .size(dimensionResource(R.dimen.category_icon_size))
                 .clip(CircleShape)
                 .background(MaterialTheme.colorScheme.primaryContainer)
                 .border(
-                    width = if (isSelected) 3.dp else if (isError) 2.dp else 0.dp,
+                    width = when {
+                        isSelected -> dimensionResource(R.dimen.border_width_large)
+                        isError -> dimensionResource(R.dimen.border_width_medium)
+                        else -> dimensionResource(R.dimen.border_width_none)
+                    },
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.primary
                         isError -> MaterialTheme.colorScheme.error
@@ -69,7 +75,7 @@ fun CategoryItem(
             )
         }
 
-        Spacer(modifier = Modifier.height(4.dp))
+        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
 
         Text(
             text = category.name,

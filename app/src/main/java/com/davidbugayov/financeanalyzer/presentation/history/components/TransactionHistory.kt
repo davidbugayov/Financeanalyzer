@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.components
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,20 +11,33 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItemWithActions
@@ -51,18 +65,40 @@ fun TransactionHistory(
     isLoading: Boolean = false,
     hasMoreData: Boolean = true
 ) {
+    // Используем фиксированный списочный стейт для улучшения управления скроллингом
     val listState = rememberLazyListState()
+    
+    // Наблюдаем за жизненным циклом для оптимизации обновлений
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            // Отключаем обновления, когда экран неактивен
+            if (event == Lifecycle.Event.ON_PAUSE) {
+                // Возможно выполнять действия по остановке ненужных операций
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+    
+    // Кэшируем обновленные колбэки для предотвращения ненужных перерисовок
+    val updateOnClick = rememberUpdatedState(onTransactionClick)
+    val updateOnLongClick = rememberUpdatedState(onTransactionLongClick)
 
-    // Оптимизация: увеличение буфера предзагрузки с 5 до 10 элементов
+    // Оптимизация запроса дополнительных данных
     val shouldLoadMore = remember {
         derivedStateOf {
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             val totalItems = listState.layoutInfo.totalItemsCount
-            lastVisibleItem > 0 && lastVisibleItem >= totalItems - 10 && hasMoreData && !isLoading
+            totalItems > 0 && 
+            lastVisibleItem >= totalItems - 3 && // Уменьшаем буфер для производительности
+            hasMoreData && !isLoading
         }
     }
 
-    // Запускаем загрузку дополнительных данных, когда нужно
+    // Запрашиваем дополнительные данные с тротлингом для предотвращения частых вызовов
     LaunchedEffect(shouldLoadMore) {
         snapshotFlow { shouldLoadMore.value }
             .distinctUntilChanged()
@@ -73,14 +109,33 @@ fun TransactionHistory(
             }
     }
 
-    // Кэшируем список групп для предотвращения ненужных перерисовок
-    val groups = remember(transactionGroups) { transactionGroups }
-
-    // Создаем карту для хранения состояния развернутости каждой группы
-    // По умолчанию все группы развернуты (true)
+    // Кэшируем состояние раскрытия групп
     val expandedState = remember {
         mutableStateMapOf<String, Boolean>().apply {
-            groups.forEach { group -> put(group.date, true) }
+            transactionGroups.forEach { group -> put(group.date, true) }
+        }
+    }
+    
+    // Обновляем состояние раскрытия только для новых групп
+    LaunchedEffect(transactionGroups) {
+        transactionGroups.forEach { group -> 
+            if (!expandedState.containsKey(group.date)) {
+                expandedState[group.date] = true
+            }
+        }
+    }
+    
+    // Кэшируем обработчики событий раскрытия
+    val expandHandlers = remember {
+        mutableMapOf<String, (Boolean) -> Unit>()
+    }
+    LaunchedEffect(transactionGroups) {
+        transactionGroups.forEach { group ->
+            if (!expandHandlers.containsKey(group.date)) {
+                expandHandlers[group.date] = { 
+                    expandedState[group.date] = it 
+                }
+            }
         }
     }
 
@@ -88,48 +143,48 @@ fun TransactionHistory(
         LazyColumn(
             state = listState,
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            contentPadding = PaddingValues(horizontal = dimensionResource(R.dimen.spacing_small)),
+            verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
         ) {
-            groups.forEach { group ->
-                item(key = "header_${group.date}") {
-                    // Заголовок группы с возможностью сворачивания/разворачивания
+            transactionGroups.forEach { group ->
+                val date = group.date
+                
+                // Заголовок группы
+                item(key = "header_$date") {
                     GroupHeader(
-                        period = group.date,
+                        period = date,
                         transactions = group.transactions,
-                        isExpanded = expandedState[group.date] ?: true,
-                        onExpandToggle = { isExpanded ->
-                            expandedState[group.date] = isExpanded
+                        isExpanded = expandedState[date] ?: true,
+                        onExpandToggle = expandHandlers[date] ?: { 
+                            expandedState[date] = it 
                         }
                     )
                 }
 
-                // Список транзакций в группе, отображаем только если группа развернута
-                if (expandedState[group.date] == true) {
-                    itemsIndexed(
+                // Транзакции, если группа раскрыта
+                if (expandedState[date] == true) {
+                    items(
                         items = group.transactions,
-                        key = { _, transaction -> transaction.id }
-                    ) { index, transaction ->
+                        key = { transaction -> "tx_${transaction.id}" }
+                    ) { transaction ->
+                        // Используем одни и те же колбэки для всех элементов
                         TransactionItemWithActions(
                             transaction = transaction,
-                            onClick = { onTransactionClick(transaction) },
-                            onLongClick = { onTransactionLongClick(transaction) }
+                            onClick = { updateOnClick.value(transaction) },
+                            onLongClick = { updateOnLongClick.value(transaction) }
                         )
-                        
-                        // Добавляем разделитель только между элементами, а не после последнего
-                        if (index < group.transactions.size - 1) {
-                            Spacer(modifier = Modifier.height(4.dp))
-                        }
                     }
                 }
-
-                item(key = "spacer_${group.date}") {
-                    Spacer(modifier = Modifier.height(4.dp))
+                
+                // Маленький разделитель между группами
+                item(key = "spacer_$date") {
+                    Spacer(modifier = Modifier.height(2.dp))
                 }
             }
 
-            // Индикатор загрузки в нижней части списка
-            item {
-                if (isLoading) {
+            // Индикатор загрузки
+            if (isLoading) {
+                item(key = "loading") {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -145,8 +200,8 @@ fun TransactionHistory(
             }
 
             // Сообщение о конце списка
-            item {
-                if (!hasMoreData && groups.isNotEmpty()) {
+            if (!hasMoreData && transactionGroups.isNotEmpty()) {
+                item(key = "end_message") {
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -163,8 +218,8 @@ fun TransactionHistory(
             }
         }
 
-        // Показываем индикатор загрузки на весь экран, если список пуст и идет загрузка
-        if (groups.isEmpty() && isLoading) {
+        // Показываем индикатор загрузки на весь экран
+        if (transactionGroups.isEmpty() && isLoading) {
             CircularProgressIndicator(
                 modifier = Modifier.align(Alignment.Center)
             )

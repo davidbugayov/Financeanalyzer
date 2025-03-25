@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +15,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 
 /**
  * Компонент для отображения индикатора загрузки с сообщением.
@@ -32,25 +35,20 @@ fun CenteredLoadingIndicator(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
     ) {
-        Surface(
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.9f),
-            shape = MaterialTheme.shapes.medium
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.Center,
+            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
         ) {
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(16.dp)
-            ) {
-                CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
-                    color = MaterialTheme.colorScheme.primary
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = message,
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            CircularProgressIndicator(
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
+                color = MaterialTheme.colorScheme.primary
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+            Text(
+                text = message,
+                style = MaterialTheme.typography.bodyLarge
+            )
         }
     }
 } 

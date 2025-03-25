@@ -46,8 +46,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
@@ -168,15 +170,15 @@ fun TransactionItem(transaction: Transaction) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
 
         // Иконка категории транзакции
         Box(
             modifier = Modifier
-                .size(32.dp)
+                .size(dimensionResource(R.dimen.icon_size_medium))
                 .clip(CircleShape)
                 .background(backgroundTint),
             contentAlignment = Alignment.Center
@@ -185,11 +187,11 @@ fun TransactionItem(transaction: Transaction) {
                 imageVector = categoryIcon,
                 contentDescription = transaction.category,
                 tint = indicatorColor,
-                modifier = Modifier.size(18.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small))
             )
         }
 
-        Spacer(modifier = Modifier.width(8.dp))
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
 
         // Информация о транзакции
         Column(
@@ -198,93 +200,71 @@ fun TransactionItem(transaction: Transaction) {
             Text(
                 text = transaction.category,
                 style = MaterialTheme.typography.bodyLarge,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
+                fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
                 color = MaterialTheme.colorScheme.onSurface
             )
-
-            // Информация о категории и дате
+            
             Text(
                 text = formattedDate,
-                fontSize = 11.sp,
+                style = MaterialTheme.typography.bodySmall,
+                fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-
-            // Информация о банках (источник -> получатель)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 2.dp)
+        }
+        
+        // Отображение источника (банка)
+        if (transaction.source != null) {
+            Column(
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_tiny))
             ) {
-                // Иконка банка-источника
-                Icon(
-                    imageVector = sourceIcon,
-                    contentDescription = transaction.source,
-                    tint = sourceColor,
-                    modifier = Modifier.size(12.dp)
-                )
-
-                Spacer(modifier = Modifier.width(2.dp))
-
-                // Название банка-источника
-                Text(
-                    text = transaction.source ?: "",
-                    fontSize = 11.sp,
-                    color = sourceColor,
-                    fontWeight = FontWeight.Medium
-                )
-
-                // Если получатель "Трата", показываем текст "снятие" или "пополнение"
-                Spacer(modifier = Modifier.width(4.dp))
-
-                val operationText = if (transaction.isExpense)
-                    stringResource(R.string.cash_withdrawal)
-                else
-                    stringResource(R.string.cash_deposit)
-
-                Text(
-                    text = "• $operationText",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
-                )
-            }
-
-            // Примечание к транзакции
-            transaction.note?.let {
-                if (it.isNotEmpty()) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = sourceIcon,
+                        contentDescription = transaction.source,
+                        tint = sourceColor,
+                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small))
+                    )
+                    
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
+                    
                     Text(
-                        text = it,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp)
+                        text = transaction.source,
+                        style = MaterialTheme.typography.bodySmall,
+                        fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+                
+                Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
+
+                Text(
+                    text = transaction.amountFormatted(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
+                    color = indicatorColor,
+                    fontWeight = FontWeight.Bold
+                )
             }
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Сумма транзакции
-        Column(
-            horizontalAlignment = Alignment.End
-        ) {
+        } else {
+            // Сумма транзакции без информации о банке
             Text(
                 text = transaction.amountFormatted(),
-                fontSize = 14.sp,
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
+                color = indicatorColor,
                 fontWeight = FontWeight.Bold,
-                color = indicatorColor
+                modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_tiny))
             )
         }
+        
+        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
     }
 }
 
 /**
- * Компонент для отображения транзакции с поддержкой нажатия и долгого нажатия.
- *
- * @param transaction Транзакция для отображения
- * @param onClick Callback, вызываемый при нажатии на транзакцию
- * @param onLongClick Callback, вызываемый при долгом нажатии на транзакцию
- * @param modifier Модификатор для настройки внешнего вида компонента
+ * Оптимизированная версия компонента элемента транзакции с обработкой нажатий
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -294,173 +274,81 @@ fun TransactionItemWithActions(
     onLongClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Кэшируем форматированные данные, чтобы не пересчитывать их при каждой перерисовке
-    val dateFormat = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
-    val formattedDate = remember(transaction.date) { dateFormat.format(transaction.date) }
-    val formattedAmount = remember(transaction.amount) { transaction.amountFormatted() }
-    
-    // Получаем иконки и цвета (без использования remember с Composable функциями)
-    val categoryIcon = getCategoryIcon(transaction.category, transaction.isExpense)
-    val  sourceIconPair = getBankIcon(transaction.source ?: "")
-    
-    // Кэшируем цвета
-    val indicatorColor = remember(transaction.isExpense) {
-        if (transaction.isExpense) Color(0xFFB71C1C) else Color(0xFF2E7D32)
-    }
-    
-    val backgroundTint = remember(transaction.isExpense) {
-        if (transaction.isExpense) Color(0xFFFFE0E0) else Color(0xFFE0F7E0)
-    }
-    
+    // Элемент окружен поверхностью с фиксированной высотой для стабильности скроллинга
     Surface(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier
+            .fillMaxWidth()
+            .height(68.dp), // Фиксированная высота для стабильного скролла
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp,
-        shadowElevation = 0.dp,
         shape = MaterialTheme.shapes.small
     ) {
-        Box(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .combinedClickable(
                     onClick = { onClick(transaction) },
                     onLongClick = { onLongClick(transaction) }
                 )
-                .padding(horizontal = 8.dp, vertical = 2.dp)
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Используем оптимизированную версию TransactionItem
-            OptimizedTransactionItem(
-                transaction = transaction,
-                formattedDate = formattedDate,
-                formattedAmount = formattedAmount,
-                categoryIcon = categoryIcon,
-                sourceIconPair = sourceIconPair,
-                indicatorColor = indicatorColor,
-                backgroundTint = backgroundTint
-            )
-        }
-    }
-}
-
-/**
- * Оптимизированная версия компонента TransactionItem с предварительно вычисленными данными
- */
-@Composable
-private fun OptimizedTransactionItem(
-    transaction: Transaction,
-    formattedDate: String,
-    formattedAmount: String,
-    categoryIcon: ImageVector,
-    sourceIconPair: Pair<ImageVector, Color>,
-    indicatorColor: Color,
-    backgroundTint: Color
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Иконка категории транзакции
-        Box(
-            modifier = Modifier
-                .size(32.dp)
-                .clip(CircleShape)
-                .background(backgroundTint),
-            contentAlignment = Alignment.Center
-        ) {
-            Icon(
-                imageVector = categoryIcon,
-                contentDescription = transaction.category,
-                tint = indicatorColor,
-                modifier = Modifier.size(18.dp)
-            )
-        }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Информация о транзакции
-        Column(
-            modifier = Modifier.weight(1f)
-        ) {
-            Text(
-                text = transaction.category,
-                style = MaterialTheme.typography.bodyLarge,
-                fontSize = 13.sp,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-
-            // Информация о категории и дате
-            Text(
-                text = formattedDate,
-                fontSize = 11.sp,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            // Информация о банках (источник -> получатель)
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                modifier = Modifier.padding(top = 2.dp)
+            // Цвет индикатора
+            val indicatorColor = if (transaction.isExpense) Color(0xFFB71C1C) else Color(0xFF2E7D32)
+            val backgroundTint = if (transaction.isExpense) Color(0xFFFFE0E0) else Color(0xFFE0F7E0)
+            
+            // Иконка категории
+            Box(
+                modifier = Modifier
+                    .size(36.dp)
+                    .background(backgroundTint, shape = CircleShape),
+                contentAlignment = Alignment.Center
             ) {
-                // Иконка банка-источника
+                val icon = getCategoryIcon(transaction.category, transaction.isExpense)
                 Icon(
-                    imageVector = sourceIconPair.first,
-                    contentDescription = transaction.source,
-                    tint = sourceIconPair.second,
-                    modifier = Modifier.size(12.dp)
+                    imageVector = icon,
+                    contentDescription = transaction.category,
+                    tint = indicatorColor,
+                    modifier = Modifier.size(20.dp)
                 )
+            }
 
-                Spacer(modifier = Modifier.width(2.dp))
+            Spacer(modifier = Modifier.width(12.dp))
 
-                // Название банка-источника
+            // Детали транзакции
+            Column(
+                modifier = Modifier.weight(1f)
+            ) {
                 Text(
-                    text = transaction.source ?: "",
-                    fontSize = 11.sp,
-                    color = sourceIconPair.second,
+                    text = transaction.category,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    fontSize = 14.sp,
+                    color = MaterialTheme.colorScheme.onSurface,
                     fontWeight = FontWeight.Medium
                 )
-
-                // Если получатель "Трата", показываем текст "снятие" или "пополнение"
-                Spacer(modifier = Modifier.width(4.dp))
-
-                val operationText = if (transaction.isExpense)
-                    stringResource(R.string.cash_withdrawal)
-                else
-                    stringResource(R.string.cash_deposit)
-
+                
+                // Форматированная дата
+                val date = remember(transaction.date) {
+                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(transaction.date)
+                }
                 Text(
-                    text = "• $operationText",
-                    fontSize = 11.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
+                    text = date,
+                    maxLines = 1,
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
 
-            // Примечание к транзакции
-            transaction.note?.let {
-                if (it.isNotEmpty()) {
-                    Text(
-                        text = it,
-                        fontSize = 12.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(top = 2.dp)
-                    )
-                }
-            }
+            // Отформатированная сумма - всегда справа
+            Text(
+                text = transaction.amountFormatted(),
+                fontSize = 14.sp,
+                fontWeight = FontWeight.Bold,
+                color = indicatorColor,
+                maxLines = 1,
+                modifier = Modifier.padding(start = 8.dp)
+            )
         }
-
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Сумма транзакции
-        Text(
-            text = formattedAmount,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Bold,
-            color = indicatorColor
-        )
     }
 }
 
@@ -496,7 +384,7 @@ fun DeleteTransactionDialog(
                 imageVector = categoryIcon,
                 contentDescription = transaction.category,
                 tint = indicatorColor,
-                modifier = Modifier.size(32.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
             )
         },
         title = {
@@ -513,7 +401,7 @@ fun DeleteTransactionDialog(
                     fontWeight = FontWeight.Bold
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Информация о категории и дате
                 Text(
@@ -525,7 +413,7 @@ fun DeleteTransactionDialog(
                     style = MaterialTheme.typography.bodyMedium
                 )
 
-                Spacer(modifier = Modifier.height(4.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Информация о банках (источник -> получатель)
                 Row(
@@ -536,21 +424,21 @@ fun DeleteTransactionDialog(
                         imageVector = sourceIcon,
                         contentDescription = transaction.source,
                         tint = sourceColor,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small))
                     )
 
-                    Spacer(modifier = Modifier.width(4.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_tiny)))
 
                     // Название банка-источника
                     Text(
                         text = transaction.source ?: "",
-                        fontSize = 14.sp,
+                        fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
                         color = sourceColor,
                         fontWeight = FontWeight.Medium
                     )
 
                         // Если трата то "снятие" или "пополнение"
-                        Spacer(modifier = Modifier.width(8.dp))
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
 
                         val operationText = if (transaction.isExpense)
                             stringResource(R.string.cash_withdrawal)
@@ -559,13 +447,13 @@ fun DeleteTransactionDialog(
 
                         Text(
                             text = "• $operationText",
-                            fontSize = 14.sp,
+                            fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             fontStyle = androidx.compose.ui.text.font.FontStyle.Italic
                         )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Сумма транзакции
                 Text(
@@ -579,7 +467,7 @@ fun DeleteTransactionDialog(
 
                 transaction.note?.let {
                     if (it.isNotEmpty()) {
-                        Spacer(modifier = Modifier.height(8.dp))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                         Text(
                             text = it,
                             style = MaterialTheme.typography.bodySmall,

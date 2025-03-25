@@ -16,6 +16,7 @@ import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -25,63 +26,57 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 
 /**
- * Универсальный компонент верхней панели приложения.
- * Используется на всех экранах для обеспечения единого стиля.
+ * Верхняя панель приложения с поддержкой кнопки "Назад" и настраиваемыми действиями.
  *
- * @param title Заголовок экрана
+ * @param title Заголовок панели
  * @param showBackButton Показывать ли кнопку "Назад"
  * @param onBackClick Обработчик нажатия на кнопку "Назад"
- * @param actions Слот для действий справа от заголовка
- * @param navigationIcon Иконка навигации
- * @param titleFontSize Размер шрифта заголовка (по умолчанию 18 sp)
+ * @param navigationIcon Пользовательская иконка навигации
+ * @param actions Дополнительные действия в правой части панели
+ * @param titleFontSize Размер шрифта заголовка
+ * @param modifier Модификатор для настройки внешнего вида
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AppTopBar(
     title: String,
     showBackButton: Boolean = false,
-    onBackClick: () -> Unit = {},
-    actions: @Composable RowScope.() -> Unit = {},
+    onBackClick: (() -> Unit)? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
-    titleFontSize: Int = 18
+    actions: @Composable (() -> Unit)? = null,
+    titleFontSize: Int = dimensionResource(R.dimen.text_size_normal).value.toInt(),
+    modifier: Modifier = Modifier
 ) {
     TopAppBar(
         title = {
             Text(
                 text = title,
                 fontSize = titleFontSize.sp,
-                fontWeight = FontWeight.Medium,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis,
-                textAlign = if (showBackButton || navigationIcon != null) TextAlign.Start else TextAlign.Center
+                overflow = TextOverflow.Ellipsis
             )
         },
         navigationIcon = {
             if (showBackButton) {
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    IconButton(onClick = onBackClick) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.navigation_back)
-                        )
-                    }
+                IconButton(onClick = { onBackClick?.invoke() }) {
+                    Icon(
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                        contentDescription = stringResource(R.string.cd_back_button)
+                    )
                 }
-            } else if (navigationIcon != null) {
-                Column(
-                    modifier = Modifier.fillMaxHeight(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-                    navigationIcon()
-                }
+            } else {
+                navigationIcon?.invoke()
             }
         },
-        actions = actions,
+        actions = {
+            actions?.invoke()
+        },
         colors = TopAppBarDefaults.topAppBarColors(
             containerColor = MaterialTheme.colorScheme.surface,
-            titleContentColor = MaterialTheme.colorScheme.onSurface
-        )
+            titleContentColor = MaterialTheme.colorScheme.onSurface,
+            navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface
+        ),
+        modifier = modifier
     )
 } 

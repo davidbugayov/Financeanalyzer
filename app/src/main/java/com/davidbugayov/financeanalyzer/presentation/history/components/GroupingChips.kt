@@ -8,6 +8,7 @@ import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -29,8 +30,8 @@ fun GroupingChips(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
     ) {
         FilterChip(
             selected = currentGrouping == GroupingType.DAY,

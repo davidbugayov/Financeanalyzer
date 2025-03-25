@@ -13,21 +13,23 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 
 /**
  * Экран для отображения списка используемых библиотек.
@@ -40,22 +42,11 @@ fun LibrariesScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.libraries_title),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                }
+            AppTopBar(
+                title = stringResource(id = R.string.libraries_title),
+                showBackButton = true,
+                onBackClick = onNavigateBack,
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
         }
     ) { paddingValues ->
@@ -63,14 +54,13 @@ fun LibrariesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_normal))
         ) {
             item {
                 Text(
                     text = stringResource(R.string.libraries_description),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal))
                 )
             }
             
@@ -82,11 +72,11 @@ fun LibrariesScreen(
                     license = library.license
                 )
                 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             }
             
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
                 
                 Text(
                     text = stringResource(R.string.licenses_note),
@@ -94,7 +84,7 @@ fun LibrariesScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxlarge)))
             }
         }
     }
@@ -115,13 +105,13 @@ private fun LibraryItem(
     license: String
 ) {
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation).div(2))
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp)
+            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
         ) {
             Text(
                 text = name,
@@ -135,23 +125,23 @@ private fun LibraryItem(
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
             
             HorizontalDivider()
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             
             Text(
-                text = "Лицензия: $license",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = stringResource(R.string.license_colon, license),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -233,3 +223,16 @@ private fun getLibraries(): List<Library> {
         )
     )
 } 
+
+/**
+ * Горизонтальный разделитель
+ */
+@Composable
+private fun HorizontalDivider() {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(dimensionResource(R.dimen.height_divider)),
+        color = MaterialTheme.colorScheme.outlineVariant
+    ) {}
+}

@@ -1,21 +1,21 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Отступы -->
-    <dimen name="spacing_tiny">2dp</dimen>
-    <dimen name="spacing_small">4dp</dimen>
-    <dimen name="spacing_medium">8dp</dimen>
-    <dimen name="spacing_normal">16dp</dimen>
-    <dimen name="spacing_large">16dp</dimen>
-    <dimen name="spacing_xlarge">24dp</dimen>
-    <dimen name="spacing_xxlarge">32dp</dimen>
-    <dimen name="spacing_xxsmall">2dp</dimen>
+    <dimen name="spacing_tiny">3dp</dimen>
+    <dimen name="spacing_small">6dp</dimen>
+    <dimen name="spacing_medium">12dp</dimen>
+    <dimen name="spacing_normal">20dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="spacing_xlarge">28dp</dimen>
+    <dimen name="spacing_xxlarge">36dp</dimen>
+    <dimen name="spacing_xxsmall">4dp</dimen>
 
     <!-- Размеры компонентов -->
-    <dimen name="icon_size_small">16dp</dimen>
-    <dimen name="icon_size_medium">24dp</dimen>
-    <dimen name="icon_size_large">36dp</dimen>
-    <dimen name="icon_size_xlarge">48dp</dimen>
-    <dimen name="icon_size_xxlarge">56dp</dimen>
+    <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_medium">32dp</dimen>
+    <dimen name="icon_size_large">48dp</dimen>
+    <dimen name="icon_size_xlarge">56dp</dimen>
+    <dimen name="icon_size_xxlarge">64dp</dimen>
 
     <!-- Высоты -->
     <dimen name="height_toolbar">56dp</dimen>
@@ -30,14 +30,14 @@
     <dimen name="height_divider">1dp</dimen>
 
     <!-- Размеры текста -->
-    <dimen name="text_size_micro">10sp</dimen>
-    <dimen name="text_size_small">10sp</dimen>
-    <dimen name="text_size_medium">14sp</dimen>
-    <dimen name="text_size_normal">16sp</dimen>
-    <dimen name="text_size_large">20sp</dimen>
-    <dimen name="text_size_xlarge">20sp</dimen>
-    <dimen name="text_size_xxlarge">24sp</dimen>
-    <dimen name="text_size_xxxlarge">32sp</dimen>
+    <dimen name="text_size_micro">11sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_normal">18sp</dimen>
+    <dimen name="text_size_large">22sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+    <dimen name="text_size_xxlarge">28sp</dimen>
+    <dimen name="text_size_xxxlarge">36sp</dimen>
 
     <!-- Радиусы -->
     <dimen name="radius_small">4dp</dimen>
@@ -47,14 +47,19 @@
     <dimen name="radius_card">12dp</dimen>
     <dimen name="radius_button">20dp</dimen>
     <dimen name="radius_fab">28dp</dimen>
+    <dimen name="corner_radius">12dp</dimen>
 
     <!-- Толщина линий -->
     <dimen name="stroke_thin">1dp</dimen>
     <dimen name="stroke_medium">2dp</dimen>
     <dimen name="stroke_thick">3dp</dimen>
+    <dimen name="border_width_none">0dp</dimen>
+    <dimen name="border_width_small">1dp</dimen>
+    <dimen name="border_width_medium">2dp</dimen>
+    <dimen name="border_width_large">3dp</dimen>
 
     <!-- Размеры для графиков -->
-    <dimen name="chart_height">200dp</dimen>
+    <dimen name="chart_height">220dp</dimen>
     <dimen name="chart_height_large">300dp</dimen>
     <dimen name="chart_bar_width">24dp</dimen>
     <dimen name="chart_line_width">2dp</dimen>
@@ -62,6 +67,10 @@
     <dimen name="chart_legend_height">48dp</dimen>
     <dimen name="chart_axis_text_size">12sp</dimen>
     <dimen name="chart_label_text_size">14sp</dimen>
+    <dimen name="chart_axis_width">50dp</dimen>
+    <dimen name="space_between_bars">24dp</dimen>
+    <dimen name="bar_width">24dp</dimen>
+    <dimen name="legend_icon_size">10dp</dimen>
 
     <!-- Размеры для анимаций -->
     <dimen name="anim_offset_small">20dp</dimen>
@@ -74,6 +83,12 @@
     <dimen name="bottom_nav_height">56dp</dimen>
     <dimen name="status_bar_height">24dp</dimen>
     <dimen name="navigation_bar_height">48dp</dimen>
+    <dimen name="nav_bar_height">62dp</dimen>
+    <dimen name="nav_button_size">42dp</dimen>
+    <dimen name="main_nav_button_size">48dp</dimen>
+    <dimen name="nav_icon_size">18dp</dimen>
+    <dimen name="main_nav_icon_size">22dp</dimen>
+    <dimen name="text_small">11sp</dimen>
 
     <!-- Размеры для карточек -->
     <dimen name="card_elevation">4dp</dimen>
@@ -105,31 +120,11 @@
     <dimen name="input_error_text_size">12sp</dimen>
 
     <!-- Размеры для списков -->
-    <dimen name="list_item_height">72dp</dimen>
-    <dimen name="list_item_padding">16dp</dimen>
-    <dimen name="list_icon_size">40dp</dimen>
+    <dimen name="list_item_height">84dp</dimen>
+    <dimen name="list_item_padding">20dp</dimen>
+    <dimen name="list_icon_size">48dp</dimen>
     <dimen name="list_divider_height">1dp</dimen>
-    <dimen name="list_section_height">48dp</dimen>
-
-    <!-- Dimensions for FinanceChartScreen -->
-    <dimen name="padding_small">8dp</dimen>
-    <dimen name="padding_medium">8dp</dimen>
-    <dimen name="padding_large">10dp</dimen>
-    <dimen name="padding_xlarge">12dp</dimen>
-    <dimen name="padding_xxlarge">16dp</dimen>
-    <dimen name="height_small">48dp</dimen>
-    <dimen name="height_large">200dp</dimen>
-    <dimen name="width_large">80dp</dimen>
-    <dimen name="font_size_small">13sp</dimen>
-    <dimen name="font_size_medium">14sp</dimen>
-    <dimen name="font_size_large">16sp</dimen>
-    <dimen name="font_size_xlarge">18sp</dimen>
-    <dimen name="font_size_xxlarge">20sp</dimen>
-
-    <!-- Новые размеры для графиков -->
-    <dimen name="bar_width">24dp</dimen>
-    <dimen name="space_between_bars">24dp</dimen>
-    <dimen name="legend_icon_size">10dp</dimen>
+    <dimen name="list_section_height">56dp</dimen>
 
     <!-- Размеры для профиля -->
     <dimen name="profile_section_spacing">16dp</dimen>
@@ -137,7 +132,17 @@
     <dimen name="profile_header_text_size">18sp</dimen>
     <dimen name="profile_item_height">56dp</dimen>
     <dimen name="profile_item_icon_size">24dp</dimen>
-    <dimen name="profile_analytics_card_height">90dp</dimen>
-    <dimen name="profile_analytics_item_height">40dp</dimen>
-    <dimen name="profile_export_button_width">80%</dimen>
+    
+    <!-- Размеры для выбора категорий -->
+    <dimen name="category_item_width">80dp</dimen>
+    <dimen name="category_icon_size">60dp</dimen>
+    
+    <!-- Размеры для выбора цвета -->
+    <dimen name="color_picker_item_size">40dp</dimen>
+
+    <dimen name="divider_height">1dp</dimen>
+
+    <dimen name="elevation_small">2dp</dimen>
+
+    <dimen name="bar_shape">16dp</dimen>
 </resources> 

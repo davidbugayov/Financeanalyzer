@@ -118,7 +118,13 @@ fun ProfileScreen(
                     totalExpense = state.totalExpense,
                     balance = state.balance,
                     savingsRate = state.savingsRate,
-                    onNavigateToChart = onNavigateToChart,
+                    totalTransactions = state.totalTransactions,
+                    totalExpenseCategories = state.totalExpenseCategories,
+                    totalIncomeCategories = state.totalIncomeCategories,
+                    averageExpense = state.averageExpense,
+                    totalSourcesUsed = state.totalSourcesUsed,
+                    dateRange = state.dateRange,
+                    onSavingsRateClick = onNavigateToChart,
                     modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                 )
 

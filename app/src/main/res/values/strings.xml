@@ -51,6 +51,9 @@
     <string name="filter_today">Сегодня</string>
     <string name="filter_week">Неделя</string>
     <string name="filter_month">Месяц</string>
+    <string name="filter_by_category">Фильтр по категории</string>
+    <string name="filter_by_source">Фильтр по банкам</string>
+    <string name="select_sources">Выберите источники</string>
     <string name="transactions_today">Транзакции за сегодня</string>
     <string name="transactions_week">Транзакции за неделю</string>
     <string name="transactions_month">Транзакции за месяц</string>
@@ -161,6 +164,17 @@
     <string name="chart_expenses">Расходы</string>
     <string name="currency_format_with_percent" formatted="false">%.2f ₽ (%.1f%%)</string>
 
+    <!-- Analytics strings -->
+    <string name="analytics_title">Финансовая аналитика</string>
+    <string name="total_transactions">Всего транзакций</string>
+    <string name="expense_categories">Категории расходов</string>
+    <string name="income_categories">Категории доходов</string>
+    <string name="average_expense">Средний расход</string>
+    <string name="sources_used">Использовано источников</string>
+    <string name="total_income">Общий доход</string>
+    <string name="total_expense">Общий расход</string>
+    <string name="savings_rate">Норма сбережений</string>
+
     <!-- Новые строки для улучшенного экрана финансовой статистики -->
     <string name="top_expense_categories">Топ категорий расходов</string>
     <string name="tap_bar_for_details">Нажмите на столбец для подробностей</string>
@@ -173,7 +187,6 @@
     <string name="yearly_summary">Годовая сводка</string>
     <string name="category_details">Детали категории</string>
     <string name="budget_overview">Обзор бюджета</string>
-    <string name="savings_rate">Норма сбережений</string>
     <string name="spending_by_day">Расходы по дням</string>
     <string name="spending_by_week">Расходы по неделям</string>
     <string name="spending_by_month">Расходы по месяцам</string>
@@ -246,7 +259,6 @@
     <string name="select_all_categories">Выбрать все категории</string>
 
     <!-- Добавленные строковые ресурсы для выбора источников -->
-    <string name="select_sources">Выбрать источники</string>
     <string name="select_all_sources">Выбрать все источники</string>
     <string name="all_sources">Все источники</string>
     <string name="sources">Источники</string>
@@ -262,8 +274,6 @@
 
     <!-- Строки для сводки групп транзакций -->
     <string name="summary">Сводка</string>
-    <string name="total_income">Общий доход</string>
-    <string name="total_expense">Общий расход</string>
     <string name="no_transactions_in_period">Нет транзакций за выбранный период</string>
 
     <!-- Профиль -->
@@ -326,6 +336,7 @@
     <string name="libraries_title">Используемые библиотеки</string>
     <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
     <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
+    <string name="license_colon">Лицензия: %s</string>
 
     <!-- Разрешения и настройки -->
     <string name="permission_denied">Разрешение отклонено</string>
@@ -343,4 +354,29 @@
     <string name="default_amount">0.00 ₽</string>
     <string name="default_small_amount">0 ₽</string>
     <string name="navigation_back">Назад</string>
+    <string name="transaction_history">История транзакций</string>
+
+    <!-- Savings Rate Dialog -->
+    <string name="savings_rate_title">Норма сбережений</string>
+    <string name="income_header">Доходы</string>
+    <string name="expenses_header">Расходы</string>
+    <string name="savings_amount">Сумма сбережений</string>
+
+    <!-- EmptyContent strings -->
+    <string name="empty_state">Пустое состояние</string>
+    <string name="empty_transactions">Нет транзакций</string>
+    <string name="empty_transactions_description">Добавьте свою первую транзакцию, нажав на кнопку "+"</string>
+
+    <!-- Bottom navigation -->
+    <string name="home_tab">Главная</string>
+    <string name="history_tab">История</string>
+    <string name="chart_tab">Графики</string>
+    <string name="add_tab">Добавить</string>
+    <string name="settings_tab">Настройки</string>
+    <string name="select_categories">Выберите категории</string>
+    <string name="category_statistics">Статистика по категории</string>
+    <string name="historical_transaction_stats">Историческая статистика транзакций</string>
+    <string name="transaction_count">Количество транзакций</string>
+    <string name="total_amount">Общая сумма</string>
+    <string name="average_per_transaction">Среднее за транзакцию</string>
 </resources>

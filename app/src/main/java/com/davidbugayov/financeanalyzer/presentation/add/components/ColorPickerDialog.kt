@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -36,17 +37,17 @@ fun ColorPickerDialog(
         text = {
             Column {
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
+                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
                 ) {
                     ColorUtils.predefinedColors.forEach { color ->
                         Box(
                             modifier = Modifier
-                                .size(40.dp)
+                                .size(dimensionResource(R.dimen.color_picker_item_size))
                                 .clip(CircleShape)
                                 .background(Color(color))
                                 .border(
-                                    width = 2.dp,
+                                    width = dimensionResource(R.dimen.border_width_medium),
                                     color = if (color == initialColor) {
                                         MaterialTheme.colorScheme.primary
                                     } else {

@@ -18,6 +18,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -116,43 +117,25 @@ fun PeriodSelectionDialog(
 
                 // Если выбран произвольный период, показываем поля для выбора дат
                 if (selectedPeriod == PeriodType.CUSTOM) {
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
-                    // Начальная дата
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onStartDateClick() }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.start_date),
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = dateFormat.format(startDate),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    // Поле начальной даты
+                    DateField(
+                        label = stringResource(R.string.start_date),
+                        date = startDate,
+                        dateFormat = dateFormat,
+                        onClick = onStartDateClick
+                    )
 
-                    // Конечная дата
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { onEndDateClick() }
-                            .padding(vertical = 8.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = stringResource(R.string.end_date),
-                            modifier = Modifier.weight(1f)
-                        )
-                        Text(
-                            text = dateFormat.format(endDate),
-                            color = MaterialTheme.colorScheme.primary
-                        )
-                    }
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+
+                    // Поле конечной даты
+                    DateField(
+                        label = stringResource(R.string.end_date),
+                        date = endDate,
+                        dateFormat = dateFormat,
+                        onClick = onEndDateClick
+                    )
                 }
             }
         },
@@ -165,12 +148,7 @@ fun PeriodSelectionDialog(
 }
 
 /**
- * Опция выбора периода с радиокнопкой.
- *
- * @param periodType Тип периода
- * @param selectedPeriod Выбранный тип периода
- * @param title Название периода
- * @param onPeriodSelected Callback, вызываемый при выборе периода
+ * Опция выбора периода с радио-кнопкой.
  */
 @Composable
 private fun PeriodOption(
@@ -183,14 +161,48 @@ private fun PeriodOption(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onPeriodSelected(periodType) }
-            .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+        verticalAlignment = Alignment.CenterVertically
     ) {
         RadioButton(
             selected = selectedPeriod == periodType,
             onClick = { onPeriodSelected(periodType) }
         )
-        Text(text = title)
+        Text(
+            text = title,
+            style = MaterialTheme.typography.bodyMedium,
+            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small))
+        )
+    }
+}
+
+/**
+ * Поле для отображения и выбора даты.
+ */
+@Composable
+private fun DateField(
+    label: String,
+    date: Date,
+    dateFormat: SimpleDateFormat,
+    onClick: () -> Unit
+) {
+    Column {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick)
+                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = dateFormat.format(date),
+                style = MaterialTheme.typography.bodyMedium
+            )
+        }
     }
 } 

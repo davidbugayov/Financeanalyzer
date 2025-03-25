@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
@@ -17,6 +18,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**
  * ViewModel для экрана профиля.
@@ -238,52 +241,42 @@ class ProfileViewModel(
             _state.update { it.copy(isLoading = true) }
             
             when (val result = loadTransactionsUseCase()) {
-                is com.davidbugayov.financeanalyzer.domain.model.Result.Success -> {
+                is Result.Success -> {
                     val transactions = result.data
                     
                     // Рассчитываем общий доход
                     val totalIncome = transactions
                         .filter { !it.isExpense }
-                        .map { it.amount }
-                        .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
-                    
+                        .sumOf { it.amount }
+
                     // Рассчитываем общие расходы
                     val totalExpense = transactions
                         .filter { it.isExpense }
-                        .map { it.amount }
-                        .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
-                    
-                    // Рассчитываем баланс
+                        .sumOf { it.amount }
+
+                    // Рассчитываем текущий баланс
                     val balance = totalIncome - totalExpense
-                    
-                    // Рассчитываем норму сбережений (если доход не равен 0)
+
+                    // Рассчитываем норму сбережений (если есть доход)
                     val savingsRate = if (totalIncome > 0) {
-                        (balance / totalIncome) * 100
+                        ((totalIncome - totalExpense) / totalIncome * 100).coerceIn(0.0, 100.0)
                     } else {
                         0.0
                     }
-                    
-                    _state.update { 
-                        it.copy(
-                            isLoading = false,
-                            totalIncome = totalIncome,
-                            totalExpense = totalExpense,
-                            balance = balance,
-                            savingsRate = savingsRate
-                        )
-                    }
+
+                    _state.update { it.copy(
+                        isLoading = false,
+                        totalIncome = totalIncome,
+                        totalExpense = totalExpense,
+                        balance = balance,
+                        savingsRate = savingsRate
+                    ) }
                 }
-                is com.davidbugayov.financeanalyzer.domain.model.Result.Error -> {
-                    // В случае ошибки используем нулевые значения
-                    _state.update { 
-                        it.copy(
-                            isLoading = false,
-                            totalIncome = 0.0,
-                            totalExpense = 0.0,
-                            balance = 0.0,
-                            savingsRate = 0.0
-                        )
-                    }
+                is Result.Error -> {
+                    _state.update { it.copy(
+                        isLoading = false,
+                        error = result.exception.message
+                    ) }
                 }
             }
         }

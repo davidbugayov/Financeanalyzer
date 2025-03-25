@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
@@ -70,13 +71,13 @@ fun AmountField(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(dimensionResource(R.dimen.spacing_normal)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.corner_radius)),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 2.dp
+        tonalElevation = dimensionResource(R.dimen.card_elevation).div(2)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
         ) {
             Text(
                 text = stringResource(R.string.amount),
@@ -146,7 +147,7 @@ fun AmountField(
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = accentColor,
-                    modifier = Modifier.padding(start = 8.dp)
+                    modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_medium))
                 )
             }
         }

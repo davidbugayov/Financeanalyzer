@@ -7,6 +7,7 @@ package com.davidbugayov.financeanalyzer.presentation.profile.model
 data class ProfileState(
     // Общие состояния
     val isLoading: Boolean = false,
+    val error: String? = null,
     
     // Состояния экспорта
     val exportSuccess: String? = null,
@@ -30,6 +31,12 @@ data class ProfileState(
     val totalExpense: Double = 0.0,
     val balance: Double = 0.0,
     val savingsRate: Double = 0.0,
+    val totalTransactions: Int = 0,
+    val totalExpenseCategories: Int = 0,
+    val totalIncomeCategories: Int = 0,
+    val averageExpense: String = "0 ₽",
+    val totalSourcesUsed: Int = 0,
+    val dateRange: String = "Все время",
     
     // Безопасность
     val isAppLockEnabled: Boolean = false,

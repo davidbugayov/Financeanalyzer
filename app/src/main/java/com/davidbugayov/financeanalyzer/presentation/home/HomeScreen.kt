@@ -40,6 +40,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
+import androidx.compose.ui.res.dimensionResource
 
 /**
  * Главный экран приложения.
@@ -131,7 +132,7 @@ fun HomeScreen(
                         )
                     }
                 },
-                titleFontSize = 16
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
         }
     ) { paddingValues ->

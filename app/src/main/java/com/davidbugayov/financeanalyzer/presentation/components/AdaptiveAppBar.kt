@@ -19,11 +19,13 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.R
 
 /**
  * Адаптивная верхняя панель приложения, которая может использоваться
@@ -45,7 +47,7 @@ fun AdaptiveAppBar(
     navigationIcon: @Composable (() -> Unit)? = null
 ) {
     TopAppBar(
-        modifier = Modifier.height(80.dp),
+        modifier = Modifier.height(dimensionResource(R.dimen.height_toolbar)),
         title = {
             Box(
                 modifier = Modifier
@@ -55,7 +57,7 @@ fun AdaptiveAppBar(
             ) {
                 Text(
                     text = title,
-                    fontSize = 20.sp,
+                    fontSize = dimensionResource(R.dimen.text_size_large).value.sp,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

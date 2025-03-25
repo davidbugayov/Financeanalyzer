@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -24,6 +25,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -35,7 +37,7 @@ import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
-import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
+import com.davidbugayov.financeanalyzer.presentation.components.EnhancedEmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
@@ -221,38 +223,42 @@ fun TransactionHistoryScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.history_title),
-                showBackButton = true,
-                onBackClick = onNavigateBack,
-                actions = {
-                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }) {
+                title = stringResource(R.string.transaction_history),
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.AccountBalance,
-                            contentDescription = stringResource(R.string.select_sources),
-                            tint = if (state.selectedSources.isNotEmpty())
-                                MaterialTheme.colorScheme.primary
-                            else
-                                LocalContentColor.current
-                        )
-                    }
-                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }) {
-                        Icon(
-                            imageVector = Icons.Default.FilterAlt,
-                            contentDescription = stringResource(R.string.select_category),
-                            tint = if (state.selectedCategories.isNotEmpty())
-                                MaterialTheme.colorScheme.primary
-                            else
-                                LocalContentColor.current
-                        )
-                    }
-                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = stringResource(R.string.select_period)
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
-                titleFontSize = 16
+                actions = {
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterAlt,
+                            contentDescription = stringResource(R.string.select_period)
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = stringResource(R.string.filter_by_category)
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBalance,
+                            contentDescription = stringResource(R.string.filter_by_source)
+                        )
+                    }
+                },
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
         }
     ) { paddingValues ->
@@ -264,7 +270,7 @@ fun TransactionHistoryScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -280,7 +286,7 @@ fun TransactionHistoryScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -299,7 +305,7 @@ fun TransactionHistoryScreen(
                                 "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
                             }
                         },
-                        fontSize = 14.sp,
+                        fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium
                     )
@@ -323,7 +329,7 @@ fun TransactionHistoryScreen(
                         onRetry = { viewModel.onEvent(TransactionHistoryEvent.ReloadTransactions) }
                     )
                 } else if (state.filteredTransactions.isEmpty() && !state.isLoading) {
-                    EmptyContent()
+                    EnhancedEmptyContent()
                 } else if (!state.isLoading) {
                     // Отображение сгруппированных транзакций
                     val groupedTransactions = viewModel.getGroupedTransactions()

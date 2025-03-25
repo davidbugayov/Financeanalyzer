@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -45,13 +46,13 @@ fun SourcePickerDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onSourceSelected(source) }
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Box(
                                 modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(16.dp)
+                                    .padding(end = dimensionResource(R.dimen.spacing_medium))
+                                    .size(dimensionResource(R.dimen.icon_size_small))
                                     .clip(CircleShape)
                                     .background(Color(source.color))
                             )
@@ -63,15 +64,15 @@ fun SourcePickerDialog(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .clickable { onAddCustomSource() }
-                                .padding(vertical = 8.dp),
+                                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = stringResource(R.string.add_custom_source),
                                 modifier = Modifier
-                                    .padding(end = 8.dp)
-                                    .size(16.dp)
+                                    .padding(end = dimensionResource(R.dimen.spacing_medium))
+                                    .size(dimensionResource(R.dimen.icon_size_small))
                             )
                             Text(stringResource(R.string.add_custom_source))
                         }

@@ -20,6 +20,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -97,7 +98,7 @@ fun AddTransactionScreen(
                         handleExit()
                     }
                 },
-                titleFontSize = 16
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
         }
     ) { paddingValues ->
@@ -129,7 +130,10 @@ fun AddTransactionScreen(
                 Column(modifier = Modifier.fillMaxWidth()) {
                     Text(
                         text = if (state.isExpense) stringResource(R.string.source) else "Куда",
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.spacing_normal),
+                            vertical = dimensionResource(R.dimen.spacing_medium)
+                        )
                     )
 
                     SourceSection(
@@ -188,7 +192,7 @@ fun AddTransactionScreen(
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = 16.dp)
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
                 )
 
                 // Поле для комментария с иконкой прикрепления
@@ -202,7 +206,7 @@ fun AddTransactionScreen(
                     }
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
 
                 // Кнопка добавления
                 AddButton(
@@ -210,7 +214,7 @@ fun AddTransactionScreen(
                     color = currentColor
                 )
 
-                Spacer(modifier = Modifier.height(24.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
             }
 
             // Диалоги

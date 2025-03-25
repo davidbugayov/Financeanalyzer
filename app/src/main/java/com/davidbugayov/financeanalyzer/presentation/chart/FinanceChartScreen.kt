@@ -36,6 +36,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingI
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
+import com.davidbugayov.financeanalyzer.presentation.components.EnhancedEmptyContent
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -120,7 +121,12 @@ fun FinanceChartScreen(
 
     // Show dialogs if needed
     if (showSavingsRateInfo) {
-        SavingsRateDialog(onDismiss = { showSavingsRateInfo = false })
+        SavingsRateDialog(
+            totalIncome = totalIncome.amount.toDouble(),
+            totalExpense = totalExpense.amount.toDouble(),
+            savingsRate = savingsRate,
+            onDismiss = { showSavingsRateInfo = false }
+        )
     }
 
     if (state.showPeriodDialog) {
@@ -191,7 +197,7 @@ fun FinanceChartScreen(
                         )
                     }
                 },
-                titleFontSize = 16
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
         }
     ) { paddingValues ->
@@ -214,7 +220,7 @@ fun FinanceChartScreen(
             } else if (filteredTransactions.isEmpty()) {
                 Timber.tag("FinanceChart").d("Empty state")
                 // Show empty state if there are no transactions
-                EmptyContent()
+                EnhancedEmptyContent()
             } else {
                 Timber.tag("FinanceChart").d("Content state")
                 // Show content if there are transactions
@@ -244,7 +250,7 @@ fun FinanceChartScreen(
                     // Daily expenses section
                     DailyExpensesChart(
                         dailyExpenses = state.dailyExpenses,
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_small))
                     )
 
                     // Statistics section
