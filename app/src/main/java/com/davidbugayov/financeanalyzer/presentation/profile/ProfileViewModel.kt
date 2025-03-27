@@ -170,13 +170,26 @@ class ProfileViewModel(
                         _state.update { it.copy(
                             isExporting = false,
                             exportSuccess = context.getString(R.string.export_success) +
-                                    "\nФайл сохранен: $filePath"
+                                    "\nФайл сохранен: ${filePath.substringAfterLast('/')}" +
+                                    "\nПуть: /Downloads"
                         ) }
+                        
+                        // Логируем успешный экспорт
+                        AnalyticsUtils.logScreenView("export_success", "csv")
                     } else {
+                        val error = exportResult.exceptionOrNull()
+                        val errorMessage = when {
+                            error is SecurityException -> "Отсутствуют разрешения для сохранения файла. Пожалуйста, предоставьте доступ к хранилищу в настройках."
+                            else -> context.getString(R.string.export_error)
+                        }
+                        
                         _state.update { it.copy(
                             isExporting = false,
-                            exportError = context.getString(R.string.export_error)
+                            exportError = errorMessage
                         ) }
+                        
+                        // Логируем ошибку экспорта
+                        AnalyticsUtils.logScreenView("export_failed", error?.message ?: "unknown")
                     }
                 }
             } catch (e: Exception) {
@@ -263,13 +276,66 @@ class ProfileViewModel(
                     } else {
                         0.0
                     }
+                    
+                    // Расчет общего количества транзакций
+                    val totalTransactions = transactions.size
+                    
+                    // Расчет уникальных категорий
+                    val uniqueExpenseCategories = transactions
+                        .filter { it.isExpense }
+                        .map { it.category }
+                        .distinct()
+                        .size
+                    
+                    val uniqueIncomeCategories = transactions
+                        .filter { !it.isExpense }
+                        .map { it.category }
+                        .distinct()
+                        .size
+                    
+                    // Расчет среднего расхода
+                    val avgExpense = if (transactions.filter { it.isExpense }.isNotEmpty()) {
+                        totalExpense / transactions.filter { it.isExpense }.size
+                    } else {
+                        0.0
+                    }
+                    
+                    // Форматирование среднего расхода
+                    val formattedAvgExpense = String.format("%,.0f ₽", avgExpense)
+                    
+                    // Расчет количества уникальных источников
+                    val uniqueSources = transactions
+                        .map { it.source }
+                        .distinct()
+                        .size
+                    
+                    // Форматирование диапазона дат
+                    val dateRange = if (transactions.isNotEmpty()) {
+                        val oldestDate = transactions.minByOrNull { it.date }?.date
+                        val newestDate = transactions.maxByOrNull { it.date }?.date
+                        
+                        if (oldestDate != null && newestDate != null) {
+                            val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+                            "${dateFormat.format(oldestDate)} - ${dateFormat.format(newestDate)}"
+                        } else {
+                            "Все время"
+                        }
+                    } else {
+                        "Все время"
+                    }
 
                     _state.update { it.copy(
                         isLoading = false,
                         totalIncome = totalIncome,
                         totalExpense = totalExpense,
                         balance = balance,
-                        savingsRate = savingsRate
+                        savingsRate = savingsRate,
+                        totalTransactions = totalTransactions,
+                        totalExpenseCategories = uniqueExpenseCategories,
+                        totalIncomeCategories = uniqueIncomeCategories,
+                        averageExpense = formattedAvgExpense,
+                        totalSourcesUsed = uniqueSources,
+                        dateRange = dateRange
                     ) }
                 }
                 is Result.Error -> {

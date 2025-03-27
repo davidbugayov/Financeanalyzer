@@ -56,7 +56,7 @@ class FilterTransactionsUseCase {
 
         val startDate = calendar.apply {
             when (periodType) {
-                PeriodType.ALL -> add(Calendar.YEAR, -10)
+                PeriodType.ALL -> add(Calendar.YEAR, -30)
                 PeriodType.DAY -> add(Calendar.DAY_OF_MONTH, -1)
                 PeriodType.WEEK -> add(Calendar.WEEK_OF_YEAR, -1)
                 PeriodType.MONTH -> add(Calendar.MONTH, -1)

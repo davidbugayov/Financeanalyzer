@@ -136,7 +136,7 @@ class SberbankImportUseCase(
             isExpense = isExpense,
             date = date,
             note = note,
-            source = "Сбербанк"
+            source = "Сбер"
         )
     }
 

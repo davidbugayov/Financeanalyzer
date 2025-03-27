@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.util.Date
+import timber.log.Timber
 
 /**
  * Реализация репозитория для работы с транзакциями.
@@ -112,15 +113,33 @@ class TransactionRepositoryImpl(
     }
     
     /**
-     * Получает транзакцию по идентификатору.
-     * @param id Идентификатор транзакции.
-     * @return Транзакция или null, если не найдена.
+     * Получает транзакцию по ID
+     *
+     * @param id ID транзакции
+     * @return Transaction или null если не найдена
      */
-    override suspend fun getTransactionById(id: String): Transaction? = withContext(Dispatchers.IO) {
-        try {
-            val transactionId = id.toLong()
-            dao.getTransactionById(transactionId)?.let { mapEntityToDomain(it) }
-        } catch (e: NumberFormatException) {
+    override suspend fun getTransactionById(id: String): Transaction? {
+        return try {
+            val transactionId = if (id.toLongOrNull() != null) {
+                // Если ID числовой, используем его как Long
+                id.toLong()
+            } else {
+                // Иначе используем хэш от строки в качестве Long ID
+                id.hashCode().toLong()
+            }
+            
+            Timber.d("РЕПОЗИТОРИЙ: Получение транзакции по ID: $id (преобразовано в $transactionId)")
+            val entity = dao.getTransactionById(transactionId)
+            
+            if (entity != null) {
+                Timber.d("РЕПОЗИТОРИЙ: Транзакция найдена")
+                mapEntityToDomain(entity)
+            } else {
+                Timber.d("РЕПОЗИТОРИЙ: Транзакция не найдена")
+                null
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при получении транзакции по ID '$id': ${e.message}")
             null
         }
     }
@@ -129,8 +148,15 @@ class TransactionRepositoryImpl(
      * Добавляет новую транзакцию.
      * @param transaction Транзакция для добавления.
      */
-    override suspend fun addTransaction(transaction: Transaction): Unit = withContext(Dispatchers.IO) {
-        dao.insertTransaction(mapDomainToEntity(transaction))
+    override suspend fun addTransaction(transaction: Transaction) {
+        try {
+            Timber.d("РЕПОЗИТОРИЙ: Добавление транзакции с id=${transaction.id}, дата=${transaction.date}")
+            dao.insertTransaction(mapDomainToEntity(transaction))
+            Timber.d("РЕПОЗИТОРИЙ: Транзакция успешно добавлена")
+        } catch (e: Exception) {
+            Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при добавлении транзакции: ${e.message}")
+            throw e
+        }
     }
     
     /**

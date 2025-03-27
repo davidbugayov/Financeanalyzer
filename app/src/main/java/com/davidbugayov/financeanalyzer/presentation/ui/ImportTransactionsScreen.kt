@@ -36,6 +36,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -54,7 +56,9 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.ui.components.BankImportCard
+import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.collectLatest
@@ -72,11 +76,13 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun ImportTransactionsScreen(
     onNavigateBack: () -> Unit,
-    viewModel: ImportTransactionsViewModel = koinViewModel()
+    viewModel: ImportTransactionsViewModel = koinViewModel(),
+    profileViewModel: ProfileViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
+    val themeMode = profileViewModel.themeMode.collectAsState().value
 
     var isImporting by remember { mutableStateOf(false) }
     var importResult by remember { mutableStateOf<ImportResult?>(null) }
@@ -85,163 +91,176 @@ fun ImportTransactionsScreen(
     var showBankInstructionDialog by remember { mutableStateOf(false) }
     var showPermissionSettingsDialog by remember { mutableStateOf(false) }
 
-    // Лончер для выбора файлов (CSV или PDF)
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
-    ) { selectedUri: Uri? ->
-        if (selectedUri != null) {
-            uri = selectedUri
-            isImporting = true
-            importResult = null
+    // Применяем тему приложения
+    FinanceAnalyzerTheme(themeMode = themeMode) {
+        // Функция для обработки выбранного URI
+        fun processUri(selectedUri: Uri?) {
+            if (selectedUri != null) {
+                uri = selectedUri
+                isImporting = true
+                importResult = null
 
-            // Запускаем импорт в корутине
-            coroutineScope.launch {
-                try {
-                    val resultFlow = viewModel.importTransactions(selectedUri)
-                    collectImportResults(resultFlow) { result ->
-                        importResult = result
-                        if (result is ImportResult.Success || result is ImportResult.Error) {
-                            isImporting = false
-                        }
-                    }
-                } catch (e: Exception) {
-                    importResult = ImportResult.Error("Ошибка при импорте: ${e.message}", e)
-                    isImporting = false
-                    coroutineScope.launch {
-                        snackbarHostState.showSnackbar("Ошибка: ${e.message}")
-                    }
-                }
-            }
-        }
-    }
-
-    // Запрашиваем разрешение на чтение файлов
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            // Запускаем выбор файла с указанием типов файлов
-            filePickerLauncher.launch(arrayOf("text/csv", "application/pdf"))
-        } else {
-            // Если разрешение не предоставлено, показываем диалог для перехода в настройки
-            showPermissionSettingsDialog = true
-        }
-    }
-
-    // Диалог для перехода в настройки приложения
-    if (showPermissionSettingsDialog) {
-        AlertDialog(
-            onDismissRequest = { showPermissionSettingsDialog = false },
-            title = { Text(text = "Требуется разрешение") },
-            text = { 
-                Text(
-                    text = "Для импорта файлов необходим доступ к хранилищу. " +
-                           "Пожалуйста, предоставьте разрешение в настройках приложения."
-                ) 
-            },
-            confirmButton = {
-                Button(
-                    onClick = {
-                        PermissionUtils.openApplicationSettings(context)
-                        showPermissionSettingsDialog = false
-                    }
-                ) {
-                    Text("Открыть настройки")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPermissionSettingsDialog = false }) {
-                    Text("Отмена")
-                }
-            }
-        )
-    }
-
-    Scaffold(
-        snackbarHost = { SnackbarHost(snackbarHostState) },
-        topBar = {
-            AppTopBar(
-                title = "Импорт транзакций",
-                showBackButton = true,
-                onBackClick = onNavigateBack,
-                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
-            )
-        }
-    ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .padding(16.dp)
-                .verticalScroll(rememberScrollState()),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(16.dp)
-        ) {
-            ImportInstructions()
-
-            // Секция с банками
-            Text(
-                text = "Поддерживаемые банки",
-                style = MaterialTheme.typography.titleLarge,
-                modifier = Modifier.fillMaxWidth()
-            )
-
-            BanksList(
-                onBankClick = { bankName ->
-                    selectedBank = bankName
-                    showBankInstructionDialog = true
-                }
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Кнопка выбора файла
-            Button(
-                onClick = {
-                    if (PermissionUtils.hasReadExternalStoragePermission(context)) {
-                        filePickerLauncher.launch(arrayOf("text/csv", "application/pdf"))
-                    } else {
-                        // Запрашиваем разрешение
-                        val permission = PermissionUtils.getReadStoragePermission()
-                        
-                        // Проверяем, можно ли запросить разрешение напрямую
-                        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                            val activity = context as? Activity
-                            if (activity != null && activity.shouldShowRequestPermissionRationale(permission)) {
-                                // Можно показать объяснение и запросить разрешение снова
-                                permissionLauncher.launch(permission)
-                            } else {
-                                // Пользователь уже отказывал в разрешении и выбрал "Больше не спрашивать"
-                                // Показываем диалог для перехода в настройки
-                                showPermissionSettingsDialog = true
+                coroutineScope.launch {
+                    try {
+                        val resultFlow = viewModel.importTransactions(selectedUri)
+                        collectImportResults(resultFlow) { result ->
+                            importResult = result
+                            if (result is ImportResult.Success || result is ImportResult.Error) {
+                                isImporting = false
                             }
-                        } else {
-                            // Для старых версий Android просто запрашиваем разрешение
-                            permissionLauncher.launch(permission)
                         }
+                    } catch (e: Exception) {
+                        importResult = ImportResult.Error("Ошибка при импорте: ${e.message}", e)
+                        isImporting = false
+                        coroutineScope.launch {
+                            snackbarHostState.showSnackbar("Ошибка: ${e.message}")
+                        }
+                    }
+                }
+            }
+        }
+
+        // На Android 15 используем GetContent напрямую, чтобы обойти проблему с разрешениями
+        val getContentLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent()
+        ) { selectedUri ->
+            processUri(selectedUri)
+        }
+
+        // На Android < 15 используем стандартные разрешения и открытие документа
+        val filePickerLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument()
+        ) { selectedUri ->
+            processUri(selectedUri)
+        }
+
+        val storagePermissionLauncher = rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                filePickerLauncher.launch(arrayOf("text/csv", "application/pdf"))
+            } else {
+                val activity = context as? Activity
+                val permission = PermissionUtils.getReadStoragePermission()
+                
+                if (activity != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+                    if (!activity.shouldShowRequestPermissionRationale(permission)) {
+                        showPermissionSettingsDialog = true
+                    }
+                }
+            }
+        }
+
+        // Диалог для перехода в настройки приложения
+        if (showPermissionSettingsDialog) {
+            AlertDialog(
+                onDismissRequest = { showPermissionSettingsDialog = false },
+                title = { Text(text = "Требуется разрешение") },
+                text = { 
+                    Text(
+                        text = if (Build.VERSION.SDK_INT >= 35) {
+                            "Для импорта файлов необходим доступ к выбранным вами файлам. " +
+                            "Пожалуйста, предоставьте разрешение."
+                        } else {
+                            "Для импорта файлов необходим доступ к хранилищу. " +
+                            "Пожалуйста, предоставьте разрешение в настройках приложения."
+                        }
+                    ) 
+                },
+                confirmButton = {
+                    Button(
+                        onClick = {
+                            PermissionUtils.openApplicationSettings(context)
+                            showPermissionSettingsDialog = false
+                        }
+                    ) {
+                        Text("Открыть настройки")
                     }
                 },
-                modifier = Modifier.fillMaxWidth(),
-                enabled = !isImporting
-            ) {
-                Icon(
-                    imageVector = Icons.Default.CloudUpload,
-                    contentDescription = null,
-                    modifier = Modifier.padding(end = 8.dp)
-                )
-                Text(text = "Выбрать файл для импорта (CSV, PDF)")
-            }
-
-            // Отображение результатов импорта
-            ImportResultsSection(importResult, isImporting)
-        }
-        
-        // Диалог с инструкциями по получению выписки из банка
-        if (showBankInstructionDialog) {
-            BankInstructionDialog(
-                bankName = selectedBank,
-                onDismiss = { showBankInstructionDialog = false }
+                dismissButton = {
+                    TextButton(onClick = { showPermissionSettingsDialog = false }) {
+                        Text("Отмена")
+                    }
+                }
             )
+        }
+
+        Scaffold(
+            snackbarHost = { SnackbarHost(snackbarHostState) },
+            topBar = {
+                AppTopBar(
+                    title = "Импорт транзакций",
+                    showBackButton = true,
+                    onBackClick = onNavigateBack,
+                    titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+                )
+            }
+        ) { paddingValues ->
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .padding(16.dp)
+                    .verticalScroll(rememberScrollState()),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                ImportInstructions()
+
+                // Секция с банками
+                Text(
+                    text = "Поддерживаемые банки",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.fillMaxWidth()
+                )
+
+                BanksList(
+                    onBankClick = { bankName ->
+                        selectedBank = bankName
+                        showBankInstructionDialog = true
+                    }
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Кнопка выбора файла
+                Button(
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= 35) {
+                            // Для Android 15+ используем ContentResolver напрямую
+                            getContentLauncher.launch("*/*")
+                        } else {
+                            // Для старых версий проверяем разрешения
+                            if (PermissionUtils.hasReadExternalStoragePermission(context)) {
+                                filePickerLauncher.launch(arrayOf("text/csv", "application/pdf"))
+                            } else {
+                                val permission = PermissionUtils.getReadStoragePermission()
+                                storagePermissionLauncher.launch(permission)
+                            }
+                        }
+                    },
+                    modifier = Modifier.fillMaxWidth(),
+                    enabled = !isImporting
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CloudUpload,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp)
+                    )
+                    Text(text = "Выбрать файл для импорта (CSV, PDF)")
+                }
+
+                // Отображение результатов импорта
+                ImportResultsSection(importResult, isImporting)
+            }
+            
+            // Диалог с инструкциями по получению выписки из банка
+            if (showBankInstructionDialog) {
+                BankInstructionDialog(
+                    bankName = selectedBank,
+                    onDismiss = { showBankInstructionDialog = false }
+                )
+            }
         }
     }
 }

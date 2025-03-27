@@ -277,8 +277,7 @@ fun TransactionItemWithActions(
     // Элемент окружен поверхностью с фиксированной высотой для стабильности скроллинга
     Surface(
         modifier = modifier
-            .fillMaxWidth()
-            .height(68.dp), // Фиксированная высота для стабильного скролла
+            .fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.small
     ) {
@@ -289,8 +288,8 @@ fun TransactionItemWithActions(
                     onClick = { onClick(transaction) },
                     onLongClick = { onLongClick(transaction) }
                 )
-                .padding(horizontal = 8.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(horizontal = 8.dp, vertical = 10.dp),
+            verticalAlignment = Alignment.Top
         ) {
             // Цвет индикатора
             val indicatorColor = if (transaction.isExpense) Color(0xFFB71C1C) else Color(0xFF2E7D32)
@@ -335,8 +334,49 @@ fun TransactionItemWithActions(
                     text = date,
                     maxLines = 1,
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 2.dp)
                 )
+
+                // Источник (банк)
+                if (transaction.source != null) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        modifier = Modifier.padding(top = 2.dp)
+                    ) {
+                        val (sourceIcon, sourceColor) = getBankIcon(transaction.source)
+                        Icon(
+                            imageVector = sourceIcon,
+                            contentDescription = transaction.source,
+                            tint = sourceColor,
+                            modifier = Modifier.size(12.dp)
+                        )
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = transaction.source,
+                            fontSize = 12.sp,
+                            color = sourceColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                    }
+                }
+
+                // Примечание
+                transaction.note?.let { note ->
+                    if (note.isNotBlank()) {
+                        Text(
+                            text = note,
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            maxLines = 3,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier
+                                .padding(top = 2.dp)
+                                .fillMaxWidth(0.85f)
+                        )
+                    }
+                }
             }
 
             // Отформатированная сумма - всегда справа
@@ -346,7 +386,9 @@ fun TransactionItemWithActions(
                 fontWeight = FontWeight.Bold,
                 color = indicatorColor,
                 maxLines = 1,
-                modifier = Modifier.padding(start = 8.dp)
+                modifier = Modifier
+                    .padding(start = 12.dp)
+                    .padding(top = 2.dp)
             )
         }
     }
