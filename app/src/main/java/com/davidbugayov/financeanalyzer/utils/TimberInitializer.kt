@@ -11,18 +11,59 @@ object TimberInitializer {
     fun init(isDebug: Boolean) {
         if (isDebug) {
             // Для отладочной сборки используем расширенное логирование через Timber
-            Timber.plant(Timber.DebugTree())
+            Timber.plant(DetailedDebugTree())
         } else {
             // Для релизной сборки используем Firebase Crashlytics, только если Firebase инициализирован
             if (FinanceApp.isFirebaseInitialized) {
                 Timber.plant(CrashReportingTree())
             } else {
                 // Если Firebase не инициализирован, используем DebugTree
-                Timber.plant(Timber.DebugTree())
+                Timber.plant(DetailedDebugTree())
                 Timber.w("Firebase не инициализирован, используем DebugTree вместо CrashReportingTree")
             }
         }
     }
+}
+
+/**
+ * Расширенная версия DebugTree для более детального логирования
+ * Добавляет информацию о классе, методе и строке в тег
+ */
+private class DetailedDebugTree : Timber.DebugTree() {
+    override fun createStackElementTag(element: StackTraceElement): String {
+        val className = element.className.substringAfterLast('.')
+        return "(${element.fileName}:${element.lineNumber}) $className#${element.methodName}"
+    }
+
+    override fun log(priority: Int, tag: String?, message: String, t: Throwable?) {
+        // Проверяем, что лог не из FileLogger для предотвращения дублирования
+        if (tag != null && (tag.contains("FileLogger") || element?.className?.contains("FileLogger") == true)) {
+            Log.println(priority, tag, message)
+            return
+        }
+        
+        // Дополнительно логируем приоритет в тег для удобства фильтрации
+        val priorityChar = when (priority) {
+            Log.VERBOSE -> 'V'
+            Log.DEBUG -> 'D'
+            Log.INFO -> 'I'
+            Log.WARN -> 'W'
+            Log.ERROR -> 'E'
+            Log.ASSERT -> 'A'
+            else -> '?'
+        }
+        
+        // Вызываем родительский метод с модифицированным тегом
+        super.log(priority, "[$priorityChar] $tag", message, t)
+    }
+    
+    // Получаем текущий StackTraceElement для проверок
+    private val element: StackTraceElement?
+        get() = try {
+            Throwable().stackTrace.firstOrNull { it.className.contains("FileLogger") == false }
+        } catch (e: Exception) {
+            null
+        }
 }
 
 /**

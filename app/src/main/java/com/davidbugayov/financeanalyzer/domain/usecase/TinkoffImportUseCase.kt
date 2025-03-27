@@ -45,12 +45,18 @@ class TinkoffImportUseCase(
 
         // Проверяем наличие характерных заголовков Тинькофф
         val headerText = headerLines.toString().lowercase()
+        
+        // Более строгая проверка формата Тинькофф
         return headerText.contains("tinkoff") ||
                 headerText.contains("тинькофф") ||
-                headerText.contains("операция") && headerText.contains("дата операции") ||
-                (headerText.contains("дата") &&
+                // Специфичные для Тинькофф строки в заголовке
+                headerText.contains("номер карты") ||
+                headerText.contains("дата операции") && headerText.contains("номер карты") ||
+                // Более строгая комбинация полей, характерная именно для Тинькофф
+                (headerText.contains("дата операции") &&
                         headerText.contains("категория") &&
-                        headerText.contains("сумма"))
+                        headerText.contains("mcc") &&
+                        headerText.contains("сумма в валюте"))
     }
 
     /**

@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.ui
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -53,9 +54,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.presentation.components.LogDialog
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.ui.components.BankImportCard
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -90,6 +93,15 @@ fun ImportTransactionsScreen(
     var selectedBank by remember { mutableStateOf("") }
     var showBankInstructionDialog by remember { mutableStateOf(false) }
     var showPermissionSettingsDialog by remember { mutableStateOf(false) }
+    var showLogsDialog by remember { mutableStateOf(false) }
+    var logs by remember { mutableStateOf<List<String>>(emptyList()) }
+
+    // Функция для обновления логов
+    fun refreshLogs() {
+        coroutineScope.launch {
+            logs = viewModel.getLogs()
+        }
+    }
 
     // Применяем тему приложения
     FinanceAnalyzerTheme(themeMode = themeMode) {
@@ -185,6 +197,24 @@ fun ImportTransactionsScreen(
             )
         }
 
+        // Диалог с логами
+        if (showLogsDialog) {
+            LogDialog(
+                logs = logs,
+                onDismiss = { showLogsDialog = false },
+                onRefresh = { refreshLogs() },
+                onShare = {
+                    // Отправка логов через Intent
+                    val intent = Intent(Intent.ACTION_SEND).apply {
+                        type = "text/plain"
+                        putExtra(Intent.EXTRA_SUBJECT, "Логи импорта FinanceAnalyzer")
+                        putExtra(Intent.EXTRA_TEXT, logs.joinToString("\n"))
+                    }
+                    context.startActivity(Intent.createChooser(intent, "Отправить логи"))
+                }
+            )
+        }
+
         Scaffold(
             snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
@@ -248,6 +278,60 @@ fun ImportTransactionsScreen(
                         modifier = Modifier.padding(end = 8.dp)
                     )
                     Text(text = "Выбрать файл для импорта (CSV, PDF)")
+                }
+
+                // Кнопка для импорта тестового файла (только для отладки)
+                if (BuildConfig.DEBUG) {
+                    Button(
+                        onClick = {
+                            isImporting = true
+                            importResult = null
+                            coroutineScope.launch {
+                                try {
+                                    val resultFlow = viewModel.importTestFile(R.raw.test_tinkoff)
+                                    collectImportResults(resultFlow) { result ->
+                                        importResult = result
+                                        if (result is ImportResult.Success || result is ImportResult.Error) {
+                                            isImporting = false
+                                        }
+                                    }
+                                } catch (e: Exception) {
+                                    importResult = ImportResult.Error("Ошибка при импорте: ${e.message}", e)
+                                    isImporting = false
+                                    coroutineScope.launch {
+                                        snackbarHostState.showSnackbar("Ошибка: ${e.message}")
+                                    }
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !isImporting
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Lightbulb,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(text = "Импортировать тестовый файл Tinkoff")
+                    }
+                }
+
+                // Для отладки добавим кнопку просмотра логов
+                if (BuildConfig.DEBUG) {
+                    Button(
+                        onClick = {
+                            refreshLogs()
+                            showLogsDialog = true
+                        },
+                        modifier = Modifier.fillMaxWidth()
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.Lightbulb,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = 8.dp)
+                        )
+                        Text(text = "Просмотр логов")
+                    }
                 }
 
                 // Отображение результатов импорта
