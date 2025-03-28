@@ -42,6 +42,9 @@ roomKsp = "1.9.22-1.0.17"
 gson = "2.10.1"
 pdfbox = "2.0.27.0"
 
+# Excel parsing libraries
+poi = "5.2.3"
+
 [libraries]
 # Kotlin
 kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", version.ref = "kotlin" }
@@ -103,6 +106,10 @@ pdfbox-android = { group = "com.tom-roush", name = "pdfbox-android", version.ref
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
 androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
+
+# Excel libraries
+poi-core = { group = "org.apache.poi", name = "poi", version.ref = "poi" }
+poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

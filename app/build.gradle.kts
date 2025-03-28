@@ -241,6 +241,10 @@ dependencies {
     
     // PDF
     implementation(libs.pdfbox.android)
+    
+    // Excel
+    implementation(libs.poi.core)
+    implementation(libs.poi.ooxml)
 
     // Testing
     testImplementation(libs.junit)

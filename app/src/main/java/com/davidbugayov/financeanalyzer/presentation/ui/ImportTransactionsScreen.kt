@@ -150,7 +150,7 @@ fun ImportTransactionsScreen(
             contract = ActivityResultContracts.RequestPermission()
         ) { isGranted ->
             if (isGranted) {
-                filePickerLauncher.launch(arrayOf("text/csv", "application/pdf"))
+                filePickerLauncher.launch(arrayOf("text/csv", "application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
             } else {
                 val activity = context as? Activity
                 val permission = PermissionUtils.getReadStoragePermission()
@@ -262,7 +262,7 @@ fun ImportTransactionsScreen(
                         } else {
                             // Для старых версий проверяем разрешения
                             if (PermissionUtils.hasReadExternalStoragePermission(context)) {
-                                filePickerLauncher.launch(arrayOf("text/csv", "application/pdf"))
+                                filePickerLauncher.launch(arrayOf("text/csv", "application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                             } else {
                                 val permission = PermissionUtils.getReadStoragePermission()
                                 storagePermissionLauncher.launch(permission)
@@ -277,7 +277,7 @@ fun ImportTransactionsScreen(
                         contentDescription = null,
                         modifier = Modifier.padding(end = 8.dp)
                     )
-                    Text(text = "Выбрать файл для импорта (CSV, PDF)")
+                    Text(text = "Выбрать файл для импорта (CSV, PDF, XLSX)")
                 }
 
                 // Кнопка для импорта тестового файла (только для отладки)
@@ -383,11 +383,12 @@ fun ImportInstructions() {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Text(
-                    text = "1. Выгрузите выписку в формате CSV из вашего банка\n" +
-                            "2. Для Сбербанка также поддерживается формат PDF\n" +
-                            "3. Выберите файл выписки через кнопку ниже\n" +
-                            "4. Приложение автоматически определит формат\n" +
-                            "5. Дождитесь завершения импорта\n\n" +
+                    text = "1. Выгрузите выписку в формате CSV или XLSX из вашего банка\n" +
+                            "2. Для Альфа-Банка лучше использовать формат XLSX\n" +
+                            "3. Для Сбербанка также поддерживается формат PDF\n" +
+                            "4. Выберите файл выписки через кнопку ниже\n" +
+                            "5. Приложение автоматически определит формат\n" +
+                            "6. Дождитесь завершения импорта\n\n" +
                             "Нажмите на карточку банка ниже, чтобы узнать как получить выписку.",
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
@@ -728,14 +729,32 @@ fun AlfaBankInstructions() {
     Text(
         buildAnnotatedString {
             withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                append("Через мобильное приложение:\n\n")
+                append("Через мобильное приложение Альфа-Банк:\n\n")
             }
             append("1. Войдите в приложение Альфа-Банк\n")
-            append("2. Выберите карту или счет\n")
-            append("3. Нажмите \"Выписка\"\n")
-            append("4. Укажите период\n")
-            append("5. Выберите \"Отправить на email\"\n")
-            append("6. Скачайте CSV-файл из письма\n")
+            append("2. Перейдите в раздел \"История\"\n")
+            append("3. Нажмите на кнопку со стрелкой вниз в правом верхнем углу\n")
+            append("4. В появившемся экране \"Выписка по счету\" выберите счет\n")
+            append("5. Укажите период выписки\n")
+            append("6. Нажмите \"Отправить по email\" или \"Скачать\"\n")
+            append("7. Выберите формат XLSX (Excel)\n")
+            append("8. Загрузите полученный файл в приложение Finanalyzer\n\n")
+            
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                append("Через Альфа-Банк Онлайн (веб-версия):\n\n")
+            }
+            append("1. Войдите в личный кабинет Альфа-Банк Онлайн\n")
+            append("2. Выберите счет или карту\n")
+            append("3. Перейдите в \"Выписки\"\n") 
+            append("4. Укажите период выписки\n")
+            append("5. Выберите формат \"Excel\"\n")
+            append("6. Скачайте файл\n")
+            append("7. Импортируйте XLSX-файл в приложение\n\n")
+            
+            withStyle(style = SpanStyle(fontWeight = FontWeight.Bold, color = MaterialTheme.colorScheme.primary)) {
+                append("Важно: ")
+            }
+            append("Приложение поддерживает прямой импорт Excel-файлов (.xlsx) из Альфа-Банка без необходимости дополнительной конвертации!")
         }
     )
 }

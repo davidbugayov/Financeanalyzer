@@ -44,9 +44,21 @@ class ImportFactory(
 
         // Обработка PDF файлов
         if (fileExtension == "pdf") {
-            Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл, используем SberbankPdfImportUseCase")
-            // Для PDF файлов у нас есть только реализация для Сбербанка
-            return SberbankPdfImportUseCase(repository, context)
+            // Проверяем содержимое PDF для выбора подходящего импортера
+            if (fileName.lowercase().contains("ozon") || fileName.lowercase().contains("озон")) {
+                Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Озон Банка, используем OzonPdfImportUseCase")
+                return OzonPdfImportUseCase(repository, context)
+            } else {
+                Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл, используем SberbankPdfImportUseCase")
+                // Для PDF файлов по умолчанию используем реализацию для Сбербанка
+                return SberbankPdfImportUseCase(repository, context)
+            }
+        }
+        
+        // Проверяем, если это Excel файл - используем AlfaBankImportUseCase для всех XLSX
+        if (fileExtension == "xlsx") {
+            Timber.d("ИМПОРТ ФАБРИКА: Обнаружен XLSX файл, используем AlfaBankImportUseCase")
+            return AlfaBankImportUseCase(repository, context)
         }
 
         // Если это CSV файл, пробуем определить его формат
