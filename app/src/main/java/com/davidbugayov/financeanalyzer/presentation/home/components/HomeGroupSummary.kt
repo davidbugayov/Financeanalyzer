@@ -47,11 +47,11 @@ fun HomeGroupSummary(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(12.dp)
         ) {
             // Отображение заголовка "Сводка"
             Text(
@@ -59,15 +59,15 @@ fun HomeGroupSummary(
                 style = MaterialTheme.typography.titleMedium,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 8.dp),
+                modifier = Modifier.padding(bottom = 4.dp),
                 color = balanceColor // Цвет заголовка соответствует балансу
             )
 
-            // Отображение общего дохода и расхода
+            // Отображение общего дохода и расхода в более компактном виде
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -86,7 +86,7 @@ fun HomeGroupSummary(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
@@ -106,13 +106,13 @@ fun HomeGroupSummary(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 8.dp),
+                    .padding(vertical = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
                     text = stringResource(R.string.balance),
                     fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Bold
                 )
                 Text(
                     text = balance.formatted(false),
@@ -122,66 +122,56 @@ fun HomeGroupSummary(
                 )
             }
 
-            HorizontalDivider(modifier = Modifier.padding(vertical = 8.dp))
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-            // Проверяем, есть ли транзакции или доходы/расходы
-            val hasTransactions = groups.isNotEmpty() ||
-                    totalIncome.amount > BigDecimal.ZERO ||
-                    totalExpense.amount > BigDecimal.ZERO
-
-            if (hasTransactions) {
-                // Отображаем группы, если они есть
-                if (groups.isNotEmpty()) {
-                    // Заменяем LazyColumn на обычный Column с ограниченным количеством элементов
-                    Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
-                    ) {
-                        // Отображаем максимум 5 групп, чтобы не перегружать интерфейс
-                        groups.take(5).forEach { group ->
-                            Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(vertical = 4.dp),
-                                horizontalArrangement = Arrangement.SpaceBetween,
-                                verticalAlignment = Alignment.CenterVertically
-                            ) {
-                                // Определяем, является ли транзакция расходом по признаку isExpense
-                                // а не по значению amount (т.к. amount у расхода может быть > 0)
-                                val isExpense =
-                                    group.transactions.isNotEmpty() && group.transactions.first().isExpense
-                                
-                                Text(
-                                    text = group.name,
-                                    fontSize = 14.sp,
-                                    // Определяем цвет текста категории: красный для расходов, зеленый для доходов
-                                    color = if (isExpense) expenseColor else incomeColor,
-                                    // Жирный шрифт для расходов
-                                    fontWeight = FontWeight.Bold
-                                )
-                                Text(
-                                    text = group.total.abs().formatted(false),
-                                    fontSize = 14.sp,
-                                    color = if (isExpense) expenseColor else incomeColor,
-                                    fontWeight = FontWeight.Medium
-                                )
-                            }
+            // Отображаем группы, если они есть (макс. 5 групп)
+            if (groups.isNotEmpty()) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    groups.take(5).forEach { group ->
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 2.dp),
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            // Определяем, является ли транзакция расходом
+                            val isExpense =
+                                group.transactions.isNotEmpty() && group.transactions.first().isExpense
+                            
+                            Text(
+                                text = group.name,
+                                fontSize = 13.sp,
+                                color = if (isExpense) expenseColor else incomeColor,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                text = group.total.abs().formatted(false),
+                                fontSize = 13.sp,
+                                color = if (isExpense) expenseColor else incomeColor,
+                                fontWeight = FontWeight.Medium
+                            )
                         }
                     }
-                } else {
-                    // Если есть доходы или расходы, но нет групп, показываем сообщение о том, что данные обобщены
-                    Text(
-                        text = stringResource(R.string.summary),
-                        modifier = Modifier.padding(vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
+                    
+                    // Если групп больше 5, показываем сообщение о том, что есть еще группы
+                    if (groups.size > 5) {
+                        Text(
+                            text = "И еще ${groups.size - 5} ${if ((groups.size - 5) % 10 == 1 && (groups.size - 5) % 100 != 11) "категория" else if ((groups.size - 5) % 10 in 2..4 && (groups.size - 5) % 100 !in 12..14) "категории" else "категорий"}",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp)
+                        )
+                    }
                 }
-            } else {
-                // Если нет ни транзакций, ни доходов/расходов, показываем сообщение об отсутствии транзакций
-                Text(
-                    text = stringResource(R.string.no_transactions_in_period),
-                    modifier = Modifier.padding(vertical = 8.dp),
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
             }
         }
     }

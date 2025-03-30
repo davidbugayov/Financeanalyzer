@@ -41,6 +41,10 @@ import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import androidx.compose.ui.res.dimensionResource
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Главный экран приложения.
@@ -80,9 +84,15 @@ fun HomeScreen(
 
     // Загружаем транзакции при первом запуске
     LaunchedEffect(key1 = Unit) {
-        viewModel.onEvent(HomeEvent.LoadTransactions)
-        // Инициализируем состояние showGroupSummary в ViewModel из SharedPreferences
-        viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
+        // Запускаем в фоновом потоке с минимальной задержкой, чтобы UI успело отрисоваться
+        MainScope().launch(Dispatchers.IO) {
+            // Добавляем небольшую задержку, чтобы UI успело отрисоваться
+            delay(100)
+            // Загружаем данные
+            viewModel.onEvent(HomeEvent.LoadTransactions)
+            // Инициализируем состояние showGroupSummary в ViewModel из SharedPreferences
+            viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
+        }
     }
 
     // Сохраняем настройку при изменении

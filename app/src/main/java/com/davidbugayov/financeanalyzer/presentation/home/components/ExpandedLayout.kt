@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
@@ -58,16 +61,7 @@ fun ExpandedLayout(
                 onFilterSelected = onFilterSelected
             )
 
-            Spacer(modifier = Modifier.height(16.dp))
-
-            // Отображение суммы для выбранного периода
-            if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
-                HomeGroupSummary(
-                    groups = state.transactionGroups,
-                    totalIncome = state.filteredIncome,
-                    totalExpense = state.filteredExpense
-                )
-            }
+            // Удаляем сводку из левой колонки, теперь она будет в LazyColumn
         }
 
         // Правая панель со списком транзакций
@@ -102,13 +96,28 @@ fun ExpandedLayout(
                         )
                     }
                 } else {
-                    // Отображаем список транзакций
-                    Column(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .verticalScroll(rememberScrollState())
+                    // Используем LazyColumn для эффективного скроллинга
+                    val lazyListState = rememberLazyListState()
+                    
+                    LazyColumn(
+                        state = lazyListState,
+                        modifier = Modifier.fillMaxSize()
                     ) {
-                        state.filteredTransactions.forEach { transaction ->
+                        // Добавляем сводку как первый элемент списка, если она нужна
+                        if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
+                            item {
+                                HomeGroupSummary(
+                                    groups = state.transactionGroups,
+                                    totalIncome = state.filteredIncome,
+                                    totalExpense = state.filteredExpense
+                                )
+                            }
+                        }
+                        
+                        items(
+                            items = state.filteredTransactions,
+                            key = { it.id } // Используем уникальный ID как ключ для лучшей производительности
+                        ) { transaction ->
                             TransactionItemWithActions(
                                 transaction = transaction,
                                 onClick = onTransactionClick,
@@ -116,7 +125,10 @@ fun ExpandedLayout(
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
-                        Spacer(modifier = Modifier.height(120.dp))
+                        // Добавляем пространство внизу для нижней панели
+                        item {
+                            Spacer(modifier = Modifier.height(120.dp))
+                        }
                     }
                 }
             }

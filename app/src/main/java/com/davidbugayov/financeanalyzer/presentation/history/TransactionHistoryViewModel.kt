@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
@@ -25,6 +26,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.withContext
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
@@ -134,37 +138,58 @@ class TransactionHistoryViewModel @Inject constructor(
      */
     private fun loadTransactionsFirstPage() {
         viewModelScope.launch {
+            // Устанавливаем флаг загрузки
             _state.update { it.copy(isLoading = true, error = null) }
             
             try {
+                // Получаем текущие параметры
                 val currentState = _state.value
                 val pageSize = currentState.pageSize
                 
-                // Получаем общее количество транзакций для выбранного периода
-                val totalCount = if (currentState.periodType == PeriodType.CUSTOM || 
-                                     currentState.periodType == PeriodType.ALL) {
-                    repository.getTransactionsCountByDateRange(
-                        currentState.startDate,
-                        currentState.endDate
-                    )
-                } else {
-                    repository.getTransactionsCount()
+                // Создаем вспомогательную корутину для получения общего количества транзакций
+                val totalCountDeferred = viewModelScope.async(Dispatchers.IO) {
+                    try {
+                        if (currentState.periodType == PeriodType.CUSTOM || 
+                            currentState.periodType == PeriodType.ALL) {
+                            repository.getTransactionsCountByDateRange(
+                                currentState.startDate,
+                                currentState.endDate
+                            )
+                        } else {
+                            repository.getTransactionsCount()
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при получении количества транзакций: ${e.message}")
+                        0 // По умолчанию считаем, что транзакций нет
+                    }
                 }
                 
-                // Загружаем первую страницу транзакций
-                val transactions = if (currentState.periodType == PeriodType.CUSTOM || 
-                                       currentState.periodType == PeriodType.ALL) {
-                    repository.getTransactionsByDateRangePaginated(
-                        currentState.startDate,
-                        currentState.endDate,
-                        pageSize,
-                        0
-                    )
-                } else {
-                    repository.getTransactionsPaginated(pageSize, 0)
+                // Запускаем асинхронную загрузку первой страницы транзакций
+                val transactions = withContext(Dispatchers.IO) {
+                    try {
+                        if (currentState.periodType == PeriodType.CUSTOM || 
+                            currentState.periodType == PeriodType.ALL) {
+                            repository.getTransactionsByDateRangePaginated(
+                                currentState.startDate,
+                                currentState.endDate,
+                                pageSize,
+                                0
+                            )
+                        } else {
+                            repository.getTransactionsPaginated(pageSize, 0)
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при загрузке первой страницы транзакций: ${e.message}")
+                        emptyList()
+                    }
                 }
                 
-                // Обновляем состояние
+                // Получаем общее количество транзакций из отложенного вычисления
+                val totalCount = totalCountDeferred.await()
+                
+                Timber.d("Загружено ${transactions.size} транзакций (первая страница из $totalCount всего)")
+                
+                // Обновляем состояние с загруженными данными
                 _state.update {
                     it.copy(
                         transactions = transactions,
@@ -175,13 +200,20 @@ class TransactionHistoryViewModel @Inject constructor(
                     )
                 }
                 
-                updateFilteredTransactions()
+                // Оптимизация: лёгкая задержка перед запуском обновления фильтрованных данных,
+                // чтобы UI успел отрисоваться после обновления состояния
+                delay(100)
+                
+                // Асинхронно обновляем отфильтрованные данные в отдельной корутине
+                launch(Dispatchers.Default) {
+                    updateFilteredTransactions()
+                }
             } catch (e: Exception) {
-                Timber.e(e, "Failed to load transactions")
+                Timber.e(e, "Критическая ошибка при загрузке транзакций: ${e.message}")
                 _state.update { 
                     it.copy(
                         isLoading = false,
-                        error = e.message
+                        error = e.message ?: "Неизвестная ошибка при загрузке данных"
                     ) 
                 }
             }
@@ -207,17 +239,24 @@ class TransactionHistoryViewModel @Inject constructor(
                 val currentPage = currentState.currentPage
                 val offset = currentPage * pageSize
                 
-                // Загружаем следующую страницу
-                val nextPageTransactions = if (currentState.periodType == PeriodType.CUSTOM || 
-                                              currentState.periodType == PeriodType.ALL) {
-                    repository.getTransactionsByDateRangePaginated(
-                        currentState.startDate,
-                        currentState.endDate,
-                        pageSize,
-                        offset
-                    )
-                } else {
-                    repository.getTransactionsPaginated(pageSize, offset)
+                // Загружаем следующую страницу в IO потоке
+                val nextPageTransactions = withContext(Dispatchers.IO) {
+                    try {
+                        if (currentState.periodType == PeriodType.CUSTOM || 
+                            currentState.periodType == PeriodType.ALL) {
+                            repository.getTransactionsByDateRangePaginated(
+                                currentState.startDate,
+                                currentState.endDate,
+                                pageSize,
+                                offset
+                            )
+                        } else {
+                            repository.getTransactionsPaginated(pageSize, offset)
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при загрузке следующей страницы: ${e.message}")
+                        emptyList()
+                    }
                 }
                 
                 // Если новых транзакций нет - больше нет данных
@@ -231,13 +270,17 @@ class TransactionHistoryViewModel @Inject constructor(
                     return@launch
                 }
                 
+                Timber.d("Загружено ${nextPageTransactions.size} дополнительных транзакций")
+                
                 // Оптимизация: добавляем задержку перед обновлением UI
                 // Это предотвращает заикание при прокрутке большого количества данных
                 delay(100)
                 
-                // Обновляем список транзакций, добавляя новые данные
+                // Используем отдельную временную переменную для нового списка транзакций
+                // чтобы минимизировать время блокировки UI потока
                 val updatedTransactions = currentState.transactions + nextPageTransactions
                 
+                // Обновляем список транзакций одним атомарным обновлением
                 _state.update {
                     it.copy(
                         transactions = updatedTransactions,
@@ -246,17 +289,18 @@ class TransactionHistoryViewModel @Inject constructor(
                     )
                 }
                 
-                // Оптимизация: выполняем фильтрацию с задержкой,
-                // чтобы не блокировать UI-поток
-                launch {
+                // Оптимизация: выполняем фильтрацию в отдельном потоке с небольшой задержкой,
+                // чтобы не блокировать UI при обработке больших списков
+                launch(Dispatchers.Default) {
+                    delay(150) // Даем время UI для отрисовки основных данных
                     updateFilteredTransactions()
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Failed to load more transactions")
+                Timber.e(e, "Ошибка при загрузке дополнительных транзакций: ${e.message}")
                 _state.update { 
                     it.copy(
                         isLoadingMore = false,
-                        error = e.message
+                        error = e.message ?: "Ошибка при загрузке данных"
                     ) 
                 }
             }
@@ -267,75 +311,85 @@ class TransactionHistoryViewModel @Inject constructor(
         resetAndReloadTransactions()
     }
 
+    /**
+     * Оптимизированная фильтрация транзакций с асинхронными операциями
+     */
     private fun updateFilteredTransactions() {
         viewModelScope.launch {
             val currentState = _state.value
             
-            // Оптимизация: выполняем фильтрацию в IO-контексте
-            val filteredTransactions = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                filterTransactionsUseCase(
-                    transactions = currentState.transactions,
-                    periodType = currentState.periodType,
-                    startDate = currentState.startDate,
-                    endDate = currentState.endDate,
-                    categories = currentState.selectedCategories,
-                    sources = currentState.selectedSources
-                )
+            if (currentState.transactions.isEmpty()) {
+                _state.update {
+                    it.copy(
+                        filteredTransactions = emptyList(),
+                        groupedTransactions = emptyMap(),
+                        categoryStats = null
+                    )
+                }
+                return@launch
             }
             
+            // Выполняем операции фильтрации и группировки асинхронно в IO-контексте
+            val filteredTransactions = withContext(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    filterTransactionsUseCase(
+                        transactions = currentState.transactions,
+                        periodType = currentState.periodType,
+                        startDate = currentState.startDate,
+                        endDate = currentState.endDate,
+                        categories = currentState.selectedCategories,
+                        sources = currentState.selectedSources
+                    )
+                } catch (e: Exception) {
+                    Timber.e(e, "Ошибка при фильтрации транзакций: ${e.message}")
+                    emptyList()
+                }
+            }
+            
+            // Выполняем группировку отфильтрованных транзакций
+            val groupedTransactions = withContext(kotlinx.coroutines.Dispatchers.IO) {
+                try {
+                    groupTransactionsUseCase(
+                        transactions = filteredTransactions,
+                        groupingType = currentState.groupingType
+                    )
+                } catch (e: Exception) {
+                    Timber.e(e, "Ошибка при группировке транзакций: ${e.message}")
+                    emptyMap()
+                }
+            }
+            
+            // Выполняем расчет статистики по категориям
+            val categoryStats = if (filteredTransactions.isNotEmpty() && currentState.selectedCategories.isNotEmpty()) {
+                withContext(kotlinx.coroutines.Dispatchers.IO) {
+                    try {
+                        calculateCategoryStatsUseCase(
+                            transactions = filteredTransactions,
+                            categories = currentState.selectedCategories,
+                            periodType = currentState.periodType,
+                            startDate = currentState.startDate,
+                            endDate = currentState.endDate
+                        )
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при расчете статистики: ${e.message}")
+                        null
+                    }
+                }
+            } else {
+                null
+            }
+            
+            // Обновляем состояние одним вызовом для оптимизации перерисовки
             _state.update {
                 it.copy(
                     filteredTransactions = filteredTransactions,
-                    error = null
-                )
-            }
-            updateGroupedTransactions()
-            updateCategoryStats()
-        }
-    }
-
-    private fun updateGroupedTransactions() {
-        viewModelScope.launch {
-            val currentState = _state.value
-            
-            // Оптимизация: выполняем группировку в IO-контексте
-            val groupedTransactions = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                groupTransactionsUseCase(
-                    transactions = currentState.filteredTransactions,
-                    groupingType = currentState.groupingType
-                )
-            }
-            
-            _state.update {
-                it.copy(
                     groupedTransactions = groupedTransactions,
-                    error = null
-                )
-            }
-        }
-    }
-
-    private fun updateCategoryStats() {
-        viewModelScope.launch {
-            val currentState = _state.value
-
-            // Оптимизация: выполняем расчеты в IO-контексте
-            val categoryStats = kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.IO) {
-                calculateCategoryStatsUseCase(
-                    transactions = currentState.filteredTransactions,
-                    categories = currentState.selectedCategories,
-                    periodType = currentState.periodType,
-                    startDate = currentState.startDate,
-                    endDate = currentState.endDate
-                )
-            }
-            
-            _state.update {
-                it.copy(
                     categoryStats = categoryStats,
                     error = null
                 )
             }
+            
+            Timber.d("Обработано ${filteredTransactions.size} транзакций, создано ${groupedTransactions.size} групп")
         }
     }
 
@@ -346,7 +400,7 @@ class TransactionHistoryViewModel @Inject constructor(
 
     private fun updateGroupingType(groupingType: GroupingType) {
         _state.update { it.copy(groupingType = groupingType) }
-        updateGroupedTransactions()
+        updateFilteredTransactions()
     }
 
     private fun updateCategories(categories: List<String>) {

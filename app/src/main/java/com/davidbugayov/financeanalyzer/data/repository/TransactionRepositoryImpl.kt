@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.util.Date
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
+import java.util.Collections
 
 /**
  * Реализация репозитория для работы с транзакциями.
@@ -22,12 +24,42 @@ class TransactionRepositoryImpl(
     private val dao: TransactionDao
 ) : TransactionRepository, ITransactionRepository {
     
+    // Кэш для транзакций с временем последнего обновления
+    private val transactionsCache = Collections.synchronizedList<Transaction>(mutableListOf())
+    private var cacheLastUpdated = 0L
+    private val CACHE_TTL = 3 * 60 * 1000L // 3 минуты
+    private val cacheLock = Any() // Для синхронизации доступа к кэшу
+    
     /**
      * Получает все транзакции.
      * @return Список всех транзакций.
      */
     override suspend fun getAllTransactions(): List<Transaction> = withContext(Dispatchers.IO) {
-        dao.getAllTransactions().map { mapEntityToDomain(it) }
+        val now = System.currentTimeMillis()
+        
+        // Если кэш актуален, возвращаем его
+        if (transactionsCache.isNotEmpty() && now - cacheLastUpdated < CACHE_TTL) {
+            Timber.d("Используем кэшированные транзакции (размер=${transactionsCache.size})")
+            return@withContext transactionsCache
+        }
+        
+        // Иначе загружаем из базы данных
+        try {
+            val transactions = dao.getAllTransactions().map { mapEntityToDomain(it) }
+            
+            // Обновляем кэш
+            synchronized(cacheLock) {
+                transactionsCache.clear()
+                transactionsCache.addAll(transactions)
+                cacheLastUpdated = now
+            }
+            
+            Timber.d("Загружено ${transactions.size} транзакций из БД и обновлен кэш")
+            return@withContext transactions
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при загрузке всех транзакций: ${e.message}")
+            throw e
+        }
     }
 
     /**
@@ -81,8 +113,37 @@ class TransactionRepositoryImpl(
         endDate: Date, 
         limit: Int, 
         offset: Int
-    ): List<Transaction> {
-        return getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
+    ): List<Transaction> = withContext(Dispatchers.IO) {
+        try {
+            // Получаем транзакции из базы данных
+            val transactions = dao.getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
+                .map { mapEntityToDomain(it) }
+            
+            Timber.d("Загружено ${transactions.size} транзакций из БД (лимит=$limit, смещение=$offset, даты: $startDate - $endDate)")
+            
+            // Если это первая страница (offset=0), обновляем кэш для метрик
+            if (offset == 0 && transactions.isNotEmpty()) {
+                // Только если кэш устарел или пуст
+                val now = System.currentTimeMillis()
+                if (now - cacheLastUpdated > CACHE_TTL || transactionsCache.isEmpty()) {
+                    // Загружаем все транзакции до входа в synchronized блок
+                    val allTransactions = dao.getAllTransactions().map { mapEntityToDomain(it) }
+                    
+                    synchronized(cacheLock) {
+                        // Обновляем кэш
+                        transactionsCache.clear()
+                        transactionsCache.addAll(allTransactions)
+                        cacheLastUpdated = now
+                        Timber.d("Обновлен кэш транзакций (размер: ${allTransactions.size})")
+                    }
+                }
+            }
+            
+            return@withContext transactions
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при загрузке транзакций с пагинацией: ${e.message}")
+            throw e
+        }
     }
 
     /**
@@ -152,6 +213,26 @@ class TransactionRepositoryImpl(
         try {
             Timber.d("РЕПОЗИТОРИЙ: Добавление транзакции с id=${transaction.id}, дата=${transaction.date}")
             dao.insertTransaction(mapDomainToEntity(transaction))
+            
+            // Обновляем кэш транзакций
+            synchronized(cacheLock) {
+                if (transactionsCache.isNotEmpty()) {
+                    // Добавляем транзакцию в кэш без обращения к базе данных
+                    transactionsCache.add(transaction)
+                    Timber.d("РЕПОЗИТОРИЙ: Транзакция добавлена в кэш (новый размер: ${transactionsCache.size})")
+                }
+            }
+            
+            // Обновляем финансовые метрики
+            try {
+                val metrics = FinancialMetrics.getInstance()
+                metrics.updateAfterAdd(transaction)
+                Timber.d("РЕПОЗИТОРИЙ: Финансовые метрики обновлены после добавления транзакции")
+            } catch (e: Exception) {
+                Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при обновлении финансовых метрик: ${e.message}")
+                // Не выбрасываем исключение, чтобы не прерывать основной процесс
+            }
+            
             Timber.d("РЕПОЗИТОРИЙ: Транзакция успешно добавлена")
         } catch (e: Exception) {
             Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при добавлении транзакции: ${e.message}")
@@ -164,7 +245,49 @@ class TransactionRepositoryImpl(
      * @param transaction Транзакция для обновления.
      */
     override suspend fun updateTransaction(transaction: Transaction) = withContext(Dispatchers.IO) {
-        dao.updateTransaction(mapDomainToEntity(transaction))
+        try {
+            // Сначала получаем старую версию транзакции для правильного обновления метрик
+            val oldTransactionEntity = transaction.id.toLongOrNull()?.let { dao.getTransactionById(it) }
+            val oldTransaction = oldTransactionEntity?.let { mapEntityToDomain(it) }
+            
+            // Обновляем транзакцию в базе данных
+            dao.updateTransaction(mapDomainToEntity(transaction))
+            
+            // Обновляем кэш транзакций
+            synchronized(cacheLock) {
+                if (transactionsCache.isNotEmpty()) {
+                    // Находим и заменяем существующую транзакцию в кэше
+                    val index = transactionsCache.indexOfFirst { it.id == transaction.id }
+                    if (index >= 0) {
+                        transactionsCache[index] = transaction
+                        Timber.d("РЕПОЗИТОРИЙ: Транзакция обновлена в кэше по индексу $index")
+                    } else {
+                        Timber.w("РЕПОЗИТОРИЙ: Транзакция не найдена в кэше, добавляем")
+                        transactionsCache.add(transaction)
+                    }
+                }
+            }
+            
+            // Обновляем финансовые метрики, если старая транзакция найдена
+            if (oldTransaction != null) {
+                try {
+                    val metrics = FinancialMetrics.getInstance()
+                    
+                    // Сначала удаляем эффект старой транзакции, потом добавляем новую
+                    metrics.updateAfterDelete(oldTransaction)
+                    metrics.updateAfterAdd(transaction)
+                    
+                    Timber.d("РЕПОЗИТОРИЙ: Финансовые метрики обновлены после обновления транзакции")
+                } catch (e: Exception) {
+                    Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при обновлении финансовых метрик: ${e.message}")
+                }
+            } else {
+                Timber.w("РЕПОЗИТОРИЙ: Старая транзакция не найдена, пропуск обновления метрик")
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при обновлении транзакции: ${e.message}")
+            throw e
+        }
     }
     
     /**
@@ -174,11 +297,42 @@ class TransactionRepositoryImpl(
     override suspend fun deleteTransaction(id: String): Unit = withContext(Dispatchers.IO) {
         try {
             val transactionId = id.toLong()
-            dao.getTransactionById(transactionId)?.let {
-                dao.deleteTransaction(it)
+            // Сначала получаем транзакцию для обновления метрик
+            val transactionEntity = dao.getTransactionById(transactionId)
+            
+            if (transactionEntity != null) {
+                // Преобразуем в доменную модель для обновления метрик
+                val transaction = mapEntityToDomain(transactionEntity)
+                
+                // Удаляем транзакцию из базы данных
+                dao.deleteTransaction(transactionEntity)
+                
+                // Обновляем кэш транзакций
+                synchronized(cacheLock) {
+                    if (transactionsCache.isNotEmpty()) {
+                        val removed = transactionsCache.removeIf { it.id == id }
+                        if (removed) {
+                            Timber.d("РЕПОЗИТОРИЙ: Транзакция удалена из кэша (новый размер: ${transactionsCache.size})")
+                        } else {
+                            Timber.w("РЕПОЗИТОРИЙ: Транзакция не найдена в кэше при удалении")
+                        }
+                    }
+                }
+                
+                // Обновляем финансовые метрики
+                try {
+                    val metrics = FinancialMetrics.getInstance()
+                    metrics.updateAfterDelete(transaction)
+                    Timber.d("РЕПОЗИТОРИЙ: Финансовые метрики обновлены после удаления транзакции")
+                } catch (e: Exception) {
+                    Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при обновлении финансовых метрик: ${e.message}")
+                }
             }
         } catch (e: NumberFormatException) {
-            // Игнорируем ошибку, если id не является числом
+            Timber.w("РЕПОЗИТОРИЙ: ID транзакции не является числом: $id")
+        } catch (e: Exception) {
+            Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при удалении транзакции: ${e.message}")
+            throw e
         }
     }
 

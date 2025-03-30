@@ -13,6 +13,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +21,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import timber.log.Timber
 
 /**
  * ViewModel для экрана профиля.
@@ -38,6 +40,9 @@ class ProfileViewModel(
     // Отдельный StateFlow для темы, который можно наблюдать из MainScreen
     private val _themeMode = MutableStateFlow(ThemeMode.SYSTEM)
     val themeMode: StateFlow<ThemeMode> = _themeMode
+    
+    // Финансовые метрики
+    private val financialMetrics = FinancialMetrics.getInstance()
 
     init {
         // Загружаем настройки уведомлений
@@ -50,6 +55,25 @@ class ProfileViewModel(
         val savedTheme = preferencesManager.getThemeMode()
         _state.update { it.copy(themeMode = savedTheme) }
         _themeMode.value = savedTheme
+        
+        // Подписываемся на обновления метрик
+        viewModelScope.launch {
+            financialMetrics.balance.collect { balance ->
+                _state.update { it.copy(balance = balance) }
+            }
+        }
+        
+        viewModelScope.launch {
+            financialMetrics.totalIncome.collect { income ->
+                _state.update { it.copy(totalIncome = income) }
+            }
+        }
+        
+        viewModelScope.launch {
+            financialMetrics.totalExpense.collect { expense ->
+                _state.update { it.copy(totalExpense = expense) }
+            }
+        }
     }
 
     /**
@@ -253,97 +277,98 @@ class ProfileViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             
-            when (val result = loadTransactionsUseCase()) {
-                is Result.Success -> {
-                    val transactions = result.data
-                    
-                    // Рассчитываем общий доход
-                    val totalIncome = transactions
-                        .filter { !it.isExpense }
-                        .sumOf { it.amount }
-
-                    // Рассчитываем общие расходы
-                    val totalExpense = transactions
-                        .filter { it.isExpense }
-                        .sumOf { it.amount }
-
-                    // Рассчитываем текущий баланс
-                    val balance = totalIncome - totalExpense
-
-                    // Рассчитываем норму сбережений (если есть доход)
-                    val savingsRate = if (totalIncome > 0) {
-                        ((totalIncome - totalExpense) / totalIncome * 100).coerceIn(0.0, 100.0)
-                    } else {
-                        0.0
-                    }
-                    
-                    // Расчет общего количества транзакций
-                    val totalTransactions = transactions.size
-                    
-                    // Расчет уникальных категорий
-                    val uniqueExpenseCategories = transactions
-                        .filter { it.isExpense }
-                        .map { it.category }
-                        .distinct()
-                        .size
-                    
-                    val uniqueIncomeCategories = transactions
-                        .filter { !it.isExpense }
-                        .map { it.category }
-                        .distinct()
-                        .size
-                    
-                    // Расчет среднего расхода
-                    val avgExpense = if (transactions.filter { it.isExpense }.isNotEmpty()) {
-                        totalExpense / transactions.filter { it.isExpense }.size
-                    } else {
-                        0.0
-                    }
-                    
-                    // Форматирование среднего расхода
-                    val formattedAvgExpense = String.format("%,.0f ₽", avgExpense)
-                    
-                    // Расчет количества уникальных источников
-                    val uniqueSources = transactions
-                        .map { it.source }
-                        .distinct()
-                        .size
-                    
-                    // Форматирование диапазона дат
-                    val dateRange = if (transactions.isNotEmpty()) {
-                        val oldestDate = transactions.minByOrNull { it.date }?.date
-                        val newestDate = transactions.maxByOrNull { it.date }?.date
+            try {
+                // Используем общий кэш метрик для базовых показателей
+                val totalIncome = financialMetrics.totalIncome.value
+                val totalExpense = financialMetrics.totalExpense.value
+                val balance = financialMetrics.balance.value
+                
+                // Для остальных параметров по-прежнему нужно загружать все транзакции
+                when (val result = loadTransactionsUseCase()) {
+                    is Result.Success -> {
+                        val transactions = result.data
                         
-                        if (oldestDate != null && newestDate != null) {
-                            val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-                            "${dateFormat.format(oldestDate)} - ${dateFormat.format(newestDate)}"
+                        // Рассчитываем норму сбережений (если есть доход)
+                        val savingsRate = if (totalIncome > 0) {
+                            ((totalIncome - totalExpense) / totalIncome * 100).coerceIn(0.0, 100.0)
+                        } else {
+                            0.0
+                        }
+                        
+                        // Расчет общего количества транзакций
+                        val totalTransactions = transactions.size
+                        
+                        // Расчет уникальных категорий
+                        val uniqueExpenseCategories = transactions
+                            .filter { it.isExpense }
+                            .map { it.category }
+                            .distinct()
+                            .size
+                        
+                        val uniqueIncomeCategories = transactions
+                            .filter { !it.isExpense }
+                            .map { it.category }
+                            .distinct()
+                            .size
+                        
+                        // Расчет среднего расхода
+                        val avgExpense = if (transactions.filter { it.isExpense }.isNotEmpty()) {
+                            totalExpense / transactions.filter { it.isExpense }.size
+                        } else {
+                            0.0
+                        }
+                        
+                        // Форматирование среднего расхода
+                        val formattedAvgExpense = String.format("%,.0f ₽", avgExpense)
+                        
+                        // Расчет количества уникальных источников
+                        val uniqueSources = transactions
+                            .map { it.source }
+                            .distinct()
+                            .size
+                        
+                        // Форматирование диапазона дат
+                        val dateRange = if (transactions.isNotEmpty()) {
+                            val oldestDate = transactions.minByOrNull { it.date }?.date
+                            val newestDate = transactions.maxByOrNull { it.date }?.date
+                            
+                            if (oldestDate != null && newestDate != null) {
+                                val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+                                "${dateFormat.format(oldestDate)} - ${dateFormat.format(newestDate)}"
+                            } else {
+                                "Все время"
+                            }
                         } else {
                             "Все время"
                         }
-                    } else {
-                        "Все время"
-                    }
 
-                    _state.update { it.copy(
-                        isLoading = false,
-                        totalIncome = totalIncome,
-                        totalExpense = totalExpense,
-                        balance = balance,
-                        savingsRate = savingsRate,
-                        totalTransactions = totalTransactions,
-                        totalExpenseCategories = uniqueExpenseCategories,
-                        totalIncomeCategories = uniqueIncomeCategories,
-                        averageExpense = formattedAvgExpense,
-                        totalSourcesUsed = uniqueSources,
-                        dateRange = dateRange
-                    ) }
+                        _state.update { it.copy(
+                            isLoading = false,
+                            totalIncome = totalIncome,
+                            totalExpense = totalExpense,
+                            balance = balance,
+                            savingsRate = savingsRate,
+                            totalTransactions = totalTransactions,
+                            totalExpenseCategories = uniqueExpenseCategories,
+                            totalIncomeCategories = uniqueIncomeCategories,
+                            averageExpense = formattedAvgExpense,
+                            totalSourcesUsed = uniqueSources,
+                            dateRange = dateRange
+                        ) }
+                    }
+                    is Result.Error -> {
+                        _state.update { it.copy(
+                            isLoading = false,
+                            error = result.exception.message
+                        ) }
+                    }
                 }
-                is Result.Error -> {
-                    _state.update { it.copy(
-                        isLoading = false,
-                        error = result.exception.message
-                    ) }
-                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке финансовой аналитики: ${e.message}")
+                _state.update { it.copy(
+                    isLoading = false,
+                    error = e.message
+                ) }
             }
         }
     }

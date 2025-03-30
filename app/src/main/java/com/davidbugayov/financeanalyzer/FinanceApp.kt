@@ -10,6 +10,7 @@ import com.davidbugayov.financeanalyzer.di.homeModule
 import com.davidbugayov.financeanalyzer.di.importModule
 import com.davidbugayov.financeanalyzer.di.profileModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
 import com.davidbugayov.financeanalyzer.utils.logging.FileLogger
 import com.google.firebase.FirebaseApp
@@ -21,11 +22,16 @@ import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import timber.log.Timber
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 class FinanceApp : Application() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var crashlytics: FirebaseCrashlytics
+    private val appScope = CoroutineScope(Dispatchers.IO)
 
     // Делаем аналитику доступной глобально
     companion object {
@@ -70,6 +76,9 @@ class FinanceApp : Application() {
                     importModule
                 )
             }
+            
+            // Инициализируем финансовые метрики
+            initializeFinancialMetrics()
 
             // Логируем через Timber для проверки отправки в Crashlytics
             Timber.i("Application initialized")
@@ -150,5 +159,30 @@ class FinanceApp : Application() {
         val runtime = Runtime.getRuntime()
         val maxMemory = runtime.maxMemory() / (1024 * 1024) // В МБ
         return maxMemory
+    }
+
+    /**
+     * Инициализирует финансовые метрики.
+     * Использует отложенную инициализацию для предотвращения ANR.
+     */
+    private fun initializeFinancialMetrics() {
+        try {
+            Timber.d("Начало отложенной инициализации финансовых метрик")
+            val metrics = FinancialMetrics.getInstance()
+            
+            // Используем отложенную инициализацию вместо блокирующего вызова
+            metrics.lazyInitialize(priority = false)
+            
+            // Планируем повторную проверку с задержкой и высоким приоритетом
+            appScope.launch {
+                delay(1500) // Даем время для завершения инициализации приложения
+                metrics.lazyInitialize(priority = true)
+                Timber.d("Запланирована вторичная проверка метрик с высоким приоритетом")
+            }
+            
+            Timber.d("Запущена отложенная инициализация финансовых метрик")
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при инициализации финансовых метрик")
+        }
     }
 } 

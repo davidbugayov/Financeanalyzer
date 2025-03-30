@@ -7,6 +7,9 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
@@ -73,43 +76,49 @@ fun CompactLayout(
             onShowAllClick = onNavigateToHistory
         )
 
-        // Список транзакций и сводка - теперь в одном скроллируемом контейнере
+        // Список транзакций теперь использует LazyColumn для виртуализации
         Box(modifier = Modifier.weight(1f)) {
-            Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-            ) {
-                // Отображение суммы для выбранного периода
-                if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
-                    HomeGroupSummary(
-                        groups = state.transactionGroups,
-                        totalIncome = state.filteredIncome,
-                        totalExpense = state.filteredExpense
+            if (state.filteredTransactions.isEmpty() && !state.isLoading) {
+                // Отображаем сообщение, если нет транзакций
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(150.dp),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Text(
+                        text = when (state.currentFilter) {
+                            TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
+                            TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
+                            TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
+                        },
+                        color = Color.Gray
                     )
                 }
-
-                // Список транзакций
-                if (state.filteredTransactions.isEmpty() && !state.isLoading) {
-                    // Отображаем сообщение, если нет транзакций
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(150.dp),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = when (state.currentFilter) {
-                                TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
-                                TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
-                                TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
-                            },
-                            color = Color.Gray
-                        )
+            } else {
+                // Используем LazyColumn для списка транзакций
+                val lazyListState = rememberLazyListState()
+                
+                LazyColumn(
+                    state = lazyListState,
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    // Добавляем сводку как первый элемент списка, если она нужна
+                    if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
+                        item {
+                            HomeGroupSummary(
+                                groups = state.transactionGroups,
+                                totalIncome = state.filteredIncome,
+                                totalExpense = state.filteredExpense
+                            )
+                        }
                     }
-                } else {
-                    // Отображаем список транзакций
-                    state.filteredTransactions.forEach { transaction ->
+                    
+                    // Добавляем транзакции
+                    items(
+                        items = state.filteredTransactions,
+                        key = { it.id } // Используем уникальный ID как ключ для лучшей производительности
+                    ) { transaction ->
                         TransactionItemWithActions(
                             transaction = transaction,
                             onClick = onTransactionClick,
@@ -117,9 +126,11 @@ fun CompactLayout(
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                     }
+                    // Добавляем пространство внизу для нижней панели
+                    item {
+                        Spacer(modifier = Modifier.height(140.dp))
+                    }
                 }
-                // Увеличиваем нижний отступ для увеличенной нижней панели
-                Spacer(modifier = Modifier.height(140.dp))
             }
         }
     }

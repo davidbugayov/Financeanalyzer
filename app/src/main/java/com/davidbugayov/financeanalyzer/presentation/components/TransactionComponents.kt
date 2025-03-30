@@ -268,10 +268,29 @@ fun TransactionItemWithActions(
     onLongClick: (Transaction) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // Элемент окружен поверхностью с фиксированной высотой для стабильности скроллинга
+    // Предварительно вычисляем значения, которые не меняются при перерисовке
+    val indicatorColor = if (transaction.isExpense) Color(0xFFB71C1C) else Color(0xFF2E7D32)
+    val backgroundTint = if (transaction.isExpense) Color(0xFFFFE0E0) else Color(0xFFE0F7E0)
+    
+    val date = remember(transaction.date) {
+        SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(transaction.date)
+    }
+    
+    val icon = getCategoryIcon(transaction.category, transaction.isExpense)
+    val amountFormatted = transaction.amountFormatted()
+    
+    // Получаем информацию о банке
+    val (sourceIcon, sourceColor) = if (transaction.source != null) {
+        getBankIcon(transaction.source)
+    } else {
+        Pair(Icons.Default.CreditCard, MaterialTheme.colorScheme.tertiary)
+    }
+    
+    val hasNote = transaction.note?.isNotBlank() == true
+    
+    // Простая поверхность без лишних эффектов
     Surface(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier = modifier.fillMaxWidth(),
         color = MaterialTheme.colorScheme.surface,
         shape = MaterialTheme.shapes.small
     ) {
@@ -282,35 +301,31 @@ fun TransactionItemWithActions(
                     onClick = { onClick(transaction) },
                     onLongClick = { onLongClick(transaction) }
                 )
-                .padding(horizontal = 8.dp, vertical = 10.dp),
-            verticalAlignment = Alignment.Top
+                .padding(horizontal = 8.dp, vertical = 8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            // Цвет индикатора
-            val indicatorColor = if (transaction.isExpense) Color(0xFFB71C1C) else Color(0xFF2E7D32)
-            val backgroundTint = if (transaction.isExpense) Color(0xFFFFE0E0) else Color(0xFFE0F7E0)
-            
-            // Иконка категории
+            // Иконка категории в оптимизированном виде
             Box(
                 modifier = Modifier
-                    .size(36.dp)
+                    .size(32.dp)
                     .background(backgroundTint, shape = CircleShape),
                 contentAlignment = Alignment.Center
             ) {
-                val icon = getCategoryIcon(transaction.category, transaction.isExpense)
                 Icon(
                     imageVector = icon,
-                    contentDescription = transaction.category,
+                    contentDescription = null, // Для улучшения производительности
                     tint = indicatorColor,
-                    modifier = Modifier.size(20.dp)
+                    modifier = Modifier.size(18.dp)
                 )
             }
 
-            Spacer(modifier = Modifier.width(12.dp))
+            Spacer(modifier = Modifier.width(8.dp))
 
-            // Детали транзакции
+            // Детали транзакции - упрощаем структуру для лучшей производительности
             Column(
                 modifier = Modifier.weight(1f)
             ) {
+                // Объединяем текстовые блоки для уменьшения количества перерисовок
                 Text(
                     text = transaction.category,
                     maxLines = 1,
@@ -320,28 +335,22 @@ fun TransactionItemWithActions(
                     fontWeight = FontWeight.Medium
                 )
                 
-                // Форматированная дата
-                val date = remember(transaction.date) {
-                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(transaction.date)
-                }
                 Text(
                     text = date,
                     maxLines = 1,
                     fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = 2.dp)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
 
-                // Источник (банк)
+                // Источник (банк) - отображаем, только если он есть
                 if (transaction.source != null) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 2.dp)
                     ) {
-                        val (sourceIcon, sourceColor) = getBankIcon(transaction.source)
                         Icon(
                             imageVector = sourceIcon,
-                            contentDescription = transaction.source,
+                            contentDescription = null, // Для улучшения производительности
                             tint = sourceColor,
                             modifier = Modifier.size(12.dp)
                         )
@@ -356,33 +365,27 @@ fun TransactionItemWithActions(
                     }
                 }
 
-                // Примечание
-                transaction.note?.let { note ->
-                    if (note.isNotBlank()) {
-                        Text(
-                            text = note,
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 3,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier
-                                .padding(top = 2.dp)
-                                .fillMaxWidth(0.85f)
-                        )
-                    }
+                // Примечание - отображаем, только если оно есть, избегаем лишних проверок
+                if (hasNote && transaction.note != null) {
+                    Text(
+                        text = transaction.note,
+                        fontSize = 12.sp,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
                 }
             }
 
-            // Отформатированная сумма - всегда справа
+            // Сумма транзакции - упрощаем отображение
             Text(
-                text = transaction.amountFormatted(),
+                text = amountFormatted,
                 fontSize = 14.sp,
                 fontWeight = FontWeight.Bold,
                 color = indicatorColor,
                 maxLines = 1,
-                modifier = Modifier
-                    .padding(start = 12.dp)
-                    .padding(top = 2.dp)
+                modifier = Modifier.padding(start = 8.dp)
             )
         }
     }

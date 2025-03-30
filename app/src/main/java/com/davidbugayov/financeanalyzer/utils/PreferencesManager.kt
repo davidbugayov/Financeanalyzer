@@ -68,5 +68,46 @@ class PreferencesManager(context: Context) {
         private const val PREFERENCES_NAME = "finance_analyzer_prefs"
         private const val KEY_CUSTOM_SOURCES = "custom_sources"
         private const val KEY_THEME_MODE = "theme_mode"
+        private const val KEY_TOTAL_INCOME = "total_income"
+        private const val KEY_TOTAL_EXPENSE = "total_expense"
+        private const val KEY_BALANCE = "balance"
+        private const val KEY_STATS_LAST_UPDATE = "stats_last_update"
+    }
+
+    /**
+     * Сохраняет финансовую статистику в SharedPreferences
+     * @param totalIncome Общий доход
+     * @param totalExpense Общий расход
+     * @param balance Текущий баланс
+     */
+    fun saveFinancialStats(totalIncome: Double, totalExpense: Double, balance: Double) {
+        sharedPreferences.edit {
+            putString(KEY_TOTAL_INCOME, totalIncome.toString())
+            putString(KEY_TOTAL_EXPENSE, totalExpense.toString())
+            putString(KEY_BALANCE, balance.toString())
+            putLong(KEY_STATS_LAST_UPDATE, System.currentTimeMillis())
+        }
+    }
+
+    /**
+     * Загружает финансовую статистику из SharedPreferences
+     * @return Triple с общим доходом, общим расходом и балансом
+     */
+    fun getFinancialStats(): Triple<Double, Double, Double> {
+        val totalIncome = sharedPreferences.getString(KEY_TOTAL_INCOME, "0.0")?.toDoubleOrNull() ?: 0.0
+        val totalExpense = sharedPreferences.getString(KEY_TOTAL_EXPENSE, "0.0")?.toDoubleOrNull() ?: 0.0
+        val balance = sharedPreferences.getString(KEY_BALANCE, "0.0")?.toDoubleOrNull() ?: 0.0
+        
+        return Triple(totalIncome, totalExpense, balance)
+    }
+
+    /**
+     * Проверяет актуальность сохраненной статистики
+     * @return true, если статистика актуальна (обновлена недавно)
+     */
+    fun isStatsUpToDate(): Boolean {
+        val lastUpdate = sharedPreferences.getLong(KEY_STATS_LAST_UPDATE, 0)
+        // Считаем статистику актуальной, если она обновлена не более 24 часов назад
+        return System.currentTimeMillis() - lastUpdate < 24 * 60 * 60 * 1000
     }
 } 

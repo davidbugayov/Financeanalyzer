@@ -38,6 +38,10 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.presentation.ui.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import org.koin.androidx.compose.koinViewModel
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import timber.log.Timber
 
 @Composable
 fun MainScreen(startDestination: String = "home") {
@@ -58,6 +62,33 @@ fun MainScreen(startDestination: String = "home") {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    // Для загрузки данных в фоновом режиме
+    LaunchedEffect(Unit) {
+        // Используем двухэтапную инициализацию для предотвращения ANR
+        // Сначала загружаем только критически важные данные для отображения интерфейса
+        MainScope().launch(Dispatchers.Main) {
+            Timber.d("Начало загрузки первичных данных для UI")
+            // Инициируем загрузку минимальных данных на экран с низким приоритетом
+            homeViewModel.onEvent(com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent.LoadTransactions)
+        }
+        
+        // Затем с задержкой запускаем фоновое обновление остальных данных
+        kotlinx.coroutines.delay(500)
+        
+        // Запускаем фоновые вычисления с правильным диспетчером
+        MainScope().launch(Dispatchers.Default) {
+            Timber.d("Запуск фоновой загрузки данных")
+            // Инициируем полное фоновое обновление без блокировки UI
+            homeViewModel.initiateBackgroundDataRefresh()
+            
+            // Предзагружаем данные для графиков с большей задержкой
+            kotlinx.coroutines.delay(2000)
+            
+            // Загружаем данные для графиков во вторую очередь
+            chartViewModel.loadTransactions()
+        }
     }
 
     // Отслеживаем изменения темы
@@ -202,9 +233,13 @@ fun MainScreen(startDestination: String = "home") {
                     AddTransactionScreen(
                         viewModel = addTransactionViewModel,
                         onNavigateBack = {
-                            homeViewModel.onEvent(com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent.LoadTransactions)
+                            // Используем фоновую загрузку вместо полной перезагрузки
+                            homeViewModel.initiateBackgroundDataRefresh()
+                            
+                            // Обновляем графики и статистику напрямую
                             chartViewModel.loadTransactions()
                             profileViewModel.updateFinancialStatistics()
+                            
                             navController.navigate(Screen.Home.route) {
                                 popUpTo(Screen.Home.route) {
                                     inclusive = true

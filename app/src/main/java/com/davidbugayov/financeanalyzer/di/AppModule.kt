@@ -12,9 +12,11 @@ import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
+import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.koin.androidApplication
@@ -39,6 +41,7 @@ val appModule = module {
     // Utils
     single { EventBus }
     single { AnalyticsUtils }
+    single { FinancialMetrics.getInstance() }
     
     // Repositories
     single<TransactionRepositoryImpl> { TransactionRepositoryImpl(get()) }
@@ -67,6 +70,16 @@ val appModule = module {
             loadTransactionsUseCase = get(),
             notificationScheduler = get(),
             preferencesManager = get()
+        )
+    }
+    
+    viewModel {
+        HomeViewModel(
+            getTransactionsUseCase = get(),
+            addTransactionUseCase = get(),
+            deleteTransactionUseCase = get(),
+            repository = get(),
+            eventBus = get()
         )
     }
 

@@ -16,6 +16,8 @@ class CalculateCategoryStatsUseCase(
 
     /**
      * Рассчитывает статистику по категории для текущего и предыдущего периодов
+     * Использует оптимизированный подход для снижения нагрузки на вычисления
+     * 
      * @return Triple<currentTotal, previousTotal, percentChange>
      */
     operator fun invoke(
@@ -25,18 +27,32 @@ class CalculateCategoryStatsUseCase(
         startDate: Date,
         endDate: Date
     ): Triple<Money, Money, Int?> {
-        // Фильтруем транзакции для текущего периода
+        // Если список пуст или нет выбранных категорий, быстро возвращаем нулевые значения
+        if (transactions.isEmpty() || categories.isEmpty()) {
+            return Triple(Money(0.0), Money(0.0), null)
+        }
+        
+        // Используем предварительную фильтрацию для снижения нагрузки на filterTransactionsUseCase
+        // Это особенно важно при больших наборах данных
+        val relevantTransactions = transactions.filter { 
+            it.date in startDate..endDate && (categories.isEmpty() || it.category in categories)
+        }
+        
+        if (relevantTransactions.isEmpty()) {
+            return Triple(Money(0.0), Money(0.0), null)
+        }
+        
+        // Фильтруем транзакции для текущего периода с оптимизированным набором данных
         val currentPeriodTransactions = filterTransactionsUseCase(
-            transactions = transactions,
+            transactions = relevantTransactions,
             periodType = periodType,
             startDate = startDate,
             endDate = endDate,
             categories = categories
         )
-        val currentPeriodTotalDouble = currentPeriodTransactions
-            .map { it.amount }
-            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
         
+        // Оптимизированный расчет суммы с одним проходом
+        val currentPeriodTotalDouble = currentPeriodTransactions.sumOf { it.amount }
         val currentPeriodTotal = Money(currentPeriodTotalDouble)
 
         // Рассчитываем предыдущий период такой же длительности
@@ -44,21 +60,29 @@ class CalculateCategoryStatsUseCase(
         val previousStartDate = Date(startDate.time - periodDuration)
         val previousEndDate = Date(endDate.time - periodDuration)
 
-        // Фильтруем транзакции для предыдущего периода
-        val previousPeriodTransactions = filterTransactionsUseCase(
-            transactions = transactions,
-            periodType = PeriodType.CUSTOM,
-            startDate = previousStartDate,
-            endDate = previousEndDate,
-            categories = categories
-        )
-        val previousPeriodTotalDouble = previousPeriodTransactions
-            .map { it.amount }
-            .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
-            
+        // Предварительно фильтруем транзакции для предыдущего периода
+        val relevantPreviousTransactions = transactions.filter {
+            it.date in previousStartDate..previousEndDate && (categories.isEmpty() || it.category in categories)
+        }
+        
+        // Фильтруем транзакции для предыдущего периода с оптимизированным набором данных
+        val previousPeriodTransactions = if (relevantPreviousTransactions.isNotEmpty()) {
+            filterTransactionsUseCase(
+                transactions = relevantPreviousTransactions,
+                periodType = PeriodType.CUSTOM,
+                startDate = previousStartDate,
+                endDate = previousEndDate,
+                categories = categories
+            )
+        } else {
+            emptyList()
+        }
+        
+        // Оптимизированный расчет суммы с одним проходом
+        val previousPeriodTotalDouble = previousPeriodTransactions.sumOf { it.amount }
         val previousPeriodTotal = Money(previousPeriodTotalDouble)
 
-        // Рассчитываем процентное изменение
+        // Рассчитываем процентное изменение только если оба периода имеют данные
         val percentChange = if (previousPeriodTotalDouble != 0.0) {
             ((currentPeriodTotalDouble - previousPeriodTotalDouble) /
                     abs(previousPeriodTotalDouble) * 100).toInt()
