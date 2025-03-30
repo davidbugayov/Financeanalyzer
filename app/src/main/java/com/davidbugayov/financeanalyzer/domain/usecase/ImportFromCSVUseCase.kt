@@ -289,13 +289,13 @@ class ImportFromCSVUseCase(
                         try {
                             // Проверяем, нет ли в строке проблемных символов
                             Timber.d("ИМПОРТ: Проверка наличия проблемных символов в строке '$line'")
-                            val problematicChars = line.toCharArray().filter { it.toInt() < 32 && it != '\n' && it != '\r' && it != '\t' }
+                            val problematicChars = line.toCharArray().filter { it.code < 32 && it != '\n' && it != '\r' && it != '\t' }
                             if (problematicChars.isNotEmpty()) {
-                                Timber.w("ИМПОРТ: В строке обнаружены проблемные символы: ${problematicChars.joinToString { "0x${it.toInt().toString(16)}" }}")
+                                Timber.w("ИМПОРТ: В строке обнаружены проблемные символы: ${problematicChars.joinToString { "0x${it.code.toString(16)}" }}")
                             }
                             
                             // Лог кодовых точек для диагностики проблем с кодировкой
-                            val codePoints = line.toCharArray().map { it.toInt() }
+                            val codePoints = line.toCharArray().map { it.code }
                             Timber.d("ИМПОРТ: Кодовые точки строки: $codePoints")
 
                             val values = parseCsvLine(line, delimiter)
@@ -309,293 +309,295 @@ class ImportFromCSVUseCase(
                                 return@forEach
                             }
 
-                            var rawDateValue = ""
-                            var rawAmountValue = ""
-                            
                             try {
-                                rawDateValue = values[dateIndex]
-                                rawAmountValue = values[amountIndex]
+                                val rawDateValue = values[dateIndex]
+                                val rawAmountValue = values[amountIndex]
                                 Timber.d("ИМПОРТ: Сырые значения: дата='$rawDateValue', сумма='$rawAmountValue'")
-                            } catch (e: Exception) {
-                                Timber.e(e, "ИМПОРТ: Ошибка доступа к данным. dateIndex=$dateIndex, amountIndex=$amountIndex, size=${values.size}")
-                                skippedCount++
-                                return@forEach
-                            }
-
-                            val dateString = cleanField(rawDateValue)
-                            val amountString = cleanField(rawAmountValue).replace(",", ".")
                             
-                            Timber.d("ИМПОРТ: Обрабатываем дату: '$dateString', сумму: '$amountString'")
+                                val dateString = cleanField(rawDateValue)
+                                val amountString = cleanField(rawAmountValue).replace(",", ".")
+                                
+                                Timber.d("ИМПОРТ: Обрабатываем дату: '$dateString', сумму: '$amountString'")
 
-                            // Парсим дату
-                            val date = try {
-                                var parsedDate: Date? = null
-                                var parseException: Exception? = null
-                                
-                                Timber.d("ИМПОРТ: Пытаемся распарсить дату '$dateString'")
-                                
-                                // Специальная обработка для format yyyy-MM-dd_HH-mm-ss
-                                parsedDate = if (dateString.matches("\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}".toRegex())) {
-                                    try {
-                                        Timber.d("ИМПОРТ: Обнаружен формат даты yyyy-MM-dd_HH-mm-ss: '$dateString'")
-                                        
-                                        // Пробуем напрямую через SimpleDateFormat
-                                        try {
-                                            val date = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).parse(dateString)
-                                            if (date != null) {
-                                                Timber.d("ИМПОРТ: Дата успешно распарсена специальным форматом через SimpleDateFormat: $dateString -> ${date.time}")
-                                                date
-                                            } else null
-                                        } catch (e: Exception) {
-                                            Timber.w(e, "ИМПОРТ: Не удалось распарсить дату через SimpleDateFormat: '$dateString'")
-                                            null
-                                        }
-                                    } catch (e: Exception) {
-                                        Timber.w(e, "ИМПОРТ: Ошибка при специальной обработке даты: '$dateString'")
-                                        null
-                                    }
-                                } else null
-                                
-                                // Если специальная обработка не сработала, продолжаем обычную
-                                if (parsedDate == null) {
-                                    // Пробуем разные форматы даты
-                                    for (format in dateFormats) {
-                                        try {
-                                            parsedDate = format.parse(dateString)
-                                            if (parsedDate != null) {
-                                                Timber.d("ИМПОРТ: Дата успешно распарсена форматом ${format.toPattern()}: $dateString -> ${parsedDate.time}")
-                                                break
-                                            }
-                                        } catch (e: Exception) {
-                                            parseException = e
-                                            Timber.v("ИМПОРТ: Не удалось распарсить дату '$dateString' форматом ${format.toPattern()}: ${e.message}")
-                                            // Пробуем следующий формат
-                                        }
-                                    }
-                                }
-                                
-                                // Если до сих пор не получилось, пробуем разобрать дату вручную
-                                if (parsedDate == null) {
-                                    Timber.w("ИМПОРТ: Не удалось распарсить дату '$dateString' ни одним из форматов: ${parseException?.message}")
+                                // Парсим дату
+                                val date = try {
+                                    Timber.d("ИМПОРТ: Пытаемся распарсить дату '$dateString'")
                                     
-                                    // Для формата yyyy-MM-dd_HH-mm-ss пробуем разбить строку
-                                    if (dateString.contains("_")) {
-                                        val parts = dateString.split("_")
-                                        if (parts.size == 2) {
-                                            val datePart = parts[0] // yyyy-MM-dd
-                                            val timePart = parts[1] // HH-mm-ss
+                                    // Специальная обработка для format yyyy-MM-dd_HH-mm-ss
+                                    var parsedDate: Date? = null
+                                    if (dateString.matches("\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}".toRegex())) {
+                                        try {
+                                            Timber.d("ИМПОРТ: Обнаружен формат даты yyyy-MM-dd_HH-mm-ss: '$dateString'")
                                             
-                                            Timber.d("ИМПОРТ: Разбили дату на части: датa='$datePart', время='$timePart'")
-                                            
-                                            // Преобразуем формат времени с "-" на ":"
-                                            val timePartFormatted = timePart.replace("-", ":")
-                                            val fullDateStr = "$datePart $timePartFormatted"
-                                            
-                                            Timber.d("ИМПОРТ: Пытаемся распарсить дату в стандартном формате: '$fullDateStr'")
-                                            
+                                            // Пробуем напрямую через SimpleDateFormat
                                             try {
-                                                parsedDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(fullDateStr)
+                                                parsedDate = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault()).parse(dateString)
                                                 if (parsedDate != null) {
-                                                    Timber.d("ИМПОРТ: Дата успешно распарсена через ручное преобразование: $fullDateStr -> ${parsedDate.time}")
+                                                    Timber.d("ИМПОРТ: Дата успешно распарсена специальным форматом через SimpleDateFormat: $dateString -> ${parsedDate.time}")
                                                 }
                                             } catch (e: Exception) {
-                                                Timber.w(e, "ИМПОРТ: Не удалось распарсить дату через ручное преобразование: '$fullDateStr'")
-                                            }
-                                        }
-                                    }
-                                }
-                                
-                                // Последняя попытка - извлечь только yyyy-MM-dd
-                                if (parsedDate == null) {
-                                    Timber.w("ИМПОРТ: Пытаемся извлечь дату из строки '$dateString'")
-                                    
-                                    // Пытаемся извлечь дату из строки
-                                    val datePattern = "\\d{4}-\\d{2}-\\d{2}".toRegex()
-                                    val datePart = datePattern.find(dateString)?.value
-                                    if (datePart != null) {
-                                        Timber.d("ИМПОРТ: Извлечена часть даты из строки: $datePart")
-                                        try {
-                                            parsedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(datePart)
-                                            if (parsedDate != null) {
-                                                Timber.d("ИМПОРТ: Дата успешно распарсена из части строки: $datePart -> $parsedDate")
-                                            } else {
-                                                Timber.w("ИМПОРТ: Не удалось распарсить дату из части строки: $datePart")
+                                                Timber.w(e, "ИМПОРТ: Не удалось распарсить дату через SimpleDateFormat: '$dateString'")
                                             }
                                         } catch (e: Exception) {
-                                            Timber.w("ИМПОРТ: Ошибка при парсинге даты из части строки: ${e.message}")
+                                            Timber.w(e, "ИМПОРТ: Ошибка при специальной обработке даты: '$dateString'")
                                         }
+                                    }
+                                    
+                                    // Если специальная обработка не сработала, продолжаем обычную
+                                    if (parsedDate == null) {
+                                        // Пробуем разные форматы даты
+                                        for (format in dateFormats) {
+                                            try {
+                                                parsedDate = format.parse(dateString)
+                                                if (parsedDate != null) {
+                                                    Timber.d("ИМПОРТ: Дата успешно распарсена форматом ${format.toPattern()}: $dateString -> ${parsedDate.time}")
+                                                    break
+                                                }
+                                            } catch (e: Exception) {
+                                                Timber.v("ИМПОРТ: Не удалось распарсить дату '$dateString' форматом ${format.toPattern()}: ${e.message}")
+                                                // Пробуем следующий формат
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Если до сих пор не получилось, пробуем разобрать дату вручную
+                                    if (parsedDate == null) {
+                                        var parseException: Exception? = null
+                                        // Пробуем другие форматы
+                                        for (format in dateFormats) {
+                                            try {
+                                                parsedDate = format.parse(dateString)
+                                                if (parsedDate != null) break
+                                            } catch (e: Exception) {
+                                                parseException = e
+                                            }
+                                        }
+                                        
+                                        if (parsedDate == null) {
+                                            Timber.w("ИМПОРТ: Не удалось распарсить дату '$dateString' ни одним из форматов: ${parseException?.message}")
+                                        }
+                                        // Для формата yyyy-MM-dd_HH-mm-ss пробуем разбить строку
+                                        if (dateString.contains("_")) {
+                                            val parts = dateString.split("_")
+                                            if (parts.size == 2) {
+                                                val datePart = parts[0] // yyyy-MM-dd
+                                                val timePart = parts[1] // HH-mm-ss
+                                                
+                                                Timber.d("ИМПОРТ: Разбили дату на части: датa='$datePart', время='$timePart'")
+                                                
+                                                // Преобразуем формат времени с "-" на ":"
+                                                val timePartFormatted = timePart.replace("-", ":")
+                                                val fullDateStr = "$datePart $timePartFormatted"
+                                                
+                                                Timber.d("ИМПОРТ: Пытаемся распарсить дату в стандартном формате: '$fullDateStr'")
+                                                
+                                                try {
+                                                    parsedDate = SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault()).parse(fullDateStr)
+                                                    if (parsedDate != null) {
+                                                        Timber.d("ИМПОРТ: Дата успешно распарсена через ручное преобразование: $fullDateStr -> ${parsedDate.time}")
+                                                    }
+                                                } catch (e: Exception) {
+                                                    Timber.w(e, "ИМПОРТ: Не удалось распарсить дату через ручное преобразование: '$fullDateStr'")
+                                                }
+                                            }
+                                        }
+                                    }
+                                    
+                                    // Последняя попытка - извлечь только yyyy-MM-dd
+                                    if (parsedDate == null) {
+                                        Timber.w("ИМПОРТ: Пытаемся извлечь дату из строки '$dateString'")
+                                        
+                                        // Пытаемся извлечь дату из строки
+                                        val datePattern = "\\d{4}-\\d{2}-\\d{2}".toRegex()
+                                        val datePart = datePattern.find(dateString)?.value
+                                        if (datePart != null) {
+                                            Timber.d("ИМПОРТ: Извлечена часть даты из строки: $datePart")
+                                            try {
+                                                parsedDate = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault()).parse(datePart)
+                                                if (parsedDate != null) {
+                                                    Timber.d("ИМПОРТ: Дата успешно распарсена из части строки: $datePart -> $parsedDate")
+                                                } else {
+                                                    Timber.w("ИМПОРТ: Не удалось распарсить дату из части строки: $datePart")
+                                                }
+                                            } catch (e: Exception) {
+                                                Timber.w("ИМПОРТ: Ошибка при парсинге даты из части строки: ${e.message}")
+                                            }
+                                        } else {
+                                            Timber.w("ИМПОРТ: Не удалось извлечь часть даты из строки")
+                                        }
+                                    }
+                                    
+                                    // Если всё равно не удалось распарсить дату, используем текущую
+                                    if (parsedDate == null) {
+                                        Timber.w("ИМПОРТ: Не удалось распарсить дату никаким способом, используем текущую дату")
+                                        Date()
                                     } else {
-                                        Timber.w("ИМПОРТ: Не удалось извлечь часть даты из строки")
+                                        parsedDate
+                                    }
+                                } catch (e: Exception) {
+                                    Timber.w("ИМПОРТ: Критическая ошибка парсинга даты '$dateString': ${e.message}")
+                                    Date() // Используем текущую дату при ошибке парсинга
+                                }
+
+                                // Парсим сумму
+                                val amount = try {
+                                    val parsedAmount = amountString.toDouble()
+                                    Timber.d("ИМПОРТ: Сумма успешно распарсена: $amountString -> $parsedAmount")
+                                    parsedAmount
+                                } catch (e: Exception) {
+                                    Timber.w("ИМПОРТ: Ошибка парсинга суммы '$amountString': ${e.message}")
+                                    0.0 // Пропускаем при ошибке парсинга суммы
+                                }
+
+                                // Определяем тип транзакции
+                                val isExpense = if (typeIndex != -1 && values.size > typeIndex) {
+                                    val typeValue = cleanField(values[typeIndex])
+                                    val isExp = if (typeValue.equals("true", ignoreCase = true) || typeValue.equals("1")) {
+                                        true
+                                    } else if (typeValue.equals("false", ignoreCase = true) || typeValue.equals("0")) {
+                                        false
+                                    } else {
+                                        typeValue.equals("Расход", ignoreCase = true)
+                                    }
+                                    Timber.d("ИМПОРТ: Тип транзакции определен из поля: $isExp (значение: $typeValue)")
+                                    isExp
+                                } else {
+                                    val isExp = amount < 0 // Отрицательная сумма = расход
+                                    Timber.d("ИМПОРТ: Тип транзакции определен по сумме: $isExp (сумма: $amount)")
+                                    isExp
+                                }
+
+                                // Определяем категорию
+                                val category = if (categoryIndex != -1 && values.size > categoryIndex) {
+                                    cleanField(values[categoryIndex])
+                                } else {
+                                    if (isExpense) "Другое" else "Другое"
+                                }
+
+                                // Определяем примечание
+                                var note: String? = null
+                                if (noteIndex != -1 && values.size > noteIndex) {
+                                    note = cleanField(values[noteIndex])
+                                    Timber.d("ИМПОРТ: Примечание из CSV: '$note'")
+                                } else if (titleIndex != -1 && values.size > titleIndex) {
+                                    // Если нет примечания, но есть название - используем его как примечание
+                                    note = cleanField(values[titleIndex])
+                                    Timber.d("ИМПОРТ: Используем Title как примечание: '$note'")
+                                } else {
+                                    Timber.d("ИМПОРТ: Поле примечания отсутствует или за пределами значений")
+                                }
+
+                                // Определяем источник
+                                val rawSource = if (sourceIndex != -1 && values.size > sourceIndex) {
+                                    values[sourceIndex]
+                                } else {
+                                    "Импорт"
+                                }
+                                
+                                // Обработка источника с переносом строки
+                                val source = cleanField(rawSource).let { src ->
+                                    // Если источник короткий и похож на часть имени банка, пробуем исправить
+                                    when {
+                                        src.equals("Сб", ignoreCase = true) -> "Сбер"
+                                        src.equals("ер", ignoreCase = true) -> "Сбер" 
+                                        src.equals("Тинь", ignoreCase = true) -> "Т-Банк"
+                                        src.equals("кофф", ignoreCase = true) -> "Т-Банк"
+                                        src.equals("Аль", ignoreCase = true) -> "Альфа"
+                                        src.equals("фа", ignoreCase = true) -> "Альфа"
+                                        src.contains("\n") -> src.replace("\n", " ").trim()
+                                        else -> src
+                                    }
+                                }
+
+                                // Проверяем значения перед созданием транзакции
+                                if (amount == 0.0) {
+                                    Timber.w("ИМПОРТ: Пропускаем транзакцию с нулевой суммой")
+                                    skippedCount++
+                                    return@forEach
+                                }
+
+                                // Создаем объект транзакции
+                                val generatedId = "import_${date.time}_${System.nanoTime()}"
+                                val transactionId = if (idIndex != -1 && values.size > idIndex) {
+                                    val csvId = cleanField(values[idIndex])
+                                    // Ограничиваем длину ID до 50 символов для предотвращения проблем с длинными ID
+                                    if (csvId.length > 50) {
+                                        Timber.w("ИМПОРТ: ID слишком длинный (${csvId.length} символов), обрезаем: $csvId")
+                                        csvId.substring(0, 50)
+                                    } else {
+                                        csvId
+                                    }
+                                } else {
+                                    generatedId
+                                }
+                                
+                                // Проверяем существование транзакции с таким ID
+                                val existingTransaction = try {
+                                    repository.getTransactionById(transactionId)
+                                } catch (e: Exception) {
+                                    Timber.w("ИМПОРТ: Ошибка проверки существующей транзакции: ${e.message}")
+                                    null
+                                }
+                                
+                                if (existingTransaction != null) {
+                                    Timber.w("ИМПОРТ: Транзакция с ID $transactionId уже существует, пропускаем")
+                                    skippedCount++
+                                    return@forEach
+                                }
+
+                                // Принудительная задержка между транзакциями для предотвращения перегрузки базы данных
+                                if (currentLine % 20 == 0) {
+                                    Timber.d("ИМПОРТ: Делаем небольшую паузу после 20 транзакций")
+                                    delay(100) // Пауза 100 мс после каждых 20 транзакций
+                                }
+
+                                // Ограничения длины полей
+                                val limitedCategory = if (category.length > 100) {
+                                    Timber.w("ИМПОРТ: Обрезаем слишком длинную категорию: ${category.length} символов")
+                                    category.substring(0, 100)
+                                } else {
+                                    category
+                                }
+                                
+                                val limitedNote = note?.let {
+                                    if (it.length > 1000) {
+                                        Timber.w("ИМПОРТ: Обрезаем слишком длинное примечание: ${it.length} символов")
+                                        it.substring(0, 1000)
+                                    } else {
+                                        it
                                     }
                                 }
                                 
-                                // Если всё равно не удалось распарсить дату, используем текущую
-                                if (parsedDate == null) {
-                                    Timber.w("ИМПОРТ: Не удалось распарсить дату никаким способом, используем текущую дату")
-                                    Date()
+                                val limitedSource = if (source.length > 100) {
+                                    Timber.w("ИМПОРТ: Обрезаем слишком длинный источник: ${source.length} символов")
+                                    source.substring(0, 100)
                                 } else {
-                                    parsedDate
+                                    source
                                 }
+
+                                val transaction = Transaction(
+                                    id = transactionId,
+                                    amount = amount.absoluteValue, // Храним положительное значение
+                                    category = limitedCategory,
+                                    isExpense = isExpense,
+                                    date = date,
+                                    note = limitedNote,
+                                    source = limitedSource
+                                )
+                                
+                                Timber.d("ИМПОРТ: Создана транзакция: id=${transaction.id}, дата=${transaction.date}, сумма=${transaction.amount}, категория=${transaction.category}, расход=${transaction.isExpense}")
+
+                                // Сохраняем транзакцию
+                                Timber.d("ИМПОРТ: Сохраняем транзакцию в базу данных")
+                                repository.addTransaction(transaction)
+                                Timber.d("ИМПОРТ: Транзакция успешно сохранена")
+
+                                importedCount++
+                                totalAmount += amount.absoluteValue
                             } catch (e: Exception) {
-                                Timber.w("ИМПОРТ: Критическая ошибка парсинга даты '$dateString': ${e.message}")
-                                Date() // Используем текущую дату при ошибке парсинга
-                            }
-
-                            // Парсим сумму
-                            val amount = try {
-                                val parsedAmount = amountString.toDouble()
-                                Timber.d("ИМПОРТ: Сумма успешно распарсена: $amountString -> $parsedAmount")
-                                parsedAmount
-                            } catch (e: Exception) {
-                                Timber.w("ИМПОРТ: Ошибка парсинга суммы '$amountString': ${e.message}")
-                                0.0 // Пропускаем при ошибке парсинга суммы
-                            }
-
-                            // Определяем тип транзакции
-                            val isExpense = if (typeIndex != -1 && values.size > typeIndex) {
-                                val typeValue = cleanField(values[typeIndex])
-                                val isExp = if (typeValue.equals("true", ignoreCase = true) || typeValue.equals("1")) {
-                                    true
-                                } else if (typeValue.equals("false", ignoreCase = true) || typeValue.equals("0")) {
-                                    false
-                                } else {
-                                    typeValue.equals("Расход", ignoreCase = true)
-                                }
-                                Timber.d("ИМПОРТ: Тип транзакции определен из поля: $isExp (значение: $typeValue)")
-                                isExp
-                            } else {
-                                val isExp = amount < 0 // Отрицательная сумма = расход
-                                Timber.d("ИМПОРТ: Тип транзакции определен по сумме: $isExp (сумма: $amount)")
-                                isExp
-                            }
-
-                            // Определяем категорию
-                            val category = if (categoryIndex != -1 && values.size > categoryIndex) {
-                                cleanField(values[categoryIndex])
-                            } else {
-                                if (isExpense) "Другое" else "Другое"
-                            }
-
-                            // Определяем примечание
-                            var note: String? = null
-                            if (noteIndex != -1 && values.size > noteIndex) {
-                                note = cleanField(values[noteIndex])
-                                Timber.d("ИМПОРТ: Примечание из CSV: '$note'")
-                            } else if (titleIndex != -1 && values.size > titleIndex) {
-                                // Если нет примечания, но есть название - используем его как примечание
-                                note = cleanField(values[titleIndex])
-                                Timber.d("ИМПОРТ: Используем Title как примечание: '$note'")
-                            } else {
-                                Timber.d("ИМПОРТ: Поле примечания отсутствует или за пределами значений")
-                            }
-
-                            // Определяем источник
-                            val rawSource = if (sourceIndex != -1 && values.size > sourceIndex) {
-                                values[sourceIndex]
-                            } else {
-                                "Импорт"
-                            }
-                            
-                            // Обработка источника с переносом строки
-                            val source = cleanField(rawSource).let { src ->
-                                // Если источник короткий и похож на часть имени банка, пробуем исправить
-                                when {
-                                    src.equals("Сб", ignoreCase = true) -> "Сбер"
-                                    src.equals("ер", ignoreCase = true) -> "Сбер" 
-                                    src.equals("Тинь", ignoreCase = true) -> "Т-Банк"
-                                    src.equals("кофф", ignoreCase = true) -> "Т-Банк"
-                                    src.equals("Аль", ignoreCase = true) -> "Альфа"
-                                    src.equals("фа", ignoreCase = true) -> "Альфа"
-                                    src.contains("\n") -> src.replace("\n", " ").trim()
-                                    else -> src
-                                }
-                            }
-
-                            // Проверяем значения перед созданием транзакции
-                            if (amount == 0.0) {
-                                Timber.w("ИМПОРТ: Пропускаем транзакцию с нулевой суммой")
+                                Timber.e(e, "ИМПОРТ: Ошибка при импорте строки $currentLine: $line")
                                 skippedCount++
-                                return@forEach
                             }
-
-                            // Создаем объект транзакции
-                            val generatedId = "import_${date.time}_${System.nanoTime()}"
-                            val transactionId = if (idIndex != -1 && values.size > idIndex) {
-                                val csvId = cleanField(values[idIndex])
-                                // Ограничиваем длину ID до 50 символов для предотвращения проблем с длинными ID
-                                if (csvId.length > 50) {
-                                    Timber.w("ИМПОРТ: ID слишком длинный (${csvId.length} символов), обрезаем: $csvId")
-                                    csvId.substring(0, 50)
-                                } else {
-                                    csvId
-                                }
-                            } else {
-                                generatedId
-                            }
-                            
-                            // Проверяем существование транзакции с таким ID
-                            val existingTransaction = try {
-                                repository.getTransactionById(transactionId)
-                            } catch (e: Exception) {
-                                Timber.w("ИМПОРТ: Ошибка проверки существующей транзакции: ${e.message}")
-                                null
-                            }
-                            
-                            if (existingTransaction != null) {
-                                Timber.w("ИМПОРТ: Транзакция с ID $transactionId уже существует, пропускаем")
-                                skippedCount++
-                                return@forEach
-                            }
-
-                            // Принудительная задержка между транзакциями для предотвращения перегрузки базы данных
-                            if (currentLine % 20 == 0) {
-                                Timber.d("ИМПОРТ: Делаем небольшую паузу после 20 транзакций")
-                                delay(100) // Пауза 100 мс после каждых 20 транзакций
-                            }
-
-                            // Ограничения длины полей
-                            val limitedCategory = if (category.length > 100) {
-                                Timber.w("ИМПОРТ: Обрезаем слишком длинную категорию: ${category.length} символов")
-                                category.substring(0, 100)
-                            } else {
-                                category
-                            }
-                            
-                            val limitedNote = note?.let {
-                                if (it.length > 1000) {
-                                    Timber.w("ИМПОРТ: Обрезаем слишком длинное примечание: ${it.length} символов")
-                                    it.substring(0, 1000)
-                                } else {
-                                    it
-                                }
-                            }
-                            
-                            val limitedSource = if (source.length > 100) {
-                                Timber.w("ИМПОРТ: Обрезаем слишком длинный источник: ${source.length} символов")
-                                source.substring(0, 100)
-                            } else {
-                                source
-                            }
-
-                            val transaction = Transaction(
-                                id = transactionId,
-                                amount = amount.absoluteValue, // Храним положительное значение
-                                category = limitedCategory,
-                                isExpense = isExpense,
-                                date = date,
-                                note = limitedNote,
-                                source = limitedSource
-                            )
-                            
-                            Timber.d("ИМПОРТ: Создана транзакция: id=${transaction.id}, дата=${transaction.date}, сумма=${transaction.amount}, категория=${transaction.category}, расход=${transaction.isExpense}")
-
-                            // Сохраняем транзакцию
-                            Timber.d("ИМПОРТ: Сохраняем транзакцию в базу данных")
-                            repository.addTransaction(transaction)
-                            Timber.d("ИМПОРТ: Транзакция успешно сохранена")
-
-                            importedCount++
-                            totalAmount += amount.absoluteValue
                         } catch (e: Exception) {
                             Timber.e(e, "ИМПОРТ: Ошибка при импорте строки $currentLine: $line")
                             skippedCount++

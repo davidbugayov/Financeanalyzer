@@ -16,7 +16,7 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
 
 /**
- * Кнопка для экспорта данных в CSV.
+ * Кнопка для экспорта данных в CSV с функцией автоматического поделиться.
  *
  * @param onClick Обработчик нажатия кнопки
  * @param isExporting Флаг, указывающий на процесс экспорта
@@ -64,7 +64,7 @@ fun ExportDescription(
     modifier: Modifier = Modifier
 ) {
     Text(
-        text = stringResource(R.string.export_description),
+        text = stringResource(R.string.export_description) + "\nПри экспорте автоматически откроется диалог для отправки файла.",
         style = MaterialTheme.typography.bodySmall,
         color = MaterialTheme.colorScheme.onSurfaceVariant,
         modifier = modifier

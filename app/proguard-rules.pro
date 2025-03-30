@@ -247,3 +247,29 @@
 -dontwarn org.apache.pdfbox.**
 -keep class com.gemalto.jp2.** { *; }
 -dontwarn com.gemalto.jp2.**
+
+# Правила для Apache POI и связанных библиотек
+-keep class org.apache.poi.** { *; }
+-dontwarn org.apache.poi.**
+-keep class org.apache.xmlbeans.** { *; }
+-dontwarn org.apache.xmlbeans.**
+-keep class org.apache.commons.** { *; }
+-dontwarn org.apache.commons.**
+-keep class org.openxmlformats.** { *; }
+-dontwarn org.openxmlformats.**
+-keep class com.microsoft.schemas.** { *; }
+-dontwarn com.microsoft.schemas.**
+
+# Правила для отсутствующих классов Java AWT
+-dontwarn java.awt.**
+-dontwarn javax.xml.stream.**
+-dontwarn net.sf.saxon.**
+-dontwarn org.apache.batik.**
+-dontwarn org.osgi.framework.**
+
+# Игнорировать отсутствующие классы при компиляции
+-ignorewarnings
+
+# Правила для Saxon
+-dontwarn net.sf.saxon.**
+-dontwarn org.apache.xmlbeans.impl.xpath.saxon.**

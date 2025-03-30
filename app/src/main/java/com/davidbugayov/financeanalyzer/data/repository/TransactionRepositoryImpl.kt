@@ -154,7 +154,7 @@ class TransactionRepositoryImpl(
             
             // Получаем транзакции за указанный период дат
             Timber.d("Загружаем транзакции за месяц $monthKey из базы данных (диапазон: $startDate - $endDate)")
-            val transactions = dao.getTransactionsByDateRange(startDate, endDate).map { mapEntityToDomain(it) }
+            val transactions = dao.getTransactionsByDateRangePaginated(startDate, endDate, 10000, 0).map { mapEntityToDomain(it) }
             
             // Обновляем кэш
             synchronized(cacheLock) {

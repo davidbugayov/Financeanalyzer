@@ -2,10 +2,13 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import androidx.core.content.ContextCompat
+import androidx.core.content.FileProvider
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -51,7 +54,7 @@ class ExportTransactionsToCSVUseCase(
                 // Создаем имя файла с текущей датой и временем
                 val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
                 val timestamp = dateFormat.format(Date())
-                val fileName = "finance_transactions_$timestamp.csv"
+                val fileName = "деньги_под_контролем_транзакции_$timestamp.csv"
 
                 // Сохраняем в публичную директорию Downloads
                 val file = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
@@ -131,5 +134,32 @@ class ExportTransactionsToCSVUseCase(
         } else {
             cleanedText
         }
+    }
+    
+    /**
+     * Открывает диалог "Поделиться" для экспортированного CSV файла
+     * 
+     * @param context Контекст приложения
+     * @param filePath Путь к CSV файлу
+     * @return Intent для показа диалога "Поделиться"
+     */
+    fun shareCSVFile(context: Context, filePath: String): Intent {
+        val file = File(filePath)
+        val fileUri: Uri = FileProvider.getUriForFile(
+            context,
+            context.packageName + ".fileprovider",
+            file
+        )
+        
+        val shareIntent = Intent(Intent.ACTION_SEND).apply {
+            type = "text/csv"
+            putExtra(Intent.EXTRA_STREAM, fileUri)
+            putExtra(Intent.EXTRA_SUBJECT, "Деньги под контролем - транзакции")
+            putExtra(Intent.EXTRA_TEXT, "Мои транзакции из приложения 'Деньги под контролем'")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        
+        Timber.d("Запуск диалога Поделиться для файла: $filePath")
+        return shareIntent
     }
 } 

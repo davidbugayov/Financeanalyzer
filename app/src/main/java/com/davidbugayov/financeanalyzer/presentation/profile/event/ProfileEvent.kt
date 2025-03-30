@@ -13,6 +13,11 @@ sealed class ProfileEvent {
     data object ExportTransactionsToCSV : ProfileEvent()
     
     /**
+     * Событие для поделиться экспортированным CSV файлом.
+     */
+    data object ShareExportedFile : ProfileEvent()
+    
+    /**
      * Событие сброса состояния экспорта.
      * Используется для очистки сообщений об успехе или ошибке.
      */

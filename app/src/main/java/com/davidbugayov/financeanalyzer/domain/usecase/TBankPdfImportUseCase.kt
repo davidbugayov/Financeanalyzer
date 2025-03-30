@@ -70,10 +70,6 @@ class TBankPdfImportUseCase(
         try {
             emit(ImportResult.Progress(1, 100, "Открытие PDF-файла выписки Т-Банка"))
             
-            // Открываем PDF файл
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("Не удалось открыть файл")
-            
             // Используем таймаут для чтения PDF содержимого
             val pdfLines = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
                 readPdfContent(uri)

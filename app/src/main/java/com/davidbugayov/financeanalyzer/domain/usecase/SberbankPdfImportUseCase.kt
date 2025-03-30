@@ -108,10 +108,6 @@ class SberbankPdfImportUseCase(
         try {
             emit(ImportResult.Progress(1, 100, "Открытие PDF-файла выписки Сбербанка"))
             
-            // Открываем PDF файл
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("Не удалось открыть файл")
-            
             // Используем таймаут для чтения PDF содержимого
             val pdfLines = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
                 readPdfContent(uri)
@@ -364,7 +360,7 @@ class SberbankPdfImportUseCase(
         }
         
         // Теперь анализируем строки данных, предполагая структуру из трех столбцов
-        var currentDate: Date? = null
+        var currentDate: Date?
         var currentLineIndex = dataIndex
         var categories = standardCategories.map { it.lowercase(Locale.getDefault()) }
         
@@ -435,12 +431,6 @@ class SberbankPdfImportUseCase(
                             if (parsedAmount != null && parsedAmount > 0) {
                                 // Определяем тип операции (расход/доход)
                                 var isExpense = !amountStr.startsWith("+")
-                                
-                                // Если строка содержит "Перевод СБП" или подобное, это может быть расход,
-                                // если нет явного знака + в начале
-                                val isTransferOperation = 
-                                    middleColumn.contains("Перевод СБП", ignoreCase = true) ||
-                                    middleColumn.contains("Перевод для Б.", ignoreCase = true)
                                 
                                 // Анализ операции на основе описания и суммы
                                 var finalIsExpense = isExpense
@@ -804,13 +794,6 @@ class SberbankPdfImportUseCase(
                                     }
                                     // Переводы часто доходы
                                     isExpense = false
-                                }
-                                
-                                // Проверяем, что у нас действительно есть дата
-                                if (date == null) {
-                                    Timber.e("Пропускаем транзакцию без даты в строке: $line")
-                                    i++
-                                    continue
                                 }
                                 
                                 // Создаем примечание из имеющихся данных
