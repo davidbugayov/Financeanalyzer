@@ -32,6 +32,7 @@ import kotlinx.coroutines.async
 import timber.log.Timber
 import java.util.Date
 import javax.inject.Inject
+import java.util.Calendar
 
 class TransactionHistoryViewModel @Inject constructor(
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
@@ -49,6 +50,22 @@ class TransactionHistoryViewModel @Inject constructor(
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
 
     init {
+        Timber.d("Инициализация TransactionHistoryViewModel с начальным периодом ALL")
+        // Принудительно устанавливаем период на ALL
+        val initialPeriod = PeriodType.ALL
+        val startDate = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
+        val endDate = Calendar.getInstance().time
+        
+        // Сразу установим правильное начальное состояние
+        _state.update { 
+            it.copy(
+                periodType = initialPeriod,
+                startDate = startDate,
+                endDate = endDate
+            ) 
+        }
+        
+        // Загружаем транзакции и категории
         loadTransactionsFirstPage()
         loadCategories()
     }
@@ -146,37 +163,68 @@ class TransactionHistoryViewModel @Inject constructor(
                 val currentState = _state.value
                 val pageSize = currentState.pageSize
                 
+                Timber.d("Начинаем загрузку транзакций с периодом: ${currentState.periodType}")
+                
                 // Создаем вспомогательную корутину для получения общего количества транзакций
                 val totalCountDeferred = viewModelScope.async(Dispatchers.IO) {
                     try {
-                        if (currentState.periodType == PeriodType.CUSTOM || 
-                            currentState.periodType == PeriodType.ALL) {
-                            repository.getTransactionsCountByDateRange(
-                                currentState.startDate,
-                                currentState.endDate
-                            )
-                        } else {
-                            repository.getTransactionsCount()
-                        }
+                        val count = repository.getTransactionsCount()
+                        Timber.d("Общее количество транзакций: $count")
+                        count
                     } catch (e: Exception) {
                         Timber.e(e, "Ошибка при получении количества транзакций: ${e.message}")
                         0 // По умолчанию считаем, что транзакций нет
                     }
                 }
                 
-                // Запускаем асинхронную загрузку первой страницы транзакций
-                val transactions = withContext(Dispatchers.IO) {
+                // Запускаем асинхронную загрузку транзакций
+                var transactions = withContext(Dispatchers.IO) {
                     try {
-                        if (currentState.periodType == PeriodType.CUSTOM || 
-                            currentState.periodType == PeriodType.ALL) {
-                            repository.getTransactionsByDateRangePaginated(
-                                currentState.startDate,
-                                currentState.endDate,
-                                pageSize,
-                                0
-                            )
-                        } else {
-                            repository.getTransactionsPaginated(pageSize, 0)
+                        Timber.d("Загрузка транзакций с периодом: ${currentState.periodType}")
+                        when (currentState.periodType) {
+                            PeriodType.ALL -> {
+                                // Для периода ALL всегда загружаем все транзакции
+                                Timber.d("Загружаем ВСЕ транзакции напрямую из репозитория")
+                                repository.getAllTransactions()
+                            }
+                            PeriodType.CUSTOM -> {
+                                // Для пользовательского периода используем фильтрацию по диапазону дат
+                                Timber.d("Загружаем транзакции по ПОЛЬЗОВАТЕЛЬСКОМУ периоду: ${currentState.startDate} - ${currentState.endDate}")
+                                repository.getTransactionsByDateRangePaginated(
+                                    currentState.startDate,
+                                    currentState.endDate,
+                                    pageSize,
+                                    0
+                                )
+                            }
+                            PeriodType.MONTH -> {
+                                // Используем оптимизированный метод для загрузки по месяцам
+                                val calendar = Calendar.getInstance()
+                                calendar.time = currentState.endDate
+                                val year = calendar.get(Calendar.YEAR)
+                                val month = calendar.get(Calendar.MONTH) + 1 // +1 т.к. Calendar.MONTH начинается с 0
+                                Timber.d("Загружаем транзакции за МЕСЯЦ: $year-$month")
+                                repository.getTransactionsByMonth(year, month)
+                            }
+                            PeriodType.WEEK -> {
+                                // Используем оптимизированный метод для загрузки по неделям
+                                val calendar = Calendar.getInstance()
+                                calendar.time = currentState.endDate
+                                val year = calendar.get(Calendar.YEAR)
+                                val week = calendar.get(Calendar.WEEK_OF_YEAR)
+                                Timber.d("Загружаем транзакции за НЕДЕЛЮ: $year-$week")
+                                repository.getTransactionsByWeek(year, week)
+                            }
+                            else -> {
+                                // Для остальных периодов (DAY, QUARTER, YEAR) используем стандартный метод
+                                Timber.d("Загружаем транзакции за период ${currentState.periodType}: ${currentState.startDate} - ${currentState.endDate}")
+                                repository.getTransactionsByDateRangePaginated(
+                                    currentState.startDate,
+                                    currentState.endDate,
+                                    pageSize,
+                                    0
+                                )
+                            }
                         }
                     } catch (e: Exception) {
                         Timber.e(e, "Ошибка при загрузке первой страницы транзакций: ${e.message}")
@@ -187,14 +235,21 @@ class TransactionHistoryViewModel @Inject constructor(
                 // Получаем общее количество транзакций из отложенного вычисления
                 val totalCount = totalCountDeferred.await()
                 
-                Timber.d("Загружено ${transactions.size} транзакций (первая страница из $totalCount всего)")
+                Timber.d("Загружено ${transactions.size} транзакций из $totalCount всего")
+                
+                // Применяем фильтры по категориям и источникам, если они выбраны
+                if (currentState.selectedCategories.isNotEmpty() || currentState.selectedSources.isNotEmpty()) {
+                    val before = transactions.size
+                    transactions = filterTransactions(transactions, currentState)
+                    Timber.d("Применены фильтры: ${before} -> ${transactions.size} транзакций")
+                }
                 
                 // Обновляем состояние с загруженными данными
                 _state.update {
                     it.copy(
                         transactions = transactions,
                         currentPage = 1,
-                        hasMoreData = transactions.size < totalCount,
+                        hasMoreData = transactions.size < totalCount && currentState.periodType != PeriodType.ALL,
                         isLoading = false,
                         error = null
                     )
@@ -205,15 +260,21 @@ class TransactionHistoryViewModel @Inject constructor(
                 delay(100)
                 
                 // Асинхронно обновляем отфильтрованные данные в отдельной корутине
-                launch(Dispatchers.Default) {
-                    updateFilteredTransactions()
+                updateFilteredAndGroupedTransactions()
+                
+                // Если у нас выбрана одна категория, загружаем статистику по ней
+                if (currentState.selectedCategories.size == 1) {
+                    calculateCategoryStats(currentState.selectedCategories.first())
+                } else {
+                    _state.update { it.copy(categoryStats = null) }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Критическая ошибка при загрузке транзакций: ${e.message}")
+                // Логируем и устанавливаем ошибку в состояние
+                Timber.e(e, "Ошибка при загрузке транзакций: ${e.message}")
                 _state.update { 
                     it.copy(
                         isLoading = false,
-                        error = e.message ?: "Неизвестная ошибка при загрузке данных"
+                        error = e.message ?: "Ошибка при загрузке транзакций"
                     ) 
                 }
             }
@@ -224,34 +285,48 @@ class TransactionHistoryViewModel @Inject constructor(
      * Загружает следующую страницу транзакций
      */
     private fun loadMoreTransactions() {
+        val currentState = _state.value
+        
+        // Проверяем, можно ли загрузить больше данных
+        if (!currentState.hasMoreData || currentState.isLoadingMore) {
+            return
+        }
+        
+        // Устанавливаем флаг загрузки
+        _state.update { it.copy(isLoadingMore = true) }
+        
         viewModelScope.launch {
-            val currentState = _state.value
-            
-            // Проверяем, есть ли ещё данные для загрузки
-            if (!currentState.hasMoreData || currentState.isLoadingMore) {
-                return@launch
-            }
-            
-            _state.update { it.copy(isLoadingMore = true) }
-            
             try {
                 val pageSize = currentState.pageSize
                 val currentPage = currentState.currentPage
                 val offset = currentPage * pageSize
                 
                 // Загружаем следующую страницу в IO потоке
-                val nextPageTransactions = withContext(Dispatchers.IO) {
+                var nextPageTransactions = withContext(Dispatchers.IO) {
                     try {
-                        if (currentState.periodType == PeriodType.CUSTOM || 
-                            currentState.periodType == PeriodType.ALL) {
-                            repository.getTransactionsByDateRangePaginated(
-                                currentState.startDate,
-                                currentState.endDate,
-                                pageSize,
-                                offset
-                            )
-                        } else {
-                            repository.getTransactionsPaginated(pageSize, offset)
+                        when (currentState.periodType) {
+                            PeriodType.ALL -> {
+                                // Загружаем все транзакции с пагинацией
+                                repository.getTransactionsPaginated(pageSize, offset)
+                            }
+                            PeriodType.CUSTOM -> {
+                                // Для пользовательского периода используем фильтрацию по диапазону дат
+                                repository.getTransactionsByDateRangePaginated(
+                                    currentState.startDate,
+                                    currentState.endDate,
+                                    pageSize,
+                                    offset
+                                )
+                            }
+                            else -> {
+                                // Для остальных периодов используем стандартный метод с диапазоном дат
+                                repository.getTransactionsByDateRangePaginated(
+                                    currentState.startDate,
+                                    currentState.endDate,
+                                    pageSize,
+                                    offset
+                                )
+                            }
                         }
                     } catch (e: Exception) {
                         Timber.e(e, "Ошибка при загрузке следующей страницы: ${e.message}")
@@ -272,6 +347,11 @@ class TransactionHistoryViewModel @Inject constructor(
                 
                 Timber.d("Загружено ${nextPageTransactions.size} дополнительных транзакций")
                 
+                // Применяем фильтры по категориям и источникам, если они выбраны
+                if (currentState.selectedCategories.isNotEmpty() || currentState.selectedSources.isNotEmpty()) {
+                    nextPageTransactions = filterTransactions(nextPageTransactions, currentState)
+                }
+                
                 // Оптимизация: добавляем задержку перед обновлением UI
                 // Это предотвращает заикание при прокрутке большого количества данных
                 delay(100)
@@ -281,28 +361,55 @@ class TransactionHistoryViewModel @Inject constructor(
                 val updatedTransactions = currentState.transactions + nextPageTransactions
                 
                 // Обновляем список транзакций одним атомарным обновлением
-                _state.update {
+                _state.update { 
                     it.copy(
                         transactions = updatedTransactions,
                         currentPage = currentPage + 1,
                         isLoadingMore = false
-                    )
+                    ) 
                 }
                 
-                // Оптимизация: выполняем фильтрацию в отдельном потоке с небольшой задержкой,
-                // чтобы не блокировать UI при обработке больших списков
-                launch(Dispatchers.Default) {
-                    delay(150) // Даем время UI для отрисовки основных данных
-                    updateFilteredTransactions()
-                }
+                // Обновляем отфильтрованные и сгруппированные транзакции
+                updateFilteredAndGroupedTransactions()
+                
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке дополнительных транзакций: ${e.message}")
                 _state.update { 
                     it.copy(
                         isLoadingMore = false,
-                        error = e.message ?: "Ошибка при загрузке данных"
+                        error = e.message
                     ) 
                 }
+            }
+        }
+    }
+
+    /**
+     * Рассчитывает статистику для выбранной категории
+     */
+    private fun calculateCategoryStats(category: String) {
+        viewModelScope.launch {
+            try {
+                val currentState = _state.value
+                val periodType = currentState.periodType
+                val startDate = currentState.startDate
+                val endDate = currentState.endDate
+                val transactions = currentState.transactions
+                
+                val result = calculateCategoryStatsUseCase(
+                    transactions = transactions,
+                    categories = listOf(category),
+                    periodType = periodType,
+                    startDate = startDate,
+                    endDate = endDate
+                )
+                
+                _state.update { it.copy(categoryStats = result) }
+                
+                Timber.d("Статистика по категории $category рассчитана: $result")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при расчете статистики по категории: ${e.message}")
+                _state.update { it.copy(categoryStats = null) }
             }
         }
     }
@@ -312,105 +419,175 @@ class TransactionHistoryViewModel @Inject constructor(
     }
 
     /**
-     * Оптимизированная фильтрация транзакций с асинхронными операциями
+     * Применяет фильтры по категориям и источникам к списку транзакций
      */
-    private fun updateFilteredTransactions() {
-        viewModelScope.launch {
+    private fun filterTransactions(transactions: List<Transaction>, state: TransactionHistoryState): List<Transaction> {
+        return filterTransactionsUseCase(
+            transactions = transactions,
+            periodType = state.periodType,
+            startDate = state.startDate,
+            endDate = state.endDate,
+            categories = state.selectedCategories,
+            sources = state.selectedSources
+        )
+    }
+
+    /**
+     * Обновляет отфильтрованные и сгруппированные транзакции
+     */
+    private fun updateFilteredAndGroupedTransactions() {
+        viewModelScope.launch(Dispatchers.Default) {
             val currentState = _state.value
+            val transactions = currentState.transactions
             
-            if (currentState.transactions.isEmpty()) {
-                _state.update {
-                    it.copy(
-                        filteredTransactions = emptyList(),
-                        groupedTransactions = emptyMap(),
-                        categoryStats = null
-                    )
-                }
-                return@launch
-            }
-            
-            // Выполняем операции фильтрации и группировки асинхронно в IO-контексте
-            val filteredTransactions = withContext(kotlinx.coroutines.Dispatchers.IO) {
-                try {
-                    filterTransactionsUseCase(
-                        transactions = currentState.transactions,
-                        periodType = currentState.periodType,
-                        startDate = currentState.startDate,
-                        endDate = currentState.endDate,
-                        categories = currentState.selectedCategories,
-                        sources = currentState.selectedSources
-                    )
-                } catch (e: Exception) {
-                    Timber.e(e, "Ошибка при фильтрации транзакций: ${e.message}")
-                    emptyList()
-                }
-            }
-            
-            // Выполняем группировку отфильтрованных транзакций
-            val groupedTransactions = withContext(kotlinx.coroutines.Dispatchers.IO) {
-                try {
-                    groupTransactionsUseCase(
-                        transactions = filteredTransactions,
-                        groupingType = currentState.groupingType
-                    )
-                } catch (e: Exception) {
-                    Timber.e(e, "Ошибка при группировке транзакций: ${e.message}")
-                    emptyMap()
-                }
-            }
-            
-            // Выполняем расчет статистики по категориям
-            val categoryStats = if (filteredTransactions.isNotEmpty() && currentState.selectedCategories.isNotEmpty()) {
-                withContext(kotlinx.coroutines.Dispatchers.IO) {
-                    try {
-                        calculateCategoryStatsUseCase(
-                            transactions = filteredTransactions,
-                            categories = currentState.selectedCategories,
-                            periodType = currentState.periodType,
-                            startDate = currentState.startDate,
-                            endDate = currentState.endDate
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при расчете статистики: ${e.message}")
-                        null
-                    }
-                }
+            // Фильтруем транзакции, если нужно
+            val filteredTransactions = if (currentState.selectedCategories.isNotEmpty() || 
+                                         currentState.selectedSources.isNotEmpty()) {
+                filterTransactions(transactions, currentState)
             } else {
-                null
+                transactions
             }
             
-            // Обновляем состояние одним вызовом для оптимизации перерисовки
-            _state.update {
-                it.copy(
-                    filteredTransactions = filteredTransactions,
-                    groupedTransactions = groupedTransactions,
-                    categoryStats = categoryStats,
-                    error = null
-                )
-            }
+            // Группируем транзакции по выбранному типу группировки
+            val groupedTransactions = groupTransactionsUseCase(
+                transactions = filteredTransactions,
+                groupingType = currentState.groupingType
+            )
             
-            Timber.d("Обработано ${filteredTransactions.size} транзакций, создано ${groupedTransactions.size} групп")
+            // Обновляем состояние в основном потоке
+            withContext(Dispatchers.Main) {
+                _state.update { 
+                    it.copy(
+                        filteredTransactions = filteredTransactions,
+                        groupedTransactions = groupedTransactions
+                    ) 
+                }
+            }
         }
     }
 
+    /**
+     * Обновляет тип периода
+     */
     private fun updatePeriodType(periodType: PeriodType) {
-        _state.update { it.copy(periodType = periodType) }
-        updateFilteredTransactions()
+        Timber.d("Обновляем тип периода на: $periodType")
+        
+        // Получаем текущее состояние
+        val currentState = _state.value
+        
+        // Вычисляем новые даты начала и конца периода
+        val (startDate, endDate) = when (periodType) {
+            PeriodType.ALL -> {
+                val end = Calendar.getInstance().time
+                val start = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
+                Timber.d("Период ALL: $start - $end")
+                Pair(start, end)
+            }
+            PeriodType.DAY -> {
+                val start = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+                val end = Calendar.getInstance().apply {
+                    set(Calendar.HOUR_OF_DAY, 23)
+                    set(Calendar.MINUTE, 59)
+                    set(Calendar.SECOND, 59)
+                    set(Calendar.MILLISECOND, 999)
+                }.time
+                Timber.d("Период DAY: $start - $end")
+                Pair(start, end)
+            }
+            PeriodType.WEEK -> {
+                val start = Calendar.getInstance().apply {
+                    add(Calendar.DAY_OF_MONTH, -7)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+                val end = Calendar.getInstance().time
+                Timber.d("Период WEEK: $start - $end")
+                Pair(start, end)
+            }
+            PeriodType.MONTH -> {
+                val start = Calendar.getInstance().apply {
+                    add(Calendar.MONTH, -1)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+                val end = Calendar.getInstance().time
+                Timber.d("Период MONTH: $start - $end")
+                Pair(start, end)
+            }
+            PeriodType.QUARTER -> {
+                val start = Calendar.getInstance().apply {
+                    add(Calendar.MONTH, -3)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+                val end = Calendar.getInstance().time
+                Timber.d("Период QUARTER: $start - $end")
+                Pair(start, end)
+            }
+            PeriodType.YEAR -> {
+                val start = Calendar.getInstance().apply {
+                    add(Calendar.YEAR, -1)
+                    set(Calendar.HOUR_OF_DAY, 0)
+                    set(Calendar.MINUTE, 0)
+                    set(Calendar.SECOND, 0)
+                    set(Calendar.MILLISECOND, 0)
+                }.time
+                val end = Calendar.getInstance().time
+                Timber.d("Период YEAR: $start - $end")
+                Pair(start, end)
+            }
+            PeriodType.CUSTOM -> {
+                // Для кастомного периода сохраняем текущие даты
+                Timber.d("Период CUSTOM: ${currentState.startDate} - ${currentState.endDate}")
+                Pair(currentState.startDate, currentState.endDate)
+            }
+        }
+        
+        // Обновляем состояние
+        _state.update { 
+            it.copy(
+                periodType = periodType,
+                startDate = startDate,
+                endDate = endDate,
+                // Сбрасываем состояние пагинации при изменении периода
+                currentPage = 0,
+                hasMoreData = true,
+                // Сбрасываем списки транзакций
+                transactions = emptyList(),
+                filteredTransactions = emptyList(),
+                groupedTransactions = emptyMap()
+            ) 
+        }
+        
+        // Загружаем транзакции для нового периода
+        Timber.d("Перезагружаем транзакции для периода $periodType")
+        loadTransactionsFirstPage()
     }
 
     private fun updateGroupingType(groupingType: GroupingType) {
         _state.update { it.copy(groupingType = groupingType) }
-        updateFilteredTransactions()
+        updateFilteredAndGroupedTransactions()
     }
 
     private fun updateCategories(categories: List<String>) {
         _state.update { it.copy(selectedCategories = categories) }
-        updateFilteredTransactions()
+        updateFilteredAndGroupedTransactions()
     }
 
     private fun updateSources(sources: List<String>) {
         _state.update { it.copy(selectedSources = sources) }
-        updateFilteredTransactions()
+        updateFilteredAndGroupedTransactions()
     }
 
     private fun updateDateRange(startDate: Date, endDate: Date) {
@@ -421,17 +598,17 @@ class TransactionHistoryViewModel @Inject constructor(
                 periodType = PeriodType.CUSTOM
             )
         }
-        updateFilteredTransactions()
+        updateFilteredAndGroupedTransactions()
     }
 
     private fun updateStartDate(date: Date) {
         _state.update { it.copy(startDate = date) }
-        updateFilteredTransactions()
+        updateFilteredAndGroupedTransactions()
     }
 
     private fun updateEndDate(date: Date) {
         _state.update { it.copy(endDate = date) }
-        updateFilteredTransactions()
+        updateFilteredAndGroupedTransactions()
     }
 
     private fun showDeleteConfirmDialog(transaction: Transaction) {
@@ -458,7 +635,7 @@ class TransactionHistoryViewModel @Inject constructor(
             }
 
             // Обновляем отфильтрованные транзакции
-            updateFilteredTransactions()
+            updateFilteredAndGroupedTransactions()
         }
     }
 
@@ -488,7 +665,7 @@ class TransactionHistoryViewModel @Inject constructor(
             }
 
             // Обновляем отфильтрованные транзакции
-            updateFilteredTransactions()
+            updateFilteredAndGroupedTransactions()
         }
     }
 

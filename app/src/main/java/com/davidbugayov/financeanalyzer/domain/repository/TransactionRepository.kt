@@ -24,45 +24,6 @@ interface TransactionRepository {
     suspend fun getTransactionsPaginated(limit: Int, offset: Int): List<Transaction>
 
     /**
-     * Получает общее количество транзакций.
-     * @return Общее количество транзакций в базе данных.
-     */
-    suspend fun getTransactionsCount(): Int
-    
-    /**
-     * Получает транзакцию по идентификатору.
-     * @param id Идентификатор транзакции.
-     * @return Транзакция или null, если транзакция не найдена.
-     */
-    suspend fun getTransactionById(id: String): Transaction?
-    
-    /**
-     * Добавляет новую транзакцию.
-     * @param transaction Транзакция для добавления.
-     */
-    suspend fun addTransaction(transaction: Transaction)
-    
-    /**
-     * Обновляет существующую транзакцию.
-     * @param transaction Транзакция для обновления.
-     */
-    suspend fun updateTransaction(transaction: Transaction)
-    
-    /**
-     * Удаляет транзакцию.
-     * @param id Идентификатор транзакции для удаления.
-     */
-    suspend fun deleteTransaction(id: String)
-
-    /**
-     * Получает транзакции за указанный период.
-     * @param startDate Начальная дата периода.
-     * @param endDate Конечная дата периода.
-     * @return Flow со списком транзакций.
-     */
-    suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): Flow<List<Transaction>>
-
-    /**
      * Получает транзакции за указанный период с пагинацией.
      * @param startDate Начальная дата периода.
      * @param endDate Конечная дата периода.
@@ -71,11 +32,44 @@ interface TransactionRepository {
      * @return Список транзакций с учетом пагинации и диапазона дат.
      */
     suspend fun getTransactionsByDateRangePaginated(
-        startDate: Date, 
+        startDate: Date,
         endDate: Date,
         limit: Int,
         offset: Int
     ): List<Transaction>
+
+    /**
+     * Получает транзакции за указанный период.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Flow со списком транзакций.
+     */
+    suspend fun getTransactionsByDateRange(
+        startDate: Date,
+        endDate: Date
+    ): Flow<List<Transaction>>
+
+    /**
+     * Получает транзакции за указанный месяц.
+     * @param year Год.
+     * @param month Месяц (1-12).
+     * @return Список транзакций за указанный месяц.
+     */
+    suspend fun getTransactionsByMonth(year: Int, month: Int): List<Transaction>
+
+    /**
+     * Получает транзакции за указанную неделю.
+     * @param year Год.
+     * @param week Неделя года (1-53).
+     * @return Список транзакций за указанную неделю.
+     */
+    suspend fun getTransactionsByWeek(year: Int, week: Int): List<Transaction>
+
+    /**
+     * Получает общее количество транзакций.
+     * @return Общее количество транзакций в базе данных.
+     */
+    suspend fun getTransactionsCount(): Int
 
     /**
      * Получает общее количество транзакций в указанном диапазоне дат.
@@ -84,4 +78,36 @@ interface TransactionRepository {
      * @return Количество транзакций в указанном диапазоне дат.
      */
     suspend fun getTransactionsCountByDateRange(startDate: Date, endDate: Date): Int
+
+    /**
+     * Получает транзакцию по идентификатору.
+     * @param id Идентификатор транзакции.
+     * @return Транзакция или null, если транзакция не найдена.
+     */
+    suspend fun getTransactionById(id: String): Transaction?
+
+    /**
+     * Добавляет новую транзакцию.
+     * @param transaction Транзакция для добавления.
+     * @return ID добавленной транзакции.
+     */
+    suspend fun addTransaction(transaction: Transaction): String
+
+    /**
+     * Обновляет существующую транзакцию.
+     * @param transaction Транзакция для обновления.
+     */
+    suspend fun updateTransaction(transaction: Transaction)
+
+    /**
+     * Удаляет транзакцию.
+     * @param transaction Транзакция для удаления.
+     */
+    suspend fun deleteTransaction(transaction: Transaction)
+
+    /**
+     * Удаляет транзакцию по идентификатору.
+     * @param id Идентификатор транзакции для удаления.
+     */
+    suspend fun deleteTransaction(id: String)
 } 

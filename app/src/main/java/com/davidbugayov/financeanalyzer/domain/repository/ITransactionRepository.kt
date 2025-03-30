@@ -34,8 +34,9 @@ interface ITransactionRepository {
     /**
      * Добавляет новую транзакцию
      * @param transaction Транзакция для добавления
+     * @return ID добавленной транзакции
      */
-    suspend fun addTransaction(transaction: Transaction)
+    suspend fun addTransaction(transaction: Transaction): String
     
     /**
      * Удаляет транзакцию

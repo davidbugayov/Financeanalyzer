@@ -54,6 +54,7 @@ import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -69,6 +70,12 @@ fun TransactionHistoryScreen(
             screenName = "transaction_history",
             screenClass = "TransactionHistoryScreen"
         )
+        Timber.d("TransactionHistoryScreen открыт, текущий период: ${state.periodType}")
+    }
+
+    // Отслеживаем изменения периода
+    LaunchedEffect(state.periodType) {
+        Timber.d("Период изменился на: ${state.periodType}, загружено транзакций: ${state.transactions.size}")
     }
 
     // Получаем список всех категорий из CategoriesViewModel

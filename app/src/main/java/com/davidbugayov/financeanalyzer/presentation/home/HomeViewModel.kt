@@ -29,6 +29,7 @@ import timber.log.Timber
 import java.util.Calendar
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.Dispatchers
 
 /**
  * ViewModel для главного экрана.
@@ -198,7 +199,7 @@ class HomeViewModel(
                 val currentTransactions = _state.value.transactions
                 if (currentTransactions.isEmpty() || currentTransactions.size < 20) {
                     Timber.d("Запрашиваем полную загрузку транзакций в фоне")
-                    loadTransactions(forceBackground = true)
+                    loadTransactions()
                 } else {
                     Timber.d("Предварительная загрузка уже выполнена, обновляем только метрики")
                 }
@@ -209,131 +210,151 @@ class HomeViewModel(
     }
 
     /**
-     * Загружает транзакции из репозитория и обновляет состояние.
-     * Использует пагинацию для снижения нагрузки.
-     * 
-     * @param forceBackground Если true, заставляет выполнение в фоне без блокировки UI
+     * Загружает транзакции за текущий месяц
      */
-    private fun loadTransactions(forceBackground: Boolean = false) {
-        // Проверяем, если загрузка уже идет, не начинаем ее снова
-        if (_state.value.isLoading && !forceBackground) {
-            Timber.d("Загрузка транзакций уже выполняется, пропускаем дублирующий вызов")
-            return
-        }
-        
-        // Устанавливаем индикатор загрузки только если не в фоновом режиме
-        if (!forceBackground) {
+    private fun loadTransactions() {
+        viewModelScope.launch {
+            Timber.d("Начинаем загрузку транзакций для домашнего экрана")
             _state.update { it.copy(isLoading = true) }
-        }
-        
-        // Запускаем загрузку в фоновом потоке
-        viewModelScope.launch(kotlinx.coroutines.Dispatchers.IO) {
+            
             try {
-                // Используем кэшированные метрики для баланса и финансовых данных
-                val income = financialMetrics.getTotalIncome()
-                val expense = financialMetrics.getTotalExpense()
-                val balance = financialMetrics.getCurrentBalance()
+                // Для оптимизации загружаем только текущий месяц
+                val calendar = Calendar.getInstance()
+                val currentYear = calendar.get(Calendar.YEAR)
+                val currentMonth = calendar.get(Calendar.MONTH) + 1 // +1 потому что MONTH начинается с 0
                 
-                // Обновляем состояние с метриками, не дожидаясь загрузки транзакций
-                if (!forceBackground) {
-                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                        _state.update {
-                            it.copy(
-                                income = income,
-                                expense = expense,
-                                balance = balance
-                            )
-                        }
+                // Используем оптимизированный метод загрузки транзакций за текущий месяц
+                Timber.d("Загрузка транзакций за текущий месяц ($currentMonth/$currentYear)")
+                
+                // Загрузка метрик из кэша без пересчета
+                val metrics = withContext(Dispatchers.IO) {
+                    try {
+                        val fm = FinancialMetrics.getInstance()
+                        fm.initializeMetricsFromCache() // Инициализация из кэша без пересчета
+                        Triple(fm.getTotalIncome(), fm.getTotalExpense(), fm.getBalance())
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при получении финансовых метрик: ${e.message}")
+                        Triple(0.0, 0.0, 0.0) // Доход, расход, баланс по умолчанию
                     }
                 }
                 
-                // Готовим параметры для загрузки транзакций
-                val calendar = Calendar.getInstance()
-                val endDateValue = calendar.time
-                calendar.add(Calendar.MONTH, -1)
-                val startDateValue = calendar.time
+                // Обновляем метрики сразу, не дожидаясь загрузки транзакций
+                _state.update { 
+                    it.copy(
+                        income = Money(metrics.first),
+                        expense = Money(metrics.second),
+                        balance = Money(metrics.third)
+                    )
+                }
                 
-                // Асинхронно загружаем только последние транзакции с пагинацией
-                val initialTransactions = withContext(kotlinx.coroutines.Dispatchers.IO) {
+                // Загружаем транзакции за текущий месяц
+                val transactions = withContext(Dispatchers.IO) {
                     try {
-                        // Загружаем только первые 20 транзакций для быстрого отображения
-                        repository.getTransactionsByDateRangePaginated(
-                            startDate = startDateValue,
-                            endDate = endDateValue,
-                            limit = 20,
-                            offset = 0
-                        )
+                        Timber.d("Запрос транзакций за месяц $currentYear-$currentMonth")
+                        val result = repository.getTransactionsByMonth(currentYear, currentMonth)
+                        Timber.d("Получено ${result.size} транзакций за месяц $currentYear-$currentMonth")
+                        result
                     } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при загрузке первой страницы транзакций: ${e.message}")
+                        Timber.e(e, "Ошибка при загрузке транзакций за месяц: ${e.message}")
                         emptyList()
                     }
                 }
                 
-                Timber.d("Загружено ${initialTransactions.size} последних транзакций для быстрого отображения")
-                
-                // Обновляем состояние с первой порцией данных в UI-потоке
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    _state.update {
-                        it.copy(
-                            transactions = initialTransactions,
-                            isLoading = false
-                        )
-                    }
-                    
-                    // Обновляем отфильтрованные транзакции
-                    updateFilteredTransactions()
+                // Обновляем состояние с загруженными транзакциями
+                Timber.d("Загружено ${transactions.size} транзакций за текущий месяц")
+                _state.update { 
+                    it.copy(
+                        transactions = transactions,
+                        isLoading = false,
+                        error = null
+                    ) 
                 }
                 
-                // Добавляем небольшую задержку, чтобы не перегружать устройство
-                kotlinx.coroutines.delay(300)
-                
-                // Затем асинхронно загружаем остальные транзакции, если нужно
-                if (initialTransactions.size >= 20) {
-                    Timber.d("Загружаем оставшиеся транзакции в фоне")
-                    
-                    // Запускаем загрузку всех транзакций с использованием repository напрямую
-                    // чтобы воспользоваться его кэшированием
-                    val allTransactions = withContext(kotlinx.coroutines.Dispatchers.IO) {
-                        try {
-                            repository.getAllTransactions()
-                        } catch (e: Exception) {
-                            Timber.e(e, "Ошибка при полной загрузке транзакций: ${e.message}")
-                            emptyList()
-                        }
-                    }
-                    
-                    if (allTransactions.isNotEmpty() && allTransactions.size > initialTransactions.size) {
-                        Timber.d("Загружены все ${allTransactions.size} транзакции")
-                        
-                        // Обновляем состояние только если есть больше транзакций
-                        kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                            _state.update {
-                                it.copy(
-                                    transactions = allTransactions
-                                )
-                            }
-                            
-                            // Обновляем отфильтрованные транзакции
-                            updateFilteredTransactions()
-                        }
-                    }
+                // Если отсутствуют транзакции за текущий месяц, загружаем несколько последних
+                if (transactions.isEmpty()) {
+                    loadLastTransactions(5) // Загружаем последние 5 транзакций
                 }
+                
+                // Подсчитываем и обновляем данные по категориям
+                updateCategoryStats(transactions)
+                
+                // Обновляем отфильтрованные данные
+                updateFilteredTransactions()
+                
             } catch (e: Exception) {
-                Timber.e(e, "Критическая ошибка при загрузке данных: ${e.message}")
-                if (!forceBackground) {
-                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                error = e.message ?: "Ошибка при загрузке данных"
-                            )
-                        }
-                    }
+                Timber.e(e, "Ошибка при загрузке данных: ${e.message}")
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = e.message ?: "Неизвестная ошибка" 
+                    ) 
                 }
             }
         }
     }
-    
+
+    /**
+     * Загружает указанное количество последних транзакций
+     */
+    private fun loadLastTransactions(count: Int) {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val transactions = repository.getTransactionsPaginated(count, 0)
+                
+                if (transactions.isNotEmpty()) {
+                    Timber.d("Загружено ${transactions.size} последних транзакций")
+                    withContext(Dispatchers.Main) {
+                        _state.update { 
+                            it.copy(
+                                transactions = transactions,
+                                isLoading = false
+                            ) 
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке последних транзакций: ${e.message}")
+            }
+        }
+    }
+
+    /**
+     * Подсчитывает и обновляет данные по категориям
+     */
+    private fun updateCategoryStats(transactions: List<Transaction>) {
+        viewModelScope.launch(Dispatchers.Default) {
+            try {
+                if (transactions.isEmpty()) {
+                    withContext(Dispatchers.Main) {
+                        _state.update { it.copy(topCategories = emptyMap()) }
+                    }
+                    return@launch
+                }
+                
+                // Группируем транзакции по категориям и суммируем значения
+                val categoryTotals = transactions
+                    .filter { it.isExpense } // Считаем только расходы
+                    .groupBy { it.category }
+                    .mapValues { (_, txs) -> 
+                        // Суммируем расходы по категории
+                        val total = txs.sumOf { it.amount }
+                        Money(total) 
+                    }
+                    .toList()
+                    .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
+                    .take(3) // Берем только топ-3 категории
+                    .toMap()
+                
+                // Обновляем состояние в основном потоке
+                withContext(Dispatchers.Main) {
+                    _state.update { it.copy(topCategories = categoryTotals) }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при обновлении статистики по категориям: ${e.message}")
+            }
+        }
+    }
+
     /**
      * Генерирует и сохраняет тестовые данные
      */

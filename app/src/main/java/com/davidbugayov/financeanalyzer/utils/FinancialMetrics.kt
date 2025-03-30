@@ -321,7 +321,7 @@ class FinancialMetrics private constructor() : KoinComponent {
      * Возвращает общий доход в формате Money
      * @return общий доход
      */
-    fun getTotalIncome(): Money {
+    fun getTotalIncomeAsMoney(): Money {
         return Money(_totalIncome.value)
     }
     
@@ -329,7 +329,7 @@ class FinancialMetrics private constructor() : KoinComponent {
      * Возвращает общий расход в формате Money
      * @return общий расход
      */
-    fun getTotalExpense(): Money {
+    fun getTotalExpenseAsMoney(): Money {
         return Money(_totalExpense.value)
     }
     
@@ -380,5 +380,36 @@ class FinancialMetrics private constructor() : KoinComponent {
                 Timber.d("Метрики уже актуальны, пересчет не требуется")
             }
         }
+    }
+    
+    /**
+     * Возвращает текущий баланс в формате Double
+     * @return текущий баланс
+     */
+    fun getBalance(): Double {
+        return _balance.value
+    }
+    
+    /**
+     * Возвращает общий доход в формате Double
+     * @return общий доход
+     */
+    fun getTotalIncome(): Double {
+        return _totalIncome.value
+    }
+    
+    /**
+     * Возвращает общий расход в формате Double
+     * @return общий расход
+     */
+    fun getTotalExpense(): Double {
+        return _totalExpense.value
+    }
+    
+    /**
+     * Инициализирует метрики из кэша (публичный метод для внешнего использования)
+     */
+    fun initializeMetricsFromCache() {
+        initializeFromCache()
     }
 } 
