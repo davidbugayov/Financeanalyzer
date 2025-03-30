@@ -40,6 +40,32 @@ class SberbankPdfImportUseCase(
     // Таймаут для операции парсинга PDF (в миллисекундах)
     private val PDF_PARSING_TIMEOUT = 30000L // 30 секунд
     
+    /**
+     * Безопасно парсит строку с суммой в число, учитывая различные форматы записи
+     */
+    private fun safeParseAmount(amountStr: String): Double? {
+        return try {
+            // Логируем исходную строку для отладки
+            Timber.d("Парсинг суммы: '$amountStr'")
+            
+            // Удаляем знаки валюты и другие специальные символы сначала
+            val withoutCurrency = amountStr.replace("[₽руб.\\s]+$".toRegex(), "").trim()
+            
+            // Удаляем все пробелы, заменяем запятую на точку
+            val cleanAmount = withoutCurrency.replace("\\s".toRegex(), "").replace(",", ".")
+            
+            // Удаляем знаки валюты, если они остались
+            val numericOnly = cleanAmount.replace("[₽руб]".toRegex(), "").trim()
+            
+            // Преобразуем в число
+            Timber.d("Преобразование суммы: исходная '$amountStr', очищенная '$numericOnly'")
+            numericOnly.toDouble()
+        } catch (e: Exception) {
+            Timber.e(e, "Не удалось преобразовать строку в число: $amountStr")
+            null
+        }
+    }
+    
     // Паттерны для парсинга PDF-выписки
     private val datePattern = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
     
@@ -48,6 +74,27 @@ class SberbankPdfImportUseCase(
     private val amountRegex = "([+-]?\\d+[\\s]?\\d+[,.]\\d{2})".toRegex()
     private val amountRegexImproved = "(([+-]?\\d+[\\s]?\\d+[,.]\\d{2})|(\\d+[,.]\\d{2}))".toRegex()
     private val cardNumberPattern = Pattern.compile("Карта\\s+([*•\\d]+)\\s+", Pattern.MULTILINE)
+    
+    // Усовершенствованный паттерн для сумм в выписке, включая пробелы между группами цифр
+    // Поддерживает форматы из скриншота: "2 800,00", "+2 000,00", "+800,00", "4 800,00" и т.д.
+    private val tableAmountRegex = "([+-]?\\d{1,3}(\\s\\d{3})*[,.]\\d{2})(?:\\s*$|\\s+(?:[А-Яа-я₽]+)?)".toRegex()
+    
+    // Паттерны для новой формы выписки с таблицей "Расшифровка операций"
+    private val tableHeaderRegex = "Расшифровка\\s+операций".toRegex(RegexOption.IGNORE_CASE)
+    private val tableColumnDateRegex = "ДАТА\\s+ОПЕРАЦИИ".toRegex(RegexOption.IGNORE_CASE)
+    private val tableColumnDescriptionRegex = "Описание\\s+операции".toRegex(RegexOption.IGNORE_CASE)
+    private val tableColumnAmountRegex = "СУММА\\s+В\\s+ВАЛЮТЕ\\s+СЧЁТА".toRegex(RegexOption.IGNORE_CASE)
+    private val dateProcessingRegex = "Дата\\s+обработки".toRegex(RegexOption.IGNORE_CASE)
+    private val authCodeRegex = "код\\s+авторизации".toRegex(RegexOption.IGNORE_CASE)
+    private val tableEndRegex = "Итого:|Общая сумма:|остаток|Конец выписки".toRegex(RegexOption.IGNORE_CASE)
+    
+    // Перечень стандартных категорий Сбербанка
+    private val standardCategories = listOf(
+        "Здоровье и красота", "Прочие операции", "Переводы", "Перевод на карту",
+        "Супермаркеты", "Рестораны", "Транспорт", "Одежда и обувь", 
+        "Развлечения", "Связь", "Коммунальные платежи", "Отели",
+        "Авто", "Топливо", "Фастфуд"
+    )
     
     // Инициализация PDFBox при создании экземпляра
     init {
@@ -185,6 +232,19 @@ class SberbankPdfImportUseCase(
     private fun parsePdfTransactions(pdfLines: List<String>, source: String): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         
+        // Проверяем, является ли выписка форматом с таблицей "Расшифровка операций"
+        val isTableFormat = pdfLines.any { 
+            it.contains("Расшифровка операций", ignoreCase = true) &&
+            (it.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true) || pdfLines.any { line -> line.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true) })
+        }
+        
+        if (isTableFormat) {
+            // Обрабатываем формат таблицы "Расшифровка операций"
+            Timber.d("Обнаружен формат таблицы 'Расшифровка операций', используем специальную обработку")
+            return parseTableFormat(pdfLines, source)
+        }
+        
+        // Продолжаем стандартную обработку для обычной выписки
         // Используем объект Date для совместимости с моделью Transaction
         val dateFormatter = SimpleDateFormat("yyyy-MM-dd", Locale.getDefault())
         
@@ -241,319 +301,697 @@ class SberbankPdfImportUseCase(
             }
         }
         
-        return transactions
+        // Возвращаем обработанные транзакции, удаляя дубликаты
+        return removeDuplicateTransactions(transactions)
     }
 
     /**
-     * Пытается найти сумму в строке, учитывая различные форматы
+     * Парсит выписку в формате таблицы "Расшифровка операций"
      */
-    private fun findAmountInString(text: String): Pair<Double, Boolean>? {
-        // Улучшенный паттерн для поиска сумм
-        val amountRegexPatterns = listOf(
-            // Сумма с пробелами и запятой: 1 000,00
-            "([+-]?\\d{1,3}(\\s\\d{3})*[,.]\\d{2})".toRegex(),
-            // Сумма без пробелов с запятой: 1000,00
-            "([+-]?\\d+[,.]\\d{2})".toRegex(),
-            // Сумма с руб./₽: 1000,00 руб.
-            "(\\d+[,.]\\d{2})\\s*(₽|руб)".toRegex(),
-            // Сумма со знаком +/- перед ней: +1000,00
-            "([+-]\\s*\\d+[,.]\\d{2})".toRegex()
-        )
-
-        // Проверяем каждый паттерн
-        for (pattern in amountRegexPatterns) {
-            val matches = pattern.findAll(text).toList()
-            if (matches.isNotEmpty()) {
-                // Берем последнее совпадение в строке (обычно это и есть сумма операции)
-                val match = matches.last()
-                val matchedText = match.groupValues[0].trim()
-                
-                // Извлекаем числовое значение, убирая все нецифровые символы, кроме точки и запятой
-                var amountStr = matchedText.replace("[^0-9,.+-]".toRegex(), "")
-                    .replace(",", ".")
-                
-                // По умолчанию, если нет явного + в начале суммы, считаем операцию расходом
-                var isExpense = !amountStr.startsWith("+")
-                
-                // Убираем знаки +/- для конвертации в число
-                amountStr = amountStr.removePrefix("+").removePrefix("-")
-                
-                // Проверяем контекст на ключевые слова для определения типа операции
-                if (text.contains("зачисление", ignoreCase = true) ||
-                    text.contains("поступление", ignoreCase = true) ||
-                    text.contains("возврат", ignoreCase = true) ||
-                    (text.contains("перевод", ignoreCase = true) && 
-                     text.contains("на карту", ignoreCase = true) &&
-                     !text.contains("с карты", ignoreCase = true))) {
-                    isExpense = false
+    private fun parseTableFormat(pdfLines: List<String>, source: String): List<Transaction> {
+        val transactions = mutableListOf<Transaction>()
+        
+        Timber.d("Начинаю парсинг таблицы, строк: ${pdfLines.size}")
+        
+        // Ищем заголовок таблицы с тремя столбцами
+        var tableStartIndex = -1
+        var hasFoundHeader = false
+        
+        // Ищем строку с заголовками "Дата операции", "Категория/Описание", "Сумма"
+        for (i in pdfLines.indices) {
+            val line = pdfLines[i].trim()
+            if (line.contains("Дата операции", ignoreCase = true) || 
+                line.contains("Дата обработки", ignoreCase = true) ||
+                line.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true)) {
+                tableStartIndex = i
+                hasFoundHeader = true
+                Timber.d("Найден заголовок таблицы в строке $i: $line")
+                break
+            }
+        }
+        
+        // Дополнительный шаг: проверяем несколько строк ниже на наличие СУММА В ВАЛЮТЕ СЧЁТА
+        if (hasFoundHeader) {
+            val maxCheck = minOf(tableStartIndex + 5, pdfLines.size - 1)
+            for (i in tableStartIndex..maxCheck) {
+                val line = pdfLines[i].trim()
+                if (line.contains("СУММА В ВАЛЮТЕ СЧЁТА", ignoreCase = true)) {
+                    Timber.d("Подтвержден формат выписки с 'СУММА В ВАЛЮТЕ СЧЁТА' в строке $i")
+                    break
                 }
-                
-                try {
-                    val amount = amountStr.toDouble()
-                    return Pair(amount, isExpense)
-                } catch (e: Exception) {
-                    // Если не удалось преобразовать в число, продолжаем поиск
+            }
+        }
+        
+        if (!hasFoundHeader) {
+            Timber.d("Не найден заголовок таблицы, пробуем анализировать данные напрямую")
+            return parseIndividualStatement(pdfLines, source)
+        }
+        
+        // Пропускаем строки заголовка и подзаголовка
+        var dataIndex = tableStartIndex + 1
+        while (dataIndex < pdfLines.size && 
+               !pdfLines[dataIndex].contains("\\d{2}\\.\\d{2}\\.\\d{4}".toRegex())) {
+            dataIndex++
+        }
+        
+        Timber.d("Начало данных таблицы: строка $dataIndex")
+        
+        // Отладочный вывод первых строк после заголовка
+        if (tableStartIndex >= 0) {
+            for (i in tableStartIndex until minOf(tableStartIndex + 10, pdfLines.size)) {
+                Timber.d("Строка ${i}: ${pdfLines[i]}")
+            }
+        }
+        
+        // Теперь анализируем строки данных, предполагая структуру из трех столбцов
+        var currentDate: Date? = null
+        var currentLineIndex = dataIndex
+        var categories = standardCategories.map { it.lowercase(Locale.getDefault()) }
+        
+        while (currentLineIndex < pdfLines.size) {
+            val currentLine = pdfLines[currentLineIndex].trim()
+            
+            if (currentLine.isBlank() || currentLine.contains("Продолжение на", ignoreCase = true)) {
+                currentLineIndex++
                     continue
                 }
-            }
-        }
-        
-        // Если ни один паттерн не сработал, пробуем найти просто числа с запятой/точкой
-        val simpleAmount = "(\\d+[,.]\\d{2})".toRegex().find(text)
-        if (simpleAmount != null) {
-            val amountStr = simpleAmount.value.replace(",", ".")
-            try {
-                val amount = amountStr.toDouble()
-                // По умолчанию считаем операцию расходом, если нет явных признаков поступления
-                var isExpense = true
-                
-                if (text.contains("зачисление", ignoreCase = true) ||
-                    text.contains("поступление", ignoreCase = true) ||
-                    text.contains("возврат", ignoreCase = true) ||
-                    (text.contains("перевод", ignoreCase = true) && 
-                     text.contains("на карту", ignoreCase = true) &&
-                     !text.contains("с карты", ignoreCase = true))) {
-                    isExpense = false
-                }
-                
-                return Pair(amount, isExpense)
-            } catch (e: Exception) {
-                // Игнорируем ошибки преобразования
-            }
-        }
-        
-        return null
-    }
-    
-    /**
-     * Парсит блок операции и возвращает транзакцию
-     */
-    private fun parseOperationBlock(block: String, source: String): Transaction? {
-        try {
-            // Разбиваем блок на строки для анализа
-            val lines = block.split("\n").filter { it.isNotBlank() }
-            if (lines.isEmpty()) return null
             
-            // Попробуем определить формат из примера: дата время категория, вторая строка - операция, сумма справа
-            if (lines.size >= 2) {
-                // Первая строка обычно содержит дату, время и категорию
-                val firstLine = lines[0]
-                
-                // Ищем дату с форматом ДД.ММ.ГГГГ
-                val dateMatch = dateRegex.find(firstLine) ?: return null
-                val dateStr = dateMatch.value
-                
-                // Ищем время в формате ЧЧ:ММ после даты
-                val timePattern = "\\d{2}:\\d{2}".toRegex()
-                val timeMatch = timePattern.find(firstLine, dateMatch.range.last)
-                
-                // Извлекаем категорию - обычно это текст между временем и концом строки или суммой
-                val categoryStartIndex = if (timeMatch != null) timeMatch.range.last + 1 else dateMatch.range.last + 1
-                var categoryEndIndex = firstLine.length
-                
-                // Если в первой строке есть сумма, обрезаем категорию до этой суммы
-                val firstLineAmountMatch = amountRegex.find(firstLine)
-                if (firstLineAmountMatch != null) {
-                    categoryEndIndex = firstLineAmountMatch.range.first
-                }
-                
-                var category = if (categoryStartIndex < categoryEndIndex) {
-                    firstLine.substring(categoryStartIndex, categoryEndIndex).trim()
-                } else {
-                    "Другое" // По умолчанию, если не удалось определить категорию
-                }
-                
-                // Обработаем случай "Прочие операции" и "Здоровье и красота"
-                if (category == "Прочие операции") {
-                    category = "Другое"
-                } else if (category == "Здоровье и красота") {
-                    category = "Здоровье"
-                } else if (category == "Перевод на карту") {
-                    category = "Переводы"
-                }
-                
-                // Пытаемся найти сумму в каждой строке блока, начиная с последней,
-                // так как сумма обычно указывается в конце или на отдельной строке
-                var amount = 0.0
-                var amountFound = false
-                var isExpense = true
-                
-                // Пытаемся найти сумму в правой части строк
-                for (i in lines.indices.reversed()) {
-                    val line = lines[i]
+            // Проверяем, если строка содержит "Итого" или "Конец выписки", это конец таблицы
+            if (currentLine.contains("Итого", ignoreCase = true) || 
+                currentLine.contains("Конец выписки", ignoreCase = true) ||
+                currentLine.contains("ОСТАТОК НА", ignoreCase = true)) {
+                break
+            }
+            
+            // Проверяем, является ли эта строка началом новой транзакции (содержит дату)
+            val dateMatch = "\\d{2}\\.\\d{2}\\.\\d{4}".toRegex().find(currentLine)
+            
+            if (dateMatch != null) {
+                // Это новая транзакция
+                try {
+                    // Парсим дату
+                    val dateStr = dateMatch.value
+                    currentDate = parseDate(dateStr)
                     
-                    // Используем улучшенную функцию поиска суммы
-                    val amountResult = findAmountInString(line)
-                    if (amountResult != null) {
-                        amount = amountResult.first
-                        isExpense = amountResult.second
-                        amountFound = true
-                        break
+                    // Ищем время операции (обычно следует за датой)
+                    val timeMatch = "\\d{2}:\\d{2}".toRegex().find(currentLine, dateMatch.range.last + 1)
+                    
+                    // Определяем позицию, где заканчивается первый столбец с датой/временем
+                    val firstColumnEndPos = if (timeMatch != null) {
+                        timeMatch.range.last + 1
+                    } else {
+                        dateMatch.range.last + 1
                     }
-                }
-                
-                if (!amountFound) return null
-                
-                // Создаем описание - объединяем все строки кроме первой
-                val description = if (lines.size > 1) {
-                    lines.subList(1, lines.size).joinToString(" ").trim()
-                } else {
-                    ""
-                }
-                
-                // Парсим дату
-                val date = try {
-                    datePattern.parse(dateStr) ?: return null
+                    
+                    // Ищем сумму в конце строки (третий столбец)
+                    // Используем обновленное регулярное выражение для более точного определения сумм
+                    val amountMatch = tableAmountRegex.find(currentLine)
+                    
+                    // Дополнительная отладка для определения суммы
+                    Timber.d("Строка для поиска суммы: '$currentLine'")
+                    if (amountMatch != null) {
+                        Timber.d("Найдена сумма: '${amountMatch.value}' в позиции ${amountMatch.range}")
+                    } else {
+                        // Если не нашли сумму с помощью tableAmountRegex, пробуем другие шаблоны
+                        val altAmountMatch = "([+-]?\\d+[,.]\\d{2})".toRegex().find(currentLine)
+                        if (altAmountMatch != null) {
+                            Timber.d("Найдена альтернативная сумма: '${altAmountMatch.value}' в позиции ${altAmountMatch.range}")
+                        }
+                    }
+                    
+                    // Если нашли сумму, обрабатываем транзакцию
+                    if (amountMatch != null) {
+                        // Получаем средний столбец между датой/временем и суммой
+                        val middleColumnStart = firstColumnEndPos
+                        val middleColumnEnd = amountMatch.range.first
+                        
+                        if (middleColumnStart < middleColumnEnd) {
+                            val middleColumn = currentLine.substring(middleColumnStart, middleColumnEnd).trim()
+                            
+                            // Парсим сумму
+                            val amountStr = amountMatch.value
+                            val parsedAmount = safeParseAmount(amountStr)
+                            
+                            if (parsedAmount != null && parsedAmount > 0) {
+                                // Определяем тип операции (расход/доход)
+                                var isExpense = !amountStr.startsWith("+")
+                                
+                                // Если строка содержит "Перевод СБП" или подобное, это может быть расход,
+                                // если нет явного знака + в начале
+                                val isTransferOperation = 
+                                    middleColumn.contains("Перевод СБП", ignoreCase = true) ||
+                                    middleColumn.contains("Перевод для Б.", ignoreCase = true)
+                                
+                                // Анализ операции на основе описания и суммы
+                                var finalIsExpense = isExpense
+                                
+                                // Анализируем тип операции по описанию
+                                if (middleColumn.contains("Перевод на карту", ignoreCase = true) || 
+                                    middleColumn.contains("Перевод от", ignoreCase = true)) {
+                                    // Переводы на карту обычно доходы
+                                    finalIsExpense = false
+                                } else if (middleColumn.contains("Перевод СБП", ignoreCase = true) || 
+                                           middleColumn.contains("Перевод для", ignoreCase = true)) {
+                                    // Переводы СБП или для кого-то обычно расходы, если нет явного +
+                                    finalIsExpense = !amountStr.startsWith("+")
+                                } else if (middleColumn.contains("Прочие расходы", ignoreCase = true) || 
+                                           middleColumn.contains("Автоплатёж", ignoreCase = true)) {
+                                    // Расходы и автоплатежи однозначно расходы
+                                    finalIsExpense = true
+                                }
+                                
+                                // Дополнительная проверка для определения типа операции на основе суммы
+                                // Обычно в выписке Сбербанка положительные значения (+X XXX,XX) - доходы
+                                if (amountStr.startsWith("+")) {
+                                    finalIsExpense = false
+                                }
+                                
+                                // Добавляем уточнение для конкретных случаев
+                                if (amountMatch.value.matches("^[+]\\d+".toRegex()) || 
+                                    amountMatch.value.matches("^[+]\\d+\\s\\d+".toRegex())) {
+                                    Timber.d("Найдена положительная сумма с явным плюсом: ${amountMatch.value}")
+                                    finalIsExpense = false
+                                }
+                                
+                                // Определяем категорию и описание из среднего столбца
+                                var category = ""
+                                
+                                // Ищем категорию среди стандартных
+                                for (cat in standardCategories) {
+                                    if (middleColumn.startsWith(cat, ignoreCase = true)) {
+                                        category = cat
+                                        break
+                                    }
+                                }
+                                
+                                // Если категория не была обнаружена, проверяем первое слово
+                                if (category.isBlank()) {
+                                    val lcMiddleColumn = middleColumn.lowercase(Locale.getDefault())
+                                    
+                                    // Проверяем, содержит ли начало описания какую-либо стандартную категорию
+                                    val matchingCategory = categories.find { cat -> 
+                                        lcMiddleColumn.startsWith(cat)
+                                    }
+                                    
+                                    if (matchingCategory != null) {
+                                        // Нашли категорию, которая является началом описания
+                                        val actualCategory = standardCategories[categories.indexOf(matchingCategory)]
+                                        category = actualCategory
+                                    } else {
+                                        // Определяем категорию по содержимому
+                                        category = determineCategory(middleColumn)
+                                    }
+                                }
+                                
+                                // Собираем дополнительную информацию из следующих строк
+                                var additionalInfo = ""
+                                var nextLineIndex = currentLineIndex + 1
+                                
+                                // Проверяем следующую строку - если это код авторизации, 
+                                // то пропускаем его и берем следующую строку как описание
+                                if (nextLineIndex < pdfLines.size) {
+                                    val nextLine = pdfLines[nextLineIndex].trim()
+                                    Timber.d("Проверяем строку ${nextLineIndex}: '${nextLine}'")
+                                    
+                                    // Проверяем, является ли строка кодом авторизации (5-7 цифр)
+                                    if (nextLine.matches("\\d{5,7}".toRegex())) {
+                                        // Это код авторизации, пропускаем его
+                                        Timber.d("Найден код авторизации: $nextLine")
+                                        nextLineIndex++
+                                        
+                                        // Берем следующую строку целиком как описание, если она существует и не начинается с даты
+                                        if (nextLineIndex < pdfLines.size) {
+                                            val descriptionLine = pdfLines[nextLineIndex].trim()
+                                            Timber.d("Строка после кода авторизации: '${descriptionLine}'")
+                                            
+                                            // Если это не начало новой транзакции (не содержит дату в формате XX.XX.XXXX)
+                                            if (!descriptionLine.contains("\\d{2}\\.\\d{2}\\.\\d{4}".toRegex())) {
+                                                // Используем всю строку целиком как примечание
+                                                additionalInfo = descriptionLine
+                                                Timber.d("Установлено примечание: '$additionalInfo'")
+                                                
+                                                nextLineIndex++
+                                            }
+                                        }
+                                    } 
+                                    // Эта строка не код авторизации, значит структура другая или код отсутствует
+                                    else if (!nextLine.contains("\\d{2}\\.\\d{2}\\.\\d{4}".toRegex())) {
+                                        // Если у нас нет кода авторизации, но следующая строка содержит описание операции,
+                                        // все равно используем её как описание
+                                        additionalInfo = nextLine
+                                        Timber.d("Строка не код авторизации, используем как примечание: '$additionalInfo'")
+                                        nextLineIndex++
+                                    }
+                                }
+                                
+                                // Проверяем, что у нас действительно есть дата
+                                if (currentDate == null) {
+                                    Timber.e("Пропускаем транзакцию без даты в строке: $currentLine")
+                                    currentLineIndex++
+                                    continue
+                                }
+                                
+                                // Создаем примечание из имеющихся данных 
+                                val noteText = when {
+                                    // Используем строку дополнительной информации если она есть
+                                    additionalInfo.isNotBlank() -> {
+                                        Timber.d("Используем additionalInfo для примечания: '$additionalInfo'")
+                                        additionalInfo
+                                    }
+                                    
+                                    // Проверяем следующую строку после текущей строки
+                                    nextLineIndex < pdfLines.size && nextLineIndex > currentLineIndex -> {
+                                        val nextLineText = pdfLines[nextLineIndex].trim()
+                                        Timber.d("Используем следующую строку для примечания: '$nextLineText'")
+                                        nextLineText
+                                    }
+                                    
+                                    // Или описание из среднего столбца
+                                    middleColumn.isNotBlank() -> {
+                                        Timber.d("Используем среднюю колонку для примечания: '$middleColumn'")
+                                        middleColumn
+                                    }
+                                    
+                                    // В крайнем случае формируем обобщенное описание
+                                    else -> {
+                                        val generatedNote = "${category}. Операция от ${datePattern.format(currentDate)}"
+                                        Timber.d("Генерируем примечание: '$generatedNote'")
+                                        generatedNote
+                                    }
+                                }
+                                
+                                Timber.d("Примечание для транзакции: $noteText")
+                                
+                                // Создаем транзакцию с примечанием
+                                val transaction = Transaction(
+                                    id = "sber_table_${currentDate.time}_${parsedAmount}_${System.nanoTime()}",
+                                    amount = parsedAmount,
+                                    category = category,
+                                    date = currentDate,
+                                    isExpense = finalIsExpense,
+                                    note = noteText,
+                                    source = source
+                                )
+                                
+                                transactions.add(transaction)
+                                Timber.d("Добавлена транзакция: $transaction")
+                                
+                                // Переходим к следующей строке после обработанных
+                                currentLineIndex = nextLineIndex
+                                continue
+                            }
+                        }
+                    }
                 } catch (e: Exception) {
-                    return null
+                    Timber.e(e, "Ошибка при парсинге строки: $currentLine")
                 }
+            }
+            
+            currentLineIndex++
+        }
+        
+        Timber.d("Всего извлечено ${transactions.size} транзакций из таблицы")
+        
+        // Возвращаем обработанные транзакции, удаляя дубликаты
+        return removeDuplicateTransactions(transactions)
+    }
+    
+    /**
+     * Проверяет, что строка содержит дату, но не является частью других данных
+     */
+    private fun isValidDateLine(line: String, dateStr: String): Boolean {
+        // Проверяем, что датой начинается строка (с небольшим отступом)
+        if (!line.trim().startsWith(dateStr)) {
+            return false
+        }
+        
+        // Проверяем, что после даты следует время в формате ЧЧ:ММ
+        val timePattern = "\\d{2}:\\d{2}".toRegex()
+        val timeMatch = timePattern.find(line, line.indexOf(dateStr) + dateStr.length)
+        
+        if (timeMatch == null) {
+            Timber.d("Строка содержит дату, но не содержит времени: $line")
+            return false
+        }
+        
+        // Проверяем, что строка не содержит "Дата формирования" или подобных служебных фраз
+        if (line.contains("Дата формирования", ignoreCase = true) || 
+            line.contains("Дата запроса", ignoreCase = true) ||
+            line.contains("Продолжение", ignoreCase = true)) {
+            Timber.d("Строка содержит служебную информацию: $line")
+            return false
+        }
+        
+        return true
+    }
+
+    /**
+     * Специализированный метод для парсинга индивидуальной выписки с тремя столбцами
+     */
+    private fun parseIndividualStatement(pdfLines: List<String>, source: String): List<Transaction> {
+        val transactions = mutableListOf<Transaction>()
+        
+        Timber.d("Анализирую выписку напрямую, строк: ${pdfLines.size}")
+        
+        // Список стандартных категорий в нижнем регистре для поиска
+        val categoriesLc = standardCategories.map { it.lowercase(Locale.getDefault()) }
+        
+        // Представим все строки в виде трех столбцов даже без четкого разделения
+        var i = 0
+        while (i < pdfLines.size - 1) {
+            val line = pdfLines[i].trim()
+            if (line.isBlank()) {
+                i++
+                continue
+            }
+            
+            // Ищем строки, которые начинаются с даты
+            val dateMatch = "^\\d{2}\\.\\d{2}\\.\\d{4}".toRegex().find(line)
+            if (dateMatch != null) {
+                try {
+                // Парсим дату
+                    val dateStr = dateMatch.value
+                    
+                    // Дополнительная проверка, что это действительно строка транзакции, а не служебная информация
+                    if (!isValidDateLine(line, dateStr)) {
+                        Timber.d("Пропускаем строку, не прошла проверку валидности даты: $line")
+                        i++
+                        continue
+                    }
+                    
+                    val date = parseDate(dateStr)
+                    if (date == null) {
+                        i++
+                        continue
+                    }
+                    
+                    // Ищем время (обычно следует сразу за датой)
+                    val timeMatch = "\\d{2}:\\d{2}".toRegex().find(line, dateMatch.range.last + 1)
+                    if (timeMatch == null) {
+                        i++
+                        continue
+                    }
+                    
+                    // Обрабатываем формат с тремя столбцами: дата и время, категория/описание, сумма
+                    val firstColumnEndPos = timeMatch.range.last + 1
+                    
+                    // Ищем сумму в конце строки (третий столбец)
+                    val amountMatch = tableAmountRegex.find(line)
+                    
+                    if (amountMatch != null) {
+                        // Получаем средний столбец между датой/временем и суммой
+                        val middleColumnStart = firstColumnEndPos
+                        val middleColumnEnd = amountMatch.range.first
+                        
+                        if (middleColumnStart < middleColumnEnd) {
+                            val middleColumn = line.substring(middleColumnStart, middleColumnEnd).trim()
+                            
+                            // Парсим сумму
+                            val amountStr = amountMatch.value
+                            val parsedAmount = safeParseAmount(amountStr)
+                            
+                            if (parsedAmount != null && parsedAmount > 0) {
+                                // Определяем тип операции (расход/доход)
+                                var isExpense = !amountStr.startsWith("+")
+                                
+                                // Дополнительная логика для определения типа операции
+                                if (middleColumn.contains("Перевод на карту", ignoreCase = true) || 
+                                    middleColumn.contains("Перевод от", ignoreCase = true)) {
+                                    // Переводы на карту обычно доходы
+                                    isExpense = false
+                                } else if (middleColumn.contains("Перевод СБП", ignoreCase = true) || 
+                                          middleColumn.contains("Перевод для", ignoreCase = true)) {
+                                    // Переводы СБП или для кого-то обычно расходы, если нет явного +
+                                    isExpense = !amountStr.startsWith("+")
+                                } else if (middleColumn.contains("Прочие расходы", ignoreCase = true) || 
+                                          middleColumn.contains("Автоплатёж", ignoreCase = true)) {
+                                    // Расходы и автоплатежи однозначно расходы
+                                    isExpense = true
+                                }
+                                
+                                // Определяем категорию и описание из среднего столбца
+                                var category = ""
+                                var description = middleColumn
+                                
+                                // Ищем категорию среди стандартных категорий
+                                for (cat in standardCategories) {
+                                    if (middleColumn.startsWith(cat, ignoreCase = true)) {
+                                        category = cat
+                                        break
+                                    }
+                                }
+                                
+                                // Если категория не найдена, проверяем начало строки более тщательно
+                                if (category.isBlank()) {
+                                    val lcMiddleColumn = middleColumn.lowercase(Locale.getDefault())
+                                    
+                                    // Проверяем каждую стандартную категорию
+                                    val matchingCategory = categoriesLc.find { cat -> 
+                                        lcMiddleColumn.startsWith(cat)
+                                    }
+                                    
+                                    if (matchingCategory != null) {
+                                        // Находим исходную категорию с правильным регистром
+                                        val catIndex = categoriesLc.indexOf(matchingCategory)
+                                        category = standardCategories[catIndex]
+                                    } else {
+                                        // Определяем категорию по содержимому
+                                        category = determineCategory(middleColumn)
+                                    }
+                                }
+                                
+                                // Собираем дополнительную информацию из следующих строк
+                                var additionalInfo = ""
+                                var nextLineIndex = i + 1
+                                
+                                // Проверяем следующую строку - если это код авторизации, 
+                                // то пропускаем его и берем следующую строку как описание
+                                if (nextLineIndex < pdfLines.size) {
+                                    val nextLine = pdfLines[nextLineIndex].trim()
+                                    
+                                    // Проверяем, является ли строка кодом авторизации (5-7 цифр)
+                                    if (nextLine.matches("\\d{5,7}".toRegex())) {
+                                        // Это код авторизации, пропускаем его
+                                        nextLineIndex++
+                                        
+                                        // Берем следующую строку целиком как описание, если она существует и не начинается с даты
+                                        if (nextLineIndex < pdfLines.size) {
+                                            val descriptionLine = pdfLines[nextLineIndex].trim()
+                                            
+                                            // Если это не начало новой транзакции (не содержит дату в формате XX.XX.XXXX)
+                                            if (!descriptionLine.contains("\\d{2}\\.\\d{2}\\.\\d{4}".toRegex())) {
+                                                // Используем всю строку целиком как примечание
+                                                additionalInfo = descriptionLine
+                                                nextLineIndex++
+                                            }
+                                        }
+                                    } 
+                                    // Эта строка не код авторизации, значит структура другая или код отсутствует
+                                    else if (!nextLine.contains("\\d{2}\\.\\d{2}\\.\\d{4}".toRegex())) {
+                                        // Используем эту строку как описание
+                                        additionalInfo = nextLine
+                                        nextLineIndex++
+                                    }
+                                }
+                                
+                                // Специальная обработка для операций "Перевод на карту"
+                                if (description.contains("Перевод на карту", ignoreCase = true) || 
+                                    description.contains("перевод с карты", ignoreCase = true) ||
+                                    category.equals("Перевод на карту", ignoreCase = true)) {
+                                    // Если категория не определена, используем "Перевод на карту"
+                                    if (category.isBlank()) {
+                                        category = "Перевод на карту"
+                                    }
+                                    // Переводы часто доходы
+                                    isExpense = false
+                                }
+                                
+                                // Проверяем, что у нас действительно есть дата
+                                if (date == null) {
+                                    Timber.e("Пропускаем транзакцию без даты в строке: $line")
+                                    i++
+                                    continue
+                                }
+                                
+                                // Создаем примечание из имеющихся данных
+                                val noteText = when {
+                                    // Используем строку дополнительной информации если она есть
+                                    additionalInfo.isNotBlank() -> {
+                                        Timber.d("Используем additionalInfo для примечания: '$additionalInfo'")
+                                        additionalInfo
+                                    }
+                                    
+                                    // Используем содержимое строки с авторизацией + строки описания
+                                    nextLineIndex < pdfLines.size && nextLineIndex > i + 1 -> {
+                                        val authCode = pdfLines[i + 1].trim()
+                                        val operationDesc = pdfLines[nextLineIndex - 1].trim()
+                                        val fullDesc = "$operationDesc $authCode".trim()
+                                        Timber.d("Используем составное примечание: '$fullDesc'")
+                                        fullDesc
+                                    }
+                                    
+                                    // Или описание из среднего столбца
+                                    description.isNotBlank() -> {
+                                        Timber.d("Используем описание для примечания: '$description'")
+                                        description
+                                    }
+                                    
+                                    // В крайнем случае формируем обобщенное описание
+                                    else -> {
+                                        val generatedNote = "${category}. Операция от ${datePattern.format(date)}"
+                                        Timber.d("Генерируем примечание: '$generatedNote'")
+                                        generatedNote
+                                    }
+                                }
+                                
+                                Timber.d("Примечание для транзакции: $noteText")
+                                
+                                // Создаем транзакцию с примечанием
+                                val transaction = Transaction(
+                                    id = "sber_individual_${date.time}_${parsedAmount}_${System.nanoTime()}",
+                                    amount = parsedAmount,
+                                    category = category,
+                                    date = date,
+                                    isExpense = isExpense,
+                                    note = noteText,
+                                    source = source
+                                )
+                                
+                                transactions.add(transaction)
+                                Timber.d("Добавлена транзакция: $transaction")
+                                
+                                // Переходим к следующей строке после всех обработанных
+                                i = nextLineIndex - 1
+                                i++
+                                continue
+                            }
+                        }
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Ошибка при обработке строки: $line - ${e.message}")
+                }
+            }
+            i++
+        }
+        
+        Timber.d("Всего извлечено ${transactions.size} транзакций из индивидуальной выписки")
+        
+        // Возвращаем обработанные транзакции, удаляя дубликаты
+        return removeDuplicateTransactions(transactions)
+    }
+    
+    /**
+     * Преобразует категорию Сбербанка в категорию приложения
+     */
+    private fun mapSberbankCategory(category: String): String {
+        return when (category.trim().lowercase(Locale.getDefault())) {
+            "супермаркеты" -> "Продукты"
+            "рестораны" -> "Рестораны"
+            "транспорт" -> "Транспорт"
+            "одежда и обувь" -> "Одежда"
+            "здоровье и красота" -> "Здоровье"
+            "связь, интернет" -> "Связь"
+            "коммунальные услуги" -> "Коммунальные платежи"
+            "дом, ремонт" -> "Дом"
+            "развлечения" -> "Развлечения"
+            "прочие операции" -> "Другое"
+            "переводы" -> "Переводы"
+            else -> category // Возвращаем оригинальную категорию, если не найдено соответствие
+        }
+    }
+    
+    /**
+     * Проверяет наличие положительных индикаторов в строке
+     */
+    private fun containsPositiveSign(line: String): Boolean {
+        val lowerLine = line.lowercase(Locale.getDefault())
+        return lowerLine.contains("возврат") || 
+               lowerLine.contains("пополнение") || 
+               lowerLine.contains("зачисление") ||
+               lowerLine.contains("поступление")
+    }
+    
+    /**
+     * Парсит дату в формате ДД.ММ.ГГГГ
+     */
+    private fun parseDate(dateStr: String): Date? {
+        // Логируем исходную строку
+        Timber.d("Пытаемся распознать дату: $dateStr")
+        
+        // Список поддерживаемых форматов дат
+        val dateFormats = listOf(
+            "dd.MM.yyyy",     // 01.01.2023
+            "dd/MM/yyyy",     // 01/01/2023
+            "dd-MM-yyyy",     // 01-01-2023
+            "yyyy-MM-dd"      // 2023-01-01
+        )
+        
+        // Пробуем найти полный паттерн даты в строке
+        for (format in dateFormats) {
+            try {
+                val dateFormat = SimpleDateFormat(format, Locale("ru"))
+                val dateMatch = 
+                    if (format == "dd.MM.yyyy") "\\d{2}\\.\\d{2}\\.\\d{4}".toRegex().find(dateStr)
+                    else if (format == "dd/MM/yyyy") "\\d{2}/\\d{2}/\\d{4}".toRegex().find(dateStr)
+                    else if (format == "dd-MM-yyyy") "\\d{2}-\\d{2}-\\d{4}".toRegex().find(dateStr)
+                    else if (format == "yyyy-MM-dd") "\\d{4}-\\d{2}-\\d{2}".toRegex().find(dateStr)
+                    else null
                 
-                return Transaction(
-                    id = "sber_pdf_${date.time}_${System.nanoTime()}",
-                    amount = amount.absoluteValue,
-                    category = category,
-                    isExpense = isExpense,
-                    date = date,
-                    note = description.takeIf { it.isNotBlank() },
-                    source = source
-                )
-            }
-            
-            // Если не смогли обработать новый формат, используем старую логику
-            val dateMatch = dateRegex.find(block) ?: return null
-            val date = try {
-                datePattern.parse(dateMatch.value)
+                if (dateMatch != null) {
+                    val matchedDateStr = dateMatch.value
+                    Timber.d("Найдено совпадение для формата $format: $matchedDateStr")
+                    return dateFormat.parse(matchedDateStr)
+                }
             } catch (e: Exception) {
-                return null
+                Timber.e(e, "Ошибка при парсинге даты в формате $format: ${e.message}")
             }
+        }
+        
+        // Если не нашли дату в известном формате, попробуем разобрать части строки
+        try {
+            // Ищем разделенные цифры, которые могут быть частями даты
+            val dayMatch = "\\b(0?[1-9]|[12][0-9]|3[01])\\b".toRegex().find(dateStr)
+            val monthMatch = "\\b(0?[1-9]|1[0-2])\\b".toRegex().find(dateStr, startIndex = dayMatch?.range?.last ?: 0)
+            val yearMatch = "\\b(20\\d{2})\\b".toRegex().find(dateStr)
             
-            // Используем улучшенную функцию поиска суммы
-            val amountResult = findAmountInString(block)
-            if (amountResult == null) return null
-            
-            val amount = amountResult.first
-            val isExpense = amountResult.second
-            
-            // Определяем категорию
-            val category = determineCategoryFromBlock(block)
-            
-            // Создаем описание
-            val description = block
-                .replace(dateRegex, "")
-                .replace(amountRegex, "")
-                .replace("\\s+".toRegex(), " ")
-                .trim()
-            
-            return Transaction(
-                id = "sber_pdf_${date.time}_${System.nanoTime()}",
-                amount = amount.absoluteValue,
-                category = category,
-                isExpense = isExpense,
-                date = date,
-                note = description.takeIf { it.isNotBlank() },
-                source = source
-            )
+            if (dayMatch != null && monthMatch != null && yearMatch != null) {
+                val day = dayMatch.value.toInt()
+                val month = monthMatch.value.toInt() - 1  // В Date месяцы начинаются с 0
+                val year = yearMatch.value.toInt() - 1900 // В Date годы отсчитываются от 1900
+                
+                Timber.d("Найдены компоненты даты: день=$day, месяц=$month+1, год=${year+1900}")
+                
+                // Создаем объект Date из найденных компонентов
+                val calendar = java.util.Calendar.getInstance()
+                calendar.set(year + 1900, month, day, 0, 0, 0)
+                calendar.set(java.util.Calendar.MILLISECOND, 0)
+                return calendar.time
+            }
         } catch (e: Exception) {
-            return null
-        }
-    }
-    
-    /**
-     * Определяет категорию на основе блока операции
-     */
-    private fun determineCategoryFromBlock(block: String): String {
-        // Список стандартных категорий Сбербанка
-        val sberCategories = mapOf(
-            "Здоровье и красота" to "Здоровье",
-            "Прочие операции" to "Другое",
-            "Переводы" to "Переводы",
-            "Супермаркеты" to "Продукты",
-            "Рестораны" to "Рестораны",
-            "Транспорт" to "Транспорт",
-            "Связь" to "Связь",
-            "Одежда и обувь" to "Одежда",
-            "Коммунальные услуги" to "Коммунальные платежи",
-            "Дом и ремонт" to "Дом"
-        )
-        
-        // Проверяем наличие категории Сбербанка в блоке
-        for ((sberCategory, appCategory) in sberCategories) {
-            if (block.contains(sberCategory, ignoreCase = true)) {
-                return appCategory
-            }
+            Timber.e(e, "Ошибка при разборе компонентов даты: ${e.message}")
         }
         
-        // Если стандартная категория не найдена, пробуем определить по ключевым словам
-        return determineCategory(block)
-    }
-    
-    /**
-     * Определяет категорию транзакции на основе описания
-     */
-    private fun determineCategory(description: String): String {
-        // Сначала проверяем стандартные категории Сбербанка и сохраняем их как есть
-        val sberCategories = listOf(
-            "Здоровье и красота",
-            "Прочие операции",
-            "Переводы",
-            "Супермаркеты",
-            "Рестораны",
-            "Транспорт",
-            "Связь",
-            "Одежда и обувь",
-            "Коммунальные услуги",
-            "Дом и ремонт",
-            "Развлечения",
-            "Отели",
-            "Авто",
-            "Топливо",
-            "Фастфуд"
-        )
-        
-        // Проверяем наличие стандартной категории Сбербанка
-        for (sberCategory in sberCategories) {
-            if (description.contains(sberCategory, ignoreCase = true)) {
-                return sberCategory
-            }
-        }
-        
-        // Если стандартная категория не найдена, определяем по ключевым словам
-        val lowerDesc = description.lowercase(Locale.getDefault())
-        
-        return when {
-            lowerDesc.contains("перевод") && (lowerDesc.contains("на карту") || 
-                                            lowerDesc.contains("поступление")) -> "Переводы"
-            lowerDesc.contains("перевод") || lowerDesc.contains("пополнение") -> "Переводы"
-            lowerDesc.contains("снятие") || lowerDesc.contains("банкомат") -> "Наличные"
-            lowerDesc.contains("пятерочка") || lowerDesc.contains("магнит") ||
-            lowerDesc.contains("ашан") || lowerDesc.contains("лента") || 
-            lowerDesc.contains("супермаркет") -> "Супермаркеты"
-            lowerDesc.contains("аптека") || lowerDesc.contains("больница") ||
-            lowerDesc.contains("клиника") || lowerDesc.contains("здоровье") -> "Здоровье и красота"
-            lowerDesc.contains("такси") || lowerDesc.contains("метро") ||
-            lowerDesc.contains("автобус") -> "Транспорт"
-            lowerDesc.contains("ресторан") || lowerDesc.contains("кафе") ||
-            lowerDesc.contains("кофейня") -> "Рестораны"
-            lowerDesc.contains("жкх") || lowerDesc.contains("коммунальн") ||
-            lowerDesc.contains("свет") || lowerDesc.contains("газ") ||
-            lowerDesc.contains("вода") -> "Коммунальные услуги"
-            lowerDesc.contains("зарплата") || lowerDesc.contains("аванс") -> "Зарплата"
-            lowerDesc.contains("мтс") || lowerDesc.contains("мегафон") ||
-            lowerDesc.contains("билайн") || lowerDesc.contains("теле2") -> "Связь"
-            lowerDesc.contains("одежда") || lowerDesc.contains("обувь") -> "Одежда и обувь"
-            else -> "Прочие операции"
-        }
+        // Если не смогли разобрать дату, возвращаем null
+        Timber.w("Не удалось распознать дату: $dateStr")
+        return null
     }
 
     /**
      * Проверяет, что файл является выпиской Сбербанка
      */
     private fun isValidSberbankStatement(text: String): Boolean {
-        return text.contains("Сбербанк", ignoreCase = true) &&
+        return (text.contains("Сбербанк", ignoreCase = true) ||
+                text.contains("СБЕР", ignoreCase = true)) &&
                (text.contains("выписка", ignoreCase = true) ||
-                text.contains("операции", ignoreCase = true)) &&
-               text.contains("дата", ignoreCase = true) &&
-               text.contains("сумма", ignoreCase = true)
+                text.contains("операции", ignoreCase = true) ||
+                text.contains("Расшифровка операций", ignoreCase = true) ||
+                text.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true) ||
+                text.contains("Дата обработки", ignoreCase = true) ||
+                text.contains("СУММА В ВАЛЮТЕ СЧЁТА", ignoreCase = true)) &&
+               (text.contains("дата", ignoreCase = true) ||
+                text.contains("ДАТА", ignoreCase = true)) &&
+               (text.contains("сумма", ignoreCase = true) ||
+                text.contains("СУММА", ignoreCase = true))
     }
     
     // Требуемые методы абстрактного класса, но они не используются напрямую
@@ -733,5 +1171,206 @@ class SberbankPdfImportUseCase(
         }
         
         return note
+    }
+
+    /**
+     * Пытается найти сумму в строке, учитывая различные форматы
+     */
+    private fun findAmountInString(text: String): Pair<Double, Boolean>? {
+        // Улучшенный паттерн для поиска сумм
+        val amountRegexPatterns = listOf(
+            // Сумма с пробелами и запятой: 1 000,00
+            "([+-]?\\d{1,3}(\\s\\d{3})*[,.]\\d{2})".toRegex(),
+            // Сумма без пробелов с запятой: 1000,00
+            "([+-]?\\d+[,.]\\d{2})".toRegex(),
+            // Сумма с руб./₽: 1000,00 руб.
+            "(\\d+[,.]\\d{2})\\s*(₽|руб)".toRegex(),
+            // Сумма со знаком +/- перед ней: +1000,00
+            "([+-]\\s*\\d+[,.]\\d{2})".toRegex(),
+            // Формат для выписки с "расшифровкой операций"
+            "([+-]?\\d{1,3}(\\s\\d{3})*[,.]\\d{2})\\s*$".toRegex()
+        )
+
+        // Проверяем каждый паттерн
+        for (pattern in amountRegexPatterns) {
+            val matches = pattern.findAll(text).toList()
+            if (matches.isNotEmpty()) {
+                // Берем последнее совпадение в строке (обычно это и есть сумма операции)
+                val match = matches.last()
+                val matchedText = match.groupValues[0].trim()
+                
+                Timber.d("Найдена сумма: '$matchedText' в тексте: '${text.take(50)}...'")
+                
+                // Извлекаем числовое значение, убирая все нецифровые символы, кроме точки и запятой
+                var amountStr = matchedText.replace("[^0-9,.+-]".toRegex(), "")
+                    .replace(",", ".")
+                
+                // По умолчанию, если нет явного + в начале суммы, считаем операцию расходом
+                var isExpense = !amountStr.startsWith("+")
+                
+                // Убираем знаки +/- для конвертации в число
+                amountStr = amountStr.removePrefix("+").removePrefix("-")
+                
+                // Проверяем контекст на ключевые слова для определения типа операции
+                if (text.contains("зачисление", ignoreCase = true) ||
+                    text.contains("поступление", ignoreCase = true) ||
+                    text.contains("возврат", ignoreCase = true) ||
+                    (text.contains("перевод", ignoreCase = true) && 
+                     text.contains("на карту", ignoreCase = true) &&
+                     !text.contains("с карты", ignoreCase = true))) {
+                    isExpense = false
+                }
+                
+                // Дополнительно проверяем явный знак "+" в начале строки суммы
+                if (matchedText.startsWith("+")) {
+                    isExpense = false
+                }
+                
+                // Проверяем отдельно для выписки с "Расшифровкой операций"
+                if (text.contains("Перевод на карту", ignoreCase = true) || 
+                    text.contains("Перевод от", ignoreCase = true)) {
+                    isExpense = false 
+                }
+                
+                // Явные признаки расхода
+                if (text.contains("Перевод СБП", ignoreCase = true) || 
+                    text.contains("Перевод для", ignoreCase = true) || 
+                    text.contains("Прочие расходы", ignoreCase = true) || 
+                    text.contains("Автоплатёж", ignoreCase = true)) {
+                    isExpense = true
+                }
+                
+                try {
+                    // Используем наш безопасный метод для парсинга числа
+                    val amount = safeParseAmount(amountStr)
+                    if (amount == null) {
+                        Timber.e("Не удалось преобразовать строку суммы в число: $amountStr")
+                        continue
+                    }
+                    return Pair(amount, isExpense)
+                } catch (e: Exception) {
+                    // Если не удалось преобразовать в число, продолжаем поиск
+                    continue
+                }
+            }
+        }
+        
+        // Если ни один паттерн не сработал, пробуем найти просто числа с запятой/точкой
+        val simpleAmount = "(\\d+[,.]\\d{2})".toRegex().find(text)
+        if (simpleAmount != null) {
+            val amountStr = simpleAmount.value.replace(",", ".")
+            try {
+                // Используем наш безопасный метод для парсинга числа
+                val amount = safeParseAmount(amountStr)
+                if (amount == null) {
+                    Timber.e("Не удалось преобразовать строку суммы в число: $amountStr")
+                    return null
+                }
+                // По умолчанию считаем операцию расходом, если нет явных признаков поступления
+                var isExpense = true
+                
+                if (text.contains("зачисление", ignoreCase = true) ||
+                    text.contains("поступление", ignoreCase = true) ||
+                    text.contains("возврат", ignoreCase = true) ||
+                    (text.contains("перевод", ignoreCase = true) && 
+                     text.contains("на карту", ignoreCase = true) &&
+                     !text.contains("с карты", ignoreCase = true))) {
+                    isExpense = false
+                }
+                
+                return Pair(amount, isExpense)
+            } catch (e: Exception) {
+                // Игнорируем ошибки преобразования
+            }
+        }
+        
+        return null
+    }
+
+    /**
+     * Определяет категорию транзакции на основе описания
+     */
+    private fun determineCategory(description: String): String {
+        // Сначала проверяем стандартные категории Сбербанка и сохраняем их как есть
+        val sberCategories = listOf(
+            "Здоровье и красота",
+            "Прочие операции",
+            "Переводы",
+            "Супермаркеты",
+            "Рестораны",
+            "Транспорт",
+            "Связь",
+            "Одежда и обувь",
+            "Коммунальные услуги",
+            "Дом и ремонт",
+            "Развлечения",
+            "Отели",
+            "Авто",
+            "Топливо",
+            "Фастфуд"
+        )
+        
+        // Проверяем наличие стандартной категории Сбербанка
+        for (sberCategory in sberCategories) {
+            if (description.contains(sberCategory, ignoreCase = true)) {
+                return sberCategory
+            }
+        }
+        
+        // Если стандартная категория не найдена, определяем по ключевым словам
+        val lowerDesc = description.lowercase(Locale.getDefault())
+        
+        return when {
+            lowerDesc.contains("перевод") && (lowerDesc.contains("на карту") || 
+                                            lowerDesc.contains("поступление")) -> "Переводы"
+            lowerDesc.contains("перевод") || lowerDesc.contains("пополнение") -> "Переводы"
+            lowerDesc.contains("снятие") || lowerDesc.contains("банкомат") -> "Наличные"
+            lowerDesc.contains("пятерочка") || lowerDesc.contains("магнит") ||
+            lowerDesc.contains("ашан") || lowerDesc.contains("лента") || 
+            lowerDesc.contains("супермаркет") -> "Супермаркеты"
+            lowerDesc.contains("аптека") || lowerDesc.contains("больница") ||
+            lowerDesc.contains("клиника") || lowerDesc.contains("здоровье") -> "Здоровье и красота"
+            lowerDesc.contains("такси") || lowerDesc.contains("метро") ||
+            lowerDesc.contains("автобус") -> "Транспорт"
+            lowerDesc.contains("ресторан") || lowerDesc.contains("кафе") ||
+            lowerDesc.contains("кофейня") -> "Рестораны"
+            lowerDesc.contains("жкх") || lowerDesc.contains("коммунальн") ||
+            lowerDesc.contains("свет") || lowerDesc.contains("газ") ||
+            lowerDesc.contains("вода") -> "Коммунальные услуги"
+            lowerDesc.contains("зарплата") || lowerDesc.contains("аванс") -> "Зарплата"
+            lowerDesc.contains("мтс") || lowerDesc.contains("мегафон") ||
+            lowerDesc.contains("билайн") || lowerDesc.contains("теле2") -> "Связь"
+            lowerDesc.contains("одежда") || lowerDesc.contains("обувь") -> "Одежда и обувь"
+            else -> "Прочие операции"
+        }
+    }
+
+    /**
+     * Удаляет дублирующиеся транзакции из списка
+     */
+    private fun removeDuplicateTransactions(transactions: List<Transaction>): List<Transaction> {
+        // Группируем транзакции по дате и сумме
+        val groupedTransactions = transactions.groupBy { "${it.date.time}_${it.amount}_${it.isExpense}" }
+        
+        // Результирующий список без дубликатов
+        val uniqueTransactions = mutableListOf<Transaction>()
+        
+        // Проходим по каждой группе и выбираем одну транзакцию из группы
+        for ((_, group) in groupedTransactions) {
+            if (group.size > 1) {
+                // Если есть дубликаты, логируем это и выбираем транзакцию с наиболее информативным описанием
+                Timber.d("Найдены ${group.size} дублирующиеся транзакции с датой ${group.first().date} и суммой ${group.first().amount}")
+                
+                // Выбираем транзакцию с наиболее длинным описанием, предполагая, что она содержит больше информации
+                val bestTransaction = group.maxByOrNull { it.note?.length ?: 0 } ?: group.first()
+                uniqueTransactions.add(bestTransaction)
+            } else {
+                // Если нет дубликатов, просто добавляем транзакцию в результат
+                uniqueTransactions.add(group.first())
+            }
+        }
+        
+        Timber.d("Удалено ${transactions.size - uniqueTransactions.size} дубликатов, осталось ${uniqueTransactions.size} уникальных транзакций")
+        return uniqueTransactions
     }
 } 

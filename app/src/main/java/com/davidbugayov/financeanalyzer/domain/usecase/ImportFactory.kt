@@ -43,6 +43,14 @@ class ImportFactory(
                     pdfContent.contains("OZON", ignoreCase = true) || pdfContent.contains("ОЗОН", ignoreCase = true)) {
                     Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Озон Банка, используем OzonPdfImportUseCase")
                     return OzonPdfImportUseCase(repository, context)
+                } else if (pdfContent.contains("Сбербанк", ignoreCase = true) || 
+                           pdfContent.contains("Расшифровка операций", ignoreCase = true) ||
+                           pdfContent.contains("СБЕР", ignoreCase = true) ||
+                           pdfContent.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true) ||
+                           pdfContent.contains("Дата обработки", ignoreCase = true) ||
+                           pdfContent.contains("СУММА В ВАЛЮТЕ СЧЁТА", ignoreCase = true)) {
+                    Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Сбербанка, используем SberbankPdfImportUseCase")
+                    return SberbankPdfImportUseCase(repository, context)
                 } else if (fileName.lowercase().contains("tinkoff") || 
                            fileName.lowercase().contains("тинькофф") || 
                            fileName.lowercase().contains("т-банк") ||
@@ -51,9 +59,6 @@ class ImportFactory(
                            pdfContent.contains("Т-Банк", ignoreCase = true)) {
                     Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Т-Банка, используем TBankPdfImportUseCase")
                     return TBankPdfImportUseCase(repository, context)
-                } else if (pdfContent.contains("Сбербанк", ignoreCase = true)) {
-                    Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Сбербанка, используем SberbankPdfImportUseCase")
-                    return SberbankPdfImportUseCase(repository, context)
                 } else {
                     Timber.d("ИМПОРТ ФАБРИКА: PDF файл неизвестного формата, используем SberbankPdfImportUseCase")
                     // Для PDF файлов по умолчанию используем реализацию для Сбербанка
