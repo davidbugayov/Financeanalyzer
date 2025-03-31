@@ -13,7 +13,7 @@ data class ProfileState(
     val exportSuccess: String? = null,
     val exportError: String? = null,
     val isExporting: Boolean = false,
-    val lastExportFileAvailable: Boolean = false,
+    val exportedFilePath: String? = null,
     
     // Настройки приложения
     val themeMode: ThemeMode = ThemeMode.SYSTEM,

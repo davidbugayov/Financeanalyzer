@@ -156,10 +156,11 @@ fun ProfileScreen(
 
                 // Кнопка экспорта данных в CSV
                 ExportButton(
-                    onClick = {
-                        viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV, context)
+                    onClick = { action ->
+                        viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV(action), context)
                     },
                     isExporting = state.isExporting,
+                    showFilePath = state.exportedFilePath,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))

@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Assessment
@@ -22,6 +21,7 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -45,13 +45,13 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
  * @param totalIncome Общий доход
  * @param totalExpense Общий расход
  * @param balance Текущий баланс
+ * @param savingsRate Норма сбережений
  * @param totalTransactions Общее количество транзакций
  * @param totalExpenseCategories Общее количество категорий расходов
  * @param totalIncomeCategories Общее количество категорий доходов
  * @param averageExpense Средний расход
  * @param totalSourcesUsed Общее количество использованных источников
  * @param dateRange Строка с диапазоном дат для отображения
- * @param savingsRate Норма сбережений
  * @param onSavingsRateClick Обработчик нажатия на норму сбережений
  * @param modifier Модификатор для настройки внешнего вида
  */
@@ -60,13 +60,13 @@ fun AnalyticsSection(
     totalIncome: Double,
     totalExpense: Double,
     balance: Double,
+    savingsRate: Double,
     totalTransactions: Int,
     totalExpenseCategories: Int,
     totalIncomeCategories: Int,
     averageExpense: String,
     totalSourcesUsed: Int,
     dateRange: String = "Все время",
-    savingsRate: Double = 0.0,
     onSavingsRateClick: () -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -100,7 +100,7 @@ fun AnalyticsSection(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.AutoMirrored.Filled.ShowChart,
+                        imageVector = Icons.Default.ShowChart,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp)
@@ -236,7 +236,7 @@ fun AnalyticsSection(
                 Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                 
                 AnalyticCard(
-                    icon = Icons.AutoMirrored.Filled.ShowChart,
+                    icon = Icons.Default.ShowChart,
                     title = stringResource(R.string.average_expense),
                     value = averageExpense,
                     modifier = Modifier.weight(1f)

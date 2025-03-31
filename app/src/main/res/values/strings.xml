@@ -277,10 +277,18 @@
     <string name="no_transactions_in_period">Нет транзакций за выбранный период</string>
 
     <!-- Профиль -->
+    <string name="profile_save">Сохранить</string>
+    <string name="profile_cancel">Отмена</string>
+    <string name="profile_settings_section">Настройки приложения</string>
     <string name="export_to_csv">Экспорт данных в CSV</string>
     <string name="export_success">Данные успешно экспортированы</string>
-    <string name="export_error">Ошибка при экспорте данных</string>
     <string name="export_description">Экспортирует все транзакции в CSV файл для использования в Excel или других программах.</string>
+    <string name="export_error">Ошибка при экспорте: %s</string>
+    <string name="export_choose_action">Выберите действие</string>
+    <string name="export_share">Отправить файл</string>
+    <string name="export_open">Открыть файл</string>
+    <string name="export_only_save">Только сохранить</string>
+    <string name="exported_file_path">Файл сохранён: %s</string>
     <string name="profile_analytics_title">Финансовая аналитика</string>
     <string name="profile_settings_title">Настройки</string>
     <string name="profile_theme_title">Тема</string>

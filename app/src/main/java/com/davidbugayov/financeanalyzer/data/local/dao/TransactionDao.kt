@@ -60,6 +60,15 @@ interface TransactionDao {
     suspend fun getTransactionsCountByDateRange(startDate: Date, endDate: Date): Int
 
     /**
+     * Получает транзакции в указанном диапазоне дат без пагинации
+     * @param startDate Начальная дата периода
+     * @param endDate Конечная дата периода
+     * @return Список всех транзакций в указанном диапазоне дат
+     */
+    @Query("SELECT * FROM transactions WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): List<TransactionEntity>
+
+    /**
      * Получает транзакцию по ID
      * @param id ID транзакции
      * @return Транзакция с указанным ID или null, если не найдена

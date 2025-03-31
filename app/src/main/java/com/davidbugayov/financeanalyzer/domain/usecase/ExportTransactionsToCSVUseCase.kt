@@ -162,4 +162,37 @@ class ExportTransactionsToCSVUseCase(
         Timber.d("Запуск диалога Поделиться для файла: $filePath")
         return shareIntent
     }
+    
+    /**
+     * Открывает CSV файл с использованием Intent.ACTION_VIEW
+     * 
+     * @param context Контекст приложения
+     * @param filePath Путь к CSV файлу
+     * @return Intent для открытия файла
+     */
+    fun openCSVFile(context: Context, filePath: String): Intent {
+        val file = File(filePath)
+        val fileUri: Uri = FileProvider.getUriForFile(
+            context,
+            context.packageName + ".fileprovider",
+            file
+        )
+        
+        val openIntent = Intent(Intent.ACTION_VIEW).apply {
+            setDataAndType(fileUri, "text/csv")
+            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+        }
+        
+        Timber.d("Открытие файла: $filePath")
+        return openIntent
+    }
+    
+    /**
+     * Возвращает enum класс для представления возможных действий с экспортированным файлом
+     */
+    enum class ExportAction {
+        SHARE,    // Поделиться файлом
+        OPEN,     // Открыть файл
+        SAVE_ONLY // Только сохранить файл
+    }
 } 

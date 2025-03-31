@@ -56,7 +56,15 @@ class ImportFactory(
                            fileName.lowercase().contains("т-банк") ||
                            pdfContent.contains("Tinkoff", ignoreCase = true) ||
                            pdfContent.contains("Тинькофф", ignoreCase = true) ||
-                           pdfContent.contains("Т-Банк", ignoreCase = true)) {
+                           pdfContent.contains("Т-Банк", ignoreCase = true) ||
+                           pdfContent.contains("ТБАНК", ignoreCase = true) ||
+                           pdfContent.contains("TBANK.RU", ignoreCase = true) ||
+                           pdfContent.contains("АКЦИОНЕРНОЕ ОБЩЕСТВО «ТБАНК»", ignoreCase = true) ||
+                           pdfContent.contains("Справка о движении средств", ignoreCase = true) ||
+                           (pdfContent.contains("Движение средств за период", ignoreCase = true) && 
+                            pdfContent.contains("Дата и время операции", ignoreCase = true)) ||
+                           (pdfContent.contains("Внутрибанковский перевод", ignoreCase = true) && 
+                            pdfContent.contains("с договора", ignoreCase = true))) {
                     Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Т-Банка, используем TBankPdfImportUseCase")
                     return TBankPdfImportUseCase(repository, context)
                 } else {

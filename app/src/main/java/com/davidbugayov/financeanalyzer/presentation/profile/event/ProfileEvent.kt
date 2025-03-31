@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.event
 
+import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase.ExportAction
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
 /**
@@ -10,12 +11,7 @@ sealed class ProfileEvent {
     /**
      * Событие экспорта транзакций в CSV.
      */
-    data object ExportTransactionsToCSV : ProfileEvent()
-    
-    /**
-     * Событие для поделиться экспортированным CSV файлом.
-     */
-    data object ShareExportedFile : ProfileEvent()
+    data class ExportTransactionsToCSV(val action: ExportAction? = null) : ProfileEvent()
     
     /**
      * Событие сброса состояния экспорта.

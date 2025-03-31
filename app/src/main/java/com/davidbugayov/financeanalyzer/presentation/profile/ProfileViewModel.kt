@@ -7,6 +7,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase.ExportAction
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
@@ -44,9 +45,6 @@ class ProfileViewModel(
     
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
-
-    // Путь к последнему экспортированному файлу
-    private var lastExportedFilePath: String? = null
 
     init {
         // Загружаем настройки уведомлений
@@ -87,22 +85,14 @@ class ProfileViewModel(
         when (event) {
             is ProfileEvent.ExportTransactionsToCSV -> {
                 if (context != null) {
-                    exportTransactionsToCSV(context)
-                }
-            }
-            is ProfileEvent.ShareExportedFile -> {
-                if (context != null && !lastExportedFilePath.isNullOrEmpty()) {
-                    shareExportedFile(context)
-                } else {
-                    _state.update { it.copy(
-                        exportError = "Файл не найден. Сначала выполните экспорт."
-                    ) }
+                    exportTransactionsToCSV(context, event.action)
                 }
             }
             is ProfileEvent.ResetExportState -> {
                 _state.update { it.copy(
                     exportSuccess = null,
-                    exportError = null
+                    exportError = null,
+                    exportedFilePath = null
                 ) }
             }
             is ProfileEvent.SetExportError -> {
@@ -192,9 +182,9 @@ class ProfileViewModel(
     }
 
     /**
-     * Экспорт транзакций в CSV файл и автоматическое открытие диалога "поделиться"
+     * Экспорт транзакций в CSV файл.
      */
-    private fun exportTransactionsToCSV(context: Context) {
+    private fun exportTransactionsToCSV(context: Context, selectedAction: ExportAction? = null) {
         viewModelScope.launch {
             _state.update { it.copy(isExporting = true) }
             
@@ -204,31 +194,61 @@ class ProfileViewModel(
                 result.collect { exportResult ->
                     if (exportResult.isSuccess) {
                         val filePath = exportResult.getOrNull() ?: ""
-                        lastExportedFilePath = filePath // Сохраняем путь к файлу
-                        
                         _state.update { it.copy(
                             isExporting = false,
-                            lastExportFileAvailable = true,
-                            exportSuccess = context.getString(R.string.export_success) +
-                                    "\nФайл сохранен: деньги_под_контролем_транзакции_${filePath.substringAfterLast('/').substringAfter('_')}" +
-                                    "\nПуть: /Downloads"
+                            exportSuccess = context.getString(R.string.export_success),
+                            exportedFilePath = filePath
                         ) }
+                        
+                        // В зависимости от выбранного действия
+                        when (selectedAction) {
+                            ExportAction.SHARE -> {
+                                // Открываем диалог "Поделиться"
+                                val shareIntent = exportTransactionsToCSVUseCase.shareCSVFile(context, filePath)
+                                context.startActivity(Intent.createChooser(shareIntent, "Поделиться файлом"))
+                            }
+                            ExportAction.OPEN -> {
+                                // Открываем файл
+                                try {
+                                    val openIntent = exportTransactionsToCSVUseCase.openCSVFile(context, filePath)
+                                    context.startActivity(openIntent)
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Ошибка открытия файла: ${e.message}")
+                                    _state.update { it.copy(
+                                        exportError = "Не удалось открыть файл. Установите приложение для просмотра CSV-файлов."
+                                    ) }
+                                }
+                            }
+                            ExportAction.SAVE_ONLY -> {
+                                // Просто сохраняем файл, ничего не делаем дополнительно
+                                _state.update { it.copy(
+                                    exportSuccess = context.getString(R.string.export_success) +
+                                            "\nФайл сохранен: ${filePath.substringAfterLast('/')}" +
+                                            "\nПуть: /Downloads"
+                                ) }
+                            }
+                            null -> {
+                                // Для обратной совместимости - если действие не выбрано,
+                                // просто показываем сообщение об успешном экспорте
+                                _state.update { it.copy(
+                                    exportSuccess = context.getString(R.string.export_success) +
+                                            "\nФайл сохранен: ${filePath.substringAfterLast('/')}" +
+                                            "\nПуть: /Downloads"
+                                ) }
+                            }
+                        }
                         
                         // Логируем успешный экспорт
                         AnalyticsUtils.logScreenView("export_success", "csv")
-                        
-                        // Автоматически запускаем функцию "поделиться"
-                        shareExportedFile(context)
                     } else {
                         val error = exportResult.exceptionOrNull()
                         val errorMessage = when {
                             error is SecurityException -> "Отсутствуют разрешения для сохранения файла. Пожалуйста, предоставьте доступ к хранилищу в настройках."
-                            else -> context.getString(R.string.export_error)
+                            else -> context.getString(R.string.export_error, error?.message ?: "неизвестная ошибка")
                         }
                         
                         _state.update { it.copy(
                             isExporting = false,
-                            lastExportFileAvailable = false,
                             exportError = errorMessage
                         ) }
                         
@@ -239,8 +259,7 @@ class ProfileViewModel(
             } catch (e: Exception) {
                 _state.update { it.copy(
                     isExporting = false,
-                    lastExportFileAvailable = false,
-                    exportError = e.message ?: context.getString(R.string.export_error)
+                    exportError = e.message ?: context.getString(R.string.export_error, "неизвестная ошибка")
                 ) }
             }
         }
@@ -389,27 +408,6 @@ class ProfileViewModel(
                 _state.update { it.copy(
                     isLoading = false,
                     error = e.message
-                ) }
-            }
-        }
-    }
-
-    /**
-     * Поделиться экспортированным файлом через стандартный диалог Android.
-     */
-    private fun shareExportedFile(context: Context) {
-        lastExportedFilePath?.let { filePath ->
-            try {
-                val shareIntent = exportTransactionsToCSVUseCase.shareCSVFile(context, filePath)
-                // Запускаем диалог выбора приложения для отправки
-                context.startActivity(Intent.createChooser(shareIntent, "Поделиться через"))
-                
-                // Логируем событие
-                AnalyticsUtils.logScreenView("share_exported_file", "csv")
-            } catch (e: Exception) {
-                Timber.e(e, "Error sharing CSV file")
-                _state.update { it.copy(
-                    exportError = "Ошибка при попытке поделиться файлом: ${e.message}"
                 ) }
             }
         }

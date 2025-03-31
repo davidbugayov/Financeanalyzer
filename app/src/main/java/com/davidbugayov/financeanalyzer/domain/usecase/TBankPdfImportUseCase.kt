@@ -58,6 +58,13 @@ class TBankPdfImportUseCase(
     // Паттерн для сумм, более точный
     private val bigAmountRegex = "-?\\d{1,3}(?:[\\s]?\\d{3})*[,.](\\d{2})\\s?₽?".toRegex()
     
+    // Паттерны специально для выписок из скриншота
+    private val tbankHeaderRegex = "АКЦИОНЕРНОЕ ОБЩЕСТВО «ТБАНК»".toRegex(RegexOption.IGNORE_CASE)
+    private val tbankAddressRegex = "РОССИЯ, \\d+, МОСКВА".toRegex(RegexOption.IGNORE_CASE)
+    private val tbankWebsiteRegex = "TBANK.RU".toRegex(RegexOption.IGNORE_CASE)
+    private val transferTypeRegex = "(?:Внутрибанковский перевод)|(?:Внешний перевод)".toRegex(RegexOption.IGNORE_CASE)
+    private val contractRegex = "(?:с договора \\d+)|(?:по номеру телефона)".toRegex(RegexOption.IGNORE_CASE)
+    
     // Инициализация PDFBox при создании экземпляра
     init {
         PDFBoxResourceLoader.init(context)
@@ -69,6 +76,10 @@ class TBankPdfImportUseCase(
     override suspend fun invoke(uri: Uri): Flow<ImportResult> = flow {
         try {
             emit(ImportResult.Progress(1, 100, "Открытие PDF-файла выписки Т-Банка"))
+            
+            // Открываем PDF файл
+            val inputStream = context.contentResolver.openInputStream(uri)
+                ?: throw IllegalArgumentException("Не удалось открыть файл")
             
             // Используем таймаут для чтения PDF содержимого
             val pdfLines = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
@@ -246,151 +257,161 @@ class TBankPdfImportUseCase(
     }
     
     /**
-     * Обрабатывает формат "Справка о движении средств"
+     * Парсит выписку в формате "Справка о движении средств"
      */
     private fun parseStatementOfFunds(pdfLines: List<String>, source: String): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         
-        // Вывод всех строк документа для отладки
-        pdfLines.forEachIndexed { index, line ->
-            Timber.d("Строка $index: $line")
-        }
-        
-        // Находим индекс начала таблицы с операциями
-        val tableStartIndex = pdfLines.indexOfFirst { line -> 
-            statementTableStartRegex.find(line) != null || 
-            line.contains("Дата", ignoreCase = true) && (
-                line.contains("операции", ignoreCase = true) ||
-                line.contains("время", ignoreCase = true) ||
-                line.contains("списания", ignoreCase = true)
-            )
-        }
-        
-        if (tableStartIndex == -1) {
-            Timber.w("Не удалось найти начало таблицы с операциями в справке о движении средств")
+        try {
+            Timber.d("Начинаем парсинг справки о движении средств")
             
-            // Если не нашли стандартным способом, попробуем найти по датам
-            val firstDateIndex = pdfLines.indexOfFirst { line ->
-                dateRegex.find(line) != null && 
-                findAmountInString(line) != null
+            // Находим диапазон дат в выписке
+            val periodInfo = pdfLines.find { it.contains("Движение средств за период", ignoreCase = true) }
+            var startPeriodDate: Date? = null
+            var endPeriodDate: Date? = null
+            
+            if (periodInfo != null) {
+                val periodMatch = periodRegex.find(periodInfo)
+                if (periodMatch != null) {
+                    Timber.d("Найден период выписки: ${periodMatch.value}")
+                    startPeriodDate = periodMatch.groupValues[1].let { parseDate(it) }
+                    endPeriodDate = periodMatch.groupValues[2].let { parseDate(it) }
+                }
             }
             
-            if (firstDateIndex != -1) {
-                Timber.d("Найдена первая операция с датой на строке $firstDateIndex: ${pdfLines[firstDateIndex]}")
-                return parseStatementWithoutHeaders(pdfLines, source, firstDateIndex)
+            // Найдем заголовок таблицы с транзакциями
+            val tableHeaderIndex = pdfLines.indexOfFirst { line ->
+                line.contains("Дата и время операции", ignoreCase = true) ||
+                line.contains("Дата операции", ignoreCase = true) ||
+                line.contains("Сумма операции", ignoreCase = true) ||
+                line.contains("Сумма в валюте", ignoreCase = true) ||
+                line.contains("Описание операции", ignoreCase = true)
+            }
+            
+            if (tableHeaderIndex == -1) {
+                Timber.d("Заголовок таблицы не найден, используем альтернативный метод парсинга")
+                return parseStatementWithoutHeaders(pdfLines, source, 0)
+            }
+            
+            Timber.d("Найден заголовок таблицы на строке $tableHeaderIndex: ${pdfLines[tableHeaderIndex]}")
+            
+            // Ищем строки, содержащие даты и суммы после заголовка таблицы
+            var i = tableHeaderIndex + 1
+            while (i < pdfLines.size) {
+                val line = pdfLines[i]
+                
+                // Проверяем, не конец ли таблицы
+                if (tableEndRegex.containsMatchIn(line)) {
+                    Timber.d("Достигнут конец таблицы на строке $i: $line")
+                    break
+                }
+                
+                // Новый формат из скриншота: проверяем наличие даты и времени операции в формате "30.03.2025 19:42"
+                val dateTimeMatch = "\\d{2}\\.\\d{2}\\.\\d{4}\\s+\\d{2}:\\d{2}".toRegex().find(line)
+                if (dateTimeMatch != null) {
+                    // Извлекаем дату и время в формате "30.03.2025 19:42"
+                    val dateTimeStr = dateTimeMatch.value
+                    Timber.d("Найдена дата и время операции: $dateTimeStr")
+                    
+                    // Пытаемся получить все необходимые данные из текущей и следующих строк
+                    val dateStr = dateTimeStr.split(" ")[0]
+                    val date = parseDate(dateStr)
+                    
+                    if (date != null) {
+                        // Ищем сумму в текущей строке
+                        var amount = findAmountInString(line)
+                        var description = line
+                        var cardNumber: String? = null
+                        
+                        // Если сумма не найдена, смотрим в следующей строке
+                        if (amount == null && i + 1 < pdfLines.size) {
+                            amount = findAmountInString(pdfLines[i + 1])
+                            if (amount != null) {
+                                description += " " + pdfLines[i + 1]
+                                i++ // Увеличиваем индекс, так как используем следующую строку
+                            }
+                        }
+                        
+                        // Смотрим описание операции в следующих строках
+                        var j = i + 1
+                        while (j < pdfLines.size && j < i + 3) {
+                            val nextLine = pdfLines[j]
+                            
+                            // Проверяем, что строка не содержит другую дату операции
+                            if ("\\d{2}\\.\\d{2}\\.\\d{4}\\s+\\d{2}:\\d{2}".toRegex().find(nextLine) == null) {
+                                // Проверяем, содержит ли строка полезную информацию для описания
+                                if (nextLine.contains("перевод", ignoreCase = true) || 
+                                    nextLine.contains("договора", ignoreCase = true) || 
+                                    nextLine.contains("номеру", ignoreCase = true) ||
+                                    nextLine.contains("внутрибанк", ignoreCase = true) ||
+                                    nextLine.contains("внешний", ignoreCase = true) ||
+                                    nextLine.contains("телефона", ignoreCase = true)) {
+                                    description += " " + nextLine
+                                    i = j // Обновляем текущий индекс
+                                }
+                            } else {
+                                // Если нашли следующую дату операции, прекращаем поиск
+                                break
+                            }
+                            j++
+                        }
+                        
+                        // Ищем номер карты в описании
+                        cardNumber = extractCardNumber(description)
+                        
+                        // Если нашли сумму, создаем транзакцию
+                        if (amount != null) {
+                            saveTransaction(transactions, date, amount, description, source, cardNumber)
+                        }
+                    }
+                } else {
+                    // Традиционный поиск даты в формате dd.MM.yyyy
+                    val dateMatch = dateRegex.find(line)
+                    if (dateMatch != null) {
+                        val dateStr = dateMatch.value
+                        val date = parseDate(dateStr)
+                        
+                        if (date != null) {
+                            // Ищем сумму в текущей строке
+                            val amount = findAmountInString(line)
+                            if (amount != null) {
+                                val description = line
+                                val cardNumber = extractCardNumber(line)
+                                saveTransaction(transactions, date, amount, description, source, cardNumber)
+                            }
+                        }
+                    }
+                }
+                
+                i++
+            }
+            
+            Timber.d("Парсинг справки завершен, найдено транзакций: ${transactions.size}")
+            
+            // Если не нашли ни одной транзакции, попробуем другой метод
+            if (transactions.isEmpty()) {
+                Timber.d("Транзакции не найдены, используем альтернативный метод парсинга")
+                return parseStatementWithoutHeaders(pdfLines, source, tableHeaderIndex + 1)
+            }
+            
+            // Если нашли транзакции, проверяем их даты с учетом периода выписки
+            if (startPeriodDate != null && endPeriodDate != null) {
+                transactions.removeIf { transaction ->
+                    val transactionDate = transaction.date.time
+                    val isOutsidePeriod = transactionDate < startPeriodDate.time || transactionDate > endPeriodDate.time
+                    if (isOutsidePeriod) {
+                        Timber.w("Удалена транзакция вне периода выписки: ${transaction.date}, сумма: ${transaction.amount}")
+                    }
+                    isOutsidePeriod
+                }
             }
             
             return transactions
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при парсинге справки о движении средств: ${e.message}")
+            // В случае ошибки возвращаем пустой список
+            return transactions
         }
-        
-        // Ищем индекс конца таблицы (если есть такие маркеры)
-        val tableEndIndex = pdfLines.subList(tableStartIndex + 1, pdfLines.size).indexOfFirst { line ->
-            tableEndRegex.find(line) != null
-        }.let { if (it == -1) pdfLines.size else tableStartIndex + 1 + it }
-        
-        Timber.d("Таблица операций: начало=${tableStartIndex}, конец=${tableEndIndex}")
-        
-        // Находим период выписки для дополнительной проверки дат
-        val periodMatch = pdfLines.joinToString(" ").let { periodRegex.find(it) }
-        val startPeriodDate = periodMatch?.groupValues?.getOrNull(1)?.let { parseDate(it) }
-        val endPeriodDate = periodMatch?.groupValues?.getOrNull(2)?.let { parseDate(it) }
-        
-        Timber.d("Период выписки: с ${startPeriodDate?.toString() ?: "неизвестно"} по ${endPeriodDate?.toString() ?: "неизвестно"}")
-        
-        // Начинаем обработку строк после заголовка таблицы, пропуская сам заголовок
-        var currentIndex = tableStartIndex + 1
-        var inTransactionEntry = false
-        var transactionDate: Date? = null
-        var transactionAmount: Pair<Double, Boolean>? = null
-        var transactionDescription = ""
-        var transactionCardNumber: String? = null
-        
-        // Пропускаем заголовки столбцов и подзаголовки, если они есть
-        while (currentIndex < tableEndIndex) {
-            val line = pdfLines[currentIndex]
-            
-            // Пропускаем пустые строки и заголовки
-            if (line.isBlank() || 
-                line.contains("Номер карты", ignoreCase = true) || 
-                line.contains("Дата списания", ignoreCase = true) ||
-                line.contains("№ п/п", ignoreCase = true)) {
-                currentIndex++
-                continue
-            }
-            
-            // Прерываем обработку, если дошли до конца таблицы
-            if (tableEndRegex.find(line) != null) {
-                break
-            }
-            
-            // Проверяем, содержит ли строка дату операции (начало новой записи)
-            val dateMatch = dateRegex.find(line)
-            
-            if (dateMatch != null) {
-                // Если уже обрабатывали транзакцию, сохраняем предыдущую
-                if (inTransactionEntry && transactionDate != null && transactionAmount != null) {
-                    saveTransaction(transactions, transactionDate, transactionAmount, transactionDescription, source, transactionCardNumber)
-                }
-                
-                // Начинаем новую запись транзакции
-                inTransactionEntry = true
-                transactionDate = parseDate(dateMatch.value)
-                transactionDescription = line
-                transactionAmount = findAmountInString(line)
-                transactionCardNumber = extractCardNumber(line)
-                
-                currentIndex++
-                continue
-            }
-            
-            // Если обрабатываем транзакцию, добавляем текущую строку к описанию
-            if (inTransactionEntry) {
-                transactionDescription += " " + line
-                
-                // Если еще не нашли сумму, ищем в текущей строке
-                if (transactionAmount == null) {
-                    transactionAmount = findAmountInString(line)
-                }
-                
-                // Если еще не нашли номер карты, ищем в текущей строке
-                if (transactionCardNumber == null) {
-                    transactionCardNumber = extractCardNumber(line)
-                }
-            } else {
-                // Если не в режиме транзакции, проверяем, может это начало новой транзакции без даты
-                val amountInLine = findAmountInString(line)
-                if (amountInLine != null) {
-                    // Возможно это строка транзакции без даты, используем дату периода
-                    inTransactionEntry = true
-                    transactionDate = endPeriodDate // Используем дату конца периода как приблизительную
-                    transactionDescription = line
-                    transactionAmount = amountInLine
-                    transactionCardNumber = extractCardNumber(line)
-                }
-            }
-            
-            currentIndex++
-        }
-        
-        // Сохраняем последнюю транзакцию, если есть и еще не сохранена
-        if (inTransactionEntry && transactionDate != null && transactionAmount != null) {
-            saveTransaction(transactions, transactionDate, transactionAmount, transactionDescription, source, transactionCardNumber)
-        }
-        
-        // Дополнительная проверка: все даты должны быть в пределах периода выписки
-        if (startPeriodDate != null && endPeriodDate != null) {
-            transactions.removeIf { transaction ->
-                val transactionDateVal = transaction.date.time
-                val isOutsidePeriod = transactionDateVal < startPeriodDate.time || transactionDateVal > endPeriodDate.time
-                if (isOutsidePeriod) {
-                    Timber.w("Удалена транзакция вне периода выписки: ${transaction.date}, сумма: ${transaction.amount}")
-                }
-                isOutsidePeriod
-            }
-        }
-        
-        Timber.d("Всего найдено транзакций в справке о движении средств: ${transactions.size}")
-        return transactions
     }
     
     /**
@@ -549,21 +570,31 @@ class TBankPdfImportUseCase(
      * Проверяет, что PDF-файл является выпиской Т-Банка
      */
     private fun isValidTBankStatement(text: String): Boolean {
-        // Проверяем наличие ключевых слов, характерных для выписки Т-Банка
-        val isRegularStatement = (text.contains("Т-Банк", ignoreCase = true) || 
-                text.contains("Tinkoff", ignoreCase = true) || 
-                text.contains("Тинькофф", ignoreCase = true)) &&
-               (text.contains("выписка", ignoreCase = true) ||
-                text.contains("операции", ignoreCase = true) ||
-                text.contains("движение средств", ignoreCase = true)) &&
-               text.contains("дата", ignoreCase = true) &&
-               text.contains("сумма", ignoreCase = true)
+        // Проверяем присутствие типичных маркеров выписки Т-Банка
+        val hasTBankMarkers = text.contains("Т-Банк", ignoreCase = true) ||
+                             text.contains("Тинькофф", ignoreCase = true) ||
+                             text.contains("Tinkoff", ignoreCase = true) ||
+                             text.contains("ТБАНК", ignoreCase = true) ||
+                             tbankHeaderRegex.containsMatchIn(text) ||
+                             tbankAddressRegex.containsMatchIn(text) ||
+                             tbankWebsiteRegex.containsMatchIn(text)
         
-        // Проверяем, является ли документ справкой о движении средств
-        val isStatementOfFunds = (statementHeaderRegex.find(text) != null || text.contains("Движение средств", ignoreCase = true)) &&
-                                  (periodRegex.find(text) != null || (text.contains("период", ignoreCase = true) && dateRegex.findAll(text).count() >= 2))
+        // Проверяем признаки справки о движении средств
+        val isStatementOfFunds = statementHeaderRegex.containsMatchIn(text) &&
+                                periodRegex.containsMatchIn(text)
         
-        return isRegularStatement || isStatementOfFunds
+        // Проверяем дополнительные признаки из выписки на скриншоте
+        val hasTransferDetails = transferTypeRegex.containsMatchIn(text) &&
+                               contractRegex.containsMatchIn(text)
+        
+        val hasOperationData = text.contains("Дата и время операции", ignoreCase = true) &&
+                             text.contains("Сумма операции", ignoreCase = true) &&
+                             text.contains("Номер карты", ignoreCase = true)
+        
+        Timber.d("Проверка выписки Т-Банка: маркеры=$hasTBankMarkers, справка=$isStatementOfFunds, " +
+                "детали переводов=$hasTransferDetails, данные операций=$hasOperationData")
+        
+        return hasTBankMarkers || isStatementOfFunds || hasTransferDetails || hasOperationData
     }
     
     /**
