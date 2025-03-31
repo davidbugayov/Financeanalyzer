@@ -32,9 +32,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
@@ -65,21 +62,6 @@ fun TransactionHistory(
 ) {
     // Используем фиксированный списочный стейт для улучшения управления скроллингом
     val listState = rememberLazyListState()
-    
-    // Наблюдаем за жизненным циклом для оптимизации обновлений
-    val lifecycleOwner = LocalLifecycleOwner.current
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            // Отключаем обновления, когда экран неактивен
-            if (event == Lifecycle.Event.ON_PAUSE) {
-                // Возможно выполнять действия по остановке ненужных операций
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
-    }
     
     // Кэшируем обновленные колбэки для предотвращения ненужных перерисовок
     val updateOnClick = rememberUpdatedState(onTransactionClick)
