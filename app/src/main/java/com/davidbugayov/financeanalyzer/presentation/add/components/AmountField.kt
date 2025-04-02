@@ -186,11 +186,25 @@ private fun formatAmount(input: String): String {
  * Преобразует отформатированную строку в объект Money
  */
 fun parseFormattedAmount(formattedAmount: String, currency: Currency = Currency.RUB): Money {
-    // Удаляем все пробелы и заменяем запятую на точку
-    val normalized = formattedAmount.replace(" ", "").replace(',', '.')
+    if (formattedAmount.isBlank()) {
+        return Money.zero(currency)
+    }
+    
+    // Удаляем все пробелы, символы валюты и заменяем запятую на точку
+    val normalized = formattedAmount
+        .replace("₽", "")
+        .replace("$", "")
+        .replace("€", "")
+        .replace(" ", "")
+        .replace(',', '.')
+        .trim()
     
     return try {
-        Money(normalized, currency)
+        if (normalized.matches(Regex("""^\d+(\.\d+)?$"""))) {
+            Money(normalized, currency)
+        } else {
+            Money.zero(currency)
+        }
     } catch (e: NumberFormatException) {
         Money.zero(currency)
     }

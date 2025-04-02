@@ -28,12 +28,14 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
@@ -45,6 +47,11 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalLifecycleOwner
 
 /**
  * Главный экран приложения.
@@ -54,6 +61,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
+    addTransactionViewModel: com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel,
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit,
@@ -63,12 +71,16 @@ fun HomeScreen(
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
 
-    // Логируем открытие главного экрана
+    // Логируем открытие главного экрана и загружаем данные
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "home",
             screenClass = "HomeScreen"
         )
+        
+        // Загружаем данные при первом входе на экран
+        Timber.d("HomeScreen: начальная загрузка данных")
+        viewModel.onEvent(HomeEvent.LoadTransactions)
     }
 
     // Состояние для обратной связи
@@ -76,32 +88,44 @@ fun HomeScreen(
     var feedbackMessage by remember { mutableStateOf("") }
     var feedbackType by remember { mutableStateOf(FeedbackType.INFO) }
 
+    // Состояние для диалога действий с транзакцией
+    var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
+    var showActionsDialog by remember { mutableStateOf(false) }
+
     // Загружаем сохраненное состояние видимости GroupSummary
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
     var showGroupSummary by rememberSaveable {
         mutableStateOf(sharedPreferences.getBoolean("show_group_summary", true))
     }
 
-    // Загружаем транзакции при первом запуске
-    LaunchedEffect(key1 = Unit) {
-        // Запускаем в фоновом потоке с минимальной задержкой, чтобы UI успело отрисоваться
-        MainScope().launch(Dispatchers.IO) {
-            // Добавляем небольшую задержку, чтобы UI успело отрисоваться
-            delay(100)
-            // Загружаем данные
-            viewModel.onEvent(HomeEvent.LoadTransactions)
-            // Инициализируем состояние showGroupSummary в ViewModel из SharedPreferences
-            viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
-        }
-    }
-
-    // Сохраняем настройку при изменении
+    // Обновляем состояние showGroupSummary в ViewModel при его изменении
     LaunchedEffect(showGroupSummary) {
         sharedPreferences.edit {
             putBoolean("show_group_summary", showGroupSummary)
         }
         // Обновляем состояние в ViewModel
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
+    }
+
+    // Обновляем транзакции при возвращении на экран
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        Timber.d("HomeScreen: регистрируем обновление при навигации")
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                // Timber.d("HomeScreen: обновление при возвращении на экран (ON_RESUME) - ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ УМЕНЬШЕНИЯ МЕРЦАНИЯ")
+                // MainScope().launch {
+                    // Добавляем задержку для корректной синхронизации с базой данных
+                    // delay(150)
+                    // viewModel.onEvent(HomeEvent.LoadTransactions)
+                // }
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
     }
 
     Scaffold(
@@ -161,9 +185,13 @@ fun HomeScreen(
                     onShowGroupSummaryChange = { showGroupSummary = it },
                     onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
                     onNavigateToHistory = onNavigateToHistory,
-                    onTransactionClick = { },
+                    onTransactionClick = { transaction ->
+                        selectedTransaction = transaction
+                        showActionsDialog = true
+                    },
                     onTransactionLongClick = { transaction ->
-                        viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
+                        selectedTransaction = transaction
+                        showActionsDialog = true
                     }
                 )
             } else {
@@ -174,9 +202,13 @@ fun HomeScreen(
                     onShowGroupSummaryChange = { showGroupSummary = it },
                     onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
                     onNavigateToHistory = onNavigateToHistory,
-                    onTransactionClick = { },
+                    onTransactionClick = { transaction ->
+                        selectedTransaction = transaction
+                        showActionsDialog = true
+                    },
                     onTransactionLongClick = { transaction ->
-                        viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
+                        selectedTransaction = transaction
+                        showActionsDialog = true
                     }
                 )
             }
@@ -214,6 +246,28 @@ fun HomeScreen(
                 CenteredLoadingIndicator(
                     message = stringResource(R.string.loading_data),
                     modifier = Modifier
+                )
+            }
+
+            // Диалог действий с транзакцией (удаление/редактирование)
+            if (showActionsDialog && selectedTransaction != null) {
+                TransactionActionsDialog(
+                    transaction = selectedTransaction!!,
+                    onDismiss = { showActionsDialog = false },
+                    onDelete = { transaction ->
+                        showActionsDialog = false
+                        viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
+                    },
+                    onEdit = { transaction ->
+                        showActionsDialog = false
+                        // Загружаем транзакцию в ViewModel для редактирования
+                        addTransactionViewModel.loadTransactionForEditing(transaction)
+                        // Переходим на экран добавления/редактирования
+                        onNavigateToAdd()
+                        feedbackMessage = "Редактирование транзакции"
+                        feedbackType = FeedbackType.INFO
+                        showFeedback = true
+                    }
                 )
             }
 

@@ -145,6 +145,7 @@ fun MainScreen(startDestination: String = "home") {
                 ) {
                     HomeScreen(
                         viewModel = homeViewModel,
+                        addTransactionViewModel = addTransactionViewModel,
                         onNavigateToHistory = { navController.navigate(Screen.History.route) },
                         onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
                         onNavigateToChart = { navController.navigate(Screen.Chart.route) },
@@ -201,7 +202,14 @@ fun MainScreen(startDestination: String = "home") {
                 ) {
                     TransactionHistoryScreen(
                         viewModel = koinViewModel<TransactionHistoryViewModel>(),
-                        onNavigateBack = { navController.navigateUp() }
+                        onNavigateBack = { navController.navigateUp() },
+                        onNavigateToEdit = { transaction ->
+                            // Сохраним выбранную транзакцию в ViewModel
+                            addTransactionViewModel.loadTransactionForEditing(transaction)
+                            
+                            // Навигация к экрану добавления/редактирования
+                            navController.navigate(Screen.AddTransaction.route)
+                        }
                     )
                 }
                 

@@ -15,6 +15,8 @@ import java.util.Date
  * Диалог выбора даты.
  *
  * @param initialDate Начальная дата для отображения в календаре
+ * @param limitDate Ограничение для выбора даты (для диапазона дат)
+ * @param isStartDate Является ли дата начальной в диапазоне (для определения ограничений)
  * @param onDateSelected Callback, вызываемый при выборе даты
  * @param onDismiss Callback, вызываемый при закрытии диалога
  */
@@ -22,6 +24,8 @@ import java.util.Date
 @Composable
 fun DatePickerDialog(
     initialDate: Date,
+    limitDate: Date? = null,
+    isStartDate: Boolean = true,
     onDateSelected: (Date) -> Unit,
     onDismiss: () -> Unit
 ) {

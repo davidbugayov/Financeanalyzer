@@ -27,7 +27,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
  * Компонент для отображения заголовка списка транзакций.
  *
  * @param currentFilter Текущий фильтр транзакций
- * @param showGroupSummary Флаг отображения сводки по группе
+ * @param showGroupSummary Флаг отображения сводки
  * @param onShowGroupSummaryChange Callback, вызываемый при изменении флага отображения сводки
  * @param onShowAllClick Callback, вызываемый при нажатии на кнопку "Все"
  */
@@ -45,6 +45,7 @@ fun HomeTransactionsHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Прямой вызов stringResource для получения текста заголовка
         Text(
             text = when (currentFilter) {
                 TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
@@ -59,7 +60,6 @@ fun HomeTransactionsHeader(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            // Кнопка для управления видимостью сводки
             IconButton(
                 onClick = { onShowGroupSummaryChange(!showGroupSummary) },
                 modifier = Modifier.size(32.dp)

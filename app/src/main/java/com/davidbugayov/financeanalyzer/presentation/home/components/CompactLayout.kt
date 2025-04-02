@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionItemWithActions
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import timber.log.Timber
 
 /**
  * Компактный макет для телефонов
@@ -78,12 +81,16 @@ fun CompactLayout(
 
         // Список транзакций теперь использует LazyColumn для виртуализации
         Box(modifier = Modifier.weight(1f)) {
+            // ЛОГИРОВАНИЕ: Проверяем состояние перед отображением списка/сообщения
+            Timber.d("CompactLayout: filteredTransactions.isEmpty=${state.filteredTransactions.isEmpty()}, isLoading=${state.isLoading}, filter=${state.currentFilter}")
+
+            // Если список отфильтрованных транзакций пуст И загрузка не идет, показываем сообщение
             if (state.filteredTransactions.isEmpty() && !state.isLoading) {
-                // Отображаем сообщение, если нет транзакций
+                Timber.d("CompactLayout: Отображаем сообщение 'Нет транзакций'") // ЛОГ
                 Box(
                     modifier = Modifier
-                        .fillMaxWidth()
-                        .height(150.dp),
+                        .fillMaxSize() // Заполняем все доступное пространство
+                        .padding(bottom = 100.dp), // Добавляем отступ снизу, чтобы сообщение не перекрывалось нижней панелью
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -92,18 +99,23 @@ fun CompactLayout(
                             TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
                             TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
                         },
-                        color = Color.Gray
+                        color = Color.Gray,
+                        style = MaterialTheme.typography.bodyLarge,
+                        textAlign = TextAlign.Center // Центрируем текст
                     )
                 }
             } else {
-                // Используем LazyColumn для списка транзакций
+                // Иначе (если есть транзакции ИЛИ идет загрузка), показываем LazyColumn
+                Timber.d("CompactLayout: Отображаем LazyColumn (список транзакций или индикатор загрузки)") // ЛОГ
                 val lazyListState = rememberLazyListState()
                 
                 LazyColumn(
                     state = lazyListState,
                     modifier = Modifier.fillMaxSize()
                 ) {
-                    // Добавляем сводку как первый элемент списка, если она нужна
+                    // Удаляем хинт для noTransactionsForPeriod, так как он больше не нужен
+                    
+                    // Добавляем сводку как первый элемент списка, если она нужна и есть транзакции
                     if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
                         item {
                             HomeGroupSummary(
@@ -119,7 +131,7 @@ fun CompactLayout(
                         items = state.filteredTransactions,
                         key = { it.id } // Используем уникальный ID как ключ для лучшей производительности
                     ) { transaction ->
-                        TransactionItemWithActions(
+                        TransactionItem(
                             transaction = transaction,
                             onClick = onTransactionClick,
                             onLongClick = onTransactionLongClick

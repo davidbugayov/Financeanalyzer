@@ -60,6 +60,7 @@
     <string name="no_transactions_today">Нет транзакций за сегодня. Добавьте новую!</string>
     <string name="no_transactions_week">Нет транзакций за неделю. Добавьте новую!</string>
     <string name="no_transactions_month">Нет транзакций за месяц. Добавьте новую!</string>
+    <string name="showing_last_transactions">Показаны последние транзакции.</string>
     
     <!-- Экран истории -->
     <string name="history_title">История транзакций</string>
@@ -127,6 +128,7 @@
     <string name="confirm">Подтвердить</string>
     <string name="success">Успешно</string>
     <string name="transaction_added_successfully">Транзакция успешно добавлена</string>
+    <string name="transaction_updated_successfully">Транзакция успешно изменена</string>
     <string name="add_another">Добавить еще</string>
     <string name="done">Готово</string>
     <string name="cancel_transaction">Отменить транзакцию</string>

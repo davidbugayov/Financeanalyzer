@@ -1,10 +1,12 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -13,17 +15,20 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionItemWithActions
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import timber.log.Timber
 
 /**
  * Расширенный макет для планшетов
@@ -80,10 +85,16 @@ fun ExpandedLayout(
 
             // Список транзакций
             Box(modifier = Modifier.weight(1f)) {
+                // ЛОГИРОВАНИЕ: Проверяем состояние перед отображением списка/сообщения
+                Timber.d("ExpandedLayout: filteredTransactions.isEmpty=${state.filteredTransactions.isEmpty()}, isLoading=${state.isLoading}, filter=${state.currentFilter}")
+                
+                // Если список отфильтрованных транзакций пуст И загрузка не идет, показываем сообщение
                 if (state.filteredTransactions.isEmpty() && !state.isLoading) {
-                    // Отображаем сообщение, если нет транзакций
+                    Timber.d("ExpandedLayout: Отображаем сообщение 'Нет транзакций'") // ЛОГ
                     Box(
-                        modifier = Modifier.fillMaxSize(),
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 100.dp), // Добавляем отступ снизу
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
@@ -92,18 +103,21 @@ fun ExpandedLayout(
                                 TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
                                 TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
                             },
-                            color = Color.Gray
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center // Центрируем текст
                         )
                     }
                 } else {
-                    // Используем LazyColumn для эффективного скроллинга
+                    // Иначе (если есть транзакции ИЛИ идет загрузка), показываем LazyColumn
+                    Timber.d("ExpandedLayout: Отображаем LazyColumn (список транзакций или индикатор загрузки)") // ЛОГ
                     val lazyListState = rememberLazyListState()
                     
                     LazyColumn(
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        // Добавляем сводку как первый элемент списка, если она нужна
+                        // Добавляем сводку по группам, если она нужна и есть транзакции
                         if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
                             item {
                                 HomeGroupSummary(
@@ -114,20 +128,22 @@ fun ExpandedLayout(
                             }
                         }
                         
+                        // Добавляем транзакции с виртуализацией
                         items(
                             items = state.filteredTransactions,
-                            key = { it.id } // Используем уникальный ID как ключ для лучшей производительности
+                            key = { it.id }
                         ) { transaction ->
-                            TransactionItemWithActions(
+                            TransactionItem(
                                 transaction = transaction,
                                 onClick = onTransactionClick,
                                 onLongClick = onTransactionLongClick
                             )
                             Spacer(modifier = Modifier.height(8.dp))
                         }
-                        // Добавляем пространство внизу для нижней панели
+                        
+                        // Добавляем большой отступ внизу для нижней панели навигации
                         item {
-                            Spacer(modifier = Modifier.height(120.dp))
+                            Spacer(modifier = Modifier.height(140.dp))
                         }
                     }
                 }

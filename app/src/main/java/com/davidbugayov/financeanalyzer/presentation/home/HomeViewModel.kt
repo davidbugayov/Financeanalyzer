@@ -64,9 +64,6 @@ class HomeViewModel(
     init {
         Timber.d("HomeViewModel initialized")
         loadTransactions()
-
-        // TODO: УДАЛИТЬ ПЕРЕД РЕЛИЗОМ - Тестовый код для проверки Crashlytics
-        // testCrashlytics()
         subscribeToEvents()
         
         // Наблюдаем за изменениями балансов
@@ -99,7 +96,24 @@ class HomeViewModel(
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SetFilter -> {
-                _state.update { it.copy(currentFilter = event.filter) }
+                Timber.d("Устанавливаем новый фильтр: ${event.filter}")
+                // Очищаем кэш перед сменой фильтра
+                clearCaches()
+                // Немедленно обновляем фильтр, ставим isLoading = true и очищаем старый список
+                _state.update { 
+                    it.copy(
+                        currentFilter = event.filter, 
+                        isLoading = true, // Показываем загрузку СРАЗУ
+                        filteredTransactions = emptyList(), // Очищаем старый список СРАЗУ
+                        transactionGroups = emptyList(), // Очищаем группы тоже
+                        // Сбрасываем статистику для фильтра
+                        filteredIncome = Money.zero(),
+                        filteredExpense = Money.zero(),
+                        filteredBalance = Money.zero()
+                    ) 
+                }
+                // Запускаем обновление отфильтрованных транзакций в фоне
+                // Эта функция позже установит isLoading = false
                 updateFilteredTransactions()
             }
             is HomeEvent.LoadTransactions -> {
@@ -171,12 +185,37 @@ class HomeViewModel(
             Timber.d("Subscribing to transaction events")
             eventBus.events.collect { event ->
                 when (event) {
-                    is Event.TransactionAdded,
-                    is Event.TransactionDeleted,
-                    is Event.TransactionUpdated -> {
+                    is Event.TransactionAdded -> {
+                        Timber.d("Получено событие TransactionAdded")
                         // Очищаем кэши при изменении данных
                         clearCaches()
                         loadTransactions()
+                    }
+                    is Event.TransactionDeleted -> {
+                        Timber.d("Получено событие TransactionDeleted")
+                        // Очищаем кэши при изменении данных
+                        clearCaches()
+                        loadTransactions()
+                    }
+                    is Event.TransactionUpdated -> {
+                        Timber.d("Получено событие TransactionUpdated in HomeViewModel")
+                        // Очищаем кэши при изменении данных
+                        clearCaches()
+                        Timber.d("Кэши очищены, запускаем полную перезагрузку данных")
+                        // Используем запуск в IO потоке для быстрого обновления
+                        viewModelScope.launch(Dispatchers.IO) {
+                            try {
+                                Timber.d("Начинаем загрузку данных после обновления транзакции")
+                                // Задержка для уверенности в обновлении базы данных
+                                delay(100)
+                                withContext(Dispatchers.Main) {
+                                    loadTransactions()
+                                }
+                                Timber.d("Данные успешно обновлены после редактирования транзакции")
+                            } catch (e: Exception) {
+                                Timber.e(e, "Ошибка при обновлении данных после редактирования: ${e.message}")
+                            }
+                        }
                     }
                 }
             }
@@ -214,31 +253,31 @@ class HomeViewModel(
      */
     private fun loadTransactions() {
         viewModelScope.launch {
-            Timber.d("Начинаем загрузку транзакций для домашнего экрана")
+            Timber.d("Начинаем загрузку транзакций для домашнего экрана (последние 60 дней)")
             _state.update { it.copy(isLoading = true) }
             
             try {
-                // Для оптимизации загружаем только текущий месяц
+                // Определяем диапазон дат: последние 60 дней
                 val calendar = Calendar.getInstance()
-                val currentYear = calendar.get(Calendar.YEAR)
-                val currentMonth = calendar.get(Calendar.MONTH) + 1 // +1 потому что MONTH начинается с 0
+                val endDate = calendar.time // Сегодня
+                calendar.add(Calendar.DAY_OF_YEAR, -60)
+                val startDate = calendar.time // 60 дней назад
                 
-                // Используем оптимизированный метод загрузки транзакций за текущий месяц
-                Timber.d("Загрузка транзакций за текущий месяц ($currentMonth/$currentYear)")
+                Timber.d("Загрузка транзакций с $startDate по $endDate")
                 
-                // Загрузка метрик из кэша без пересчета
+                // Загрузка метрик остается как есть (они считаются глобально)
                 val metrics = withContext(Dispatchers.IO) {
                     try {
                         val fm = FinancialMetrics.getInstance()
-                        fm.initializeMetricsFromCache() // Инициализация из кэша без пересчета
+                        fm.initializeMetricsFromCache() 
                         Triple(fm.getTotalIncome(), fm.getTotalExpense(), fm.getBalance())
                     } catch (e: Exception) {
                         Timber.e(e, "Ошибка при получении финансовых метрик: ${e.message}")
-                        Triple(0.0, 0.0, 0.0) // Доход, расход, баланс по умолчанию
+                        Triple(0.0, 0.0, 0.0) 
                     }
                 }
                 
-                // Обновляем метрики сразу, не дожидаясь загрузки транзакций
+                // Обновляем метрики сразу
                 _state.update { 
                     it.copy(
                         income = Money(metrics.first),
@@ -247,38 +286,37 @@ class HomeViewModel(
                     )
                 }
                 
-                // Загружаем транзакции за текущий месяц
+                // Загружаем транзакции за последние 60 дней
                 val transactions = withContext(Dispatchers.IO) {
                     try {
-                        Timber.d("Запрос транзакций за месяц $currentYear-$currentMonth")
-                        val result = repository.getTransactionsByMonth(currentYear, currentMonth)
-                        Timber.d("Получено ${result.size} транзакций за месяц $currentYear-$currentMonth")
-                        result
+                        Timber.d("Запрос транзакций за последние 60 дней")
+                        // Используем новый метод репозитория для получения СПИСКА транзакций по диапазону дат
+                        repository.getTransactionsByDateRangeList(startDate, endDate)
                     } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при загрузке транзакций за месяц: ${e.message}")
+                        Timber.e(e, "Ошибка при загрузке транзакций за диапазон дат: ${e.message}")
                         emptyList()
                     }
                 }
                 
                 // Обновляем состояние с загруженными транзакциями
-                Timber.d("Загружено ${transactions.size} транзакций за текущий месяц")
+                Timber.d("Загружено ${transactions.size} транзакций за последние 60 дней")
                 _state.update { 
                     it.copy(
-                        transactions = transactions,
+                        transactions = transactions, // Сохраняем ВСЕ загруженные транзакции (за 60 дней)
                         isLoading = false,
                         error = null
                     ) 
                 }
                 
-                // Если отсутствуют транзакции за текущий месяц, загружаем несколько последних
-                if (transactions.isEmpty()) {
-                    loadLastTransactions(5) // Загружаем последние 5 транзакций
-                }
+                // Убираем вызов loadLastTransactions(5), он больше не нужен
+                // if (transactions.isEmpty()) {
+                //    loadLastTransactions(5) 
+                // }
                 
-                // Подсчитываем и обновляем данные по категориям
+                // Подсчитываем и обновляем данные по категориям (на основе загруженных транзакций)
                 updateCategoryStats(transactions)
                 
-                // Обновляем отфильтрованные данные
+                // Обновляем отфильтрованные данные (сработает на основе нового полного списка transactions)
                 updateFilteredTransactions()
                 
             } catch (e: Exception) {
@@ -289,31 +327,6 @@ class HomeViewModel(
                         error = e.message ?: "Неизвестная ошибка" 
                     ) 
                 }
-            }
-        }
-    }
-
-    /**
-     * Загружает указанное количество последних транзакций
-     */
-    private fun loadLastTransactions(count: Int) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val transactions = repository.getTransactionsPaginated(count, 0)
-                
-                if (transactions.isNotEmpty()) {
-                    Timber.d("Загружено ${transactions.size} последних транзакций")
-                    withContext(Dispatchers.Main) {
-                        _state.update { 
-                            it.copy(
-                                transactions = transactions,
-                                isLoading = false
-                            ) 
-                        }
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке последних транзакций: ${e.message}")
             }
         }
     }
@@ -416,10 +429,24 @@ class HomeViewModel(
             val cacheKey = FilterCacheKey(
                 filter = currentState.currentFilter.toString()
             )
+            
+            // Определяем, есть ли транзакции за выбранный период
+            val filteredForPeriod = when (currentState.currentFilter) {
+                TransactionFilter.TODAY -> getTodayTransactions(currentState.transactions)
+                TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
+                TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
+            }
+            
+            // Логируем состояние для отладки
+            Timber.d("updateFilteredTransactions: filter=${currentState.currentFilter}, всего транзакций=${currentState.transactions.size}, " +
+                    "отфильтрованных=${filteredForPeriod.size}")
+            
+            // Определяем какие транзакции показывать - ТЕПЕРЬ ПРОСТО РЕЗУЛЬТАТ ФИЛЬТРАЦИИ
+            val filtered = filteredForPeriod
     
             // Проверяем кэш быстро без блокировки
             val cachedEntry = filteredTransactionsCache[cacheKey]
-            if (cachedEntry != null && cachedEntry.first.size == currentState.transactions.size) {
+            if (cachedEntry != null && cachedEntry.first.size == filtered.size) {
                 Timber.d("Используем кэшированные данные для отфильтрованных транзакций")
                 val filteredData = cachedEntry
                 
@@ -437,19 +464,6 @@ class HomeViewModel(
                 return@launch
             }
     
-            // Выполняем фильтрацию в фоновом потоке
-            Timber.d("Кэша нет, выполняем фильтрацию транзакций")
-            val filtered = when (currentState.currentFilter) {
-                TransactionFilter.TODAY -> getTodayTransactions(currentState.transactions)
-                TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
-                TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
-            }
-            
-            Timber.d("Отфильтровано ${filtered.size} транзакций")
-    
-            // Вычисляем статистику для отфильтрованных транзакций
-            Timber.d("Вычисляем статистику для отфильтрованных транзакций")
-            
             // Оптимизированный расчет статистики - за один проход по данным
             var income = 0.0
             var expense = 0.0
@@ -507,17 +521,20 @@ class HomeViewModel(
             // Обновляем состояние в основном потоке
             kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
                 _state.update {
+                    Timber.d("Обновляем состояние: filtered.size=${filtered.size}, filter=${it.currentFilter}")
+                    
                     it.copy(
                         filteredTransactions = filtered,
                         filteredIncome = filteredIncome,
                         filteredExpense = filteredExpense,
                         filteredBalance = filteredBalance,
-                        transactionGroups = groups
+                        transactionGroups = groups,
+                        isLoading = false // Снимаем флаг загрузки ЗДЕСЬ, после всех расчетов
                     )
                 }
             }
             
-            Timber.d("Обновление отфильтрованных транзакций завершено")
+            Timber.d("Обновление отфильтрованных транзакций завершено.")
         }
     }
 

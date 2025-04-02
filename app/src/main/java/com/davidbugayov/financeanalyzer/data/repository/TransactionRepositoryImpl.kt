@@ -676,4 +676,27 @@ class TransactionRepositoryImpl(
         // Делегируем вызов методу getTransactionsPaginated
         return getTransactionsPaginated(limit, offset)
     }
+
+    /**
+     * Получает список транзакций за указанный период (не Flow).
+     * Реализует метод из TransactionRepository.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Список транзакций.
+     */
+    override suspend fun getTransactionsByDateRangeList(
+        startDate: Date,
+        endDate: Date
+    ): List<Transaction> = withContext(Dispatchers.IO) {
+        try {
+            Timber.d("РЕПОЗИТОРИЙ: Загрузка списка транзакций по диапазону дат из DAO")
+            val entities = dao.getTransactionsByDateRange(startDate, endDate)
+            val transactions = entities.map { mapEntityToDomain(it) }
+            Timber.d("РЕПОЗИТОРИЙ: Загружено ${transactions.size} транзакций из DAO по диапазону дат")
+            return@withContext transactions
+        } catch (e: Exception) {
+            Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при загрузке списка транзакций по диапазону дат: ${e.message}")
+            throw e // Перебрасываем исключение для обработки выше
+        }
+    }
 } 

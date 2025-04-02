@@ -50,6 +50,17 @@ interface TransactionRepository {
     ): Flow<List<Transaction>>
 
     /**
+     * Получает список транзакций за указанный период (не Flow).
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Список транзакций.
+     */
+    suspend fun getTransactionsByDateRangeList(
+        startDate: Date,
+        endDate: Date
+    ): List<Transaction>
+
+    /**
      * Получает транзакции за указанный месяц.
      * @param year Год.
      * @param month Месяц (1-12).

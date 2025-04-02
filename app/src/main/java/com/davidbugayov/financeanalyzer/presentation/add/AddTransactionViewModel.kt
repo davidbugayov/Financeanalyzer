@@ -6,9 +6,11 @@ import android.content.ComponentName
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.components.parseFormattedAmount
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionState
@@ -18,6 +20,7 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.davidbugayov.financeanalyzer.utils.Event
 import com.davidbugayov.financeanalyzer.utils.EventBus
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -33,6 +36,7 @@ import timber.log.Timber
 class AddTransactionViewModel(
     application: Application,
     private val addTransactionUseCase: AddTransactionUseCase,
+    private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val categoriesViewModel: CategoriesViewModel,
     private val preferencesManager: PreferencesManager
 ) : AndroidViewModel(application), KoinComponent {
@@ -112,6 +116,24 @@ class AddTransactionViewModel(
             }
             // Очищаем список использованных категорий
             usedCategories.clear()
+        }
+    }
+
+    /**
+     * Отправляет транзакцию (добавляет новую или обновляет существующую)
+     */
+    fun submitTransaction() {
+        if (!validateInput()) {
+            return
+        }
+        
+        // Если мы в режиме редактирования и у нас есть транзакция для редактирования
+        val currentState = _state.value
+        if (currentState.editMode && currentState.transactionToEdit != null) {
+            val transactionToEdit = currentState.transactionToEdit
+            updateTransaction(transactionToEdit)
+        } else {
+            addTransaction()
         }
     }
 
@@ -297,15 +319,24 @@ class AddTransactionViewModel(
     }
 
     private fun validateInput(): Boolean {
-        // Используем parseFormattedAmount для преобразования строки в Money
-        val money = parseFormattedAmount(_state.value.amount)
+        var money = Money.zero()
         
-        val hasErrors = money.isZero() || _state.value.category.isBlank()
+        try {
+            // Используем parseFormattedAmount для преобразования строки в Money
+            money = parseFormattedAmount(_state.value.amount)
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при парсинге суммы: ${_state.value.amount}")
+        }
+        
+        val hasInvalidAmount = money.isZero() || _state.value.amount.isBlank()
+        val hasInvalidCategory = _state.value.category.isBlank()
+        
+        val hasErrors = hasInvalidAmount || hasInvalidCategory
 
         _state.update {
             it.copy(
-                amountError = money.isZero(),
-                categoryError = _state.value.category.isBlank()
+                amountError = hasInvalidAmount,
+                categoryError = hasInvalidCategory
             )
         }
 
@@ -531,6 +562,99 @@ class AddTransactionViewModel(
 
             // Логируем удаление источника
             AnalyticsUtils.logSourceDeleted(source)
+        }
+    }
+
+    /**
+     * Загружает транзакцию для редактирования
+     */
+    fun loadTransactionForEditing(transaction: Transaction) {
+        // Преобразуем сумму в строку с правильным форматированием для поля ввода
+        // Используем абсолютное значение суммы, чтобы не было знака минус перед расходами
+        val amount = Math.abs(transaction.amount)
+        val formattedAmount = String.format("%.0f", amount)
+        
+        _state.update {
+            it.copy(
+                amount = formattedAmount,
+                category = transaction.category,
+                isExpense = transaction.isExpense,
+                selectedDate = transaction.date,
+                note = transaction.note ?: "",
+                source = transaction.source ?: "Сбер",
+                sourceColor = it.sources.find { source -> source.name == transaction.source }?.color ?: ColorUtils.SBER_COLOR,
+                editMode = true,
+                transactionToEdit = transaction
+            )
+        }
+    }
+
+    /**
+     * Обновляет существующую транзакцию
+     */
+    fun updateTransaction(transaction: Transaction) {
+        if (!validateInput()) {
+            return
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(isLoading = true) }
+            
+            try {
+                // Преобразуем строку в объект Money
+                val money = parseFormattedAmount(_state.value.amount)
+                
+                // Создаем обновленную транзакцию с сохранением id
+                val updatedTransaction = Transaction(
+                    id = transaction.id,
+                    amount = money.amount.toDouble(),
+                    category = _state.value.category,
+                    isExpense = _state.value.isExpense,
+                    date = _state.value.selectedDate,
+                    note = _state.value.note.ifBlank { null },
+                    source = _state.value.source.ifBlank { "Сбер" }
+                )
+
+                // Вызываем use case для обновления транзакции
+                updateTransactionUseCase(updatedTransaction)
+
+                // Увеличиваем счетчик использования категории
+                categoriesViewModel.incrementCategoryUsage(_state.value.category, _state.value.isExpense)
+
+                // Логируем обновление транзакции в аналитику
+                AnalyticsUtils.logEvent(
+                    eventName = "transaction_updated",
+                    params = mapOf(
+                        "type" to if (_state.value.isExpense) "expense" else "income",
+                        "amount" to money.amount.toString(),
+                        "category" to _state.value.category
+                    )
+                )
+                
+                _state.update { it.copy(isSuccess = true) }
+
+                // Добавляем задержку, чтобы база данных успела обновиться
+                Timber.d("Ожидаем обновления базы данных перед отправкой события...")
+                delay(250)
+                
+                // Уведомляем другие компоненты об обновлении транзакции
+                Timber.d("Отправляем событие TransactionUpdated: ${updatedTransaction.id} - ${updatedTransaction.category} (${updatedTransaction.amount})")
+                EventBus.emit(Event.TransactionUpdated)
+                Timber.d("Событие TransactionUpdated успешно отправлено")
+
+                // Обновляем виджеты баланса
+                updateBalanceWidget()
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message) }
+
+                // Логируем ошибку в аналитику
+                AnalyticsUtils.logError(
+                    errorType = "transaction_update_error",
+                    errorMessage = e.message ?: "Unknown error"
+                )
+            } finally {
+                _state.update { it.copy(isLoading = false) }
+            }
         }
     }
 } 

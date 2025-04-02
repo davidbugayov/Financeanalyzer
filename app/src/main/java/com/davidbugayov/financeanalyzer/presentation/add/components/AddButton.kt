@@ -23,6 +23,7 @@ import com.davidbugayov.financeanalyzer.R
 fun AddButton(
     onClick: () -> Unit,
     color: Color,
+    text: String? = null,
     modifier: Modifier = Modifier
 ) {
     Button(
@@ -37,7 +38,7 @@ fun AddButton(
         )
     ) {
         Text(
-            text = stringResource(R.string.add_button),
+            text = text ?: stringResource(R.string.add_button),
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold
         )

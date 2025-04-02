@@ -36,6 +36,7 @@ import java.util.Locale
  * @param onPeriodSelected Callback, вызываемый при выборе периода
  * @param onStartDateClick Callback, вызываемый при нажатии на поле начальной даты
  * @param onEndDateClick Callback, вызываемый при нажатии на поле конечной даты
+ * @param onConfirm Callback, вызываемый при подтверждении выбора произвольного периода
  * @param onDismiss Callback, вызываемый при закрытии диалога
  */
 @Composable
@@ -46,6 +47,7 @@ fun PeriodSelectionDialog(
     onPeriodSelected: (PeriodType) -> Unit,
     onStartDateClick: () -> Unit,
     onEndDateClick: () -> Unit,
+    onConfirm: () -> Unit = {},
     onDismiss: () -> Unit
 ) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -140,8 +142,21 @@ fun PeriodSelectionDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.close))
+            if (selectedPeriod == PeriodType.CUSTOM) {
+                TextButton(onClick = onConfirm) {
+                    Text(stringResource(R.string.apply))
+                }
+            } else {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.close))
+                }
+            }
+        },
+        dismissButton = {
+            if (selectedPeriod == PeriodType.CUSTOM) {
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
             }
         }
     )

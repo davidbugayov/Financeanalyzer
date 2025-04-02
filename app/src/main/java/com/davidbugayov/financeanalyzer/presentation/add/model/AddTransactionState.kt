@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.add.model
 
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.util.Date
 
 /**
@@ -36,5 +37,7 @@ data class AddTransactionState(
     val categoryToDelete: String? = null,
     val sourceToDelete: String? = null,
     val showDeleteCategoryConfirmDialog: Boolean = false,
-    val showDeleteSourceConfirmDialog: Boolean = false
+    val showDeleteSourceConfirmDialog: Boolean = false,
+    val editMode: Boolean = false,
+    val transactionToEdit: Transaction? = null
 ) 

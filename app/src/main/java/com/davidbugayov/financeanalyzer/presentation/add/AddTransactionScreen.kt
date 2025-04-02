@@ -89,7 +89,10 @@ fun AddTransactionScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.add_transaction),
+                title = if (state.editMode) 
+                    "Редактирование транзакции"
+                else 
+                    stringResource(R.string.add_transaction),
                 showBackButton = true,
                 onBackClick = {
                     if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
@@ -210,7 +213,13 @@ fun AddTransactionScreen(
 
                 // Кнопка добавления
                 AddButton(
-                    onClick = { viewModel.onEvent(AddTransactionEvent.Submit) },
+                    onClick = { 
+                        viewModel.submitTransaction()
+                    },
+                    text = if (state.editMode) 
+                        "Сохранить"
+                    else 
+                        "Добавить",
                     color = currentColor
                 )
 
@@ -270,7 +279,8 @@ fun AddTransactionScreen(
                     },
                     onAddAnother = {
                         viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
-                    }
+                    },
+                    isEditMode = state.editMode
                 )
             }
 

@@ -10,12 +10,20 @@ import com.davidbugayov.financeanalyzer.R
 @Composable
 fun SuccessDialog(
     onDismiss: () -> Unit,
-    onAddAnother: () -> Unit
+    onAddAnother: () -> Unit,
+    isEditMode: Boolean = false
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.success)) },
-        text = { Text(text = stringResource(R.string.transaction_added_successfully)) },
+        text = { 
+            Text(
+                text = stringResource(
+                    if (isEditMode) R.string.transaction_updated_successfully 
+                    else R.string.transaction_added_successfully
+                )
+            ) 
+        },
         confirmButton = {
             TextButton(onClick = onAddAnother) {
                 Text(text = stringResource(R.string.add_another))

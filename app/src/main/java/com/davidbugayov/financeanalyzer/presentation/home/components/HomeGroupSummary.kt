@@ -21,6 +21,8 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.math.BigDecimal
 
 /**
@@ -36,9 +38,9 @@ fun HomeGroupSummary(
     totalIncome: Money,
     totalExpense: Money
 ) {
-    // Определяем цвета для доходов и расходов
-    val incomeColor = Color(0xFF2E7D32) // Темно-зеленый для доходов
-    val expenseColor = Color(0xFFB71C1C) // Темно-красный для расходов
+    // Определяем цвета для доходов и расходов из темы
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
     
     // Вычисляем баланс
     val balance = totalIncome - totalExpense
@@ -76,7 +78,7 @@ fun HomeGroupSummary(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = totalIncome.formatted(false),
+                    text = "+" + totalIncome.abs().formatted(false),
                     fontSize = 14.sp,
                     color = incomeColor,
                     fontWeight = FontWeight.Bold
@@ -95,7 +97,7 @@ fun HomeGroupSummary(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = totalExpense.formatted(false),
+                    text = "-" + totalExpense.abs().formatted(false),
                     fontSize = 14.sp,
                     color = expenseColor,
                     fontWeight = FontWeight.Bold
@@ -114,8 +116,13 @@ fun HomeGroupSummary(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
+                val balanceText = if (balance.amount >= BigDecimal.ZERO) {
+                    "+" + balance.abs().formatted(false)
+                } else {
+                    "-" + balance.abs().formatted(false)
+                }
                 Text(
-                    text = balance.formatted(false),
+                    text = balanceText,
                     fontSize = 14.sp,
                     color = balanceColor,
                     fontWeight = FontWeight.Bold
@@ -150,8 +157,16 @@ fun HomeGroupSummary(
                                 overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
                                 modifier = Modifier.weight(1f)
                             )
+                            
+                            // Добавляем знак + или - в зависимости от типа транзакции
+                            val formattedAmount = if (isExpense) {
+                                "-" + group.total.abs().formatted(false)
+                            } else {
+                                "+" + group.total.abs().formatted(false)
+                            }
+                            
                             Text(
-                                text = group.total.abs().formatted(false),
+                                text = formattedAmount,
                                 fontSize = 13.sp,
                                 color = if (isExpense) expenseColor else incomeColor,
                                 fontWeight = FontWeight.Medium
@@ -162,13 +177,13 @@ fun HomeGroupSummary(
                     // Если групп больше 5, показываем сообщение о том, что есть еще группы
                     if (groups.size > 5) {
                         Text(
-                            text = "И еще ${groups.size - 5} ${if ((groups.size - 5) % 10 == 1 && (groups.size - 5) % 100 != 11) "категория" else if ((groups.size - 5) % 10 in 2..4 && (groups.size - 5) % 100 !in 12..14) "категории" else "категорий"}",
+                            text = "И ещё ${groups.size - 5} элементов",
                             fontSize = 12.sp,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(top = 4.dp)
+                                .padding(top = 4.dp),
+                            fontWeight = FontWeight.Light
                         )
                     }
                 }
