@@ -18,7 +18,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
  */
 @Database(
     entities = [TransactionEntity::class],
-    version = 9,
+    version = 11,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -205,6 +205,34 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 9 на версию 10
+         * Добавляет поле sourceColor в таблицу transactions
+         */
+        private val MIGRATION_9_10 = object : Migration(9, 10) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Добавляем колонку sourceColor с NULL значением по умолчанию
+                db.execSQL("ALTER TABLE transactions ADD COLUMN sourceColor INTEGER")
+                
+                // Обновляем цвета для стандартных источников
+                db.execSQL("UPDATE transactions SET sourceColor = 0xFF21A038 WHERE source = 'Сбер'")
+                db.execSQL("UPDATE transactions SET sourceColor = 0xFFFFDD2D WHERE source = 'Т-Банк'")
+                db.execSQL("UPDATE transactions SET sourceColor = 0xFFEF3124 WHERE source = 'Альфа'")
+            }
+        }
+
+        /**
+         * Миграция с версии 10 на версию 11
+         * Устанавливает значение для sourceColor по умолчанию, чтобы использовался метод getEffectiveSourceColor()
+         */
+        private val MIGRATION_10_11 = object : Migration(10, 11) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Устанавливаем значение по умолчанию 0 для всех записей
+                // Это заставит использовать логику метода getEffectiveSourceColor()
+                db.execSQL("UPDATE transactions SET sourceColor = 0 WHERE sourceColor IS NULL")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -229,7 +257,9 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_5_6,
                         MIGRATION_6_7,
                         MIGRATION_7_8,
-                        MIGRATION_8_9
+                        MIGRATION_8_9,
+                        MIGRATION_9_10,
+                        MIGRATION_10_11
                     )
                     .build()
                 INSTANCE = instance

@@ -361,7 +361,8 @@ class AddTransactionViewModel(
                     isExpense = _state.value.isExpense,
                     date = _state.value.selectedDate,
                     note = _state.value.note.ifBlank { null },
-                    source = _state.value.source.ifBlank { "Сбер" }
+                    source = _state.value.source.ifBlank { "Сбер" },
+                    sourceColor = _state.value.sourceColor
                 )
 
                 addTransactionUseCase(transaction)
@@ -612,7 +613,8 @@ class AddTransactionViewModel(
                     isExpense = _state.value.isExpense,
                     date = _state.value.selectedDate,
                     note = _state.value.note.ifBlank { null },
-                    source = _state.value.source.ifBlank { "Сбер" }
+                    source = _state.value.source.ifBlank { "Сбер" },
+                    sourceColor = _state.value.sourceColor
                 )
 
                 // Вызываем use case для обновления транзакции

@@ -1,20 +1,22 @@
 package com.davidbugayov.financeanalyzer.data.repository
 
+import android.annotation.SuppressLint
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
-import java.util.Date
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import java.util.Collections
-import kotlinx.coroutines.runBlocking
 import java.util.Calendar
+import java.util.Date
 
 /**
  * Реализация репозитория для работы с транзакциями.
@@ -604,8 +606,8 @@ class TransactionRepositoryImpl(
     }
     
     /**
-     * Преобразует сущность в доменную модель.
-     * @param entity Сущность транзакции.
+     * Создает доменную модель Transaction из сущности базы данных.
+     * @param entity Сущность базы данных.
      * @return Доменная модель транзакции.
      */
     private fun mapEntityToDomain(entity: TransactionEntity): Transaction {
@@ -616,7 +618,8 @@ class TransactionRepositoryImpl(
             date = entity.date,
             isExpense = entity.isExpense,
             note = entity.note,
-            source = entity.source
+            source = entity.source,
+            sourceColor = entity.sourceColor
         )
     }
     
@@ -639,7 +642,8 @@ class TransactionRepositoryImpl(
             date = domain.date,
             isExpense = domain.isExpense,
             note = domain.note,
-            source = domain.source ?: "Наличные"
+            source = domain.source,
+            sourceColor = domain.sourceColor
         )
     }
 

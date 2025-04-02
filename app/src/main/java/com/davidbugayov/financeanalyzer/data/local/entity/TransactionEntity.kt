@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.data.local.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.util.Date
 
 /**
@@ -18,45 +19,6 @@ data class TransactionEntity(
     val isExpense: Boolean,
     val date: Date,
     val note: String?,
-    val source: String = "Наличные"
-) {
-
-    /**
-     * Преобразует Entity в доменную модель
-     */
-    fun toDomain(): Transaction {
-        return Transaction(
-            id = id.toString(),
-            amount = amount.toDouble(),
-            category = category,
-            isExpense = isExpense,
-            date = date,
-            note = note,
-            source = source
-        )
-    }
-
-    companion object {
-
-        /**
-         * Преобразует доменную модель в Entity
-         */
-        fun fromDomain(transaction: Transaction): TransactionEntity {
-            val id = try {
-                transaction.id.toLong()
-            } catch (e: NumberFormatException) {
-                0L
-            }
-            
-            return TransactionEntity(
-                id = id,
-                amount = transaction.amount.toString(),
-                category = transaction.category,
-                isExpense = transaction.isExpense,
-                date = transaction.date,
-                note = transaction.note,
-                source = transaction.source ?: "Наличные"
-            )
-        }
-    }
-} 
+    val source: String = "Наличные",
+    val sourceColor: Int = 0
+)

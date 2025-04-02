@@ -5,6 +5,7 @@ import android.net.Uri
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
@@ -22,6 +23,7 @@ import kotlin.math.absoluteValue
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import timber.log.Timber
+import android.graphics.Color
 
 /**
  * Реализация импорта транзакций из PDF-выписки Т-Банка.
@@ -245,7 +247,8 @@ class TBankPdfImportUseCase(
                         date = date,
                         isExpense = isExpense,
                         note = note,
-                        source = source
+                        source = source,
+                        sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
                     )
                     
                     transactions.add(transaction)
@@ -552,13 +555,14 @@ class TBankPdfImportUseCase(
             }
             
             val transaction = Transaction(
-                id = "tbank_statement_${date.time}_${System.nanoTime()}",
+                id = "tbank_pdf_${date.time}_${System.nanoTime()}",
                 amount = amount,
                 category = category,
                 date = date,
                 isExpense = isExpense,
                 note = note,
-                source = source
+                source = source,
+                sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
             )
             
             transactions.add(transaction)

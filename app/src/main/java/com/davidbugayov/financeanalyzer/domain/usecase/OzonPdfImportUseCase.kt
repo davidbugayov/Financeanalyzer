@@ -21,6 +21,8 @@ import java.util.regex.Matcher
 import java.util.regex.Pattern
 import kotlin.math.absoluteValue
 import timber.log.Timber
+import android.graphics.Color
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
  * Реализация импорта транзакций из PDF-выписки Озон Банка.
@@ -347,7 +349,8 @@ class OzonPdfImportUseCase(
                             isExpense = isExpense,
                             date = date,
                             note = descriptionText.takeIf { it.isNotBlank() },
-                            source = source
+                            source = source,
+                            sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
                         )
                         
                         transactions.add(transaction)

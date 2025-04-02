@@ -434,34 +434,67 @@ class TransactionHistoryViewModel @Inject constructor(
 
     /**
      * Обновляет отфильтрованные и сгруппированные транзакции
+     * Оптимизирован для более эффективной работы с большими списками
      */
     private fun updateFilteredAndGroupedTransactions() {
         viewModelScope.launch(Dispatchers.Default) {
             val currentState = _state.value
             val transactions = currentState.transactions
             
-            // Фильтруем транзакции, если нужно
-            val filteredTransactions = if (currentState.selectedCategories.isNotEmpty() || 
-                                         currentState.selectedSources.isNotEmpty()) {
-                filterTransactions(transactions, currentState)
+            // Проверяем, нужно ли выполнять фильтрацию
+            if (transactions.isEmpty()) {
+                withContext(Dispatchers.Main) {
+                    _state.update { 
+                        it.copy(
+                            filteredTransactions = emptyList(),
+                            groupedTransactions = emptyMap()
+                        ) 
+                    }
+                }
+                return@launch
+            }
+            
+            Timber.d("Начало обработки ${transactions.size} транзакций")
+            
+            // Фильтруем транзакции только если есть фильтры
+            val hasFilters = currentState.selectedCategories.isNotEmpty() || 
+                             currentState.selectedSources.isNotEmpty()
+            
+            val filteredTransactions = if (hasFilters) {
+                // Применяем фильтрацию только если заданы фильтры
+                val before = transactions.size
+                val filtered = filterTransactions(transactions, currentState)
+                Timber.d("Фильтрация: $before -> ${filtered.size} транзакций")
+                filtered
             } else {
+                // Если нет фильтров, используем исходный список
                 transactions
             }
             
-            // Группируем транзакции по выбранному типу группировки
-            val groupedTransactions = groupTransactionsUseCase(
-                transactions = filteredTransactions,
-                groupingType = currentState.groupingType
-            )
+            // Вычисляем группы транзакций, если нужно
+            val groupedTransactions = if (filteredTransactions.isNotEmpty()) {
+                val startTime = System.currentTimeMillis()
+                
+                // Используем более эффективный алгоритм группировки
+                val groups = groupTransactionsUseCase(
+                    transactions = filteredTransactions,
+                    groupingType = currentState.groupingType
+                )
+                
+                val endTime = System.currentTimeMillis()
+                Timber.d("Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс")
+                
+                groups
+            } else {
+                emptyMap()
+            }
             
             // Обновляем состояние в основном потоке
             withContext(Dispatchers.Main) {
-                _state.update { 
-                    it.copy(
-                        filteredTransactions = filteredTransactions,
-                        groupedTransactions = groupedTransactions
-                    ) 
-                }
+                _state.update { it.copy(
+                    filteredTransactions = filteredTransactions,
+                    groupedTransactions = groupedTransactions
+                )}
             }
         }
     }

@@ -72,7 +72,7 @@ class ExportTransactionsToCSVUseCase(
                 // Записываем данные в CSV
                 FileWriter(file).use { writer ->
                     // Заголовок CSV
-                    writer.append("ID,Дата,Категория,Сумма,Тип,Примечание,Источник\n")
+                    writer.append("ID,Дата,Категория,Сумма,Тип,Примечание,Источник,SourceColor\n")
 
                     // Данные транзакций
                     transactions.forEach { transaction ->
@@ -83,6 +83,7 @@ class ExportTransactionsToCSVUseCase(
                         val formattedDate = dateFormat.format(transaction.date)
                         val formattedAmount = transaction.amount.toString()
                         val transactionType = if (transaction.isExpense) "Расход" else "Доход"
+                        val sourceColor = transaction.sourceColor?.toString() ?: ""
                         
                         // Формируем строку в правильном CSV формате
                         val csvLine = listOf(
@@ -92,7 +93,8 @@ class ExportTransactionsToCSVUseCase(
                             formattedAmount,
                             transactionType,
                             cleanNote,
-                            cleanSource
+                            cleanSource,
+                            sourceColor
                         ).joinToString(",")
                         
                         writer.append(csvLine).append("\n")

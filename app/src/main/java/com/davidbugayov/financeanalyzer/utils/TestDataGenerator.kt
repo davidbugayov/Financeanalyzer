@@ -74,6 +74,7 @@ object TestDataGenerator {
             }
             
             // Создаем транзакцию и добавляем в список
+            val source = if (Random.nextBoolean()) "Сбер" else if (Random.nextBoolean()) "Т-Банк" else "Наличные"
             transactions.add(
                 Transaction(
                     id = i.toString(),
@@ -81,7 +82,9 @@ object TestDataGenerator {
                     category = category,
                     isExpense = isExpense,
                     date = date,
-                    note = if (Random.nextBoolean()) "Примечание к транзакции" else null
+                    note = if (Random.nextBoolean()) "Примечание к транзакции" else null,
+                    source = source,
+                    sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
                 )
             )
         }

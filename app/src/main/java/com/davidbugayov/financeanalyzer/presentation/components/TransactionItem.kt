@@ -44,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -51,6 +52,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -72,11 +74,14 @@ fun TransactionItem(
     showDivider: Boolean = true
 ) {
     val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    val incomeColor = LocalIncomeColor.current
-    val expenseColor = LocalExpenseColor.current
+    val incomeColor = Color(ColorUtils.INCOME_COLOR)
+    val expenseColor = Color(ColorUtils.EXPENSE_COLOR)
     
     // Получаем иконку и цвет для категории
     val categoryInfo = getCategoryInfo(transaction.category, transaction.isExpense, incomeColor, expenseColor)
+    
+    // Определяем цвет источника
+    val sourceColor = Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
     
     Column {
         Row(
@@ -92,16 +97,16 @@ fun TransactionItem(
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Иконка категории
+            // Иконка категории с цветом источника
             Surface(
                 modifier = Modifier.size(40.dp),
                 shape = CircleShape,
-                color = categoryInfo.backgroundColor.copy(alpha = 0.2f)
+                color = sourceColor.copy(alpha = 0.3f)
             ) {
                 Icon(
                     imageVector = categoryInfo.icon,
                     contentDescription = if (transaction.isExpense) "Расход" else "Доход",
-                    tint = if (transaction.isExpense) expenseColor else incomeColor,
+                    tint = sourceColor,
                     modifier = Modifier
                         .padding(8.dp)
                         .size(24.dp)
@@ -122,29 +127,32 @@ fun TransactionItem(
                     overflow = TextOverflow.Ellipsis
                 )
                 
-                Row {
+                // Источник и дата на одном уровне
+                Row(
+                    modifier = Modifier.padding(top = 4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    // Источник (если есть)
                     transaction.source?.let { source ->
                         Text(
                             text = source,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            style = MaterialTheme.typography.bodySmall,
+                            color = sourceColor,
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f, fill = false)
                         )
+                        
+                        // Разделитель между источником и датой - очень маленький отступ
+                        Spacer(modifier = Modifier.width(4.dp))
                     }
                     
                     // Дата транзакции
-                    if (transaction.source != null) {
-                        Text(
-                            text = " • ${dateFormatter.format(transaction.date)}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    } else {
-                        Text(
-                            text = dateFormatter.format(transaction.date),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
+                    Text(
+                        text = dateFormatter.format(transaction.date),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
                 
                 // Комментарий (если есть)

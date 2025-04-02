@@ -5,9 +5,16 @@ import android.net.Uri
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.apache.poi.ss.usermodel.*
+import org.apache.poi.hssf.usermodel.HSSFWorkbook
+import org.apache.poi.ss.usermodel.Cell
+import org.apache.poi.ss.usermodel.CellType
+import org.apache.poi.ss.usermodel.DateUtil
+import org.apache.poi.ss.usermodel.Row
+import org.apache.poi.ss.usermodel.Sheet
+import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import timber.log.Timber
 import java.io.BufferedReader
@@ -534,7 +541,8 @@ class AlfaBankImportUseCase(
             isExpense = isExpense,
             date = date,
             note = description.takeIf { it.isNotBlank() },
-            source = "Альфа-Банк"
+            source = "Альфа-Банк",
+            sourceColor = ColorUtils.ALFA_COLOR
         )
     }
 
@@ -617,7 +625,8 @@ class AlfaBankImportUseCase(
             isExpense = isExpense,
             date = date,
             note = description.takeIf { it.isNotBlank() },
-            source = "Альфа-Банк"
+            source = "Альфа-Банк",
+            sourceColor = ColorUtils.ALFA_COLOR
         )
     }
 

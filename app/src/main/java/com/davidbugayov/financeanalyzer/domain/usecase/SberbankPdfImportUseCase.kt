@@ -5,6 +5,7 @@ import android.net.Uri
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
@@ -22,6 +23,7 @@ import kotlin.math.absoluteValue
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import timber.log.Timber
+import android.graphics.Color
 
 /**
  * Реализация импорта транзакций из PDF-выписки Сбербанка.
@@ -293,7 +295,8 @@ class SberbankPdfImportUseCase(
                         date = date,
                         isExpense = isExpense,
                         note = note,
-                        source = source
+                        source = source,
+                        sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
                     )
                     
                     transactions.add(transaction)
@@ -584,13 +587,14 @@ class SberbankPdfImportUseCase(
                                 
                                 // Создаем транзакцию с примечанием
                                 val transaction = Transaction(
-                                    id = "sber_table_${currentDate.time}_${parsedAmount}_${System.nanoTime()}",
+                                    id = "sber_pdf_table_${currentDate.time}_${System.nanoTime()}",
                                     amount = parsedAmount,
                                     category = category,
                                     date = currentDate,
                                     isExpense = finalIsExpense,
                                     note = noteText,
-                                    source = source
+                                    source = source,
+                                    sourceColor = ColorUtils.getSourceColor(source) ?: (if (finalIsExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
                                 )
                                 
                                 transactions.add(transaction)
@@ -854,7 +858,8 @@ class SberbankPdfImportUseCase(
                                     date = date,
                                     isExpense = isExpense,
                                     note = noteText,
-                                    source = source
+                                    source = source,
+                                    sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
                                 )
                                 
                                 transactions.add(transaction)

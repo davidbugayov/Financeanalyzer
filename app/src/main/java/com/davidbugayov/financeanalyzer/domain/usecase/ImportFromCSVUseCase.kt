@@ -17,6 +17,9 @@ import timber.log.Timber
 import kotlinx.coroutines.delay
 import kotlin.math.min
 import java.util.concurrent.atomic.AtomicBoolean
+import android.graphics.Color
+import android.util.Log
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
  * Реализация UseCase для импорта транзакций из CSV файла.
@@ -178,6 +181,11 @@ class ImportFromCSVUseCase(
                 it.equals("Источник", ignoreCase = true) || it.equals("Source", ignoreCase = true)
             }
             Timber.d("ИМПОРТ: Индекс Источника: $sourceIndex (найдено: ${if(sourceIndex >= 0) header[sourceIndex] else "нет"})")
+            
+            val sourceColorIndex = header.indexOfFirst { 
+                it.equals("SourceColor", ignoreCase = true) || it.equals("ЦветИсточника", ignoreCase = true)
+            }
+            Timber.d("ИМПОРТ: Индекс Цвета источника: $sourceColorIndex (найдено: ${if(sourceColorIndex >= 0) header[sourceColorIndex] else "нет"})")
             
             val titleIndex = header.indexOfFirst { 
                 it.equals("Title", ignoreCase = true) || it.equals("Название", ignoreCase = true)
@@ -519,72 +527,15 @@ class ImportFromCSVUseCase(
                             }
 
                             // Создаем объект транзакции
-                            val generatedId = "import_${date.time}_${System.nanoTime()}"
-                            val transactionId = if (idIndex != -1 && values.size > idIndex) {
-                                val csvId = cleanField(values[idIndex])
-                                // Ограничиваем длину ID до 50 символов для предотвращения проблем с длинными ID
-                                if (csvId.length > 50) {
-                                    Timber.w("ИМПОРТ: ID слишком длинный (${csvId.length} символов), обрезаем: $csvId")
-                                    csvId.substring(0, 50)
-                                } else {
-                                    csvId
-                                }
-                            } else {
-                                generatedId
-                            }
-                            
-                            // Проверяем существование транзакции с таким ID
-                            val existingTransaction = try {
-                                repository.getTransactionById(transactionId)
-                            } catch (e: Exception) {
-                                Timber.w("ИМПОРТ: Ошибка проверки существующей транзакции: ${e.message}")
-                                null
-                            }
-                            
-                            if (existingTransaction != null) {
-                                Timber.w("ИМПОРТ: Транзакция с ID $transactionId уже существует, пропускаем")
-                                skippedCount++
-                                return@forEach
-                            }
-
-                            // Принудительная задержка между транзакциями для предотвращения перегрузки базы данных
-                            if (currentLine % 20 == 0) {
-                                Timber.d("ИМПОРТ: Делаем небольшую паузу после 20 транзакций")
-                                delay(100) // Пауза 100 мс после каждых 20 транзакций
-                            }
-
-                            // Ограничения длины полей
-                            val limitedCategory = if (category.length > 100) {
-                                Timber.w("ИМПОРТ: Обрезаем слишком длинную категорию: ${category.length} символов")
-                                category.substring(0, 100)
-                            } else {
-                                category
-                            }
-                            
-                            val limitedNote = note?.let {
-                                if (it.length > 1000) {
-                                    Timber.w("ИМПОРТ: Обрезаем слишком длинное примечание: ${it.length} символов")
-                                    it.substring(0, 1000)
-                                } else {
-                                    it
-                                }
-                            }
-                            
-                            val limitedSource = if (source.length > 100) {
-                                Timber.w("ИМПОРТ: Обрезаем слишком длинный источник: ${source.length} символов")
-                                source.substring(0, 100)
-                            } else {
-                                source
-                            }
-
                             val transaction = Transaction(
-                                id = transactionId,
-                                amount = amount.absoluteValue, // Храним положительное значение
-                                category = limitedCategory,
-                                isExpense = isExpense,
+                                id = "csv_${date.time}_${System.nanoTime()}",
+                                amount = amount,
+                                category = category,
                                 date = date,
-                                note = limitedNote,
-                                source = limitedSource
+                                isExpense = isExpense,
+                                note = note,
+                                source = source,
+                                sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
                             )
                             
                             Timber.d("ИМПОРТ: Создана транзакция: id=${transaction.id}, дата=${transaction.date}, сумма=${transaction.amount}, категория=${transaction.category}, расход=${transaction.isExpense}")
