@@ -539,19 +539,29 @@ class HomeViewModel(
     }
 
     /**
-     * Возвращает транзакции за последний месяц
+     * Возвращает транзакции за текущий календарный месяц
      * @param transactions Список всех транзакций
-     * @return Отфильтрованный список транзакций за последний месяц
+     * @return Отфильтрованный список транзакций за текущий календарный месяц
      */
     private fun getLastMonthTransactions(transactions: List<Transaction>): List<Transaction> {
-        // Оптимизация: устанавливаем точную дату для сравнения, избегая многократных вычислений
+        // Получаем текущую дату и устанавливаем начало текущего месяца
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.MONTH, -1)
-        val monthAgo = calendar.timeInMillis
+        calendar.set(Calendar.DAY_OF_MONTH, 1) // Первый день месяца
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startOfMonth = calendar.timeInMillis
+        
+        // Конец месяца - текущий момент
+        val endOfMonth = System.currentTimeMillis()
 
         return transactions
             .asSequence()
-            .filter { it.date.time >= monthAgo }
+            .filter { 
+                val time = it.date.time
+                time >= startOfMonth && time <= endOfMonth 
+            }
             .sortedByDescending { it.date }
             .toList()
     }
@@ -588,19 +598,30 @@ class HomeViewModel(
     }
     
     /**
-     * Возвращает транзакции за последнюю неделю
+     * Возвращает транзакции за текущую календарную неделю
      * @param transactions Список всех транзакций
-     * @return Отфильтрованный список транзакций за последнюю неделю
+     * @return Отфильтрованный список транзакций за текущую календарную неделю
      */
     private fun getLastWeekTransactions(transactions: List<Transaction>): List<Transaction> {
-        // Оптимизация: устанавливаем точную дату для сравнения, избегая многократных вычислений
+        // Получаем текущую дату и устанавливаем начало текущей недели
         val calendar = Calendar.getInstance()
-        calendar.add(Calendar.DAY_OF_MONTH, -7)
-        val weekAgo = calendar.timeInMillis
+        // Устанавливаем на начало недели (понедельник)
+        calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        val startOfWeek = calendar.timeInMillis
+        
+        // Конец недели - текущий момент
+        val endOfWeek = System.currentTimeMillis()
 
         return transactions
             .asSequence()
-            .filter { it.date.time >= weekAgo }
+            .filter {
+                val time = it.date.time
+                time >= startOfWeek && time <= endOfWeek
+            }
             .sortedByDescending { it.date }
             .toList()
     }
