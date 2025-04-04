@@ -42,6 +42,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
 import timber.log.Timber
+import kotlinx.coroutines.delay
 
 @Composable
 fun MainScreen(startDestination: String = "home") {
@@ -66,27 +67,17 @@ fun MainScreen(startDestination: String = "home") {
 
     // Для загрузки данных в фоновом режиме
     LaunchedEffect(Unit) {
-        // Используем двухэтапную инициализацию для предотвращения ANR
-        // Сначала загружаем только критически важные данные для отображения интерфейса
-        MainScope().launch(Dispatchers.Main) {
-            Timber.d("Начало загрузки первичных данных для UI")
-            // Инициируем загрузку минимальных данных на экран с низким приоритетом
-            homeViewModel.onEvent(com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent.LoadTransactions)
-        }
+        Timber.d("MainScreen: Планируем фоновую инициализацию данных")
         
-        // Затем с задержкой запускаем фоновое обновление остальных данных
-        kotlinx.coroutines.delay(500)
-        
-        // Запускаем фоновые вычисления с правильным диспетчером
+        // Запускаем единую фоновую задачу для инициализации данных после небольшой задержки
         MainScope().launch(Dispatchers.Default) {
-            Timber.d("Запуск фоновой загрузки данных")
-            // Инициируем полное фоновое обновление без блокировки UI
+            delay(500) // Даем время UI на отрисовку
+            Timber.d("MainScreen: Запускаем initiateBackgroundDataRefresh")
             homeViewModel.initiateBackgroundDataRefresh()
             
-            // Предзагружаем данные для графиков с большей задержкой
-            kotlinx.coroutines.delay(2000)
-            
-            // Загружаем данные для графиков во вторую очередь
+            // Загружаем данные для графиков с большей задержкой, чтобы не мешать основному экрану
+            delay(2000) 
+            Timber.d("MainScreen: Запускаем загрузку данных для графиков")
             chartViewModel.loadTransactions()
         }
     }

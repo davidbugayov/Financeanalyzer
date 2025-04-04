@@ -71,17 +71,16 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
+    
+    // Переменная для отслеживания первоначальной загрузки
+    val initialLoadDone = remember { mutableStateOf(false) }
 
-    // Логируем открытие главного экрана и загружаем данные
+    // Логируем открытие главного экрана и загружаем данные только при первом входе
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "home",
             screenClass = "HomeScreen"
         )
-        
-        // Загружаем данные при первом входе на экран
-        Timber.d("HomeScreen: начальная загрузка данных")
-        viewModel.onEvent(HomeEvent.LoadTransactions)
     }
 
     // Состояние для обратной связи
@@ -108,21 +107,31 @@ fun HomeScreen(
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
     }
 
-    // Обновляем транзакции при возвращении на экран
-    // Используем LocalLifecycleOwner из androidx.lifecycle.compose
+    // Обновляем транзакции при возвращении на экран, но с управлением частоты
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         Timber.d("HomeScreen: регистрируем обновление при навигации")
+        
+        // Время последнего обновления
+        var lastRefreshTime = 0L
+        
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                // Timber.d("HomeScreen: обновление при возвращении на экран (ON_RESUME) - ВРЕМЕННО ОТКЛЮЧЕНО ДЛЯ УМЕНЬШЕНИЯ МЕРЦАНИЯ")
-                // MainScope().launch {
-                    // Добавляем задержку для корректной синхронизации с базой данных
-                    // delay(150)
-                    // viewModel.onEvent(HomeEvent.LoadTransactions)
-                // }
+                // Проверяем, прошло ли достаточно времени с последнего обновления
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastRefreshTime > 2000) { // Не обновляем чаще чем раз в 2 секунды
+                    Timber.d("HomeScreen: Запрашиваем обновление данных после навигации (ON_RESUME)")
+                    
+                    // Запускаем стандартную загрузку данных. Дебаунсинг внутри ViewModel предотвратит лишние вызовы.
+                    viewModel.onEvent(HomeEvent.LoadTransactions)
+                    
+                    lastRefreshTime = currentTime
+                } else {
+                    Timber.d("HomeScreen: пропускаем обновление - прошло менее 2 секунд с последнего")
+                }
             }
         }
+        
         lifecycleOwner.lifecycle.addObserver(observer)
         
         onDispose {

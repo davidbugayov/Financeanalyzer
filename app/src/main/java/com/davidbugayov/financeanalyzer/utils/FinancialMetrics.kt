@@ -47,6 +47,11 @@ class FinancialMetrics private constructor() : KoinComponent {
     private val transactionsCache = Collections.synchronizedList(mutableListOf<Transaction>())
     private var transactionsCacheTimestamp = 0L
     
+    // Добавляем трекеры для предотвращения лишних вызовов
+    private var lastLazyInitTime = 0L
+    private var isLazyInitInProgress = false
+    private var secondaryInitPending = false
+    
     // Константы для кэширования
     companion object {
         @Volatile
@@ -180,21 +185,60 @@ class FinancialMetrics private constructor() : KoinComponent {
      * @param priority если true, увеличивает приоритет корутины
      */
     fun lazyInitialize(priority: Boolean = false) {
+        val currentTime = System.currentTimeMillis()
+        
+        // Если прошло менее 2 секунд с последнего запроса на инициализацию, и не высокий приоритет, просто запланируем вторичную проверку
+        if (!priority && currentTime - lastLazyInitTime < 2000) {
+            Timber.d("Слишком частый вызов инициализации метрик, используем кэшированные данные")
+            
+            // Планируем вторичную проверку, если ещё не запланирована и нет высокоприоритетной загрузки в процессе
+            if (!secondaryInitPending && !isLazyInitInProgress) {
+                secondaryInitPending = true
+                Timber.d("Запланирована вторичная проверка метрик с высоким приоритетом")
+                
+                // Запускаем отложенный высокоприоритетный вызов
+                CoroutineScope(Dispatchers.Default).launch {
+                    delay(3000) // Значительная задержка перед повторной проверкой
+                    secondaryInitPending = false
+                    lazyInitialize(true) // Вызов повторной проверки с высоким приоритетом
+                }
+            }
+            return
+        }
+        
+        // Если уже идёт процесс инициализации, избегаем дублирования
+        if (isLazyInitInProgress) {
+            return
+        }
+        
+        lastLazyInitTime = currentTime
         val dispatcher = if (priority) Dispatchers.IO else Dispatchers.Default
         
         CoroutineScope(dispatcher).launch {
-            Timber.d("Запуск отложенной инициализации метрик с приоритетом=${priority}")
-            
-            // Сначала загружаем быстро из кэша
-            if (_balance.value == 0.0 && _totalIncome.value == 0.0 && _totalExpense.value == 0.0) {
+            try {
+                isLazyInitInProgress = true
+                Timber.d("Запуск отложенной инициализации метрик с приоритетом=${priority}")
+                
+                // Сначала загружаем быстро из кэша для быстрого отображения UI
                 initializeFromCache()
+                
+                // Если это не высокоприоритетный вызов, добавляем задержку
+                if (!priority) {
+                    delay(500)
+                }
+                
+                // Проверяем необходимость пересчета на основе времени
+                val now = System.currentTimeMillis()
+                if (now - lastInitTime < MIN_RECALCULATION_INTERVAL && !priority) {
+                    Timber.d("Пропускаем пересчет метрик - слишком частый вызов")
+                    return@launch
+                }
+                
+                // Затем проверяем необходимость пересчета
+                loadInitialStats()
+            } finally {
+                isLazyInitInProgress = false
             }
-            
-            // Потом добавляем небольшую задержку
-            delay(500)
-            
-            // Затем проверяем необходимость пересчета
-            loadInitialStats()
         }
     }
     

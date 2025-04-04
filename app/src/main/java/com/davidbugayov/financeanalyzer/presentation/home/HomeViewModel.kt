@@ -59,7 +59,6 @@ class HomeViewModel(
 
     init {
         Timber.d("HomeViewModel initialized")
-        loadTransactions()
         subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
         
         // Наблюдаем за изменениями балансов
@@ -192,24 +191,66 @@ class HomeViewModel(
      * Инициирует фоновую загрузку данных
      * Обновляет данные в фоне, не блокируя UI
      */
+    private var lastBackgroundRefreshTime = 0L
+    private var isBackgroundRefreshInProgress = false
+    
     fun initiateBackgroundDataRefresh() {
+        // Защита от слишком частых вызовов
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastBackgroundRefreshTime < 1000 || isBackgroundRefreshInProgress) {
+            Timber.d("Пропускаем фоновое обновление - слишком частый вызов или обновление уже идет")
+            return
+        }
+    
         viewModelScope.launch {
             try {
-                // Проверяем, нужно ли обновлять метрики
-                Timber.d("Инициирована фоновая загрузка данных")
+                isBackgroundRefreshInProgress = true
+                lastBackgroundRefreshTime = currentTime
+                
+                Timber.d("Инициирована фоновая загрузка метрик (без перезагрузки транзакций)")
                 // Просим FinancialMetrics запланировать проверку в фоне
+                // Это обновит глобальные метрики, которые HomeViewModel слушает через StateFlow
                 financialMetrics.lazyInitialize(priority = true)
                 
-                // Проверяем, нужно ли загружать транзакции полностью
-                val currentTransactions = _state.value.transactions
-                if (currentTransactions.isEmpty() || currentTransactions.size < 20) {
-                    Timber.d("Запрашиваем полную загрузку транзакций в фоне")
-                    loadTransactions()
-                } else {
-                    Timber.d("Предварительная загрузка уже выполнена, обновляем только метрики")
-                }
+                // УДАЛЯЕМ ЛОГИКУ ПРОВЕРКИ И ПЕРЕЗАГРУЗКИ ТРАНЗАКЦИЙ ЗДЕСЬ
+                // // Проверяем, нужно ли загружать транзакции полностью
+                // val currentTransactions = _state.value.transactions
+                // if (currentTransactions.isEmpty() || currentTransactions.size < 20) {
+                //     Timber.d("Запрашиваем полную загрузку транзакций в фоне")
+                //     
+                //     // Небольшая задержка, чтобы не перегружать UI
+                //     delay(100)
+                //     
+                //     // Используем loadTransactions, который уже имеет защиту от множественных вызовов
+                //     loadTransactions()
+                // } else {
+                //     Timber.d("Предварительная загрузка уже выполнена, обновляем только метрики")
+                //     
+                //     // Только обновляем метрики, но не перезагружаем транзакции
+                //     val metrics = withContext(Dispatchers.IO) {
+                //         try {
+                //             val fm = FinancialMetrics.getInstance()
+                //             fm.initializeMetricsFromCache() 
+                //             Triple(fm.getTotalIncome(), fm.getTotalExpense(), fm.getBalance())
+                //         } catch (e: Exception) {
+                //             Timber.e(e, "Ошибка при получении финансовых метрик: ${e.message}")
+                //             Triple(0.0, 0.0, 0.0) 
+                //         }
+                //     }
+                //     
+                //     // Обновляем только метрики
+                //     _state.update { 
+                //         it.copy(
+                //             income = Money(metrics.first),
+                //             expense = Money(metrics.second),
+                //             balance = Money(metrics.third)
+                //         )
+                //     }
+                // }
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при фоновом обновлении данных")
+                Timber.e(e, "Ошибка при фоновом обновлении метрик")
+            } finally {
+                isBackgroundRefreshInProgress = false
             }
         }
     }
@@ -217,8 +258,21 @@ class HomeViewModel(
     /**
      * Загружает транзакции за текущий месяц
      */
+    private var lastLoadTime = 0L // Время последней загрузки
+    private var isLoadingInProgress = false // Флаг, указывающий на то, что загрузка уже идет
+    
     private fun loadTransactions() {
+        // Проверка, чтобы избежать множественных вызовов за короткий промежуток времени (дебаунсинг)
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastLoadTime < 500 || isLoadingInProgress) {
+            Timber.d("Пропускаем загрузку данных - слишком частый вызов или загрузка уже идет")
+            return
+        }
+        
         viewModelScope.launch {
+            isLoadingInProgress = true
+            lastLoadTime = currentTime
+            
             Timber.d("Начинаем загрузку транзакций для домашнего экрана (последние 60 дней)")
             _state.update { it.copy(isLoading = true) }
             
@@ -274,11 +328,6 @@ class HomeViewModel(
                     ) 
                 }
                 
-                // Убираем вызов loadLastTransactions(5), он больше не нужен
-                // if (transactions.isEmpty()) {
-                //    loadLastTransactions(5) 
-                // }
-                
                 // Подсчитываем и обновляем данные по категориям (на основе загруженных транзакций)
                 updateCategoryStats(transactions)
                 
@@ -293,6 +342,8 @@ class HomeViewModel(
                         error = e.message ?: "Неизвестная ошибка" 
                     ) 
                 }
+            } finally {
+                isLoadingInProgress = false
             }
         }
     }
@@ -369,135 +420,154 @@ class HomeViewModel(
      * Обновляет отфильтрованные транзакции на основе текущего фильтра
      * Использует оптимизированные алгоритмы для фильтрации и группировки
      */
+    private var lastFilterUpdateTime = 0L
+    private var isFilterUpdateInProgress = false
+    
     private fun updateFilteredTransactions() {
+        // Проверка, чтобы избежать множественных вызовов за короткий промежуток времени
+        val currentTime = System.currentTimeMillis()
+        if (currentTime - lastFilterUpdateTime < 300 || isFilterUpdateInProgress) {
+            Timber.d("Пропускаем обновление фильтра - слишком частый вызов или обновление уже идет")
+            return
+        }
+        
         // Запускаем обработку в отдельной корутине
         viewModelScope.launch(kotlinx.coroutines.Dispatchers.Default) {
-            Timber.d("Обновление отфильтрованных транзакций запущено")
-            val currentState = _state.value
-            
-            if (currentState.transactions.isEmpty()) {
-                Timber.d("Список транзакций пуст, нет данных для фильтрации")
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    _state.update {
-                        it.copy(
-                            filteredTransactions = emptyList(),
-                            filteredIncome = Money(0.0),
-                            filteredExpense = Money(0.0),
-                            filteredBalance = Money(0.0),
-                            transactionGroups = emptyList()
-                        )
-                    }
-                }
-                return@launch
-            }
-    
-            // Создаем ключ для кэша
-            val cacheKey = FilterCacheKey(
-                filter = currentState.currentFilter.toString()
-            )
-            
-            // Определяем, есть ли транзакции за выбранный период
-            val filteredForPeriod = when (currentState.currentFilter) {
-                TransactionFilter.TODAY -> getTodayTransactions(currentState.transactions)
-                TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
-                TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
-            }
-            
-            // Логируем состояние для отладки
-            Timber.d("updateFilteredTransactions: filter=${currentState.currentFilter}, всего транзакций=${currentState.transactions.size}, " +
-                    "отфильтрованных=${filteredForPeriod.size}")
-            
-            // Определяем какие транзакции показывать - ТЕПЕРЬ ПРОСТО РЕЗУЛЬТАТ ФИЛЬТРАЦИИ
-            val filtered = filteredForPeriod
-    
-            // Проверяем кэш быстро без блокировки
-            val cachedEntry = filteredTransactionsCache[cacheKey]
-            if (cachedEntry != null && cachedEntry.first.size == filtered.size) {
-                Timber.d("Используем кэшированные данные для отфильтрованных транзакций")
-                val filteredData = cachedEntry
+            try {
+                isFilterUpdateInProgress = true
+                lastFilterUpdateTime = currentTime
                 
-                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                    _state.update {
-                        it.copy(
-                            filteredTransactions = filteredData.first,
-                            filteredIncome = filteredData.second.first,
-                            filteredExpense = filteredData.second.second,
-                            filteredBalance = filteredData.second.third,
-                            transactionGroups = filteredData.third
-                        )
+                Timber.d("Обновление отфильтрованных транзакций запущено")
+                val currentState = _state.value
+                
+                if (currentState.transactions.isEmpty()) {
+                    Timber.d("Список транзакций пуст, нет данных для фильтрации")
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        _state.update {
+                            it.copy(
+                                filteredTransactions = emptyList(),
+                                filteredIncome = Money(0.0),
+                                filteredExpense = Money(0.0),
+                                filteredBalance = Money(0.0),
+                                transactionGroups = emptyList(),
+                                isLoading = false // Убираем индикатор загрузки, даже если нет данных
+                            )
+                        }
+                    }
+                    return@launch
+                }
+        
+                // Создаем ключ для кэша
+                val cacheKey = FilterCacheKey(
+                    filter = currentState.currentFilter.toString()
+                )
+                
+                // Определяем, есть ли транзакции за выбранный период
+                val filteredForPeriod = when (currentState.currentFilter) {
+                    TransactionFilter.TODAY -> getTodayTransactions(currentState.transactions)
+                    TransactionFilter.WEEK -> getLastWeekTransactions(currentState.transactions)
+                    TransactionFilter.MONTH -> getLastMonthTransactions(currentState.transactions)
+                }
+                
+                // Логируем состояние для отладки
+                Timber.d("updateFilteredTransactions: filter=${currentState.currentFilter}, всего транзакций=${currentState.transactions.size}, " +
+                        "отфильтрованных=${filteredForPeriod.size}")
+                
+                // Определяем какие транзакции показывать - ТЕПЕРЬ ПРОСТО РЕЗУЛЬТАТ ФИЛЬТРАЦИИ
+                val filtered = filteredForPeriod
+        
+                // Проверяем кэш быстро без блокировки
+                val cachedEntry = filteredTransactionsCache[cacheKey]
+                if (cachedEntry != null && cachedEntry.first.size == filtered.size) {
+                    Timber.d("Используем кэшированные данные для отфильтрованных транзакций")
+                    val filteredData = cachedEntry
+                    
+                    kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                        _state.update {
+                            it.copy(
+                                filteredTransactions = filteredData.first,
+                                filteredIncome = filteredData.second.first,
+                                filteredExpense = filteredData.second.second,
+                                filteredBalance = filteredData.second.third,
+                                transactionGroups = filteredData.third,
+                                isLoading = false
+                            )
+                        }
+                    }
+                    return@launch
+                }
+        
+                // Оптимизированный расчет статистики - за один проход по данным
+                var income = 0.0
+                var expense = 0.0
+                
+                // Оптимизация: предварительно создаём структуры для группировки
+                val categoryMap = if (currentState.showGroupSummary) mutableMapOf<String, MutableList<Transaction>>() else null
+                val categoryTotals = if (currentState.showGroupSummary) mutableMapOf<String, Double>() else null
+                
+                // За один проход вычисляем все необходимые метрики
+                filtered.forEach { transaction ->
+                    if (transaction.isExpense) {
+                        expense += transaction.amount
+                    } else {
+                        income += transaction.amount
+                    }
+                    
+                    // Если нужно группировать, делаем это за тот же проход
+                    if (currentState.showGroupSummary) {
+                        val category = transaction.category
+                        // Добавляем транзакцию в соответствующую группу
+                        categoryMap?.getOrPut(category) { mutableListOf() }?.add(transaction)
+                        // Обновляем сумму для категории
+                        categoryTotals?.put(category, (categoryTotals[category] ?: 0.0) + kotlin.math.abs(transaction.amount))
                     }
                 }
-                return@launch
-            }
-    
-            // Оптимизированный расчет статистики - за один проход по данным
-            var income = 0.0
-            var expense = 0.0
-            
-            // Оптимизация: предварительно создаём структуры для группировки
-            val categoryMap = if (currentState.showGroupSummary) mutableMapOf<String, MutableList<Transaction>>() else null
-            val categoryTotals = if (currentState.showGroupSummary) mutableMapOf<String, Double>() else null
-            
-            // За один проход вычисляем все необходимые метрики
-            filtered.forEach { transaction ->
-                if (transaction.isExpense) {
-                    expense += transaction.amount
+                
+                val balance = income - expense
+                val filteredIncome = Money(income)
+                val filteredExpense = Money(expense)
+                val filteredBalance = Money(balance)
+        
+                // Формируем группы транзакций по категориям только если они нужны
+                val groups = if (filtered.isNotEmpty() && currentState.showGroupSummary && categoryMap != null && categoryTotals != null) {
+                    // Преобразуем в итоговый список групп
+                    categoryMap.map { (category, categoryTransactions) ->
+                        val categoryTotal = categoryTotals[category] ?: 0.0
+                        
+                        // Создаем группу транзакций
+                        TransactionGroup(
+                            date = category,
+                            transactions = categoryTransactions,
+                            balance = Money(categoryTotal),
+                            name = category,
+                            total = Money(categoryTotal)
+                        )
+                    }.sortedByDescending { it.total.amount }
                 } else {
-                    income += transaction.amount
+                    emptyList()
                 }
                 
-                // Если нужно группировать, делаем это за тот же проход
-                if (currentState.showGroupSummary) {
-                    val category = transaction.category
-                    // Добавляем транзакцию в соответствующую группу
-                    categoryMap?.getOrPut(category) { mutableListOf() }?.add(transaction)
-                    // Обновляем сумму для категории
-                    categoryTotals?.put(category, (categoryTotals[category] ?: 0.0) + kotlin.math.abs(transaction.amount))
+                // Сохраняем в кэш результаты вычислений
+                val statsTriple = Triple(filteredIncome, filteredExpense, filteredBalance)
+                filteredTransactionsCache[cacheKey] = Triple(filtered, statsTriple, groups)
+        
+                // Обновляем состояние в основном потоке
+                kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
+                    _state.update {
+                        Timber.d("Обновляем состояние: filtered.size=${filtered.size}, filter=${it.currentFilter}")
+                        
+                        it.copy(
+                            filteredTransactions = filtered,
+                            filteredIncome = filteredIncome,
+                            filteredExpense = filteredExpense,
+                            filteredBalance = filteredBalance,
+                            transactionGroups = groups,
+                            isLoading = false // Снимаем флаг загрузки ЗДЕСЬ, после всех расчетов
+                        )
+                    }
                 }
-            }
-            
-            val balance = income - expense
-            val filteredIncome = Money(income)
-            val filteredExpense = Money(expense)
-            val filteredBalance = Money(balance)
-    
-            // Формируем группы транзакций по категориям только если они нужны
-            val groups = if (filtered.isNotEmpty() && currentState.showGroupSummary && categoryMap != null && categoryTotals != null) {
-                // Преобразуем в итоговый список групп
-                categoryMap.map { (category, categoryTransactions) ->
-                    val categoryTotal = categoryTotals[category] ?: 0.0
-                    
-                    // Создаем группу транзакций
-                    TransactionGroup(
-                        date = category,
-                        transactions = categoryTransactions,
-                        balance = Money(categoryTotal),
-                        name = category,
-                        total = Money(categoryTotal)
-                    )
-                }.sortedByDescending { it.total.amount }
-            } else {
-                emptyList()
-            }
-            
-            // Сохраняем в кэш результаты вычислений
-            val statsTriple = Triple(filteredIncome, filteredExpense, filteredBalance)
-            filteredTransactionsCache[cacheKey] = Triple(filtered, statsTriple, groups)
-    
-            // Обновляем состояние в основном потоке
-            kotlinx.coroutines.withContext(kotlinx.coroutines.Dispatchers.Main) {
-                _state.update {
-                    Timber.d("Обновляем состояние: filtered.size=${filtered.size}, filter=${it.currentFilter}")
-                    
-                    it.copy(
-                        filteredTransactions = filtered,
-                        filteredIncome = filteredIncome,
-                        filteredExpense = filteredExpense,
-                        filteredBalance = filteredBalance,
-                        transactionGroups = groups,
-                        isLoading = false // Снимаем флаг загрузки ЗДЕСЬ, после всех расчетов
-                    )
-                }
+            } finally {
+                isFilterUpdateInProgress = false
             }
             
             Timber.d("Обновление отфильтрованных транзакций завершено.")

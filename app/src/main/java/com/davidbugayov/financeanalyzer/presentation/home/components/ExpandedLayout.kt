@@ -85,32 +85,15 @@ fun ExpandedLayout(
 
             // Список транзакций
             Box(modifier = Modifier.weight(1f)) {
-                // ЛОГИРОВАНИЕ: Проверяем состояние перед отображением списка/сообщения
-                Timber.d("ExpandedLayout: filteredTransactions.isEmpty=${state.filteredTransactions.isEmpty()}, isLoading=${state.isLoading}, filter=${state.currentFilter}")
-                
-                // Если список отфильтрованных транзакций пуст И загрузка не идет, показываем сообщение
-                if (state.filteredTransactions.isEmpty() && !state.isLoading) {
-                    Timber.d("ExpandedLayout: Отображаем сообщение 'Нет транзакций'") // ЛОГ
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .padding(bottom = 100.dp), // Добавляем отступ снизу
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = when (state.currentFilter) {
-                                TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
-                                TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
-                                TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
-                            },
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center // Центрируем текст
-                        )
-                    }
-                } else {
-                    // Иначе (если есть транзакции ИЛИ идет загрузка), показываем LazyColumn
-                    Timber.d("ExpandedLayout: Отображаем LazyColumn (список транзакций или индикатор загрузки)") // ЛОГ
+                // Определяем, нужно ли показывать LazyColumn или сообщение "Нет транзакций"
+                // Показываем LazyColumn, если:
+                // 1. Загрузка все еще идет (isLoading = true)
+                // 2. Загрузка завершена (isLoading = false), НО основной список транзакций НЕ ПУСТ (state.transactions.isNotEmpty()).
+                //    В этом случае LazyColumn сам покажет либо отфильтрованный список, либо сообщение "Нет транзакций за период".
+                val showLazyColumn = state.isLoading || state.transactions.isNotEmpty()
+
+                if (showLazyColumn) {
+                    Timber.d("ExpandedLayout: Отображаем LazyColumn (список транзакций или индикатор загрузки)")
                     val lazyListState = rememberLazyListState()
                     
                     LazyColumn(
@@ -148,6 +131,26 @@ fun ExpandedLayout(
                         item {
                             Spacer(modifier = Modifier.height(140.dp))
                         }
+                    }
+                } else {
+                    // Если список отфильтрованных транзакций пуст И загрузка не идет, показываем сообщение
+                    Timber.d("ExpandedLayout: Отображаем сообщение 'Нет транзакций'") // ЛОГ
+                    Box(
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 100.dp), // Добавляем отступ снизу
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = when (state.currentFilter) {
+                                TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
+                                TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
+                                TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
+                            },
+                            color = Color.Gray,
+                            style = MaterialTheme.typography.bodyLarge,
+                            textAlign = TextAlign.Center // Центрируем текст
+                        )
                     }
                 }
             }

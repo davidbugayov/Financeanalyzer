@@ -13,7 +13,7 @@ data class HomeState(
     val transactions: List<Transaction> = emptyList(),
     val filteredTransactions: List<Transaction> = emptyList(),
     val transactionGroups: List<TransactionGroup> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val error: String? = null,
     val balance: Money = Money.zero(),
     val income: Money = Money.zero(),
