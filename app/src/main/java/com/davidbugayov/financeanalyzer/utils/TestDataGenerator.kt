@@ -22,22 +22,22 @@ object TestDataGenerator {
     
     /**
      * Генерирует список тестовых транзакций
-     * @param count Количество транзакций для генерации
-     * @return Список сгенерированных транзакций
+     * @param count Количество транзакций для генерации (по умолчанию 100)
+     * @return Список сгенерированных транзакций за последний календарный месяц
      */
-    fun generateTransactions(count: Int): List<Transaction> {
+    fun generateTransactions(count: Int = 100): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         val calendar = Calendar.getInstance()
 
-        // Устанавливаем начальную дату (365 дней назад вместо 30)
-        calendar.add(Calendar.DAY_OF_MONTH, -365)
+        // Получаем текущую дату
+        val endDate = calendar.timeInMillis
+        
+        // Устанавливаем начальную дату (1 месяц назад)
+        calendar.add(Calendar.MONTH, -1)
         val startDate = calendar.timeInMillis
         
-        // Текущая дата
-        val endDate = System.currentTimeMillis()
-        
         for (i in 0 until count) {
-            // Генерируем случайную дату в диапазоне последних 365 дней
+            // Генерируем случайную дату в диапазоне последнего месяца
             val randomDate = Random.nextLong(startDate, endDate)
             val date = Date(randomDate)
             

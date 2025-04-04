@@ -56,6 +56,12 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// Создаем SimpleDateFormat один раз и переиспользуем для всех экземпляров
+private val DATE_FORMATTER = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+
+// Кэш для категорий и их иконок для более быстрого поиска
+private val CATEGORY_ICON_CACHE = mutableMapOf<Pair<String, Boolean>, ImageVector>()
+
 /**
  * Универсальный компонент для отображения транзакции в списке.
  * Поддерживает как простой клик, так и передачу транзакции в обработчики.
@@ -73,23 +79,46 @@ fun TransactionItem(
     onLongClick: (Transaction) -> Unit = {},
     showDivider: Boolean = true
 ) {
-    val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    val incomeColor = Color(ColorUtils.INCOME_COLOR)
-    val expenseColor = Color(ColorUtils.EXPENSE_COLOR)
+    // Используем remember для кэширования дорогостоящих вычислений
+    val incomeColor = remember { Color(ColorUtils.INCOME_COLOR) }
+    val expenseColor = remember { Color(ColorUtils.EXPENSE_COLOR) }
     
-    // Получаем иконку и цвет для категории
-    val categoryInfo = getCategoryInfo(transaction.category, transaction.isExpense, incomeColor, expenseColor)
+    // Форматируем дату только один раз и запоминаем результат
+    val formattedDate = remember(transaction.date) { 
+        DATE_FORMATTER.format(transaction.date) 
+    }
     
-    // Определяем цвет источника
-    val sourceColor = Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
+    // Получаем иконку и цвет для категории, используя кэширование
+    val categoryInfo = remember(transaction.category, transaction.isExpense) {
+        getCategoryInfo(transaction.category, transaction.isExpense, incomeColor, expenseColor)
+    }
+    
+    // Определяем цвет источника, используя remember для кэширования
+    val sourceColor = remember(transaction.source, transaction.sourceColor, transaction.isExpense) {
+        Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
+    }
+    
+    // Предварительно вычисляем и кэшируем форматированную сумму
+    val formattedAmount = remember(transaction.amount, transaction.isExpense) {
+        val amount = Money(transaction.amount)
+        if (transaction.isExpense) {
+            "-${amount.abs().formatted(showCurrency = true)}"
+        } else {
+            "+${amount.abs().formatted(showCurrency = true)}"
+        }
+    }
+    
+    // Стабилизируем лямбды обработчиков кликов, чтобы избежать пересоздания при рекомпозиции
+    val onClickStable = remember(onClick) { onClick }
+    val onLongClickStable = remember(onLongClick) { onLongClick }
     
     Column {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .combinedClickable(
-                    onClick = { onClick(transaction) },
-                    onLongClick = { onLongClick(transaction) }
+                    onClick = { onClickStable(transaction) },
+                    onLongClick = { onLongClickStable(transaction) }
                 )
                 .padding(
                     horizontal = dimensionResource(id = R.dimen.spacing_normal),
@@ -133,9 +162,9 @@ fun TransactionItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     // Источник (если есть)
-                    transaction.source?.let { source ->
+                    if (transaction.source != null) {
                         Text(
-                            text = source,
+                            text = transaction.source,
                             style = MaterialTheme.typography.bodySmall,
                             color = sourceColor,
                             maxLines = 1,
@@ -147,9 +176,9 @@ fun TransactionItem(
                         Spacer(modifier = Modifier.width(4.dp))
                     }
                     
-                    // Дата транзакции
+                    // Дата транзакции - используем предварительно отформатированную дату
                     Text(
-                        text = dateFormatter.format(transaction.date),
+                        text = formattedDate,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
@@ -171,14 +200,7 @@ fun TransactionItem(
             
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_normal)))
             
-            // Сумма транзакции
-            val amount = Money(transaction.amount)
-            val formattedAmount = if (transaction.isExpense) {
-                "-${amount.abs().formatted(showCurrency = true)}"
-            } else {
-                "+${amount.abs().formatted(showCurrency = true)}"
-            }
-            
+            // Сумма транзакции - используем предварительно отформатированное значение
             Text(
                 text = formattedAmount,
                 style = MaterialTheme.typography.bodyLarge,
@@ -189,7 +211,7 @@ fun TransactionItem(
         
         // Разделитель
         if (showDivider) {
-            Divider(
+            androidx.compose.material3.HorizontalDivider(
                 modifier = Modifier.padding(start = 72.dp, end = 16.dp),
                 color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                 thickness = 0.5.dp
@@ -208,6 +230,7 @@ data class CategoryInfo(
 
 /**
  * Возвращает иконку и цвет для категории транзакции
+ * Оптимизировано с использованием кэша для часто используемых категорий
  */
 fun getCategoryInfo(
     category: String, 
@@ -215,47 +238,42 @@ fun getCategoryInfo(
     incomeColor: Color,
     expenseColor: Color
 ): CategoryInfo {
+    // Попытка получения иконки из кэша
+    val cacheKey = category.lowercase() to isExpense
+    val cachedIcon = CATEGORY_ICON_CACHE[cacheKey]
+    
+    if (cachedIcon != null) {
+        // Если иконка найдена в кэше, возвращаем ее с соответствующим цветом
+        return CategoryInfo(cachedIcon, if (isExpense) expenseColor else incomeColor)
+    }
+    
+    // Если иконки нет в кэше, определяем ее и добавляем в кэш
     val (icon, bgColor) = when {
         !isExpense -> {
-            when {
-                category.equals("Зарплата", ignoreCase = true) -> 
-                    Icons.Default.Payments to incomeColor
-                category.equals("Перевод", ignoreCase = true) ->
-                    Icons.Default.MonetizationOn to incomeColor
+            when (category.lowercase()) {
+                "зарплата" -> Icons.Default.Payments to incomeColor
+                "перевод" -> Icons.Default.MonetizationOn to incomeColor
                 else -> Icons.Default.MonetizationOn to incomeColor
             }
         }
-        category.equals("Продукты", ignoreCase = true) -> 
-            Icons.Default.LocalGroceryStore to expenseColor
-        category.equals("Еда", ignoreCase = true) || 
-        category.equals("Рестораны", ignoreCase = true) -> 
-            Icons.Default.Fastfood to expenseColor
-        category.equals("Транспорт", ignoreCase = true) ->
-            Icons.Default.LocalTaxi to expenseColor
-        category.equals("Связь", ignoreCase = true) ||
-        category.equals("Интернет", ignoreCase = true) -> 
-            Icons.Default.Wifi to expenseColor
-        category.equals("Развлечения", ignoreCase = true) ->
-            Icons.Default.SportsEsports to expenseColor
-        category.equals("Покупки", ignoreCase = true) ->
-            Icons.Default.ShoppingBag to expenseColor
-        category.equals("Животные", ignoreCase = true) ->
-            Icons.Default.Pets to expenseColor
-        category.equals("Комиссия", ignoreCase = true) || 
-        category.equals("Счета", ignoreCase = true) ->
-            Icons.Default.Receipt to expenseColor
-        category.equals("Жилье", ignoreCase = true) ->
-            Icons.Default.Home to expenseColor
-        category.equals("Кредит", ignoreCase = true) ||
-        category.equals("Карта", ignoreCase = true) ->
-            Icons.Default.CreditCard to expenseColor
-        category.equals("Работа", ignoreCase = true) -> 
-            Icons.Default.WorkOutline to expenseColor
-        else -> if (isExpense) 
-            Icons.Default.ShoppingCart to expenseColor
-        else 
-            Icons.Default.MonetizationOn to incomeColor
+        else -> when (category.lowercase()) {
+            "продукты" -> Icons.Default.LocalGroceryStore to expenseColor
+            "еда", "рестораны" -> Icons.Default.Fastfood to expenseColor
+            "транспорт" -> Icons.Default.LocalTaxi to expenseColor
+            "связь", "интернет" -> Icons.Default.Wifi to expenseColor
+            "развлечения" -> Icons.Default.SportsEsports to expenseColor
+            "покупки" -> Icons.Default.ShoppingBag to expenseColor
+            "животные" -> Icons.Default.Pets to expenseColor
+            "комиссия", "счета" -> Icons.Default.Receipt to expenseColor
+            "жилье" -> Icons.Default.Home to expenseColor
+            "кредит", "карта" -> Icons.Default.CreditCard to expenseColor
+            "работа" -> Icons.Default.WorkOutline to expenseColor
+            else -> Icons.Default.ShoppingCart to expenseColor
+        }
     }
+    
+    // Сохраняем иконку в кэш для будущего использования
+    CATEGORY_ICON_CACHE[cacheKey] = icon
     
     return CategoryInfo(icon, bgColor)
 } 

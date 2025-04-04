@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,6 +12,11 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,6 +51,9 @@ fun HomeGroupSummary(
     // Вычисляем баланс
     val balance = totalIncome - totalExpense
     val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+    
+    // Состояние для отслеживания - показывать ли все группы
+    var showAllGroups by rememberSaveable { mutableStateOf(false) }
     
     Card(
         modifier = Modifier
@@ -131,62 +140,82 @@ fun HomeGroupSummary(
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
 
-            // Отображаем группы, если они есть (макс. 5 групп)
-            if (groups.isNotEmpty()) {
-                Column(
-                    verticalArrangement = Arrangement.spacedBy(2.dp)
-                ) {
-                    groups.take(5).forEach { group ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            // Определяем, является ли транзакция расходом
-                            val isExpense =
-                                group.transactions.isNotEmpty() && group.transactions.first().isExpense
-                            
-                            Text(
-                                text = group.name,
-                                fontSize = 13.sp,
-                                color = if (isExpense) expenseColor else incomeColor,
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
-                            
-                            // Добавляем знак + или - в зависимости от типа транзакции
-                            val formattedAmount = if (isExpense) {
-                                "-" + group.total.abs().formatted(false)
-                            } else {
-                                "+" + group.total.abs().formatted(false)
-                            }
-                            
-                            Text(
-                                text = formattedAmount,
-                                fontSize = 13.sp,
-                                color = if (isExpense) expenseColor else incomeColor,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+            // Определяем, сколько групп показывать
+            val visibleGroupsCount = if (showAllGroups) groups.size else 5
+            val visibleGroups = remember(groups, showAllGroups) {
+                groups.take(visibleGroupsCount)
+            }
+
+            // Предварительно обрабатываем данные для каждой группы
+            val processedGroups = remember(visibleGroups) {
+                visibleGroups.map { group ->
+                    val isExpense = group.transactions.isNotEmpty() && group.transactions.first().isExpense
+                    val formattedAmount = if (isExpense) {
+                        "-" + group.total.abs().formatted(false)
+                    } else {
+                        "+" + group.total.abs().formatted(false)
                     }
                     
-                    // Если групп больше 5, показываем сообщение о том, что есть еще группы
-                    if (groups.size > 5) {
+                    Triple(group.name, isExpense, formattedAmount)
+                }
+            }
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(2.dp)
+            ) {
+                processedGroups.forEach { (name, isExpense, formattedAmount) ->
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = 2.dp),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
                         Text(
-                            text = "И ещё ${groups.size - 5} элементов",
-                            fontSize = 12.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(top = 4.dp),
-                            fontWeight = FontWeight.Light
+                            text = name,
+                            fontSize = 13.sp,
+                            color = if (isExpense) expenseColor else incomeColor,
+                            fontWeight = FontWeight.Medium,
+                            maxLines = 1,
+                            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                            modifier = Modifier.weight(1f)
+                        )
+                        
+                        Text(
+                            text = formattedAmount,
+                            fontSize = 13.sp,
+                            color = if (isExpense) expenseColor else incomeColor,
+                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
+            }
+
+            // Если есть еще группы и не показываем все, отображаем текст "И ещё X элементов"
+            if (groups.size > 5 && !showAllGroups) {
+                Text(
+                    text = "И ещё ${groups.size - 5} элементов",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                        .clickable { showAllGroups = true },
+                    fontWeight = FontWeight.Medium
+                )
+            } 
+            // Если показываем все группы, добавляем кнопку "Скрыть"
+            else if (showAllGroups && groups.size > 5) {
+                Text(
+                    text = "Скрыть",
+                    fontSize = 12.sp,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp)
+                        .clickable { showAllGroups = false },
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

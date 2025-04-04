@@ -26,6 +26,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.res.dimensionResource
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -39,19 +44,15 @@ import com.davidbugayov.financeanalyzer.presentation.components.TransactionActio
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
+import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
-import androidx.compose.ui.res.dimensionResource
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalLifecycleOwner
 
 /**
  * Главный экран приложения.
@@ -108,6 +109,7 @@ fun HomeScreen(
     }
 
     // Обновляем транзакции при возвращении на экран
+    // Используем LocalLifecycleOwner из androidx.lifecycle.compose
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         Timber.d("HomeScreen: регистрируем обновление при навигации")
@@ -125,6 +127,35 @@ fun HomeScreen(
         
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
+
+    // Оптимизируем обработчики событий TransactionClick и TransactionLongClick, чтобы они не пересоздавались при каждой рекомпозиции
+    val onTransactionClick = remember<(Transaction) -> Unit> {
+        { transaction ->
+            selectedTransaction = transaction
+            showActionsDialog = true
+        }
+    }
+
+    val onTransactionLongClick = remember<(Transaction) -> Unit> {
+        { transaction ->
+            selectedTransaction = transaction
+            showActionsDialog = true
+        }
+    }
+
+    // Оптимизируем обработчик изменения showGroupSummary
+    val onShowGroupSummaryChange = remember<(Boolean) -> Unit> {
+        { newValue ->
+            showGroupSummary = newValue
+        }
+    }
+
+    // Оптимизируем обработчик выбора фильтра
+    val onFilterSelected = remember<(TransactionFilter) -> Unit> {
+        { filter ->
+            viewModel.onEvent(HomeEvent.SetFilter(filter))
         }
     }
 
@@ -182,34 +213,22 @@ fun HomeScreen(
                 CompactLayout(
                     state = state,
                     showGroupSummary = showGroupSummary,
-                    onShowGroupSummaryChange = { showGroupSummary = it },
-                    onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
+                    onShowGroupSummaryChange = onShowGroupSummaryChange,
+                    onFilterSelected = onFilterSelected,
                     onNavigateToHistory = onNavigateToHistory,
-                    onTransactionClick = { transaction ->
-                        selectedTransaction = transaction
-                        showActionsDialog = true
-                    },
-                    onTransactionLongClick = { transaction ->
-                        selectedTransaction = transaction
-                        showActionsDialog = true
-                    }
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick
                 )
             } else {
                 // Расширенный макет для планшетов
                 ExpandedLayout(
                     state = state,
                     showGroupSummary = showGroupSummary,
-                    onShowGroupSummaryChange = { showGroupSummary = it },
-                    onFilterSelected = { viewModel.onEvent(HomeEvent.SetFilter(it)) },
+                    onShowGroupSummaryChange = onShowGroupSummaryChange,
+                    onFilterSelected = onFilterSelected,
                     onNavigateToHistory = onNavigateToHistory,
-                    onTransactionClick = { transaction ->
-                        selectedTransaction = transaction
-                        showActionsDialog = true
-                    },
-                    onTransactionLongClick = { transaction ->
-                        selectedTransaction = transaction
-                        showActionsDialog = true
-                    }
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick
                 )
             }
 

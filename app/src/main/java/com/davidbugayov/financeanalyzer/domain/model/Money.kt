@@ -164,10 +164,8 @@ data class Money(
      * @return Отформатированная строка
      */
     fun format(showCurrency: Boolean = true, showSign: Boolean = false): String {
-        val symbols = DecimalFormatSymbols(Locale.getDefault())
-        symbols.groupingSeparator = currency.groupingSeparator
-        symbols.decimalSeparator = currency.decimalSeparator
-
+        val locale = Locale.getDefault()
+        
         val pattern = buildString {
             if (showSign) append("+;-")
             append("#,##0")
@@ -176,12 +174,10 @@ data class Money(
                 repeat(currency.decimalPlaces) { append("#") }
             }
         }
-
-        val formatter = DecimalFormat(pattern, symbols)
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = currency.decimalPlaces
+        
+        val formatter = getFormatter(locale, currency, pattern)
         val formattedAmount = formatter.format(amount)
-
+        
         return when {
             !showCurrency -> formattedAmount
             currency.symbolPosition == SymbolPosition.BEFORE -> "${currency.symbol}$formattedAmount"
@@ -291,6 +287,29 @@ data class Money(
     }
 
     companion object {
+        // Кэш для форматтеров денежных значений
+        private val formatters = mutableMapOf<Triple<Locale, Currency, String>, DecimalFormat>()
+        private val symbolsCache = mutableMapOf<Pair<Locale, Currency>, DecimalFormatSymbols>()
+        
+        /**
+         * Получает форматтер для денежного значения, используя кэш для улучшения производительности
+         */
+        private fun getFormatter(locale: Locale, currency: Currency, pattern: String): DecimalFormat {
+            val key = Triple(locale, currency, pattern)
+            return formatters.getOrPut(key) {
+                val symbols = symbolsCache.getOrPut(locale to currency) {
+                    DecimalFormatSymbols(locale).apply {
+                        groupingSeparator = currency.groupingSeparator
+                        decimalSeparator = currency.decimalSeparator
+                    }
+                }
+                
+                DecimalFormat(pattern, symbols).apply {
+                    minimumFractionDigits = 0
+                    maximumFractionDigits = currency.decimalPlaces
+                }
+            }
+        }
 
         /**
          * Создает денежное значение из строки

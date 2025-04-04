@@ -128,17 +128,20 @@ fun ExpandedLayout(
                             }
                         }
                         
-                        // Добавляем транзакции с виртуализацией
+                        // Добавляем транзакции с виртуализацией и contentType
                         items(
                             items = state.filteredTransactions,
-                            key = { it.id }
+                            key = { it.id },
+                            contentType = { "transaction" } // Указываем тип контента для оптимизации рекомпозиций
                         ) { transaction ->
                             TransactionItem(
                                 transaction = transaction,
                                 onClick = onTransactionClick,
-                                onLongClick = onTransactionLongClick
+                                onLongClick = onTransactionLongClick,
+                                // Разделитель включаем только если это не последний элемент
+                                showDivider = true
                             )
-                            Spacer(modifier = Modifier.height(8.dp))
+                            // Отступ между элементами создаем через padding в TransactionItem для уменьшения иерархии представлений
                         }
                         
                         // Добавляем большой отступ внизу для нижней панели навигации

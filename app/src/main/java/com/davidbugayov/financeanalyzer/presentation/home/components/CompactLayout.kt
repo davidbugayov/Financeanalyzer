@@ -126,17 +126,20 @@ fun CompactLayout(
                         }
                     }
                     
-                    // Добавляем транзакции
+                    // Добавляем транзакции с указанием contentType для улучшения производительности
                     items(
                         items = state.filteredTransactions,
-                        key = { it.id } // Используем уникальный ID как ключ для лучшей производительности
+                        key = { it.id }, // Используем уникальный ID как ключ для лучшей производительности
+                        contentType = { "transaction" } // Указываем тип контента для оптимизации рекомпозиций
                     ) { transaction ->
                         TransactionItem(
                             transaction = transaction,
                             onClick = onTransactionClick,
-                            onLongClick = onTransactionLongClick
+                            onLongClick = onTransactionLongClick,
+                            // Разделитель включаем только если это не последний элемент
+                            showDivider = true
                         )
-                        Spacer(modifier = Modifier.height(8.dp))
+                        // Отступ между элементами создаем через padding вместо Spacer для уменьшения иерархии представлений
                     }
                     // Добавляем пространство внизу для нижней панели
                     item {
