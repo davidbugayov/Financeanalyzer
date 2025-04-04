@@ -79,11 +79,11 @@ class ExportTransactionsToCSVUseCase(
                         val cleanId = cleanText(transaction.id)
                         val cleanCategory = cleanText(transaction.category)
                         val cleanNote = cleanText(transaction.note ?: "")
-                        val cleanSource = cleanText(transaction.source ?: "")
+                        val cleanSource = cleanText(transaction.source)
                         val formattedDate = dateFormat.format(transaction.date)
                         val formattedAmount = transaction.amount.toString()
                         val transactionType = if (transaction.isExpense) "Расход" else "Доход"
-                        val sourceColor = transaction.sourceColor?.toString() ?: ""
+                        val sourceColor = transaction.sourceColor.toString()
                         
                         // Формируем строку в правильном CSV формате
                         val csvLine = listOf(

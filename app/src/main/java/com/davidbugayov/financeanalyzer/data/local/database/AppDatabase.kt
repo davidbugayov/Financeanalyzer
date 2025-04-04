@@ -18,7 +18,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
  */
 @Database(
     entities = [TransactionEntity::class],
-    version = 12,
+    version = 13,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -267,6 +267,44 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 12 на версию 13
+         * Добавляет поле id_string в таблицу transactions для поддержки строковых идентификаторов
+         */
+        private val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Создаем новую таблицу с полем id_string
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS transactions_new (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        id_string TEXT NOT NULL,
+                        amount TEXT NOT NULL,
+                        category TEXT NOT NULL,
+                        isExpense INTEGER NOT NULL,
+                        date INTEGER NOT NULL,
+                        note TEXT,
+                        source TEXT NOT NULL DEFAULT 'Наличные',
+                        sourceColor INTEGER NOT NULL DEFAULT 0
+                    )
+                """)
+                
+                // Копируем данные из старой таблицы в новую, конвертируя id в id_string
+                db.execSQL("""
+                    INSERT OR IGNORE INTO transactions_new (id, id_string, amount, category, isExpense, date, note, source, sourceColor)
+                    SELECT id, CAST(id AS TEXT), amount, category, isExpense, date, note, source, sourceColor FROM transactions
+                """)
+                
+                // Удаляем старую таблицу
+                db.execSQL("DROP TABLE IF EXISTS transactions")
+                
+                // Переименовываем новую таблицу
+                db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
+                
+                // Создаем индекс для id_string
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions(id_string)")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -294,7 +332,8 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_8_9,
                         MIGRATION_9_10,
                         MIGRATION_10_11,
-                        MIGRATION_11_12
+                        MIGRATION_11_12,
+                        MIGRATION_12_13
                     )
                     .build()
                 INSTANCE = instance

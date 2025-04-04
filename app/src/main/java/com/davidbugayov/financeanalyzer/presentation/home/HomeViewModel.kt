@@ -13,8 +13,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import com.davidbugayov.financeanalyzer.utils.Event
-import com.davidbugayov.financeanalyzer.utils.EventBus
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,8 +36,7 @@ import kotlinx.coroutines.Dispatchers
  * @property getTransactionsUseCase UseCase для загрузки транзакций
  * @property addTransactionUseCase UseCase для добавления новых транзакций
  * @property deleteTransactionUseCase UseCase для удаления транзакций
- * @property repository Репозиторий для прямого доступа к транзакциям с поддержкой пагинации
- * @property eventBus Шина событий для коммуникации между компонентами
+ * @property repository Репозиторий для прямого доступа к транзакциям с поддержкой пагинации и подпиской на изменения
  * @property _state Внутренний MutableStateFlow для хранения состояния экрана
  * @property state Публичный StateFlow для наблюдения за состоянием экрана
  */
@@ -47,8 +44,7 @@ class HomeViewModel(
     private val getTransactionsUseCase: GetTransactionsUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
-    private val repository: TransactionRepository,
-    private val eventBus: EventBus
+    private val repository: TransactionRepository
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(HomeState())
@@ -64,7 +60,7 @@ class HomeViewModel(
     init {
         Timber.d("HomeViewModel initialized")
         loadTransactions()
-        subscribeToEvents()
+        subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
         
         // Наблюдаем за изменениями балансов
         viewModelScope.launch {
@@ -150,8 +146,7 @@ class HomeViewModel(
                     onSuccess = {
                         // Очищаем кэши при удалении транзакции
                         clearCaches()
-                        // Уведомляем другие компоненты об удалении транзакции
-                        eventBus.emit(Event.TransactionDeleted)
+                        // Уведомление об удалении теперь происходит через SharedFlow репозитория
                         // Скрываем диалог подтверждения
                         _state.update { it.copy(transactionToDelete = null) }
                     },
@@ -178,46 +173,17 @@ class HomeViewModel(
     }
 
     /**
-     * Подписываемся на события изменения транзакций через EventBus
+     * Подписываемся на изменения данных в репозитории
      */
-    private fun subscribeToEvents() {
+    private fun subscribeToRepositoryChanges() {
         viewModelScope.launch {
-            Timber.d("Subscribing to transaction events")
-            eventBus.events.collect { event ->
-                when (event) {
-                    is Event.TransactionAdded -> {
-                        Timber.d("Получено событие TransactionAdded")
-                        // Очищаем кэши при изменении данных
-                        clearCaches()
-                        loadTransactions()
-                    }
-                    is Event.TransactionDeleted -> {
-                        Timber.d("Получено событие TransactionDeleted")
-                        // Очищаем кэши при изменении данных
-                        clearCaches()
-                        loadTransactions()
-                    }
-                    is Event.TransactionUpdated -> {
-                        Timber.d("Получено событие TransactionUpdated in HomeViewModel")
-                        // Очищаем кэши при изменении данных
-                        clearCaches()
-                        Timber.d("Кэши очищены, запускаем полную перезагрузку данных")
-                        // Используем запуск в IO потоке для быстрого обновления
-                        viewModelScope.launch(Dispatchers.IO) {
-                            try {
-                                Timber.d("Начинаем загрузку данных после обновления транзакции")
-                                // Задержка для уверенности в обновлении базы данных
-                                delay(100)
-                                withContext(Dispatchers.Main) {
-                                    loadTransactions()
-                                }
-                                Timber.d("Данные успешно обновлены после редактирования транзакции")
-                            } catch (e: Exception) {
-                                Timber.e(e, "Ошибка при обновлении данных после редактирования: ${e.message}")
-                            }
-                        }
-                    }
-                }
+            Timber.d("Subscribing to repository data changes")
+            repository.dataChangeEvents.collect {
+                Timber.d("Получено событие изменения данных из репозитория")
+                // Очищаем кэши при изменении данных
+                clearCaches()
+                // Перезагружаем данные
+                loadTransactions()
             }
         }
     }
@@ -392,7 +358,6 @@ class HomeViewModel(
             if (!hasError) {
                 // Очищаем кэши при добавлении тестовых данных
                 clearCaches()
-                eventBus.emit(Event.TransactionAdded)
                 Timber.d("Test data generation completed successfully")
             } else {
                 _state.update { it.copy(error = "Ошибка при сохранении некоторых тестовых транзакций") }

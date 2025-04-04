@@ -161,20 +161,18 @@ fun TransactionItem(
                     modifier = Modifier.padding(top = 4.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    // Источник (если есть)
-                    if (transaction.source != null) {
-                        Text(
-                            text = transaction.source,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = sourceColor,
-                            maxLines = 1,
-                            overflow = TextOverflow.Ellipsis,
-                            modifier = Modifier.weight(1f, fill = false)
-                        )
-                        
-                        // Разделитель между источником и датой - очень маленький отступ
-                        Spacer(modifier = Modifier.width(4.dp))
-                    }
+                    // Источник
+                    Text(
+                        text = transaction.source,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = sourceColor,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.weight(1f, fill = false)
+                    )
+                    
+                    // Разделитель между источником и датой - очень маленький отступ
+                    Spacer(modifier = Modifier.width(4.dp))
                     
                     // Дата транзакции - используем предварительно отформатированную дату
                     Text(

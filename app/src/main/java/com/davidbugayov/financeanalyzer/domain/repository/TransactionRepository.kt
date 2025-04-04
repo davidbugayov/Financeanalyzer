@@ -2,13 +2,29 @@ package com.davidbugayov.financeanalyzer.domain.repository
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharedFlow
 import java.util.Date
+
+/**
+ * Событие изменения данных в репозитории
+ */
+sealed class DataChangeEvent {
+    data class TransactionChanged(val transactionId: String?) : DataChangeEvent() // null если массовое изменение
+}
 
 /**
  * Репозиторий для работы с транзакциями.
  * Следует принципам Clean Architecture.
  */
 interface TransactionRepository {
+
+    /**
+     * Поток событий изменения данных в репозитории.
+     * ViewModel могут подписаться на него, чтобы реагировать на добавление,
+     * удаление или обновление транзакций.
+     */
+    val dataChangeEvents: SharedFlow<DataChangeEvent>
+
     /**
      * Получает все транзакции.
      * @return Список всех транзакций.

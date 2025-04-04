@@ -122,7 +122,7 @@ class FilterTransactionsUseCase {
     ): List<Transaction> {
         return if (sources.isNotEmpty()) {
             transactions.filter { transaction ->
-                transaction.source in sources || (transaction.source == null && "Наличные" in sources)
+                transaction.source in sources
             }
         } else {
             transactions

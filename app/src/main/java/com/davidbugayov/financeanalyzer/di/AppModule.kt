@@ -16,7 +16,6 @@ import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.utils.EventBus
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -40,7 +39,6 @@ val appModule = module {
     single { PreferencesManager(androidContext()) }
 
     // Utils
-    single { EventBus }
     single { AnalyticsUtils }
     single { FinancialMetrics.getInstance() }
     
@@ -81,8 +79,7 @@ val appModule = module {
             getTransactionsUseCase = get(),
             addTransactionUseCase = get(),
             deleteTransactionUseCase = get(),
-            repository = get(),
-            eventBus = get()
+            repository = get()
         )
     }
 

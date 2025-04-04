@@ -14,6 +14,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Category
@@ -21,7 +22,6 @@ import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.ShowChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -100,7 +100,7 @@ fun AnalyticsSection(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Icon(
-                        imageVector = Icons.Default.ShowChart,
+                        imageVector = Icons.AutoMirrored.Filled.ShowChart,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
                         modifier = Modifier.size(28.dp)
@@ -236,7 +236,7 @@ fun AnalyticsSection(
                 Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
                 
                 AnalyticCard(
-                    icon = Icons.Default.ShowChart,
+                    icon = Icons.AutoMirrored.Filled.ShowChart,
                     title = stringResource(R.string.average_expense),
                     value = averageExpense,
                     modifier = Modifier.weight(1f)

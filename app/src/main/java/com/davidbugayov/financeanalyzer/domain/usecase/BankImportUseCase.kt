@@ -41,7 +41,7 @@ abstract class BankImportUseCase(
 
             // Проверяем, что формат файла соответствует ожидаемому для данного банка
             if (!isValidFormat(reader)) {
-                emit(ImportResult.Error("Формат файла не соответствует формату ${bankName}"))
+                emit(ImportResult.Error("Формат файла не соответствует формату $bankName"))
                 return@flow
             }
 
@@ -78,7 +78,7 @@ abstract class BankImportUseCase(
                             ImportResult.Progress(
                                 current = currentLine,
                                 total = totalLines,
-                                message = "Импортируется $currentLine из $totalLines транзакций из ${bankName}"
+                                message = "Импортируется $currentLine из $totalLines транзакций из $bankName"
                             )
                         )
                     }
@@ -115,7 +115,7 @@ abstract class BankImportUseCase(
         } catch (e: Exception) {
             emit(
                 ImportResult.Error(
-                    message = "Ошибка импорта из ${bankName}: ${e.message}",
+                    message = "Ошибка импорта из $bankName: ${e.message}",
                     exception = e
                 )
             )

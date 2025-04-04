@@ -103,4 +103,12 @@ interface TransactionDao {
      */
     @Query("DELETE FROM transactions")
     suspend fun deleteAllTransactions()
+    
+    /**
+     * Удаляет транзакцию по строковому идентификатору.
+     * Применяется, когда ID может быть не только числовым.
+     * @param id Строковый ID транзакции
+     */
+    @Query("DELETE FROM transactions WHERE id_string = :id")
+    suspend fun deleteTransactionById(id: String)
 } 

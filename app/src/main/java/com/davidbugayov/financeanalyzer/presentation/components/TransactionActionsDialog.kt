@@ -71,23 +71,21 @@ fun TransactionActionsDialog(
                 
                 Spacer(modifier = Modifier.height(12.dp))
                 
-                // Отображаем источник, если он есть
-                if (transaction.source != null) {
-                    Row(verticalAlignment = Alignment.CenterVertically) {
-                        // Добавляем цветной индикатор источника
-                        Box(
-                            modifier = Modifier
-                                .size(12.dp)
-                                .background(Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense)), CircleShape)
-                        )
-                        Spacer(modifier = Modifier.width(4.dp))
-                        
-                        Text(
-                            text = "Источник: ${transaction.source}",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
-                        )
-                    }
+                // Отображаем источник
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    // Добавляем цветной индикатор источника
+                    Box(
+                        modifier = Modifier
+                            .size(12.dp)
+                            .background(Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense)), CircleShape)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
+                    
+                    Text(
+                        text = "Источник: ${transaction.source}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
+                    )
                 }
                 
                 // Отображаем примечание, если оно есть

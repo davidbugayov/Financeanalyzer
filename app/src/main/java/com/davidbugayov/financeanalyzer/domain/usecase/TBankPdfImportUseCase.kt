@@ -79,10 +79,6 @@ class TBankPdfImportUseCase(
         try {
             emit(ImportResult.Progress(1, 100, "Открытие PDF-файла выписки Т-Банка"))
             
-            // Открываем PDF файл
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("Не удалось открыть файл")
-            
             // Используем таймаут для чтения PDF содержимого
             val pdfLines = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
                 readPdfContent(uri)
@@ -324,7 +320,6 @@ class TBankPdfImportUseCase(
                         // Ищем сумму в текущей строке
                         var amount = findAmountInString(line)
                         var description = line
-                        var cardNumber: String? = null
                         
                         // Если сумма не найдена, смотрим в следующей строке
                         if (amount == null && i + 1 < pdfLines.size) {
@@ -359,12 +354,9 @@ class TBankPdfImportUseCase(
                             j++
                         }
                         
-                        // Ищем номер карты в описании
-                        cardNumber = extractCardNumber(description)
-                        
                         // Если нашли сумму, создаем транзакцию
                         if (amount != null) {
-                            saveTransaction(transactions, date, amount, description, source, cardNumber)
+                            saveTransaction(transactions, date, amount, description, source)
                         }
                     }
                 } else {
@@ -379,8 +371,7 @@ class TBankPdfImportUseCase(
                             val amount = findAmountInString(line)
                             if (amount != null) {
                                 val description = line
-                                val cardNumber = extractCardNumber(line)
-                                saveTransaction(transactions, date, amount, description, source, cardNumber)
+                                saveTransaction(transactions, date, amount, description, source)
                             }
                         }
                     }
@@ -452,10 +443,9 @@ class TBankPdfImportUseCase(
                     // Ищем сумму в текущей строке или в следующих 2-3 строках
                     var amount: Pair<Double, Boolean>? = findAmountInString(line)
                     var description = line
-                    var cardNumber = extractCardNumber(line)
                     
                     if (amount != null) {
-                        saveTransaction(transactions, date, amount, description, source, cardNumber)
+                        saveTransaction(transactions, date, amount, description, source)
                     }
                 }
             }
@@ -500,10 +490,7 @@ class TBankPdfImportUseCase(
                     val descEnd = maxOf(dateIndex, amountIndex) + 1
                     val description = pdfLines.subList(descStart, minOf(descEnd, pdfLines.size)).joinToString(" ")
                     
-                    // Ищем номер карты
-                    val cardNumber = extractCardNumber(description)
-                    
-                    saveTransaction(transactions, date, amount, description, source, cardNumber)
+                    saveTransaction(transactions, date, amount, description, source)
                 }
             }
         }
@@ -540,19 +527,13 @@ class TBankPdfImportUseCase(
         date: Date,
         amountInfo: Pair<Double, Boolean>,
         description: String,
-        source: String,
-        cardNumber: String? = null
+        source: String
     ) {
         val (amount, isExpense) = amountInfo
         
         if (amount > 0) {
             val category = determineCategory(description)
-            var note = extractNoteFromDescription(description)
-            
-            // Если есть номер карты, добавляем его к примечанию
-            if (cardNumber != null && !description.contains(cardNumber)) {
-                note = if (note.isNullOrEmpty()) "Карта: $cardNumber" else "$note (Карта: $cardNumber)"
-            }
+            val note = extractNoteFromDescription(description)
             
             val transaction = Transaction(
                 id = "tbank_pdf_${date.time}_${System.nanoTime()}",

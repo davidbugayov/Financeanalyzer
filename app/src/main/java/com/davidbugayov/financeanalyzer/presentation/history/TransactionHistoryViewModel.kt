@@ -18,8 +18,6 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.utils.Event
-import com.davidbugayov.financeanalyzer.utils.EventBus
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,7 +39,6 @@ class TransactionHistoryViewModel @Inject constructor(
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val repository: TransactionRepository,
-    private val eventBus: EventBus,
     private val analyticsUtils: AnalyticsUtils,
     val categoriesViewModel: CategoriesViewModel
 ) : ViewModel() {
@@ -68,6 +65,7 @@ class TransactionHistoryViewModel @Inject constructor(
         // Загружаем транзакции и категории
         loadTransactionsFirstPage()
         loadCategories()
+        subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
     }
 
     private fun loadCategories() {
@@ -123,7 +121,7 @@ class TransactionHistoryViewModel @Inject constructor(
         viewModelScope.launch {
             when (val result = deleteTransactionUseCase(transaction)) {
                 is Result.Success -> {
-                    eventBus.emit(Event.TransactionDeleted)
+                    // Уведомление об удалении теперь происходит через SharedFlow репозитория
                     resetAndReloadTransactions()
                 }
                 is Result.Error -> {
@@ -148,6 +146,20 @@ class TransactionHistoryViewModel @Inject constructor(
             ) 
         }
         loadTransactionsFirstPage()
+    }
+
+    /**
+     * Подписываемся на изменения данных в репозитории
+     */
+    private fun subscribeToRepositoryChanges() {
+        viewModelScope.launch {
+            Timber.d("Subscribing to repository data changes in HistoryViewModel")
+            repository.dataChangeEvents.collect {
+                Timber.d("Получено событие изменения данных из репозитория в HistoryViewModel")
+                // Сбрасываем и перезагружаем данные
+                resetAndReloadTransactions()
+            }
+        }
     }
 
     /**

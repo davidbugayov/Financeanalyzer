@@ -1,8 +1,10 @@
 package com.davidbugayov.financeanalyzer.domain.usecase
 
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
+import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.util.safeCall
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
@@ -17,15 +19,12 @@ class UpdateTransactionUseCase(
      * Обновляет транзакцию в базе данных.
      *
      * @param transaction Обновленная транзакция
-     * @return Unit при успешном выполнении или выбрасывает исключение
+     * @return Результат операции в виде Result<Unit>
      */
-    suspend operator fun invoke(transaction: Transaction) = withContext(Dispatchers.IO) {
-        try {
+    suspend operator fun invoke(transaction: Transaction): Result<Unit> {
+        return safeCall {
             Timber.d("Обновление транзакции: $transaction")
             repository.updateTransaction(transaction)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при обновлении транзакции")
-            throw e
         }
     }
 } 

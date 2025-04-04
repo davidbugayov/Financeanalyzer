@@ -15,8 +15,7 @@ val homeModule = module {
             getTransactionsUseCase = get(),
             addTransactionUseCase = get(),
             deleteTransactionUseCase = get(),
-            repository = get(),
-            eventBus = get()
+            repository = get()
         )
     }
 } 

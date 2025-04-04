@@ -110,10 +110,6 @@ class SberbankPdfImportUseCase(
         try {
             emit(ImportResult.Progress(1, 100, "Открытие PDF-файла выписки Сбербанка"))
             
-            // Открываем PDF файл
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("Не удалось открыть файл")
-            
             // Используем таймаут для чтения PDF содержимого
             val pdfLines = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
                 readPdfContent(uri)
@@ -367,7 +363,7 @@ class SberbankPdfImportUseCase(
         }
         
         // Теперь анализируем строки данных, предполагая структуру из трех столбцов
-        var currentDate: Date? = null
+        var currentDate: Date?
         var currentLineIndex = dataIndex
         var categories = standardCategories.map { it.lowercase(Locale.getDefault()) }
         
@@ -438,12 +434,6 @@ class SberbankPdfImportUseCase(
                             if (parsedAmount != null && parsedAmount > 0) {
                                 // Определяем тип операции (расход/доход)
                                 var isExpense = !amountStr.startsWith("+")
-                                
-                                // Если строка содержит "Перевод СБП" или подобное, это может быть расход,
-                                // если нет явного знака + в начале
-                                val isTransferOperation = 
-                                    middleColumn.contains("Перевод СБП", ignoreCase = true) ||
-                                    middleColumn.contains("Перевод для Б.", ignoreCase = true)
                                 
                                 // Анализ операции на основе описания и суммы
                                 var finalIsExpense = isExpense
@@ -547,13 +537,6 @@ class SberbankPdfImportUseCase(
                                     }
                                 }
                                 
-                                // Проверяем, что у нас действительно есть дата
-                                if (currentDate == null) {
-                                    Timber.e("Пропускаем транзакцию без даты в строке: $currentLine")
-                                    currentLineIndex++
-                                    continue
-                                }
-                                
                                 // Создаем примечание из имеющихся данных 
                                 val noteText = when {
                                     // Используем строку дополнительной информации если она есть
@@ -562,22 +545,24 @@ class SberbankPdfImportUseCase(
                                         additionalInfo
                                     }
                                     
-                                    // Проверяем следующую строку после текущей строки
-                                    nextLineIndex < pdfLines.size && nextLineIndex > currentLineIndex -> {
-                                        val nextLineText = pdfLines[nextLineIndex].trim()
-                                        Timber.d("Используем следующую строку для примечания: '$nextLineText'")
-                                        nextLineText
+                                    // Используем содержимое строки с авторизацией + строки описания
+                                    nextLineIndex < pdfLines.size && nextLineIndex > currentLineIndex + 1 -> {
+                                        val authCode = pdfLines[currentLineIndex + 1].trim()
+                                        val operationDesc = pdfLines[nextLineIndex - 1].trim()
+                                        val fullDesc = "$operationDesc $authCode".trim()
+                                        Timber.d("Используем составное примечание: '$fullDesc'")
+                                        fullDesc
                                     }
                                     
                                     // Или описание из среднего столбца
                                     middleColumn.isNotBlank() -> {
-                                        Timber.d("Используем среднюю колонку для примечания: '$middleColumn'")
+                                        Timber.d("Используем описание для примечания: '$middleColumn'")
                                         middleColumn
                                     }
                                     
                                     // В крайнем случае формируем обобщенное описание
                                     else -> {
-                                        val generatedNote = "${category}. Операция от ${datePattern.format(currentDate)}"
+                                        val generatedNote = "${category}. Операция от ${datePattern.format(currentDate!!)}"
                                         Timber.d("Генерируем примечание: '$generatedNote'")
                                         generatedNote
                                     }
@@ -587,7 +572,7 @@ class SberbankPdfImportUseCase(
                                 
                                 // Создаем транзакцию с примечанием
                                 val transaction = Transaction(
-                                    id = "sber_pdf_table_${currentDate.time}_${System.nanoTime()}",
+                                    id = "sber_pdf_${currentDate!!.time}_${parsedAmount}_${System.nanoTime()}",
                                     amount = parsedAmount,
                                     category = category,
                                     date = currentDate,
@@ -808,13 +793,6 @@ class SberbankPdfImportUseCase(
                                     }
                                     // Переводы часто доходы
                                     isExpense = false
-                                }
-                                
-                                // Проверяем, что у нас действительно есть дата
-                                if (date == null) {
-                                    Timber.e("Пропускаем транзакцию без даты в строке: $line")
-                                    i++
-                                    continue
                                 }
                                 
                                 // Создаем примечание из имеющихся данных

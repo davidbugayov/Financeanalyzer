@@ -9,6 +9,8 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.onFailure
+import com.davidbugayov.financeanalyzer.domain.model.onSuccess
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.components.parseFormattedAmount
@@ -17,8 +19,6 @@ import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionSta
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.utils.Event
-import com.davidbugayov.financeanalyzer.utils.EventBus
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -343,57 +343,109 @@ class AddTransactionViewModel(
         return !hasErrors
     }
 
+    /**
+     * Добавляет новую транзакцию
+     */
     private fun addTransaction() {
-        if (!validateInput()) {
-            return
-        }
-
         viewModelScope.launch {
+            val currentState = _state.value
+            val amountDouble = currentState.amount.replace(" ", "").toDoubleOrNull()
+
+            if (amountDouble == null) {
+                _state.update { it.copy(amountError = true) }
+                return@launch
+            }
+
+            val transaction = Transaction(
+                amount = amountDouble,
+                category = currentState.category,
+                isExpense = currentState.isExpense,
+                date = currentState.selectedDate,
+                note = currentState.note.trim(),
+                source = currentState.source,
+                sourceColor = currentState.sourceColor
+            )
+
             _state.update { it.copy(isLoading = true) }
+
+            // Используем методы onSuccess и onFailure вместо fold
+            val result = addTransactionUseCase(transaction)
             
-            try {
-                // Преобразуем строку в объект Money
-                val money = parseFormattedAmount(_state.value.amount)
-                
-                val transaction = Transaction(
-                    amount = money.amount.toDouble(),
-                    category = _state.value.category,
-                    isExpense = _state.value.isExpense,
-                    date = _state.value.selectedDate,
-                    note = _state.value.note.ifBlank { null },
-                    source = _state.value.source.ifBlank { "Сбер" },
-                    sourceColor = _state.value.sourceColor
-                )
+            result.onSuccess { 
+                Timber.d("Transaction added successfully")
+                _state.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        isSuccess = true // Показываем диалог успеха
+                    )
+                }
+                updateCategoryPositions()
+                updateAppWidget()
+            }
+            
+            result.onFailure { exception ->
+                Timber.e(exception as Throwable, "Failed to add transaction")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = exception.message ?: "Не удалось добавить транзакцию"
+                    )
+                }
+            }
+        }
+    }
 
-                addTransactionUseCase(transaction)
+    /**
+     * Обновляет существующую транзакцию
+     * @param transactionToEdit Оригинальная транзакция для редактирования
+     */
+    private fun updateTransaction(transactionToEdit: Transaction) {
+        viewModelScope.launch {
+            val currentState = _state.value
+            val amountDouble = currentState.amount.replace(" ", "").toDoubleOrNull()
 
-                // Увеличиваем счетчик использования категории
-                categoriesViewModel.incrementCategoryUsage(_state.value.category, _state.value.isExpense)
+            if (amountDouble == null) {
+                _state.update { it.copy(amountError = true) }
+                return@launch
+            }
 
-                // Логируем добавление транзакции в аналитику
-                AnalyticsUtils.logTransactionAdded(
-                    type = if (_state.value.isExpense) "expense" else "income",
-                    amount = money,
-                    category = _state.value.category
-                )
-                
-                _state.update { it.copy(isSuccess = true) }
+            val updatedTransaction = transactionToEdit.copy(
+                amount = amountDouble,
+                category = currentState.category,
+                isExpense = currentState.isExpense,
+                date = currentState.selectedDate,
+                note = currentState.note.trim(),
+                source = currentState.source,
+                sourceColor = currentState.sourceColor
+            )
 
-                // Уведомляем другие компоненты о добавлении транзакции
-                EventBus.emit(Event.TransactionAdded)
+            _state.update { it.copy(isLoading = true) }
 
-                // Обновляем виджеты баланса
-                updateBalanceWidget()
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
-
-                // Логируем ошибку в аналитику
-                AnalyticsUtils.logError(
-                    errorType = "transaction_add_error",
-                    errorMessage = e.message ?: "Unknown error"
-                )
-            } finally {
-                _state.update { it.copy(isLoading = false) }
+            // Используем методы onSuccess и onFailure вместо fold
+            val result = updateTransactionUseCase(updatedTransaction)
+            
+            result.onSuccess {
+                Timber.d("Transaction updated successfully: $updatedTransaction")
+                _state.update { state ->
+                    state.copy(
+                        isLoading = false,
+                        isSuccess = true, // Показываем диалог успеха
+                        editMode = false, 
+                        transactionToEdit = null
+                    )
+                }
+                updateCategoryPositions()
+                updateAppWidget()
+            }
+            
+            result.onFailure { exception ->
+                Timber.e(exception as Throwable, "Failed to update transaction")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = exception.message ?: "Не удалось обновить транзакцию"
+                    )
+                }
             }
         }
     }
@@ -459,7 +511,7 @@ class AddTransactionViewModel(
     /**
      * Обновляет виджет баланса после изменения данных, но только если виджеты добавлены на домашний экран
      */
-    private fun updateBalanceWidget() {
+    private fun updateAppWidget() {
         val context = getApplication<Application>().applicationContext
         val widgetManager = AppWidgetManager.getInstance(context)
         val widgetComponent = ComponentName(context, "com.davidbugayov.financeanalyzer.widget.BalanceWidget")
@@ -582,81 +634,11 @@ class AddTransactionViewModel(
                 isExpense = transaction.isExpense,
                 selectedDate = transaction.date,
                 note = transaction.note ?: "",
-                source = transaction.source ?: "Сбер",
+                source = transaction.source,
                 sourceColor = it.sources.find { source -> source.name == transaction.source }?.color ?: ColorUtils.SBER_COLOR,
                 editMode = true,
                 transactionToEdit = transaction
             )
-        }
-    }
-
-    /**
-     * Обновляет существующую транзакцию
-     */
-    fun updateTransaction(transaction: Transaction) {
-        if (!validateInput()) {
-            return
-        }
-
-        viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
-            
-            try {
-                // Преобразуем строку в объект Money
-                val money = parseFormattedAmount(_state.value.amount)
-                
-                // Создаем обновленную транзакцию с сохранением id
-                val updatedTransaction = Transaction(
-                    id = transaction.id,
-                    amount = money.amount.toDouble(),
-                    category = _state.value.category,
-                    isExpense = _state.value.isExpense,
-                    date = _state.value.selectedDate,
-                    note = _state.value.note.ifBlank { null },
-                    source = _state.value.source.ifBlank { "Сбер" },
-                    sourceColor = _state.value.sourceColor
-                )
-
-                // Вызываем use case для обновления транзакции
-                updateTransactionUseCase(updatedTransaction)
-
-                // Увеличиваем счетчик использования категории
-                categoriesViewModel.incrementCategoryUsage(_state.value.category, _state.value.isExpense)
-
-                // Логируем обновление транзакции в аналитику
-                AnalyticsUtils.logEvent(
-                    eventName = "transaction_updated",
-                    params = mapOf(
-                        "type" to if (_state.value.isExpense) "expense" else "income",
-                        "amount" to money.amount.toString(),
-                        "category" to _state.value.category
-                    )
-                )
-                
-                _state.update { it.copy(isSuccess = true) }
-
-                // Добавляем задержку, чтобы база данных успела обновиться
-                Timber.d("Ожидаем обновления базы данных перед отправкой события...")
-                delay(250)
-                
-                // Уведомляем другие компоненты об обновлении транзакции
-                Timber.d("Отправляем событие TransactionUpdated: ${updatedTransaction.id} - ${updatedTransaction.category} (${updatedTransaction.amount})")
-                EventBus.emit(Event.TransactionUpdated)
-                Timber.d("Событие TransactionUpdated успешно отправлено")
-
-                // Обновляем виджеты баланса
-                updateBalanceWidget()
-            } catch (e: Exception) {
-                _state.update { it.copy(error = e.message) }
-
-                // Логируем ошибку в аналитику
-                AnalyticsUtils.logError(
-                    errorType = "transaction_update_error",
-                    errorMessage = e.message ?: "Unknown error"
-                )
-            } finally {
-                _state.update { it.copy(isLoading = false) }
-            }
         }
     }
 } 

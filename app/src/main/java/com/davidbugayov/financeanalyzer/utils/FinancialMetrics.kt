@@ -412,4 +412,16 @@ class FinancialMetrics private constructor() : KoinComponent {
     fun initializeMetricsFromCache() {
         initializeFromCache()
     }
+
+    /**
+     * Принудительно инвалидирует кэш метрик и запускает их пересчет.
+     * Используется после изменения данных (добавление, удаление, обновление транзакции).
+     */
+    fun invalidateMetrics() {
+        Timber.d("Инвалидация кэша метрик и запуск пересчета")
+        // Помечаем кэш как неактуальный - УДАЛЕНО, т.к. нет такого метода
+        // preferencesManager.invalidateStatsCache()
+        // Запускаем пересчет напрямую
+        recalculateStats()
+    }
 } 

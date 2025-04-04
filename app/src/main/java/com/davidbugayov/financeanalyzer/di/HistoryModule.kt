@@ -26,7 +26,6 @@ val historyModule = module {
             calculateCategoryStatsUseCase = get(),
             deleteTransactionUseCase = get(),
             repository = get(),
-            eventBus = get(),
             analyticsUtils = get(),
             categoriesViewModel = get()
         )

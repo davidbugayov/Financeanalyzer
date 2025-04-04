@@ -170,8 +170,6 @@ fun TransactionHistoryScreen(
     if (state.showStartDatePicker) {
         DatePickerDialog(
             initialDate = state.startDate,
-            limitDate = state.endDate,
-            isStartDate = true,
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
@@ -185,8 +183,6 @@ fun TransactionHistoryScreen(
     if (state.showEndDatePicker) {
         DatePickerDialog(
             initialDate = state.endDate,
-            limitDate = state.startDate,
-            isStartDate = false,
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)

@@ -6,8 +6,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.OpenInNew
 import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.automirrored.filled.OpenInNew
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -118,7 +118,7 @@ private fun ActionChoiceDialog(
                     onClick = { onActionSelected(ExportAction.OPEN) }
                 ) {
                     Icon(
-                        imageVector = Icons.Default.OpenInNew,
+                        imageVector = Icons.AutoMirrored.Filled.OpenInNew,
                         contentDescription = null,
                         modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_small))
                     )
