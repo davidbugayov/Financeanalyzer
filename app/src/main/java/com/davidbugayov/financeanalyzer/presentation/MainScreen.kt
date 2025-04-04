@@ -30,19 +30,19 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryS
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
+import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
-import com.davidbugayov.financeanalyzer.presentation.ui.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
-import org.koin.androidx.compose.koinViewModel
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.Dispatchers
-import timber.log.Timber
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @Composable
 fun MainScreen(startDestination: String = "home") {

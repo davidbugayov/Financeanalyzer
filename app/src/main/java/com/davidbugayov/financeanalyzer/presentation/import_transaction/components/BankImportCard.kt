@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.ui.components
+package com.davidbugayov.financeanalyzer.presentation.import_transaction.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable

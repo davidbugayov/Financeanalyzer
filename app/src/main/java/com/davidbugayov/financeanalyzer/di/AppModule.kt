@@ -7,7 +7,12 @@ import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImp
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
@@ -52,6 +57,11 @@ val appModule = module {
     single { AddTransactionUseCase(get()) }
     single { DeleteTransactionUseCase(get()) }
     single { UpdateTransactionUseCase(get()) }
+    single { FilterTransactionsUseCase() }
+    single { GroupTransactionsUseCase() }
+    single { CalculateCategoryStatsUseCase(get()) }
+    single { ExportTransactionsToCSVUseCase(get()) }
+    single { ImportTransactionsManager(get(), androidContext()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }

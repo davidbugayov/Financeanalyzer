@@ -39,4 +39,10 @@
     <color name="chart_grid">#E0E0E0</color>
     <color name="chart_line">#2196F3</color>
     <color name="chart_bar">#03A9F4</color>
+
+    <!-- Bank colors -->
+    <color name="bank_sberbank">#1A9F29</color>
+    <color name="bank_tinkoff">#FFDD2D</color>
+    <color name="bank_alfabank">#EF3124</color>
+    <color name="bank_ozon">#0066C0</color>
 </resources>

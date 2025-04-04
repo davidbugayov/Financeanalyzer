@@ -14,16 +14,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
 import java.util.regex.Pattern
 import kotlin.math.absoluteValue
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import timber.log.Timber
-import android.graphics.Color
 
 /**
  * Реализация импорта транзакций из PDF-выписки Т-Банка.
@@ -762,8 +761,8 @@ class TBankPdfImportUseCase(
         // Этот метод не будет использован для PDF
         throw NotImplementedError("Метод не реализован для PDF, используется специализированная логика")
     }
-    
-    override fun countTransactionLines(uri: Uri): Int {
+
+    override suspend fun countTransactionLines(uri: Uri): Int {
         // Для PDF мы не можем заранее точно определить количество транзакций
         return 100 // Возвращаем примерное значение
     }

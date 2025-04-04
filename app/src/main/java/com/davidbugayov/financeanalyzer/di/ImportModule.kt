@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.di
 
-import com.davidbugayov.financeanalyzer.presentation.ui.ImportTransactionsViewModel
-import org.koin.android.ext.koin.androidContext
+import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
@@ -13,8 +12,7 @@ val importModule = module {
     // ViewModel для экрана импорта
     viewModel {
         ImportTransactionsViewModel(
-            repository = get(),
-            context = androidContext()
+            importManager = get(),
         )
     }
 } 

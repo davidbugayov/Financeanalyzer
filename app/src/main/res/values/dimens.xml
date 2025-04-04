@@ -33,7 +33,7 @@
     <dimen name="text_size_micro">11sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
-    <dimen name="text_size_normal">18sp</dimen>
+    <dimen name="text_size_normal">20sp</dimen>
     <dimen name="text_size_large">22sp</dimen>
     <dimen name="text_size_xlarge">24sp</dimen>
     <dimen name="text_size_xxlarge">28sp</dimen>
@@ -98,7 +98,7 @@
     <dimen name="card_image_height">200dp</dimen>
 
     <!-- Размеры для кнопок -->
-    <dimen name="button_height">48dp</dimen>
+    <dimen name="button_height">56dp</dimen>
     <dimen name="button_min_width">88dp</dimen>
     <dimen name="button_padding">16dp</dimen>
     <dimen name="button_elevation">2dp</dimen>
@@ -145,4 +145,14 @@
     <dimen name="elevation_small">2dp</dimen>
 
     <dimen name="bar_shape">16dp</dimen>
+
+    <!-- Import Transactions Screen -->
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="space_small">8dp</dimen>
+    <dimen name="space_medium">16dp</dimen>
+    <dimen name="space_large">24dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="empty_state_height">120dp</dimen>
 </resources> 
