@@ -95,7 +95,7 @@ fun HomeScreen(
     // Загружаем сохраненное состояние видимости GroupSummary
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
     var showGroupSummary by rememberSaveable {
-        mutableStateOf(sharedPreferences.getBoolean("show_group_summary", true))
+        mutableStateOf(sharedPreferences.getBoolean("show_group_summary", false))
     }
 
     // Обновляем состояние showGroupSummary в ViewModel при его изменении

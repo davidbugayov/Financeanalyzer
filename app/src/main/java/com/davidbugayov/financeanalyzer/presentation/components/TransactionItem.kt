@@ -56,6 +56,10 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
+// Определяем цвета как константы на верхнем уровне
+private val IncomeColorVal = Color(ColorUtils.INCOME_COLOR)
+private val ExpenseColorVal = Color(ColorUtils.EXPENSE_COLOR)
+
 // Создаем SimpleDateFormat один раз и переиспользуем для всех экземпляров
 private val DATE_FORMATTER = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
@@ -79,9 +83,9 @@ fun TransactionItem(
     onLongClick: (Transaction) -> Unit = {},
     showDivider: Boolean = true
 ) {
-    // Используем remember для кэширования дорогостоящих вычислений
-    val incomeColor = remember { Color(ColorUtils.INCOME_COLOR) }
-    val expenseColor = remember { Color(ColorUtils.EXPENSE_COLOR) }
+    // Используем константы для цветов
+    val incomeColor = IncomeColorVal
+    val expenseColor = ExpenseColorVal
     
     // Форматируем дату только один раз и запоминаем результат
     val formattedDate = remember(transaction.date) { 
@@ -97,6 +101,9 @@ fun TransactionItem(
     val sourceColor = remember(transaction.source, transaction.sourceColor, transaction.isExpense) {
         Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
     }
+    
+    // Кэшируем производный цвет для Surface
+    val surfaceColor = remember(sourceColor) { sourceColor.copy(alpha = 0.3f) }
     
     // Предварительно вычисляем и кэшируем форматированную сумму
     val formattedAmount = remember(transaction.amount, transaction.isExpense) {
@@ -130,7 +137,7 @@ fun TransactionItem(
             Surface(
                 modifier = Modifier.size(40.dp),
                 shape = CircleShape,
-                color = sourceColor.copy(alpha = 0.3f)
+                color = surfaceColor
             ) {
                 Icon(
                     imageVector = categoryInfo.icon,
