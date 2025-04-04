@@ -18,7 +18,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
  */
 @Database(
     entities = [TransactionEntity::class],
-    version = 11,
+    version = 12,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -233,6 +233,40 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 11 на версию 12
+         * Исправляет структуру таблицы transactions для решения проблемы с миграцией
+         */
+        private val MIGRATION_11_12 = object : Migration(11, 12) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Создаем новую таблицу с правильной структурой
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS transactions_new (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        amount TEXT NOT NULL,
+                        category TEXT NOT NULL,
+                        isExpense INTEGER NOT NULL,
+                        date INTEGER NOT NULL,
+                        note TEXT,
+                        source TEXT NOT NULL DEFAULT 'Наличные',
+                        sourceColor INTEGER NOT NULL DEFAULT 0
+                    )
+                """)
+                
+                // Копируем данные из старой таблицы в новую
+                db.execSQL("""
+                    INSERT OR IGNORE INTO transactions_new (id, amount, category, isExpense, date, note, source, sourceColor)
+                    SELECT id, amount, category, isExpense, date, note, source, sourceColor FROM transactions
+                """)
+                
+                // Удаляем старую таблицу
+                db.execSQL("DROP TABLE IF EXISTS transactions")
+                
+                // Переименовываем новую таблицу
+                db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -259,7 +293,8 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_7_8,
                         MIGRATION_8_9,
                         MIGRATION_9_10,
-                        MIGRATION_10_11
+                        MIGRATION_10_11,
+                        MIGRATION_11_12
                     )
                     .build()
                 INSTANCE = instance

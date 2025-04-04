@@ -10,15 +10,17 @@ import java.util.Date
  * Entity для хранения транзакций в базе данных Room.
  * Представляет таблицу transactions в базе данных.
  */
-@Entity(tableName = "transactions")
+@Entity(
+    tableName = "transactions",
+    primaryKeys = ["id"]
+)
 data class TransactionEntity(
-    @PrimaryKey(autoGenerate = true)
     val id: Long = 0,
     val amount: String,
     val category: String,
     val isExpense: Boolean,
     val date: Date,
-    val note: String?,
+    val note: String? = null,
     val source: String = "Наличные",
     val sourceColor: Int = 0
 )
