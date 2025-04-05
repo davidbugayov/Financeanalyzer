@@ -8,12 +8,11 @@ coroutines = "1.7.3"
 
 # AndroidX
 androidxCore = "1.12.0"
-androidxLifecycle = "2.7.0"
+androidxLifecycle = "2.8.7"
 androidxActivity = "1.8.2"
 androidxNavigation = "2.7.7"
 androidxSplashscreen = "1.0.1"
 material = "1.11.0"
-constraintLayout = "2.1.4"
 customView = "1.1.0"
 customViewPoolingContainer = "1.0.0"
 
@@ -59,7 +58,6 @@ androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-v
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxSplashscreen" }
-androidx-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintLayout" }
 androidx-customview = { group = "androidx.customview", name = "customview", version.ref = "customView" }
 androidx-customview-poolingcontainer = { group = "androidx.customview", name = "customview-poolingcontainer", version.ref = "customViewPoolingContainer" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -115,7 +113,6 @@ poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" 
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
-android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
