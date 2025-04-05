@@ -21,6 +21,7 @@ import timber.log.Timber
 import java.util.Calendar
 import java.util.Collections
 import java.util.Date
+import java.util.concurrent.locks.ReentrantReadWriteLock
 
 /**
  * Реализация репозитория для работы с транзакциями.
@@ -39,7 +40,7 @@ class TransactionRepositoryImpl(
     private val transactionsCache = Collections.synchronizedList<Transaction>(mutableListOf())
     private var cacheLastUpdated = 0L
     private val CACHE_TTL = 5 * 60 * 1000L // 5 минут
-    private val cacheLock = Any() // Для синхронизации доступа к кэшу
+    private val cacheLock = ReentrantReadWriteLock()
     
     // Кэши для различных типов группировки
     private val monthlyTransactionsCache = Collections.synchronizedMap<String, List<Transaction>>(mutableMapOf())
@@ -53,12 +54,15 @@ class TransactionRepositoryImpl(
      * Очищает все кэши.
      */
     private fun clearCaches() {
-        synchronized(cacheLock) {
+        cacheLock.writeLock().lock()
+        try {
             transactionsCache.clear()
             monthlyTransactionsCache.clear()
             weeklyTransactionsCache.clear()
             cacheLastUpdated = 0L
             Timber.d("Все кэши репозитория очищены")
+        } finally {
+            cacheLock.writeLock().unlock()
         }
     }
 
@@ -93,33 +97,30 @@ class TransactionRepositoryImpl(
     override suspend fun getAllTransactions(): List<Transaction> = withContext(Dispatchers.IO) {
         try {
             Timber.d("Запрос ВСЕХ транзакций из базы данных")
-            
-            // Проверяем актуальность кэша вне критической секции
             var cachedData: List<Transaction>? = null
-            synchronized(cacheLock) {
+            cacheLock.readLock().lock()
+            try {
                 if (transactionsCache.isNotEmpty() && System.currentTimeMillis() - cacheLastUpdated < CACHE_TTL) {
-                    cachedData = ArrayList(transactionsCache) // Создаем копию в синхронизированном блоке
+                    cachedData = ArrayList(transactionsCache)
                 }
+            } finally {
+                cacheLock.readLock().unlock()
             }
-            
-            // Если кэш актуален, возвращаем данные
             if (cachedData != null) {
-                Timber.d("Возвращаем кэшированные транзакции (${cachedData!!.size} шт.)")
-                return@withContext cachedData!!
+                Timber.d("Возвращаем кэшированные транзакции (${cachedData.size} шт.)")
+                return@withContext cachedData
             }
-            
-            // Кэш устарел или пуст, загружаем из базы данных
             Timber.d("Загружаем все транзакции из базы данных")
             val transactionEntities = dao.getAllTransactions()
             val transactions = transactionEntities.map { mapEntityToDomain(it) }
-            
-            // Обновляем кэш после загрузки
-            synchronized(cacheLock) {
+            cacheLock.writeLock().lock()
+            try {
                 transactionsCache.clear()
                 transactionsCache.addAll(transactions)
                 cacheLastUpdated = System.currentTimeMillis()
+            } finally {
+                cacheLock.writeLock().unlock()
             }
-            
             Timber.d("Загружено ${transactions.size} транзакций из базы данных и обновлен кэш")
             return@withContext transactions
         } catch (e: Exception) {
@@ -132,35 +133,30 @@ class TransactionRepositoryImpl(
      * Обновляет кэши транзакций по месяцам и неделям
      */
     private fun updateMonthlyAndWeeklyCache(transactions: List<Transaction>) {
-        // Очищаем существующие кэши
-        monthlyTransactionsCache.clear()
-        weeklyTransactionsCache.clear()
-        
-        // Группируем транзакции по месяцам
-        val groupedByMonth = transactions.groupBy { transaction ->
-            val calendar = Calendar.getInstance()
-            calendar.time = transaction.date
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH) + 1 // +1 т.к. месяцы в Calendar начинаются с 0
-            "$year-${month.toString().padStart(2, '0')}" // Формат YYYY-MM
+        cacheLock.writeLock().lock()
+        try {
+            monthlyTransactionsCache.clear()
+            weeklyTransactionsCache.clear()
+            val groupedByMonth = transactions.groupBy { transaction ->
+                val calendar = Calendar.getInstance()
+                calendar.time = transaction.date
+                val year = calendar.get(Calendar.YEAR)
+                val month = calendar.get(Calendar.MONTH) + 1
+                "$year-${month.toString().padStart(2, '0')}"
+            }
+            monthlyTransactionsCache.putAll(groupedByMonth)
+            val groupedByWeek = transactions.groupBy { transaction ->
+                val calendar = Calendar.getInstance()
+                calendar.time = transaction.date
+                val year = calendar.get(Calendar.YEAR)
+                val week = calendar.get(Calendar.WEEK_OF_YEAR)
+                "$year-W${week.toString().padStart(2, '0')}"
+            }
+            weeklyTransactionsCache.putAll(groupedByWeek)
+            Timber.d("Кэши обновлены: ${monthlyTransactionsCache.size} месяцев, ${weeklyTransactionsCache.size} недель")
+        } finally {
+            cacheLock.writeLock().unlock()
         }
-        
-        // Сохраняем группировку по месяцам в кэш
-        monthlyTransactionsCache.putAll(groupedByMonth)
-        
-        // Группируем транзакции по неделям
-        val groupedByWeek = transactions.groupBy { transaction ->
-            val calendar = Calendar.getInstance()
-            calendar.time = transaction.date
-            val year = calendar.get(Calendar.YEAR)
-            val week = calendar.get(Calendar.WEEK_OF_YEAR)
-            "$year-W${week.toString().padStart(2, '0')}" // Формат YYYY-WXX
-        }
-        
-        // Сохраняем группировку по неделям в кэш
-        weeklyTransactionsCache.putAll(groupedByWeek)
-        
-        Timber.d("Кэши обновлены: ${monthlyTransactionsCache.size} месяцев, ${weeklyTransactionsCache.size} недель")
     }
 
     /**
