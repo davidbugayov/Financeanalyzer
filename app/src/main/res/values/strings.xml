@@ -13,6 +13,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
     <string name="back">Назад</string>
+    <string name="hide_summary">Скрыть сводку</string>
     <string name="show_summary">Показать сводку</string>
     <string name="expand">Развернуть</string>
     <string name="collapse">Свернуть</string>

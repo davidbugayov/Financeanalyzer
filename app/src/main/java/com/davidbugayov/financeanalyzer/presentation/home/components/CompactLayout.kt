@@ -16,6 +16,7 @@ import androidx.compose.foundation.background
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -76,7 +77,6 @@ fun CompactLayout(
             currentFilter = state.currentFilter,
             showGroupSummary = showGroupSummary,
             onShowGroupSummaryChange = onShowGroupSummaryChange,
-            onShowAllClick = onNavigateToHistory
         )
 
         // Определяем, нужно ли показывать LazyColumn или сообщение "Нет транзакций"
@@ -89,6 +89,14 @@ fun CompactLayout(
         if (showLazyColumn) {
             Timber.d("CompactLayout: Отображаем LazyColumn (список транзакций или индикатор загрузки)")
             val lazyListState = rememberLazyListState()
+            
+            // Добавляем эффект для скролла к началу списка при изменении showGroupSummary
+            LaunchedEffect(showGroupSummary) {
+                if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                    lazyListState.animateScrollToItem(0)
+                    Timber.d("CompactLayout: Скроллим к началу списка при показе сводки")
+                }
+            }
             
             LazyColumn(
                 state = lazyListState,

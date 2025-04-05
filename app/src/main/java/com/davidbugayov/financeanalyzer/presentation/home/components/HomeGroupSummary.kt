@@ -143,7 +143,8 @@ fun HomeGroupSummary(
             // Определяем, сколько групп показывать
             val visibleGroupsCount = if (showAllGroups) groups.size else 5
             val visibleGroups = remember(groups, showAllGroups) {
-                groups.take(visibleGroupsCount)
+                // Сначала фильтруем группы с нулевым доходом, затем берем нужное количество
+                groups.filter { it.total.amount > BigDecimal.ZERO }.take(visibleGroupsCount)
             }
 
             // Предварительно обрабатываем данные для каждой группы
@@ -192,9 +193,11 @@ fun HomeGroupSummary(
             }
 
             // Если есть еще группы и не показываем все, отображаем текст "И ещё X элементов"
-            if (groups.size > 5 && !showAllGroups) {
+            val filteredGroupsSize = remember(groups) { groups.filter { it.total.amount > BigDecimal.ZERO }.size }
+            
+            if (filteredGroupsSize > 5 && !showAllGroups) {
                 Text(
-                    text = "И ещё ${groups.size - 5} элементов",
+                    text = "И ещё ${filteredGroupsSize - 5} элементов",
                     fontSize = 12.sp,
                     color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
@@ -205,7 +208,7 @@ fun HomeGroupSummary(
                 )
             } 
             // Если показываем все группы, добавляем кнопку "Скрыть"
-            else if (showAllGroups && groups.size > 5) {
+            else if (showAllGroups && filteredGroupsSize > 5) {
                 Text(
                     text = "Скрыть",
                     fontSize = 12.sp,

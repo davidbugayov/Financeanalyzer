@@ -17,6 +17,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -80,7 +81,6 @@ fun ExpandedLayout(
                 currentFilter = state.currentFilter,
                 showGroupSummary = showGroupSummary,
                 onShowGroupSummaryChange = onShowGroupSummaryChange,
-                onShowAllClick = onNavigateToHistory
             )
 
             // Список транзакций
@@ -95,6 +95,14 @@ fun ExpandedLayout(
                 if (showLazyColumn) {
                     Timber.d("ExpandedLayout: Отображаем LazyColumn (список транзакций или индикатор загрузки)")
                     val lazyListState = rememberLazyListState()
+                    
+                    // Добавляем эффект для скролла к началу списка при изменении showGroupSummary
+                    LaunchedEffect(showGroupSummary) {
+                        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                            lazyListState.animateScrollToItem(0)
+                            Timber.d("ExpandedLayout: Скроллим к началу списка при показе сводки")
+                        }
+                    }
                     
                     LazyColumn(
                         state = lazyListState,

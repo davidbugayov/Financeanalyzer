@@ -26,6 +26,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
+import java.math.BigDecimal
 import java.util.Calendar
 
 /**
@@ -52,6 +53,8 @@ class HomeViewModel(
     // Кэши для хранения результатов вычислений
     private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<TransactionGroup>>>()
     private val statsCache = mutableMapOf<List<Transaction>, Triple<Money, Money, Money>>()
+    // Кэш для загруженных транзакций по временным периодам
+    private val transactionCache = mutableMapOf<String, List<Transaction>>()
     
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
@@ -269,11 +272,12 @@ class HomeViewModel(
      */
     private var lastLoadTime = 0L // Время последней загрузки
     private var isLoadingInProgress = false // Флаг, указывающий на то, что загрузка уже идет
+    private var loadedPeriod = 30 // По умолчанию загружаем за 30 дней вместо 60
     
     private fun loadTransactions() {
         // Проверка, чтобы избежать множественных вызовов за короткий промежуток времени (дебаунсинг)
         val currentTime = System.currentTimeMillis()
-        if (currentTime - lastLoadTime < 300 || isLoadingInProgress) {
+        if (currentTime - lastLoadTime < 500 || isLoadingInProgress) { // Увеличил до 500 мс для более эффективного дебаунсинга
             Timber.d("Пропускаем загрузку данных - слишком частый вызов или загрузка уже идет")
             return
         }
@@ -282,49 +286,55 @@ class HomeViewModel(
             isLoadingInProgress = true
             lastLoadTime = currentTime
             
-            Timber.d("Начинаем загрузку транзакций для домашнего экрана (последние 60 дней)")
+            Timber.d("Начинаем загрузку транзакций для домашнего экрана (последние $loadedPeriod дней)")
             _state.update { it.copy(isLoading = true) }
             
             try {
-                // Определяем диапазон дат: последние 60 дней
+                // Определяем диапазон дат: последние N дней
                 val calendar = Calendar.getInstance()
                 val endDate = calendar.time // Сегодня
-                calendar.add(Calendar.DAY_OF_YEAR, -60)
-                val startDate = calendar.time // 60 дней назад
+                calendar.add(Calendar.DAY_OF_YEAR, -loadedPeriod)
+                val startDate = calendar.time // N дней назад
                 
                 Timber.d("Загрузка транзакций с $startDate по $endDate")
 
-                // Параллельно загружаем метрики и транзакции для ускорения
-                val metrics = async(Dispatchers.IO) {
-                    try {
-                        val fm = FinancialMetrics.getInstance()
-                        fm.initializeMetricsFromCache() 
-                        Triple(fm.getTotalIncome(), fm.getTotalExpense(), fm.getBalance())
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при получении финансовых метрик: ${e.message}")
-                        Triple(0.0, 0.0, 0.0) 
+                // 1. Используем SuspendableLoadingCache для кэширования результатов между вызовами loadTransactions
+                val cacheKey = "transactions_${startDate.time}_${endDate.time}"
+                val cachedTransactions = transactionCache[cacheKey]
+                
+                val transactions = if (cachedTransactions != null) {
+                    Timber.d("Используем кэшированные транзакции")
+                    cachedTransactions
+                } else {
+                    // Параллельно загружаем метрики и транзакции для ускорения
+                    val transactionsDeferred = async(Dispatchers.IO) {
+                        try {
+                            Timber.d("Запрос транзакций за последние $loadedPeriod дней")
+                            val result = repository.getTransactionsByDateRangeList(startDate, endDate)
+                            // Кэшируем результат
+                            transactionCache[cacheKey] = result
+                            result
+                        } catch (e: Exception) {
+                            Timber.e(e, "Ошибка при загрузке транзакций за диапазон дат: ${e.message}")
+                            emptyList()
+                        }
                     }
+                    
+                    transactionsDeferred.await()
                 }
+                
+                // 2. Используем ранее инициализированные метрики вместо их перевычисления
+                val metricsResult = Triple(
+                    financialMetrics.getTotalIncome(), 
+                    financialMetrics.getTotalExpense(), 
+                    financialMetrics.getBalance()
+                )
 
-                val transactionsDeferred = async(Dispatchers.IO) {
-                    try {
-                        Timber.d("Запрос транзакций за последние 60 дней")
-                        repository.getTransactionsByDateRangeList(startDate, endDate)
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при загрузке транзакций за диапазон дат: ${e.message}")
-                        emptyList()
-                    }
-                }
-
-                // Дожидаемся загрузки обоих результатов
-                val metricsResult = metrics.await()
-                val transactions = transactionsDeferred.await()
-
-                // Обновляем состояние с загруженными транзакциями и метриками одновременно
-                Timber.d("Загружено ${transactions.size} транзакций за последние 60 дней")
+                // 3. Обновляем состояние с загруженными транзакциями и метриками
+                Timber.d("Загружено ${transactions.size} транзакций за последние $loadedPeriod дней")
                 _state.update { 
                     it.copy(
-                        transactions = transactions, // Сохраняем ВСЕ загруженные транзакции (за 60 дней)
+                        transactions = transactions,
                         income = Money(metricsResult.first),
                         expense = Money(metricsResult.second),
                         balance = Money(metricsResult.third),
@@ -333,11 +343,16 @@ class HomeViewModel(
                     ) 
                 }
                 
-                // Подсчитываем и обновляем данные по категориям (на основе загруженных транзакций)
-                updateCategoryStats(transactions)
+                // 4. Запускаем обновление категорий и фильтрацию параллельно
+                val job1 = viewModelScope.launch(Dispatchers.Default) {
+                    updateCategoryStats(transactions)
+                }
                 
-                // Обновляем отфильтрованные данные (сработает на основе нового полного списка transactions)
-                updateFilteredTransactions()
+                val job2 = viewModelScope.launch(Dispatchers.Default) {
+                    updateFilteredTransactions()
+                }
+                
+                // Не блокируем основной поток, просто даем задачам выполниться в фоне
                 
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке данных: ${e.message}")
@@ -425,23 +440,26 @@ class HomeViewModel(
      * Обновляет отфильтрованные транзакции и статистику на основе текущего фильтра
      */
     private var isFilteringInProgress = false
-    
+    private var lastFilterUpdateTime = 0L
+
     private fun updateFilteredTransactions() {
-        if (isFilteringInProgress) {
-            Timber.d("Фильтрация уже выполняется, пропускаем")
+        // Защита от слишком частых обновлений
+        val currentTime = System.currentTimeMillis()
+        if (isFilteringInProgress || currentTime - lastFilterUpdateTime < 300) {
+            Timber.d("Фильтрация уже выполняется или вызвана слишком часто, пропускаем")
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) { // Сразу запускаем в фоновом потоке
             isFilteringInProgress = true
+            lastFilterUpdateTime = currentTime
             
             try {
                 val transactions = _state.value.transactions
                 val currentFilter = _state.value.currentFilter
 
-                // Ключ для кэша: фильтр + размер транзакций 
-                // (если размер изменился, значит данные изменились)
-                val cacheKey = FilterCacheKey(currentFilter, transactions.size)
+                // Оптимизированный ключ кэша - только фильтр и хэш-код списка транзакций
+                val cacheKey = FilterCacheKey(currentFilter, transactions.hashCode())
 
                 // Проверяем кэш перед вычислениями
                 val cachedData = filteredTransactionsCache[cacheKey]
@@ -449,51 +467,63 @@ class HomeViewModel(
                     Timber.d("Используем кэшированные отфильтрованные данные для ${currentFilter.name}")
 
                     // Обновляем состояние сразу из кэша без вычислений
-                    _state.update {
-                        it.copy(
-                            filteredTransactions = cachedData.first,
-                            filteredIncome = cachedData.second.first,
-                            filteredExpense = cachedData.second.second,
-                            filteredBalance = cachedData.second.third,
-                            transactionGroups = cachedData.third,
-                            isLoading = false
-                        ) 
-                    }
-                    return@launch
-                }
-
-                // Запускаем вычисления в фоновом потоке
-                withContext(Dispatchers.Default) {
-                    // Фильтруем транзакции на основе текущего фильтра
-                    val filteredTransactions = filterTransactions(transactions, currentFilter)
-
-                    // Вычисляем статистику для отфильтрованных транзакций
-                    val stats = calculateStats(filteredTransactions)
-
-                    // Группируем транзакции для отображения
-                    val groups = groupTransactions(filteredTransactions, currentFilter)
-
-                    // Сохраняем результаты в кэш
-                    filteredTransactionsCache[cacheKey] =
-                        Triple(filteredTransactions, stats, groups)
-
-                    // Обновляем состояние в главном потоке с новыми данными
                     withContext(Dispatchers.Main) {
-                        _state.update { state ->
-                            state.copy(
-                                filteredTransactions = filteredTransactions,
-                                filteredIncome = stats.first,
-                                filteredExpense = stats.second,
-                                filteredBalance = stats.third,
-                                transactionGroups = groups,
+                        _state.update {
+                            it.copy(
+                                filteredTransactions = cachedData.first,
+                                filteredIncome = cachedData.second.first,
+                                filteredExpense = cachedData.second.second,
+                                filteredBalance = cachedData.second.third,
+                                transactionGroups = cachedData.third,
                                 isLoading = false
                             )
                         }
                     }
+                    return@launch
+                }
+
+                // Фильтруем транзакции на основе текущего фильтра
+                // Используем оптимизированные функции фильтрации
+                val filteredTransactions = when (currentFilter) {
+                    TransactionFilter.TODAY -> getTodayTransactions(transactions)
+                    TransactionFilter.WEEK -> getLastWeekTransactions(transactions)
+                    TransactionFilter.MONTH -> getLastMonthTransactions(transactions)
+                }
+
+                // Проверяем, есть ли кэшированная статистика для этих отфильтрованных транзакций
+                val statsKey = filteredTransactions.hashCode()
+                val stats = statsCache[filteredTransactions] ?: calculateStats(filteredTransactions).also {
+                    // Кэшируем результаты вычислений
+                    statsCache[filteredTransactions] = it
+                }
+
+                // Используем кэшированные данные по группам, если они доступны
+                val groups = if (_state.value.showGroupSummary) 
+                    groupTransactions(filteredTransactions, currentFilter) 
+                else 
+                    emptyList()
+
+                // Сохраняем результаты в кэш
+                filteredTransactionsCache[cacheKey] = Triple(filteredTransactions, stats, groups)
+
+                // Обновляем состояние в главном потоке с новыми данными
+                withContext(Dispatchers.Main) {
+                    _state.update { state ->
+                        state.copy(
+                            filteredTransactions = filteredTransactions,
+                            filteredIncome = stats.first,
+                            filteredExpense = stats.second,
+                            filteredBalance = stats.third,
+                            transactionGroups = groups,
+                            isLoading = false
+                        )
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при обновлении отфильтрованных транзакций: ${e.message}")
-                _state.update { it.copy(isLoading = false) }
+                withContext(Dispatchers.Main) {
+                    _state.update { it.copy(isLoading = false) }
+                }
             } finally {
                 isFilteringInProgress = false
             }
@@ -595,6 +625,7 @@ class HomeViewModel(
         Timber.d("Очистка всех кэшей в HomeViewModel")
         filteredTransactionsCache.clear()
         statsCache.clear()
+        transactionCache.clear()
         Timber.d("Кэши в HomeViewModel очищены")
     }
 
@@ -645,72 +676,6 @@ class HomeViewModel(
     }
 
     /**
-     * Фильтрует транзакции на основе заданного фильтра
-     */
-    private fun filterTransactions(
-        transactions: List<Transaction>,
-        filter: TransactionFilter
-    ): List<Transaction> {
-        if (transactions.isEmpty()) {
-            return emptyList()
-        }
-
-        val calendar = Calendar.getInstance()
-        val today = calendar.time
-
-        return when (filter) {
-            TransactionFilter.TODAY -> {
-                // Фильтруем транзакции за сегодня
-                val startOfDay = Calendar.getInstance().apply {
-                    time = today
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-
-                val endOfDay = Calendar.getInstance().apply {
-                    time = today
-                    set(Calendar.HOUR_OF_DAY, 23)
-                    set(Calendar.MINUTE, 59)
-                    set(Calendar.SECOND, 59)
-                    set(Calendar.MILLISECOND, 999)
-                }.time
-
-                transactions.filter { it.date in startOfDay..endOfDay }
-            }
-
-            TransactionFilter.WEEK -> {
-                // Фильтруем транзакции за последние 7 дней
-                val weekAgo = Calendar.getInstance().apply {
-                    time = today
-                    add(Calendar.DAY_OF_YEAR, -6) // 7 дней включая сегодня
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-
-                transactions.filter { it.date >= weekAgo }
-            }
-
-            TransactionFilter.MONTH -> {
-                // Фильтруем транзакции за последние 30 дней
-                val monthAgo = Calendar.getInstance().apply {
-                    time = today
-                    add(Calendar.DAY_OF_YEAR, -29) // 30 дней включая сегодня
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-
-                transactions.filter { it.date >= monthAgo }
-            }
-        }
-    }
-
-    /**
      * Вычисляет статистику для списка транзакций
      * @return Triple(доход, расход, баланс)
      */
@@ -758,7 +723,7 @@ class HomeViewModel(
                 (categoryTotals[category] ?: 0.0) + Math.abs(transaction.amount)
         }
 
-        // Преобразуем в итоговый список групп
+        // Преобразуем в итоговый список групп и отфильтруем группы с нулевым доходом
         return categoryMap.map { (category, categoryTransactions) ->
             val categoryTotal = categoryTotals[category] ?: 0.0
 
@@ -770,6 +735,8 @@ class HomeViewModel(
                 name = category,
                 total = Money(categoryTotal)
             )
-        }.sortedByDescending { it.total.amount }
+        }
+        .filter { it.total.amount > BigDecimal.ZERO } // Фильтруем группы с нулевым доходом
+        .sortedByDescending { it.total.amount }
     }
 } 

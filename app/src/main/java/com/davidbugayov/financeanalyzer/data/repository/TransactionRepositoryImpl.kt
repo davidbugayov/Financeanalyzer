@@ -22,6 +22,7 @@ import java.util.Calendar
 import java.util.Collections
 import java.util.Date
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Реализация репозитория для работы с транзакциями.
@@ -43,8 +44,8 @@ class TransactionRepositoryImpl(
     private val cacheLock = ReentrantReadWriteLock()
     
     // Кэши для различных типов группировки
-    private val monthlyTransactionsCache = Collections.synchronizedMap<String, List<Transaction>>(mutableMapOf())
-    private val weeklyTransactionsCache = Collections.synchronizedMap<String, List<Transaction>>(mutableMapOf())
+    private val monthlyTransactionsCache = ConcurrentHashMap<String, List<Transaction>>()
+    private val weeklyTransactionsCache = ConcurrentHashMap<String, List<Transaction>>()
     
     // SharedFlow для уведомления об изменениях данных
     private val _dataChangeEvents = MutableSharedFlow<DataChangeEvent>(replay = 0, extraBufferCapacity = 1)
@@ -115,9 +116,7 @@ class TransactionRepositoryImpl(
             val transactions = transactionEntities.map { mapEntityToDomain(it) }
             cacheLock.writeLock().lock()
             try {
-                transactionsCache.clear()
-                transactionsCache.addAll(transactions)
-                cacheLastUpdated = System.currentTimeMillis()
+                updateCache(transactions)
             } finally {
                 cacheLock.writeLock().unlock()
             }
@@ -127,6 +126,12 @@ class TransactionRepositoryImpl(
             Timber.e(e, "Ошибка при получении всех транзакций: ${e.message}")
             emptyList()
         }
+    }
+
+    private fun updateCache(transactions: List<Transaction>) {
+        transactionsCache.clear()
+        transactionsCache.addAll(transactions)
+        cacheLastUpdated = System.currentTimeMillis()
     }
 
     /**
@@ -170,19 +175,10 @@ class TransactionRepositoryImpl(
             Timber.d("Получение транзакций за месяц $year-${month.toString().padStart(2, '0')}")
             val monthKey = "$year-${month.toString().padStart(2, '0')}"
             
-            // Проверяем кэш вне критической секции
-            var cachedMonthData: List<Transaction>? = null
-            synchronized(cacheLock) {
-                val cachedData = monthlyTransactionsCache[monthKey]
-                if (cachedData != null) {
-                    cachedMonthData = ArrayList(cachedData) // Создаем копию в синхронизированном блоке
-                }
-            }
-            
-            // Используем кэшированные данные, если они есть
-            if (cachedMonthData != null) {
-                Timber.d("Используем кэшированные транзакции за месяц $monthKey (размер=${cachedMonthData!!.size})")
-                return@withContext cachedMonthData!!
+            // Проверяем кэш (ConcurrentHashMap безопасен для чтения)
+            monthlyTransactionsCache[monthKey]?.let {
+                Timber.d("Используем кэшированные транзакции за месяц $monthKey (размер=${it.size})")
+                return@withContext it // ConcurrentHashMap возвращает актуальные данные
             }
             
             // Получаем диапазон дат для месяца
@@ -196,16 +192,14 @@ class TransactionRepositoryImpl(
             calendar.set(Calendar.MINUTE, 59)
             calendar.set(Calendar.SECOND, 59)
             calendar.set(Calendar.MILLISECOND, 999)
-            val endDate = calendar.time
+            val properEndDate = calendar.time
             
             // Получаем транзакции за указанный период дат
-            Timber.d("Загружаем транзакции за месяц $monthKey из базы данных (диапазон: $startDate - $endDate)")
-            val transactions = dao.getTransactionsByDateRange(startDate, endDate).map { mapEntityToDomain(it) }
+            Timber.d("Загружаем транзакции за месяц $monthKey из базы данных (диапазон: $startDate - $properEndDate)")
+            val transactions = dao.getTransactionsByDateRange(startDate, properEndDate).map { mapEntityToDomain(it) }
             
-            // Обновляем кэш
-            synchronized(cacheLock) {
-                monthlyTransactionsCache[monthKey] = transactions
-            }
+            // Обновляем кэш (ConcurrentHashMap безопасен для записи)
+            monthlyTransactionsCache[monthKey] = transactions
             
             Timber.d("Загружено ${transactions.size} транзакций за месяц $monthKey")
             return@withContext transactions
@@ -224,16 +218,16 @@ class TransactionRepositoryImpl(
     override suspend fun getTransactionsByWeek(year: Int, week: Int): List<Transaction> = withContext(Dispatchers.IO) {
         val weekKey = "$year-W${week.toString().padStart(2, '0')}"
         
-        // Проверяем, есть ли данные в кэше
-        if (transactionsCache.isNotEmpty() && System.currentTimeMillis() - cacheLastUpdated < CACHE_TTL) {
-            // Если общий кэш актуален, проверяем кэш по неделям
-            weeklyTransactionsCache[weekKey]?.let {
+        // Проверяем кэш по неделям (ConcurrentHashMap безопасен для чтения)
+        weeklyTransactionsCache[weekKey]?.let {
+            // Проверяем актуальность основного кэша, чтобы решить, можно ли доверять недельному
+            if (System.currentTimeMillis() - cacheLastUpdated < CACHE_TTL) {
                 Timber.d("Используем кэшированные транзакции за неделю $weekKey (размер=${it.size})")
                 return@withContext it
             }
         }
         
-        // Если нет в кэше или кэш устарел, загружаем из базы данных
+        // Если нет в кэше или основной кэш устарел, загружаем из базы данных
         try {
             // Создаем граничные даты для запроса
             val calendar = Calendar.getInstance()
@@ -250,21 +244,14 @@ class TransactionRepositoryImpl(
             calendar.set(Calendar.HOUR_OF_DAY, 23)
             calendar.set(Calendar.MINUTE, 59)
             calendar.set(Calendar.SECOND, 59)
-            val endDate = calendar.time
+            val properEndDate = calendar.time
             
             // Запрашиваем транзакции за неделю
-            val transactions = dao.getTransactionsByDateRangePaginated(startDate, endDate, 1000, 0)
+            val transactions = dao.getTransactionsByDateRangePaginated(startDate, properEndDate, 1000, 0)
                 .map { mapEntityToDomain(it) }
             
-            // Если в кэше есть данные, обновляем только эту неделю
-            if (transactionsCache.isNotEmpty()) {
-                synchronized(cacheLock) {
-                    weeklyTransactionsCache[weekKey] = transactions
-                }
-            } else {
-                // Иначе загружаем все транзакции и обновляем все кэши
-                getAllTransactions()
-            }
+            // Обновляем кэш недели (ConcurrentHashMap безопасен для записи)
+            weeklyTransactionsCache[weekKey] = transactions
             
             Timber.d("Загружено ${transactions.size} транзакций за неделю $weekKey")
             return@withContext transactions
@@ -406,31 +393,36 @@ class TransactionRepositoryImpl(
      * @param id ID транзакции
      * @return Transaction или null если не найдена
      */
-    override suspend fun getTransactionById(id: String): Transaction? {
-        return try {
-            // Попытка найти транзакцию напрямую в кэше
-            val cachedTransaction = transactionsCache.find { it.id == id }
+    override suspend fun getTransactionById(id: String): Transaction? = withContext(Dispatchers.IO) {
+        try {
+            // Try to find the transaction directly in the cache first
+            val cachedTransaction = cacheLock.readLock().let { lock ->
+                lock.lock()
+                try {
+                    transactionsCache.find { it.id == id }
+                } finally {
+                    lock.unlock()
+                }
+            }
             if (cachedTransaction != null) {
-                Timber.d("РЕПОЗИТОРИЙ: Транзакция найдена в кэше: ID=$id")
-                return cachedTransaction
+                Timber.d("Transaction found in cache: ID=$id")
+                return@withContext cachedTransaction
             }
 
-            // Если в кэше не найдено, ищем все транзакции и находим нужную
-            Timber.d("РЕПОЗИТОРИЙ: Поиск транзакции с ID=$id в базе данных")
-            val allTransactions = dao.getAllTransactions()
-            val entities = allTransactions.filter { it.idString == id }
+            // If not found in cache, query the database directly by ID
+            Timber.d("Searching for transaction with ID=$id in the database")
+            val entity = dao.getTransactionByIdString(id) // Use direct DAO method
 
-            if (entities.isNotEmpty()) {
-                val entity = entities.first()
-                Timber.d("РЕПОЗИТОРИЙ: Транзакция найдена в базе: ID=$id")
+            if (entity != null) {
+                Timber.d("Transaction found in database: ID=$id")
                 mapEntityToDomain(entity)
             } else {
-                Timber.d("РЕПОЗИТОРИЙ: Транзакция не найдена: ID=$id")
+                Timber.d("Transaction not found: ID=$id")
                 null
             }
         } catch (e: Exception) {
-            Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при получении транзакции по ID '$id': ${e.message}")
-            null
+            Timber.e(e, "Error getting transaction by ID '$id': ${e.message}")
+            null // Return null on error
         }
     }
     
@@ -444,7 +436,7 @@ class TransactionRepositoryImpl(
         try {
             val entity = mapDomainToEntity(transaction)
             val id = dao.insertTransaction(entity)
-            clearCaches() // Очищаем кэш после добавления
+            invalidateMainCache() // Инвалидируем основной кэш вместо полной очистки
             FinancialMetrics.getInstance().invalidateMetrics()
             internalNotifyDataChanged(transaction.id) // Уведомляем об изменении
             Timber.d("Транзакция добавлена: ID=$id")
@@ -492,13 +484,13 @@ class TransactionRepositoryImpl(
                 dao.insertTransaction(entity)
             }
 
-            // Очищаем все кэши
+            // Инвалидируем основной кэш
             try {
-                clearCaches()
-                Timber.d("Кэш очищен")
+                invalidateMainCache()
+                Timber.d("Основной кэш инвалидирован")
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при очистке кэша: ${e.message}")
-                // Продолжаем выполнение даже при ошибке кэша
+                Timber.e(e, "Ошибка при инвалидации основного кэша: ${e.message}")
+                // Продолжаем выполнение
             }
 
             // Инвалидируем метрики
@@ -535,7 +527,7 @@ class TransactionRepositoryImpl(
         try {
             val entity = mapDomainToEntity(transaction)
             dao.deleteTransaction(entity)
-            clearCaches() // Очищаем кэш после удаления
+            invalidateMainCache() // Инвалидируем основной кэш
             FinancialMetrics.getInstance().invalidateMetrics()
             internalNotifyDataChanged(transaction.id) // Уведомляем об изменении
             Timber.d("Транзакция удалена: ID=${transaction.id}")
@@ -552,7 +544,7 @@ class TransactionRepositoryImpl(
     override suspend fun deleteTransaction(id: String) = withContext(Dispatchers.IO) {
         try {
             dao.deleteTransactionById(id)
-            clearCaches() // Очищаем кэш после удаления
+            invalidateMainCache() // Инвалидируем основной кэш
             FinancialMetrics.getInstance().invalidateMetrics()
             internalNotifyDataChanged(id) // Уведомляем об изменении
             Timber.d("Транзакция удалена по ID: $id")
@@ -616,28 +608,29 @@ class TransactionRepositoryImpl(
         Timber.d("МАППИНГ В СУЩНОСТЬ: Начало преобразования Transaction -> TransactionEntity")
         Timber.d("Исходная транзакция: id=${domain.id}, сумма=${domain.amount}, категория=${domain.category}")
 
-        // КРИТИЧЕСКИ ВАЖНО: правильно обрабатываем ID
         var longId = 0L
+        val domainId = domain.id // Use a local val for clarity
 
-        try {
-            // Пытаемся преобразовать строковый ID в Long
-            if (domain.id.isNotEmpty() && domain.id != "0") {
-                // Если ID числовой, пробуем преобразовать напрямую
-                longId = domain.id.toLongOrNull() ?: domain.id.hashCode().toLong()
-                Timber.d("ID конвертирован в числовой формат: $longId")
-            } else {
-                // Для новых транзакций используем 0, чтобы Room сгенерировал новый ID
-                Timber.d("Используем ID=0 для новой транзакции")
+        if (domainId.isNotEmpty() && domainId != "0") {
+            try {
+                longId = domainId.toLong() // Try direct conversion
+                Timber.d("ID '$domainId' успешно конвертирован в Long: $longId")
+            } catch (e: NumberFormatException) {
+                // If ID is not empty, not "0", but not a number - this is a data error.
+                // Logging the error. Returning 0L might lead to creating a new record instead of updating.
+                // Consider throwing an exception or using a specific value.
+                // Keeping 0L for now, but with a warning.
+                Timber.e(e, "Ошибка: ID транзакции '$domainId' не является валидным числом! Используется ID=0.")
+                // longId remains 0L by default
             }
-        } catch (e: Exception) {
-            // В случае ошибки конвертации используем хэш-код строки
-            Timber.e(e, "Ошибка при конвертации ID, используем хэш-код: ${e.message}")
-            longId = domain.id.hashCode().toLong()
+        } else {
+            Timber.d("ID пустой или '0', используется ID=0 для новой транзакции.")
+            // longId remains 0L
         }
 
         val entity = TransactionEntity(
             id = longId,
-            idString = domain.id,
+            idString = domainId, // Always save the original ID
             amount = domain.amount.toString(),
             category = domain.category,
             date = domain.date,
@@ -705,6 +698,20 @@ class TransactionRepositoryImpl(
         } catch (e: Exception) {
             Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при загрузке списка транзакций по диапазону дат: ${e.message}")
             throw e // Перебрасываем исключение для обработки выше
+        }
+    }
+
+    /**
+     * Инвалидирует основной кэш транзакций.
+     */
+    private fun invalidateMainCache() {
+        cacheLock.writeLock().lock()
+        try {
+            transactionsCache.clear()
+            cacheLastUpdated = 0L
+            Timber.d("Основной кэш транзакций инвалидирован")
+        } finally {
+            cacheLock.writeLock().unlock()
         }
     }
 } 

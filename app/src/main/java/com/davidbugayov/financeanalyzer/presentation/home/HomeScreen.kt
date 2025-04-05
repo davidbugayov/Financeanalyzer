@@ -87,17 +87,11 @@ fun HomeScreen(
 
     // Загружаем сохраненное состояние видимости GroupSummary
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
-    var showGroupSummary by rememberSaveable {
-        mutableStateOf(sharedPreferences.getBoolean("show_group_summary", false))
-    }
-
-    // Обновляем состояние showGroupSummary в ViewModel при его изменении
-    LaunchedEffect(showGroupSummary) {
-        sharedPreferences.edit {
-            putBoolean("show_group_summary", showGroupSummary)
-        }
-        // Обновляем состояние в ViewModel
-        viewModel.onEvent(HomeEvent.SetShowGroupSummary(showGroupSummary))
+    
+    // Инициализируем состояние из SharedPreferences при первом запуске
+    LaunchedEffect(Unit) {
+        val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)
+        viewModel.onEvent(HomeEvent.SetShowGroupSummary(savedShowSummary))
     }
 
     // Обновляем транзакции при возвращении на экран, но с управлением частоты
@@ -150,7 +144,12 @@ fun HomeScreen(
     // Оптимизируем обработчик изменения showGroupSummary
     val onShowGroupSummaryChange = remember<(Boolean) -> Unit> {
         { newValue ->
-            showGroupSummary = newValue
+            // Обновляем состояние только в ViewModel
+            viewModel.onEvent(HomeEvent.SetShowGroupSummary(newValue))
+            // Обновляем SharedPreferences
+            sharedPreferences.edit {
+                putBoolean("show_group_summary", newValue)
+            }
         }
     }
 
@@ -214,7 +213,7 @@ fun HomeScreen(
                 // Компактный макет для телефонов
                 CompactLayout(
                     state = state,
-                    showGroupSummary = showGroupSummary,
+                    showGroupSummary = state.showGroupSummary,
                     onShowGroupSummaryChange = onShowGroupSummaryChange,
                     onFilterSelected = onFilterSelected,
                     onNavigateToHistory = onNavigateToHistory,
@@ -225,7 +224,7 @@ fun HomeScreen(
                 // Расширенный макет для планшетов
                 ExpandedLayout(
                     state = state,
-                    showGroupSummary = showGroupSummary,
+                    showGroupSummary = state.showGroupSummary,
                     onShowGroupSummaryChange = onShowGroupSummaryChange,
                     onFilterSelected = onFilterSelected,
                     onNavigateToHistory = onNavigateToHistory,
