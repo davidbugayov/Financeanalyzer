@@ -213,6 +213,8 @@ dependencies {
     implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
+    implementation("androidx.lifecycle:lifecycle-runtime-compose:2.8.7")
+
     // Explicit dependency for Layout Inspector
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.customview)
