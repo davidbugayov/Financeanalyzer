@@ -154,6 +154,7 @@ fun ExpandedLayout(
                                 TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
                                 TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
                                 TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
+                                TransactionFilter.ALL -> stringResource(R.string.no_transactions)
                             },
                             color = Color.Gray,
                             style = MaterialTheme.typography.bodyLarge,

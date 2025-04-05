@@ -100,5 +100,26 @@ fun HomeFilterChips(
                 selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
             )
         )
+        
+        // Фильтр "Все"
+        FilterChip(
+            selected = currentFilter == TransactionFilter.ALL,
+            onClick = { 
+                Timber.d("Выбран фильтр ALL")
+                onFilterSelected(TransactionFilter.ALL) 
+            },
+            label = {
+                Text(
+                    stringResource(R.string.all),
+                    fontSize = 14.sp,
+                    fontWeight = if (currentFilter == TransactionFilter.ALL) 
+                        FontWeight.Bold else FontWeight.Medium
+                )
+            },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
+                selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+            )
+        )
     }
 } 

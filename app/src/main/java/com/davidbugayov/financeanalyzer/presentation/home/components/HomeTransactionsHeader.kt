@@ -42,6 +42,7 @@ fun HomeTransactionsHeader(
                 TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
                 TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
                 TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
+                TransactionFilter.ALL -> stringResource(R.string.all_transactions)
             },
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium

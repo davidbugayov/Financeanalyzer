@@ -15,7 +15,11 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
@@ -44,6 +48,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingScreen
+import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 
 @Composable
 fun MainScreen(startDestination: String = "home") {
@@ -53,6 +59,10 @@ fun MainScreen(startDestination: String = "home") {
     val chartViewModel: ChartViewModel = koinViewModel()
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
+    val onboardingViewModel: OnboardingViewModel = koinViewModel()
+    
+    // Проверяем, нужно ли показывать онбординг
+    var shouldShowOnboarding by remember { mutableStateOf(!onboardingViewModel.isOnboardingCompleted()) }
     
     val themeState = profileViewModel.themeMode.collectAsState()
     val themeMode = themeState.value
@@ -99,282 +109,292 @@ fun MainScreen(startDestination: String = "home") {
         }
     }
 
-    // Применяем тему к всему приложению - теперь изменения themeMode будут автоматически
-    // вызывать перерисовку всей композиции с новой темой
+    // Применяем тему к всему приложению
     FinanceAnalyzerTheme(themeMode = themeMode) {
-        Scaffold(
-            modifier = Modifier
-                .fillMaxSize() // Растягиваем фон на весь экран
-        ) { paddingValues ->
-            NavHost(
-                navController = navController, 
-                startDestination = startDestination,
-                modifier = Modifier.padding(
-                    start = paddingValues.calculateLeftPadding(layoutDirection),
-                    end = paddingValues.calculateRightPadding(layoutDirection)
-                )
-            ) {
-                composable(
-                    route = Screen.Home.route,
-                    enterTransition = {
-                        fadeIn(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
+        if (shouldShowOnboarding) {
+            // Показываем экран онбординга
+            OnboardingScreen(
+                onFinish = {
+                    // Отмечаем онбординг как завершенный
+                    onboardingViewModel.completeOnboarding()
+                    shouldShowOnboarding = false
+                }
+            )
+        } else {
+            Scaffold(
+                modifier = Modifier
+                    .fillMaxSize() // Растягиваем фон на весь экран
+            ) { paddingValues ->
+                NavHost(
+                    navController = navController, 
+                    startDestination = startDestination,
+                    modifier = Modifier.padding(
+                        start = paddingValues.calculateLeftPadding(layoutDirection),
+                        end = paddingValues.calculateRightPadding(layoutDirection)
+                    )
+                ) {
+                    composable(
+                        route = Screen.Home.route,
+                        enterTransition = {
+                            fadeIn(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
                             )
-                        )
-                    },
-                    exitTransition = {
-                        fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    popEnterTransition = {
-                        fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    }
-                ) {
-                    HomeScreen(
-                        viewModel = homeViewModel,
-                        addTransactionViewModel = addTransactionViewModel,
-                        onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                        onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
-                        onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                        onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
-                    )
-                }
-                
-                composable(
-                    route = Screen.History.route,
-                    enterTransition = {
-                        slideIntoContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        ) + fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        ) + fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        ) + fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        ) + fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    }
-                ) {
-                    TransactionHistoryScreen(
-                        viewModel = koinViewModel<TransactionHistoryViewModel>(),
-                        onNavigateBack = { navController.navigateUp() },
-                        onNavigateToEdit = { transaction ->
-                            // Сохраним выбранную транзакцию в ViewModel
-                            addTransactionViewModel.loadTransactionForEditing(transaction)
-                            
-                            // Навигация к экрану добавления/редактирования
-                            navController.navigate(Screen.AddTransaction.route)
+                        },
+                        exitTransition = {
+                            fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        popEnterTransition = {
+                            fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
                         }
-                    )
-                }
-                
-                composable(
-                    route = Screen.AddTransaction.route,
-                    enterTransition = {
-                        slideIntoContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Up
-                        ) + fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Down
-                        ) + fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
+                    ) {
+                        HomeScreen(
+                            viewModel = homeViewModel,
+                            addTransactionViewModel = addTransactionViewModel,
+                            onNavigateToHistory = { navController.navigate(Screen.History.route) },
+                            onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
+                            onNavigateToChart = { navController.navigate(Screen.Chart.route) },
+                            onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
                         )
                     }
-                ) {
-                    // Получаем предыдущий маршрут из стека навигации
-                    val backStackEntry = remember { navController.previousBackStackEntry }
                     
-                    AddTransactionScreen(
-                        viewModel = addTransactionViewModel,
-                        onNavigateBack = {
-                            // Используем фоновую загрузку вместо полной перезагрузки
-                            homeViewModel.initiateBackgroundDataRefresh()
-                            
-                            // Обновляем графики и статистику напрямую
-                            chartViewModel.loadTransactions()
-                            profileViewModel.updateFinancialStatistics()
-
-                            // Просто возвращаемся назад, чтобы вернуться на предыдущий экран
-                            navController.navigateUp()
+                    composable(
+                        route = Screen.History.route,
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
                         }
-                    )
-                }
-                
-                composable(
-                    route = Screen.Chart.route,
-                    enterTransition = {
-                        slideIntoContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        ) + fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        ) + fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    popEnterTransition = {
-                        slideIntoContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        ) + fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    popExitTransition = {
-                        slideOutOfContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        ) + fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
+                    ) {
+                        TransactionHistoryScreen(
+                            viewModel = koinViewModel<TransactionHistoryViewModel>(),
+                            onNavigateBack = { navController.navigateUp() },
+                            onNavigateToEdit = { transaction ->
+                                // Сохраним выбранную транзакцию в ViewModel
+                                addTransactionViewModel.loadTransactionForEditing(transaction)
+                                
+                                // Навигация к экрану добавления/редактирования
+                                navController.navigate(Screen.AddTransaction.route)
+                            }
                         )
                     }
-                ) {
-                    FinanceChartScreen(
-                        viewModel = chartViewModel,
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
-                
-                composable(
-                    route = Screen.Profile.route,
-                    enterTransition = {
-                        fadeIn(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
+                    
+                    composable(
+                        route = Screen.AddTransaction.route,
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Up
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
                             )
-                        )
-                    },
-                    exitTransition = {
-                        fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    }
-                ) {
-                    ProfileScreen(
-                        onNavigateBack = { navController.popBackStack() },
-                        onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
-                        onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                        onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
-                    )
-                }
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Down
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        // Получаем предыдущий маршрут из стека навигации
+                        val backStackEntry = remember { navController.previousBackStackEntry }
+                        
+                        AddTransactionScreen(
+                            viewModel = addTransactionViewModel,
+                            onNavigateBack = {
+                                // Используем фоновую загрузку вместо полной перезагрузки
+                                homeViewModel.initiateBackgroundDataRefresh()
+                                
+                                // Обновляем графики и статистику напрямую
+                                chartViewModel.loadTransactions()
+                                profileViewModel.updateFinancialStatistics()
 
-                composable(
-                    route = Screen.ImportTransactions.route,
-                    enterTransition = {
-                        fadeIn(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
+                                // Просто возвращаемся назад, чтобы вернуться на предыдущий экран
+                                navController.navigateUp()
+                            }
+                        )
+                    }
+                    
+                    composable(
+                        route = Screen.Chart.route,
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
                             )
-                        )
-                    },
-                    exitTransition = {
-                        fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        FinanceChartScreen(
+                            viewModel = chartViewModel,
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
-                ) {
-                    ImportTransactionsScreen(
-                        onNavigateBack = { navController.popBackStack() }
-                    )
-                }
-                
-                composable(
-                    route = Screen.Libraries.route,
-                    enterTransition = {
-                        slideIntoContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.Start
-                        ) + fadeIn(
-                            animationSpec = tween(300, easing = EaseInOut)
-                        )
-                    },
-                    exitTransition = {
-                        slideOutOfContainer(
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            ),
-                            towards = AnimatedContentTransitionScope.SlideDirection.End
-                        ) + fadeOut(
-                            animationSpec = tween(300, easing = EaseInOut)
+                    
+                    composable(
+                        route = Screen.Profile.route,
+                        enterTransition = {
+                            fadeIn(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            )
+                        },
+                        exitTransition = {
+                            fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        ProfileScreen(
+                            onNavigateBack = { navController.popBackStack() },
+                            onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
+                            onNavigateToChart = { navController.navigate(Screen.Chart.route) },
+                            onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
                         )
                     }
-                ) {
-                    LibrariesScreen(
-                        onNavigateBack = { navController.navigateUp() }
-                    )
+
+                    composable(
+                        route = Screen.ImportTransactions.route,
+                        enterTransition = {
+                            fadeIn(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            )
+                        },
+                        exitTransition = {
+                            fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        ImportTransactionsScreen(
+                            onNavigateBack = { navController.popBackStack() }
+                        )
+                    }
+                    
+                    composable(
+                        route = Screen.Libraries.route,
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        LibrariesScreen(
+                            onNavigateBack = { navController.navigateUp() }
+                        )
+                    }
                 }
             }
         }

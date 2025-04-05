@@ -8,6 +8,7 @@ import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.historyModule
 import com.davidbugayov.financeanalyzer.di.homeModule
 import com.davidbugayov.financeanalyzer.di.importModule
+import com.davidbugayov.financeanalyzer.di.onboardingModule
 import com.davidbugayov.financeanalyzer.di.profileModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
@@ -73,7 +74,8 @@ class FinanceApp : Application() {
                     addTransactionModule,
                     historyModule,
                     profileModule,
-                    importModule
+                    importModule,
+                    onboardingModule
                 )
             }
             

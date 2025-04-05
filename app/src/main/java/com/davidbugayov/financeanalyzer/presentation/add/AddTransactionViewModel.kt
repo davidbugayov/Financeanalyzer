@@ -715,7 +715,14 @@ class AddTransactionViewModel(
         val formattedAmount = String.format("%.0f", amount)
 
         // Логируем действия
-        Timber.d("ЗАГРУЗКА ТРАНЗАКЦИИ: ID=${transaction.id}, сумма=${transaction.amount}, формат.сумма=$formattedAmount")
+        Timber.d("===== НАЧАЛО ЗАГРУЗКИ ТРАНЗАКЦИИ ДЛЯ РЕДАКТИРОВАНИЯ =====")
+        Timber.d("ID: ${transaction.id}")
+        Timber.d("Сумма оригинальная: ${transaction.amount}")
+        Timber.d("Сумма форматированная: $formattedAmount")
+        Timber.d("Категория: ${transaction.category}")
+        Timber.d("Источник: ${transaction.source}")
+        Timber.d("Дата: ${transaction.date}")
+        Timber.d("Тип транзакции: ${if (transaction.isExpense) "Расход" else "Доход"}")
         
         _state.update {
             it.copy(
@@ -732,7 +739,13 @@ class AddTransactionViewModel(
         }
 
         // Логируем состояние после загрузки
-        Timber.d("ЗАГРУЖЕНА В ФОРМУ: ${_state.value.amount}, isExpense=${_state.value.isExpense}")
+        val state = _state.value
+        Timber.d("Состояние после загрузки:")
+        Timber.d("- Сумма в форме: ${state.amount}")
+        Timber.d("- isExpense: ${state.isExpense}")
+        Timber.d("- editMode: ${state.editMode}")
+        Timber.d("- transactionToEdit ID: ${state.transactionToEdit?.id}")
+        Timber.d("===== ЗАВЕРШЕНА ЗАГРУЗКА ТРАНЗАКЦИИ ДЛЯ РЕДАКТИРОВАНИЯ =====")
     }
 
     /**

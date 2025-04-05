@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
@@ -50,14 +51,43 @@ class HomeViewModel(
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
-    // Кэши для хранения результатов вычислений
+    // --- Кэширование --- 
+    // Кэши для хранения результатов вычислений, чтобы избежать повторных затратных операций
+    /**
+     * Кэш для отфильтрованных транзакций и их статистики.
+     * Ключ: комбинация фильтра и хэш списка исходных транзакций.
+     * Значение: отфильтрованные транзакции, статистика (доход, расход, баланс), группы транзакций.
+     * 
+     * Это позволяет избежать повторных вычислений, если список транзакций и фильтр не изменились.
+     */
     private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<TransactionGroup>>>()
+    
+    /**
+     * Кэш для базовой статистики (доход, расход, баланс) по списку транзакций.
+     * Ключ: список транзакций.
+     * Значение: статистика (доход, расход, баланс).
+     * 
+     * Используется для быстрого доступа к статистике, если она уже была вычислена.
+     */
     private val statsCache = mutableMapOf<List<Transaction>, Triple<Money, Money, Money>>()
-    // Кэш для загруженных транзакций по временным периодам
+    
+    /**
+     * Кэш для исходных транзакций, загруженных из репозитория для определенного периода.
+     * Ключ: строка, представляющая период (например, "transactions_start_end").
+     * Значение: список транзакций за этот период.
+     * 
+     * Позволяет избежать повторных запросов к репозиторию для одного и того же периода.
+     */
     private val transactionCache = mutableMapOf<String, List<Transaction>>()
+    // --- Конец Кэширования ---
     
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
+
+    // Добавляем константу TAG для логов
+    companion object {
+        private const val TAG = "HomeViewModel"
+    }
 
     init {
         Timber.d("HomeViewModel initialized")
@@ -93,15 +123,12 @@ class HomeViewModel(
     fun onEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.SetFilter -> {
-                Timber.d("Устанавливаем новый фильтр: ${event.filter}")
-                // Очищаем кэш перед сменой фильтра
-                clearCaches()
-                // Немедленно обновляем фильтр, ставим isLoading = true и очищаем старый список
                 _state.update { 
                     it.copy(
-                        currentFilter = event.filter, 
-                        isLoading = true, // Показываем загрузку СРАЗУ
-                        filteredTransactions = emptyList(), // Очищаем старый список СРАЗУ
+                        currentFilter = event.filter,
+                        isLoading = true, // Показываем индикатор загрузки
+                        // Очищаем текущие отфильтрованные данные для UI
+                        filteredTransactions = emptyList(),
                         transactionGroups = emptyList(), // Очищаем группы тоже
                         // Сбрасываем статистику для фильтра
                         filteredIncome = Money.zero(),
@@ -111,7 +138,7 @@ class HomeViewModel(
                 }
                 // Запускаем обновление отфильтрованных транзакций в фоне
                 // Эта функция позже установит isLoading = false
-                updateFilteredTransactions()
+                updateFilteredTransactions(event.filter)
             }
             is HomeEvent.LoadTransactions -> {
                 loadTransactions()
@@ -349,7 +376,7 @@ class HomeViewModel(
                 }
                 
                 val job2 = viewModelScope.launch(Dispatchers.Default) {
-                    updateFilteredTransactions()
+                    updateFilteredTransactions(_state.value.currentFilter)
                 }
                 
                 // Не блокируем основной поток, просто даем задачам выполниться в фоне
@@ -436,96 +463,110 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Обновляет отфильтрованные транзакции и статистику на основе текущего фильтра
-     */
+    // Блокировка для предотвращения одновременных обновлений
     private var isFilteringInProgress = false
-    private var lastFilterUpdateTime = 0L
-
-    private fun updateFilteredTransactions() {
-        // Защита от слишком частых обновлений
-        val currentTime = System.currentTimeMillis()
-        if (isFilteringInProgress || currentTime - lastFilterUpdateTime < 300) {
-            Timber.d("Фильтрация уже выполняется или вызвана слишком часто, пропускаем")
+    
+    /**
+     * Обновляет список отфильтрованных транзакций на основе выбранного фильтра
+     * @param filter Выбранный фильтр транзакций
+     */
+    private fun updateFilteredTransactions(filter: TransactionFilter) {
+        val allTransactions = _state.value.transactions
+        if (allTransactions.isEmpty()) {
+            _state.update { it.copy(filteredTransactions = emptyList()) }
             return
         }
 
-        viewModelScope.launch(Dispatchers.Default) { // Сразу запускаем в фоновом потоке
-            isFilteringInProgress = true
-            lastFilterUpdateTime = currentTime
-            
+        val calendar = Calendar.getInstance()
+        val now = calendar.time
+
+        val filteredTransactions = when (filter) {
+            TransactionFilter.TODAY -> {
+                // Получаем только транзакции за сегодня
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startOfDay = calendar.time
+                
+                calendar.add(Calendar.DAY_OF_MONTH, 1)
+                val endOfDay = calendar.time
+                
+                allTransactions.filter { transaction ->
+                    transaction.date in startOfDay..<endOfDay
+                }
+            }
+            TransactionFilter.WEEK -> {
+                // Получаем транзакции за последние 7 дней
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                calendar.add(Calendar.DAY_OF_MONTH, -6) // -6 дней + сегодня = 7 дней
+                val startOfWeek = calendar.time
+                
+                calendar.add(Calendar.DAY_OF_MONTH, 7)
+                val endOfWeek = calendar.time
+                
+                allTransactions.filter { transaction ->
+                    transaction.date in startOfWeek..<endOfWeek
+                }
+            }
+            TransactionFilter.MONTH -> {
+                // Получаем транзакции за последние 30 дней
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                calendar.add(Calendar.DAY_OF_MONTH, -29) // -29 дней + сегодня = 30 дней
+                val startOfMonth = calendar.time
+                
+                calendar.add(Calendar.DAY_OF_MONTH, 30)
+                val endOfMonth = calendar.time
+                
+                allTransactions.filter { transaction ->
+                    transaction.date in startOfMonth..<endOfMonth
+                }
+            }
+            TransactionFilter.ALL -> {
+                // Для фильтра "Все" берем все транзакции без фильтрации
+                allTransactions
+            }
+        }
+
+        val transactionGroups = groupTransactionsByDate(filteredTransactions)
+        _state.update { it.copy(filteredTransactions = filteredTransactions, transactionGroups = transactionGroups) }
+    }
+    
+    /**
+     * Загружает транзакции в соответствии с выбранным фильтром
+     * @param filter Фильтр для загрузки транзакций
+     */
+    private fun loadTransactionsForFilter(filter: TransactionFilter) {
+        viewModelScope.launch {
             try {
-                val transactions = _state.value.transactions
-                val currentFilter = _state.value.currentFilter
-
-                // Оптимизированный ключ кэша - только фильтр и хэш-код списка транзакций
-                val cacheKey = FilterCacheKey(currentFilter, transactions.hashCode())
-
-                // Проверяем кэш перед вычислениями
-                val cachedData = filteredTransactionsCache[cacheKey]
-                if (cachedData != null) {
-                    Timber.d("Используем кэшированные отфильтрованные данные для ${currentFilter.name}")
-
-                    // Обновляем состояние сразу из кэша без вычислений
-                    withContext(Dispatchers.Main) {
-                        _state.update {
-                            it.copy(
-                                filteredTransactions = cachedData.first,
-                                filteredIncome = cachedData.second.first,
-                                filteredExpense = cachedData.second.second,
-                                filteredBalance = cachedData.second.third,
-                                transactionGroups = cachedData.third,
-                                isLoading = false
-                            )
-                        }
-                    }
-                    return@launch
+                val transactions = when (filter) {
+                    TransactionFilter.TODAY -> getTransactionsUseCase.getRecentTransactions(1)
+                    TransactionFilter.WEEK -> getTransactionsUseCase.getRecentTransactions(7)
+                    TransactionFilter.MONTH -> getTransactionsUseCase.getRecentTransactions(30)
+                    TransactionFilter.ALL -> getTransactionsUseCase.getAllTransactions()
                 }
-
-                // Фильтруем транзакции на основе текущего фильтра
-                // Используем оптимизированные функции фильтрации
-                val filteredTransactions = when (currentFilter) {
-                    TransactionFilter.TODAY -> getTodayTransactions(transactions)
-                    TransactionFilter.WEEK -> getLastWeekTransactions(transactions)
-                    TransactionFilter.MONTH -> getLastMonthTransactions(transactions)
+                _state.update { currentState ->
+                    currentState.copy(
+                        transactions = transactions,
+                        isLoading = false,
+                        error = null
+                    )
                 }
-
-                // Проверяем, есть ли кэшированная статистика для этих отфильтрованных транзакций
-                val statsKey = filteredTransactions.hashCode()
-                val stats = statsCache[filteredTransactions] ?: calculateStats(filteredTransactions).also {
-                    // Кэшируем результаты вычислений
-                    statsCache[filteredTransactions] = it
-                }
-
-                // Используем кэшированные данные по группам, если они доступны
-                val groups = if (_state.value.showGroupSummary) 
-                    groupTransactions(filteredTransactions, currentFilter) 
-                else 
-                    emptyList()
-
-                // Сохраняем результаты в кэш
-                filteredTransactionsCache[cacheKey] = Triple(filteredTransactions, stats, groups)
-
-                // Обновляем состояние в главном потоке с новыми данными
-                withContext(Dispatchers.Main) {
-                    _state.update { state ->
-                        state.copy(
-                            filteredTransactions = filteredTransactions,
-                            filteredIncome = stats.first,
-                            filteredExpense = stats.second,
-                            filteredBalance = stats.third,
-                            transactionGroups = groups,
-                            isLoading = false
-                        )
-                    }
-                }
+                updateFilteredTransactions(filter)
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при обновлении отфильтрованных транзакций: ${e.message}")
-                withContext(Dispatchers.Main) {
-                    _state.update { it.copy(isLoading = false) }
+                Log.e(TAG, "Error loading transactions", e)
+                _state.update { currentState ->
+                    currentState.copy(
+                        isLoading = false,
+                        error = e.message ?: "Unknown error"
+                    )
                 }
-            } finally {
-                isFilteringInProgress = false
             }
         }
     }
@@ -630,11 +671,16 @@ class HomeViewModel(
     }
 
     /**
-     * Ключ для кэша фильтрованных транзакций
+     * Ключ для кэша фильтрованных транзакций (`filteredTransactionsCache`).
+     * Включает сам фильтр и хэш-код списка транзакций, к которому он применялся.
+     * 
+     * Использование хэш-кода вместо размера списка (`size`) гарантирует более точное  
+     * отслеживание изменений в данных. Размер может не измениться при изменении содержимого 
+     * (например, при замене одной транзакции другой), а хэш-код отразит это изменение.
      */
     private data class FilterCacheKey(
         val filter: TransactionFilter,
-        val size: Int
+        val transactionListHashCode: Int // Используем хэш-код списка для точности кэширования
     )
 
     private fun calculateTotalIncome(transactions: List<Transaction>): Money {
@@ -701,42 +747,63 @@ class HomeViewModel(
     }
 
     /**
-     * Группирует транзакции для отображения
+     * Группирует транзакции по дате для отображения в UI
+     * @param transactions Список транзакций для группировки
+     * @return Список групп транзакций, сгруппированных по дате
      */
-    private fun groupTransactions(
-        transactions: List<Transaction>,
-        filter: TransactionFilter
-    ): List<TransactionGroup> {
-        if (transactions.isEmpty() || !_state.value.showGroupSummary) {
+    private fun groupTransactionsByDate(transactions: List<Transaction>): List<TransactionGroup> {
+        if (transactions.isEmpty()) {
             return emptyList()
         }
-
-        // Группируем по категориям
-        val categoryMap = mutableMapOf<String, MutableList<Transaction>>()
-        val categoryTotals = mutableMapOf<String, Double>()
-
-        // Группируем транзакции и вычисляем суммы по категориям
-        transactions.forEach { transaction ->
-            val category = transaction.category
-            categoryMap.getOrPut(category) { mutableListOf() }.add(transaction)
-            categoryTotals[category] =
-                (categoryTotals[category] ?: 0.0) + Math.abs(transaction.amount)
+        
+        // Группируем транзакции по дате (без времени)
+        val groupedTransactions = transactions.groupBy { transaction ->
+            // Получаем только дату без времени
+            val calendar = Calendar.getInstance()
+            calendar.time = transaction.date
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
+            calendar.set(Calendar.MILLISECOND, 0)
+            calendar.time
         }
-
-        // Преобразуем в итоговый список групп и отфильтруем группы с нулевым доходом
-        return categoryMap.map { (category, categoryTransactions) ->
-            val categoryTotal = categoryTotals[category] ?: 0.0
-
-            // Создаем группу транзакций
+        
+        // Сортируем даты по убыванию (сначала новые)
+        val sortedDates = groupedTransactions.keys.sortedByDescending { it }
+        
+        // Создаем группы транзакций
+        return sortedDates.map { date ->
+            val transactionsForDate = groupedTransactions[date] ?: emptyList()
+            
+            // Вычисляем сумму доходов и расходов для группы
+            var incomeSum = BigDecimal.ZERO
+            var expenseSum = BigDecimal.ZERO
+            
+            transactionsForDate.forEach { transaction ->
+                if (transaction.isExpense) {
+                    expenseSum = expenseSum.add(BigDecimal(transaction.amount.toString()))
+                } else {
+                    incomeSum = incomeSum.add(BigDecimal(transaction.amount.toString()))
+                }
+            }
+            
+            // Сортируем транзакции внутри группы по времени (сначала новые)
+            val sortedTransactions = transactionsForDate.sortedByDescending { it.date }
+            
+            // Форматируем дату для отображения в UI
+            val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+            val dateString = dateFormat.format(date)
+            
+            // Вычисляем общий баланс (доходы - расходы)
+            val balanceAmount = incomeSum.subtract(expenseSum)
+            
             TransactionGroup(
-                date = category,
-                transactions = categoryTransactions,
-                balance = Money(categoryTotal),
-                name = category,
-                total = Money(categoryTotal)
+                date = dateString,
+                transactions = sortedTransactions,
+                balance = Money(balanceAmount),
+                name = dateString,
+                total = Money(balanceAmount)
             )
         }
-        .filter { it.total.amount > BigDecimal.ZERO } // Фильтруем группы с нулевым доходом
-        .sortedByDescending { it.total.amount }
     }
 } 

@@ -1,9 +1,10 @@
 package com.davidbugayov.financeanalyzer.domain.usecase
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import java.util.Date
+import java.util.Calendar
 
 /**
  * Реализация Use case для получения потока транзакций за указанный период времени.
@@ -14,7 +15,7 @@ import java.util.Date
  * @property repository Репозиторий для работы с транзакциями
  */
 class GetTransactionsUseCaseImpl(
-    private val repository: ITransactionRepository
+    private val repository: TransactionRepository
 ) : GetTransactionsUseCase {
 
     /**
@@ -26,6 +27,31 @@ class GetTransactionsUseCaseImpl(
      * @return Flow с списком транзакций за указанный период
      */
     override suspend fun invoke(startDate: Date, endDate: Date): Flow<List<Transaction>> {
-        return repository.getTransactions(startDate, endDate)
+        return repository.getTransactionsByDateRange(startDate, endDate)
+    }
+
+    /**
+     * Получает список всех транзакций через репозиторий.
+     *
+     * @return Список всех транзакций
+     */
+    override suspend fun getAllTransactions(): List<Transaction> {
+        return repository.getAllTransactions()
+    }
+
+    /**
+     * Получает список транзакций за последние N дней.
+     *
+     * @param days Количество дней для получения транзакций
+     * @return Список транзакций за указанный период
+     */
+    override suspend fun getRecentTransactions(days: Int): List<Transaction> {
+        val endDate = Date() // Текущая дата
+        val calendar = Calendar.getInstance()
+        calendar.time = endDate
+        calendar.add(Calendar.DAY_OF_YEAR, -days) // Вычитаем указанное количество дней
+        val startDate = calendar.time
+        
+        return repository.getTransactionsByDateRangeList(startDate, endDate)
     }
 } 
