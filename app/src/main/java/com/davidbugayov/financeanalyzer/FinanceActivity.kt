@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer
 
+import android.Manifest
 import android.app.AlarmManager
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -10,6 +11,7 @@ import android.os.Bundle
 import android.provider.Settings
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -21,7 +23,9 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
+import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.utils.TransactionReminderReceiver
 import com.davidbugayov.financeanalyzer.widget.BalanceWidget
 import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
 import timber.log.Timber
@@ -42,6 +46,9 @@ class FinanceActivity : ComponentActivity() {
         
         // Проверяем разрешение на использование точных будильников
         checkExactAlarmPermission()
+
+        // Проверяем разрешение на уведомления
+        checkNotificationPermission()
         
         // Обновляем виджеты при запуске приложения
         updateWidgets()
@@ -138,6 +145,79 @@ class FinanceActivity : ComponentActivity() {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error updating widgets")
+        }
+    }
+
+    /**
+     * Проверяет, есть ли у приложения разрешение на отправку уведомлений.
+     * Если нет, запрашивает разрешение через системный диалог.
+     */
+    private fun checkNotificationPermission() {
+        // Регистрируем обработчик результата запроса разрешения
+        val requestPermissionLauncher = registerForActivityResult(
+            ActivityResultContracts.RequestPermission()
+        ) { isGranted ->
+            if (isGranted) {
+                Timber.d("Notification permission granted")
+                // Разрешение получено, можно настроить уведомления
+                setupNotificationsIfEnabled()
+            } else {
+                Timber.d("Notification permission denied")
+                // Показываем уведомление о том, что разрешение отклонено
+                showPermissionDeniedNotification()
+            }
+        }
+
+        // Проверяем, есть ли разрешение на уведомления
+        if (!PermissionUtils.hasNotificationPermission(this)) {
+            Timber.d("Notification permission not granted, requesting...")
+
+            // На Android 13+ (API 33) и выше нужно запрашивать специальное разрешение
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                requestPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            } else {
+                // На более старых версиях разрешение не требуется явно
+                setupNotificationsIfEnabled()
+            }
+        } else {
+            // Разрешение уже есть, можно настроить уведомления
+            Timber.d("Notification permission already granted")
+            setupNotificationsIfEnabled()
+        }
+    }
+
+    /**
+     * Настраивает уведомления, если они включены в настройках приложения.
+     */
+    private fun setupNotificationsIfEnabled() {
+        val preferencesManager = PreferencesManager(this)
+        if (preferencesManager.isTransactionReminderEnabled()) {
+            // Если уведомления включены в настройках, настраиваем их
+            try {
+                val hour = 20 // По умолчанию 20:00
+                val minute = 0
+                val notificationScheduler =
+                    com.davidbugayov.financeanalyzer.utils.NotificationScheduler()
+                notificationScheduler.scheduleTransactionReminder(this, hour, minute)
+                Timber.d("Transaction reminder scheduled at $hour:$minute")
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to schedule transaction reminder")
+            }
+        }
+    }
+
+    /**
+     * Показывает уведомление о том, что разрешение на уведомления отклонено.
+     */
+    private fun showPermissionDeniedNotification() {
+        try {
+            val intent = Intent(this, TransactionReminderReceiver::class.java).apply {
+                action = TransactionReminderReceiver.ACTION_SHOW_PERMISSION_NOTIFICATION
+            }
+            sendBroadcast(intent)
+            Timber.d("Sent broadcast to show notification permission reminder")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to send broadcast for notification permission reminder")
         }
     }
     

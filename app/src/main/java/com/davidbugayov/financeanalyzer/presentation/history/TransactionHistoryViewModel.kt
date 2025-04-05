@@ -2,10 +2,8 @@ package com.davidbugayov.financeanalyzer.presentation.history
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
@@ -18,19 +16,19 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.async
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.withContext
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import timber.log.Timber
+import java.util.Calendar
 import java.util.Date
 import javax.inject.Inject
-import java.util.Calendar
 
 class TransactionHistoryViewModel @Inject constructor(
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
@@ -260,6 +258,7 @@ class TransactionHistoryViewModel @Inject constructor(
                 _state.update {
                     it.copy(
                         transactions = transactions,
+                        filteredTransactions = transactions,
                         currentPage = 1,
                         hasMoreData = transactions.size < totalCount && currentState.periodType != PeriodType.ALL,
                         isLoading = false,
@@ -464,6 +463,14 @@ class TransactionHistoryViewModel @Inject constructor(
                     }
                 }
                 return@launch
+            }
+
+            // Сразу же устанавливаем filteredTransactions равным исходным транзакциям
+            // чтобы избежать показ "Нет транзакций" во время длительной группировки
+            withContext(Dispatchers.Main) {
+                _state.update {
+                    it.copy(filteredTransactions = transactions)
+                }
             }
             
             Timber.d("Начало обработки ${transactions.size} транзакций")

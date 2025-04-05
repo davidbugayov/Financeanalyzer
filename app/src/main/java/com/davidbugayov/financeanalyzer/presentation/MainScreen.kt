@@ -15,6 +15,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
@@ -229,6 +230,9 @@ fun MainScreen(startDestination: String = "home") {
                         )
                     }
                 ) {
+                    // Получаем предыдущий маршрут из стека навигации
+                    val backStackEntry = remember { navController.previousBackStackEntry }
+                    
                     AddTransactionScreen(
                         viewModel = addTransactionViewModel,
                         onNavigateBack = {
@@ -238,12 +242,9 @@ fun MainScreen(startDestination: String = "home") {
                             // Обновляем графики и статистику напрямую
                             chartViewModel.loadTransactions()
                             profileViewModel.updateFinancialStatistics()
-                            
-                            navController.navigate(Screen.Home.route) {
-                                popUpTo(Screen.Home.route) {
-                                    inclusive = true
-                                }
-                            }
+
+                            // Просто возвращаемся назад, чтобы вернуться на предыдущий экран
+                            navController.navigateUp()
                         }
                     )
                 }

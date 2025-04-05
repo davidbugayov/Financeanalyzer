@@ -5,11 +5,11 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
+import android.net.Uri
 import androidx.core.app.NotificationCompat
 import com.davidbugayov.financeanalyzer.FinanceActivity
 import com.davidbugayov.financeanalyzer.R
 import timber.log.Timber
-import java.util.Calendar
 
 /**
  * BroadcastReceiver для показа уведомлений о необходимости внести транзакции.
@@ -19,19 +19,70 @@ class TransactionReminderReceiver : BroadcastReceiver() {
     companion object {
         private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
         private const val TRANSACTION_REMINDER_NOTIFICATION_ID = 1001
+
+        // Action для показа уведомления о необходимости предоставления разрешений
+        const val ACTION_SHOW_PERMISSION_NOTIFICATION =
+            "com.davidbugayov.financeanalyzer.SHOW_PERMISSION_NOTIFICATION"
     }
 
     override fun onReceive(context: Context, intent: Intent) {
-        Timber.d("TransactionReminderReceiver: onReceive")
+        Timber.d("TransactionReminderReceiver: onReceive, action: ${intent.action}")
         try {
-            // Показываем уведомление
-            showNotification(context)
-            
-            // Перепланируем уведомление на следующий день
-            rescheduleReminder(context)
+            when (intent.action) {
+                ACTION_SHOW_PERMISSION_NOTIFICATION -> {
+                    // Показываем уведомление о разрешениях
+                    showPermissionNotification(context)
+                }
+
+                else -> {
+                    // Показываем стандартное уведомление
+                    showNotification(context)
+
+                    // Перепланируем уведомление на следующий день
+                    rescheduleReminder(context)
+                }
+            }
         } catch (e: Exception) {
             Timber.e(e, "Error in TransactionReminderReceiver.onReceive")
         }
+    }
+
+    /**
+     * Показывает уведомление о необходимости предоставления разрешений на уведомления.
+     * @param context Контекст приложения.
+     */
+    private fun showPermissionNotification(context: Context) {
+        // Создаем Intent для запуска настроек уведомлений с использованием PermissionUtils
+        val intent = Intent().apply {
+            action = Intent.ACTION_VIEW
+            data = Uri.parse("package:${context.packageName}")
+            // Используем специальный флаг, чтобы создать новую задачу
+            flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        }
+
+        // Будем использовать тот же ID для обоих уведомлений
+        val pendingIntent = PendingIntent.getActivity(
+            context,
+            TRANSACTION_REMINDER_NOTIFICATION_ID,
+            intent,
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+        )
+
+        // Создаем уведомление
+        val builder = NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
+            .setSmallIcon(R.drawable.ic_notification)
+            .setContentTitle(context.getString(R.string.notification_disabled_title))
+            .setContentText(context.getString(R.string.notification_disabled_description))
+            .setPriority(NotificationCompat.PRIORITY_HIGH)
+            .setContentIntent(pendingIntent)
+            .setAutoCancel(true)
+
+        // Показываем уведомление
+        val notificationManager =
+            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+        notificationManager.notify(TRANSACTION_REMINDER_NOTIFICATION_ID, builder.build())
+
+        Timber.d("Permission notification shown")
     }
 
     /**

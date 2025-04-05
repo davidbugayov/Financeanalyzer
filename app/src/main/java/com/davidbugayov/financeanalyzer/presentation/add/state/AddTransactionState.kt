@@ -16,10 +16,12 @@ import java.util.Date
  * @property isLoading Флаг загрузки при сохранении
  * @property error Текст ошибки (null если ошибок нет)
  * @property isSuccess Флаг успешного сохранения
+ * @property successMessage Сообщение об успешном действии
  * @property showDatePicker Флаг отображения диалога выбора даты
  * @property showCategoryPicker Флаг отображения диалога выбора категории
  * @property showCustomCategoryDialog Флаг отображения диалога добавления категории
  * @property customCategory Текст новой пользовательской категории
+ * @property transactionId ID транзакции при редактировании
  */
 data class AddTransactionState(
     val title: String = "",
@@ -31,8 +33,10 @@ data class AddTransactionState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isSuccess: Boolean = false,
+    val successMessage: String = "Операция выполнена успешно",
     val showDatePicker: Boolean = false,
     val showCategoryPicker: Boolean = false,
     val showCustomCategoryDialog: Boolean = false,
-    val customCategory: String = ""
+    val customCategory: String = "",
+    val transactionId: String = ""
 ) 

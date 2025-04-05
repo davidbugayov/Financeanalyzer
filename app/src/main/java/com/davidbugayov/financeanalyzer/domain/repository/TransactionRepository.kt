@@ -26,6 +26,13 @@ interface TransactionRepository {
     val dataChangeEvents: SharedFlow<DataChangeEvent>
 
     /**
+     * Принудительно отправляет событие изменения данных.
+     * Используется для принудительного обновления UI, например после изменения транзакции.
+     * @param transactionId ID измененной транзакции или null для массовых изменений.
+     */
+    suspend fun notifyDataChanged(transactionId: String? = null)
+
+    /**
      * Получает все транзакции.
      * @return Список всех транзакций.
      */

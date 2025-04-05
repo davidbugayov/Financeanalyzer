@@ -13,6 +13,7 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -22,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.add.components.AddButton
 import com.davidbugayov.financeanalyzer.presentation.add.components.AmountField
@@ -69,6 +69,16 @@ fun AddTransactionScreen(
             screenName = "add_transaction",
             screenClass = "AddTransactionScreen"
         )
+
+        // Устанавливаем callback для навигации назад
+        viewModel.navigateBackCallback = onNavigateBack
+    }
+
+    // Очищаем callback при выходе из композиции
+    DisposableEffect(Unit) {
+        onDispose {
+            viewModel.navigateBackCallback = null
+        }
     }
 
     // Функция для обработки выхода с экрана
@@ -220,7 +230,8 @@ fun AddTransactionScreen(
                         "Сохранить"
                     else 
                         "Добавить",
-                    color = currentColor
+                    color = currentColor,
+                    isLoading = state.isLoading
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
@@ -271,10 +282,19 @@ fun AddTransactionScreen(
                 )
             }
 
-            if (state.isSuccess) {
+            // Диалоги для отображения результатов операций
+            if (state.error != null) {
+                ErrorDialog(
+                    message = state.error ?: "",
+                    onDismiss = {
+                        viewModel.onEvent(AddTransactionEvent.ClearError)
+                    }
+                )
+            } else if (state.isSuccess) {
                 SuccessDialog(
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideSuccessDialog)
+                        // Возвращаемся на предыдущий экран при нажатии "Готово"
                         handleExit()
                     },
                     onAddAnother = {

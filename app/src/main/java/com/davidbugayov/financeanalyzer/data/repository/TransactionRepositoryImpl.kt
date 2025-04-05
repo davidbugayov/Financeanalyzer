@@ -1,14 +1,12 @@
 package com.davidbugayov.financeanalyzer.data.repository
 
-import android.annotation.SuppressLint
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
@@ -20,9 +18,8 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
-import java.util.Collections
 import java.util.Calendar
+import java.util.Collections
 import java.util.Date
 
 /**
@@ -69,10 +66,23 @@ class TransactionRepositoryImpl(
      * Отправляет событие изменения данных в SharedFlow.
      * @param transactionId ID измененной транзакции или null для массовых изменений.
      */
-    private fun notifyDataChanged(transactionId: String? = null) {
+    private fun internalNotifyDataChanged(transactionId: String? = null) {
         repositoryScope.launch {
             Timber.d("Отправка события изменения данных: transactionId=$transactionId")
             _dataChangeEvents.tryEmit(DataChangeEvent.TransactionChanged(transactionId))
+        }
+    }
+
+    /**
+     * Принудительно отправляет событие изменения данных.
+     * Реализация интерфейсного метода для внешнего использования.
+     * @param transactionId ID измененной транзакции или null для массовых изменений.
+     */
+    override suspend fun notifyDataChanged(transactionId: String?) {
+        withContext(Dispatchers.IO) {
+            Timber.d("Принудительная отправка события изменения данных из внешнего источника: transactionId=$transactionId")
+            clearCaches() // Очищаем кэш перед уведомлением
+            _dataChangeEvents.emit(DataChangeEvent.TransactionChanged(transactionId))
         }
     }
 
@@ -128,10 +138,10 @@ class TransactionRepositoryImpl(
         
         // Группируем транзакции по месяцам
         val groupedByMonth = transactions.groupBy { transaction ->
-            val calendar = java.util.Calendar.getInstance()
+            val calendar = Calendar.getInstance()
             calendar.time = transaction.date
-            val year = calendar.get(java.util.Calendar.YEAR)
-            val month = calendar.get(java.util.Calendar.MONTH) + 1 // +1 т.к. месяцы в Calendar начинаются с 0
+            val year = calendar.get(Calendar.YEAR)
+            val month = calendar.get(Calendar.MONTH) + 1 // +1 т.к. месяцы в Calendar начинаются с 0
             "$year-${month.toString().padStart(2, '0')}" // Формат YYYY-MM
         }
         
@@ -140,10 +150,10 @@ class TransactionRepositoryImpl(
         
         // Группируем транзакции по неделям
         val groupedByWeek = transactions.groupBy { transaction ->
-            val calendar = java.util.Calendar.getInstance()
+            val calendar = Calendar.getInstance()
             calendar.time = transaction.date
-            val year = calendar.get(java.util.Calendar.YEAR)
-            val week = calendar.get(java.util.Calendar.WEEK_OF_YEAR)
+            val year = calendar.get(Calendar.YEAR)
+            val week = calendar.get(Calendar.WEEK_OF_YEAR)
             "$year-W${week.toString().padStart(2, '0')}" // Формат YYYY-WXX
         }
         
@@ -230,20 +240,20 @@ class TransactionRepositoryImpl(
         // Если нет в кэше или кэш устарел, загружаем из базы данных
         try {
             // Создаем граничные даты для запроса
-            val calendar = java.util.Calendar.getInstance()
+            val calendar = Calendar.getInstance()
             calendar.clear()
-            calendar.set(java.util.Calendar.YEAR, year)
-            calendar.set(java.util.Calendar.WEEK_OF_YEAR, week)
-            calendar.set(java.util.Calendar.DAY_OF_WEEK, calendar.getFirstDayOfWeek())
-            calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
-            calendar.set(java.util.Calendar.MINUTE, 0)
-            calendar.set(java.util.Calendar.SECOND, 0)
+            calendar.set(Calendar.YEAR, year)
+            calendar.set(Calendar.WEEK_OF_YEAR, week)
+            calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+            calendar.set(Calendar.HOUR_OF_DAY, 0)
+            calendar.set(Calendar.MINUTE, 0)
+            calendar.set(Calendar.SECOND, 0)
             val startDate = calendar.time
             
-            calendar.add(java.util.Calendar.DAY_OF_WEEK, 6)
-            calendar.set(java.util.Calendar.HOUR_OF_DAY, 23)
-            calendar.set(java.util.Calendar.MINUTE, 59)
-            calendar.set(java.util.Calendar.SECOND, 59)
+            calendar.add(Calendar.DAY_OF_WEEK, 6)
+            calendar.set(Calendar.HOUR_OF_DAY, 23)
+            calendar.set(Calendar.MINUTE, 59)
+            calendar.set(Calendar.SECOND, 59)
             val endDate = calendar.time
             
             // Запрашиваем транзакции за неделю
@@ -303,8 +313,8 @@ class TransactionRepositoryImpl(
         // Проверяем, актуален ли наш кэш
         if (transactionsCache.isNotEmpty() && System.currentTimeMillis() - cacheLastUpdated < CACHE_TTL) {
             // Фильтруем кэшированные транзакции по диапазону дат
-            val filteredTransactions = transactionsCache.filter { 
-                it.date in startDate..endDate 
+            val filteredTransactions = transactionsCache.filter {
+                it.date >= startDate && it.date <= endDate
             }
             
             // Применяем пагинацию к отфильтрованным транзакциям
@@ -341,11 +351,11 @@ class TransactionRepositoryImpl(
      * Форматирует дату для использования в ключах кэша
      */
     private fun formatDate(date: Date): String {
-        val calendar = java.util.Calendar.getInstance()
+        val calendar = Calendar.getInstance()
         calendar.time = date
-        val year = calendar.get(java.util.Calendar.YEAR)
-        val month = calendar.get(java.util.Calendar.MONTH) + 1
-        val day = calendar.get(java.util.Calendar.DAY_OF_MONTH)
+        val year = calendar.get(Calendar.YEAR)
+        val month = calendar.get(Calendar.MONTH) + 1
+        val day = calendar.get(Calendar.DAY_OF_MONTH)
         return "$year-${month.toString().padStart(2, '0')}-${day.toString().padStart(2, '0')}"
     }
 
@@ -369,8 +379,8 @@ class TransactionRepositoryImpl(
     ): Int = withContext(Dispatchers.IO) {
         // Пытаемся использовать кэш, если он актуален
         if (transactionsCache.isNotEmpty() && System.currentTimeMillis() - cacheLastUpdated < CACHE_TTL) {
-            val count = transactionsCache.count { it.date in startDate..endDate }
-            Timber.d("Получено количество транзакций в диапазоне дат из кэша: $count")
+            val count = transactionsCache.count { it.date >= startDate && it.date <= endDate }
+            Timber.d("Используем кэшированные данные для подсчета: $count")
             return@withContext count
         }
         
@@ -402,22 +412,24 @@ class TransactionRepositoryImpl(
      */
     override suspend fun getTransactionById(id: String): Transaction? {
         return try {
-            val transactionId = if (id.toLongOrNull() != null) {
-                // Если ID числовой, используем его как Long
-                id.toLong()
-            } else {
-                // Иначе используем хэш от строки в качестве Long ID
-                id.hashCode().toLong()
+            // Попытка найти транзакцию напрямую в кэше
+            val cachedTransaction = transactionsCache.find { it.id == id }
+            if (cachedTransaction != null) {
+                Timber.d("РЕПОЗИТОРИЙ: Транзакция найдена в кэше: ID=$id")
+                return cachedTransaction
             }
-            
-            Timber.d("РЕПОЗИТОРИЙ: Получение транзакции по ID: $id (преобразовано в $transactionId)")
-            val entity = dao.getTransactionById(transactionId)
-            
-            if (entity != null) {
-                Timber.d("РЕПОЗИТОРИЙ: Транзакция найдена")
+
+            // Если в кэше не найдено, ищем все транзакции и находим нужную
+            Timber.d("РЕПОЗИТОРИЙ: Поиск транзакции с ID=$id в базе данных")
+            val allTransactions = dao.getAllTransactions()
+            val entities = allTransactions.filter { it.idString == id }
+
+            if (entities.isNotEmpty()) {
+                val entity = entities.first()
+                Timber.d("РЕПОЗИТОРИЙ: Транзакция найдена в базе: ID=$id")
                 mapEntityToDomain(entity)
             } else {
-                Timber.d("РЕПОЗИТОРИЙ: Транзакция не найдена")
+                Timber.d("РЕПОЗИТОРИЙ: Транзакция не найдена: ID=$id")
                 null
             }
         } catch (e: Exception) {
@@ -438,7 +450,7 @@ class TransactionRepositoryImpl(
             val id = dao.insertTransaction(entity)
             clearCaches() // Очищаем кэш после добавления
             FinancialMetrics.getInstance().invalidateMetrics()
-            notifyDataChanged(transaction.id) // Уведомляем об изменении
+            internalNotifyDataChanged(transaction.id) // Уведомляем об изменении
             Timber.d("Транзакция добавлена: ID=$id")
             return@withContext id.toString()
         } catch (e: Exception) {
@@ -453,14 +465,68 @@ class TransactionRepositoryImpl(
      */
     override suspend fun updateTransaction(transaction: Transaction) = withContext(Dispatchers.IO) {
         try {
+            // Максимально подробное логирование
+            Timber.d("===== НАЧАЛО ОБНОВЛЕНИЯ ТРАНЗАКЦИИ =====")
+            Timber.d("ID: ${transaction.id}")
+            Timber.d("Сумма: ${transaction.amount}")
+            Timber.d("Категория: ${transaction.category}")
+            Timber.d("Источник: ${transaction.source}")
+            Timber.d("Дата: ${transaction.date}")
+
+            // Проверяем, существует ли транзакция с таким ID
+            val existingTransaction = transaction.id.let { id ->
+                if (id.isNotEmpty()) {
+                    dao.getTransactionByIdString(id)
+                } else {
+                    null
+                }
+            }
+
+            // Создаем сущность для обновления
             val entity = mapDomainToEntity(transaction)
-            dao.updateTransaction(entity)
-            clearCaches() // Очищаем кэш после обновления
-            FinancialMetrics.getInstance().invalidateMetrics()
-            notifyDataChanged(transaction.id) // Уведомляем об изменении
-            Timber.d("Транзакция обновлена: ID=${transaction.id}")
+            Timber.d("Сущность создана: id=${entity.id}, idString=${entity.idString}")
+
+            if (existingTransaction != null) {
+                // Если транзакция существует, обновляем ее
+                Timber.d("Обновляем существующую транзакцию с ID=${entity.idString}")
+                dao.updateTransaction(entity)
+            } else {
+                // Если транзакции не существует, вставляем как новую
+                Timber.d("Транзакция с ID=${entity.idString} не найдена, вставляем новую")
+                dao.insertTransaction(entity)
+            }
+
+            // Очищаем все кэши
+            try {
+                clearCaches()
+                Timber.d("Кэш очищен")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при очистке кэша: ${e.message}")
+                // Продолжаем выполнение даже при ошибке кэша
+            }
+
+            // Инвалидируем метрики
+            try {
+                FinancialMetrics.getInstance().invalidateMetrics()
+                Timber.d("Метрики сброшены")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при сбросе метрик: ${e.message}")
+                // Продолжаем выполнение даже при ошибке метрик
+            }
+
+            // Отправляем уведомление об изменении
+            try {
+                internalNotifyDataChanged(transaction.id)
+                Timber.d("Отправлено уведомление об изменении данных")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при отправке уведомления: ${e.message}")
+                // Продолжаем выполнение даже при ошибке уведомления
+            }
+
+            Timber.d("===== ЗАВЕРШЕНО ОБНОВЛЕНИЕ ТРАНЗАКЦИИ ID=${transaction.id} =====")
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при обновлении транзакции: ${e.message}")
+            Timber.e(e, "===== ОШИБКА ОБНОВЛЕНИЯ ТРАНЗАКЦИИ ID=${transaction.id} =====")
+            Timber.e(e, "Сообщение: ${e.message}")
             throw e // Пробрасываем исключение для обработки в UseCase
         }
     }
@@ -475,7 +541,7 @@ class TransactionRepositoryImpl(
             dao.deleteTransaction(entity)
             clearCaches() // Очищаем кэш после удаления
             FinancialMetrics.getInstance().invalidateMetrics()
-            notifyDataChanged(transaction.id) // Уведомляем об изменении
+            internalNotifyDataChanged(transaction.id) // Уведомляем об изменении
             Timber.d("Транзакция удалена: ID=${transaction.id}")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при удалении транзакции: ${e.message}")
@@ -492,7 +558,7 @@ class TransactionRepositoryImpl(
             dao.deleteTransactionById(id)
             clearCaches() // Очищаем кэш после удаления
             FinancialMetrics.getInstance().invalidateMetrics()
-            notifyDataChanged(id) // Уведомляем об изменении
+            internalNotifyDataChanged(id) // Уведомляем об изменении
             Timber.d("Транзакция удалена по ID: $id")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при удалении транзакции по ID: $id - ${e.message}")
@@ -551,11 +617,30 @@ class TransactionRepositoryImpl(
      * @return Сущность транзакции.
      */
     private fun mapDomainToEntity(domain: Transaction): TransactionEntity {
-        // Генерируем Long ID только если его нет (для новых транзакций)
-        val id = if (domain.id.toLongOrNull() != null && domain.id != "0") domain.id.toLong() else 0L
-        
-        return TransactionEntity(
-            id = id,
+        Timber.d("МАППИНГ В СУЩНОСТЬ: Начало преобразования Transaction -> TransactionEntity")
+        Timber.d("Исходная транзакция: id=${domain.id}, сумма=${domain.amount}, категория=${domain.category}")
+
+        // КРИТИЧЕСКИ ВАЖНО: правильно обрабатываем ID
+        var longId = 0L
+
+        try {
+            // Пытаемся преобразовать строковый ID в Long
+            if (domain.id.isNotEmpty() && domain.id != "0") {
+                // Если ID числовой, пробуем преобразовать напрямую
+                longId = domain.id.toLongOrNull() ?: domain.id.hashCode().toLong()
+                Timber.d("ID конвертирован в числовой формат: $longId")
+            } else {
+                // Для новых транзакций используем 0, чтобы Room сгенерировал новый ID
+                Timber.d("Используем ID=0 для новой транзакции")
+            }
+        } catch (e: Exception) {
+            // В случае ошибки конвертации используем хэш-код строки
+            Timber.e(e, "Ошибка при конвертации ID, используем хэш-код: ${e.message}")
+            longId = domain.id.hashCode().toLong()
+        }
+
+        val entity = TransactionEntity(
+            id = longId,
             idString = domain.id,
             amount = domain.amount.toString(),
             category = domain.category,
@@ -565,6 +650,9 @@ class TransactionRepositoryImpl(
             source = domain.source,
             sourceColor = domain.sourceColor
         )
+
+        Timber.d("РЕЗУЛЬТАТ МАППИНГА: id=${entity.id}, idString=${entity.idString}, сумма=${entity.amount}")
+        return entity
     }
 
     /**

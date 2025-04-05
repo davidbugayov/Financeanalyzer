@@ -337,6 +337,8 @@
     <string name="select_reminder_time">Выберите время напоминания:</string>
     <string name="reminder_description">Вы будете получать ежедневные напоминания о необходимости внести транзакции в указанное время.</string>
     <string name="notifications_disabled_message">Напоминания отключены. Включите их, чтобы не забывать вносить транзакции.</string>
+    <string name="notification_disabled_title">Уведомления отключены</string>
+    <string name="notification_disabled_description">Для полноценной работы напоминаний включите разрешение на уведомления в настройках приложения</string>
     
     <!-- Информация о приложении -->
     <string name="app_info">О приложении</string>

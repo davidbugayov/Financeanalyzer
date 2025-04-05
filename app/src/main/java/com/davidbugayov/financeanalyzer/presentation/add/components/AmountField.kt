@@ -26,11 +26,9 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import java.math.BigDecimal
 
 /**
  * Поле ввода суммы транзакции с форматированием в виде "xxx xxx xxx,xx"
@@ -92,14 +90,15 @@ fun AmountField(
                 OutlinedTextField(
                     value = textFieldValue,
                     onValueChange = { newValue ->
-                        // Удаляем все нецифровые символы, кроме запятой
-                        val digitsOnly = newValue.text.replace(Regex("[^0-9,]"), "")
-                        // Заменяем запятую на точку для внутреннего представления
+                        // Разрешаем запятую и точку, но преобразуем их в единый формат
+                        val digitsOnly = newValue.text.replace(Regex("[^0-9.,]"), "")
+
+                        // Заменяем и запятую, и точку на точку для внутреннего представления
                         val normalized = digitsOnly.replace(',', '.')
-                        
-                        // Проверяем, что у нас не более одной запятой
-                        val commaCount = digitsOnly.count { it == ',' }
-                        if (commaCount <= 1) {
+
+                        // Проверяем, что у нас не более одного десятичного разделителя
+                        val pointCount = normalized.count { it == '.' }
+                        if (pointCount <= 1) {
                             // Сохраняем текущую позицию курсора относительно конца строки
                             val distanceFromEnd = newValue.text.length - newValue.selection.end
                             

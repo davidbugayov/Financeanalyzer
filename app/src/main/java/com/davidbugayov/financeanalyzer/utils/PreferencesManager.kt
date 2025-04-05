@@ -72,6 +72,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_TOTAL_EXPENSE = "total_expense"
         private const val KEY_BALANCE = "balance"
         private const val KEY_STATS_LAST_UPDATE = "stats_last_update"
+        private const val KEY_TRANSACTION_REMINDER_ENABLED = "transaction_reminder_enabled"
     }
 
     /**
@@ -109,5 +110,13 @@ class PreferencesManager(context: Context) {
         val lastUpdate = sharedPreferences.getLong(KEY_STATS_LAST_UPDATE, 0)
         // Считаем статистику актуальной, если она обновлена не более 24 часов назад
         return System.currentTimeMillis() - lastUpdate < 24 * 60 * 60 * 1000
+    }
+
+    /**
+     * Возвращает, включены ли уведомления о транзакциях.
+     * @return true, если уведомления о транзакциях включены
+     */
+    fun isTransactionReminderEnabled(): Boolean {
+        return sharedPreferences.getBoolean(KEY_TRANSACTION_REMINDER_ENABLED, true)
     }
 } 

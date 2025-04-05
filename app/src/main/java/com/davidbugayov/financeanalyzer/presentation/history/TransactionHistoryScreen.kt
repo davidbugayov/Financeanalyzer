@@ -7,19 +7,16 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -32,7 +29,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
@@ -61,9 +57,9 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
-import timber.log.Timber
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -401,9 +397,11 @@ fun TransactionHistoryScreen(
                         error = state.error,
                         onRetry = { viewModel.onEvent(TransactionHistoryEvent.ReloadTransactions) }
                     )
-                } else if (state.filteredTransactions.isEmpty() && !state.isLoading) {
+                } else if (state.isLoading && !state.isLoadingMore) {
+                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                } else if (state.filteredTransactions.isEmpty()) {
                     EnhancedEmptyContent()
-                } else if (!state.isLoading) {
+                } else {
                     // Отображение сгруппированных транзакций
                     val groupedTransactions = viewModel.getGroupedTransactions()
                     val transactionGroups = remember(groupedTransactions) {
@@ -438,8 +436,8 @@ fun TransactionHistoryScreen(
                             showTransactionActionsDialog(transaction)
                         },
                         onTransactionLongClick = { transaction ->
-                            // Показываем контекстное меню или диалог с выбором действия
-                            handleTransactionEvent(TransactionEvent.ShowDeleteConfirmDialog(transaction))
+                            // Показываем тот же диалог выбора действий, что и при клике
+                            showTransactionActionsDialog(transaction)
                         },
                         onLoadMore = {
                             viewModel.onEvent(TransactionHistoryEvent.LoadMoreTransactions)
@@ -447,10 +445,6 @@ fun TransactionHistoryScreen(
                         isLoading = state.isLoadingMore,
                         hasMoreData = state.hasMoreData
                     )
-                }
-
-                if (state.isLoading && !state.isLoadingMore) {
-                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                 }
             }
         }

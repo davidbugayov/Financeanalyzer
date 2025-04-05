@@ -77,6 +77,14 @@ interface TransactionDao {
     suspend fun getTransactionById(id: Long): TransactionEntity?
 
     /**
+     * Получает транзакцию по строковому ID
+     * @param idString Строковый ID транзакции
+     * @return Транзакция с указанным строковым ID или null, если не найдена
+     */
+    @Query("SELECT * FROM transactions WHERE id_string = :idString")
+    suspend fun getTransactionByIdString(idString: String): TransactionEntity?
+
+    /**
      * Добавляет новую транзакцию в базу данных
      * @param transaction Транзакция для добавления
      * @return ID добавленной транзакции
