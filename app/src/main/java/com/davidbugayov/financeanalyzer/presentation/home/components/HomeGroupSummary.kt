@@ -20,9 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
-import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import java.math.BigDecimal
 
 /**
@@ -174,112 +172,6 @@ fun HomeGroupSummary(
                         )
                     }
                 }
-            }
-        }
-    }
-}
-
-/**
- * Компонент для отображения сводки по фильтрованным транзакциям.
- *
- * @param filteredTransactions Список фильтрованных транзакций
- * @param totalIncome Общий доход
- * @param totalExpense Общий расход
- * @param currentFilter Текущий фильтр
- */
-@Composable
-fun HomeGroupSummary(
-    filteredTransactions: List<Transaction>,
-    totalIncome: Money,
-    totalExpense: Money,
-    currentFilter: TransactionFilter
-) {
-    // Группировка транзакций не выполняется в этой версии, так как предполагается, 
-    // что эти данные уже доступны в HomeState и передаются в state.transactionGroups.
-    // Просто отображаем сводку по доходам и расходам
-    val incomeColor = Color(0xFF2E7D32) // Темно-зеленый для доходов
-    val expenseColor = Color(0xFFB71C1C) // Темно-красный для расходов
-    
-    // Вычисляем баланс
-    val balance = totalIncome - totalExpense
-    val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
-    
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
-    ) {
-        Column(
-            modifier = Modifier.padding(12.dp)
-        ) {
-            // Отображение заголовка "Сводка"
-            Text(
-                text = stringResource(R.string.summary),
-                style = MaterialTheme.typography.titleMedium,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 4.dp),
-                color = balanceColor
-            )
-
-            // Отображение общего дохода и расхода
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.total_income),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = totalIncome.formatted(false),
-                    fontSize = 14.sp,
-                    color = incomeColor,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.total_expense),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = totalExpense.formatted(false),
-                    fontSize = 14.sp,
-                    color = expenseColor,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Отображение баланса
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.balance),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = balance.formatted(false),
-                    fontSize = 14.sp,
-                    color = balanceColor,
-                    fontWeight = FontWeight.Bold
-                )
             }
         }
     }

@@ -6,6 +6,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 
@@ -30,6 +35,23 @@ object PermissionUtils {
             // До Android 13 отдельное разрешение на уведомления не требуется
             true
         }
+    }
+
+    /**
+     * Создает и возвращает лаунчер для запроса разрешений на уведомления
+     *
+     * @param onPermissionResult Функция обратного вызова, которая будет вызвана с результатом запроса
+     * @return Composable функция, которая возвращает лаунчер для запроса разрешений
+     */
+    @Composable
+    fun rememberNotificationPermissionLauncher(
+        onPermissionResult: (Boolean) -> Unit
+    ): ActivityResultLauncher<String> {
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+            onPermissionResult
+        )
+        return remember { launcher }
     }
 
     /**

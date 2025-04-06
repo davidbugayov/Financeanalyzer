@@ -5,8 +5,8 @@ import android.app.PendingIntent
 import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
-import android.net.Uri
 import androidx.core.app.NotificationCompat
+import androidx.core.net.toUri
 import com.davidbugayov.financeanalyzer.FinanceActivity
 import com.davidbugayov.financeanalyzer.R
 import timber.log.Timber
@@ -55,7 +55,7 @@ class TransactionReminderReceiver : BroadcastReceiver() {
         // Создаем Intent для запуска настроек уведомлений с использованием PermissionUtils
         val intent = Intent().apply {
             action = Intent.ACTION_VIEW
-            data = Uri.parse("package:${context.packageName}")
+            data = "package:${context.packageName}".toUri()
             // Используем специальный флаг, чтобы создать новую задачу
             flags = Intent.FLAG_ACTIVITY_NEW_TASK
         }

@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.utils
 
 import androidx.core.graphics.toColorInt
 import com.davidbugayov.financeanalyzer.domain.model.Source
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 
 object ColorUtils {
 
@@ -80,22 +79,9 @@ object ColorUtils {
      * @param isExpense Флаг расхода
      * @return Цвет источника или цвет по умолчанию (для расхода/дохода)
      */
-    fun getEffectiveSourceColor(source: String, sourceColor: Int, isExpense: Boolean): Int {
-        return sourceColor.takeIf { it != 0 } 
-            ?: getSourceColor(source) 
-            ?: if (isExpense) EXPENSE_COLOR else INCOME_COLOR
-    }
-
-    /**
-     * Получает эффективный цвет источника транзакции.
-     * Если цвет источника не задан явно, определяет его по названию источника.
-     * Если и это не удалось, использует цвет по умолчанию для расхода/дохода.
-     * 
-     * @return Эффективный цвет источника
-     */
-    fun Transaction.getEffectiveSourceColor(): Int {
-        return sourceColor.takeIf { it != 0 } 
-            ?: getSourceColor(source) 
+    fun getEffectiveSourceColor(sourceName: String, sourceColor: Int, isExpense: Boolean): Int {
+        return sourceColor.takeIf { it != 0 }
+            ?: getSourceColor(sourceName) 
             ?: if (isExpense) EXPENSE_COLOR else INCOME_COLOR
     }
 } 

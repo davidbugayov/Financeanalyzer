@@ -23,6 +23,7 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
+import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.TransactionReminderReceiver
@@ -153,6 +154,13 @@ class FinanceActivity : ComponentActivity() {
      * Если нет, запрашивает разрешение через системный диалог.
      */
     private fun checkNotificationPermission() {
+        // Проверяем, завершен ли онбординг
+        val onboardingManager = OnboardingManager(this)
+        if (!onboardingManager.isOnboardingCompleted()) {
+            Timber.d("Skipping notification permission check - onboarding not completed")
+            return
+        }
+
         // Регистрируем обработчик результата запроса разрешения
         val requestPermissionLauncher = registerForActivityResult(
             ActivityResultContracts.RequestPermission()

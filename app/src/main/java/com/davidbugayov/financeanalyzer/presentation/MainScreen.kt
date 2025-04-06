@@ -1,6 +1,8 @@
 package com.davidbugayov.financeanalyzer.presentation
 
+import android.Manifest
 import android.app.Activity
+import android.os.Build
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.Spring
@@ -11,16 +13,20 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -38,18 +44,20 @@ import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingScreen
+import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
+import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
+import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingScreen
-import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 
 @Composable
 fun MainScreen(startDestination: String = "home") {
@@ -60,9 +68,92 @@ fun MainScreen(startDestination: String = "home") {
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
     val onboardingViewModel: OnboardingViewModel = koinViewModel()
+    val context = LocalContext.current
+
+    // Функция для настройки уведомлений, определена локально
+    fun setupNotifications() {
+        try {
+            val notificationScheduler = NotificationScheduler()
+            notificationScheduler.scheduleTransactionReminder(
+                context,
+                20,
+                0
+            ) // По умолчанию в 20:00
+            Timber.d("Transaction reminders scheduled after permission granted")
+        } catch (e: Exception) {
+            Timber.e(e, "Failed to schedule transaction reminders")
+        }
+    }
     
     // Проверяем, нужно ли показывать онбординг
     var shouldShowOnboarding by remember { mutableStateOf(!onboardingViewModel.isOnboardingCompleted()) }
+
+    // Состояние для диалогов разрешений
+    var showPermissionDialog by remember { mutableStateOf(false) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
+
+    // Лаунчер для запроса разрешений на уведомления
+    val permissionLauncher = PermissionUtils.rememberNotificationPermissionLauncher { isGranted ->
+        if (isGranted) {
+            // Разрешение предоставлено, настраиваем уведомления
+            setupNotifications()
+            Timber.d("Notification permission granted after onboarding")
+        } else {
+            // Пользователь отказал, показываем диалог с предложением перейти в настройки
+            showSettingsDialog = true
+            Timber.d("Notification permission denied after onboarding")
+        }
+    }
+
+    // Диалог с предложением перейти в настройки (когда пользователь отказал в разрешении)
+    if (showSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { showSettingsDialog = false },
+            title = { Text("Разрешение отклонено") },
+            text = { Text("Для получения уведомлений о транзакциях необходимо разрешение. Вы можете включить его в настройках приложения.") },
+            confirmButton = {
+                Button(onClick = {
+                    PermissionUtils.openNotificationSettings(context)
+                    showSettingsDialog = false
+                }) {
+                    Text("Открыть настройки")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSettingsDialog = false }) {
+                    Text("Отмена")
+                }
+            }
+        )
+    }
+
+    // Диалог запроса разрешений
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            title = { Text("Нужно разрешение") },
+            text = { Text("Для получения уведомлений о транзакциях требуется ваше разрешение.") },
+            confirmButton = {
+                Button(onClick = {
+                    showPermissionDialog = false
+                    // Запрашиваем разрешение напрямую
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        // Для более старых версий разрешение не требуется
+                        setupNotifications()
+                    }
+                }) {
+                    Text("Запросить разрешение")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog = false }) {
+                    Text("Отмена")
+                }
+            }
+        )
+    }
     
     val themeState = profileViewModel.themeMode.collectAsState()
     val themeMode = themeState.value
@@ -118,6 +209,16 @@ fun MainScreen(startDestination: String = "home") {
                     // Отмечаем онбординг как завершенный
                     onboardingViewModel.completeOnboarding()
                     shouldShowOnboarding = false
+
+                    // После завершения онбординга запрашиваем разрешение на уведомления
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+                        !PermissionUtils.hasNotificationPermission(context)
+                    ) {
+                        showPermissionDialog = true
+                    } else {
+                        // Для старых версий просто настраиваем уведомления
+                        setupNotifications()
+                    }
                 }
             )
         } else {

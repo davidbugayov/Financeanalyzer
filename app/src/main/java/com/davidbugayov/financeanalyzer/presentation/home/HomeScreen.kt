@@ -19,7 +19,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -68,14 +67,6 @@ fun HomeScreen(
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
 
-    // Логируем открытие главного экрана и загружаем данные только при первом входе
-    LaunchedEffect(Unit) {
-        AnalyticsUtils.logScreenView(
-            screenName = "home",
-            screenClass = "HomeScreen"
-        )
-    }
-
     // Состояние для обратной связи
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
@@ -87,6 +78,14 @@ fun HomeScreen(
 
     // Загружаем сохраненное состояние видимости GroupSummary
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
+
+    // Логируем открытие главного экрана и загружаем данные только при первом входе
+    LaunchedEffect(Unit) {
+        AnalyticsUtils.logScreenView(
+            screenName = "home",
+            screenClass = "HomeScreen"
+        )
+    }
     
     // Инициализируем состояние из SharedPreferences при первом запуске
     LaunchedEffect(Unit) {

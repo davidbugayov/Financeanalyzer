@@ -1,20 +1,16 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Fastfood
 import androidx.compose.material.icons.filled.Home
@@ -24,13 +20,11 @@ import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.ReceiptLong
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.SportsEsports
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.WorkOutline
-import androidx.compose.material3.Divider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,19 +33,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -60,8 +50,10 @@ import java.util.Locale
 private val IncomeColorVal = Color(ColorUtils.INCOME_COLOR)
 private val ExpenseColorVal = Color(ColorUtils.EXPENSE_COLOR)
 
-// Создаем SimpleDateFormat один раз и переиспользуем для всех экземпляров
-private val DATE_FORMATTER = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+// Функция для создания форматтера с текущей локалью
+private fun getDateFormatter(): SimpleDateFormat {
+    return SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+}
 
 // Кэш для категорий и их иконок для более быстрого поиска
 private val CATEGORY_ICON_CACHE = mutableMapOf<Pair<String, Boolean>, ImageVector>()
@@ -88,8 +80,8 @@ fun TransactionItem(
     val expenseColor = ExpenseColorVal
     
     // Форматируем дату только один раз и запоминаем результат
-    val formattedDate = remember(transaction.date) { 
-        DATE_FORMATTER.format(transaction.date) 
+    val formattedDate = remember(transaction.date) {
+        getDateFormatter().format(transaction.date) 
     }
     
     // Получаем иконку и цвет для категории, используя кэширование

@@ -26,10 +26,13 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
@@ -53,6 +56,9 @@ fun SettingsSection(
     transactionReminderTime: Pair<Int, Int>?,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
+
     Card(
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
@@ -111,12 +117,17 @@ fun SettingsSection(
             SettingsItem(
                 icon = Icons.Default.Timer,
                 title = stringResource(R.string.profile_transaction_reminders_title),
-                subtitle = if (isTransactionReminderEnabled && transactionReminderTime != null) {
+                subtitle = if (!hasNotificationPermission) {
+                    stringResource(R.string.notification_disabled_description)
+                } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
                     val (hour, minute) = transactionReminderTime
                     "Ежедневно в ${hour}:${String.format("%02d", minute)}"
                 } else {
                     stringResource(R.string.off)
                 },
+                subtitleStyle = if (!hasNotificationPermission) {
+                    MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.error)
+                } else null,
                 onClick = onTransactionReminderClick
             )
             
@@ -131,6 +142,7 @@ fun SettingsSection(
  * @param subtitle Подзаголовок настройки (опционально).
  * @param onClick Обработчик нажатия на настройку.
  * @param trailingContent Содержимое в конце элемента (опционально).
+ * @param subtitleStyle Стиль для подзаголовка (опционально).
  */
 @Composable
 fun SettingsItem(
@@ -138,6 +150,7 @@ fun SettingsItem(
     icon: ImageVector,
     onClick: () -> Unit,
     subtitle: String? = null,
+    subtitleStyle: TextStyle? = null,
     trailingContent: @Composable (() -> Unit)? = null
 ) {
     Row(
@@ -168,8 +181,8 @@ fun SettingsItem(
             if (subtitle != null) {
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    style = subtitleStyle ?: MaterialTheme.typography.bodySmall,
+                    color = subtitleStyle?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }
