@@ -29,8 +29,12 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+
+// Предопределенные цвета для улучшения производительности
+private val PositiveBackgroundColor = Color(0xFFE0F7E0) // Светло-зеленый фон
+private val PositiveTextColor = Color(0xFF2E7D32)       // Темно-зеленый текст
+private val NegativeBackgroundColor = Color(0xFFFFE0E0) // Светло-красный фон
+private val NegativeTextColor = Color(0xFFB71C1C)       // Темно-красный текст
 
 /**
  * Заголовок группы транзакций с возможностью сворачивания/разворачивания.
@@ -48,16 +52,6 @@ fun GroupHeader(
     isExpanded: Boolean = true,
     onExpandToggle: (Boolean) -> Unit = {}
 ) {
-    // Цвета из темы
-    val positiveColor = LocalIncomeColor.current
-    val negativeColor = LocalExpenseColor.current
-    
-    // Предопределенные цвета для улучшения производительности
-    val positiveBackgroundColor = positiveColor.copy(alpha = 0.1f) 
-    val positiveTextColor = positiveColor
-    val negativeBackgroundColor = negativeColor.copy(alpha = 0.1f)
-    val negativeTextColor = negativeColor
-    
     // Оптимизация вычисления финансовых сумм с использованием sequence
     val financialSummary = remember(transactions) {
         val income = transactions
@@ -80,8 +74,8 @@ fun GroupHeader(
     
     // Определяем цвета заранее, не вычисляя их каждый раз
     val isPositive = balance >= Money.zero()
-    val backgroundColor = if (isPositive) positiveBackgroundColor else negativeBackgroundColor
-    val textColor = if (isPositive) positiveTextColor else negativeTextColor
+    val backgroundColor = if (isPositive) PositiveBackgroundColor else NegativeBackgroundColor
+    val textColor = if (isPositive) PositiveTextColor else NegativeTextColor
     
     // Оптимизируем обработчик нажатия
     val clickHandler = remember(onExpandToggle, isExpanded) {
@@ -133,14 +127,14 @@ fun GroupHeader(
                 FinancialInfoColumn(
                     label = stringResource(R.string.income),
                     value = income.toString(),
-                    color = positiveTextColor
+                    color = PositiveTextColor
                 )
                 
                 // Расходы
                 FinancialInfoColumn(
                     label = stringResource(R.string.expense),
                     value = expense.toString(),
-                    color = negativeTextColor
+                    color = NegativeTextColor
                 )
                 
                 // Баланс

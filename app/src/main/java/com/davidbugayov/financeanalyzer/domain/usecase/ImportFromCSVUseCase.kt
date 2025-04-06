@@ -405,9 +405,8 @@ class ImportFromCSVUseCase(
                                                 e,
                                                 "ИМПОРТ: Ошибка при специальной обработке даты: '$dateString'"
                                             )
-                                            null
                                         }
-                                    } else null
+                                    }
 
                                     // Если специальная обработка не сработала, продолжаем обычную
                                     if (parsedDate == null) {

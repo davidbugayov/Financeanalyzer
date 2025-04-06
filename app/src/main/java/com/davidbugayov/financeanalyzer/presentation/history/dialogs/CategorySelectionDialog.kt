@@ -70,7 +70,7 @@ fun CategorySelectionDialog(
 
     // Цвета для категорий
     val expenseColor = MaterialTheme.colorScheme.error
-    val incomeColor = MaterialTheme.colorScheme.primary
+    val incomeColor = Color(0xFF4CAF50) // Зеленый цвет для доходов
 
     AlertDialog(
         onDismissRequest = onDismiss,

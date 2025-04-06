@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -12,96 +11,41 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
-import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import java.math.BigDecimal
 
 /**
- * Компонент для отображения сводки по группам транзакций и категориям.
+ * Компонент для отображения сводки по группам транзакций.
  *
- * @param filteredTransactions Отфильтрованные транзакции для группировки по категориям
+ * @param groups Список групп транзакций
  * @param totalIncome Общий доход
  * @param totalExpense Общий расход
- * @param currentFilter Текущий фильтр периода (день/неделя/месяц)
  */
 @Composable
 fun HomeGroupSummary(
-    filteredTransactions: List<Transaction> = emptyList(),
+    groups: List<TransactionGroup>,
     totalIncome: Money,
-    totalExpense: Money,
-    currentFilter: TransactionFilter = TransactionFilter.MONTH
+    totalExpense: Money
 ) {
-    // Определяем цвета для доходов и расходов из темы
-    val incomeColor = LocalIncomeColor.current
-    val expenseColor = LocalExpenseColor.current
-
+    // Определяем цвета для доходов и расходов
+    val incomeColor = Color(0xFF2E7D32) // Темно-зеленый для доходов
+    val expenseColor = Color(0xFFB71C1C) // Темно-красный для расходов
+    
     // Вычисляем баланс
     val balance = totalIncome - totalExpense
     val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
-
-    // Состояние для отслеживания - показывать ли все группы
-    var showAllGroups by rememberSaveable { mutableStateOf(false) }
     
-    // Состояние для выбора типа - расходы или доходы
-    var showExpenses by rememberSaveable { mutableStateOf(true) }
-
-    // Получаем строки для заголовков за пределами remember
-    val titleToday = "Сводка за сегодня"
-    val titleWeek = "Сводка за неделю"
-    val titleMonth = "Сводка за месяц"
-    val titleAll = stringResource(R.string.summary)
-
-    // Определяем заголовок периода в зависимости от фильтра
-    val periodTitle = remember(currentFilter) {
-        when (currentFilter) {
-            TransactionFilter.TODAY -> titleToday
-            TransactionFilter.WEEK -> titleWeek
-            TransactionFilter.MONTH -> titleMonth
-            TransactionFilter.ALL -> titleAll
-        }
-    }
-    
-    // Группируем транзакции по категориям
-    val categoryGroups = remember(filteredTransactions, showExpenses) {
-        // Фильтруем по типу (расходы/доходы)
-        val filteredByType = filteredTransactions.filter { 
-            it.isExpense == showExpenses 
-        }
-        
-        // Группируем по категориям и суммируем
-        val groupedByCategory = filteredByType.groupBy { it.category }
-        
-        groupedByCategory.map { (category, transactions) ->
-            // Суммируем все транзакции в этой категории
-            val total = transactions.sumOf { it.amount }
-            val money = Money(total)
-            
-            // Создаем объект с информацией о категории
-            CategorySummary(
-                category = category,
-                amount = money,
-                isExpense = showExpenses
-            )
-        }.sortedByDescending { it.amount.amount }
-    }
-
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -111,14 +55,14 @@ fun HomeGroupSummary(
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            // Отображение заголовка в зависимости от периода
+            // Отображение заголовка "Сводка"
             Text(
-                text = periodTitle,
+                text = stringResource(R.string.summary),
                 style = MaterialTheme.typography.titleMedium,
                 fontSize = 16.sp,
                 fontWeight = FontWeight.Bold,
                 modifier = Modifier.padding(bottom = 4.dp),
-                color = MaterialTheme.colorScheme.primary
+                color = balanceColor // Цвет заголовка соответствует балансу
             )
 
             // Отображение общего дохода и расхода в более компактном виде
@@ -134,7 +78,7 @@ fun HomeGroupSummary(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "+" + totalIncome.abs().formatted(false),
+                    text = totalIncome.formatted(false),
                     fontSize = 14.sp,
                     color = incomeColor,
                     fontWeight = FontWeight.Bold
@@ -153,7 +97,7 @@ fun HomeGroupSummary(
                     fontWeight = FontWeight.Medium
                 )
                 Text(
-                    text = "-" + totalExpense.abs().formatted(false),
+                    text = totalExpense.formatted(false),
                     fontSize = 14.sp,
                     color = expenseColor,
                     fontWeight = FontWeight.Bold
@@ -172,13 +116,8 @@ fun HomeGroupSummary(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
-                val balanceText = if (balance.amount >= BigDecimal.ZERO) {
-                    "+" + balance.abs().formatted(false)
-                } else {
-                    "-" + balance.abs().formatted(false)
-                }
                 Text(
-                    text = balanceText,
+                    text = balance.formatted(false),
                     fontSize = 14.sp,
                     color = balanceColor,
                     fontWeight = FontWeight.Bold
@@ -186,50 +125,13 @@ fun HomeGroupSummary(
             }
 
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-            
-            // Переключатель между расходами и доходами
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = if (showExpenses) "Категории расходов" else "Категории доходов",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-                
-                Text(
-                    text = "Показать ${if (showExpenses) "доходы" else "расходы"}",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable { showExpenses = !showExpenses }
-                )
-            }
 
-            // Определяем, сколько категорий показывать
-            val visibleCount = if (showAllGroups) categoryGroups.size else minOf(5, categoryGroups.size)
-            val visibleCategories = categoryGroups.take(visibleCount)
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                if (visibleCategories.isEmpty()) {
-                    Text(
-                        text = if (showExpenses) 
-                            "Нет расходов за выбранный период" 
-                        else 
-                            "Нет доходов за выбранный период",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                } else {
-                    visibleCategories.forEach { categorySummary ->
+            // Отображаем группы, если они есть (макс. 5 групп)
+            if (groups.isNotEmpty()) {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(2.dp)
+                ) {
+                    groups.take(5).forEach { group ->
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
@@ -237,65 +139,148 @@ fun HomeGroupSummary(
                             horizontalArrangement = Arrangement.SpaceBetween,
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                text = categorySummary.category,
-                                fontSize = 13.sp,
-                                color = if (categorySummary.isExpense) expenseColor else incomeColor,
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
+                            // Определяем, является ли транзакция расходом
+                            val isExpense =
+                                group.transactions.isNotEmpty() && group.transactions.first().isExpense
                             
                             Text(
-                                text = if (categorySummary.isExpense) 
-                                        "-" + categorySummary.amount.abs().formatted(false) 
-                                      else 
-                                        "+" + categorySummary.amount.abs().formatted(false),
+                                text = group.name,
                                 fontSize = 13.sp,
-                                color = if (categorySummary.isExpense) expenseColor else incomeColor,
+                                color = if (isExpense) expenseColor else incomeColor,
+                                fontWeight = FontWeight.Medium,
+                                maxLines = 1,
+                                overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
+                                modifier = Modifier.weight(1f)
+                            )
+                            Text(
+                                text = group.total.abs().formatted(false),
+                                fontSize = 13.sp,
+                                color = if (isExpense) expenseColor else incomeColor,
                                 fontWeight = FontWeight.Medium
                             )
                         }
                     }
+                    
+                    // Если групп больше 5, показываем сообщение о том, что есть еще группы
+                    if (groups.size > 5) {
+                        Text(
+                            text = "И еще ${groups.size - 5} ${if ((groups.size - 5) % 10 == 1 && (groups.size - 5) % 100 != 11) "категория" else if ((groups.size - 5) % 10 in 2..4 && (groups.size - 5) % 100 !in 12..14) "категории" else "категорий"}",
+                            fontSize = 12.sp,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            fontStyle = androidx.compose.ui.text.font.FontStyle.Italic,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 4.dp)
+                        )
+                    }
                 }
-            }
-
-            // Если есть еще категории и не показываем все, отображаем текст "И ещё X элементов"
-            if (categoryGroups.size > 5 && !showAllGroups) {
-                Text(
-                    text = "И ещё ${categoryGroups.size - 5} категорий",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .clickable { showAllGroups = true },
-                    fontWeight = FontWeight.Medium
-                )
-            } 
-            // Если показываем все категории, добавляем кнопку "Скрыть"
-            else if (showAllGroups && categoryGroups.size > 5) {
-                Text(
-                    text = "Скрыть",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .clickable { showAllGroups = false },
-                    fontWeight = FontWeight.Medium
-                )
             }
         }
     }
 }
 
 /**
- * Класс для хранения сводной информации о категории
+ * Компонент для отображения сводки по фильтрованным транзакциям.
+ *
+ * @param filteredTransactions Список фильтрованных транзакций
+ * @param totalIncome Общий доход
+ * @param totalExpense Общий расход
+ * @param currentFilter Текущий фильтр
  */
-data class CategorySummary(
-    val category: String,
-    val amount: Money,
-    val isExpense: Boolean
-)
+@Composable
+fun HomeGroupSummary(
+    filteredTransactions: List<Transaction>,
+    totalIncome: Money,
+    totalExpense: Money,
+    currentFilter: TransactionFilter
+) {
+    // Группировка транзакций не выполняется в этой версии, так как предполагается, 
+    // что эти данные уже доступны в HomeState и передаются в state.transactionGroups.
+    // Просто отображаем сводку по доходам и расходам
+    val incomeColor = Color(0xFF2E7D32) // Темно-зеленый для доходов
+    val expenseColor = Color(0xFFB71C1C) // Темно-красный для расходов
+    
+    // Вычисляем баланс
+    val balance = totalIncome - totalExpense
+    val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+    
+    Card(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+    ) {
+        Column(
+            modifier = Modifier.padding(12.dp)
+        ) {
+            // Отображение заголовка "Сводка"
+            Text(
+                text = stringResource(R.string.summary),
+                style = MaterialTheme.typography.titleMedium,
+                fontSize = 16.sp,
+                fontWeight = FontWeight.Bold,
+                modifier = Modifier.padding(bottom = 4.dp),
+                color = balanceColor
+            )
+
+            // Отображение общего дохода и расхода
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.total_income),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = totalIncome.formatted(false),
+                    fontSize = 14.sp,
+                    color = incomeColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.total_expense),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Medium
+                )
+                Text(
+                    text = totalExpense.formatted(false),
+                    fontSize = 14.sp,
+                    color = expenseColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+
+            // Отображение баланса
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 4.dp),
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = stringResource(R.string.balance),
+                    fontSize = 14.sp,
+                    fontWeight = FontWeight.Bold
+                )
+                Text(
+                    text = balance.formatted(false),
+                    fontSize = 14.sp,
+                    color = balanceColor,
+                    fontWeight = FontWeight.Bold
+                )
+            }
+        }
+    }
+} 

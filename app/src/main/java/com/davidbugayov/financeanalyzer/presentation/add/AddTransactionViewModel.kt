@@ -695,7 +695,7 @@ class AddTransactionViewModel(
                 _state.update {
                     it.copy(
                         source = "Сбер",
-                        sourceColor = ColorUtils.SBER_COLOR // Цвет Сбера
+                        sourceColor = 0xFF21A038.toInt() // Цвет Сбера
                     )
                 }
             }

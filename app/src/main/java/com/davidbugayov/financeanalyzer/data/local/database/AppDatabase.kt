@@ -11,7 +11,6 @@ import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
  * Класс базы данных Room для приложения.
@@ -216,9 +215,9 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE transactions ADD COLUMN sourceColor INTEGER")
                 
                 // Обновляем цвета для стандартных источников
-                db.execSQL("UPDATE transactions SET sourceColor = ${ColorUtils.SBER_COLOR} WHERE source = 'Сбер'")
-                db.execSQL("UPDATE transactions SET sourceColor = ${ColorUtils.TINKOFF_COLOR} WHERE source = 'Т-Банк'")
-                db.execSQL("UPDATE transactions SET sourceColor = ${ColorUtils.ALFA_COLOR} WHERE source = 'Альфа'")
+                db.execSQL("UPDATE transactions SET sourceColor = 0xFF21A038 WHERE source = 'Сбер'")
+                db.execSQL("UPDATE transactions SET sourceColor = 0xFFFFDD2D WHERE source = 'Т-Банк'")
+                db.execSQL("UPDATE transactions SET sourceColor = 0xFFEF3124 WHERE source = 'Альфа'")
             }
         }
 

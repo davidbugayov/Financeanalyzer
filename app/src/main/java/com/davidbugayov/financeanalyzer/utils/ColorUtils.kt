@@ -22,7 +22,8 @@ object ColorUtils {
     val defaultSources = listOf(
         Source(name = "Сбер", color = SBER_COLOR),
         Source(name = "Т-Банк", color = TINKOFF_COLOR),
-        Source(name = "Альфа", color = ALFA_COLOR)
+        Source(name = "Альфа", color = ALFA_COLOR),
+        Source(name = "Наличные", color = CASH_COLOR)
     )
 
     val predefinedColors = listOf(
@@ -66,6 +67,7 @@ object ColorUtils {
             name.contains("райффайзен") -> "#FFED00".toColorInt()
             name.contains("почта банк") -> "#74397E".toColorInt()
             name.contains("юмани") || name.contains("yoomoney") -> "#8F2FE2".toColorInt()
+            name.contains("наличные") || name.contains("кэш") || name.contains("cash") -> CASH_COLOR
             else -> null
         }
     }

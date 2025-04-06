@@ -39,6 +39,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -48,6 +49,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -223,8 +225,8 @@ private fun ExpandableGroupHeader(
             
             val balanceText = balance.formatted(showSign = true)
             val balanceColor = when {
-                balance.isPositive() -> MaterialTheme.colorScheme.primary
-                balance.isNegative() -> MaterialTheme.colorScheme.error
+                balance.isPositive() -> Color(ColorUtils.INCOME_COLOR)
+                balance.isNegative() -> Color(ColorUtils.EXPENSE_COLOR)
                 else -> MaterialTheme.colorScheme.onSurface
             }
             
