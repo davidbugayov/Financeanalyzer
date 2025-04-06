@@ -380,36 +380,34 @@ class ImportFromCSVUseCase(
                                     Timber.d("ИМПОРТ: Пытаемся распарсить дату '$dateString'")
 
                                     // Специальная обработка для format yyyy-MM-dd_HH-mm-ss
-                                    parsedDate =
-                                        if (dateString.matches("\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}".toRegex())) {
-                                            try {
-                                                Timber.d("ИМПОРТ: Обнаружен формат даты yyyy-MM-dd_HH-mm-ss: '$dateString'")
+                                    if (dateString.matches("\\d{4}-\\d{2}-\\d{2}_\\d{2}-\\d{2}-\\d{2}".toRegex())) {
+                                        try {
+                                            Timber.d("ИМПОРТ: Обнаружен формат даты yyyy-MM-dd_HH-mm-ss: '$dateString'")
 
-                                                // Пробуем напрямую через SimpleDateFormat
-                                                try {
-                                                    val date = SimpleDateFormat(
-                                                        "yyyy-MM-dd_HH-mm-ss",
-                                                        Locale.getDefault()
-                                                    ).parse(dateString)
-                                                    if (date != null) {
-                                                        Timber.d("ИМПОРТ: Дата успешно распарсена специальным форматом через SimpleDateFormat: $dateString -> ${date.time}")
-                                                        date
-                                                    } else null
-                                                } catch (e: Exception) {
-                                                    Timber.w(
-                                                        e,
-                                                        "ИМПОРТ: Не удалось распарсить дату через SimpleDateFormat: '$dateString'"
-                                                    )
-                                                    null
+                                            // Пробуем напрямую через SimpleDateFormat
+                                            try {
+                                                val date = SimpleDateFormat(
+                                                    "yyyy-MM-dd_HH-mm-ss",
+                                                    Locale.getDefault()
+                                                ).parse(dateString)
+                                                if (date != null) {
+                                                    Timber.d("ИМПОРТ: Дата успешно распарсена специальным форматом через SimpleDateFormat: $dateString -> ${date.time}")
+                                                    parsedDate = date
                                                 }
                                             } catch (e: Exception) {
                                                 Timber.w(
                                                     e,
-                                                    "ИМПОРТ: Ошибка при специальной обработке даты: '$dateString'"
+                                                    "ИМПОРТ: Не удалось распарсить дату через SimpleDateFormat: '$dateString'"
                                                 )
-                                                null
                                             }
-                                        } else null
+                                        } catch (e: Exception) {
+                                            Timber.w(
+                                                e,
+                                                "ИМПОРТ: Ошибка при специальной обработке даты: '$dateString'"
+                                            )
+                                            null
+                                        }
+                                    } else null
 
                                     // Если специальная обработка не сработала, продолжаем обычную
                                     if (parsedDate == null) {

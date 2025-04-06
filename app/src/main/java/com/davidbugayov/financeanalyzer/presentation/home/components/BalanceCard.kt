@@ -17,8 +17,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.foundation.BorderStroke
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import java.math.BigDecimal
 
 /**
@@ -32,23 +35,23 @@ fun BalanceCard(
     balance: Money,
     modifier: Modifier = Modifier
 ) {
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    
     // Определяем цвет карточки в зависимости от баланса
-    val cardColor = if (balance.amount >= BigDecimal.ZERO) 
-        Color(0xFFE0F7E0) // Светло-зеленый для положительного баланса
-    else 
-        Color(0xFFFFE0E0) // Светло-красный для отрицательного баланса
+    val cardColor = MaterialTheme.colorScheme.background
     
     // Получаем цвета из локального контекста для текста
     val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) 
-        Color(0xFF2E7D32) // Темно-зеленый текст для положительного баланса
+        incomeColor // Зеленый текст для положительного баланса
     else 
-        Color(0xFFB71C1C) // Темно-красный текст для отрицательного баланса
+        expenseColor // Красный текст для отрицательного баланса
     
     // Цвет заголовка (немного светлее основного цвета текста)
     val titleColor = if (balance.amount >= BigDecimal.ZERO) 
-        Color(0xFF388E3C) // Зеленый для положительного баланса
+        incomeColor.copy(alpha = 0.7f) // Зеленый для положительного баланса
     else 
-        Color(0xFFC62828) // Красный для отрицательного баланса
+        expenseColor.copy(alpha = 0.7f) // Красный для отрицательного баланса
     
     Card(
         modifier = modifier
@@ -56,6 +59,10 @@ fun BalanceCard(
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
             containerColor = cardColor
+        ),
+        border = BorderStroke(
+            width = 3.dp,
+            color = balanceTextColor
         )
     ) {
         Column(

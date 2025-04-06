@@ -216,7 +216,6 @@ fun HomeScreen(
                     showGroupSummary = state.showGroupSummary,
                     onShowGroupSummaryChange = onShowGroupSummaryChange,
                     onFilterSelected = onFilterSelected,
-                    onNavigateToHistory = onNavigateToHistory,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick
                 )
@@ -227,7 +226,6 @@ fun HomeScreen(
                     showGroupSummary = state.showGroupSummary,
                     onShowGroupSummaryChange = onShowGroupSummaryChange,
                     onFilterSelected = onFilterSelected,
-                    onNavigateToHistory = onNavigateToHistory,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick
                 )

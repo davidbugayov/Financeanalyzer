@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.theme.WarningColor
 
 /**
  * Компонент для отображения логов в диалоговом окне.
@@ -165,7 +166,7 @@ private fun LogItem(log: String) {
     // Определяем цвет в зависимости от типа лога
     val logColor = when {
         log.contains(" E/") || log.contains("[E]") -> Color.Red.copy(alpha = 0.8f)
-        log.contains(" W/") || log.contains("[W]") -> Color(0xFFFFA000) // Amber
+        log.contains(" W/") || log.contains("[W]") -> WarningColor // Amber
         log.contains(" D/") || log.contains("[D]") -> Color.Blue.copy(alpha = 0.7f)
         log.contains(" I/") || log.contains("[I]") -> Color.Green.copy(alpha = 0.7f)
         else -> MaterialTheme.colorScheme.onSurface

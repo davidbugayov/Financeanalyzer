@@ -39,6 +39,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalWarningColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
 
 /**
  * Компонент для отображения финансовой статистики и аналитики.
@@ -71,9 +75,9 @@ fun AnalyticsSection(
     modifier: Modifier = Modifier
 ) {
     // Цвета для финансовых показателей
-    val incomeColor = Color(0xFF4CAF50) // Зеленый для доходов
-    val expenseColor = Color(0xFFE53935) // Красный для расходов
-    val balanceColor = if (balance >= 0) Color(0xFF4CAF50) else Color(0xFFE53935)
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    val balanceColor = if (balance >= 0) incomeColor else expenseColor
 
     // Расчет норм сбережений - используем переданное значение вместо расчета
     val calculatedSavingsRate = savingsRate
@@ -178,10 +182,10 @@ fun AnalyticsSection(
                 
                 // Норма сбережений
                 val savingsRateColor = when {
-                    calculatedSavingsRate >= 20 -> Color(0xFF4CAF50) // Зеленый
-                    calculatedSavingsRate >= 10 -> Color(0xFFFFC107) // Желтый
-                    calculatedSavingsRate > 0 -> Color(0xFFFF9800)  // Оранжевый
-                    else -> Color(0xFFE53935) // Красный
+                    calculatedSavingsRate >= 20 -> incomeColor // Зеленый
+                    calculatedSavingsRate >= 10 -> LocalWarningColor.current // Желтый
+                    calculatedSavingsRate > 0 -> LocalInfoColor.current.copy(alpha = 0.8f)  // Оранжевый
+                    else -> expenseColor // Красный
                 }
                 
                 FinancialCard(

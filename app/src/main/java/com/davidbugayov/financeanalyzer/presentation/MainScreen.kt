@@ -249,8 +249,7 @@ fun MainScreen(startDestination: String = "home") {
                             )
                         }
                     ) {
-                        // Получаем предыдущий маршрут из стека навигации
-                        val backStackEntry = remember { navController.previousBackStackEntry }
+                        // Получаем предыдущий маршрут из стека навигации - unused
                         
                         AddTransactionScreen(
                             viewModel = addTransactionViewModel,

@@ -78,6 +78,8 @@ val LocalExpenseColor = staticCompositionLocalOf { md_theme_light_expense }
 val LocalBalanceCardColor = staticCompositionLocalOf { md_theme_light_primaryContainer }
 val LocalBalanceTextColor = staticCompositionLocalOf { md_theme_light_balance_text }
 val LocalFabColor = staticCompositionLocalOf { md_theme_light_fab }
+val LocalWarningColor = staticCompositionLocalOf { WarningColor }
+val LocalInfoColor = staticCompositionLocalOf { InfoColor }
 
 @Composable
 fun FinanceAnalyzerTheme(
@@ -117,7 +119,9 @@ fun FinanceAnalyzerTheme(
         LocalExpenseColor provides expenseColor,
         LocalBalanceCardColor provides balanceCardColor,
         LocalBalanceTextColor provides balanceTextColor,
-        LocalFabColor provides fabColor
+        LocalFabColor provides fabColor,
+        LocalWarningColor provides WarningColor,
+        LocalInfoColor provides InfoColor
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

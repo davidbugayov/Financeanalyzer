@@ -25,7 +25,7 @@ import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.filled.ShowChart
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -69,7 +69,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         OnboardingPage(
             title = "Аналитика и графики",
             description = "Анализируйте свои финансы с помощью наглядных графиков и диаграмм",
-            icon = Icons.Default.ShowChart
+            icon = Icons.AutoMirrored.Filled.ShowChart
         ),
         OnboardingPage(
             title = "Импорт транзакций",

@@ -238,7 +238,7 @@ fun TransactionHistoryScreen(
         // Получаем список всех источников из utils
         val sources = remember {
             val defaultSources = ColorUtils.defaultSources
-            defaultSources + listOf(Source(name = "Наличные", color = 0xFF9E9E9E.toInt()))
+            defaultSources + listOf(Source(name = "Наличные", color = ColorUtils.CASH_COLOR))
         }
 
         SourceSelectionDialog(

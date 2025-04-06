@@ -371,11 +371,11 @@ class HomeViewModel(
                 }
                 
                 // 4. Запускаем обновление категорий и фильтрацию параллельно
-                val job1 = viewModelScope.launch(Dispatchers.Default) {
+                viewModelScope.launch(Dispatchers.Default) {
                     updateCategoryStats(transactions)
                 }
                 
-                val job2 = viewModelScope.launch(Dispatchers.Default) {
+                viewModelScope.launch(Dispatchers.Default) {
                     updateFilteredTransactions(_state.value.currentFilter)
                 }
                 
@@ -484,7 +484,6 @@ class HomeViewModel(
         }
 
         val calendar = Calendar.getInstance()
-        val now = calendar.time
 
         val filteredTransactions = when (filter) {
             TransactionFilter.TODAY -> {

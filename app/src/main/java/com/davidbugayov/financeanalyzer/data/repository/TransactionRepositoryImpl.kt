@@ -547,18 +547,14 @@ class TransactionRepositoryImpl(
             Timber.d("Дата: ${transaction.date}")
 
             // Проверяем, является ли ID числовым
-            var numericId = 0L
-            val isNumeric = try {
+            try {
                 if (transaction.id.all { it.isDigit() }) {
-                    numericId = transaction.id.toLong()
                     Timber.d("Числовой ID: ${transaction.id}")
-                    true
                 } else {
-                    false
+                    Timber.d("Нечисловой ID: ${transaction.id}")
                 }
             } catch (e: NumberFormatException) {
-                Timber.e(e, "ID не является числовым: ${transaction.id}")
-                false
+                Timber.e(e, "Ошибка при проверке ID: ${transaction.id}")
             }
 
             // Ищем существующую транзакцию

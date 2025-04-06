@@ -10,6 +10,9 @@ object ColorUtils {
     val SBER_COLOR = "#21A038".toColorInt()
     val TINKOFF_COLOR = "#FFDD2D".toColorInt()
     val ALFA_COLOR = "#EF3124".toColorInt()
+    
+    // Другие цвета для источников
+    val CASH_COLOR = "#9E9E9E".toColorInt() // Серый цвет для наличных
 
     // Цвета для доходов и расходов
     val INCOME_COLOR = "#4CAF50".toColorInt() // Зеленый
