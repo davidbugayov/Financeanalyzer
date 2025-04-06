@@ -103,7 +103,7 @@ fun CompactLayout(
                 if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
                     item {
                         HomeGroupSummary(
-                            groups = state.transactionGroups,
+                            filteredTransactions = state.filteredTransactions,
                             totalIncome = state.filteredIncome,
                             totalExpense = state.filteredExpense
                         )
