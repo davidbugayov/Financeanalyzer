@@ -473,7 +473,12 @@ class HomeViewModel(
     private fun updateFilteredTransactions(filter: TransactionFilter) {
         val allTransactions = _state.value.transactions
         if (allTransactions.isEmpty()) {
-            _state.update { it.copy(filteredTransactions = emptyList()) }
+            _state.update { it.copy(
+                filteredTransactions = emptyList(),
+                filteredIncome = Money.zero(),
+                filteredExpense = Money.zero(),
+                filteredBalance = Money.zero()
+            ) }
             return
         }
 
@@ -534,8 +539,17 @@ class HomeViewModel(
             }
         }
 
+        // Рассчитываем сумму доходов, расходов и баланс для отфильтрованных транзакций
+        val (filteredIncome, filteredExpense, filteredBalance) = calculateStats(filteredTransactions)
+
         val transactionGroups = groupTransactionsByDate(filteredTransactions)
-        _state.update { it.copy(filteredTransactions = filteredTransactions, transactionGroups = transactionGroups) }
+        _state.update { it.copy(
+            filteredTransactions = filteredTransactions, 
+            transactionGroups = transactionGroups,
+            filteredIncome = filteredIncome,
+            filteredExpense = filteredExpense,
+            filteredBalance = filteredBalance
+        ) }
     }
     
     /**
