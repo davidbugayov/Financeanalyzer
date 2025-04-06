@@ -477,7 +477,8 @@ class HomeViewModel(
                 filteredTransactions = emptyList(),
                 filteredIncome = Money.zero(),
                 filteredExpense = Money.zero(),
-                filteredBalance = Money.zero()
+                filteredBalance = Money.zero(),
+                isLoading = false
             ) }
             return
         }
@@ -548,7 +549,8 @@ class HomeViewModel(
             transactionGroups = transactionGroups,
             filteredIncome = filteredIncome,
             filteredExpense = filteredExpense,
-            filteredBalance = filteredBalance
+            filteredBalance = filteredBalance,
+            isLoading = false  // Отключаем индикатор загрузки после обновления данных
         ) }
     }
     
