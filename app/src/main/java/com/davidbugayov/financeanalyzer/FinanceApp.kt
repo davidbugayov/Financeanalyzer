@@ -4,6 +4,7 @@ import android.app.Application
 import android.util.Log
 import com.davidbugayov.financeanalyzer.di.addTransactionModule
 import com.davidbugayov.financeanalyzer.di.appModule
+import com.davidbugayov.financeanalyzer.di.budgetModule
 import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.historyModule
 import com.davidbugayov.financeanalyzer.di.homeModule
@@ -19,14 +20,14 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
-import org.koin.android.ext.koin.androidContext
-import org.koin.android.ext.koin.androidLogger
-import org.koin.core.context.startKoin
-import timber.log.Timber
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
+import org.koin.android.ext.koin.androidContext
+import org.koin.android.ext.koin.androidLogger
+import org.koin.core.context.startKoin
+import timber.log.Timber
 
 class FinanceApp : Application() {
 
@@ -75,7 +76,8 @@ class FinanceApp : Application() {
                     historyModule,
                     profileModule,
                     importModule,
-                    onboardingModule
+                    onboardingModule,
+                    budgetModule
                 )
             }
             

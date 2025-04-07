@@ -20,8 +20,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -49,6 +50,7 @@ import com.davidbugayov.financeanalyzer.R
  * @param onAddClick обработчик нажатия на кнопку "Добавить"
  * @param onChartClick обработчик нажатия на кнопку "Графики"
  * @param onHistoryClick обработчик нажатия на кнопку "История"
+ * @param onBudgetClick обработчик нажатия на кнопку "Бюджет"
  * @param modifier модификатор для управления позиционированием
  */
 @Composable
@@ -57,6 +59,7 @@ fun AnimatedBottomNavigationBar(
     onAddClick: () -> Unit = {},
     onChartClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
+    onBudgetClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Получаем отступы от системной навигации
@@ -106,11 +109,19 @@ fun AnimatedBottomNavigationBar(
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Графики (слева)
+                // Статистика (слева)
                 NavButton(
-                    icon = Icons.Default.BarChart,
-                    text = stringResource(R.string.charts),
+                    icon = Icons.Default.Assessment,
+                    text = stringResource(R.string.statistics),
                     onClick = onChartClick,
+                    isMain = false
+                )
+
+                // Бюджет (слева от центра)
+                NavButton(
+                    icon = Icons.Default.AccountBalanceWallet,
+                    text = stringResource(R.string.budget),
+                    onClick = onBudgetClick,
                     isMain = false
                 )
 

@@ -460,4 +460,43 @@
     <string name="csv_example">Дата,Сумма,Категория,Примечание\n01.01.2023,1000,Продукты,Покупка в магазине\n02.01.2023,-500,Транспорт,Такси\n03.01.2023,5000,Зарплата,Аванс\n04.01.2023,-2500,Развлечения,Кино</string>
     <string name="csv_note_title">Примечание:</string>
     <string name="csv_note">Положительные суммы будут импортированы как доходы, отрицательные - как расходы.</string>
+
+    <!-- Budget screen strings -->
+    <string name="budget">Бюджет</string>
+    <string name="budget_transactions">Транзакции</string>
+    <string name="budget_category_transactions">Транзакции категории %s</string>
+    <string name="add_budget_category">Добавить категорию бюджета</string>
+    <string name="budget_limit">Лимит бюджета</string>
+    <string name="budget_spent">Потратить</string>
+    <string name="budget_remaining">Осталось</string>
+    <string name="budget_overspent">Перерасход</string>
+    <string name="budget_category_name">Название категории</string>
+    <string name="budget_category_limit">Лимит категории</string>
+    <string name="budget_category_period">Период</string>
+    <string name="budget_category_add">Добавить</string>
+    <string name="budget_category_edit">Редактировать</string>
+    <string name="budget_category_delete">Удалить</string>
+    <string name="budget_category_delete_confirmation">Вы уверены, что хотите удалить эту категорию бюджета?</string>
+    <string name="budget_category_added">Категория бюджета добавлена</string>
+    <string name="budget_category_updated">Категория бюджета обновлена</string>
+    <string name="budget_category_deleted">Категория бюджета удалена</string>
+    <string name="budget_category_error_name">Введите название категории</string>
+    <string name="budget_category_error_limit">Введите лимит категории</string>
+    <string name="budget_category_error_exists">Категория с таким названием уже существует</string>
+    <string name="budget_category_error_delete">Не удалось удалить категорию</string>
+    <string name="budget_category_error_add">Не удалось добавить категорию</string>
+    <string name="budget_category_error_update">Не удалось обновить категорию</string>
+    <string name="budget_no_categories">Нет категорий бюджета</string>
+    <string name="budget_no_transactions">Нет транзакций в этой категории</string>
+    <string name="budget_add_first_category">Добавьте первую категорию бюджета</string>
+    <string name="budget_direct_expenses">Прямые траты</string>
+    <string name="budget_related_expenses">Связанные траты</string>
+    <string name="budget_total_expenses">Общие расходы</string>
+    <string name="budget_over_budget">от бюджета</string>
+    <string name="statistics">Статистика</string>
+
+    <!-- Icons for budget categories -->
+    <string name="ic_gamepad">ic_gamepad</string>
+    <string name="ic_restaurant">ic_restaurant</string>
+    <string name="ic_receipt">ic_receipt</string>
 </resources>

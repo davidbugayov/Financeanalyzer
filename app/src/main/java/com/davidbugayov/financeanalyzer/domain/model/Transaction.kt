@@ -15,5 +15,7 @@ data class Transaction(
     val isExpense: Boolean,
     val note: String? = null,
     val source: String,
-    val sourceColor: Int
+    val sourceColor: Int,
+    val categoryId: String = "",
+    val title: String = ""
 )

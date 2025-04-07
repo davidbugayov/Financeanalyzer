@@ -28,4 +28,12 @@ sealed class Screen(val route: String) {
 
     /** Экран импорта транзакций */
     data object ImportTransactions : Screen("import")
+
+    /** Экран бюджета */
+    data object Budget : Screen("budget")
+
+    /** Экран транзакций бюджетной категории */
+    data object BudgetTransactions : Screen("budget/{categoryId}") {
+        fun createRoute(categoryId: String) = "budget/$categoryId"
+    }
 } 

@@ -30,11 +30,15 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
+import com.davidbugayov.financeanalyzer.presentation.budget.BudgetTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
@@ -261,7 +265,8 @@ fun MainScreen(startDestination: String = "home") {
                             onNavigateToHistory = { navController.navigate(Screen.History.route) },
                             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                            onNavigateToProfile = { navController.navigate(Screen.Profile.route) }
+                            onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                            onNavigateToBudget = { navController.navigate(Screen.Budget.route) }
                         )
                     }
                     
@@ -492,6 +497,81 @@ fun MainScreen(startDestination: String = "home") {
                         }
                     ) {
                         LibrariesScreen(
+                            onNavigateBack = { navController.navigateUp() }
+                        )
+                    }
+
+                    // Экран бюджета
+                    composable(
+                        route = Screen.Budget.route,
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        BudgetScreen(
+                            onNavigateBack = { navController.navigateUp() },
+                            onNavigateToTransactions = { categoryId ->
+                                navController.navigate(
+                                    Screen.BudgetTransactions.createRoute(
+                                        categoryId
+                                    )
+                                )
+                            }
+                        )
+                    }
+
+                    // Экран транзакций бюджетной категории
+                    composable(
+                        route = Screen.BudgetTransactions.route,
+                        arguments = listOf(
+                            navArgument("categoryId") { type = NavType.StringType }
+                        ),
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) { backStackEntry ->
+                        val categoryId =
+                            backStackEntry.arguments?.getString("categoryId") ?: return@composable
+                        BudgetTransactionsScreen(
+                            categoryId = categoryId,
                             onNavigateBack = { navController.navigateUp() }
                         )
                     }
