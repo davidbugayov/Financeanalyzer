@@ -8,7 +8,9 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
+import com.davidbugayov.financeanalyzer.data.local.dao.BudgetCategoryDao
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
+import com.davidbugayov.financeanalyzer.data.local.entity.BudgetCategoryEntity
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 
@@ -17,8 +19,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
  * Содержит таблицу транзакций.
  */
 @Database(
-    entities = [TransactionEntity::class],
-    version = 13,
+    entities = [TransactionEntity::class, BudgetCategoryEntity::class],
+    version = 14,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -28,6 +30,11 @@ abstract class AppDatabase : RoomDatabase() {
      * Предоставляет доступ к DAO для работы с транзакциями
      */
     abstract fun transactionDao(): TransactionDao
+
+    /**
+     * Получает DAO для работы с бюджетными категориями
+     */
+    abstract fun budgetCategoryDao(): BudgetCategoryDao
 
     companion object {
 
@@ -305,6 +312,28 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 13 на 14:
+         * - Добавляет таблицу бюджетных категорий
+         */
+        private val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS budget_categories (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        limit REAL NOT NULL,
+                        spent REAL NOT NULL,
+                        wallet_balance REAL NOT NULL DEFAULT 0.0,
+                        period_duration INTEGER NOT NULL DEFAULT 14,
+                        period_start_date INTEGER NOT NULL DEFAULT ${System.currentTimeMillis()}
+                    )
+                    """.trimIndent()
+                )
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -333,7 +362,8 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_9_10,
                         MIGRATION_10_11,
                         MIGRATION_11_12,
-                        MIGRATION_12_13
+                        MIGRATION_12_13,
+                        MIGRATION_13_14
                     )
                     .build()
                 INSTANCE = instance

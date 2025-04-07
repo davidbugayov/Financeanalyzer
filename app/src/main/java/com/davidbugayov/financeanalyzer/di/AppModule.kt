@@ -37,6 +37,7 @@ val appModule = module {
     // Database
     single { AppDatabase.getInstance(androidContext()) }
     single { get<AppDatabase>().transactionDao() }
+    single { get<AppDatabase>().budgetCategoryDao() }
 
     // Preferences
     single { CategoryPreferences.getInstance(androidContext()) }
