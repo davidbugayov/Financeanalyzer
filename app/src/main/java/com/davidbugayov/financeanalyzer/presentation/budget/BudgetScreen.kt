@@ -43,6 +43,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
 import com.davidbugayov.financeanalyzer.presentation.budget.components.BudgetCategoryCard
+import com.davidbugayov.financeanalyzer.presentation.budget.components.CategoryAction
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
@@ -132,64 +133,38 @@ fun BudgetScreen(
                         BudgetCategoryCard(
                             category = category,
                             onCategoryClick = onNavigateToTransactions,
-                            onMenuClick = {
-                                selectedCategory = it
-                                categoryMenuExpanded = true
+                            onMenuClick = { categoryFromMenu, action ->
+                                when (action) {
+                                    CategoryAction.ADD_FUNDS -> {
+                                        // Открываем диалог добавления средств
+                                        selectedCategory = categoryFromMenu
+                                        walletAmount = ""
+                                        showAddFundsDialog = true
+                                    }
+                                    CategoryAction.SPEND -> {
+                                        // Открываем диалог списания средств
+                                        selectedCategory = categoryFromMenu
+                                        walletAmount = ""
+                                        showSpendFromWalletDialog = true
+                                    }
+                                    CategoryAction.TRANSFER -> {
+                                        // Открываем диалог перевода средств
+                                        selectedFromCategory = categoryFromMenu
+                                        transferAmount = ""
+                                        showTransferDialog = true
+                                    }
+                                    CategoryAction.RESET_PERIOD -> {
+                                        // Сбрасываем период
+                                        viewModel.onEvent(BudgetEvent.ResetPeriod(categoryFromMenu.id))
+                                    }
+                                    CategoryAction.DELETE -> {
+                                        // Удаляем категорию
+                                        viewModel.onEvent(BudgetEvent.DeleteCategory(categoryFromMenu))
+                                    }
+                                }
                             }
                         )
                     }
-                }
-            }
-
-            // Выпадающее меню для категории
-            if (categoryMenuExpanded && selectedCategory != null) {
-                DropdownMenu(
-                    expanded = categoryMenuExpanded,
-                    onDismissRequest = { categoryMenuExpanded = false }
-                ) {
-                    DropdownMenuItem(
-                        text = { Text("Добавить средства") },
-                        onClick = {
-                            categoryMenuExpanded = false
-                            walletAmount = ""
-                            showAddFundsDialog = true
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Потратить") },
-                        onClick = {
-                            categoryMenuExpanded = false
-                            walletAmount = ""
-                            showSpendFromWalletDialog = true
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Перевести в другую категорию") },
-                        onClick = {
-                            categoryMenuExpanded = false
-                            selectedFromCategory = selectedCategory
-                            transferAmount = ""
-                            showTransferDialog = true
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Сбросить период") },
-                        onClick = {
-                            categoryMenuExpanded = false
-                            selectedCategory?.let { category ->
-                                viewModel.onEvent(BudgetEvent.ResetPeriod(category.id))
-                            }
-                        }
-                    )
-                    DropdownMenuItem(
-                        text = { Text("Удалить категорию") },
-                        onClick = {
-                            categoryMenuExpanded = false
-                            selectedCategory?.let { category ->
-                                viewModel.onEvent(BudgetEvent.DeleteCategory(category))
-                            }
-                        }
-                    )
                 }
             }
 
