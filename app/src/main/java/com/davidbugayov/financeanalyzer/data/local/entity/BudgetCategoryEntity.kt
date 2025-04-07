@@ -6,44 +6,52 @@ import androidx.room.PrimaryKey
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
 
 /**
- * Entity для хранения бюджетных категорий в базе данных Room.
- * Представляет таблицу budget_categories в базе данных.
+ * Entity класс для бюджетных категорий в Room
  */
 @Entity(tableName = "budget_categories")
 data class BudgetCategoryEntity(
-    @PrimaryKey val id: String,
+    @PrimaryKey
+    val id: String,
     val name: String,
+    @ColumnInfo(name = "[limit]")
     val limit: Double,
     val spent: Double,
-    @ColumnInfo(name = "wallet_balance") val walletBalance: Double = 0.0,
-    @ColumnInfo(name = "period_duration") val periodDuration: Int = 14,
-    @ColumnInfo(name = "period_start_date") val periodStartDate: Long = System.currentTimeMillis()
+    @ColumnInfo(name = "wallet_balance")
+    val wallet_balance: Double = 0.0,
+    @ColumnInfo(name = "period_duration")
+    val period_duration: Int = 14,
+    @ColumnInfo(name = "period_start_date")
+    val period_start_date: Long = System.currentTimeMillis()
 ) {
     /**
      * Преобразует Entity в доменную модель
      */
-    fun toDomain(): BudgetCategory = BudgetCategory(
-        id = id,
-        name = name,
-        limit = limit,
-        spent = spent,
-        walletBalance = walletBalance,
-        periodDuration = periodDuration,
-        periodStartDate = periodStartDate
-    )
+    fun toDomain(): BudgetCategory {
+        return BudgetCategory(
+            id = id,
+            name = name,
+            limit = limit,
+            spent = spent,
+            walletBalance = wallet_balance,
+            periodDuration = period_duration,
+            periodStartDate = period_start_date
+        )
+    }
 
     companion object {
         /**
          * Преобразует доменную модель в Entity
          */
-        fun fromDomain(domain: BudgetCategory): BudgetCategoryEntity = BudgetCategoryEntity(
-            id = domain.id,
-            name = domain.name,
-            limit = domain.limit,
-            spent = domain.spent,
-            walletBalance = domain.walletBalance,
-            periodDuration = domain.periodDuration,
-            periodStartDate = domain.periodStartDate
-        )
+        fun fromDomain(budgetCategory: BudgetCategory): BudgetCategoryEntity {
+            return BudgetCategoryEntity(
+                id = budgetCategory.id,
+                name = budgetCategory.name,
+                limit = budgetCategory.limit,
+                spent = budgetCategory.spent,
+                wallet_balance = budgetCategory.walletBalance,
+                period_duration = budgetCategory.periodDuration,
+                period_start_date = budgetCategory.periodStartDate
+            )
+        }
     }
 } 

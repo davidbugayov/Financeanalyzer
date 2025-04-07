@@ -124,7 +124,9 @@ fun BudgetScreen(
 
                 // Список категорий
                 LazyColumn(
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier
+                        .weight(1f)
+                        .padding(bottom = 80.dp)
                 ) {
                     items(state.categories) { category ->
                         BudgetCategoryCard(

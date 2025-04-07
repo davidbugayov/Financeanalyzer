@@ -73,6 +73,8 @@ class PreferencesManager(context: Context) {
         private const val KEY_BALANCE = "balance"
         private const val KEY_STATS_LAST_UPDATE = "stats_last_update"
         private const val KEY_TRANSACTION_REMINDER_ENABLED = "transaction_reminder_enabled"
+        private const val KEY_APP_INSTALLATION_TIME = "app_installation_time"
+        private const val KEY_FIRST_LAUNCH_DONE = "first_launch_done"
     }
 
     /**
@@ -118,5 +120,51 @@ class PreferencesManager(context: Context) {
      */
     fun isTransactionReminderEnabled(): Boolean {
         return sharedPreferences.getBoolean(KEY_TRANSACTION_REMINDER_ENABLED, true)
+    }
+    
+    /**
+     * Отмечает время первой установки приложения
+     */
+    fun markInstallationTime() {
+        if (!sharedPreferences.contains(KEY_APP_INSTALLATION_TIME)) {
+            sharedPreferences.edit {
+                putLong(KEY_APP_INSTALLATION_TIME, System.currentTimeMillis())
+            }
+        }
+    }
+    
+    /**
+     * Отмечает, что первый запуск приложения завершен
+     */
+    fun markFirstLaunchDone() {
+        sharedPreferences.edit {
+            putBoolean(KEY_FIRST_LAUNCH_DONE, true)
+        }
+    }
+    
+    /**
+     * Проверяет, прошло ли достаточно времени после установки для показа уведомлений
+     * Возвращает true, если:
+     * 1. Прошло более 24 часов с момента установки, ИЛИ
+     * 2. Первый запуск уже был завершен (не установка, а обновление)
+     */
+    fun shouldShowNotifications(): Boolean {
+        val installTime = sharedPreferences.getLong(KEY_APP_INSTALLATION_TIME, 0)
+        val firstLaunchDone = sharedPreferences.getBoolean(KEY_FIRST_LAUNCH_DONE, false)
+        
+        // Если первый запуск уже был завершен, то можно показывать уведомления
+        if (firstLaunchDone) return true
+        
+        // Если прошло более 24 часов с момента установки, можно показывать уведомления
+        val timeSinceInstall = System.currentTimeMillis() - installTime
+        val oneDayInMillis = 24 * 60 * 60 * 1000L
+        
+        // Если прошло более 24 часов, отмечаем, что первый запуск завершен
+        if (timeSinceInstall > oneDayInMillis) {
+            markFirstLaunchDone()
+            return true
+        }
+        
+        return false
     }
 } 

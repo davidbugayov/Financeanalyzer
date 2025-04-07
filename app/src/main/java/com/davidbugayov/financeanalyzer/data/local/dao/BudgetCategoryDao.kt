@@ -7,7 +7,6 @@ import androidx.room.OnConflictStrategy
 import androidx.room.Query
 import androidx.room.Update
 import com.davidbugayov.financeanalyzer.data.local.entity.BudgetCategoryEntity
-import kotlinx.coroutines.flow.Flow
 
 /**
  * DAO (Data Access Object) для работы с бюджетными категориями в базе данных Room.
@@ -17,52 +16,66 @@ import kotlinx.coroutines.flow.Flow
 interface BudgetCategoryDao {
 
     /**
-     * Получает все бюджетные категории
-     * @return Flow со списком всех категорий
+     * Получает все бюджетные категории из базы данных
+     * @return Список всех бюджетных категорий
      */
     @Query("SELECT * FROM budget_categories ORDER BY name ASC")
-    fun getAllCategories(): Flow<List<BudgetCategoryEntity>>
+    suspend fun getAllBudgetCategories(): List<BudgetCategoryEntity>
 
     /**
-     * Получает категорию по идентификатору
-     * @param id Идентификатор категории
-     * @return Категория с указанным идентификатором или null, если категория не найдена
+     * Получает бюджетную категорию по ID
+     * @param id ID бюджетной категории
+     * @return Бюджетная категория с указанным ID или null, если не найдена
      */
     @Query("SELECT * FROM budget_categories WHERE id = :id")
-    suspend fun getCategoryById(id: String): BudgetCategoryEntity?
+    suspend fun getBudgetCategoryById(id: String): BudgetCategoryEntity?
 
     /**
-     * Добавляет новую категорию
-     * @param category Категория для добавления
-     * @return ID добавленной категории
+     * Добавляет новую бюджетную категорию в базу данных
+     * @param budgetCategory Бюджетная категория для добавления
      */
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertCategory(category: BudgetCategoryEntity): Long
+    suspend fun insertBudgetCategory(budgetCategory: BudgetCategoryEntity)
 
     /**
-     * Обновляет существующую категорию
-     * @param category Категория для обновления
+     * Обновляет существующую бюджетную категорию в базе данных
+     * @param budgetCategory Обновленная бюджетная категория
      */
     @Update
-    suspend fun updateCategory(category: BudgetCategoryEntity)
+    suspend fun updateBudgetCategory(budgetCategory: BudgetCategoryEntity)
 
     /**
-     * Удаляет категорию
-     * @param category Категория для удаления
+     * Удаляет бюджетную категорию из базы данных
+     * @param budgetCategory Бюджетная категория для удаления
      */
     @Delete
-    suspend fun deleteCategory(category: BudgetCategoryEntity)
+    suspend fun deleteBudgetCategory(budgetCategory: BudgetCategoryEntity)
 
     /**
-     * Удаляет категорию по идентификатору
-     * @param id Идентификатор категории для удаления
+     * Удаляет бюджетную категорию по ID
+     * @param id ID бюджетной категории для удаления
      */
     @Query("DELETE FROM budget_categories WHERE id = :id")
-    suspend fun deleteCategoryById(id: String)
+    suspend fun deleteBudgetCategoryById(id: String)
 
     /**
-     * Удаляет все категории
+     * Удаляет все бюджетные категории из базы данных
      */
     @Query("DELETE FROM budget_categories")
-    suspend fun deleteAllCategories()
+    suspend fun deleteAllBudgetCategories()
+
+    /**
+     * Обновляет потраченную сумму для указанной категории
+     * @param id ID бюджетной категории
+     * @param spent Новое значение потраченной суммы
+     */
+    @Query("UPDATE budget_categories SET spent = :spent WHERE id = :id")
+    suspend fun updateSpentAmount(id: String, spent: Double)
+
+    /**
+     * Проверяет, существуют ли бюджетные категории в базе данных
+     * @return true, если есть хотя бы одна категория, иначе false
+     */
+    @Query("SELECT EXISTS(SELECT 1 FROM budget_categories LIMIT 1)")
+    suspend fun hasBudgetCategories(): Boolean
 } 

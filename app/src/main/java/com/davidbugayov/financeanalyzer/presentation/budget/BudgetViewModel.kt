@@ -4,9 +4,9 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
 import com.davidbugayov.financeanalyzer.domain.repository.BudgetRepository
-import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,9 +14,9 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Calendar
+import java.util.UUID
 
 class BudgetViewModel(
-    private val transactionRepository: TransactionRepository,
     private val budgetRepository: BudgetRepository
 ) : ViewModel() {
 
@@ -25,6 +25,14 @@ class BudgetViewModel(
 
     init {
         loadBudgetCategories()
+        calculateTotals()
+        
+        // Создаем примеры категорий через небольшую задержку,
+        // чтобы дать время на загрузку существующих категорий
+        viewModelScope.launch {
+            delay(500)
+            createSampleBudgetCategories()
+        }
     }
 
     fun onEvent(event: BudgetEvent) {
@@ -38,14 +46,69 @@ class BudgetViewModel(
             is BudgetEvent.AddFundsToWallet -> addFundsToWallet(event.categoryId, event.amount)
             is BudgetEvent.SpendFromWallet -> spendFromWallet(event.categoryId, event.amount)
             is BudgetEvent.TransferBetweenWallets -> transferBetweenWallets(
-                event.fromCategoryId,
-                event.toCategoryId,
+                event.fromCategoryId, 
+                event.toCategoryId, 
                 event.amount
             )
-
             is BudgetEvent.SetPeriodDuration -> setPeriodDuration(event.days)
             is BudgetEvent.ResetPeriod -> resetPeriod(event.categoryId)
             is BudgetEvent.ResetAllPeriods -> resetAllPeriods()
+        }
+    }
+
+    /**
+     * Создает образцы бюджетных категорий, если их еще нет
+     */
+    private fun createSampleBudgetCategories() {
+        viewModelScope.launch {
+            try {
+                // Проверяем, есть ли уже категории
+                if (_state.value.categories.isEmpty()) {
+                    Timber.d("Создаем примеры категорий бюджета")
+                    
+                    // Примеры категорий
+                    val sampleCategories = listOf(
+                        BudgetCategory(
+                            name = "Продукты", 
+                            limit = 5000.0, 
+                            spent = 0.0, 
+                            id = UUID.randomUUID().toString(),
+                            walletBalance = 5000.0
+                        ),
+                        BudgetCategory(
+                            name = "Развлечения", 
+                            limit = 3000.0, 
+                            spent = 0.0, 
+                            id = UUID.randomUUID().toString(),
+                            walletBalance = 3000.0
+                        ),
+                        BudgetCategory(
+                            name = "Транспорт", 
+                            limit = 2000.0, 
+                            spent = 0.0, 
+                            id = UUID.randomUUID().toString(),
+                            walletBalance = 2000.0
+                        )
+                    )
+                    
+                    // Добавляем категории в репозиторий
+                    sampleCategories.forEach { category ->
+                        budgetRepository.addBudgetCategory(category)
+                    }
+                    
+                    // Перезагружаем категории
+                    loadBudgetCategories()
+                    
+                    Timber.d("Примеры категорий бюджета созданы")
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при создании примеров категорий бюджета")
+                _state.update { 
+                    it.copy(
+                        error = e.message ?: "Ошибка при создании примеров категорий бюджета"
+                    )
+                }
+            }
         }
     }
 
@@ -53,21 +116,21 @@ class BudgetViewModel(
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
-
-                // Загружаем бюджетные категории из репозитория
-                budgetRepository.getAllCategories()
-                    .collect { categories ->
-                        _state.update {
-                            it.copy(
-                                categories = categories,
-                                isLoading = false
-                            )
-                        }
-                        calculateTotals()
-                    }
+                
+                // Загружаем категории из репозитория
+                val categories = budgetRepository.getAllBudgetCategories()
+                
+                _state.update { 
+                    it.copy(
+                        categories = categories,
+                        isLoading = false
+                    )
+                }
+                
+                calculateTotals()
             } catch (e: Exception) {
                 Timber.e(e, "Error loading budget categories")
-                _state.update {
+                _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
                         isLoading = false
@@ -82,8 +145,8 @@ class BudgetViewModel(
         val totalLimit = categories.sumOf { it.limit }
         val totalSpent = categories.sumOf { it.spent }
         val totalWalletBalance = categories.sumOf { it.walletBalance }
-
-        _state.update {
+        
+        _state.update { 
             it.copy(
                 totalLimit = totalLimit,
                 totalSpent = totalSpent,
@@ -96,25 +159,23 @@ class BudgetViewModel(
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
-
-                // Создаем новую категорию
+                
                 val newCategory = BudgetCategory(
-                    name = name,
-                    limit = limit,
-                    spent = 0.0,
-                    id = "",  // ID будет сгенерирован в репозитории
-                    walletBalance = 0.0,
-                    periodDuration = _state.value.selectedPeriodDuration
+                    name = name, 
+                    limit = limit, 
+                    spent = 0.0, 
+                    id = UUID.randomUUID().toString(),
+                    walletBalance = 0.0
                 )
-
-                // Сохраняем в репозиторий
-                budgetRepository.addCategory(newCategory)
-
-                // Категории будут обновлены автоматически через Flow
-                _state.update { it.copy(isLoading = false) }
+                
+                // Добавляем категорию в репозиторий
+                budgetRepository.addBudgetCategory(newCategory)
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error adding budget category")
-                _state.update {
+                _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
                         isLoading = false
@@ -128,15 +189,15 @@ class BudgetViewModel(
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
-
+                
                 // Обновляем категорию в репозитории
-                budgetRepository.updateCategory(category)
-
-                // Категории будут обновлены автоматически через Flow
-                _state.update { it.copy(isLoading = false) }
+                budgetRepository.updateBudgetCategory(category)
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error updating budget category")
-                _state.update {
+                _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
                         isLoading = false
@@ -150,15 +211,15 @@ class BudgetViewModel(
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
-
+                
                 // Удаляем категорию из репозитория
-                budgetRepository.deleteCategory(category.id)
-
-                // Категории будут обновлены автоматически через Flow
-                _state.update { it.copy(isLoading = false) }
+                budgetRepository.deleteBudgetCategory(category)
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error deleting budget category")
-                _state.update {
+                _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
                         isLoading = false
@@ -170,202 +231,206 @@ class BudgetViewModel(
 
     // Распределяет полученный доход по всем категориям согласно их лимитам
     private fun distributeIncome(amount: Double) {
-        try {
-            if (_state.value.categories.isEmpty() || amount <= 0) {
-                return
-            }
-
-            val totalLimit = _state.value.totalLimit
-            var remainingAmount = amount
-
-            // Обновляем категории, пропорционально распределяя доход
-            viewModelScope.launch {
-                try {
-                    _state.value.categories.forEach { category ->
-                        val categoryRatio = category.limit / totalLimit
-                        val categoryAmount = (amount * categoryRatio).coerceAtMost(remainingAmount)
-                        remainingAmount -= categoryAmount
-
-                        val updatedCategory = category.copy(
-                            walletBalance = category.walletBalance + categoryAmount
-                        )
-
-                        budgetRepository.updateCategory(updatedCategory)
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "Error updating categories during income distribution")
-                    _state.update {
-                        it.copy(error = e.message ?: "Ошибка при распределении дохода")
-                    }
+        viewModelScope.launch {
+            try {
+                if (_state.value.categories.isEmpty() || amount <= 0) {
+                    return@launch
                 }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error distributing income")
-            _state.update {
-                it.copy(error = e.message ?: "Ошибка при распределении дохода")
+                
+                val totalLimit = _state.value.totalLimit
+                var remainingAmount = amount
+                
+                // Обновляем категории, пропорционально распределяя доход
+                val updatedCategories = _state.value.categories.map { category ->
+                    val categoryRatio = category.limit / totalLimit
+                    val categoryAmount = (amount * categoryRatio).coerceAtMost(remainingAmount)
+                    remainingAmount -= categoryAmount
+                    
+                    category.copy(
+                        walletBalance = category.walletBalance + categoryAmount
+                    )
+                }
+                
+                // Обновляем каждую категорию в репозитории
+                updatedCategories.forEach { category ->
+                    budgetRepository.updateBudgetCategory(category)
+                }
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
+            } catch (e: Exception) {
+                Timber.e(e, "Error distributing income")
+                _state.update { 
+                    it.copy(error = e.message ?: "Ошибка при распределении дохода")
+                }
             }
         }
     }
-
+    
+    // Добавляет средства в кошелек конкретной категории
     private fun addFundsToWallet(categoryId: String, amount: Double) {
-        if (amount <= 0) return
-
         viewModelScope.launch {
             try {
-                // Получаем категорию из репозитория
-                val category = budgetRepository.getCategoryById(categoryId) ?: return@launch
-
-                // Обновляем баланс кошелька
+                if (amount <= 0) return@launch
+                
+                // Находим категорию по ID
+                val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
+                
+                // Обновляем категорию
                 val updatedCategory = category.copy(
                     walletBalance = category.walletBalance + amount
                 )
-
+                
                 // Сохраняем обновленную категорию
-                budgetRepository.updateCategory(updatedCategory)
+                budgetRepository.updateBudgetCategory(updatedCategory)
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error adding funds to wallet")
-                _state.update {
-                    it.copy(error = e.message ?: "Ошибка при добавлении средств")
+                _state.update { 
+                    it.copy(error = e.message ?: "Ошибка при добавлении средств в кошелек")
                 }
             }
         }
     }
-
+    
+    // Списывает средства из кошелька и увеличивает счетчик потраченных средств
     private fun spendFromWallet(categoryId: String, amount: Double) {
-        if (amount <= 0) return
-
         viewModelScope.launch {
             try {
-                // Получаем категорию из репозитория
-                val category = budgetRepository.getCategoryById(categoryId) ?: return@launch
-
-                // Проверяем, достаточно ли средств в кошельке
+                if (amount <= 0) return@launch
+                
+                // Находим категорию по ID
+                val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
+                
+                // Проверяем, достаточно ли средств
                 if (category.walletBalance < amount) {
-                    _state.update {
-                        it.copy(error = "Недостаточно средств в кошельке")
+                    _state.update { 
+                        it.copy(error = "Недостаточно средств в кошельке '${category.name}'")
                     }
                     return@launch
                 }
-
-                // Обновляем баланс кошелька и расходы
+                
+                // Обновляем категорию
                 val updatedCategory = category.copy(
                     walletBalance = category.walletBalance - amount,
                     spent = category.spent + amount
                 )
-
+                
                 // Сохраняем обновленную категорию
-                budgetRepository.updateCategory(updatedCategory)
+                budgetRepository.updateBudgetCategory(updatedCategory)
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error spending from wallet")
-                _state.update {
-                    it.copy(error = e.message ?: "Ошибка при списании средств")
+                _state.update { 
+                    it.copy(error = e.message ?: "Ошибка при списании средств из кошелька")
                 }
             }
         }
     }
-
-    private fun transferBetweenWallets(
-        fromCategoryId: String,
-        toCategoryId: String,
-        amount: Double
-    ) {
-        if (amount <= 0 || fromCategoryId == toCategoryId) return
-
+    
+    // Перевод средств между кошельками
+    private fun transferBetweenWallets(fromCategoryId: String, toCategoryId: String, amount: Double) {
         viewModelScope.launch {
             try {
-                // Получаем категории из репозитория
-                val fromCategory = budgetRepository.getCategoryById(fromCategoryId) ?: return@launch
-                val toCategory = budgetRepository.getCategoryById(toCategoryId) ?: return@launch
-
-                // Проверяем, достаточно ли средств в кошельке
+                if (amount <= 0 || fromCategoryId == toCategoryId) return@launch
+                
+                // Находим категории по ID
+                val fromCategory = budgetRepository.getBudgetCategoryById(fromCategoryId) ?: return@launch
+                val toCategory = budgetRepository.getBudgetCategoryById(toCategoryId) ?: return@launch
+                
+                // Проверяем, достаточно ли средств
                 if (fromCategory.walletBalance < amount) {
-                    _state.update {
-                        it.copy(error = "Недостаточно средств в исходном кошельке")
+                    _state.update { 
+                        it.copy(error = "Недостаточно средств в кошельке '${fromCategory.name}'")
                     }
                     return@launch
                 }
-
-                // Обновляем оба кошелька
+                
+                // Обновляем категории
                 val updatedFromCategory = fromCategory.copy(
                     walletBalance = fromCategory.walletBalance - amount
                 )
-
                 val updatedToCategory = toCategory.copy(
                     walletBalance = toCategory.walletBalance + amount
                 )
-
+                
                 // Сохраняем обновленные категории
-                budgetRepository.updateCategory(updatedFromCategory)
-                budgetRepository.updateCategory(updatedToCategory)
+                budgetRepository.updateBudgetCategory(updatedFromCategory)
+                budgetRepository.updateBudgetCategory(updatedToCategory)
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error transferring between wallets")
-                _state.update {
-                    it.copy(error = e.message ?: "Ошибка при переводе средств")
+                _state.update { 
+                    it.copy(error = e.message ?: "Ошибка при переводе средств между кошельками")
                 }
             }
         }
     }
-
+    
+    // Изменяет продолжительность расчетного периода
     private fun setPeriodDuration(days: Int) {
-        if (days <= 0) return
-
-        _state.update {
+        if (days < 1) return
+        
+        _state.update { 
             it.copy(selectedPeriodDuration = days)
         }
-
-        // Обновляем период для всех категорий
-        viewModelScope.launch {
-            try {
-                _state.value.categories.forEach { category ->
-                    val updatedCategory = category.copy(periodDuration = days)
-                    budgetRepository.updateCategory(updatedCategory)
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Error setting period duration")
-                _state.update {
-                    it.copy(error = e.message ?: "Ошибка при установке длительности периода")
-                }
-            }
-        }
     }
-
+    
+    // Сбрасывает расчетный период для указанной категории
     private fun resetPeriod(categoryId: String) {
         viewModelScope.launch {
             try {
-                // Получаем категорию из репозитория
-                val category = budgetRepository.getCategoryById(categoryId) ?: return@launch
-
-                // Обнуляем затраты и обновляем дату начала периода
+                // Находим категорию по ID
+                val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
+                
+                // Обновляем категорию
                 val updatedCategory = category.copy(
                     spent = 0.0,
                     periodStartDate = System.currentTimeMillis()
                 )
-
+                
                 // Сохраняем обновленную категорию
-                budgetRepository.updateCategory(updatedCategory)
+                budgetRepository.updateBudgetCategory(updatedCategory)
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error resetting period")
-                _state.update {
-                    it.copy(error = e.message ?: "Ошибка при сбросе периода")
+                _state.update { 
+                    it.copy(error = e.message ?: "Ошибка при сбросе расчетного периода")
                 }
             }
         }
     }
-
+    
+    // Сбрасывает расчетный период для всех категорий
     private fun resetAllPeriods() {
         viewModelScope.launch {
             try {
-                _state.value.categories.forEach { category ->
+                // Получаем все категории
+                val categories = budgetRepository.getAllBudgetCategories()
+                
+                // Обновляем каждую категорию
+                categories.forEach { category ->
                     val updatedCategory = category.copy(
                         spent = 0.0,
                         periodStartDate = System.currentTimeMillis()
                     )
-                    budgetRepository.updateCategory(updatedCategory)
+                    budgetRepository.updateBudgetCategory(updatedCategory)
                 }
+                
+                // Перезагружаем категории
+                loadBudgetCategories()
             } catch (e: Exception) {
                 Timber.e(e, "Error resetting all periods")
-                _state.update {
-                    it.copy(error = e.message ?: "Ошибка при сбросе всех периодов")
+                _state.update { 
+                    it.copy(error = e.message ?: "Ошибка при сбросе всех расчетных периодов")
                 }
             }
         }
@@ -373,42 +438,43 @@ class BudgetViewModel(
 
     // Проверяет, не истек ли расчетный период для категорий
     fun checkPeriodsExpiration() {
-        val currentTime = System.currentTimeMillis()
-        val calendar = Calendar.getInstance()
-
-        val expiredCategories = _state.value.categories.filter { category ->
-            calendar.timeInMillis = category.periodStartDate
-            calendar.add(Calendar.DAY_OF_MONTH, category.periodDuration)
-            currentTime > calendar.timeInMillis
-        }
-
-        if (expiredCategories.isNotEmpty()) {
-            val updatedCategories = _state.value.categories.map { category ->
-                calendar.timeInMillis = category.periodStartDate
-                calendar.add(Calendar.DAY_OF_MONTH, category.periodDuration)
-
-                if (currentTime > calendar.timeInMillis) {
-                    // Период истек, сбрасываем
-                    category.copy(
-                        spent = 0.0,
-                        periodStartDate = System.currentTimeMillis()
-                    )
-                } else {
-                    category
+        viewModelScope.launch {
+            try {
+                val currentTime = System.currentTimeMillis()
+                val calendar = Calendar.getInstance()
+                
+                // Получаем все категории
+                val categories = budgetRepository.getAllBudgetCategories()
+                
+                val expiredCategories = categories.filter { category ->
+                    calendar.timeInMillis = category.periodStartDate
+                    calendar.add(Calendar.DAY_OF_MONTH, category.periodDuration)
+                    currentTime > calendar.timeInMillis
+                }
+                
+                if (expiredCategories.isNotEmpty()) {
+                    // Обновляем каждую просроченную категорию
+                    expiredCategories.forEach { category ->
+                        val updatedCategory = category.copy(
+                            spent = 0.0,
+                            periodStartDate = System.currentTimeMillis()
+                        )
+                        budgetRepository.updateBudgetCategory(updatedCategory)
+                    }
+                    
+                    // Перезагружаем категории
+                    loadBudgetCategories()
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error checking periods expiration")
+                _state.update { 
+                    it.copy(error = e.message ?: "Ошибка при проверке истечения расчетных периодов")
                 }
             }
-
-            _state.update {
-                it.copy(categories = updatedCategories)
-            }
-
-            calculateTotals()
         }
     }
 
-    private fun clearError() {
-        _state.update {
-            it.copy(error = null)
-        }
+    fun clearError() {
+        _state.update { it.copy(error = null) }
     }
 } 

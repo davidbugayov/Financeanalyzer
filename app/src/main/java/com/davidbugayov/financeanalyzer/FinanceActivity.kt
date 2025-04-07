@@ -199,8 +199,13 @@ class FinanceActivity : ComponentActivity() {
      */
     private fun setupNotificationsIfEnabled() {
         val preferencesManager = PreferencesManager(this)
-        if (preferencesManager.isTransactionReminderEnabled()) {
-            // Если уведомления включены в настройках, настраиваем их
+        
+        // Отмечаем время установки при первом запуске
+        preferencesManager.markInstallationTime()
+        
+        // Проверяем, нужно ли показывать уведомления (не сразу после установки)
+        if (preferencesManager.isTransactionReminderEnabled() && preferencesManager.shouldShowNotifications()) {
+            // Если уведомления включены в настройках и можно их показывать, настраиваем их
             try {
                 val hour = 20 // По умолчанию 20:00
                 val minute = 0
@@ -211,6 +216,8 @@ class FinanceActivity : ComponentActivity() {
             } catch (e: Exception) {
                 Timber.e(e, "Failed to schedule transaction reminder")
             }
+        } else {
+            Timber.d("Transaction reminders are disabled or app was just installed")
         }
     }
 

@@ -26,6 +26,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
+import kotlin.math.min
 
 @Composable
 fun BudgetCategoryCard(
@@ -35,18 +36,18 @@ fun BudgetCategoryCard(
     modifier: Modifier = Modifier
 ) {
     // Рассчитываем процент расходов от лимита (не больше 100%)
-    val spentPercentage = (category.spent / category.limit).coerceAtMost(1.0).toFloat()
-
+    val spentPercentage = min((category.spent / category.limit).toFloat(), 1f)
+    
     // Определяем, превышен ли лимит бюджета
     val isOverBudget = category.spent > category.limit
-
+    
     // Определяем цвет индикатора в зависимости от процента трат
     val indicatorColor = when {
         isOverBudget -> Color.Red
         spentPercentage > 0.8f -> Color(0xFFFF9800) // Оранжевый при приближении к лимиту
         else -> MaterialTheme.colorScheme.primary
     }
-
+    
     Card(
         modifier = modifier
             .fillMaxWidth()
@@ -69,7 +70,7 @@ fun BudgetCategoryCard(
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Medium
                 )
-
+                
                 IconButton(onClick = { onMenuClick(category) }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
@@ -77,18 +78,18 @@ fun BudgetCategoryCard(
                     )
                 }
             }
-
+            
             Spacer(modifier = Modifier.height(8.dp))
-
+            
             // Прогресс расходов
             LinearProgressIndicator(
                 progress = { spentPercentage },
                 modifier = Modifier.fillMaxWidth(),
                 color = indicatorColor
             )
-
+            
             Spacer(modifier = Modifier.height(8.dp))
-
+            
             // Информация о расходах и лимите
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -99,17 +100,17 @@ fun BudgetCategoryCard(
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (isOverBudget) Color.Red else MaterialTheme.colorScheme.onSurface
                 )
-
+                
                 Text(
                     text = "Лимит: ${category.limit.toInt()} ₽",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
-
+            
             Spacer(modifier = Modifier.height(8.dp))
             HorizontalDivider()
             Spacer(modifier = Modifier.height(8.dp))
-
+            
             // Информация о кошельке с иконкой
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -124,14 +125,14 @@ fun BudgetCategoryCard(
                         contentDescription = "Баланс кошелька",
                         tint = MaterialTheme.colorScheme.primary
                     )
-
+                    
                     Text(
                         text = "  Кошелёк: ${category.walletBalance.toInt()} ₽",
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
                 }
-
+                
                 // Кнопка для перехода к транзакциям категории
                 IconButton(onClick = { onCategoryClick(category.id) }) {
                     Icon(

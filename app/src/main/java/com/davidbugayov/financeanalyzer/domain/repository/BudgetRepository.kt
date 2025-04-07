@@ -4,43 +4,62 @@ import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
 import kotlinx.coroutines.flow.Flow
 
 /**
- * Репозиторий для работы с бюджетными категориями
+ * Интерфейс репозитория для работы с бюджетными категориями
  */
 interface BudgetRepository {
+
     /**
      * Получает все бюджетные категории
-     * @return Flow со списком бюджетных категорий
+     * @return Flow со списком всех бюджетных категорий
      */
-    fun getAllCategories(): Flow<List<BudgetCategory>>
+    suspend fun getAllBudgetCategories(): List<BudgetCategory>
 
     /**
-     * Получает категорию по идентификатору
-     * @param id Идентификатор категории
-     * @return Категория или null, если категория не найдена
+     * Получает бюджетную категорию по ID
+     * @param id ID бюджетной категории
+     * @return Бюджетная категория с указанным ID или null, если не найдена
      */
-    suspend fun getCategoryById(id: String): BudgetCategory?
+    suspend fun getBudgetCategoryById(id: String): BudgetCategory?
 
     /**
-     * Добавляет новую категорию бюджета
-     * @param category Категория для добавления
-     * @return ID добавленной категории
+     * Добавляет новую бюджетную категорию
+     * @param budgetCategory Бюджетная категория для добавления
      */
-    suspend fun addCategory(category: BudgetCategory): String
+    suspend fun addBudgetCategory(budgetCategory: BudgetCategory)
 
     /**
-     * Обновляет существующую категорию
-     * @param category Категория для обновления
+     * Обновляет существующую бюджетную категорию
+     * @param budgetCategory Обновленная бюджетная категория
      */
-    suspend fun updateCategory(category: BudgetCategory)
+    suspend fun updateBudgetCategory(budgetCategory: BudgetCategory)
 
     /**
-     * Удаляет категорию
-     * @param id Идентификатор категории для удаления
+     * Удаляет бюджетную категорию
+     * @param budgetCategory Бюджетная категория для удаления
      */
-    suspend fun deleteCategory(id: String)
+    suspend fun deleteBudgetCategory(budgetCategory: BudgetCategory)
 
     /**
-     * Удаляет все категории
+     * Удаляет бюджетную категорию по ID
+     * @param id ID бюджетной категории для удаления
      */
-    suspend fun deleteAllCategories()
+    suspend fun deleteBudgetCategoryById(id: String)
+
+    /**
+     * Удаляет все бюджетные категории
+     */
+    suspend fun deleteAllBudgetCategories()
+
+    /**
+     * Обновляет потраченную сумму для указанной категории
+     * @param id ID бюджетной категории
+     * @param spent Новое значение потраченной суммы
+     */
+    suspend fun updateSpentAmount(id: String, spent: Double)
+
+    /**
+     * Проверяет, существуют ли бюджетные категории
+     * @return true, если есть хотя бы одна категория, иначе false
+     */
+    suspend fun hasBudgetCategories(): Boolean
 } 

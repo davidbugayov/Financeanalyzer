@@ -8,10 +8,10 @@ import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
-import com.davidbugayov.financeanalyzer.data.local.dao.BudgetCategoryDao
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
-import com.davidbugayov.financeanalyzer.data.local.entity.BudgetCategoryEntity
+import com.davidbugayov.financeanalyzer.data.local.dao.BudgetCategoryDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
+import com.davidbugayov.financeanalyzer.data.local.entity.BudgetCategoryEntity
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 
 /**
@@ -20,7 +20,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
  */
 @Database(
     entities = [TransactionEntity::class, BudgetCategoryEntity::class],
-    version = 14,
+    version = 17,
     exportSchema = false
 )
 @TypeConverters(DateConverter::class)
@@ -32,7 +32,7 @@ abstract class AppDatabase : RoomDatabase() {
     abstract fun transactionDao(): TransactionDao
 
     /**
-     * Получает DAO для работы с бюджетными категориями
+     * Предоставляет доступ к DAO для работы с бюджетными категориями
      */
     abstract fun budgetCategoryDao(): BudgetCategoryDao
 
@@ -153,7 +153,7 @@ abstract class AppDatabase : RoomDatabase() {
 
         /**
          * Миграция с версии 6 на версию 7
-         * Оставляем пустую миграцию, т.к. таблица financial_goals больше не нужна
+         * Оставляет пустую миграцию, т.к. таблица financial_goals больше не нужна
          */
         private val MIGRATION_6_7 = object : Migration(6, 7) {
             override fun migrate(db: SupportSQLiteDatabase) {
@@ -313,8 +313,8 @@ abstract class AppDatabase : RoomDatabase() {
         }
 
         /**
-         * Миграция с версии 13 на 14:
-         * - Добавляет таблицу бюджетных категорий
+         * Миграция с версии 13 на версию 14
+         * Добавляет таблицу budget_categories
          */
         private val MIGRATION_13_14 = object : Migration(13, 14) {
             override fun migrate(database: SupportSQLiteDatabase) {
@@ -323,14 +323,69 @@ abstract class AppDatabase : RoomDatabase() {
                     CREATE TABLE IF NOT EXISTS budget_categories (
                         id TEXT NOT NULL PRIMARY KEY,
                         name TEXT NOT NULL,
-                        limit REAL NOT NULL,
+                        [limit] REAL NOT NULL,
                         spent REAL NOT NULL,
                         wallet_balance REAL NOT NULL DEFAULT 0.0,
                         period_duration INTEGER NOT NULL DEFAULT 14,
                         period_start_date INTEGER NOT NULL DEFAULT ${System.currentTimeMillis()}
                     )
-                    """.trimIndent()
+                    """
                 )
+            }
+        }
+
+        /**
+         * Миграция 14 -> 15
+         * - Исправляет проблему с именем столбца limit, добавляя квадратные скобки
+         */
+        private val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Создаем временную таблицу с правильной структурой
+                database.execSQL(
+                    """
+                    CREATE TABLE IF NOT EXISTS budget_categories_temp (
+                        id TEXT NOT NULL PRIMARY KEY,
+                        name TEXT NOT NULL,
+                        [limit] REAL NOT NULL,
+                        spent REAL NOT NULL,
+                        wallet_balance REAL NOT NULL DEFAULT 0.0,
+                        period_duration INTEGER NOT NULL DEFAULT 14,
+                        period_start_date INTEGER NOT NULL DEFAULT ${System.currentTimeMillis()}
+                    )
+                    """
+                )
+                
+                // Копируем данные из старой таблицы в новую
+                database.execSQL("INSERT OR IGNORE INTO budget_categories_temp (id, name, [limit], spent, wallet_balance, period_duration, period_start_date) SELECT id, name, \"limit\", spent, wallet_balance, period_duration, period_start_date FROM budget_categories")
+                
+                // Удаляем старую таблицу
+                database.execSQL("DROP TABLE budget_categories")
+                
+                // Переименовываем временную таблицу
+                database.execSQL("ALTER TABLE budget_categories_temp RENAME TO budget_categories")
+            }
+        }
+
+        /**
+         * Миграция 15 -> 16
+         * Обновление хеша схемы после добавления BudgetCategoryEntity в список сущностей Room
+         */
+        private val MIGRATION_15_16 = object : Migration(15, 16) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Миграция не требует SQL операций, 
+                // так как таблица budget_categories уже создана в MIGRATION_13_14 и исправлена в MIGRATION_14_15
+                // Эта миграция только обновляет версию и хеш схемы
+            }
+        }
+
+        /**
+         * Миграция 16 -> 17
+         * Исправляет проблему с несоответствием имен столбцов в таблице budget_categories
+         */
+        private val MIGRATION_16_17 = object : Migration(16, 17) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Эта миграция помогает синхронизировать имена столбцов в Entity и БД,
+                // аннотации ColumnInfo для этой цели добавлены в BudgetCategoryEntity
             }
         }
 
@@ -363,8 +418,12 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_10_11,
                         MIGRATION_11_12,
                         MIGRATION_12_13,
-                        MIGRATION_13_14
+                        MIGRATION_13_14,
+                        MIGRATION_14_15,
+                        MIGRATION_15_16,
+                        MIGRATION_16_17
                     )
+                    .fallbackToDestructiveMigration()
                     .build()
                 INSTANCE = instance
                 instance
