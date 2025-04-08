@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.budget.model
 
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Состояние для экрана бюджета
@@ -17,8 +18,8 @@ data class BudgetState(
     val categories: List<BudgetCategory> = emptyList(),
     val isLoading: Boolean = false,
     val error: String? = null,
-    val totalLimit: Double = 0.0,
-    val totalSpent: Double = 0.0,
-    val totalWalletBalance: Double = 0.0,
+    val totalLimit: Money = Money(0.0),
+    val totalSpent: Money = Money(0.0),
+    val totalWalletBalance: Money = Money(0.0),
     val selectedPeriodDuration: Int = 14
 ) 

@@ -31,7 +31,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 fun SavingsRateDialog(
     totalIncome: Money,
     totalExpense: Money,
-    savingsRate: Money,
+    savingsRate: Double,
     onDismiss: () -> Unit
 ) {
     val incomeColor = LocalIncomeColor.current

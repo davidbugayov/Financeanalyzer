@@ -117,7 +117,7 @@ fun FinanceChartScreen(
     val savingsRate = if (!totalIncome.isZero()) {
         totalIncome.minus(totalExpense).percentageOf(totalIncome)
     } else {
-        BigDecimal.ZERO
+        0.0
     }
 
     // Show dialogs if needed

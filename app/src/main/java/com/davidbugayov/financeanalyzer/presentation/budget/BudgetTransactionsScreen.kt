@@ -65,7 +65,7 @@ fun BudgetTransactionsScreen(
             Transaction(
                 id = "1",
                 title = "Развлечения",
-                amount = -222.0,
+                amount = Money(-222.0),
                 date = Calendar.getInstance().time,
                 categoryId = "entertainment",
                 category = "Развлечения",
@@ -77,7 +77,7 @@ fun BudgetTransactionsScreen(
             Transaction(
                 id = "2",
                 title = "Рестораны",
-                amount = -612.0,
+                amount = Money(-612.0),
                 date = Calendar.getInstance().time,
                 categoryId = "restaurants",
                 category = "Рестораны",
@@ -89,7 +89,7 @@ fun BudgetTransactionsScreen(
             Transaction(
                 id = "3",
                 title = "Рестораны",
-                amount = -2051.0,
+                amount = Money(-2051.0),
                 date = Calendar.getInstance().time,
                 categoryId = "restaurants",
                 category = "Рестораны",
@@ -162,7 +162,7 @@ fun BudgetTransactionsScreen(
                     Spacer(modifier = Modifier.height(8.dp))
 
                     Text(
-                        text = "Бюджет: ${category.limit.toInt()} ₽",
+                        text = "Бюджет: ${category.limit.amount.toInt()} ₽",
                         style = MaterialTheme.typography.bodyLarge
                     )
 
@@ -201,7 +201,7 @@ fun BudgetTransactionsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "${category.spent.toInt()} ₽",
+                                text = "${category.spent.amount.toInt()} ₽",
                                 style = MaterialTheme.typography.bodyLarge
                             )
                         }
@@ -237,7 +237,7 @@ fun BudgetTransactionsScreen(
                         )
 
                         Text(
-                            text = "${category.spent.toInt()} ₽",
+                            text = "${category.spent.amount.toInt()} ₽",
                             style = MaterialTheme.typography.titleMedium,
                             color = Color.Red,
                             fontWeight = FontWeight.Bold
@@ -338,7 +338,7 @@ private fun TransactionItem(transaction: Transaction) {
 
         // Amount
         Text(
-            text = formatCurrency(transaction.amount),
+            text = transaction.amount.format(),
             style = MaterialTheme.typography.bodyLarge,
             color = Color.Red,
             fontWeight = FontWeight.Medium
@@ -352,8 +352,3 @@ private fun TransactionItem(transaction: Transaction) {
         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
     )
 }
-
-// Простая функция для форматирования валюты
-private fun formatCurrency(amount: Double): String {
-    return "${amount.toInt()} ₽"
-} 
