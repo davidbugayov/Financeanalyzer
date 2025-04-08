@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import kotlinx.coroutines.flow.Flow
 
 /**
@@ -51,15 +52,15 @@ interface BudgetRepository {
     suspend fun deleteAllBudgetCategories()
 
     /**
-     * Обновляет потраченную сумму для указанной категории
+     * Обновляет потраченную сумму для бюджетной категории
      * @param id ID бюджетной категории
-     * @param spent Новое значение потраченной суммы
+     * @param spent Новая потраченная сумма
      */
-    suspend fun updateSpentAmount(id: String, spent: Double)
+    suspend fun updateSpentAmount(id: String, spent: Money)
 
     /**
-     * Проверяет, существуют ли бюджетные категории
-     * @return true, если есть хотя бы одна категория, иначе false
+     * Проверяет, есть ли бюджетные категории
+     * @return true, если есть хотя бы одна бюджетная категория, иначе false
      */
     suspend fun hasBudgetCategories(): Boolean
 } 

@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.import_transaction.model
 
+import com.davidbugayov.financeanalyzer.domain.model.Money
+
 /**
  * Состояние UI для экрана импорта транзакций.
  * Следует принципам MVI и Clean Architecture.
@@ -13,6 +15,6 @@ data class ImportTransactionsState(
     val skippedCount: Int = 0,
     val error: String? = null,
     val isImportCompleted: Boolean = false,
-    val totalAmount: Double = 0.0,
+    val totalAmount: Money = Money.zero(),
     val logs: List<String> = emptyList()
 ) 

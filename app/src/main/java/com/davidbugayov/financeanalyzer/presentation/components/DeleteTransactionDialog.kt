@@ -42,7 +42,7 @@ fun DeleteTransactionDialog(
     onDismiss: () -> Unit
 ) {
     val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-    val moneyFormatter = Money(transaction.amount)
+    val moneyFormatter = transaction.amount
     
     AlertDialog(
         onDismissRequest = onDismiss,

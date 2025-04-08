@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.model
 
+import com.davidbugayov.financeanalyzer.domain.model.Money
+
 /**
  * Состояние экрана профиля.
  * Следует принципам MVI (Model-View-Intent).
@@ -28,9 +30,9 @@ data class ProfileState(
     val isEditingNotifications: Boolean = false,
     
     // Финансовая аналитика
-    val totalIncome: Double = 0.0,
-    val totalExpense: Double = 0.0,
-    val balance: Double = 0.0,
+    val totalIncome: Money = Money.zero(),
+    val totalExpense: Money = Money.zero(),
+    val balance: Money = Money.zero(),
     val savingsRate: Double = 0.0,
     val totalTransactions: Int = 0,
     val totalExpenseCategories: Int = 0,

@@ -29,6 +29,7 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Calendar
 import kotlin.math.abs
+import java.time.LocalDateTime
 
 /**
  * ViewModel для главного экрана.
@@ -97,21 +98,21 @@ class HomeViewModel(
         viewModelScope.launch {
             financialMetrics.balance.collect { balance ->
                 // Обновляем баланс без полной перезагрузки транзакций
-                _state.update { it.copy(balance = Money(balance)) }
+                _state.update { it.copy(balance = balance) }
             }
         }
         
         viewModelScope.launch {
             financialMetrics.totalIncome.collect { income ->
                 // Обновляем доход без полной перезагрузки транзакций
-                _state.update { it.copy(income = Money(income)) }
+                _state.update { it.copy(income = income) }
             }
         }
         
         viewModelScope.launch {
             financialMetrics.totalExpense.collect { expense ->
                 // Обновляем расход без полной перезагрузки транзакций
-                _state.update { it.copy(expense = Money(expense)) }
+                _state.update { it.copy(expense = expense) }
             }
         }
     }
@@ -352,9 +353,9 @@ class HomeViewModel(
                 
                 // 2. Используем ранее инициализированные метрики вместо их перевычисления
                 val metricsResult = Triple(
-                    financialMetrics.getTotalIncome(), 
-                    financialMetrics.getTotalExpense(), 
-                    financialMetrics.getBalance()
+                    financialMetrics.getTotalIncomeAsMoney(),
+                    financialMetrics.getTotalExpenseAsMoney(),
+                    financialMetrics.getCurrentBalance()
                 )
 
                 // 3. Обновляем состояние с загруженными транзакциями и метриками
@@ -362,9 +363,9 @@ class HomeViewModel(
                 _state.update { 
                     it.copy(
                         transactions = transactions,
-                        income = Money(metricsResult.first),
-                        expense = Money(metricsResult.second),
-                        balance = Money(metricsResult.third),
+                        income = metricsResult.first,
+                        expense = metricsResult.second,
+                        balance = metricsResult.third,
                         isLoading = false,
                         error = null
                     ) 
@@ -413,9 +414,10 @@ class HomeViewModel(
                     .filter { it.isExpense } // Считаем только расходы
                     .groupBy { it.category }
                     .mapValues { (_, txs) -> 
-                        // Суммируем расходы по категории
-                        val total = txs.sumOf { it.amount }
-                        Money(total) 
+                        // Суммируем расходы по категории с использованием Money
+                        txs.fold(Money.zero()) { acc, transaction -> 
+                            acc + transaction.amount 
+                        }
                     }
                     .toList()
                     .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
@@ -594,29 +596,20 @@ class HomeViewModel(
             return cachedStats
         }
 
-        // Оптимизируем вычисления: делаем один проход по списку вместо нескольких
-        var income = 0.0
-        var expense = 0.0
-
-        for (transaction in transactions) {
-            if (transaction.isExpense) {
-                expense += abs(transaction.amount)
-            } else {
-                income += transaction.amount
-            }
-        }
+        // Используем fold для более функционального и лаконичного кода
+        val income = transactions
+            .filter { !it.isExpense }
+            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+            
+        val expense = transactions
+            .filter { it.isExpense }
+            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
 
         // Вычисляем баланс как разницу между доходами и расходами
-        val incomeSum = BigDecimal.valueOf(income)
-        val expenseSum = BigDecimal.valueOf(expense)
-        val balanceSum = incomeSum.subtract(expenseSum)
+        val balance = income - expense
 
-        // Создаем Money объекты для возврата
-        val result = Triple(
-            Money(incomeSum),
-            Money(expenseSum),
-            Money(balanceSum)
-        )
+        // Создаем Triple с Money объектами для возврата
+        val result = Triple(income, expense, balance)
 
         // Кэшируем результат для будущих запросов
         statsCache[transactions] = result
@@ -654,16 +647,13 @@ class HomeViewModel(
             val transactionsForDate = groupedTransactions[date] ?: emptyList()
             
             // Вычисляем сумму доходов и расходов для группы
-            var incomeSum = BigDecimal.ZERO
-            var expenseSum = BigDecimal.ZERO
-            
-            transactionsForDate.forEach { transaction ->
-                if (transaction.isExpense) {
-                    expenseSum = expenseSum.add(BigDecimal(transaction.amount.toString()))
-                } else {
-                    incomeSum = incomeSum.add(BigDecimal(transaction.amount.toString()))
-                }
-            }
+            val income = transactionsForDate
+                .filter { !it.isExpense }
+                .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+                
+            val expense = transactionsForDate
+                .filter { it.isExpense }
+                .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
             
             // Сортируем транзакции внутри группы по времени (сначала новые)
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }
@@ -673,14 +663,14 @@ class HomeViewModel(
             val dateString = dateFormat.format(date)
             
             // Вычисляем общий баланс (доходы - расходы)
-            val balanceAmount = incomeSum.subtract(expenseSum)
+            val balance = income - expense
             
             TransactionGroup(
                 date = dateString,
                 transactions = sortedTransactions,
-                balance = Money(balanceAmount),
+                balance = balance,
                 name = dateString,
-                total = Money(balanceAmount)
+                total = balance
             )
         }
     }

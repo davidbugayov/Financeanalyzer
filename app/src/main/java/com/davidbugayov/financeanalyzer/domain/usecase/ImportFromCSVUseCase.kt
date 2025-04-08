@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.Dispatchers
@@ -286,7 +287,7 @@ class ImportFromCSVUseCase(
             var currentLine = 0
             var importedCount = 0
             var skippedCount = 0
-            var totalAmount = 0.0
+            var totalAmount = Money.zero()
 
             // Читаем и обрабатываем данные
             withContext(Dispatchers.IO) {
@@ -504,7 +505,7 @@ class ImportFromCSVUseCase(
                                 }
 
                                 // Парсим сумму
-                                val amount = try {
+                                val amountValue = try {
                                     val parsedAmount = amountString.toDouble()
                                     Timber.d("ИМПОРТ: Сумма успешно распарсена: $amountString -> $parsedAmount")
                                     parsedAmount
@@ -512,6 +513,9 @@ class ImportFromCSVUseCase(
                                     Timber.w("ИМПОРТ: Ошибка парсинга суммы '$amountString': ${e.message}")
                                     0.0 // Пропускаем при ошибке парсинга суммы
                                 }
+
+                                // Создаем объект Money с положительным значением суммы
+                                val amount = Money(amountValue.absoluteValue)
 
                                 // Определяем тип транзакции
                                 val isExpense = if (typeIndex != -1 && values.size > typeIndex) {
@@ -534,8 +538,8 @@ class ImportFromCSVUseCase(
                                     Timber.d("ИМПОРТ: Тип транзакции определен из поля: $isExp (значение: $typeValue)")
                                     isExp
                                 } else {
-                                    val isExp = amount < 0 // Отрицательная сумма = расход
-                                    Timber.d("ИМПОРТ: Тип транзакции определен по сумме: $isExp (сумма: $amount)")
+                                    val isExp = amountValue < 0 // Отрицательная сумма = расход
+                                    Timber.d("ИМПОРТ: Тип транзакции определен по сумме: $isExp (сумма: $amountValue)")
                                     isExp
                                 }
 
@@ -584,7 +588,7 @@ class ImportFromCSVUseCase(
                                 }
 
                                 // Проверяем значения перед созданием транзакции
-                                if (amount == 0.0) {
+                                if (amount.isZero()) {
                                     Timber.w("ИМПОРТ: Пропускаем транзакцию с нулевой суммой")
                                     skippedCount++
                                     return@forEach
@@ -611,7 +615,11 @@ class ImportFromCSVUseCase(
                                 Timber.d("ИМПОРТ: Транзакция успешно сохранена")
 
                                 importedCount++
-                                totalAmount += amount.absoluteValue
+                                // Учитываем сумму транзакции в общей сумме
+                                totalAmount = if (isExpense) 
+                                    totalAmount - amount
+                                else 
+                                    totalAmount + amount
                             } catch (e: Exception) {
                                 Timber.e(e, "ИМПОРТ: Ошибка при импорте строки $currentLine: $line")
                                 skippedCount++

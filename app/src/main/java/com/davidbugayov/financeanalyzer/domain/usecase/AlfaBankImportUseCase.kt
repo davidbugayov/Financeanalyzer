@@ -4,6 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.flow.Flow
@@ -164,7 +165,9 @@ class AlfaBankImportUseCase(
                     emit(ImportResult.Success(
                         importedCount = transactions.size,
                         skippedCount = 0,
-                        totalAmount = transactions.sumOf { if (it.isExpense) -it.amount else it.amount }
+                        totalAmount = transactions.fold(Money.zero()) { acc, transaction ->
+                            if (transaction.isExpense) acc - transaction.amount else acc + transaction.amount 
+                        }
                     ))
                 } else {
                     emit(ImportResult.Error(message = "Не найдено транзакций в файле"))
@@ -517,10 +520,13 @@ class AlfaBankImportUseCase(
         val cleanAmount = amountString.replace("\\s".toRegex(), "")
             .replace(",", ".")
             .replace("[^\\d.-]".toRegex(), "")
-        val amount = cleanAmount.toDoubleOrNull() ?: 0.0
+        val amountValue = cleanAmount.toDoubleOrNull() ?: 0.0
+        
+        // Создаем объект Money
+        val amount = Money(amountValue.absoluteValue)
         
         // Считаем расходом, если сумма отрицательная или содержит минус
-        val isExpense = amount < 0 || amountString.contains("-")
+        val isExpense = amountValue < 0 || amountString.contains("-")
         
         // Получаем описание
         val descriptionCell = columnIndices["description"]?.let { row.getCell(it) }
@@ -536,7 +542,7 @@ class AlfaBankImportUseCase(
         
         return Transaction(
             id = "alfabank_${date.time}_${System.nanoTime()}",
-            amount = amount.absoluteValue,
+            amount = amount,
             category = category,
             isExpense = isExpense,
             date = date,
@@ -597,12 +603,15 @@ class AlfaBankImportUseCase(
         // Парсим сумму и определяем тип транзакции
         val amountString = parts[amountIndex].replace("\\s".toRegex(), "")
             .replace(",", ".").replace("[^\\d.-]".toRegex(), "")
-        val amount = amountString.toDoubleOrNull() ?: 0.0
-        val isExpense = amount < 0 ||
+        val amountValue = amountString.toDoubleOrNull() ?: 0.0
+        val isExpense = amountValue < 0 ||
                 parts.any {
                     it.contains("списание", ignoreCase = true) ||
                             it.contains("расход", ignoreCase = true)
                 }
+
+        // Создаем объект Money с положительным значением
+        val amount = Money(amountValue.absoluteValue)
 
         // Определяем описание
         val description = if (descriptionIndex != -1 && descriptionIndex < parts.size) {
@@ -620,7 +629,7 @@ class AlfaBankImportUseCase(
 
         return Transaction(
             id = "alfabank_${date.time}_${System.nanoTime()}",
-            amount = amount.absoluteValue,
+            amount = amount,
             category = category,
             isExpense = isExpense,
             date = date,

@@ -4,6 +4,7 @@ import android.net.Uri
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsState
@@ -60,7 +61,7 @@ class ImportTransactionsViewModel(
                         totalCount = 0,
                         successCount = 0,
                         skippedCount = 0,
-                        totalAmount = 0.0,
+                        totalAmount = Money(0.0),
                         currentStep = "Анализ файла..."
                     )
                 }

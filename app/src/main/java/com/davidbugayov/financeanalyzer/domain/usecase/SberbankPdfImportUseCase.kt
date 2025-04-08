@@ -24,6 +24,7 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import timber.log.Timber
 import android.graphics.Color
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Реализация импорта транзакций из PDF-выписки Сбербанка.
@@ -45,7 +46,7 @@ class SberbankPdfImportUseCase(
     /**
      * Безопасно парсит строку с суммой в число, учитывая различные форматы записи
      */
-    private fun safeParseAmount(amountStr: String): Double? {
+    private fun safeParseAmount(amountStr: String): Money? {
         return try {
             // Логируем исходную строку для отладки
             Timber.d("Парсинг суммы: '$amountStr'")
@@ -61,7 +62,7 @@ class SberbankPdfImportUseCase(
             
             // Преобразуем в число
             Timber.d("Преобразование суммы: исходная '$amountStr', очищенная '$numericOnly'")
-            numericOnly.toDouble()
+            Money.parse(numericOnly)
         } catch (e: Exception) {
             Timber.e(e, "Не удалось преобразовать строку в число: $amountStr")
             null
@@ -147,13 +148,16 @@ class SberbankPdfImportUseCase(
             
             var importedCount = 0
             var skippedCount = 0
-            var totalAmount = 0.0
+            var totalAmount = Money.zero()
             
             for ((index, transaction) in transactions.withIndex()) {
                 try {
                     repository.addTransaction(transaction)
                     importedCount++
-                    totalAmount += if (transaction.isExpense) -transaction.amount else transaction.amount
+                    totalAmount = if (transaction.isExpense) 
+                        totalAmount - transaction.amount 
+                    else 
+                        totalAmount + transaction.amount
                     
                     if (index % 5 == 0) {
                         val progress = 70 + (index.toFloat() / transactions.size * 30).toInt()
@@ -279,7 +283,7 @@ class SberbankPdfImportUseCase(
                 val (amount, isExpense) = amountInfo
                 
                 // Если сумма найдена, создаем транзакцию
-                if (amount > 0) {
+                if (amount > Money.zero()) {
                     val category = determineCategory(transactionBlock)
                     
                     val note = extractNoteFromDescription(transactionBlock)
@@ -431,7 +435,7 @@ class SberbankPdfImportUseCase(
                             val amountStr = amountMatch.value
                             val parsedAmount = safeParseAmount(amountStr)
                             
-                            if (parsedAmount != null && parsedAmount > 0) {
+                            if (parsedAmount != null && parsedAmount > Money.zero()) {
                                 // Определяем тип операции (расход/доход)
                                 var isExpense = !amountStr.startsWith("+")
                                 
@@ -699,7 +703,7 @@ class SberbankPdfImportUseCase(
                             val amountStr = amountMatch.value
                             val parsedAmount = safeParseAmount(amountStr)
                             
-                            if (parsedAmount != null && parsedAmount > 0) {
+                            if (parsedAmount != null && parsedAmount > Money.zero()) {
                                 // Определяем тип операции (расход/доход)
                                 var isExpense = !amountStr.startsWith("+")
                                 
@@ -1159,7 +1163,7 @@ class SberbankPdfImportUseCase(
     /**
      * Пытается найти сумму в строке, учитывая различные форматы
      */
-    private fun findAmountInString(text: String): Pair<Double, Boolean>? {
+    private fun findAmountInString(text: String): Pair<Money, Boolean>? {
         // Улучшенный паттерн для поиска сумм
         val amountRegexPatterns = listOf(
             // Сумма с пробелами и запятой: 1 000,00

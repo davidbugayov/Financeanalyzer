@@ -99,11 +99,11 @@ fun TransactionItem(
     
     // Предварительно вычисляем и кэшируем форматированную сумму
     val formattedAmount = remember(transaction.amount, transaction.isExpense) {
-        val amount = Money(transaction.amount)
+        val amount = transaction.amount
         if (transaction.isExpense) {
-            "-${amount.abs().formatted(showCurrency = true)}"
+            "-${amount.abs().format(showCurrency = true)}"
         } else {
-            "+${amount.abs().formatted(showCurrency = true)}"
+            "+${amount.abs().format(showCurrency = true)}"
         }
     }
     

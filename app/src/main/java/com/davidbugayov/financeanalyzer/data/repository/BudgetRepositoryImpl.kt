@@ -1,8 +1,9 @@
 package com.davidbugayov.financeanalyzer.data.repository
 
-import com.davidbugayov.financeanalyzer.data.local.dao.BudgetCategoryDao
-import com.davidbugayov.financeanalyzer.data.local.entity.BudgetCategoryEntity
+import android.content.Context
+import com.davidbugayov.financeanalyzer.data.preferences.BudgetCategoryPreferences
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.repository.BudgetRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
@@ -11,42 +12,44 @@ import kotlinx.coroutines.flow.flow
  * Реализация репозитория для работы с бюджетными категориями
  */
 class BudgetRepositoryImpl(
-    private val budgetCategoryDao: BudgetCategoryDao
+    private val budgetCategoryPreferences: BudgetCategoryPreferences
 ) : BudgetRepository {
 
     override suspend fun getAllBudgetCategories(): List<BudgetCategory> {
-        return budgetCategoryDao.getAllBudgetCategories().map { it.toDomain() }
+        return budgetCategoryPreferences.getBudgetCategories()
     }
 
     override suspend fun getBudgetCategoryById(id: String): BudgetCategory? {
-        return budgetCategoryDao.getBudgetCategoryById(id)?.toDomain()
+        return budgetCategoryPreferences.getBudgetCategories().find { it.id == id }
     }
 
     override suspend fun addBudgetCategory(budgetCategory: BudgetCategory) {
-        budgetCategoryDao.insertBudgetCategory(BudgetCategoryEntity.fromDomain(budgetCategory))
+        budgetCategoryPreferences.addBudgetCategory(budgetCategory)
     }
 
     override suspend fun updateBudgetCategory(budgetCategory: BudgetCategory) {
-        budgetCategoryDao.updateBudgetCategory(BudgetCategoryEntity.fromDomain(budgetCategory))
+        budgetCategoryPreferences.updateBudgetCategory(budgetCategory)
     }
 
     override suspend fun deleteBudgetCategory(budgetCategory: BudgetCategory) {
-        budgetCategoryDao.deleteBudgetCategory(BudgetCategoryEntity.fromDomain(budgetCategory))
+        budgetCategoryPreferences.removeBudgetCategory(budgetCategory.id)
     }
 
     override suspend fun deleteBudgetCategoryById(id: String) {
-        budgetCategoryDao.deleteBudgetCategoryById(id)
+        budgetCategoryPreferences.removeBudgetCategory(id)
     }
 
     override suspend fun deleteAllBudgetCategories() {
-        budgetCategoryDao.deleteAllBudgetCategories()
+        budgetCategoryPreferences.saveBudgetCategories(emptyList())
     }
 
-    override suspend fun updateSpentAmount(id: String, spent: Double) {
-        budgetCategoryDao.updateSpentAmount(id, spent)
+    override suspend fun updateSpentAmount(id: String, spent: Money) {
+        val category = getBudgetCategoryById(id) ?: return
+        val updatedCategory = category.copy(spent = spent)
+        budgetCategoryPreferences.updateBudgetCategory(updatedCategory)
     }
 
     override suspend fun hasBudgetCategories(): Boolean {
-        return budgetCategoryDao.hasBudgetCategories()
+        return budgetCategoryPreferences.getBudgetCategories().isNotEmpty()
     }
 } 

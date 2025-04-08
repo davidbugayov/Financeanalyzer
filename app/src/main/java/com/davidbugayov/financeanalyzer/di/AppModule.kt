@@ -1,8 +1,10 @@
 package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
+import com.davidbugayov.financeanalyzer.data.preferences.BudgetCategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -40,7 +42,9 @@ val appModule = module {
 
     // Preferences
     single { CategoryPreferences.getInstance(androidContext()) }
+    single { SourcePreferences.getInstance(androidContext()) }
     single { CategoryUsagePreferences.getInstance(androidContext()) }
+    single {  BudgetCategoryPreferences.getInstance(androidContext()) }
     single { PreferencesManager(androidContext()) }
 
     // Utils
@@ -72,7 +76,7 @@ val appModule = module {
             addTransactionUseCase = get(),
             updateTransactionUseCase = get(),
             categoriesViewModel = get(),
-            preferencesManager = get()
+            sourcePreferences = get()
         )
     }
     viewModel {

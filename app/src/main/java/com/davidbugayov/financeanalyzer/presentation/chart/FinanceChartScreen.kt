@@ -41,6 +41,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelec
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import timber.log.Timber
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlin.math.max
@@ -96,25 +97,25 @@ fun FinanceChartScreen(
     // Calculate totals
     val totalIncome = filteredTransactions
         .filter { !it.isExpense }
-        .map { Money(it.amount) }
+        .map { it.amount }
         .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
     val totalExpense = filteredTransactions
         .filter { it.isExpense }
-        .map { Money(it.amount) }
+        .map { it.amount }
         .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
     Timber.tag("FinanceChart").d("Total income: $totalIncome, Total expense: $totalExpense")
 
     // Calculate statistics
     val daysInPeriod = max(1, (state.endDate.time - state.startDate.time) / (24 * 60 * 60 * 1000))
-    val avgDailyExpense = totalExpense.amount.toDouble() / daysInPeriod
-    val avgMonthlyExpense = avgDailyExpense * 30
-    val avgYearlyExpense = avgDailyExpense * 365
+    val avgDailyExpense = totalExpense.div(daysInPeriod.toBigDecimal())
+    val avgMonthlyExpense = avgDailyExpense.times(BigDecimal.valueOf(30))
+    val avgYearlyExpense = avgDailyExpense.times(BigDecimal.valueOf(365))
 
     // Calculate savings rate
     val savingsRate = if (!totalIncome.isZero()) {
-        (totalIncome.minus(totalExpense)).percentageOf(totalIncome)
+        totalIncome.minus(totalExpense).percentageOf(totalIncome)
     } else {
         0.0
     }
@@ -122,8 +123,8 @@ fun FinanceChartScreen(
     // Show dialogs if needed
     if (showSavingsRateInfo) {
         SavingsRateDialog(
-            totalIncome = totalIncome.amount.toDouble(),
-            totalExpense = totalExpense.amount.toDouble(),
+            totalIncome = totalIncome,
+            totalExpense = totalExpense,
             savingsRate = savingsRate,
             onDismiss = { showSavingsRateInfo = false }
         )

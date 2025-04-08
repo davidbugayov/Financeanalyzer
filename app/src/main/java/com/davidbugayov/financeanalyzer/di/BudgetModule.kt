@@ -7,8 +7,6 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 val budgetModule = module {
-    // Репозиторий для бюджетных категорий
-    single { get<com.davidbugayov.financeanalyzer.data.local.database.AppDatabase>().budgetCategoryDao() }
     single<BudgetRepository> { BudgetRepositoryImpl(get()) }
 
     viewModel { BudgetViewModel(get()) }

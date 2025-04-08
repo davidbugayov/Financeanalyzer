@@ -29,8 +29,8 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
  */
 @Composable
 fun SavingsRateDialog(
-    totalIncome: Double,
-    totalExpense: Double,
+    totalIncome: Money,
+    totalExpense: Money,
     savingsRate: Double,
     onDismiss: () -> Unit
 ) {
@@ -65,7 +65,7 @@ fun SavingsRateDialog(
                 )
 
                 Text(
-                    text = Money(totalIncome).format(),
+                    text = totalIncome.format(),
                     style = MaterialTheme.typography.titleMedium,
                     color = incomeColor,
                     modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_medium))
@@ -78,7 +78,7 @@ fun SavingsRateDialog(
                 )
 
                 Text(
-                    text = Money(totalExpense).format(),
+                    text = totalExpense.format(),
                     style = MaterialTheme.typography.titleMedium,
                     color = expenseColor,
                     modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_medium))
@@ -104,7 +104,7 @@ fun SavingsRateDialog(
                 )
 
                 Text(
-                    text = Money(totalIncome - totalExpense).format(),
+                    text = (totalIncome - totalExpense).format(),
                     style = MaterialTheme.typography.titleMedium,
                     color = if (totalIncome > totalExpense) incomeColor else expenseColor,
                     modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_medium))

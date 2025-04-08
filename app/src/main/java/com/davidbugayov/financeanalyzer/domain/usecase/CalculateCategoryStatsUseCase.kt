@@ -29,7 +29,7 @@ class CalculateCategoryStatsUseCase(
     ): Triple<Money, Money, Int?> {
         // Если список пуст или нет выбранных категорий, быстро возвращаем нулевые значения
         if (transactions.isEmpty() || categories.isEmpty()) {
-            return Triple(Money(0.0), Money(0.0), null)
+            return Triple(Money.zero(), Money.zero(), null)
         }
         
         // Используем предварительную фильтрацию для снижения нагрузки на filterTransactionsUseCase
@@ -39,7 +39,7 @@ class CalculateCategoryStatsUseCase(
         }
         
         if (relevantTransactions.isEmpty()) {
-            return Triple(Money(0.0), Money(0.0), null)
+            return Triple(Money.zero(), Money.zero(), null)
         }
         
         // Фильтруем транзакции для текущего периода с оптимизированным набором данных
@@ -52,8 +52,9 @@ class CalculateCategoryStatsUseCase(
         )
         
         // Оптимизированный расчет суммы с одним проходом
-        val currentPeriodTotalDouble = currentPeriodTransactions.sumOf { it.amount }
-        val currentPeriodTotal = Money(currentPeriodTotalDouble)
+        val currentPeriodTotal = currentPeriodTransactions.fold(Money.zero()) { acc, transaction ->
+            acc + transaction.amount
+        }
 
         // Рассчитываем предыдущий период такой же длительности
         val periodDuration = endDate.time - startDate.time
@@ -79,13 +80,13 @@ class CalculateCategoryStatsUseCase(
         }
         
         // Оптимизированный расчет суммы с одним проходом
-        val previousPeriodTotalDouble = previousPeriodTransactions.sumOf { it.amount }
-        val previousPeriodTotal = Money(previousPeriodTotalDouble)
+        val previousPeriodTotal = previousPeriodTransactions.fold(Money.zero()) { acc, transaction ->
+            acc + transaction.amount
+        }
 
         // Рассчитываем процентное изменение только если оба периода имеют данные
-        val percentChange = if (previousPeriodTotalDouble != 0.0) {
-            ((currentPeriodTotalDouble - previousPeriodTotalDouble) /
-                    abs(previousPeriodTotalDouble) * 100).toInt()
+        val percentChange = if (!previousPeriodTotal.isZero()) {
+            currentPeriodTotal.percentageDifference(previousPeriodTotal).toInt()
         } else null
 
         return Triple(currentPeriodTotal, previousPeriodTotal, percentChange)

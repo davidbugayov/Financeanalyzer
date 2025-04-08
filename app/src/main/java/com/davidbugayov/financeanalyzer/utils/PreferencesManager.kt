@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
@@ -17,30 +18,6 @@ class PreferencesManager(context: Context) {
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
         PREFERENCES_NAME, Context.MODE_PRIVATE
     )
-    private val gson = Gson()
-
-    /**
-     * Сохраняет список источников средств в SharedPreferences
-     * @param sources Список источников для сохранения
-     */
-    fun saveCustomSources(sources: List<Source>) {
-        val sourcesJson = gson.toJson(sources)
-        sharedPreferences.edit { putString(KEY_CUSTOM_SOURCES, sourcesJson) }
-    }
-
-    /**
-     * Загружает список источников средств из SharedPreferences
-     * @return Список источников или пустой список, если ничего не сохранено
-     */
-    fun getCustomSources(): List<Source> {
-        val sourcesJson = sharedPreferences.getString(KEY_CUSTOM_SOURCES, null) ?: return emptyList()
-        val type = object : TypeToken<List<Source>>() {}.type
-        return try {
-            gson.fromJson(sourcesJson, type)
-        } catch (e: Exception) {
-            emptyList()
-        }
-    }
 
     /**
      * Сохраняет тему приложения в SharedPreferences
@@ -66,7 +43,6 @@ class PreferencesManager(context: Context) {
     companion object {
 
         private const val PREFERENCES_NAME = "finance_analyzer_prefs"
-        private const val KEY_CUSTOM_SOURCES = "custom_sources"
         private const val KEY_THEME_MODE = "theme_mode"
         private const val KEY_TOTAL_INCOME = "total_income"
         private const val KEY_TOTAL_EXPENSE = "total_expense"
@@ -83,11 +59,11 @@ class PreferencesManager(context: Context) {
      * @param totalExpense Общий расход
      * @param balance Текущий баланс
      */
-    fun saveFinancialStats(totalIncome: Double, totalExpense: Double, balance: Double) {
+    fun saveFinancialStats(totalIncome: Money, totalExpense: Money, balance: Money) {
         sharedPreferences.edit {
-            putString(KEY_TOTAL_INCOME, totalIncome.toString())
-            putString(KEY_TOTAL_EXPENSE, totalExpense.toString())
-            putString(KEY_BALANCE, balance.toString())
+            putString(KEY_TOTAL_INCOME, totalIncome.amount.toString())
+            putString(KEY_TOTAL_EXPENSE, totalExpense.amount.toString())
+            putString(KEY_BALANCE, balance.amount.toString())
             putLong(KEY_STATS_LAST_UPDATE, System.currentTimeMillis())
         }
     }
@@ -96,10 +72,10 @@ class PreferencesManager(context: Context) {
      * Загружает финансовую статистику из SharedPreferences
      * @return Triple с общим доходом, общим расходом и балансом
      */
-    fun getFinancialStats(): Triple<Double, Double, Double> {
-        val totalIncome = sharedPreferences.getString(KEY_TOTAL_INCOME, "0.0")?.toDoubleOrNull() ?: 0.0
-        val totalExpense = sharedPreferences.getString(KEY_TOTAL_EXPENSE, "0.0")?.toDoubleOrNull() ?: 0.0
-        val balance = sharedPreferences.getString(KEY_BALANCE, "0.0")?.toDoubleOrNull() ?: 0.0
+    fun getFinancialStats(): Triple<Money, Money, Money> {
+        val totalIncome = Money(sharedPreferences.getString(KEY_TOTAL_INCOME, "0.0") ?: "0.0")
+        val totalExpense = Money(sharedPreferences.getString(KEY_TOTAL_EXPENSE, "0.0") ?: "0.0")
+        val balance = Money(sharedPreferences.getString(KEY_BALANCE, "0.0") ?: "0.0")
         
         return Triple(totalIncome, totalExpense, balance)
     }
