@@ -425,7 +425,7 @@ class TransactionHistoryViewModel @Inject constructor(
         }
     }
 
-    private fun loadTransactions() {
+    fun loadTransactions() {
         resetAndReloadTransactions()
     }
 
@@ -774,5 +774,33 @@ class TransactionHistoryViewModel @Inject constructor(
      */
     fun getGroupedTransactions(): Map<String, List<Transaction>> {
         return state.value.groupedTransactions
+    }
+
+    /**
+     * Временный метод для проверки количества транзакций в базе данных
+     */
+    fun checkTransactionCount() {
+        viewModelScope.launch {
+            try {
+                Timber.d("Начинаем проверку количества транзакций в базе данных")
+                val count = repository.getTransactionsCount()
+                Timber.d("Количество транзакций в базе данных: $count")
+                
+                // Проверяем доступность базы данных
+                val allTransactions = repository.getAllTransactions()
+                Timber.d("Всего транзакций при прямом запросе: ${allTransactions.size}")
+                
+                // Проверяем транзакции за последний месяц
+                val calendar = Calendar.getInstance()
+                val endDate = calendar.time
+                calendar.add(Calendar.MONTH, -1)
+                val startDate = calendar.time
+                val monthlyTransactions = repository.getTransactionsByDateRangeList(startDate, endDate)
+                Timber.d("Транзакций за последний месяц: ${monthlyTransactions.size}")
+                
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при проверке количества транзакций: ${e.message}")
+            }
+        }
     }
 }

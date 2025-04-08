@@ -83,9 +83,6 @@ class FinanceApp : Application() {
             
             // Инициализируем финансовые метрики
             initializeFinancialMetrics()
-            
-            // Восстановление данных в базе после миграции
-            initializeDataRecovery()
 
             // Логируем через Timber для проверки отправки в Crashlytics
             Timber.i("Application initialized")
@@ -169,108 +166,19 @@ class FinanceApp : Application() {
     }
 
     /**
-     * Инициализирует финансовые метрики.
-     * Использует отложенную инициализацию для предотвращения ANR.
+     * Инициализирует финансовые метрики в отдельном потоке
      */
     private fun initializeFinancialMetrics() {
-        try {
-            Timber.d("Начало отложенной инициализации финансовых метрик")
-            val metrics = FinancialMetrics.getInstance()
-            
-            // Используем отложенную инициализацию вместо блокирующего вызова
-            metrics.lazyInitialize(priority = false)
-            
-            // Планируем повторную проверку с задержкой и высоким приоритетом
-            appScope.launch {
-                delay(1500) // Даем время для завершения инициализации приложения
-                metrics.lazyInitialize(priority = true)
-                Timber.d("Запланирована вторичная проверка метрик с высоким приоритетом")
-            }
-            
-            Timber.d("Запущена отложенная инициализация финансовых метрик")
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при инициализации финансовых метрик")
-        }
-    }
-
-    /**
-     * Инициализирует восстановление данных после миграции
-     */
-    private fun initializeDataRecovery() {
-        Timber.d("Запуск восстановления данных базы")
-        
-        // Запускаем восстановление в отдельном потоке
         appScope.launch {
             try {
-                // Даем время на инициализацию базы данных и миграцию
-                delay(2000)
-                
-                // Получаем репозиторий транзакций через Koin
-                val repository = org.koin.core.context.GlobalContext.get().get<com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository>()
-                
-                // Проверяем, есть ли уже транзакции в базе
-                val transactionsCount = repository.getTransactionsCount()
-                
-                if (transactionsCount == 0) {
-                    Timber.d("База данных пуста, создаем тестовые транзакции")
-                    
-                    // Создаем и добавляем несколько тестовых транзакций
-                    createTestTransactions().forEach { transaction ->
-                        repository.addTransaction(transaction)
-                    }
-                    
-                    Timber.d("Создано ${createTestTransactions().size} тестовых транзакций")
-                } else {
-                    Timber.d("В базе уже есть $transactionsCount транзакций, восстановление не требуется")
-                }
+                Timber.i("Initializing financial metrics...")
+                val metrics = FinancialMetrics.getInstance()
+                // Начинаем первоначальный расчет метрик
+                metrics.lazyInitialize()
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при восстановлении данных: ${e.message}")
+                Timber.e(e, "Error initializing financial metrics")
+                CrashlyticsUtils.recordException(e)
             }
         }
-    }
-    
-    /**
-     * Создает список тестовых транзакций
-     */
-    private fun createTestTransactions(): List<com.davidbugayov.financeanalyzer.domain.model.Transaction> {
-        val categories = listOf("Продукты", "Транспорт", "Развлечения", "Здоровье", "Одежда")
-        val sources = listOf("Сбер", "Тинькофф", "Альфа", "Наличные")
-        val notes = listOf("Еженедельная закупка", "Поездка на работу", "Встреча с друзьями", null)
-        
-        val transactions = mutableListOf<com.davidbugayov.financeanalyzer.domain.model.Transaction>()
-        
-        // Начальная дата - 30 дней назад
-        val calendar = java.util.Calendar.getInstance()
-        calendar.add(java.util.Calendar.DAY_OF_MONTH, -30)
-        val startDate = calendar.time
-        
-        // Создаем 20 тестовых транзакций
-        repeat(20) {
-            // Случайная дата в пределах последних 30 дней
-            val randomDays = (0..30).random()
-            calendar.time = startDate
-            calendar.add(java.util.Calendar.DAY_OF_MONTH, randomDays)
-            
-            // Случайная сумма от 100 до 5000
-            val amount = (100..5000).random().toDouble()
-            
-            // Случайно выбираем, будет ли это расходом или доходом
-            val isExpense = kotlin.random.Random.nextDouble() < 0.7 // 70% шанс, что это расход
-            
-            transactions.add(
-                com.davidbugayov.financeanalyzer.domain.model.Transaction(
-                    id = java.util.UUID.randomUUID().toString(),
-                    amount = amount,
-                    category = categories.random(),
-                    date = calendar.time,
-                    isExpense = isExpense,
-                    note = notes.random(),
-                    source = sources.random(),
-                    sourceColor = 0 // Используем цвет по умолчанию
-                )
-            )
-        }
-        
-        return transactions
     }
 } 

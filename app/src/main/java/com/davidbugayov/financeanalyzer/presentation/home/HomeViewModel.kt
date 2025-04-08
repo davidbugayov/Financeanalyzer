@@ -437,28 +437,42 @@ class HomeViewModel(
      */
     private fun generateAndSaveTestData() {
         viewModelScope.launch {
-            Timber.d("Generating test data")
-            // Генерируем 100 транзакций за последний месяц
-            val testTransactions = TestDataGenerator.generateTransactions(100)
+            try {
+                Timber.d("Generating test data")
+                // Устанавливаем флаг загрузки
+                _state.update { it.copy(isLoading = true) }
+                
+                // Генерируем 100 транзакций за последний месяц
+                val testTransactions = TestDataGenerator.generateTransactions(100)
 
-            var hasError = false
-            testTransactions.forEach { transaction ->
-                Timber.d("Saving test transaction: ${transaction.category}")
-                addTransactionUseCase(transaction).fold(
-                    onSuccess = { /* Transaction saved successfully */ },
-                    onFailure = { exception: Throwable ->
-                        hasError = true
-                        Timber.e(exception, "Failed to save test transaction: ${transaction.category}")
-                    }
-                )
-            }
+                var hasError = false
+                testTransactions.forEach { transaction ->
+                    Timber.d("Saving test transaction: ${transaction.category}")
+                    addTransactionUseCase(transaction).fold(
+                        onSuccess = { /* Transaction saved successfully */ },
+                        onFailure = { exception: Throwable ->
+                            hasError = true
+                            Timber.e(exception, "Failed to save test transaction: ${transaction.category}")
+                        }
+                    )
+                }
 
-            if (!hasError) {
-                // Очищаем кэши при добавлении тестовых данных
-                clearCaches()
-                Timber.d("Test data generation completed successfully")
-            } else {
-                _state.update { it.copy(error = "Ошибка при сохранении некоторых тестовых транзакций") }
+                if (!hasError) {
+                    // Очищаем кэши при добавлении тестовых данных
+                    clearCaches()
+                    Timber.d("Test data generation completed successfully")
+                } else {
+                    _state.update { it.copy(error = "Ошибка при сохранении некоторых тестовых транзакций") }
+                }
+                
+                // Запускаем обновление транзакций для отображения новых данных
+                loadTransactions()
+            } catch (e: Exception) {
+                Timber.e(e, "Error generating test data")
+                _state.update { it.copy(error = e.message ?: "Ошибка при генерации тестовых данных") }
+            } finally {
+                // В любом случае (успех или ошибка) отключаем индикатор загрузки
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }

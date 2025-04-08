@@ -115,6 +115,8 @@ fun TransactionHistoryScreen(
             screenClass = "TransactionHistoryScreen"
         )
         Timber.d("TransactionHistoryScreen открыт, текущий период: ${state.periodType}")
+        viewModel.loadTransactions()
+        viewModel.checkTransactionCount()
     }
 
     // Отслеживаем изменения периода
