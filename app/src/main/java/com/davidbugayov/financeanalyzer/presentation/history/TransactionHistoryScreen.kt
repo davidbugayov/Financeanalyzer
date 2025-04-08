@@ -412,13 +412,13 @@ fun TransactionHistoryScreen(
                             // Для доходов
                             val income = transactions
                                 .filter { !it.isExpense }
-                                .map { Money(it.amount) }
+                                .map { it.amount }
                                 .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
                             // Для расходов берем абсолютное значение (без минуса)
                             val expense = transactions
                                 .filter { it.isExpense }
-                                .map { Money(it.amount) }
+                                .map { it.amount }
                                 .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
                             // Для баланса: доходы - расходы

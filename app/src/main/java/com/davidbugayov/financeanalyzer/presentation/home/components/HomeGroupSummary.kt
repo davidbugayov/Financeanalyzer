@@ -88,14 +88,15 @@ fun HomeGroupSummary(
         val groupedByCategory = filteredByType.groupBy { it.category }
 
         groupedByCategory.map { (category, transactions) ->
-            // Суммируем все транзакции в этой категории
-            val total = transactions.sumOf { it.amount }
-            val money = Money(total)
+            // Суммируем все транзакции в этой категории с использованием Money
+            val amount = transactions.fold(Money.zero()) { acc, transaction -> 
+                acc + transaction.amount 
+            }
 
             // Создаем объект с информацией о категории
             CategorySummary(
                 category = category,
-                amount = money,
+                amount = amount,
                 isExpense = showExpenses
             )
         }.sortedByDescending { it.amount.amount }

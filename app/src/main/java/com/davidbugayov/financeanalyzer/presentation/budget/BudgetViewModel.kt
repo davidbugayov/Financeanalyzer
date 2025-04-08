@@ -15,6 +15,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Calendar
 import java.util.UUID
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 class BudgetViewModel(
     private val budgetRepository: BudgetRepository
@@ -70,24 +71,24 @@ class BudgetViewModel(
                     val sampleCategories = listOf(
                         BudgetCategory(
                             name = "Продукты", 
-                            limit = 5000.0, 
-                            spent = 0.0, 
+                            limit = Money(5000.0), 
+                            spent = Money(0.0), 
                             id = UUID.randomUUID().toString(),
-                            walletBalance = 5000.0
+                            walletBalance = Money(5000.0)
                         ),
                         BudgetCategory(
                             name = "Развлечения", 
-                            limit = 3000.0, 
-                            spent = 0.0, 
+                            limit = Money(3000.0), 
+                            spent = Money(0.0), 
                             id = UUID.randomUUID().toString(),
-                            walletBalance = 3000.0
+                            walletBalance = Money(3000.0)
                         ),
                         BudgetCategory(
                             name = "Транспорт", 
-                            limit = 2000.0, 
-                            spent = 0.0, 
+                            limit = Money(2000.0), 
+                            spent = Money(0.0), 
                             id = UUID.randomUUID().toString(),
-                            walletBalance = 2000.0
+                            walletBalance = Money(2000.0)
                         )
                     )
                     
@@ -142,9 +143,11 @@ class BudgetViewModel(
 
     private fun calculateTotals() {
         val categories = _state.value.categories
-        val totalLimit = categories.sumOf { it.limit }
-        val totalSpent = categories.sumOf { it.spent }
-        val totalWalletBalance = categories.sumOf { it.walletBalance }
+        
+        // Используем методы Money для суммирования вместо преобразования в Double
+        val totalLimit = categories.fold(Money(0.0)) { acc, category -> acc.plus(category.limit) }
+        val totalSpent = categories.fold(Money(0.0)) { acc, category -> acc.plus(category.spent) }
+        val totalWalletBalance = categories.fold(Money(0.0)) { acc, category -> acc.plus(category.walletBalance) }
         
         _state.update { 
             it.copy(
@@ -155,7 +158,7 @@ class BudgetViewModel(
         }
     }
 
-    private fun addCategory(name: String, limit: Double) {
+    private fun addCategory(name: String, limit: Money) {
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
@@ -163,9 +166,9 @@ class BudgetViewModel(
                 val newCategory = BudgetCategory(
                     name = name, 
                     limit = limit, 
-                    spent = 0.0, 
+                    spent = Money(0.0), 
                     id = UUID.randomUUID().toString(),
-                    walletBalance = 0.0
+                    walletBalance = Money(0.0)
                 )
                 
                 // Добавляем категорию в репозиторий
@@ -230,10 +233,10 @@ class BudgetViewModel(
     }
 
     // Распределяет полученный доход по всем категориям согласно их лимитам
-    private fun distributeIncome(amount: Double) {
+    private fun distributeIncome(amount: Money) {
         viewModelScope.launch {
             try {
-                if (_state.value.categories.isEmpty() || amount <= 0) {
+                if (_state.value.categories.isEmpty() || amount.isZero() || amount.isNegative()) {
                     return@launch
                 }
                 
@@ -242,12 +245,12 @@ class BudgetViewModel(
                 
                 // Обновляем категории, пропорционально распределяя доход
                 val updatedCategories = _state.value.categories.map { category ->
-                    val categoryRatio = category.limit / totalLimit
-                    val categoryAmount = (amount * categoryRatio).coerceAtMost(remainingAmount)
-                    remainingAmount -= categoryAmount
+                    val categoryRatio = category.limit.percentageOf(totalLimit) / 100.0
+                    val categoryAmount = amount.times(categoryRatio)
+                    remainingAmount = remainingAmount.minus(categoryAmount)
                     
                     category.copy(
-                        walletBalance = category.walletBalance + categoryAmount
+                        walletBalance = category.walletBalance.plus(categoryAmount)
                     )
                 }
                 
@@ -268,17 +271,17 @@ class BudgetViewModel(
     }
     
     // Добавляет средства в кошелек конкретной категории
-    private fun addFundsToWallet(categoryId: String, amount: Double) {
+    private fun addFundsToWallet(categoryId: String, amount: Money) {
         viewModelScope.launch {
             try {
-                if (amount <= 0) return@launch
+                if (amount.isZero() || amount.isNegative()) return@launch
                 
                 // Находим категорию по ID
                 val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
                 
                 // Обновляем категорию
                 val updatedCategory = category.copy(
-                    walletBalance = category.walletBalance + amount
+                    walletBalance = category.walletBalance.plus(amount)
                 )
                 
                 // Сохраняем обновленную категорию
@@ -296,16 +299,16 @@ class BudgetViewModel(
     }
     
     // Списывает средства из кошелька и увеличивает счетчик потраченных средств
-    private fun spendFromWallet(categoryId: String, amount: Double) {
+    private fun spendFromWallet(categoryId: String, amount: Money) {
         viewModelScope.launch {
             try {
-                if (amount <= 0) return@launch
+                if (amount.isZero() || amount.isNegative()) return@launch
                 
                 // Находим категорию по ID
                 val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
                 
                 // Проверяем, достаточно ли средств
-                if (category.walletBalance < amount) {
+                if (category.walletBalance.compareTo(amount) < 0) {
                     _state.update { 
                         it.copy(error = "Недостаточно средств в кошельке '${category.name}'")
                     }
@@ -314,8 +317,8 @@ class BudgetViewModel(
                 
                 // Обновляем категорию
                 val updatedCategory = category.copy(
-                    walletBalance = category.walletBalance - amount,
-                    spent = category.spent + amount
+                    walletBalance = category.walletBalance.minus(amount),
+                    spent = category.spent.plus(amount)
                 )
                 
                 // Сохраняем обновленную категорию
@@ -333,17 +336,17 @@ class BudgetViewModel(
     }
     
     // Перевод средств между кошельками
-    private fun transferBetweenWallets(fromCategoryId: String, toCategoryId: String, amount: Double) {
+    private fun transferBetweenWallets(fromCategoryId: String, toCategoryId: String, amount: Money) {
         viewModelScope.launch {
             try {
-                if (amount <= 0 || fromCategoryId == toCategoryId) return@launch
+                if (amount.isZero() || amount.isNegative() || fromCategoryId == toCategoryId) return@launch
                 
                 // Находим категории по ID
                 val fromCategory = budgetRepository.getBudgetCategoryById(fromCategoryId) ?: return@launch
                 val toCategory = budgetRepository.getBudgetCategoryById(toCategoryId) ?: return@launch
                 
                 // Проверяем, достаточно ли средств
-                if (fromCategory.walletBalance < amount) {
+                if (fromCategory.walletBalance.compareTo(amount) < 0) {
                     _state.update { 
                         it.copy(error = "Недостаточно средств в кошельке '${fromCategory.name}'")
                     }
@@ -352,10 +355,10 @@ class BudgetViewModel(
                 
                 // Обновляем категории
                 val updatedFromCategory = fromCategory.copy(
-                    walletBalance = fromCategory.walletBalance - amount
+                    walletBalance = fromCategory.walletBalance.minus(amount)
                 )
                 val updatedToCategory = toCategory.copy(
-                    walletBalance = toCategory.walletBalance + amount
+                    walletBalance = toCategory.walletBalance.plus(amount)
                 )
                 
                 // Сохраняем обновленные категории
@@ -391,7 +394,7 @@ class BudgetViewModel(
                 
                 // Обновляем категорию
                 val updatedCategory = category.copy(
-                    spent = 0.0,
+                    spent = Money(0.0),
                     periodStartDate = System.currentTimeMillis()
                 )
                 
@@ -419,7 +422,7 @@ class BudgetViewModel(
                 // Обновляем каждую категорию
                 categories.forEach { category ->
                     val updatedCategory = category.copy(
-                        spent = 0.0,
+                        spent = Money(0.0),
                         periodStartDate = System.currentTimeMillis()
                     )
                     budgetRepository.updateBudgetCategory(updatedCategory)
@@ -456,7 +459,7 @@ class BudgetViewModel(
                     // Обновляем каждую просроченную категорию
                     expiredCategories.forEach { category ->
                         val updatedCategory = category.copy(
-                            spent = 0.0,
+                            spent = Money(0.0),
                             periodStartDate = System.currentTimeMillis()
                         )
                         budgetRepository.updateBudgetCategory(updatedCategory)

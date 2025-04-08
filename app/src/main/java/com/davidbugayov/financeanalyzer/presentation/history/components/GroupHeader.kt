@@ -53,24 +53,21 @@ fun GroupHeader(
     onExpandToggle: (Boolean) -> Unit = {}
 ) {
     // Оптимизация вычисления финансовых сумм с использованием sequence
-    val financialSummary = remember(transactions) {
-        val income = transactions
-            .asSequence()
-            .filter { !it.isExpense }
-            .map { Money(it.amount) }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+    val income = transactions
+        .filter { !it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
-        val expense = transactions
-            .asSequence()
-            .filter { it.isExpense }
-            .map { Money(it.amount) }
-            .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+    val expense = transactions
+        .filter { it.isExpense }
+        .map { it.amount }
+        .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
-        val balance = income.minus(expense)
-        Triple(income, expense, balance)
-    }
+    val balance = income - expense
 
-    val (income, expense, balance) = financialSummary
+    val formattedIncome = income.format(showCurrency = true)
+    val formattedExpense = expense.format(showCurrency = true)
+    val formattedBalance = balance.format(showCurrency = true)
     
     // Определяем цвета заранее, не вычисляя их каждый раз
     val isPositive = balance >= Money.zero()
@@ -126,21 +123,21 @@ fun GroupHeader(
                 // Доходы
                 FinancialInfoColumn(
                     label = stringResource(R.string.income),
-                    value = income.toString(),
+                    value = formattedIncome,
                     color = PositiveTextColor
                 )
                 
                 // Расходы
                 FinancialInfoColumn(
                     label = stringResource(R.string.expense),
-                    value = expense.toString(),
+                    value = formattedExpense,
                     color = NegativeTextColor
                 )
                 
                 // Баланс
                 FinancialInfoColumn(
                     label = stringResource(R.string.balance),
-                    value = balance.toString(),
+                    value = formattedBalance,
                     color = textColor
                 )
             }

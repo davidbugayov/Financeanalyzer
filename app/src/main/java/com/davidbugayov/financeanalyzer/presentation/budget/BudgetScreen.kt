@@ -42,6 +42,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.budget.components.BudgetCategoryCard
 import com.davidbugayov.financeanalyzer.presentation.budget.components.CategoryAction
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
@@ -201,7 +202,7 @@ fun BudgetScreen(
                                         viewModel.onEvent(
                                             BudgetEvent.AddCategory(
                                                 name = categoryName,
-                                                limit = limit
+                                                limit = Money(limit)
                                             )
                                         )
                                         categoryName = ""
@@ -250,7 +251,7 @@ fun BudgetScreen(
                             onClick = {
                                 val amount = incomeAmount.toDoubleOrNull() ?: 0.0
                                 if (amount > 0) {
-                                    viewModel.onEvent(BudgetEvent.DistributeIncome(amount))
+                                    viewModel.onEvent(BudgetEvent.DistributeIncome(Money(amount)))
                                     incomeAmount = ""
                                     showDistributeIncomeDialog = false
                                 }
@@ -299,7 +300,7 @@ fun BudgetScreen(
                                         viewModel.onEvent(
                                             BudgetEvent.AddFundsToWallet(
                                                 categoryId = category.id,
-                                                amount = amount
+                                                amount = Money(amount)
                                             )
                                         )
                                     }
@@ -333,7 +334,7 @@ fun BudgetScreen(
                             )
 
                             Text(
-                                text = "Баланс кошелька: ${selectedCategory!!.walletBalance.toInt()} ₽",
+                                text = "Баланс кошелька: ${selectedCategory!!.walletBalance} ₽",
                                 style = MaterialTheme.typography.bodyMedium
                             )
 
@@ -356,7 +357,7 @@ fun BudgetScreen(
                                         viewModel.onEvent(
                                             BudgetEvent.SpendFromWallet(
                                                 categoryId = category.id,
-                                                amount = amount
+                                                amount = Money(amount)
                                             )
                                         )
                                     }
@@ -390,7 +391,7 @@ fun BudgetScreen(
                             )
 
                             Text(
-                                text = "Баланс: ${selectedFromCategory!!.walletBalance.toInt()} ₽",
+                                text = "Баланс: ${selectedFromCategory!!.walletBalance} ₽",
                                 style = MaterialTheme.typography.bodySmall
                             )
 
@@ -445,7 +446,7 @@ fun BudgetScreen(
                                         BudgetEvent.TransferBetweenWallets(
                                             fromCategoryId = selectedFromCategory!!.id,
                                             toCategoryId = selectedToCategory!!.id,
-                                            amount = amount
+                                            amount = Money(amount)
                                         )
                                     )
                                     transferAmount = ""
@@ -542,9 +543,9 @@ fun BudgetScreen(
 
 @Composable
 fun BudgetSummaryCard(
-    totalLimit: Double,
-    totalSpent: Double,
-    totalWalletBalance: Double,
+    totalLimit: Money,
+    totalSpent: Money,
+    totalWalletBalance: Money,
     periodDuration: Int,
     onAddCategoryClick: () -> Unit
 ) {
@@ -597,7 +598,7 @@ fun BudgetSummaryCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${totalLimit.toInt()} ₽",
+                        text = totalLimit.format(),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium
                     )
@@ -610,7 +611,7 @@ fun BudgetSummaryCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${totalSpent.toInt()} ₽",
+                        text = totalSpent.format(),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
                         color = if (totalSpent > totalLimit) Color.Red else MaterialTheme.colorScheme.onSurface
@@ -624,10 +625,10 @@ fun BudgetSummaryCard(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = "${totalWalletBalance.toInt()} ₽",
+                        text = totalWalletBalance.format(),
                         style = MaterialTheme.typography.bodyLarge,
                         fontWeight = FontWeight.Medium,
-                        color = if (totalWalletBalance < 0) Color.Red else MaterialTheme.colorScheme
+                        color = if (totalWalletBalance < Money.zero()) Color.Red else MaterialTheme.colorScheme
                             .primary
                     )
                 }

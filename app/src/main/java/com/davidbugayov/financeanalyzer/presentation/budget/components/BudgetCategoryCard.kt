@@ -33,6 +33,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
 import kotlin.math.min
+import java.math.BigDecimal
 
 // Перечисление действий для меню категории
 enum class CategoryAction {
@@ -131,14 +132,17 @@ fun BudgetCategoryCard(
             }
 
             // Прогресс
-            val progressValue = min(category.spent / if (category.limit > 0) category.limit else 1.0, 1.0).toFloat()
+            val progressValue = min(
+                category.spent.amount.toDouble() / if (category.limit.amount > BigDecimal.ZERO) category.limit.amount.toDouble() else 1.0, 
+                1.0
+            ).toFloat()
             LinearProgressIndicator(
                 progress = progressValue,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .height(6.dp),
-                color = if (category.spent >= category.limit) Color.Red else MaterialTheme.colorScheme.primary,
+                color = if (category.spent.amount >= category.limit.amount) Color.Red else MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
             )
 
@@ -147,12 +151,12 @@ fun BudgetCategoryCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Потрачено: ${category.spent.toInt()} ₽",
+                    text = "Потрачено: ${category.spent.amount.toInt()} ₽",
                     style = MaterialTheme.typography.bodyMedium
                 )
 
                 Text(
-                    text = "Лимит: ${category.limit.toInt()} ₽",
+                    text = "Лимит: ${category.limit.amount.toInt()} ₽",
                     style = MaterialTheme.typography.bodyMedium
                 )
             }
@@ -178,7 +182,7 @@ fun BudgetCategoryCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     
                     Text(
-                        text = "Кошелёк: ${category.walletBalance.toInt()} ₽",
+                        text = "Кошелёк: ${category.walletBalance.amount.toInt()} ₽",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )

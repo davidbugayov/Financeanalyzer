@@ -271,7 +271,7 @@ fun ImportResultsSection(state: ImportTransactionsState) {
                         Text(
                             text = stringResource(
                                 R.string.import_total_amount,
-                                state.totalAmount.toInt()
+                                state.totalAmount.amount.toInt()
                             ),
                             style = MaterialTheme.typography.bodyLarge,
                             fontWeight = FontWeight.Bold

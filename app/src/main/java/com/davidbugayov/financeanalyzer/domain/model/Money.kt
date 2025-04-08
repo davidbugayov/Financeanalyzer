@@ -317,7 +317,7 @@ data class Money(
          * @param currency Валюта
          * @return Денежное значение
          */
-        fun parse(value: String, currency: Currency = Currency.RUB): Money {
+        fun fromString(value: String, currency: Currency = Currency.RUB): Money {
             val cleanValue = value
                 .replace(currency.symbol, "")
                 .replace(currency.groupingSeparator.toString(), "")
@@ -338,6 +338,16 @@ data class Money(
          */
         fun zero(currency: Currency = Currency.RUB): Money {
             return Money(BigDecimal.ZERO, currency)
+        }
+        
+        /**
+         * Алиас для метода fromString для более читаемого кода
+         * @param value Строка с денежным значением
+         * @param currency Валюта
+         * @return Денежное значение
+         */
+        fun parse(value: String, currency: Currency = Currency.RUB): Money {
+            return fromString(value, currency)
         }
     }
 } 

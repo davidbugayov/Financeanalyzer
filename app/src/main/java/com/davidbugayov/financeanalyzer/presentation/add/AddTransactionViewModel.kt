@@ -18,7 +18,7 @@ import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionSta
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -38,7 +38,7 @@ class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val categoriesViewModel: CategoriesViewModel,
-    private val preferencesManager: PreferencesManager
+    private val sourcePreferences: SourcePreferences
 ) : AndroidViewModel(application), KoinComponent {
 
     // Расширение для преобразования строки в Double
@@ -69,8 +69,8 @@ class AddTransactionViewModel(
      * Инициализирует список источников
      */
     private fun initSources() {
-        // Загружаем сохраненные источники из SharedPreferences
-        val savedSources = preferencesManager.getCustomSources()
+        // Загружаем сохраненные источники из SourcePreferences
+        val savedSources = sourcePreferences.getCustomSources()
         
         // Если есть сохраненные источники, используем их
         // Иначе используем стандартные источники
@@ -341,7 +341,7 @@ class AddTransactionViewModel(
 
             try {
                 // Используем parseFormattedAmount для преобразования строки в Money
-                money = Money.parse(_state.value.amount)
+                money = Money.fromString(_state.value.amount)
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при парсинге суммы: ${_state.value.amount}")
             }
@@ -393,7 +393,7 @@ class AddTransactionViewModel(
 
                 // Создаем объект транзакции
                 val transaction = Transaction(
-                    amount = finalAmount,
+                    amount = Money(finalAmount),
                     date = currentState.selectedDate,
                     note = currentState.note.trim(),
                     category = currentState.category,
@@ -483,7 +483,7 @@ class AddTransactionViewModel(
                 // Создаем объект транзакции
                 val transaction = Transaction(
                     id = transactionId ?: "",
-                    amount = finalAmount,
+                    amount = Money(finalAmount),
                     date = currentState.selectedDate,
                     note = currentState.note.trim(),
                     category = currentState.category,
@@ -574,8 +574,8 @@ class AddTransactionViewModel(
             val currentSources = _state.value.sources.toMutableList()
             currentSources.add(newSource)
             
-            // Сохраняем обновленный список источников в SharedPreferences
-            preferencesManager.saveCustomSources(currentSources)
+            // Сохраняем обновленный список источников в SourcePreferences
+            sourcePreferences.saveCustomSources(currentSources)
             
             // Обновляем состояние
             _state.update { it.copy(sources = currentSources) }
@@ -684,8 +684,8 @@ class AddTransactionViewModel(
             // Удаляем источник из списка
             currentSources.remove(sourceToDelete)
 
-            // Сохраняем обновленный список источников в SharedPreferences
-            preferencesManager.saveCustomSources(currentSources)
+            // Сохраняем обновленный список источников в SourcePreferences
+            sourcePreferences.saveCustomSources(currentSources)
 
             // Обновляем состояние
             _state.update { it.copy(sources = currentSources) }
@@ -711,7 +711,7 @@ class AddTransactionViewModel(
     fun loadTransactionForEditing(transaction: Transaction) {
         // Преобразуем сумму в строку с правильным форматированием для поля ввода
         // Используем абсолютное значение суммы, чтобы не было знака минус перед расходами
-        val amount = Math.abs(transaction.amount)
+        val amount = Math.abs(transaction.amount.amount.toDouble())
         val formattedAmount = String.format("%.0f", amount)
 
         // Логируем действия

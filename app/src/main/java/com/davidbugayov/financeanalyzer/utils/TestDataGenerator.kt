@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.utils
 
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.util.Calendar
 import java.util.Date
@@ -78,7 +79,7 @@ object TestDataGenerator {
             transactions.add(
                 Transaction(
                     id = i.toString(),
-                    amount = amount.toInt().toDouble(), // Округляем до целых
+                    amount = Money(amount.toInt().toDouble()), // Округляем до целых
                     category = category,
                     isExpense = isExpense,
                     date = date,

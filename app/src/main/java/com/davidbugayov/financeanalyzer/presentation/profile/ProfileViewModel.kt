@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * ViewModel для экрана профиля.
@@ -329,8 +330,9 @@ class ProfileViewModel(
                         val transactions = result.data
                         
                         // Рассчитываем норму сбережений (если есть доход)
-                        val savingsRate = if (totalIncome > 0) {
-                            ((totalIncome - totalExpense) / totalIncome * 100).coerceIn(0.0, 100.0)
+                        val savingsRate = if (!totalIncome.isZero()) {
+                            // Используем метод percentageDifference из Money для расчета процентного изменения
+                            (balance.percentageOf(totalIncome)).coerceIn(0.0, 100.0)
                         } else {
                             0.0
                         }
@@ -352,14 +354,16 @@ class ProfileViewModel(
                             .size
                         
                         // Расчет среднего расхода
-                        val avgExpense = if (transactions.filter { it.isExpense }.isNotEmpty()) {
-                            totalExpense / transactions.filter { it.isExpense }.size
+                        val expenseTransactions = transactions.filter { it.isExpense }
+                        val avgExpense = if (expenseTransactions.isNotEmpty()) {
+                            // Используем деление на количество транзакций напрямую, без конвертации в Double
+                            totalExpense / expenseTransactions.size
                         } else {
-                            0.0
+                            Money.zero()
                         }
                         
-                        // Форматирование среднего расхода
-                        val formattedAvgExpense = String.format("%,.0f ₽", avgExpense)
+                        // Форматирование среднего расхода с использованием Money
+                        val formattedAvgExpense = avgExpense.format()
                         
                         // Расчет количества уникальных источников
                         val uniqueSources = transactions

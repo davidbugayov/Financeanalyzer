@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.utils
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionType
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -14,6 +15,8 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.Collections
+import java.math.BigDecimal
+import kotlinx.coroutines.withContext
 
 /**
  * Класс для централизованного управления финансовыми метриками.
@@ -27,14 +30,14 @@ class FinancialMetrics private constructor() : KoinComponent {
     private val scope = CoroutineScope(Dispatchers.IO)
     
     // StateFlow для основных финансовых метрик
-    private val _totalIncome = MutableStateFlow(0.0)
-    val totalIncome: StateFlow<Double> = _totalIncome.asStateFlow()
+    private val _totalIncome = MutableStateFlow(Money.zero())
+    val totalIncome: StateFlow<Money> = _totalIncome.asStateFlow()
     
-    private val _totalExpense = MutableStateFlow(0.0)
-    val totalExpense: StateFlow<Double> = _totalExpense.asStateFlow()
+    private val _totalExpense = MutableStateFlow(Money.zero())
+    val totalExpense: StateFlow<Money> = _totalExpense.asStateFlow()
     
-    private val _balance = MutableStateFlow(0.0)
-    val balance: StateFlow<Double> = _balance.asStateFlow()
+    private val _balance = MutableStateFlow(Money.zero())
+    val balance: StateFlow<Money> = _balance.asStateFlow()
     
     // Состояние загрузки данных
     private val _isLoading = MutableStateFlow(false)
@@ -255,34 +258,36 @@ class FinancialMetrics private constructor() : KoinComponent {
                 val transactions = getTransactions()
                 
                 // Рассчитываем метрики на основе всех транзакций
-                val income = transactions
-                    .filter { !it.isExpense }
-                    .sumOf { it.amount }
-                
-                val expense = transactions
-                    .filter { it.isExpense }
-                    .sumOf { it.amount }
-                
-                val bal = income - expense
-                
-                // Обновляем StateFlow
-                _totalIncome.value = income
-                _totalExpense.value = expense
-                _balance.value = bal
-                
-                Timber.d("Пересчитано: доход=$income, расход=$expense, баланс=$bal")
-                
-                // Опционально обновляем кэш в SharedPreferences
-                if (updatePreferences) {
-                    preferencesManager.saveFinancialStats(income, expense, bal)
-                    Timber.d("Обновлен кэш в SharedPreferences")
-                }
+                calculateMetrics(transactions)
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при пересчете статистических данных")
             } finally {
                 _isLoading.value = false
             }
         }
+    }
+    
+    private fun calculateMetrics(transactions: List<Transaction>) {
+        val income = transactions
+            .filter { !it.isExpense }
+            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+            
+        val expense = transactions
+            .filter { it.isExpense }
+            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+            
+        val balance = income - expense
+        
+        _totalIncome.value = income
+        _totalExpense.value = expense
+        _balance.value = balance
+        
+        // Сохраняем в SharedPreferences
+        preferencesManager.saveFinancialStats(
+            _totalIncome.value,
+            _totalExpense.value,
+            _balance.value
+        )
     }
     
     /**
@@ -295,9 +300,9 @@ class FinancialMetrics private constructor() : KoinComponent {
         scope.launch {
             // Обновляем метрики
             if (transaction.isExpense) {
-                _totalExpense.value += transaction.amount
+                _totalExpense.value = _totalExpense.value + transaction.amount
             } else {
-                _totalIncome.value += transaction.amount
+                _totalIncome.value = _totalIncome.value + transaction.amount
             }
             
             // Пересчитываем баланс
@@ -329,9 +334,9 @@ class FinancialMetrics private constructor() : KoinComponent {
         scope.launch {
             // Обновляем метрики
             if (transaction.isExpense) {
-                _totalExpense.value -= transaction.amount
+                _totalExpense.value = _totalExpense.value - transaction.amount
             } else {
-                _totalIncome.value -= transaction.amount
+                _totalIncome.value = _totalIncome.value - transaction.amount
             }
             
             // Пересчитываем баланс
@@ -339,7 +344,7 @@ class FinancialMetrics private constructor() : KoinComponent {
             
             // Удаляем из кэша транзакций
             if (transactionsCache.isNotEmpty()) {
-                transactionsCache.removeIf { it.id == transaction.id }
+                transactionsCache.remove(transaction)
             }
             
             // Сохраняем обновленные данные в SharedPreferences
@@ -358,7 +363,7 @@ class FinancialMetrics private constructor() : KoinComponent {
      * @return текущий баланс
      */
     fun getCurrentBalance(): Money {
-        return Money(_balance.value)
+        return _balance.value
     }
     
     /**
@@ -366,7 +371,7 @@ class FinancialMetrics private constructor() : KoinComponent {
      * @return общий доход
      */
     fun getTotalIncomeAsMoney(): Money {
-        return Money(_totalIncome.value)
+        return _totalIncome.value
     }
     
     /**
@@ -374,7 +379,7 @@ class FinancialMetrics private constructor() : KoinComponent {
      * @return общий расход
      */
     fun getTotalExpenseAsMoney(): Money {
-        return Money(_totalExpense.value)
+        return _totalExpense.value
     }
     
     /**
@@ -396,25 +401,9 @@ class FinancialMetrics private constructor() : KoinComponent {
                     val transactions = getTransactions()
                     
                     // Вычисляем основные метрики
-                    val income = transactions
-                        .filter { !it.isExpense }
-                        .sumOf { it.amount }
+                    calculateMetrics(transactions)
                     
-                    val expense = transactions
-                        .filter { it.isExpense }
-                        .sumOf { it.amount }
-                    
-                    val bal = income - expense
-                    
-                    // Обновляем значения
-                    _totalIncome.value = income
-                    _totalExpense.value = expense
-                    _balance.value = bal
-                    
-                    // Сохраняем в кэш
-                    preferencesManager.saveFinancialStats(income, expense, bal)
-                    
-                    Timber.d("Финансовые метрики успешно вычислены и сохранены: доход=$income, расход=$expense, баланс=$bal")
+                    Timber.d("Финансовые метрики успешно вычислены и сохранены: доход=$totalIncome, расход=$totalExpense, баланс=$balance")
                 } catch (e: Exception) {
                     Timber.e(e, "Ошибка при вычислении финансовых метрик")
                 } finally {
@@ -427,27 +416,27 @@ class FinancialMetrics private constructor() : KoinComponent {
     }
     
     /**
-     * Возвращает текущий баланс в формате Double
+     * Возвращает текущий баланс в формате BigDecimal
      * @return текущий баланс
      */
-    fun getBalance(): Double {
-        return _balance.value
+    fun getBalance(): BigDecimal {
+        return _balance.value.amount
     }
     
     /**
-     * Возвращает общий доход в формате Double
+     * Возвращает общий доход в формате BigDecimal
      * @return общий доход
      */
-    fun getTotalIncome(): Double {
-        return _totalIncome.value
+    fun getTotalIncome(): BigDecimal {
+        return _totalIncome.value.amount
     }
     
     /**
-     * Возвращает общий расход в формате Double
+     * Возвращает общий расход в формате BigDecimal
      * @return общий расход
      */
-    fun getTotalExpense(): Double {
-        return _totalExpense.value
+    fun getTotalExpense(): BigDecimal {
+        return _totalExpense.value.amount
     }
     
     /**
