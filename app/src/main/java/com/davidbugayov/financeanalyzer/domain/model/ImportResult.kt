@@ -26,7 +26,7 @@ sealed class ImportResult {
     data class Success(
         val importedCount: Int,
         val skippedCount: Int,
-        val totalAmount: Double
+        val totalAmount: Money
     ) : ImportResult()
 
     /**

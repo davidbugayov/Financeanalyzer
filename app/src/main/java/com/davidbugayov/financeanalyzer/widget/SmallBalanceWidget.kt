@@ -9,8 +9,8 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -22,7 +22,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import java.math.BigDecimal
 
 /**
  * Компактный виджет для отображения текущего баланса.
@@ -90,33 +89,30 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
         scope.launch {
             loadTransactionsUseCase().fold(
                 onSuccess = { transactions: List<Transaction> ->
+                    // Рассчитываем баланс
+                    val currency = if (transactions.isNotEmpty()) transactions.first().amount.currency else Money.zero().currency
+                    
                     val income = transactions
                         .filter { transaction -> !transaction.isExpense }
-                        .map { transaction -> Money(transaction.amount) }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money(0.0)
+                        .fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
 
-                    val expenses = transactions
+                    val expense = transactions
                         .filter { transaction -> transaction.isExpense }
-                        .map { transaction -> Money(transaction.amount) }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money(0.0)
-                        
-                    val balance = income - expenses
+                        .fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
+
+                    val balance = income - expense
 
                     // Обновляем UI виджета
                     withContext(Dispatchers.Main) {
-                        // Форматируем баланс для компактного отображения
-                        val formattedBalance = balance.format(false)
+                        views.setTextViewText(R.id.small_widget_balance, balance.formatForDisplay())
 
-                        // Устанавливаем значение в виджет
-                        views.setTextViewText(R.id.small_widget_balance, formattedBalance)
-
-                        // Устанавливаем цвет баланса в зависимости от значения
-                        val balanceColor = if (balance.amount >= BigDecimal.ZERO) {
-                            0xFF4CAF50.toInt() // Green
+                        // Устанавливаем цвет в зависимости от значения баланса
+                        val color = if (balance.isPositive()) {
+                            context.getColor(R.color.income)
                         } else {
-                            0xFFF44336.toInt() // Red
+                            context.getColor(R.color.expense)
                         }
-                        views.setTextColor(R.id.small_widget_balance, balanceColor)
+                        views.setTextColor(R.id.small_widget_balance, color)
 
                         // Обновляем виджет
                         appWidgetManager.updateAppWidget(appWidgetId, views)

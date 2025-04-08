@@ -11,6 +11,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Базовый абстрактный класс для импорта транзакций из выписок различных банков.
@@ -85,7 +86,7 @@ abstract class BankImportUseCase(
             var currentLine = 0
             var importedCount = 0
             var skippedCount = 0
-            var totalAmount = 0.0
+            var totalAmount = Money.zero()
 
             // Читаем и обрабатываем строки с транзакциями
             withContext(Dispatchers.IO) {
@@ -110,7 +111,11 @@ abstract class BankImportUseCase(
                             repository.addTransaction(transactionWithSource)
 
                             importedCount++
-                            totalAmount += transactionWithSource.amount
+                            // Учитываем сумму транзакции в общей сумме
+                            totalAmount = if (transactionWithSource.isExpense) 
+                                totalAmount - transactionWithSource.amount 
+                            else 
+                                totalAmount + transactionWithSource.amount
                         } catch (e: Exception) {
                             skippedCount++
                         }

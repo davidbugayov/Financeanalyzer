@@ -54,7 +54,7 @@ fun TransactionActionsDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    text = Money(transaction.amount).formatted(showSign = true),
+                    text = transaction.amount.formatted(showSign = true),
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (transaction.isExpense) 
                         Color(ColorUtils.EXPENSE_COLOR)

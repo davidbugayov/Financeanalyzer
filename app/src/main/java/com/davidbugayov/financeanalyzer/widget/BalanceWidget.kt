@@ -9,8 +9,6 @@ import android.content.Intent
 import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -19,7 +17,9 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.FinanceActivity
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.fold
 
 /**
  * Виджет для отображения текущего баланса, доходов и расходов.
@@ -56,12 +56,12 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
     ) {
         // Создаем RemoteViews для обновления виджета
         val views = RemoteViews(context.packageName, R.layout.balance_widget_layout)
-        
+
         // Создаем Intent для запуска главной активности приложения
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         if (launchAppIntent != null) {
             launchAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            
+
             // Создаем PendingIntent для запуска приложения
             val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 PendingIntent.getActivity(
@@ -78,10 +78,10 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
             }
-            
+
             // Устанавливаем обработчик нажатия на весь виджет
             views.setOnClickPendingIntent(R.id.widget_balance, pendingIntent)
-            
+
             // Также добавляем обработчик на весь контейнер для лучшей отзывчивости
             views.setOnClickPendingIntent(R.id.widget_container, pendingIntent)
         }
@@ -91,39 +91,33 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
             loadTransactionsUseCase().fold(
                 onSuccess = { transactions ->
                     // Рассчитываем баланс, доходы и расходы
+                    val currency = if (transactions.isNotEmpty()) transactions.first().amount.currency else Money.zero().currency
+
                     val income = transactions
                         .filter { transaction -> !transaction.isExpense }
-                        .map { transaction -> Money(transaction.amount) }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money(0.0)
+                        .fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
 
                     val expense = transactions
                         .filter { transaction -> transaction.isExpense }
-                        .map { transaction -> Money(transaction.amount) }
-                        .reduceOrNull { acc, money -> acc + money } ?: Money(0.0)
-                        
+                        .fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
+
                     val balance = income - expense
 
                     // Обновляем UI виджета
                     withContext(Dispatchers.Main) {
-                        // Форматируем числа для компактного отображения
-                        val formattedBalance = balance.format(false)
-                        val formattedIncome = income.format(false)
-                        val formattedExpense = expense.format(false)
+                        views.setTextViewText(R.id.widget_balance, balance.formatForDisplay())
+                        views.setTextViewText(R.id.widget_income, income.formatForDisplay())
+                        views.setTextViewText(R.id.widget_expense, expense.formatForDisplay())
 
-                        // Обновляем виджет с новыми данными
-                        views.setTextViewText(R.id.widget_balance, formattedBalance)
-                        views.setTextViewText(R.id.widget_income, formattedIncome)
-                        views.setTextViewText(R.id.widget_expense, formattedExpense)
-
-                        // Устанавливаем цвет баланса в зависимости от его значения
-                        val balanceColor = if (balance.amount >= BigDecimal.ZERO) {
-                            0xFF4CAF50.toInt() // Green
+                        // Устанавливаем цвет в зависимости от значения баланса
+                        val color = if (balance.isPositive()) {
+                            context.getColor(R.color.income)
                         } else {
-                            0xFFF44336.toInt() // Red
+                            context.getColor(R.color.expense)
                         }
-                        views.setTextColor(R.id.widget_balance, balanceColor)
+                        views.setTextColor(R.id.widget_balance, color)
 
-                        // Применяем изменения к виджету
+                        // Обновляем виджет
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
                 },

@@ -43,6 +43,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalWarningColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
+import java.math.BigDecimal
 
 /**
  * Компонент для отображения финансовой статистики и аналитики.
@@ -61,9 +62,9 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
  */
 @Composable
 fun AnalyticsSection(
-    totalIncome: Double,
-    totalExpense: Double,
-    balance: Double,
+    totalIncome: Money,
+    totalExpense: Money,
+    balance: Money,
     savingsRate: Double,
     totalTransactions: Int,
     totalExpenseCategories: Int,
@@ -77,7 +78,7 @@ fun AnalyticsSection(
     // Цвета для финансовых показателей
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val balanceColor = if (balance >= 0) incomeColor else expenseColor
+    val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
 
     // Расчет норм сбережений - используем переданное значение вместо расчета
     val calculatedSavingsRate = savingsRate
@@ -144,7 +145,7 @@ fun AnalyticsSection(
                 // Доход
                 FinancialCard(
                     title = stringResource(R.string.income),
-                    value = Money(totalIncome).format(),
+                    value = totalIncome.format(),
                     color = incomeColor,
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     modifier = Modifier.weight(1f)
@@ -155,7 +156,7 @@ fun AnalyticsSection(
                 // Расходы
                 FinancialCard(
                     title = stringResource(R.string.expenses),
-                    value = Money(totalExpense).format(),
+                    value = totalExpense.format(),
                     color = expenseColor,
                     icon = Icons.AutoMirrored.Filled.TrendingDown,
                     modifier = Modifier.weight(1f)
@@ -172,7 +173,7 @@ fun AnalyticsSection(
                 // Баланс
                 FinancialCard(
                     title = stringResource(R.string.balance),
-                    value = Money(balance).format(),
+                    value = balance.format(),
                     color = balanceColor,
                     icon = Icons.Default.MonetizationOn,
                     modifier = Modifier.weight(1f)

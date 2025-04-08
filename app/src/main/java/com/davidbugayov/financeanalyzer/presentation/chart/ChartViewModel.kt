@@ -270,10 +270,10 @@ class ChartViewModel : ViewModel(), KoinComponent {
             .mapValues { (_, transactions) ->
                 transactions
                     .map { it.amount }
-                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                    .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
             }
             
-        return expensesByCategory.mapValues { (_, amount) -> Money(amount) }
+        return expensesByCategory
     }
 
     fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
@@ -283,10 +283,10 @@ class ChartViewModel : ViewModel(), KoinComponent {
             .mapValues { (_, transactions) ->
                 transactions
                     .map { it.amount }
-                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                    .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
             }
             
-        return incomeByCategory.mapValues { (_, amount) -> Money(amount) }
+        return incomeByCategory
     }
 
     private fun calculateDailyExpenses(transactions: List<Transaction>): List<DailyExpense> {
@@ -313,14 +313,14 @@ class ChartViewModel : ViewModel(), KoinComponent {
                     val expenseAmount = transactionsForDate
                         .filter { it.isExpense }
                         .map { it.amount }
-                        .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                        .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
 
                     DailyExpense(
                         date = date,
                         amount = expenseAmount
                     )
                 }
-                .filter { it.amount.amount.toDouble() > 0 }
+                .filter { !it.amount.isZero() }
                 .sortedBy { it.date }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при расчете ежедневных расходов")

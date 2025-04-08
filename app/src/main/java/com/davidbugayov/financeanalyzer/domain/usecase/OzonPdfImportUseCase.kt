@@ -23,6 +23,7 @@ import kotlin.math.absoluteValue
 import timber.log.Timber
 import android.graphics.Color
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Реализация импорта транзакций из PDF-выписки Озон Банка.
@@ -135,13 +136,16 @@ class OzonPdfImportUseCase(
             
             var importedCount = 0
             var skippedCount = 0
-            var totalAmount = 0.0
+            var totalAmount = Money.zero()
             
             for ((index, transaction) in transactions.withIndex()) {
                 try {
                     repository.addTransaction(transaction)
                     importedCount++
-                    totalAmount += if (transaction.isExpense) -transaction.amount else transaction.amount
+                    totalAmount = if (transaction.isExpense) 
+                        totalAmount - transaction.amount 
+                    else 
+                        totalAmount + transaction.amount
                     
                     if (index % 5 == 0) {
                         val progress = 70 + (index.toFloat() / transactions.size * 30).toInt()
@@ -344,7 +348,7 @@ class OzonPdfImportUseCase(
                         // Создаем транзакцию
                         val transaction = Transaction(
                             id = "ozon_${documentId}_${date.time}_${System.nanoTime()}",
-                            amount = amount,
+                            amount = Money(amount),
                             category = category,
                             isExpense = isExpense,
                             date = date,

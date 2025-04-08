@@ -38,6 +38,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import java.text.SimpleDateFormat
@@ -53,8 +54,8 @@ fun BudgetTransactionsScreen(
     val category = remember {
         BudgetCategory(
             name = "Развлечения",
-            limit = 10000.0,
-            spent = 30471.0,
+            limit = Money(10000.0),
+            spent = Money(30471.0),
             id = categoryId
         )
     }

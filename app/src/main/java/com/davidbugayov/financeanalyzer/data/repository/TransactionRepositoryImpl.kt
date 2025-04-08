@@ -569,7 +569,7 @@ class TransactionRepositoryImpl(
             val entity = TransactionEntity(
                 id = existingTransaction.id, // Используем ID из существующей записи
                 idString = transaction.id,
-                amount = transaction.amount.toString(),
+                amount = transaction.amount,
                 category = transaction.category,
                 date = transaction.date,
                 isExpense = transaction.isExpense,
@@ -687,7 +687,7 @@ class TransactionRepositoryImpl(
     private fun mapEntityToDomain(entity: TransactionEntity): Transaction {
         return Transaction(
             id = entity.idString,
-            amount = entity.amount.toDouble(),
+            amount = entity.amount,
             category = entity.category,
             date = entity.date,
             isExpense = entity.isExpense,
@@ -728,7 +728,7 @@ class TransactionRepositoryImpl(
         val entity = TransactionEntity(
             id = longId, // Используем вычисленный Long ID только если он полностью числовой
             idString = domainId, // Всегда сохраняем оригинальный строковый ID
-            amount = domain.amount.toString(),
+            amount = domain.amount,
             category = domain.category,
             date = domain.date,
             isExpense = domain.isExpense,

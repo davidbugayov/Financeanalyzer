@@ -13,10 +13,10 @@ package com.davidbugayov.financeanalyzer.domain.model
  */
 data class BudgetCategory(
     val name: String,
-    val limit: Double,
-    val spent: Double,
+    val limit: Money,
+    val spent: Money,
     val id: String,
-    val walletBalance: Double = 0.0,
+    val walletBalance: Money = Money.zero(),
     val periodDuration: Int = 14,
     val periodStartDate: Long = System.currentTimeMillis()
 ) 

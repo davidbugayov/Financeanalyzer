@@ -9,7 +9,7 @@ import java.util.UUID
  */
 data class Transaction(
     val id: String = UUID.randomUUID().toString(),
-    val amount: Double,
+    val amount: Money,
     val category: String,
     val date: Date = Date(),
     val isExpense: Boolean,

@@ -333,7 +333,7 @@ fun BudgetScreen(
                             )
 
                             Text(
-                                text = "Баланс кошелька: ${selectedCategory!!.walletBalance.toInt()} ₽",
+                                text = "Баланс кошелька: ${selectedCategory!!.walletBalance} ₽",
                                 style = MaterialTheme.typography.bodyMedium
                             )
 
@@ -390,7 +390,7 @@ fun BudgetScreen(
                             )
 
                             Text(
-                                text = "Баланс: ${selectedFromCategory!!.walletBalance.toInt()} ₽",
+                                text = "Баланс: ${selectedFromCategory!!.walletBalance} ₽",
                                 style = MaterialTheme.typography.bodySmall
                             )
 
