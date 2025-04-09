@@ -16,6 +16,7 @@ object ColorUtils {
     // Цвета для доходов и расходов
     val INCOME_COLOR = "#4CAF50".toColorInt() // Зеленый
     val EXPENSE_COLOR = "#F44336".toColorInt() // Красный
+    val TRANSFER_COLOR = "#9E9E9E".toColorInt() // Серый для переводов
 
     // Предустановленные источники
     val defaultSources = listOf(
@@ -67,6 +68,7 @@ object ColorUtils {
             name.contains("почта банк") -> "#74397E".toColorInt()
             name.contains("юмани") || name.contains("yoomoney") -> "#8F2FE2".toColorInt()
             name.contains("наличные") || name.contains("кэш") || name.contains("cash") -> CASH_COLOR
+            name.contains("перевод") -> TRANSFER_COLOR
             else -> null
         }
     }

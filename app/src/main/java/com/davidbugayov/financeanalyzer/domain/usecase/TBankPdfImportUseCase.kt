@@ -618,47 +618,82 @@ class TBankPdfImportUseCase(
      * @return Пара (сумма как Money, признак расхода) или null, если сумма не найдена.
      */
     private fun findAmountInString(text: String): Pair<Money, Boolean>? {
-        // Пробуем более точный паттерн для сумм сначала
-        val bigAmountMatch = bigAmountRegex.find(text)
-        if (bigAmountMatch != null) {
-            val amountStr = bigAmountMatch.value.replace("\\s".toRegex(), "")
-                .replace(",", ".")
-                .replace("[^\\d.-]".toRegex(), "")
-            val amount = try {
-                Money.fromString(amountStr)
-            } catch (e: Exception) {
-                return null
-            }
-            
-            // Проверяем знак из контекста
-            val isExpense = text.contains("списание", ignoreCase = true) ||
-                            text.contains("расход", ignoreCase = true) ||
-                            text.contains("-", ignoreCase = true)
-            
-            return Pair(amount, isExpense)
-        }
-        
-        // Затем пробуем более общий паттерн
-        val amountMatch = amountRegex.find(text) ?: return null
-        
-        // Преобразуем сумму в число
-        val amountStr = amountMatch.value.replace("\\s".toRegex(), "")
-            .replace(",", ".")
-        val amount = try {
-            Money.fromString(amountStr)
-        } catch (e: Exception) {
+        // Проверяем, не является ли текст датой
+        if (dateRegex.matches(text)) {
+            Timber.d("Текст является датой, пропускаем обработку как суммы: $text")
             return null
         }
         
-        // Если сумма менее 1 рубля, это вероятно не транзакция, а какой-то показатель
-        if (amount.amount.toDouble() < 1.0) return null
+        // Убираем даты из текста перед поиском сумм
+        val textWithoutDates = text.replace(dateRegex, " ")
         
-        // Проверяем знак из контекста
-        val isExpense = text.contains("списание", ignoreCase = true) ||
-                        text.contains("расход", ignoreCase = true) ||
-                        text.contains("-", ignoreCase = true)
+        // Сначала ищем большие суммы с пробелами между разрядами (173 000.00)
+        val bigAmountMatch = bigAmountRegex.find(textWithoutDates)
+        if (bigAmountMatch != null) {
+            Timber.d("Найдена сумма с большим форматом: ${bigAmountMatch.value}")
+            return parseAmountValue(bigAmountMatch.value)
+        }
         
-        return Pair(amount, isExpense)
+        // Проверим наличие суммы с символом рубля
+        val amountWithSymbolMatch = amountRegexWithSymbol.find(textWithoutDates)
+        if (amountWithSymbolMatch != null) {
+            val amountStr = amountWithSymbolMatch.value.replace("₽", "").trim()
+            Timber.d("Найдена сумма с символом рубля: $amountStr")
+            return parseAmountValue(amountStr)
+        }
+        
+        // Если не нашли с символом рубля, ищем просто числа
+        val amountMatch = amountRegex.find(textWithoutDates)
+        if (amountMatch != null) {
+            // Дополнительная проверка, чтобы исключить даты
+            val value = amountMatch.value
+            if (!value.matches("\\d{2}\\.\\d{2}\\.\\d{2}".toRegex()) && !value.matches("\\d{2}\\.\\d{2}\\.\\d{4}".toRegex())) {
+                Timber.d("Найдена сумма без символа: $value")
+                return parseAmountValue(value)
+            }
+        }
+        
+        return null
+    }
+    
+    /**
+     * Парсит строку суммы в объект Money и определяет тип транзакции
+     */
+    private fun parseAmountValue(amountStr: String): Pair<Money, Boolean>? {
+        try {
+            // Проверяем, не является ли это датой
+            if (amountStr.matches("\\d{2}\\.\\d{2}\\.\\d{4}".toRegex())) {
+                Timber.d("Строка похожа на дату, пропускаем: $amountStr")
+                return null
+            }
+            
+            // Нормализуем строку с суммой: заменяем запятую на точку и удаляем пробелы
+            val normalizedAmount = amountStr
+                .replace(",", ".")
+                .replace(" ", "")
+                .replace("+", "")
+                .replace("₽", "")
+                .trim()
+            
+            // Парсим сумму и определяем тип транзакции (расход или доход)
+            val amount = Money.fromString(normalizedAmount)
+            
+            // Дополнительная проверка: сумма не должна быть слишком маленькой
+            // (это может быть дата, которую неправильно распознали как сумму)
+            if (amount.amount.toDouble() < 0.5) {
+                Timber.d("Сумма слишком маленькая, возможно это дата: $amountStr")
+                return null
+            }
+            
+            // Если в исходной строке был минус - это расход, иначе - доход
+            val isExpense = amountStr.contains("-")
+            
+            Timber.d("Успешно распарсена сумма: $amount, расход: $isExpense")
+            return Pair(amount, isExpense)
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка парсинга суммы: $amountStr")
+            return null
+        }
     }
     
     /**

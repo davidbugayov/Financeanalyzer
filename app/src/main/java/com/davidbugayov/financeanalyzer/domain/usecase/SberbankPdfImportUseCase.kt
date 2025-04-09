@@ -60,9 +60,16 @@ class SberbankPdfImportUseCase(
             // Удаляем знаки валюты, если они остались
             val numericOnly = cleanAmount.replace("[₽руб]".toRegex(), "").trim()
             
+            // Удаляем знак "+" в начале строки, если он есть
+            val finalAmount = if (numericOnly.startsWith("+")) {
+                numericOnly.substring(1)
+            } else {
+                numericOnly
+            }
+            
             // Преобразуем в число
-            Timber.d("Преобразование суммы: исходная '$amountStr', очищенная '$numericOnly'")
-            Money.parse(numericOnly)
+            Timber.d("Преобразование суммы: исходная '$amountStr', очищенная '$finalAmount'")
+            Money.parse(finalAmount)
         } catch (e: Exception) {
             Timber.e(e, "Не удалось преобразовать строку в число: $amountStr")
             null

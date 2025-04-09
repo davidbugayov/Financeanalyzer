@@ -59,7 +59,6 @@ abstract class AppDatabase : RoomDatabase() {
                     """
                     CREATE TABLE transactions_temp (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                        title TEXT,
                         amount REAL NOT NULL,
                         currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}',
                         category TEXT NOT NULL,
@@ -73,8 +72,8 @@ abstract class AppDatabase : RoomDatabase() {
                 // Копируем данные из старой таблицы в новую
                 db.execSQL(
                     """
-                    INSERT INTO transactions_temp (id, title, amount, currencyCode, category, isExpense, date, note)
-                    SELECT id, title, amount, currencyCode, category, isExpense, date, note FROM transactions
+                    INSERT INTO transactions_temp (id, amount, currencyCode, category, isExpense, date, note)
+                    SELECT id, amount, currencyCode, category, isExpense, date, note FROM transactions
                 """
                 )
 
@@ -119,7 +118,6 @@ abstract class AppDatabase : RoomDatabase() {
                     """
                     CREATE TABLE transactions_temp (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
-                        title TEXT,
                         amount TEXT NOT NULL,
                         currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}',
                         category TEXT NOT NULL,
@@ -135,8 +133,8 @@ abstract class AppDatabase : RoomDatabase() {
                 // Копируем данные из старой таблицы в новую, преобразуя amount в TEXT
                 db.execSQL(
                     """
-                    INSERT INTO transactions_temp (id, title, amount, currencyCode, category, isExpense, date, note, source, destination)
-                    SELECT id, title, CAST(amount AS TEXT), currencyCode, category, isExpense, date, note, source, destination FROM transactions
+                    INSERT INTO transactions_temp (id, amount, currencyCode, category, isExpense, date, note, source, destination)
+                    SELECT id, CAST(amount AS TEXT), currencyCode, category, isExpense, date, note, source, destination FROM transactions
                 """
                 )
 
@@ -247,7 +245,9 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("""
                     CREATE TABLE IF NOT EXISTS transactions_new (
                         id INTEGER PRIMARY KEY NOT NULL,
+                        id_string TEXT NOT NULL,
                         amount TEXT NOT NULL,
+                        currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}',
                         category TEXT NOT NULL,
                         isExpense INTEGER NOT NULL,
                         date INTEGER NOT NULL,
@@ -259,8 +259,8 @@ abstract class AppDatabase : RoomDatabase() {
                 
                 // Копируем данные из старой таблицы в новую
                 db.execSQL("""
-                    INSERT OR IGNORE INTO transactions_new (id, amount, category, isExpense, date, note, source, sourceColor)
-                    SELECT id, amount, category, isExpense, date, note, source, sourceColor FROM transactions
+                    INSERT OR IGNORE INTO transactions_new (id, id_string, amount, currencyCode, category, isExpense, date, note, source, sourceColor)
+                    SELECT id, CAST(id AS TEXT), amount, '${Currency.RUB.code}', category, isExpense, date, note, source, sourceColor FROM transactions
                 """)
                 
                 // Удаляем старую таблицу
@@ -273,14 +273,24 @@ abstract class AppDatabase : RoomDatabase() {
 
         /**
          * Миграция с версии 12 на версию 13
-         * Обновляет формат хранения денежных значений для поддержки нового типа Money
+         * Добавляет поле destination в таблицу transactions
          */
         private val MIGRATION_12_13 = object : Migration(12, 13) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Создаем временную таблицу с новой схемой
-                db.execSQL(
-                    """
-                    CREATE TABLE transactions_temp (
+                // Добавляем колонку destination с значением по умолчанию "Наличные"
+                db.execSQL("ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'")
+            }
+        }
+
+        /**
+         * Миграция с версии 13 на версию 14
+         * Пересоздает таблицу transactions с правильной структурой
+         */
+        private val MIGRATION_13_14 = object : Migration(13, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Создаем новую таблицу с правильной структурой
+                db.execSQL("""
+                    CREATE TABLE IF NOT EXISTS transactions_new (
                         id INTEGER PRIMARY KEY NOT NULL,
                         id_string TEXT NOT NULL,
                         amount TEXT NOT NULL,
@@ -291,37 +301,30 @@ abstract class AppDatabase : RoomDatabase() {
                         source TEXT NOT NULL DEFAULT 'Наличные',
                         sourceColor INTEGER NOT NULL DEFAULT 0
                     )
-                """
-                )
-
-                // Копируем данные из старой таблицы в новую, преобразуя amount в новый формат
-                db.execSQL(
-                    """
-                    INSERT INTO transactions_temp (
-                        id, id_string, amount, category, isExpense, date, note, source, sourceColor
-                    )
-                    SELECT 
-                        id,
-                        CAST(id AS TEXT),
-                        amount || ',RUB',
-                        category,
-                        isExpense,
-                        date,
-                        note,
-                        source,
-                        sourceColor
-                    FROM transactions
-                """
-                )
-
-                // Удаляем старую таблицу
-                db.execSQL("DROP TABLE transactions")
-
-                // Переименовываем временную таблицу
-                db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
-
+                """)
+                
                 // Создаем индекс для id_string
-                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions(id_string)")
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions_new (id_string)")
+                
+                // Копируем данные из старой таблицы в новую
+                db.execSQL("""
+                    INSERT OR IGNORE INTO transactions_new (id, id_string, amount, category, isExpense, date, note, source, sourceColor)
+                    SELECT id, CAST(id AS TEXT), amount, category, isExpense, date, note, source, sourceColor FROM transactions
+                """)
+                
+                // Удаляем старую таблицу
+                db.execSQL("DROP TABLE IF EXISTS transactions")
+                
+                // Переименовываем новую таблицу
+                db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
+            }
+        }
+
+        // Миграция с 14 на 13 (для обратной совместимости при откате версии)
+        private val MIGRATION_14_13 = object : Migration(14, 13) {
+            override fun migrate(database: SupportSQLiteDatabase) {
+                // Пустая миграция, так как структура в версии 13 уже должна быть совместима
+                // Здесь можно добавить обратные изменения, если в версии 14 были внесены изменения в схему
             }
         }
 
@@ -353,35 +356,31 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_9_10,
                         MIGRATION_10_11,
                         MIGRATION_11_12,
-                        MIGRATION_12_13
+                        MIGRATION_12_13,
+                        MIGRATION_13_14,
+                        MIGRATION_14_13
                     )
                     .fallbackToDestructiveMigration()
                     .addCallback(object : Callback() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
-                            // Проверяем все миграции при создании базы данных
-                            try {
-                                for (i in 1 until 13) {
-                                    val migration = when (i) {
-                                        1 -> MIGRATION_1_2
-                                        2 -> MIGRATION_2_3
-                                        3 -> MIGRATION_3_4
-                                        4 -> MIGRATION_4_5
-                                        5 -> MIGRATION_5_6
-                                        6 -> MIGRATION_6_7
-                                        7 -> MIGRATION_7_8
-                                        8 -> MIGRATION_8_9
-                                        9 -> MIGRATION_9_10
-                                        10 -> MIGRATION_10_11
-                                        11 -> MIGRATION_11_12
-                                        12 -> MIGRATION_12_13
-                                        else -> null
-                                    }
-                                    migration?.migrate(db)
-                                }
-                            } catch (e: Exception) {
-                                throw IllegalStateException("Migration check failed: ${e.message}", e)
-                            }
+                            // Создаем таблицу с правильной структурой при первом создании базы данных
+                            db.execSQL("""
+                                CREATE TABLE IF NOT EXISTS transactions (
+                                    id INTEGER PRIMARY KEY NOT NULL,
+                                    id_string TEXT NOT NULL,
+                                    amount TEXT NOT NULL,
+                                    category TEXT NOT NULL,
+                                    isExpense INTEGER NOT NULL,
+                                    date INTEGER NOT NULL,
+                                    note TEXT,
+                                    source TEXT NOT NULL DEFAULT 'Наличные',
+                                    sourceColor INTEGER NOT NULL DEFAULT 0
+                                )
+                            """)
+                            
+                            // Создаем индекс для id_string
+                            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)")
                         }
                     })
                     .build()
