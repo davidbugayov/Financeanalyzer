@@ -22,7 +22,7 @@ import timber.log.Timber
     entities = [
         TransactionEntity::class
     ],
-    version = 12,
+    version = 13,
     exportSchema = true
 )
 @TypeConverters(DateConverter::class, MoneyConverter::class)
@@ -271,6 +271,60 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 12 на версию 13
+         * Обновляет формат хранения денежных значений для поддержки нового типа Money
+         */
+        private val MIGRATION_12_13 = object : Migration(12, 13) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Создаем временную таблицу с новой схемой
+                db.execSQL(
+                    """
+                    CREATE TABLE transactions_temp (
+                        id INTEGER PRIMARY KEY NOT NULL,
+                        id_string TEXT NOT NULL,
+                        amount TEXT NOT NULL,
+                        category TEXT NOT NULL,
+                        isExpense INTEGER NOT NULL,
+                        date INTEGER NOT NULL,
+                        note TEXT,
+                        source TEXT NOT NULL DEFAULT 'Наличные',
+                        sourceColor INTEGER NOT NULL DEFAULT 0
+                    )
+                """
+                )
+
+                // Копируем данные из старой таблицы в новую, преобразуя amount в новый формат
+                db.execSQL(
+                    """
+                    INSERT INTO transactions_temp (
+                        id, id_string, amount, category, isExpense, date, note, source, sourceColor
+                    )
+                    SELECT 
+                        id,
+                        CAST(id AS TEXT),
+                        amount || ',RUB',
+                        category,
+                        isExpense,
+                        date,
+                        note,
+                        source,
+                        sourceColor
+                    FROM transactions
+                """
+                )
+
+                // Удаляем старую таблицу
+                db.execSQL("DROP TABLE transactions")
+
+                // Переименовываем временную таблицу
+                db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+
+                // Создаем индекс для id_string
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions(id_string)")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -298,7 +352,8 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_8_9,
                         MIGRATION_9_10,
                         MIGRATION_10_11,
-                        MIGRATION_11_12
+                        MIGRATION_11_12,
+                        MIGRATION_12_13
                     )
                     .fallbackToDestructiveMigration()
                     .addCallback(object : Callback() {
@@ -306,7 +361,7 @@ abstract class AppDatabase : RoomDatabase() {
                             super.onCreate(db)
                             // Проверяем все миграции при создании базы данных
                             try {
-                                for (i in 1 until 12) {
+                                for (i in 1 until 13) {
                                     val migration = when (i) {
                                         1 -> MIGRATION_1_2
                                         2 -> MIGRATION_2_3
@@ -319,6 +374,7 @@ abstract class AppDatabase : RoomDatabase() {
                                         9 -> MIGRATION_9_10
                                         10 -> MIGRATION_10_11
                                         11 -> MIGRATION_11_12
+                                        12 -> MIGRATION_12_13
                                         else -> null
                                     }
                                     migration?.migrate(db)

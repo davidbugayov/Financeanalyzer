@@ -5,6 +5,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
+import timber.log.Timber
 
 /**
  * Класс для представления денежных значений.
@@ -17,6 +18,12 @@ data class Money(
     val amount: BigDecimal,
     val currency: Currency = Currency.RUB
 ) {
+
+    init {
+        require(amount.scale() <= currency.decimalPlaces) {
+            "Amount scale (${amount.scale()}) exceeds currency decimal places (${currency.decimalPlaces})"
+        }
+    }
 
     constructor(amount: Double, currency: Currency = Currency.RUB) : this(
         BigDecimal.valueOf(amount).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN),
@@ -45,7 +52,9 @@ data class Money(
      * @throws IllegalArgumentException если валюты не совпадают
      */
     operator fun plus(other: Money): Money {
-        require(currency == other.currency) { "Cannot add Money with different currencies" }
+        require(currency == other.currency) {
+            "Cannot add money with different currencies: $currency and ${other.currency}"
+        }
         return Money(amount.add(other.amount), currency)
     }
 
@@ -56,7 +65,9 @@ data class Money(
      * @throws IllegalArgumentException если валюты не совпадают
      */
     operator fun minus(other: Money): Money {
-        require(currency == other.currency) { "Cannot subtract Money with different currencies" }
+        require(currency == other.currency) {
+            "Cannot subtract money with different currencies: $currency and ${other.currency}"
+        }
         return Money(amount.subtract(other.amount), currency)
     }
 
@@ -66,7 +77,10 @@ data class Money(
      * @return Результат умножения
      */
     operator fun times(multiplier: BigDecimal): Money {
-        return Money(amount.multiply(multiplier), currency)
+        require(multiplier >= BigDecimal.ZERO) {
+            "Multiplier must be non-negative: $multiplier"
+        }
+        return Money(amount.multiply(multiplier).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN), currency)
     }
 
     /**
@@ -327,7 +341,8 @@ data class Money(
             return try {
                 Money(BigDecimal(cleanValue), currency)
             } catch (e: NumberFormatException) {
-                Money(BigDecimal.ZERO, currency)
+                Timber.e(e, "Failed to parse amount: $value")
+                throw IllegalArgumentException("Invalid amount format: $value", e)
             }
         }
 
@@ -347,7 +362,17 @@ data class Money(
          * @return Денежное значение
          */
         fun parse(value: String, currency: Currency = Currency.RUB): Money {
-            return fromString(value, currency)
+            require(value.isNotBlank()) { "Amount string cannot be blank" }
+            require(value.matches(Regex("""^-?\d+(\.\d+)?$"""))) {
+                "Invalid amount format: $value"
+            }
+            
+            return try {
+                Money(BigDecimal(value).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN), currency)
+            } catch (e: NumberFormatException) {
+                Timber.e(e, "Failed to parse amount: $value")
+                throw IllegalArgumentException("Invalid amount format: $value", e)
+            }
         }
     }
 } 
