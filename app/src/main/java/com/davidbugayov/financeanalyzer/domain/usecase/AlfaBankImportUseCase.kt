@@ -540,16 +540,24 @@ class AlfaBankImportUseCase(
             inferCategoryFromDescription(description, isExpense)
         }
         
-        return Transaction(
+        // Проверяем, является ли это переводом
+        val isTransfer = category == "Переводы" || description.contains("перев", ignoreCase = true)
+        
+        // Создаем транзакцию
+        val transaction = Transaction(
             id = "alfabank_${date.time}_${System.nanoTime()}",
             amount = amount,
             category = category,
-            isExpense = isExpense,
             date = date,
-            note = description.takeIf { it.isNotBlank() },
+            isExpense = isExpense,
+            note = description,
             source = "Альфа-Банк",
-            sourceColor = ColorUtils.ALFA_COLOR
+            sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
+                          if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+            isTransfer = isTransfer
         )
+        
+        return transaction
     }
 
     /**
@@ -627,16 +635,24 @@ class AlfaBankImportUseCase(
             inferCategoryFromDescription(description, isExpense)
         }
 
-        return Transaction(
+        // Проверяем, является ли это переводом
+        val isTransfer = category == "Переводы" || description.contains("перев", ignoreCase = true)
+        
+        // Создаем транзакцию
+        val transaction = Transaction(
             id = "alfabank_${date.time}_${System.nanoTime()}",
             amount = amount,
             category = category,
-            isExpense = isExpense,
             date = date,
-            note = description.takeIf { it.isNotBlank() },
+            isExpense = isExpense,
+            note = description,
             source = "Альфа-Банк",
-            sourceColor = ColorUtils.ALFA_COLOR
+            sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
+                          if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+            isTransfer = isTransfer
         )
+
+        return transaction
     }
 
     /**

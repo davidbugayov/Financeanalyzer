@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.utils
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionType
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

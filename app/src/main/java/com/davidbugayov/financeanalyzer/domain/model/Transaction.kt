@@ -5,7 +5,7 @@ import java.util.UUID
 
 /**
  * Модель данных для транзакции.
- * Представляет финансовую операцию (доход или расход).
+ * Представляет финансовую операцию (доход, расход или перевод).
  */
 data class Transaction(
     val id: String = UUID.randomUUID().toString(),
@@ -17,5 +17,6 @@ data class Transaction(
     val source: String,
     val sourceColor: Int,
     val categoryId: String = "",
-    val title: String = ""
+    val title: String = "",
+    val isTransfer: Boolean = false
 )

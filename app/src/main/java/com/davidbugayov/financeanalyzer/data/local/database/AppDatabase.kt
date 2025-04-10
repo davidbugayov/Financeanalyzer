@@ -22,7 +22,7 @@ import timber.log.Timber
     entities = [
         TransactionEntity::class
     ],
-    version = 13,
+    version = 14,
     exportSchema = true
 )
 @TypeConverters(DateConverter::class, MoneyConverter::class)
@@ -284,39 +284,13 @@ abstract class AppDatabase : RoomDatabase() {
 
         /**
          * Миграция с версии 13 на версию 14
-         * Пересоздает таблицу transactions с правильной структурой
+         * Добавляет поле isTransfer в таблицу transactions
          */
         private val MIGRATION_13_14 = object : Migration(13, 14) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Создаем новую таблицу с правильной структурой
-                db.execSQL("""
-                    CREATE TABLE IF NOT EXISTS transactions_new (
-                        id INTEGER PRIMARY KEY NOT NULL,
-                        id_string TEXT NOT NULL,
-                        amount TEXT NOT NULL,
-                        category TEXT NOT NULL,
-                        isExpense INTEGER NOT NULL,
-                        date INTEGER NOT NULL,
-                        note TEXT,
-                        source TEXT NOT NULL DEFAULT 'Наличные',
-                        sourceColor INTEGER NOT NULL DEFAULT 0
-                    )
-                """)
-                
-                // Создаем индекс для id_string
-                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions_new (id_string)")
-                
-                // Копируем данные из старой таблицы в новую
-                db.execSQL("""
-                    INSERT OR IGNORE INTO transactions_new (id, id_string, amount, category, isExpense, date, note, source, sourceColor)
-                    SELECT id, CAST(id AS TEXT), amount, category, isExpense, date, note, source, sourceColor FROM transactions
-                """)
-                
-                // Удаляем старую таблицу
-                db.execSQL("DROP TABLE IF EXISTS transactions")
-                
-                // Переименовываем новую таблицу
-                db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
+                // Add the isTransfer column with a default value of 0 (false)
+                db.execSQL("ALTER TABLE transactions ADD COLUMN isTransfer INTEGER NOT NULL DEFAULT 0")
+                Timber.i("Ran migration from version 13 to 14, adding isTransfer column.")
             }
         }
 

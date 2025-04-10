@@ -538,6 +538,9 @@ class TBankPdfImportUseCase(
             val category = determineCategory(description)
             val note = extractNoteFromDescription(description)
             
+            // Проверяем, является ли это переводом
+            val isTransfer = category == "Переводы"
+            
             val transaction = Transaction(
                 id = "tbank_pdf_${date.time}_${System.nanoTime()}",
                 amount = amount,
@@ -546,11 +549,13 @@ class TBankPdfImportUseCase(
                 isExpense = isExpense,
                 note = note,
                 source = source,
-                sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
+                sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
+                    ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                isTransfer = isTransfer
             )
             
             transactions.add(transaction)
-            Timber.d("Добавлена транзакция: дата=${date}, сумма=${amount}, расход=${isExpense}, описание=${note ?: "нет"}")
+            Timber.d("Добавлена транзакция: дата=${date}, сумма=${amount}, расход=${isExpense}, перевод=${isTransfer}, описание=${note ?: "нет"}")
         }
     }
     

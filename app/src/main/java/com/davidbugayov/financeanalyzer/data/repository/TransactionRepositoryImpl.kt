@@ -575,7 +575,8 @@ class TransactionRepositoryImpl(
                 isExpense = transaction.isExpense,
                 note = transaction.note,
                 source = transaction.source,
-                sourceColor = transaction.sourceColor
+                sourceColor = transaction.sourceColor,
+                isTransfer = transaction.isTransfer
             )
 
             Timber.d("Сущность создана: id=${entity.id}, idString=${entity.idString}")
@@ -693,7 +694,8 @@ class TransactionRepositoryImpl(
             isExpense = entity.isExpense,
             note = entity.note,
             source = entity.source,
-            sourceColor = entity.sourceColor
+            sourceColor = entity.sourceColor,
+            isTransfer = entity.isTransfer
         )
     }
     
@@ -734,7 +736,8 @@ class TransactionRepositoryImpl(
             isExpense = domain.isExpense,
             note = domain.note,
             source = domain.source,
-            sourceColor = domain.sourceColor
+            sourceColor = domain.sourceColor,
+            isTransfer = domain.isTransfer
         )
 
         Timber.d("Создана сущность: id=${entity.id}, idString=${entity.idString}")

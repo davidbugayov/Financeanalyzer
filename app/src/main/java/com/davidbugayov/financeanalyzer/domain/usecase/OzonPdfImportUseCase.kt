@@ -345,16 +345,21 @@ class OzonPdfImportUseCase(
                         // Определяем категорию транзакции
                         val category = inferCategoryFromDescription(descriptionText, isExpense)
                         
+                        // Проверяем, является ли транзакция переводом
+                        val isTransfer = category == "Переводы" || descriptionText.contains("перев", ignoreCase = true)
+                        
                         // Создаем транзакцию
                         val transaction = Transaction(
-                            id = "ozon_${documentId}_${date.time}_${System.nanoTime()}",
+                            id = "ozon_pdf_${date.time}_${System.nanoTime()}",
                             amount = Money(amount),
                             category = category,
-                            isExpense = isExpense,
                             date = date,
+                            isExpense = isExpense,
                             note = descriptionText.takeIf { it.isNotBlank() },
                             source = source,
-                            sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
+                            sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else
+                                         if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+                            isTransfer = isTransfer
                         )
                         
                         transactions.add(transaction)

@@ -26,5 +26,6 @@ data class TransactionEntity(
     val date: Date,
     val note: String? = null,
     val source: String = "Наличные",
-    val sourceColor: Int = 0
+    val sourceColor: Int = 0,
+    val isTransfer: Boolean = false
 )

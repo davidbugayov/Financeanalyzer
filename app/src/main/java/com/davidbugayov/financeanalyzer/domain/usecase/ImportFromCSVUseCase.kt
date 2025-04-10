@@ -524,56 +524,35 @@ class ImportFromCSVUseCase(
                             var note: String? = null
                             if (noteIndex != -1 && values.size > noteIndex) {
                                 note = cleanField(values[noteIndex])
-                                Timber.d("ИМПОРТ: Примечание из CSV: '$note'")
-                            } else if (titleIndex != -1 && values.size > titleIndex) {
-                                // Если нет примечания, но есть название - используем его как примечание
-                                note = cleanField(values[titleIndex])
-                                Timber.d("ИМПОРТ: Используем Title как примечание: '$note'")
-                            } else {
-                                Timber.d("ИМПОРТ: Поле примечания отсутствует или за пределами значений")
                             }
 
                             // Определяем источник
-                            val rawSource =
-                                if (sourceIndex != -1 && values.size > sourceIndex) {
-                                    values[sourceIndex]
-                                } else {
-                                    "Импорт"
-                                }
-
-                            // Обработка источника с переносом строки
-                            val source = cleanField(rawSource).let { src ->
-                                // Если источник короткий и похож на часть имени банка, пробуем исправить
-                                when {
-                                    src.equals("Сб", ignoreCase = true) -> "Сбер"
-                                    src.equals("ер", ignoreCase = true) -> "Сбер"
-                                    src.equals("Тинь", ignoreCase = true) -> "Т-Банк"
-                                    src.equals("кофф", ignoreCase = true) -> "Т-Банк"
-                                    src.equals("Аль", ignoreCase = true) -> "Альфа"
-                                    src.equals("фа", ignoreCase = true) -> "Альфа"
-                                    src.contains("\n") -> src.replace("\n", " ").trim()
-                                    else -> src
-                                }
+                            val source = if (sourceIndex != -1 && values.size > sourceIndex) {
+                                cleanField(values[sourceIndex])
+                            } else {
+                                "Импорт CSV"
                             }
 
-                            // Проверяем значения перед созданием транзакции
-                            if (amount.isZero()) {
-                                Timber.w("ИМПОРТ: Пропускаем транзакцию с нулевой суммой")
-                                skippedCount++
-                                return@forEach
+                            // Проверяем, не является ли это переводом
+                            val isTransfer = if (category.contains("перевод", ignoreCase = true) || 
+                                                 category.contains("transfer", ignoreCase = true)) {
+                                true
+                            } else {
+                                false
                             }
 
-                            // Создаем объект транзакции
+                            // Создаем транзакцию с уникальным ID на основе времени и случайности
                             val transaction = Transaction(
                                 id = "csv_${date.time}_${System.nanoTime()}",
-                                amount = amount,
+                                amount = Money(amountValue.absoluteValue),
                                 category = category,
                                 date = date,
                                 isExpense = isExpense,
                                 note = note,
                                 source = source,
-                                sourceColor = ColorUtils.getSourceColor(source)
-                                    ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
+                                sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
+                                             if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+                                isTransfer = isTransfer
                             )
 
                             Timber.d("ИМПОРТ: Создана транзакция: id=${transaction.id}, дата=${transaction.date}, сумма=${transaction.amount}, категория=${transaction.category}, расход=${transaction.isExpense}")
