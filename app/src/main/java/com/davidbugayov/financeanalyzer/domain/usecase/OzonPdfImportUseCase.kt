@@ -2,8 +2,11 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.content.Context
 import android.net.Uri
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
@@ -31,10 +34,14 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
  *
  * @param repository Репозиторий для сохранения импортированных транзакций
  * @param context Контекст приложения для доступа к файловой системе
+ * @param categoryPreferences Предпочтения категорий для создания новых категорий
+ * @param sourcePreferences Предпочтения источников для создания новых источников
  */
 class OzonPdfImportUseCase(
     repository: TransactionRepositoryImpl,
-    context: Context
+    context: Context,
+    private val categoryPreferences: CategoryPreferences,
+    private val sourcePreferences: SourcePreferences
 ) : BankImportUseCase(repository, context) {
 
     companion object {
@@ -112,6 +119,9 @@ class OzonPdfImportUseCase(
             
             // Всегда используем "Озон" как источник
             val source = "Озон Банк"
+            
+            // Добавляем источник "Озон Банк", если его еще нет в предпочтениях
+            addSourceIfNotExists(source)
             
             // Парсим данные из PDF и преобразуем их в транзакции
             emit(ImportResult.Progress(20, 100, "Анализ выписки"))
@@ -357,8 +367,9 @@ class OzonPdfImportUseCase(
                             isExpense = isExpense,
                             note = descriptionText.takeIf { it.isNotBlank() },
                             source = source,
-                            sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                                         if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+                            sourceColor = ColorUtils.getSourceColor(source) ?: 
+                                       (if (isTransfer) ColorUtils.TRANSFER_COLOR else
+                                        if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
                             isTransfer = isTransfer
                         )
                         
@@ -455,58 +466,75 @@ class OzonPdfImportUseCase(
      * Определяет категорию транзакции на основе её описания
      */
     private fun inferCategoryFromDescription(description: String, isExpense: Boolean): String {
-        val lowercaseDesc = description.lowercase()
-
-        return when {
-            // Проверяем на типичные места
-            lowercaseDesc.contains("кафе") || 
-            lowercaseDesc.contains("ресторан") ||
-            lowercaseDesc.contains("teremok") ||
-            lowercaseDesc.contains("теремок") -> "Рестораны"
+        // Словарь категорий для Озон Банка
+        val categoryKeywords = mapOf(
+            "Продукты" to listOf("супермаркет", "продукты", "магазин", "пятерочка", "магнит", "ашан", "лента", "перекресток", "продуктовый", "бакалея"),
+            "Рестораны" to listOf("ресторан", "кафе", "столовая", "бар", "паб", "тратория", "пиццерия", "суши", "фастфуд", "бистро", "макдоналдс", "кофейня"),
+            "Транспорт" to listOf("такси", "метро", "автобус", "троллейбус", "трамвай", "проезд", "транспорт", "каршеринг", "яндекс", "убер", "билет"),
+            "Здоровье" to listOf("аптека", "лекарства", "врач", "медицина", "клиника", "больница", "поликлиника", "анализы", "стоматолог"),
+            "Одежда" to listOf("одежда", "обувь", "зара", "h&m", "магазин", "бутик", "галерея", "shopping", "молл"),
+            "Связь" to listOf("связь", "интернет", "мобильный", "телефон", "мтс", "билайн", "мегафон", "теле2", "оператор"),
+            "Коммунальные платежи" to listOf("жкх", "коммунальные", "электричество", "газ", "вода", "отопление", "квартплата", "услуги"),
+            "Развлечения" to listOf("кино", "театр", "концерт", "развлечения", "шоу", "парк", "музей", "выставка", "клуб"),
+            "Подписки" to listOf("подписка", "netflix", "spotify", "apple", "google", "яндекс", "музыка", "кино", "плюс"),
+            "Переводы" to listOf("перевод", "p2p", "с2с", "card2card", "по номеру телефона", "по номеру карты"),
+            "Зарплата" to listOf("зарплата", "аванс", "премия", "бонус", "выплата", "оклад", "вознаграждение", "доход"),
+            "Другое" to listOf()
+        )
+        
+        val lowerDesc = description.lowercase(Locale.getDefault())
+        
+        // Проверяем наличие ключевых слов каждой категории в описании
+        for ((category, keywords) in categoryKeywords) {
+            for (keyword in keywords) {
+                if (lowerDesc.contains(keyword)) {
+                    // Найдена категория, добавляем её в настройки, если нужно
+                    addCategoryIfNotExists(category, isExpense)
+                    return category
+                }
+            }
+        }
+        
+        // Если категория не определена, используем "Другое"
+        val defaultCategory = if (isExpense) "Другое" else "Доход"
+        addCategoryIfNotExists(defaultCategory, isExpense)
+        return defaultCategory
+    }
+    
+    /**
+     * Добавляет категорию в настройки, если её там еще нет
+     * 
+     * @param category Название категории
+     * @param isExpense Флаг, является ли категория расходной
+     */
+    private fun addCategoryIfNotExists(category: String, isExpense: Boolean) {
+        if (isExpense) {
+            categoryPreferences.addExpenseCategory(category)
+        } else {
+            categoryPreferences.addIncomeCategory(category)
+        }
+    }
+    
+    /**
+     * Добавляет источник в настройки, если его там еще нет
+     * 
+     * @param sourceName Название источника
+     */
+    private fun addSourceIfNotExists(sourceName: String) {
+        // Проверяем, есть ли уже такой источник в списке пользовательских
+        val customSources = sourcePreferences.getCustomSources()
+        if (customSources.none { it.name == sourceName }) {
+            // Определяем цвет для источника
+            val sourceColor = ColorUtils.getSourceColor(sourceName) ?: ColorUtils.predefinedColors.random()
             
-            lowercaseDesc.contains("продукт") || 
-            lowercaseDesc.contains("перекресток") || 
-            lowercaseDesc.contains("vkusvill") || 
-            lowercaseDesc.contains("вкусвилл") ||
-            lowercaseDesc.contains("пекарня") ||
-            lowercaseDesc.contains("буханка") ||
-            lowercaseDesc.contains("bukhanka") ||
-            lowercaseDesc.contains("милаш био") -> "Продукты"
-            
-            lowercaseDesc.contains("winelab") ||
-            lowercaseDesc.contains("bristol") ||
-            lowercaseDesc.contains("винлаб") ||
-            lowercaseDesc.contains("вино") -> "Алкоголь"
-            
-            // Озон-специфичные категории
-            lowercaseDesc.contains("ozon") && lowercaseDesc.contains("заказ") -> "Покупки"
-            lowercaseDesc.contains("озон") && lowercaseDesc.contains("заказ") -> "Покупки"
-            lowercaseDesc.contains("платформе ozon") -> "Покупки"
-            lowercaseDesc.contains("ozon") && !lowercaseDesc.contains("пополнение") -> "Покупки"
-            lowercaseDesc.contains("ozon") && lowercaseDesc.contains("travel") -> "Путешествия"
-            
-            // Перевод и зачисления
-            lowercaseDesc.contains("перевод") && lowercaseDesc.contains("отправитель") -> "Переводы"
-            lowercaseDesc.contains("перевод") && !lowercaseDesc.contains("отправитель") -> "Переводы"
-            lowercaseDesc.contains("перевод") && lowercaseDesc.contains("через сбп") -> "Переводы"
-            
-            // Покупки в магазинах
-            lowercaseDesc.contains("оплата товаров") ||
-            lowercaseDesc.contains("оплата услуг") ||
-            lowercaseDesc.contains("salon hilding") ||
-            lowercaseDesc.contains("salon") -> "Одежда"
-            
-            // Другие типичные категории
-            lowercaseDesc.contains("зарплата") || lowercaseDesc.contains("аванс") -> "Зарплата"
-            lowercaseDesc.contains("такси") || lowercaseDesc.contains("метро") -> "Транспорт"
-            lowercaseDesc.contains("аптека") || lowercaseDesc.contains("клиника") -> "Здоровье"
-            lowercaseDesc.contains("жкх") || lowercaseDesc.contains("коммунал") -> "Коммунальные платежи"
-            lowercaseDesc.contains("мтс") || lowercaseDesc.contains("связь") -> "Связь"
-            lowercaseDesc.contains("одежда") || lowercaseDesc.contains("обувь") -> "Одежда"
-            lowercaseDesc.contains("кэшбэк") || lowercaseDesc.contains("cashback") -> "Кэшбэк"
-            lowercaseDesc.contains("пополнение") -> "Пополнение"
-            
-            else -> if (isExpense) "Другое" else "Доход"
+            // Создаем и добавляем новый источник
+            val newSource = Source(
+                name = sourceName,
+                color = sourceColor,
+                isCustom = true
+            )
+            sourcePreferences.addCustomSource(newSource)
+            Timber.d("Добавлен новый источник: $sourceName с цветом ${sourceColor.toString(16)}")
         }
     }
 } 

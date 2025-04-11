@@ -65,7 +65,7 @@ val appModule = module {
     single { GroupTransactionsUseCase() }
     single { CalculateCategoryStatsUseCase(get()) }
     single { ExportTransactionsToCSVUseCase(get()) }
-    single { ImportTransactionsManager(get(), androidContext()) }
+    single { ImportTransactionsManager(get(), androidContext(), get(), get()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }

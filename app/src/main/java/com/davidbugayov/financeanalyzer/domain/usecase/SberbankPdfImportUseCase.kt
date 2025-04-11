@@ -25,6 +25,9 @@ import java.time.format.DateTimeFormatter
 import timber.log.Timber
 import android.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.domain.model.Source
 
 /**
  * Реализация импорта транзакций из PDF-выписки Сбербанка.
@@ -32,10 +35,14 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
  *
  * @param repository Репозиторий для сохранения импортированных транзакций
  * @param context Контекст приложения для доступа к файловой системе
+ * @param categoryPreferences Предпочтения категорий для создания новых категорий
+ * @param sourcePreferences Предпочтения источников для создания новых источников
  */
 class SberbankPdfImportUseCase(
     repository: TransactionRepositoryImpl,
-    context: Context
+    context: Context,
+    private val categoryPreferences: CategoryPreferences,
+    private val sourcePreferences: SourcePreferences
 ) : BankImportUseCase(repository, context) {
 
     override val bankName: String = "Сбербанк"
@@ -134,6 +141,9 @@ class SberbankPdfImportUseCase(
             // Всегда используем "Сбер" как источник
             val source = "Сбер"
             
+            // Добавляем источник "Сбер", если его еще нет в предпочтениях
+            addSourceIfNotExists(source)
+            
             // Парсим данные из PDF и преобразуем их в транзакции
             emit(ImportResult.Progress(20, 100, "Анализ выписки"))
             
@@ -159,6 +169,9 @@ class SberbankPdfImportUseCase(
             
             for ((index, transaction) in transactions.withIndex()) {
                 try {
+                    // Добавляем категорию в предпочтения, если её там еще нет
+                    addCategoryIfNotExists(transaction.category, transaction.isExpense)
+                    
                     repository.addTransaction(transaction)
                     importedCount++
                     totalAmount = if (transaction.isExpense) 
@@ -299,19 +312,21 @@ class SberbankPdfImportUseCase(
                     val categoryIndex = standardCategories.indexOf(category)
                     
                     // Проверяем, является ли транзакция переводом
-                    val isTransfer = category == "Переводы" || (note?.contains("перев", ignoreCase = true) == true)
+                    val isTransfer = category == "Переводы" || category == "Перевод на карту" || 
+                                   transactionBlock.lowercase().contains("перевод")
                     
                     // Создаем объект транзакции
                     val transaction = Transaction(
-                        id = "sber_pdf_${date.time}_${amount}_${System.nanoTime()}",
+                        id = "sber_pdf_${date.time}_${System.nanoTime()}",
                         amount = amount,
                         category = category,
                         date = date,
                         isExpense = isExpense,
                         note = note,
                         source = source,
-                        sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
-                            ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                        sourceColor = ColorUtils.getSourceColor(source) ?: 
+                                    (if (isTransfer) ColorUtils.TRANSFER_COLOR else
+                                     if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
                         isTransfer = isTransfer
                     )
                     
@@ -590,9 +605,6 @@ class SberbankPdfImportUseCase(
                                 
                                 Timber.d("Примечание для транзакции: $noteText")
                                 
-                                // Проверяем, является ли транзакция переводом
-                                val isTransfer = category == "Переводы" || noteText.contains("перев", ignoreCase = true)
-
                                 // Создаем транзакцию с примечанием
                                 val transaction = Transaction(
                                     id = "sber_pdf_${currentDate!!.time}_${parsedAmount}_${System.nanoTime()}",
@@ -602,9 +614,8 @@ class SberbankPdfImportUseCase(
                                     isExpense = finalIsExpense,
                                     note = noteText,
                                     source = source,
-                                    sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                                        if (finalIsExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
-                                    isTransfer = isTransfer
+                                    sourceColor = if (finalIsExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+                                    isTransfer = false
                                 )
                                 
                                 transactions.add(transaction)
@@ -808,14 +819,10 @@ class SberbankPdfImportUseCase(
                                     }
                                 }
                                 
-                                // Fix for linter error: 'equals' with 'ignoreCase' parameter doesn't exist for String
-                                // Replace category.equals("Перевод на карту", ignoreCase = true) with equals check
-                                val isTransferOnCardCategory = category.equals("Перевод на карту", ignoreCase = true)
-
                                 // Специальная обработка для операций "Перевод на карту"
-                                if (description.contains("Перевод на карту", ignoreCase = true) ||
+                                if (description.contains("Перевод на карту", ignoreCase = true) || 
                                     description.contains("перевод с карты", ignoreCase = true) ||
-                                    isTransferOnCardCategory) {
+                                    category.equals("Перевод на карту", ignoreCase = true)) {
                                     // Если категория не определена, используем "Перевод на карту"
                                     if (category.isBlank()) {
                                         category = "Перевод на карту"
@@ -857,9 +864,6 @@ class SberbankPdfImportUseCase(
                                 
                                 Timber.d("Примечание для транзакции: $noteText")
                                 
-                                // Проверяем, является ли транзакция переводом
-                                val isTransfer = category == "Переводы" || noteText.contains("перев", ignoreCase = true)
-
                                 // Создаем транзакцию с примечанием
                                 val transaction = Transaction(
                                     id = "sber_individual_${date.time}_${parsedAmount}_${System.nanoTime()}",
@@ -869,9 +873,10 @@ class SberbankPdfImportUseCase(
                                     isExpense = isExpense,
                                     note = noteText,
                                     source = source,
-                                    sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                                        ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
-                                    isTransfer = isTransfer
+                                    sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                                    isTransfer = category == "Переводы" || category == "Перевод на карту" || 
+                                                noteText.lowercase().contains("перевод") || 
+                                                description.lowercase().contains("перевод")
                                 )
                                 
                                 transactions.add(transaction)
@@ -1389,5 +1394,42 @@ class SberbankPdfImportUseCase(
         
         Timber.d("Удалено ${transactions.size - uniqueTransactions.size} дубликатов, осталось ${uniqueTransactions.size} уникальных транзакций")
         return uniqueTransactions
+    }
+
+    /**
+     * Добавляет категорию в настройки, если её там еще нет
+     * 
+     * @param category Название категории
+     * @param isExpense Флаг, является ли категория расходной
+     */
+    private fun addCategoryIfNotExists(category: String, isExpense: Boolean) {
+        if (isExpense) {
+            categoryPreferences.addExpenseCategory(category)
+        } else {
+            categoryPreferences.addIncomeCategory(category)
+        }
+    }
+    
+    /**
+     * Добавляет источник в настройки, если его там еще нет
+     * 
+     * @param sourceName Название источника
+     */
+    private fun addSourceIfNotExists(sourceName: String) {
+        // Проверяем, есть ли уже такой источник в списке пользовательских
+        val customSources = sourcePreferences.getCustomSources()
+        if (customSources.none { it.name == sourceName }) {
+            // Определяем цвет для источника
+            val sourceColor = ColorUtils.getSourceColor(sourceName) ?: ColorUtils.predefinedColors.random()
+            
+            // Создаем и добавляем новый источник
+            val newSource = Source(
+                name = sourceName,
+                color = sourceColor,
+                isCustom = true
+            )
+            sourcePreferences.addCustomSource(newSource)
+            Timber.d("Добавлен новый источник: $sourceName с цветом ${sourceColor.toString(16)}")
+        }
     }
 } 

@@ -391,6 +391,9 @@ class AddTransactionViewModel(
                 // Инвертируем сумму, если это расход
                 val finalAmount = if (currentState.isExpense) -amount else amount
 
+                // Проверяем, является ли категория "Переводы"
+                val isTransfer = currentState.category == "Переводы"
+
                 // Создаем объект транзакции
                 val transaction = Transaction(
                     amount = Money(finalAmount),
@@ -399,7 +402,8 @@ class AddTransactionViewModel(
                     category = currentState.category,
                     source = currentState.source,
                     isExpense = currentState.isExpense,
-                    sourceColor = currentState.sourceColor
+                    sourceColor = currentState.sourceColor,
+                    isTransfer = isTransfer
                 )
 
                 addTransactionUseCase(transaction).fold(
@@ -480,6 +484,9 @@ class AddTransactionViewModel(
                 // Инвертируем сумму, если это расход
                 val finalAmount = if (currentState.isExpense) -amount else amount
 
+                // Проверяем, является ли категория "Переводы"
+                val isTransfer = currentState.category == "Переводы"
+
                 // Создаем объект транзакции
                 val transaction = Transaction(
                     id = transactionId ?: "",
@@ -489,7 +496,8 @@ class AddTransactionViewModel(
                     category = currentState.category,
                     source = currentState.source,
                     isExpense = currentState.isExpense,
-                    sourceColor = currentState.sourceColor
+                    sourceColor = currentState.sourceColor,
+                    isTransfer = isTransfer
                 )
 
                 updateTransactionUseCase(transaction).fold(

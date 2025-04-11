@@ -23,6 +23,7 @@ import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.ShoppingBag
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.material.icons.filled.WorkOutline
 import androidx.compose.material3.Icon
@@ -49,6 +50,7 @@ import java.util.Locale
 // Определяем цвета как константы на верхнем уровне
 private val IncomeColorVal = Color(ColorUtils.INCOME_COLOR)
 private val ExpenseColorVal = Color(ColorUtils.EXPENSE_COLOR)
+private val TransferColorVal = Color(ColorUtils.TRANSFER_COLOR)
 
 // Функция для создания форматтера с текущей локалью
 private fun getDateFormatter(): SimpleDateFormat {
@@ -202,7 +204,11 @@ fun TransactionItem(
                 text = formattedAmount,
                 style = MaterialTheme.typography.bodyLarge,
                 fontWeight = FontWeight.Bold,
-                color = if (transaction.isExpense) expenseColor else incomeColor
+                color = when {
+                    transaction.isTransfer -> TransferColorVal
+                    transaction.isExpense -> expenseColor
+                    else -> incomeColor
+                }
             )
         }
         
@@ -249,7 +255,7 @@ fun getCategoryInfo(
         !isExpense -> {
             when (category.lowercase()) {
                 "зарплата" -> Icons.Default.Payments to incomeColor
-                "перевод" -> Icons.Default.MonetizationOn to incomeColor
+                "перевод", "переводы" -> Icons.Default.SwapHoriz to TransferColorVal
                 else -> Icons.Default.MonetizationOn to incomeColor
             }
         }
@@ -265,6 +271,7 @@ fun getCategoryInfo(
             "жилье" -> Icons.Default.Home to expenseColor
             "кредит", "карта" -> Icons.Default.CreditCard to expenseColor
             "работа" -> Icons.Default.WorkOutline to expenseColor
+            "переводы" -> Icons.Default.SwapHoriz to TransferColorVal
             else -> Icons.Default.ShoppingCart to expenseColor
         }
     }

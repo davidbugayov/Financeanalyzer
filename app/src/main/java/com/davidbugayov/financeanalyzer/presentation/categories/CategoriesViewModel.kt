@@ -17,6 +17,7 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Work
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
@@ -54,6 +55,7 @@ class CategoriesViewModel(
         CategoryItem("Услуги", Icons.Default.Work),
         CategoryItem("Благотворительность", Icons.Default.Payments),
         CategoryItem("Кредит", Icons.Default.CreditCard),
+        CategoryItem("Переводы", Icons.Default.SwapHoriz),
         CategoryItem("Другое", Icons.Default.Add)
     )
 

@@ -20,6 +20,7 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStream
+import java.io.InputStreamReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -89,9 +90,98 @@ class AlfaBankImportUseCase(
                 importFromExcel(uri) { result -> emit(result) }
             }
             else -> {
-                // Для CSV и других форматов используем стандартный метод
-                Timber.d("АЛЬФА-ИМПОРТ: Обнаружен файл CSV/TXT, используем стандартный импорт")
-                super.invoke(uri).collect { result -> emit(result) }
+                // Для CSV и других форматов используем стандартный метод с фильтрацией
+                Timber.d("АЛЬФА-ИМПОРТ: Обнаружен файл CSV/TXT, используем стандартный импорт с фильтрацией")
+                
+                val inputStream = context.contentResolver.openInputStream(uri)
+                    ?: throw IllegalArgumentException("Не удалось открыть файл")
+                
+                val reader = BufferedReader(InputStreamReader(inputStream))
+                
+                // Проверяем, что формат файла соответствует ожидаемому для данного банка
+                val validFormat = isValidFormat(reader)
+                
+                if (!validFormat) {
+                    emit(ImportResult.Error("Формат файла не соответствует формату $bankName"))
+                    return@flow
+                }
+                
+                // Заново открываем поток для чтения данных
+                inputStream.close()
+                
+                val dataStream = context.contentResolver.openInputStream(uri)
+                    ?: throw IllegalArgumentException("Не удалось открыть файл")
+                
+                val dataReader = BufferedReader(InputStreamReader(dataStream))
+                
+                // Пропускаем заголовок (количество строк зависит от конкретного банка)
+                skipHeaders(dataReader)
+                
+                // Считаем количество строк для отображения прогресса
+                val totalLines = countTransactionLines(uri)
+                
+                var currentLine = 0
+                var importedCount = 0
+                var skippedCount = 0
+                var totalAmount = Money.zero()
+                
+                // Читаем и обрабатываем строки с транзакциями
+                dataReader.useLines { lines ->
+                    lines.forEach { line ->
+                        if (shouldSkipLine(line)) {
+                            return@forEach
+                        }
+                        
+                        currentLine++
+                        
+                        try {
+                            // Парсим строку и получаем транзакцию
+                            val transaction = parseLine(line)
+                            
+                            // Добавляем информацию о банке как источнике
+                            val transactionWithSource = transaction.copy(
+                                source = bankName
+                            )
+                            
+                            // Сохраняем только транзакции с положительной суммой
+                            if (transactionWithSource.amount > Money.zero()) {
+                                // Сохраняем транзакцию без создания новых категорий
+                                repository.addTransaction(transactionWithSource)
+                                
+                                importedCount++
+                                // Учитываем сумму транзакции в общей сумме
+                                totalAmount = if (transactionWithSource.isExpense) 
+                                    totalAmount - transactionWithSource.amount 
+                                else 
+                                    totalAmount + transactionWithSource.amount
+                            } else {
+                                skippedCount++
+                                Timber.d("АЛЬФА-ИМПОРТ: Пропущена транзакция с нулевой суммой")
+                            }
+                        } catch (e: Exception) {
+                            skippedCount++
+                            Timber.e(e, "АЛЬФА-ИМПОРТ: Ошибка при обработке строки $currentLine: ${e.message}")
+                        }
+                        
+                        // Эмитим прогресс каждые 10 записей
+                        if (currentLine % 10 == 0) {
+                            emit(ImportResult.Progress(
+                                current = currentLine,
+                                total = totalLines,
+                                message = "Импортируется $currentLine из $totalLines транзакций из $bankName"
+                            ))
+                        }
+                    }
+                }
+                
+                // Отправляем результат успешного импорта
+                emit(
+                    ImportResult.Success(
+                        importedCount = importedCount,
+                        skippedCount = skippedCount,
+                        totalAmount = totalAmount
+                    )
+                )
             }
         }
     }
@@ -137,23 +227,26 @@ class AlfaBankImportUseCase(
                 // Импортируем данные из Excel
                 val transactions = parseExcelFile(stream)
                 
+                // Фильтруем: оставляем только транзакции с положительной суммой
+                val filteredTransactions = transactions.filter { it.amount > Money.zero() }
+                
                 // Сохраняем транзакции
-                if (transactions.isNotEmpty()) {
+                if (filteredTransactions.isNotEmpty()) {
                     emit(ImportResult.Progress(
                         current = 50,
                         total = 100,
-                        message = "Сохранение ${transactions.size} транзакций..."
+                        message = "Сохранение ${filteredTransactions.size} транзакций..."
                     ))
                     
                     // Сохраняем пакетами по 50 транзакций
                     val batchSize = 50
-                    transactions.chunked(batchSize).forEachIndexed { index, batch ->
+                    filteredTransactions.chunked(batchSize).forEachIndexed { index, batch ->
                         // Сохраняем пакет транзакций по одной
                         batch.forEach { transaction ->
                             repository.addTransaction(transaction)
                         }
                         
-                        val progress = 50 + (index + 1) * 50 / ((transactions.size / batchSize) + 1)
+                        val progress = 50 + (index + 1) * 50 / ((filteredTransactions.size / batchSize) + 1)
                         emit(ImportResult.Progress(
                             current = progress,
                             total = 100,
@@ -163,14 +256,14 @@ class AlfaBankImportUseCase(
                     
                     // Используем правильные имена параметров из класса ImportResult.Success
                     emit(ImportResult.Success(
-                        importedCount = transactions.size,
-                        skippedCount = 0,
-                        totalAmount = transactions.fold(Money.zero()) { acc, transaction ->
+                        importedCount = filteredTransactions.size,
+                        skippedCount = transactions.size - filteredTransactions.size,
+                        totalAmount = filteredTransactions.fold(Money.zero()) { acc, transaction ->
                             if (transaction.isExpense) acc - transaction.amount else acc + transaction.amount 
                         }
                     ))
                 } else {
-                    emit(ImportResult.Error(message = "Не найдено транзакций в файле"))
+                    emit(ImportResult.Error(message = "Не найдено транзакций с положительными суммами в файле"))
                 }
             }
         } catch (e: Exception) {
@@ -541,7 +634,7 @@ class AlfaBankImportUseCase(
         }
         
         // Проверяем, является ли это переводом
-        val isTransfer = category == "Переводы" || description.contains("перев", ignoreCase = true)
+        val isTransfer = category == "Переводы" || description.lowercase().contains("перевод")
         
         // Создаем транзакцию
         val transaction = Transaction(
@@ -552,8 +645,9 @@ class AlfaBankImportUseCase(
             isExpense = isExpense,
             note = description,
             source = "Альфа-Банк",
-            sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
-                          if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+            sourceColor = ColorUtils.getSourceColor("альфа") ?:
+                        (if (isTransfer) ColorUtils.TRANSFER_COLOR else
+                         if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
             isTransfer = isTransfer
         )
         
@@ -636,7 +730,7 @@ class AlfaBankImportUseCase(
         }
 
         // Проверяем, является ли это переводом
-        val isTransfer = category == "Переводы" || description.contains("перев", ignoreCase = true)
+        val isTransfer = category == "Переводы" || description.lowercase().contains("перевод")
         
         // Создаем транзакцию
         val transaction = Transaction(
@@ -647,8 +741,9 @@ class AlfaBankImportUseCase(
             isExpense = isExpense,
             note = description,
             source = "Альфа-Банк",
-            sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
-                          if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+            sourceColor = ColorUtils.getSourceColor("альфа") ?:
+                        (if (isTransfer) ColorUtils.TRANSFER_COLOR else
+                         if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
             isTransfer = isTransfer
         )
 

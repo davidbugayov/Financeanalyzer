@@ -24,6 +24,9 @@ import java.util.Date
 import java.util.Locale
 import java.util.regex.Pattern
 import kotlin.math.absoluteValue
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.domain.model.Source
 
 /**
  * Реализация импорта транзакций из PDF-выписки Т-Банка.
@@ -31,10 +34,14 @@ import kotlin.math.absoluteValue
  *
  * @param repository Репозиторий для сохранения импортированных транзакций
  * @param context Контекст приложения для доступа к файловой системе
+ * @param categoryPreferences Предпочтения категорий для создания новых категорий
+ * @param sourcePreferences Предпочтения источников для создания новых источников
  */
 class TBankPdfImportUseCase(
     repository: TransactionRepositoryImpl,
-    context: Context
+    context: Context,
+    private val categoryPreferences: CategoryPreferences,
+    private val sourcePreferences: SourcePreferences
 ) : BankImportUseCase(repository, context) {
 
     override val bankName: String = "Т-Банк"
@@ -102,6 +109,9 @@ class TBankPdfImportUseCase(
             // Всегда используем "Т-Банк" как источник
             val source = "Т-Банк"
             
+            // Добавляем источник "Т-Банк", если его еще нет в предпочтениях
+            addSourceIfNotExists(source)
+            
             // Парсим данные из PDF и преобразуем их в транзакции
             emit(ImportResult.Progress(20, 100, "Анализ выписки Т-Банка"))
             
@@ -127,6 +137,9 @@ class TBankPdfImportUseCase(
             
             for ((index, transaction) in transactions.withIndex()) {
                 try {
+                    // Добавляем категорию в предпочтения, если её там еще нет
+                    addCategoryIfNotExists(transaction.category, transaction.isExpense)
+                    
                     repository.addTransaction(transaction)
                     importedCount++
                     totalAmount = if (transaction.isExpense) 
@@ -238,6 +251,9 @@ class TBankPdfImportUseCase(
                     // Извлекаем примечание из описания операции
                     val note = extractNoteFromDescription(transactionBlock)
                     
+                    // Проверяем, является ли транзакция переводом
+                    val isTransfer = category == "Переводы" || transactionBlock.contains("перевод", ignoreCase = true)
+                    
                     // Создаем транзакцию
                     val transaction = Transaction(
                         id = "tbank_pdf_${date.time}_${System.nanoTime()}",
@@ -247,7 +263,10 @@ class TBankPdfImportUseCase(
                         isExpense = isExpense,
                         note = note,
                         source = source,
-                        sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
+                        sourceColor = ColorUtils.getSourceColor(source) ?: 
+                                     (if (isTransfer) ColorUtils.TRANSFER_COLOR else
+                                      if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                        isTransfer = isTransfer
                     )
                     
                     transactions.add(transaction)
@@ -539,7 +558,7 @@ class TBankPdfImportUseCase(
             val note = extractNoteFromDescription(description)
             
             // Проверяем, является ли это переводом
-            val isTransfer = category == "Переводы"
+            val isTransfer = category == "Переводы" || description.contains("перевод", ignoreCase = true)
             
             val transaction = Transaction(
                 id = "tbank_pdf_${date.time}_${System.nanoTime()}",
@@ -549,8 +568,9 @@ class TBankPdfImportUseCase(
                 isExpense = isExpense,
                 note = note,
                 source = source,
-                sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
-                    ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                sourceColor = ColorUtils.getSourceColor(source) ?: 
+                            (if (isTransfer) ColorUtils.TRANSFER_COLOR else
+                             if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
                 isTransfer = isTransfer
             )
             
@@ -754,6 +774,39 @@ class TBankPdfImportUseCase(
         
         // Если не определили по ключевым словам, возвращаем "Другое"
         return "Другое"
+    }
+    
+    /**
+     * Добавляет категорию в предпочтения, если её еще нет
+     */
+    private fun addCategoryIfNotExists(category: String, isExpense: Boolean) {
+        if (isExpense) {
+            categoryPreferences.addExpenseCategory(category)
+        } else {
+            categoryPreferences.addIncomeCategory(category)
+        }
+        Timber.d("Проверка и добавление категории: $category, расход: $isExpense")
+    }
+    
+    /**
+     * Добавляет источник в предпочтения, если его еще нет
+     */
+    private fun addSourceIfNotExists(sourceName: String) {
+        // Проверяем, есть ли уже такой источник в списке пользовательских
+        val customSources = sourcePreferences.getCustomSources()
+        if (customSources.none { it.name == sourceName }) {
+            // Определяем цвет для источника
+            val sourceColor = ColorUtils.getSourceColor(sourceName) ?: ColorUtils.predefinedColors.random()
+            
+            // Создаем и добавляем новый источник
+            val newSource = Source(
+                name = sourceName,
+                color = sourceColor,
+                isCustom = true
+            )
+            sourcePreferences.addCustomSource(newSource)
+            Timber.d("Добавлен новый источник: $sourceName с цветом ${sourceColor.toString(16)}")
+        }
     }
     
     // Методы базового класса, переопределены для соответствия формату Т-Банка

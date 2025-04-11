@@ -2,6 +2,8 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.content.Context
 import android.net.Uri
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import timber.log.Timber
 import java.io.BufferedReader
@@ -13,10 +15,14 @@ import java.io.InputStreamReader
  *
  * @param repository Репозиторий для сохранения импортированных транзакций
  * @param context Контекст приложения для доступа к файловой системе
+ * @param categoryPreferences Предпочтения категорий для создания новых категорий
+ * @param sourcePreferences Предпочтения источников для создания новых источников
  */
 class ImportFactory(
     private val repository: TransactionRepositoryImpl,
-    private val context: Context
+    private val context: Context,
+    private val categoryPreferences: CategoryPreferences,
+    private val sourcePreferences: SourcePreferences
 ) {
     /**
      * Создает подходящий обработчик импорта на основе содержимого файла.
@@ -42,7 +48,7 @@ class ImportFactory(
                 if (fileName.lowercase().contains("ozon") || fileName.lowercase().contains("озон") ||
                     pdfContent.contains("OZON", ignoreCase = true) || pdfContent.contains("ОЗОН", ignoreCase = true)) {
                     Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Озон Банка, используем OzonPdfImportUseCase")
-                    return OzonPdfImportUseCase(repository, context)
+                    return OzonPdfImportUseCase(repository, context, categoryPreferences, sourcePreferences)
                 } else if (pdfContent.contains("Сбербанк", ignoreCase = true) || 
                            pdfContent.contains("Расшифровка операций", ignoreCase = true) ||
                            pdfContent.contains("СБЕР", ignoreCase = true) ||
@@ -50,7 +56,7 @@ class ImportFactory(
                            pdfContent.contains("Дата обработки", ignoreCase = true) ||
                            pdfContent.contains("СУММА В ВАЛЮТЕ СЧЁТА", ignoreCase = true)) {
                     Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Сбербанка, используем SberbankPdfImportUseCase")
-                    return SberbankPdfImportUseCase(repository, context)
+                    return SberbankPdfImportUseCase(repository, context, categoryPreferences, sourcePreferences)
                 } else if (fileName.lowercase().contains("tinkoff") || 
                            fileName.lowercase().contains("тинькофф") || 
                            fileName.lowercase().contains("т-банк") ||
@@ -66,15 +72,15 @@ class ImportFactory(
                            (pdfContent.contains("Внутрибанковский перевод", ignoreCase = true) && 
                             pdfContent.contains("с договора", ignoreCase = true))) {
                     Timber.d("ИМПОРТ ФАБРИКА: Обнаружен PDF файл Т-Банка, используем TBankPdfImportUseCase")
-                    return TBankPdfImportUseCase(repository, context)
+                    return TBankPdfImportUseCase(repository, context, categoryPreferences, sourcePreferences)
                 } else {
                     Timber.d("ИМПОРТ ФАБРИКА: PDF файл неизвестного формата, используем SberbankPdfImportUseCase")
                     // Для PDF файлов по умолчанию используем реализацию для Сбербанка
-                    return SberbankPdfImportUseCase(repository, context)
+                    return SberbankPdfImportUseCase(repository, context, categoryPreferences, sourcePreferences)
                 }
             } catch (e: Exception) {
                 Timber.e(e, "ИМПОРТ ФАБРИКА: Ошибка при чтении PDF-файла, используем SberbankPdfImportUseCase по умолчанию")
-                return SberbankPdfImportUseCase(repository, context)
+                return SberbankPdfImportUseCase(repository, context, categoryPreferences, sourcePreferences)
             }
         }
         
