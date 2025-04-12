@@ -73,6 +73,15 @@ fun AddTransactionScreen(
         // Устанавливаем callback для навигации назад
         viewModel.navigateBackCallback = onNavigateBack
     }
+    
+    // Гарантируем, что режим "Доход" будет активен при lockExpenseSelection
+    LaunchedEffect(viewModel.lockExpenseSelection) {
+        if (viewModel.lockExpenseSelection && state.isExpense) {
+            // Если установлена блокировка выбора расхода, но состояние - расход,
+            // принудительно переключаем на доход
+            viewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+        }
+    }
 
     // Очищаем callback при выходе из композиции
     DisposableEffect(Unit) {
@@ -136,7 +145,8 @@ fun AddTransactionScreen(
                     },
                     onToggleTransactionType = {
                         viewModel.onEvent(AddTransactionEvent.ToggleTransactionType)
-                    }
+                    },
+                    lockExpenseSelection = viewModel.lockExpenseSelection
                 )
 
                 // Секция "Откуда"

@@ -16,7 +16,7 @@ data class AddTransactionState(
     val categoryError: Boolean = false,
     val note: String = "",
     val selectedDate: Date = Date(),
-    val isExpense: Boolean = true,
+    val isExpense: Boolean = false,
     val showDatePicker: Boolean = false,
     val showCategoryPicker: Boolean = false,
     val showCustomCategoryDialog: Boolean = false,

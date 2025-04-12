@@ -51,11 +51,24 @@ class AddTransactionViewModel(
 
     // Храним категории, которые были использованы в этой сессии
     private val usedCategories = mutableSetOf<Pair<String, Boolean>>() // category to isExpense
+    
+    // Флаг для автоматического распределения дохода
+    private var autoDistributeIncome = false
+    private var budgetViewModel: com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel? = null
+
+    /**
+     * Флаг блокировки выбора типа транзакции "Расход" 
+     */
+    private var _lockExpenseSelection: Boolean = false
+    val lockExpenseSelection: Boolean get() = _lockExpenseSelection
 
     /**
      * Метод для возврата к предыдущему экрану (будет вызываться из AddTransactionScreen)
      */
     var navigateBackCallback: (() -> Unit)? = null
+    
+    // Callback, который будет вызван после успешного добавления дохода
+    var onIncomeAddedCallback: ((com.davidbugayov.financeanalyzer.domain.model.Money) -> Unit)? = null
 
     init {
         // Загружаем категории
@@ -111,7 +124,11 @@ class AddTransactionViewModel(
                 sources = it.sources,
                 // Устанавливаем значения по умолчанию для источника
                 source = "Сбер",
-                sourceColor = ColorUtils.SBER_COLOR
+                sourceColor = ColorUtils.SBER_COLOR,
+                // Если установлена блокировка выбора расхода, принудительно устанавливаем тип "Доход"
+                isExpense = if (_lockExpenseSelection) false else it.isExpense,
+                // Если это доход и установлена блокировка, устанавливаем категорию дохода
+                category = if (_lockExpenseSelection && !it.isExpense) "Зарплата" else ""
             )
         }
     }
@@ -126,6 +143,47 @@ class AddTransactionViewModel(
             }
             // Очищаем список использованных категорий
             usedCategories.clear()
+        }
+    }
+
+    /**
+     * Предустанавливает параметры для добавления дохода
+     * @param amount начальная сумма дохода (может быть пустой)
+     * @param shouldDistribute флаг, указывающий, должен ли доход быть автоматически распределён
+     * @param lockExpenseSelection флаг, блокирующий возможность переключения на расход
+     */
+    fun setupForIncomeAddition(amount: String = "", shouldDistribute: Boolean = false, lockExpenseSelection: Boolean = false) {
+        // Устанавливаем параметры транзакции как доход
+        _state.update { 
+            it.copy(
+                isExpense = false,  // Принудительно установить тип "Доход"
+                amount = amount,
+                title = "Доход",
+                category = "Зарплата" // Предустановленная категория дохода
+            )
+        }
+        
+        // Устанавливаем флаг автоматического распределения
+        autoDistributeIncome = shouldDistribute
+        
+        // Устанавливаем флаг блокировки выбора расхода
+        _lockExpenseSelection = lockExpenseSelection
+        
+        // Принудительно обновляем состояние ещё раз для гарантии
+        if (lockExpenseSelection) {
+            _state.update { 
+                it.copy(isExpense = false)
+            }
+        }
+        
+        // Пытаемся получить экземпляр BudgetViewModel через Koin
+        if (shouldDistribute && budgetViewModel == null) {
+            try {
+                budgetViewModel = org.koin.core.context.GlobalContext.get()
+                    .getOrNull<com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel>()
+            } catch (e: Exception) {
+                Timber.e(e, "Не удалось получить BudgetViewModel")
+            }
         }
     }
 
@@ -330,6 +388,19 @@ class AddTransactionViewModel(
             is AddTransactionEvent.AttachReceipt -> {
                 attachReceipt()
             }
+            is AddTransactionEvent.ForceSetIncomeType -> {
+                // Принудительно устанавливаем тип "Доход"
+                _state.update {
+                    it.copy(
+                        isExpense = false,
+                        // Всегда устанавливаем категорию дохода - "Зарплата"
+                        category = "Зарплата"
+                    )
+                }
+                
+                // Логируем принудительную установку режима дохода
+                Timber.d("Forced income type selection")
+            }
         }
     }
 
@@ -419,6 +490,24 @@ class AddTransactionViewModel(
 
                         // Обновляем категории
                         updateCategoryPositions()
+                        
+                        // Проверяем, нужно ли распределить доход по бюджету
+                        if (!currentState.isExpense && autoDistributeIncome) {
+                            val incomeAmount = Money(amount)
+                            
+                            // Вызываем callback для распределения дохода
+                            onIncomeAddedCallback?.invoke(incomeAmount)
+                            
+                            // Или используем BudgetViewModel напрямую, если он доступен
+                            budgetViewModel?.let { viewModel ->
+                                viewModel.onEvent(
+                                    com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent.DistributeIncome(
+                                        incomeAmount
+                                    )
+                                )
+                                Timber.d("Доход автоматически распределен: $amount")
+                            }
+                        }
 
                         // Обновляем UI в основном потоке
                         withContext(Dispatchers.Main) {

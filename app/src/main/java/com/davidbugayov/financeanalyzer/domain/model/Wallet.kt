@@ -1,22 +1,24 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
 /**
- * Модель бюджетной категории
+ * Модель кошелька
  *
- * @property name Название категории
+ * @property name Название кошелька
  * @property limit Лимит расходов на период
  * @property spent Потраченная сумма
- * @property id Уникальный идентификатор категории
- * @property walletBalance Текущий баланс в "виртуальном кошельке"
+ * @property id Уникальный идентификатор кошелька
+ * @property balance Текущий баланс в кошельке
  * @property periodDuration Продолжительность расчетного периода в днях (по умолчанию 14 дней)
  * @property periodStartDate Дата начала текущего расчетного периода (в миллисекундах)
+ * @property linkedCategories Список категорий, транзакции которых учитываются в этом кошельке
  */
-data class BudgetCategory(
+data class Wallet(
     val name: String,
     val limit: Money,
     val spent: Money,
     val id: String,
-    val walletBalance: Money = Money.zero(),
+    val balance: Money = Money.zero(),
     val periodDuration: Int = 14,
-    val periodStartDate: Long = System.currentTimeMillis()
-) 
+    val periodStartDate: Long = System.currentTimeMillis(),
+    val linkedCategories: List<String> = emptyList()
+)

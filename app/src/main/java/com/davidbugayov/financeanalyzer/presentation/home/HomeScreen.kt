@@ -62,7 +62,8 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToBudget: () -> Unit
+    onNavigateToBudget: () -> Unit,
+    onNavigateToWallets: () -> Unit = onNavigateToBudget
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -253,8 +254,8 @@ fun HomeScreen(
                     showFeedback = true
                 },
                 onBudgetClick = {
-                    onNavigateToBudget()
-                    feedbackMessage = "Переход к бюджету"
+                    onNavigateToWallets()
+                    feedbackMessage = "Переход к кошелькам"
                     feedbackType = FeedbackType.INFO
                     showFeedback = true
                 },

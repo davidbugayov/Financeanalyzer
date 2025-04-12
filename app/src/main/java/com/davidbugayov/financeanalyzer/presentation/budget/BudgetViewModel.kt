@@ -2,8 +2,11 @@ package com.davidbugayov.financeanalyzer.presentation.budget
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
-import com.davidbugayov.financeanalyzer.domain.repository.BudgetRepository
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import kotlinx.coroutines.delay
@@ -15,24 +18,28 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Calendar
 import java.util.UUID
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import java.math.BigDecimal
 
 class BudgetViewModel(
-    private val budgetRepository: BudgetRepository
+    private val walletRepository: WalletRepository,
+    private val transactionRepository: TransactionRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BudgetState())
     val state: StateFlow<BudgetState> = _state.asStateFlow()
 
     init {
+        // Очищаем все существующие кошельки
+        clearExistingWallets()
+        
+        // Загружаем категории бюджета
         loadBudgetCategories()
         calculateTotals()
         
-        // Создаем примеры категорий через небольшую задержку,
-        // чтобы дать время на загрузку существующих категорий
+        // Создаем тестовый кошелек через небольшую задержку,
+        // чтобы дать время на загрузку существующих кошельков
         viewModelScope.launch {
-            delay(500)
-            createSampleBudgetCategories()
+            createSampleWallets()
         }
     }
 
@@ -58,55 +65,87 @@ class BudgetViewModel(
     }
 
     /**
-     * Создает образцы бюджетных категорий, если их еще нет
+     * Создает образцы кошельков, если их еще нет
      */
-    private fun createSampleBudgetCategories() {
+    private fun createSampleWallets() {
         viewModelScope.launch {
             try {
-                // Проверяем, есть ли уже категории
+                // Проверяем, есть ли уже кошельки
                 if (_state.value.categories.isEmpty()) {
-                    Timber.d("Создаем примеры категорий бюджета")
+                    Timber.d("Создаем тестовый кошелек")
                     
-                    // Примеры категорий
-                    val sampleCategories = listOf(
-                        BudgetCategory(
-                            name = "Продукты", 
-                            limit = Money(5000.0), 
-                            spent = Money(0.0), 
-                            id = UUID.randomUUID().toString(),
-                            walletBalance = Money(5000.0)
-                        ),
-                        BudgetCategory(
-                            name = "Развлечения", 
-                            limit = Money(3000.0), 
-                            spent = Money(0.0), 
-                            id = UUID.randomUUID().toString(),
-                            walletBalance = Money(3000.0)
-                        ),
-                        BudgetCategory(
-                            name = "Транспорт", 
-                            limit = Money(2000.0), 
-                            spent = Money(0.0), 
-                            id = UUID.randomUUID().toString(),
-                            walletBalance = Money(2000.0)
-                        )
+                    // Создаем только один тестовый кошелек - "Развлечения"
+                    val entertainmentWalletId = UUID.randomUUID().toString()
+                    val entertainmentWallet = Wallet(
+                        name = "Развлечения", 
+                        limit = Money(3000.0), 
+                        spent = Money(500.0), 
+                        id = entertainmentWalletId,
+                        balance = Money(2500.0),
+                        // Связанные категории
+                        linkedCategories = listOf("Кино", "Игры", "Рестораны", "Театр", "Концерты")
                     )
                     
-                    // Добавляем категории в репозиторий
-                    sampleCategories.forEach { category ->
-                        budgetRepository.addBudgetCategory(category)
+                    // Добавляем кошелек в репозиторий
+                    walletRepository.addWallet(entertainmentWallet)
+                    
+                    // Добавляем несколько транзакций для этого кошелька
+                    try {
+                        // Транзакция "Кино"
+                        transactionRepository.addTransaction(
+                            Transaction(
+                                amount = Money(-250.0),
+                                category = "Кино",
+                                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -2) }.time,
+                                isExpense = true,
+                                note = "Поход в кинотеатр",
+                                source = "Сбер",
+                                sourceColor = 0xFF21A038.toInt(),
+                                categoryId = entertainmentWalletId
+                            )
+                        )
+                        
+                        // Транзакция "Рестораны"
+                        transactionRepository.addTransaction(
+                            Transaction(
+                                amount = Money(-150.0),
+                                category = "Рестораны",
+                                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -1) }.time,
+                                isExpense = true,
+                                note = "Кофе и десерт",
+                                source = "Наличные",
+                                sourceColor = 0xFF777777.toInt(),
+                                categoryId = entertainmentWalletId
+                            )
+                        )
+                        
+                        // Транзакция "Игры"
+                        transactionRepository.addTransaction(
+                            Transaction(
+                                amount = Money(-100.0),
+                                category = "Игры",
+                                date = Calendar.getInstance().time,
+                                isExpense = true,
+                                note = "Покупка игры в Steam",
+                                source = "Т-Банк",
+                                sourceColor = 0xFFCF102D.toInt(),
+                                categoryId = entertainmentWalletId
+                            )
+                        )
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при создании тестовых транзакций")
                     }
                     
-                    // Перезагружаем категории
+                    // Перезагружаем кошельки
                     loadBudgetCategories()
                     
-                    Timber.d("Примеры категорий бюджета созданы")
+                    Timber.d("Тестовый кошелек создан")
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при создании примеров категорий бюджета")
+                Timber.e(e, "Ошибка при создании тестового кошелька")
                 _state.update { 
                     it.copy(
-                        error = e.message ?: "Ошибка при создании примеров категорий бюджета"
+                        error = e.message ?: "Ошибка при создании тестового кошелька"
                     )
                 }
             }
@@ -118,19 +157,22 @@ class BudgetViewModel(
             try {
                 _state.update { it.copy(isLoading = true) }
                 
-                // Загружаем категории из репозитория
-                val categories = budgetRepository.getAllBudgetCategories()
+                // Загружаем кошельки из репозитория
+                val wallets = walletRepository.getAllWallets()
                 
                 _state.update { 
                     it.copy(
-                        categories = categories,
+                        categories = wallets,
                         isLoading = false
                     )
                 }
                 
                 calculateTotals()
+                
+                // Обновляем суммы трат для всех кошельков
+                updateSpentAmounts(wallets)
             } catch (e: Exception) {
-                Timber.e(e, "Error loading budget categories")
+                Timber.e(e, "Error loading wallets")
                 _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
@@ -141,13 +183,61 @@ class BudgetViewModel(
         }
     }
 
+    /**
+     * Обновляет суммы трат для всех кошельков на основе транзакций
+     */
+    private fun updateSpentAmounts(wallets: List<Wallet>) {
+        viewModelScope.launch {
+            try {
+                // Загружаем все транзакции
+                val allTransactions = transactionRepository.getAllTransactions()
+                
+                // Фильтруем только расходные транзакции
+                val expenseTransactions = allTransactions.filter { it.isExpense }
+                
+                // Обрабатываем каждый кошелек
+                wallets.forEach { wallet ->
+                    // Находим транзакции, относящиеся к этому кошельку
+                    val walletTransactions = expenseTransactions.filter { 
+                        it.category == wallet.name || it.categoryId == wallet.id 
+                    }
+                    
+                    // Рассчитываем сумму трат
+                    val totalSpent = walletTransactions.fold(Money(0.0)) { acc, transaction ->
+                        acc.plus(transaction.amount.abs())
+                    }
+                    
+                    // Если сумма трат изменилась, обновляем кошелек
+                    if (totalSpent != wallet.spent) {
+                        // Явно указываем linkedCategories со значением по умолчанию,
+                        // чтобы избежать NullPointerException для кошельков без этого поля
+                        val updatedWallet = wallet.copy(
+                            spent = totalSpent,
+                            linkedCategories = wallet.linkedCategories ?: emptyList()
+                        )
+                        walletRepository.updateWallet(updatedWallet)
+                    }
+                }
+                
+                // Перезагружаем кошельки с обновленными данными
+                val updatedWallets = walletRepository.getAllWallets()
+                _state.update { it.copy(categories = updatedWallets) }
+                
+                // Пересчитываем итоги
+                calculateTotals()
+            } catch (e: Exception) {
+                Timber.e(e, "Error updating spent amounts: ${e.message}")
+            }
+        }
+    }
+
     private fun calculateTotals() {
-        val categories = _state.value.categories
+        val wallets = _state.value.categories
         
         // Используем методы Money для суммирования вместо преобразования в Double
-        val totalLimit = categories.fold(Money(0.0)) { acc, category -> acc.plus(category.limit) }
-        val totalSpent = categories.fold(Money(0.0)) { acc, category -> acc.plus(category.spent) }
-        val totalWalletBalance = categories.fold(Money(0.0)) { acc, category -> acc.plus(category.walletBalance) }
+        val totalLimit = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.limit) }
+        val totalSpent = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.spent) }
+        val totalWalletBalance = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.balance) }
         
         _state.update { 
             it.copy(
@@ -163,21 +253,21 @@ class BudgetViewModel(
             try {
                 _state.update { it.copy(isLoading = true) }
                 
-                val newCategory = BudgetCategory(
+                val newWallet = Wallet(
                     name = name, 
                     limit = limit, 
                     spent = Money(0.0), 
                     id = UUID.randomUUID().toString(),
-                    walletBalance = Money(0.0)
+                    balance = Money(0.0)
                 )
                 
-                // Добавляем категорию в репозиторий
-                budgetRepository.addBudgetCategory(newCategory)
+                // Добавляем кошелек в репозиторий
+                walletRepository.addWallet(newWallet)
                 
-                // Перезагружаем категории
+                // Перезагружаем кошельки
                 loadBudgetCategories()
             } catch (e: Exception) {
-                Timber.e(e, "Error adding budget category")
+                Timber.e(e, "Error adding wallet")
                 _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
@@ -188,18 +278,18 @@ class BudgetViewModel(
         }
     }
 
-    private fun updateCategory(category: BudgetCategory) {
+    private fun updateCategory(wallet: Wallet) {
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
                 
-                // Обновляем категорию в репозитории
-                budgetRepository.updateBudgetCategory(category)
+                // Обновляем кошелек в репозитории
+                walletRepository.updateWallet(wallet)
                 
-                // Перезагружаем категории
+                // Перезагружаем кошельки
                 loadBudgetCategories()
             } catch (e: Exception) {
-                Timber.e(e, "Error updating budget category")
+                Timber.e(e, "Error updating wallet")
                 _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
@@ -210,18 +300,18 @@ class BudgetViewModel(
         }
     }
 
-    private fun deleteCategory(category: BudgetCategory) {
+    private fun deleteCategory(wallet: Wallet) {
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
                 
-                // Удаляем категорию из репозитория
-                budgetRepository.deleteBudgetCategory(category)
+                // Удаляем кошелек из репозитория
+                walletRepository.deleteWallet(wallet)
                 
-                // Перезагружаем категории
+                // Перезагружаем кошельки
                 loadBudgetCategories()
             } catch (e: Exception) {
-                Timber.e(e, "Error deleting budget category")
+                Timber.e(e, "Error deleting wallet")
                 _state.update { 
                     it.copy(
                         error = e.message ?: "Unknown error",
@@ -232,252 +322,323 @@ class BudgetViewModel(
         }
     }
 
-    // Распределяет полученный доход по всем категориям согласно их лимитам
+    private fun clearError() {
+        _state.update { it.copy(error = null) }
+    }
+
+    /**
+     * Распределяет доход по всем кошелькам пропорционально их лимитам
+     */
     private fun distributeIncome(amount: Money) {
         viewModelScope.launch {
             try {
-                if (_state.value.categories.isEmpty() || amount.isZero() || amount.isNegative()) {
+                val wallets = _state.value.categories
+                
+                if (wallets.isEmpty()) {
+                    Timber.d("Нет кошельков для распределения дохода")
                     return@launch
                 }
                 
-                val totalLimit = _state.value.totalLimit
-                var remainingAmount = amount
+                // Рассчитываем общий лимит
+                val totalLimit = wallets.fold(Money(0.0)) { acc, wallet -> 
+                    acc.plus(wallet.limit) 
+                }
                 
-                // Обновляем категории, пропорционально распределяя доход
-                val updatedCategories = _state.value.categories.map { category ->
-                    val categoryRatio = category.limit.percentageOf(totalLimit) / 100.0
-                    val categoryAmount = amount.times(categoryRatio)
-                    remainingAmount = remainingAmount.minus(categoryAmount)
+                if (totalLimit.amount <= BigDecimal.ZERO) {
+                    Timber.d("Нулевой или отрицательный общий лимит, невозможно распределить доход")
+                    return@launch
+                }
+                
+                // Распределяем доход по кошелькам пропорционально их лимитам
+                wallets.forEach { wallet ->
+                    // Рассчитываем долю кошелька от общего лимита
+                    val proportion = wallet.limit.amount / totalLimit.amount
                     
-                    category.copy(
-                        walletBalance = category.walletBalance.plus(categoryAmount)
+                    // Рассчитываем сумму для добавления в этот кошелек
+                    val amountToAdd = Money(amount.amount * proportion)
+                    
+                    // Обновляем баланс кошелька
+                    val updatedWallet = wallet.copy(
+                        balance = wallet.balance.plus(amountToAdd),
+                        linkedCategories = wallet.linkedCategories ?: emptyList()
+                    )
+                    
+                    // Сохраняем обновленный кошелек
+                    walletRepository.updateWallet(updatedWallet)
+                }
+                
+                // Перезагружаем кошельки
+                loadBudgetCategories()
+                
+                Timber.d("Доход успешно распределен")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при распределении дохода")
+                _state.update { 
+                    it.copy(
+                        error = e.message ?: "Ошибка при распределении дохода"
                     )
                 }
-                
-                // Обновляем каждую категорию в репозитории
-                updatedCategories.forEach { category ->
-                    budgetRepository.updateBudgetCategory(category)
-                }
-                
-                // Перезагружаем категории
-                loadBudgetCategories()
-            } catch (e: Exception) {
-                Timber.e(e, "Error distributing income")
-                _state.update { 
-                    it.copy(error = e.message ?: "Ошибка при распределении дохода")
-                }
             }
         }
     }
-    
-    // Добавляет средства в кошелек конкретной категории
-    private fun addFundsToWallet(categoryId: String, amount: Money) {
+
+    /**
+     * Добавляет средства в выбранный кошелек
+     */
+    private fun addFundsToWallet(walletId: String, amount: Money) {
         viewModelScope.launch {
             try {
-                if (amount.isZero() || amount.isNegative()) return@launch
+                // Получаем кошелек по ID
+                val wallet = walletRepository.getWalletById(walletId) ?: return@launch
                 
-                // Находим категорию по ID
-                val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
-                
-                // Обновляем категорию
-                val updatedCategory = category.copy(
-                    walletBalance = category.walletBalance.plus(amount)
+                // Обновляем баланс кошелька
+                val updatedWallet = wallet.copy(
+                    balance = wallet.balance.plus(amount),
+                    linkedCategories = wallet.linkedCategories ?: emptyList()
                 )
                 
-                // Сохраняем обновленную категорию
-                budgetRepository.updateBudgetCategory(updatedCategory)
+                // Сохраняем обновленный кошелек
+                walletRepository.updateWallet(updatedWallet)
                 
-                // Перезагружаем категории
+                // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                Timber.d("Средства успешно добавлены в кошелек")
             } catch (e: Exception) {
-                Timber.e(e, "Error adding funds to wallet")
+                Timber.e(e, "Ошибка при добавлении средств в кошелек")
                 _state.update { 
-                    it.copy(error = e.message ?: "Ошибка при добавлении средств в кошелек")
+                    it.copy(
+                        error = e.message ?: "Ошибка при добавлении средств в кошелек"
+                    )
                 }
             }
         }
     }
-    
-    // Списывает средства из кошелька и увеличивает счетчик потраченных средств
-    private fun spendFromWallet(categoryId: String, amount: Money) {
+
+    /**
+     * Тратит средства из выбранного кошелька
+     */
+    private fun spendFromWallet(walletId: String, amount: Money) {
         viewModelScope.launch {
             try {
-                if (amount.isZero() || amount.isNegative()) return@launch
-                
-                // Находим категорию по ID
-                val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
+                // Получаем кошелек по ID
+                val wallet = walletRepository.getWalletById(walletId) ?: return@launch
                 
                 // Проверяем, достаточно ли средств
-                if (category.walletBalance.compareTo(amount) < 0) {
+                if (wallet.balance.amount < amount.amount) {
                     _state.update { 
-                        it.copy(error = "Недостаточно средств в кошельке '${category.name}'")
+                        it.copy(
+                            error = "Недостаточно средств в кошельке"
+                        )
                     }
                     return@launch
                 }
                 
-                // Обновляем категорию
-                val updatedCategory = category.copy(
-                    walletBalance = category.walletBalance.minus(amount),
-                    spent = category.spent.plus(amount)
+                // Обновляем баланс и сумму трат кошелька
+                val updatedWallet = wallet.copy(
+                    balance = wallet.balance.minus(amount),
+                    spent = wallet.spent.plus(amount),
+                    linkedCategories = wallet.linkedCategories ?: emptyList()
                 )
                 
-                // Сохраняем обновленную категорию
-                budgetRepository.updateBudgetCategory(updatedCategory)
+                // Сохраняем обновленный кошелек
+                walletRepository.updateWallet(updatedWallet)
                 
-                // Перезагружаем категории
+                // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                Timber.d("Средства успешно потрачены из кошелька")
             } catch (e: Exception) {
-                Timber.e(e, "Error spending from wallet")
+                Timber.e(e, "Ошибка при трате средств из кошелька")
                 _state.update { 
-                    it.copy(error = e.message ?: "Ошибка при списании средств из кошелька")
+                    it.copy(
+                        error = e.message ?: "Ошибка при трате средств из кошелька"
+                    )
                 }
             }
         }
     }
-    
-    // Перевод средств между кошельками
-    private fun transferBetweenWallets(fromCategoryId: String, toCategoryId: String, amount: Money) {
+
+    /**
+     * Переводит средства между кошельками
+     */
+    private fun transferBetweenWallets(fromWalletId: String, toWalletId: String, amount: Money) {
         viewModelScope.launch {
             try {
-                if (amount.isZero() || amount.isNegative() || fromCategoryId == toCategoryId) return@launch
+                // Получаем кошельки по ID
+                val fromWallet = walletRepository.getWalletById(fromWalletId) ?: return@launch
+                val toWallet = walletRepository.getWalletById(toWalletId) ?: return@launch
                 
-                // Находим категории по ID
-                val fromCategory = budgetRepository.getBudgetCategoryById(fromCategoryId) ?: return@launch
-                val toCategory = budgetRepository.getBudgetCategoryById(toCategoryId) ?: return@launch
-                
-                // Проверяем, достаточно ли средств
-                if (fromCategory.walletBalance.compareTo(amount) < 0) {
+                // Проверяем, достаточно ли средств в исходном кошельке
+                if (fromWallet.balance.amount < amount.amount) {
                     _state.update { 
-                        it.copy(error = "Недостаточно средств в кошельке '${fromCategory.name}'")
+                        it.copy(
+                            error = "Недостаточно средств в исходном кошельке"
+                        )
                     }
                     return@launch
                 }
                 
-                // Обновляем категории
-                val updatedFromCategory = fromCategory.copy(
-                    walletBalance = fromCategory.walletBalance.minus(amount)
-                )
-                val updatedToCategory = toCategory.copy(
-                    walletBalance = toCategory.walletBalance.plus(amount)
+                // Обновляем балансы кошельков
+                val updatedFromWallet = fromWallet.copy(
+                    balance = fromWallet.balance.minus(amount),
+                    linkedCategories = fromWallet.linkedCategories ?: emptyList()
                 )
                 
-                // Сохраняем обновленные категории
-                budgetRepository.updateBudgetCategory(updatedFromCategory)
-                budgetRepository.updateBudgetCategory(updatedToCategory)
+                val updatedToWallet = toWallet.copy(
+                    balance = toWallet.balance.plus(amount),
+                    linkedCategories = toWallet.linkedCategories ?: emptyList()
+                )
                 
-                // Перезагружаем категории
+                // Сохраняем обновленные кошельки
+                walletRepository.updateWallet(updatedFromWallet)
+                walletRepository.updateWallet(updatedToWallet)
+                
+                // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                Timber.d("Средства успешно переведены между кошельками")
             } catch (e: Exception) {
-                Timber.e(e, "Error transferring between wallets")
+                Timber.e(e, "Ошибка при переводе средств между кошельками")
                 _state.update { 
-                    it.copy(error = e.message ?: "Ошибка при переводе средств между кошельками")
+                    it.copy(
+                        error = e.message ?: "Ошибка при переводе средств между кошельками"
+                    )
                 }
             }
         }
     }
-    
-    // Изменяет продолжительность расчетного периода
+
+    /**
+     * Устанавливает продолжительность периода для всех кошельков
+     */
     private fun setPeriodDuration(days: Int) {
-        if (days < 1) return
-        
-        _state.update { 
-            it.copy(selectedPeriodDuration = days)
-        }
-    }
-    
-    // Сбрасывает расчетный период для указанной категории
-    private fun resetPeriod(categoryId: String) {
         viewModelScope.launch {
             try {
-                // Находим категорию по ID
-                val category = budgetRepository.getBudgetCategoryById(categoryId) ?: return@launch
+                // Получаем все кошельки
+                val wallets = walletRepository.getAllWallets()
                 
-                // Обновляем категорию
-                val updatedCategory = category.copy(
-                    spent = Money(0.0),
-                    periodStartDate = System.currentTimeMillis()
-                )
+                // Устанавливаем новую продолжительность периода для каждого кошелька
+                wallets.forEach { wallet ->
+                    val updatedWallet = wallet.copy(
+                        periodDuration = days,
+                        linkedCategories = wallet.linkedCategories ?: emptyList()
+                    )
+                    walletRepository.updateWallet(updatedWallet)
+                }
                 
-                // Сохраняем обновленную категорию
-                budgetRepository.updateBudgetCategory(updatedCategory)
+                // Обновляем состояние
+                _state.update { it.copy(selectedPeriodDuration = days) }
                 
-                // Перезагружаем категории
+                // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                Timber.d("Продолжительность периода успешно обновлена для всех кошельков")
             } catch (e: Exception) {
-                Timber.e(e, "Error resetting period")
+                Timber.e(e, "Ошибка при установке продолжительности периода")
                 _state.update { 
-                    it.copy(error = e.message ?: "Ошибка при сбросе расчетного периода")
+                    it.copy(
+                        error = e.message ?: "Ошибка при установке продолжительности периода"
+                    )
                 }
             }
         }
     }
-    
-    // Сбрасывает расчетный период для всех категорий
+
+    /**
+     * Сбрасывает период для конкретного кошелька
+     */
+    private fun resetPeriod(walletId: String) {
+        viewModelScope.launch {
+            try {
+                // Получаем кошелек по ID
+                val wallet = walletRepository.getWalletById(walletId) ?: return@launch
+                
+                // Сбрасываем период и потраченную сумму
+                val updatedWallet = wallet.copy(
+                    periodStartDate = System.currentTimeMillis(),
+                    spent = Money(0.0),
+                    linkedCategories = wallet.linkedCategories ?: emptyList()
+                )
+                
+                // Сохраняем обновленный кошелек
+                walletRepository.updateWallet(updatedWallet)
+                
+                // Перезагружаем кошельки
+                loadBudgetCategories()
+                
+                Timber.d("Период успешно сброшен для кошелька")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при сбросе периода для кошелька")
+                _state.update { 
+                    it.copy(
+                        error = e.message ?: "Ошибка при сбросе периода для кошелька"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Сбрасывает периоды для всех кошельков
+     */
     private fun resetAllPeriods() {
         viewModelScope.launch {
             try {
-                // Получаем все категории
-                val categories = budgetRepository.getAllBudgetCategories()
+                // Получаем все кошельки
+                val wallets = walletRepository.getAllWallets()
                 
-                // Обновляем каждую категорию
-                categories.forEach { category ->
-                    val updatedCategory = category.copy(
+                // Сбрасываем периоды и потраченные суммы для всех кошельков
+                wallets.forEach { wallet ->
+                    val updatedWallet = wallet.copy(
+                        periodStartDate = System.currentTimeMillis(),
                         spent = Money(0.0),
-                        periodStartDate = System.currentTimeMillis()
+                        linkedCategories = wallet.linkedCategories ?: emptyList()
                     )
-                    budgetRepository.updateBudgetCategory(updatedCategory)
+                    walletRepository.updateWallet(updatedWallet)
                 }
                 
-                // Перезагружаем категории
+                // Перезагружаем кошельки
                 loadBudgetCategories()
+                
+                Timber.d("Периоды успешно сброшены для всех кошельков")
             } catch (e: Exception) {
-                Timber.e(e, "Error resetting all periods")
+                Timber.e(e, "Ошибка при сбросе периодов для всех кошельков")
                 _state.update { 
-                    it.copy(error = e.message ?: "Ошибка при сбросе всех расчетных периодов")
+                    it.copy(
+                        error = e.message ?: "Ошибка при сбросе периодов для всех кошельков"
+                    )
                 }
             }
         }
     }
 
-    // Проверяет, не истек ли расчетный период для категорий
-    fun checkPeriodsExpiration() {
+    /**
+     * Очищает все существующие кошельки (кроме тех, которые имеют транзакции)
+     */
+    private fun clearExistingWallets() {
         viewModelScope.launch {
             try {
-                val currentTime = System.currentTimeMillis()
-                val calendar = Calendar.getInstance()
+                val wallets = walletRepository.getAllWallets()
                 
-                // Получаем все категории
-                val categories = budgetRepository.getAllBudgetCategories()
-                
-                val expiredCategories = categories.filter { category ->
-                    calendar.timeInMillis = category.periodStartDate
-                    calendar.add(Calendar.DAY_OF_MONTH, category.periodDuration)
-                    currentTime > calendar.timeInMillis
+                // Удаляем все кошельки с определенными именами 
+                // (сохраняем кошельки созданные пользователем)
+                val walletsToRemove = wallets.filter { 
+                    it.name == "Продукты" || 
+                    it.name == "Транспорт" || 
+                    // Можно добавить и другие имена тестовых кошельков, если они есть
+                    it.name == "Развлечения" && it.linkedCategories.isEmpty() // Удаляем пустой кошелек "Развлечения" без связанных категорий
                 }
                 
-                if (expiredCategories.isNotEmpty()) {
-                    // Обновляем каждую просроченную категорию
-                    expiredCategories.forEach { category ->
-                        val updatedCategory = category.copy(
-                            spent = Money(0.0),
-                            periodStartDate = System.currentTimeMillis()
-                        )
-                        budgetRepository.updateBudgetCategory(updatedCategory)
-                    }
-                    
-                    // Перезагружаем категории
-                    loadBudgetCategories()
+                // Удаляем выбранные кошельки
+                walletsToRemove.forEach { wallet ->
+                    walletRepository.deleteWallet(wallet)
                 }
+                
+                Timber.d("Очищены существующие тестовые кошельки: ${walletsToRemove.size}")
             } catch (e: Exception) {
-                Timber.e(e, "Error checking periods expiration")
-                _state.update { 
-                    it.copy(error = e.message ?: "Ошибка при проверке истечения расчетных периодов")
-                }
+                Timber.e(e, "Ошибка при очистке существующих кошельков")
             }
         }
-    }
-
-    fun clearError() {
-        _state.update { it.copy(error = null) }
     }
 } 

@@ -44,4 +44,5 @@ sealed class AddTransactionEvent {
     object ClearError : AddTransactionEvent()
     object HideSuccessDialog : AddTransactionEvent()
     object AttachReceipt : AddTransactionEvent()
+    object ForceSetIncomeType : AddTransactionEvent()
 } 

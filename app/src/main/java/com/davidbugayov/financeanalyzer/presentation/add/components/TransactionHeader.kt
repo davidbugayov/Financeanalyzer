@@ -13,6 +13,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
@@ -34,7 +35,8 @@ fun TransactionHeader(
     expenseColor: Color,
     onDateClick: () -> Unit,
     onToggleTransactionType: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    lockExpenseSelection: Boolean = false
 ) {
     Row(
         modifier = modifier
@@ -74,13 +76,15 @@ fun TransactionHeader(
             FilterChip(
                 selected = isExpense,
                 onClick = {
-                    if (!isExpense) onToggleTransactionType()
+                    if (!isExpense && !lockExpenseSelection) onToggleTransactionType()
                 },
                 label = { Text(stringResource(R.string.expense_type)) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = expenseColor.copy(alpha = 0.2f),
                     selectedLabelColor = expenseColor
-                )
+                ),
+                enabled = !lockExpenseSelection,
+                modifier = if (lockExpenseSelection) Modifier.alpha(0.5f) else Modifier
             )
         }
     }

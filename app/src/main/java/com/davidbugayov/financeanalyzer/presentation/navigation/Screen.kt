@@ -32,8 +32,12 @@ sealed class Screen(val route: String) {
     /** Экран бюджета */
     data object Budget : Screen("budget")
 
-    /** Экран транзакций бюджетной категории */
-    data object BudgetTransactions : Screen("budget/{categoryId}") {
-        fun createRoute(categoryId: String) = "budget/$categoryId"
+    
+    /** Экран кошельков */
+    data object Wallets : Screen("wallets")
+
+    /** Экран транзакций кошелька */
+    data object WalletTransactions : Screen("wallet/{walletId}") {
+        fun createRoute(walletId: String) = "wallet/$walletId"
     }
 } 

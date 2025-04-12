@@ -38,7 +38,8 @@ import androidx.navigation.navArgument
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
-import com.davidbugayov.financeanalyzer.presentation.budget.BudgetTransactionsScreen
+import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
@@ -62,6 +63,7 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 
 @Composable
 fun MainScreen(startDestination: String = "home") {
@@ -266,7 +268,8 @@ fun MainScreen(startDestination: String = "home") {
                             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
                             onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                            onNavigateToBudget = { navController.navigate(Screen.Budget.route) }
+                            onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
+                            onNavigateToWallets = { navController.navigate(Screen.Wallets.route) }
                         )
                     }
                     
@@ -338,7 +341,7 @@ fun MainScreen(startDestination: String = "home") {
                                     dampingRatio = Spring.DampingRatioMediumBouncy,
                                     stiffness = Spring.StiffnessLow
                                 ),
-                                towards = AnimatedContentTransitionScope.SlideDirection.Up
+                                towards = AnimatedContentTransitionScope.SlideDirection.Down
                             ) + fadeIn(
                                 animationSpec = tween(300, easing = EaseInOut)
                             )
@@ -355,7 +358,20 @@ fun MainScreen(startDestination: String = "home") {
                             )
                         }
                     ) {
-                        // Получаем предыдущий маршрут из стека навигации - unused
+                        // Получаем предыдущий маршрут из стека навигации, чтобы определить источник перехода
+                        val previousRoute = navController.previousBackStackEntry?.destination?.route
+                        
+                        // Если переход был из бюджета, принудительно настраиваем режим дохода
+                        if (previousRoute == Screen.Budget.route) {
+                            LaunchedEffect(Unit) {
+                                addTransactionViewModel.setupForIncomeAddition(
+                                    shouldDistribute = false,
+                                    lockExpenseSelection = true
+                                )
+                                // Принудительно меняем тип на доход
+                                addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                            }
+                        }
                         
                         AddTransactionScreen(
                             viewModel = addTransactionViewModel,
@@ -528,10 +544,11 @@ fun MainScreen(startDestination: String = "home") {
                         }
                     ) {
                         BudgetScreen(
+                            navController = navController,
                             onNavigateBack = { navController.navigateUp() },
                             onNavigateToTransactions = { categoryId ->
                                 navController.navigate(
-                                    Screen.BudgetTransactions.createRoute(
+                                    Screen.WalletTransactions.createRoute(
                                         categoryId
                                     )
                                 )
@@ -541,9 +558,9 @@ fun MainScreen(startDestination: String = "home") {
 
                     // Экран транзакций бюджетной категории
                     composable(
-                        route = Screen.BudgetTransactions.route,
+                        route = Screen.WalletTransactions.route,
                         arguments = listOf(
-                            navArgument("categoryId") { type = NavType.StringType }
+                            navArgument("walletId") { type = NavType.StringType }
                         ),
                         enterTransition = {
                             slideIntoContainer(
@@ -568,11 +585,93 @@ fun MainScreen(startDestination: String = "home") {
                             )
                         }
                     ) { backStackEntry ->
-                        val categoryId =
-                            backStackEntry.arguments?.getString("categoryId") ?: return@composable
-                        BudgetTransactionsScreen(
-                            categoryId = categoryId,
-                            onNavigateBack = { navController.navigateUp() }
+                        val walletId =
+                            backStackEntry.arguments?.getString("walletId") ?: return@composable
+                        WalletTransactionsScreen(
+                            walletId = walletId,
+                            onNavigateBack = { navController.navigateUp() },
+                            addTransactionViewModel = addTransactionViewModel,
+                            navController = navController
+                        )
+                    }
+                    
+                    // Экран кошельков (новый)
+                    composable(
+                        route = Screen.Wallets.route,
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        BudgetScreen( // Временно используем старый экран с новым ViewModel
+                            navController = navController,
+                            onNavigateBack = { navController.navigateUp() },
+                            onNavigateToTransactions = { walletId ->
+                                navController.navigate(
+                                    Screen.WalletTransactions.createRoute(
+                                        walletId
+                                    )
+                                )
+                            },
+                            viewModel = koinViewModel<BudgetViewModel>(),
+                            addTransactionViewModel = addTransactionViewModel
+                        )
+                    }
+
+                    // Экран транзакций кошелька (новый)
+                    composable(
+                        route = Screen.WalletTransactions.route,
+                        arguments = listOf(
+                            navArgument("walletId") { type = NavType.StringType }
+                        ),
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) { backStackEntry ->
+                        val walletId =
+                            backStackEntry.arguments?.getString("walletId") ?: return@composable
+                        WalletTransactionsScreen(
+                            walletId = walletId,
+                            onNavigateBack = { navController.navigateUp() },
+                            addTransactionViewModel = addTransactionViewModel,
+                            navController = navController
                         )
                     }
                 }

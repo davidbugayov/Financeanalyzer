@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.budget.components
+package com.davidbugayov.financeanalyzer.presentation.budget.wallet.components
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,12 +31,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.domain.model.BudgetCategory
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import kotlin.math.min
 import java.math.BigDecimal
 
-// Перечисление действий для меню категории
-enum class CategoryAction {
+// Перечисление действий для меню кошелька
+enum class WalletAction {
     ADD_FUNDS,
     SPEND,
     TRANSFER,
@@ -45,10 +45,10 @@ enum class CategoryAction {
 }
 
 @Composable
-fun BudgetCategoryCard(
-    category: BudgetCategory,
-    onCategoryClick: (String) -> Unit,
-    onMenuClick: (BudgetCategory, CategoryAction) -> Unit
+fun WalletCard(
+    category: Wallet,
+    onWalletClick: (String) -> Unit,
+    onMenuClick: (Wallet, WalletAction) -> Unit
 ) {
     var showMenu by remember { mutableStateOf(false) }
 
@@ -56,9 +56,13 @@ fun BudgetCategoryCard(
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onCategoryClick(category.id) },
+            .clickable { onWalletClick(category.id) },
         shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 3.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+            contentColor = MaterialTheme.colorScheme.onSurface
+        )
     ) {
         Column(
             modifier = Modifier
@@ -70,11 +74,22 @@ fun BudgetCategoryCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = category.name,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Medium
-                )
+                Row(
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.AccountBalanceWallet,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Spacer(modifier = Modifier.width(8.dp))
+                    Text(
+                        text = category.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
 
                 Box {
                     IconButton(
@@ -84,7 +99,7 @@ fun BudgetCategoryCard(
                     ) {
                         Icon(
                             imageVector = Icons.Default.MoreVert,
-                            contentDescription = "Действия для категории ${category.name}"
+                            contentDescription = "Действия для кошелька ${category.name}"
                         )
                     }
                     
@@ -96,35 +111,35 @@ fun BudgetCategoryCard(
                             text = { Text("Добавить средства") },
                             onClick = {
                                 showMenu = false
-                                onMenuClick(category, CategoryAction.ADD_FUNDS)
+                                onMenuClick(category, WalletAction.ADD_FUNDS)
                             }
                         )
                         DropdownMenuItem(
                             text = { Text("Потратить") },
                             onClick = {
                                 showMenu = false
-                                onMenuClick(category, CategoryAction.SPEND)
+                                onMenuClick(category, WalletAction.SPEND)
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Перевести в другую категорию") },
+                            text = { Text("Перевести в другой кошелек") },
                             onClick = {
                                 showMenu = false
-                                onMenuClick(category, CategoryAction.TRANSFER)
+                                onMenuClick(category, WalletAction.TRANSFER)
                             }
                         )
                         DropdownMenuItem(
                             text = { Text("Сбросить период") },
                             onClick = {
                                 showMenu = false
-                                onMenuClick(category, CategoryAction.RESET_PERIOD)
+                                onMenuClick(category, WalletAction.RESET_PERIOD)
                             }
                         )
                         DropdownMenuItem(
-                            text = { Text("Удалить категорию") },
+                            text = { Text("Удалить кошелек") },
                             onClick = {
                                 showMenu = false
-                                onMenuClick(category, CategoryAction.DELETE)
+                                onMenuClick(category, WalletAction.DELETE)
                             }
                         )
                     }
@@ -161,6 +176,17 @@ fun BudgetCategoryCard(
                 )
             }
 
+            // Процент использования бюджета
+            if (category.limit.amount > BigDecimal.ZERO) {
+                val percent = (category.spent.amount.toDouble() / category.limit.amount.toDouble() * 100).toInt()
+                Text(
+                    text = "$percent% использовано",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (percent >= 100) Color.Red else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = 4.dp)
+                )
+            }
+
             // Баланс кошелька
             Row(
                 modifier = Modifier
@@ -182,7 +208,7 @@ fun BudgetCategoryCard(
                     Spacer(modifier = Modifier.width(4.dp))
                     
                     Text(
-                        text = "Кошелёк: ${category.walletBalance.amount.toInt()} ₽",
+                        text = "Кошелёк: ${category.balance.amount.toInt()} ₽",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.primary
                     )
