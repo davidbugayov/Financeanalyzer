@@ -50,4 +50,12 @@ class WalletRepositoryImpl(
     override suspend fun hasWallets(): Boolean {
         return walletPreferences.getWallets().isNotEmpty()
     }
+
+    override suspend fun getWalletsByIds(ids: List<String>): List<Wallet> {
+        if (ids.isEmpty()) return emptyList()
+        
+        return walletPreferences.getWallets()
+            .filter { ids.contains(it.id) }
+    }
+
 } 

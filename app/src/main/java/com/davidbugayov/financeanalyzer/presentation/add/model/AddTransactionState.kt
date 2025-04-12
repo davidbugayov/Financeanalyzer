@@ -16,7 +16,7 @@ data class AddTransactionState(
     val categoryError: Boolean = false,
     val note: String = "",
     val selectedDate: Date = Date(),
-    val isExpense: Boolean = false,
+    val isExpense: Boolean = true,
     val showDatePicker: Boolean = false,
     val showCategoryPicker: Boolean = false,
     val showCustomCategoryDialog: Boolean = false,
@@ -39,5 +39,9 @@ data class AddTransactionState(
     val showDeleteCategoryConfirmDialog: Boolean = false,
     val showDeleteSourceConfirmDialog: Boolean = false,
     val editMode: Boolean = false,
-    val transactionToEdit: Transaction? = null
+    val transactionToEdit: Transaction? = null,
+    val addToWallet: Boolean = false, // Добавлять ли доход в кошелек (по умолчанию - нет)
+    val selectedWallets: List<String> = emptyList(), // Список ID выбранных кошельков
+    val showWalletSelector: Boolean = false, // Показывать ли диалог выбора кошельков
+    val targetWalletId: String? = null // ID целевого кошелька для добавления дохода
 ) 

@@ -236,6 +236,9 @@ fun HomeScreen(
             AnimatedBottomNavigationBar(
                 visible = true,
                 onAddClick = {
+                    // Сбрасываем состояние AddTransactionViewModel к дефолтному
+                    addTransactionViewModel.resetToDefaultState()
+                    // Выполняем навигацию
                     onNavigateToAdd()
                     feedbackMessage = "Добавление новой транзакции"
                     feedbackType = FeedbackType.INFO

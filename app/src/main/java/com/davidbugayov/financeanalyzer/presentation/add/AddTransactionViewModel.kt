@@ -5,20 +5,25 @@ import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionState
+import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -28,6 +33,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
+import java.util.Locale
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -38,7 +44,8 @@ class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val categoriesViewModel: CategoriesViewModel,
-    private val sourcePreferences: SourcePreferences
+    private val sourcePreferences: SourcePreferences,
+    private val walletRepository: WalletRepository
 ) : AndroidViewModel(application), KoinComponent {
 
     // Расширение для преобразования строки в Double
@@ -70,11 +77,48 @@ class AddTransactionViewModel(
     // Callback, который будет вызван после успешного добавления дохода
     var onIncomeAddedCallback: ((com.davidbugayov.financeanalyzer.domain.model.Money) -> Unit)? = null
 
+    // Список доступных кошельков с внутренним MutableStateFlow для обновлений
+    private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
+    val wallets: List<Wallet>
+        get() = _wallets.value
+
+    /**
+     * Устанавливает ID целевого кошелька для добавления дохода
+     * и автоматически включает опцию добавления в кошелек
+     */
+    fun setTargetWalletId(walletId: String) {
+        _state.update { 
+            it.copy(
+                targetWalletId = walletId,
+                addToWallet = true,
+                selectedWallets = listOf(walletId)
+            ) 
+        }
+    }
+
     init {
         // Загружаем категории
-        loadCategories()
+        loadInitialData()
         
         // Инициализируем список источников
+        // initSources() // Called within loadInitialData now
+
+        // Загружаем список кошельков
+        viewModelScope.launch {
+            try {
+                val walletsList = walletRepository.getAllWallets()
+                _wallets.value = walletsList
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке кошельков")
+            }
+        }
+    }
+
+    /**
+     * Загружает начальные данные: категории и источники.
+     */
+    private fun loadInitialData() {
+        loadCategories()
         initSources()
     }
 
@@ -147,43 +191,50 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Предустанавливает параметры для добавления дохода
-     * @param amount начальная сумма дохода (может быть пустой)
-     * @param shouldDistribute флаг, указывающий, должен ли доход быть автоматически распределён
-     * @param lockExpenseSelection флаг, блокирующий возможность переключения на расход
+     * Сбрасывает состояние ViewModel к значениям по умолчанию.
+     * Используется при навигации на экран добавления транзакции из мест,
+     * где не требуется предзаполненное или измененное состояние (например, из HomeScreen).
      */
-    fun setupForIncomeAddition(amount: String = "", shouldDistribute: Boolean = false, lockExpenseSelection: Boolean = false) {
+    fun resetToDefaultState() {
+        _state.update { AddTransactionState() } // Создаем новый экземпляр дефолтного состояния
+        loadInitialData() // Перезагружаем кошельки и категории
+        onIncomeAddedCallback = null // Сбрасываем коллбэк
+    }
+
+    /**
+     * Настройка ViewModel для добавления дохода из BudgetScreen.
+     * @param amount Начальная сумма (может быть пустой).
+     * @param shouldDistribute Флаг, указывающий, нужно ли вызывать callback для распределения дохода.
+     * @param lockExpenseSelection Блокирует ли выбор типа "Расход".
+     */
+    fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean, lockExpenseSelection: Boolean) {
         // Устанавливаем параметры транзакции как доход
-        _state.update { 
+        _state.update {
             it.copy(
                 isExpense = false,  // Принудительно установить тип "Доход"
                 amount = amount,
-                title = "Доход",
+                title = "Доход", // Предзаполняем заголовок
                 category = "Зарплата" // Предустановленная категория дохода
             )
         }
-        
+
         // Устанавливаем флаг автоматического распределения
         autoDistributeIncome = shouldDistribute
-        
+
         // Устанавливаем флаг блокировки выбора расхода
         _lockExpenseSelection = lockExpenseSelection
-        
-        // Принудительно обновляем состояние ещё раз для гарантии
+
+        // Принудительно обновляем состояние ещё раз для гарантии, если выбор расхода заблокирован
         if (lockExpenseSelection) {
-            _state.update { 
+            _state.update {
                 it.copy(isExpense = false)
             }
         }
-        
-        // Пытаемся получить экземпляр BudgetViewModel через Koin
-        if (shouldDistribute && budgetViewModel == null) {
-            try {
-                budgetViewModel = org.koin.core.context.GlobalContext.get()
-                    .getOrNull<com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel>()
-            } catch (e: Exception) {
-                Timber.e(e, "Не удалось получить BudgetViewModel")
-            }
+
+        // Коллбэк для распределения сбрасывается здесь, так как он должен устанавливаться
+        // только если shouldDistribute = true (это делается в BudgetScreen)
+        if (!shouldDistribute) {
+            onIncomeAddedCallback = null
         }
     }
 
@@ -401,6 +452,48 @@ class AddTransactionViewModel(
                 // Логируем принудительную установку режима дохода
                 Timber.d("Forced income type selection")
             }
+            
+            // Обработка событий для работы с кошельками
+            is AddTransactionEvent.ToggleAddToWallet -> {
+                // Переключить флаг добавления в кошелек
+                _state.update { it.copy(addToWallet = !it.addToWallet) }
+                
+                // Если включено добавление в кошельки, и список выбранных кошельков пуст,
+                // сразу открываем диалог выбора кошельков
+                if (_state.value.addToWallet && _state.value.selectedWallets.isEmpty()) {
+                    onEvent(AddTransactionEvent.ShowWalletSelector)
+                }
+            }
+            
+            is AddTransactionEvent.ShowWalletSelector -> {
+                _state.update { it.copy(showWalletSelector = true) }
+                // Здесь можно загрузить список кошельков, если он еще не загружен
+                loadWallets()
+            }
+            
+            is AddTransactionEvent.HideWalletSelector -> {
+                _state.update { it.copy(showWalletSelector = false) }
+            }
+            
+            is AddTransactionEvent.SelectWallet -> {
+                val currentSelected = _state.value.selectedWallets.toMutableList()
+                
+                if (event.selected) {
+                    // Добавляем кошелек, если его еще нет в списке
+                    if (!currentSelected.contains(event.walletId)) {
+                        currentSelected.add(event.walletId)
+                    }
+                } else {
+                    // Удаляем кошелек из списка
+                    currentSelected.remove(event.walletId)
+                }
+                
+                _state.update { it.copy(selectedWallets = currentSelected) }
+            }
+            
+            is AddTransactionEvent.SelectWallets -> {
+                _state.update { it.copy(selectedWallets = event.walletIds) }
+            }
         }
     }
 
@@ -443,6 +536,29 @@ class AddTransactionViewModel(
     }
 
     /**
+     * Загружает список доступных кошельков
+     */
+    private fun loadWallets() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Получаем список кошельков из репозитория
+                val walletsList = walletRepository.getAllWallets()
+                _wallets.value = walletsList
+                
+                // Если список выбранных кошельков пуст, предварительно выбираем все кошельки
+                if (_state.value.selectedWallets.isEmpty()) {
+                    val walletIds = walletsList.map { it.id }
+                    _state.update { it.copy(selectedWallets = walletIds) }
+                }
+                
+                Timber.d("Загружено ${walletsList.size} кошельков")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке кошельков")
+            }
+        }
+    }
+
+    /**
      * Добавляет новую транзакцию
      */
     private fun addTransaction() {
@@ -454,7 +570,7 @@ class AddTransactionViewModel(
                 // Проверяем, что сумма введена
                 if (amount <= 0.0) {
                     withContext(Dispatchers.Main) {
-                        _state.update { it.copy(error = "Введите сумму транзакции") }
+                        _state.update { it.copy(error = "Введите сумму транзакции", isLoading = false) }
                     }
                     return@launch
                 }
@@ -491,21 +607,39 @@ class AddTransactionViewModel(
                         // Обновляем категории
                         updateCategoryPositions()
                         
-                        // Проверяем, нужно ли распределить доход по бюджету
-                        if (!currentState.isExpense && autoDistributeIncome) {
+                        // Если это доход и установлен флаг добавления в кошелек
+                        if (!currentState.isExpense && currentState.addToWallet) {
+                            // Распределяем доход по выбранным кошелькам
+                            if (currentState.selectedWallets.isNotEmpty()) {
+                                addIncomeToWallets(
+                                    walletIds = currentState.selectedWallets,
+                                    totalAmount = Money(amount)
+                                )
+                            }
+                        }
+                        
+                        // Проверяем, нужно ли распределить доход по бюджету или обновить конкретный кошелек
+                        if (!currentState.isExpense) {
                             val incomeAmount = Money(amount)
                             
-                            // Вызываем callback для распределения дохода
-                            onIncomeAddedCallback?.invoke(incomeAmount)
+                            // Если есть целевой кошелек или включено автоматическое распределение,
+                            // вызываем соответствующий коллбэк
+                            if (currentState.targetWalletId != null || autoDistributeIncome) {
+                                // Вызываем callback для обновления баланса кошелька или распределения дохода
+                                onIncomeAddedCallback?.invoke(incomeAmount)
+                                Timber.d("Вызван callback для обновления баланса кошелька: ${currentState.targetWalletId}")
+                            }
                             
-                            // Или используем BudgetViewModel напрямую, если он доступен
-                            budgetViewModel?.let { viewModel ->
-                                viewModel.onEvent(
-                                    com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent.DistributeIncome(
-                                        incomeAmount
+                            // Или используем BudgetViewModel напрямую, если он доступен и включено автораспределение
+                            if (autoDistributeIncome) {
+                                budgetViewModel?.let { viewModel ->
+                                    viewModel.onEvent(
+                                        com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent.DistributeIncome(
+                                            incomeAmount
+                                        )
                                     )
-                                )
-                                Timber.d("Доход автоматически распределен: $amount")
+                                    Timber.d("Доход автоматически распределен: $amount")
+                                }
                             }
                         }
 
@@ -524,7 +658,8 @@ class AddTransactionViewModel(
                             _state.update {
                                 it.copy(
                                     error = exception.message ?: "Ошибка при добавлении транзакции",
-                                    isSuccess = false
+                                    isSuccess = false,
+                                    isLoading = false
                                 )
                             }
                         }
@@ -535,10 +670,49 @@ class AddTransactionViewModel(
                     _state.update {
                         it.copy(
                             error = e.message ?: "Непредвиденная ошибка при добавлении транзакции",
-                            isSuccess = false
+                            isSuccess = false,
+                            isLoading = false
                         )
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * Добавляет доход в выбранные кошельки, распределяя сумму между ними
+     */
+    private fun addIncomeToWallets(walletIds: List<String>, totalAmount: Money) {
+        if (walletIds.isEmpty()) return
+        
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Получаем список кошельков по их ID
+                val walletsList = walletRepository.getWalletsByIds(walletIds)
+                
+                if (walletsList.isEmpty()) {
+                    Timber.e("Не найдено кошельков для добавления дохода")
+                    return@launch
+                }
+                
+                // Равномерно распределяем сумму между кошельками
+                val amountPerWallet = totalAmount / walletsList.size
+                
+                // Обновляем каждый кошелек
+                for (wallet in walletsList) {
+                    // Увеличиваем баланс кошелька
+                    val updatedWallet = wallet.copy(
+                        balance = wallet.balance.plus(amountPerWallet)
+                    )
+                    
+                    // Сохраняем обновленный кошелек
+                    walletRepository.updateWallet(updatedWallet)
+                }
+                
+                Timber.d("Доход $totalAmount добавлен в ${walletsList.size} кошельков")
+                
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при добавлении дохода в кошельки")
             }
         }
     }
@@ -555,7 +729,7 @@ class AddTransactionViewModel(
                 val transactionId = currentState.transactionToEdit?.id
                 if (transactionId?.isBlank() == true) {
                     withContext(Dispatchers.Main) {
-                        _state.update { it.copy(error = "ID транзакции не указан") }
+                        _state.update { it.copy(error = "ID транзакции не указан", isLoading = false) }
                     }
                     return@launch
                 }
@@ -565,7 +739,7 @@ class AddTransactionViewModel(
                 // Проверяем, что сумма введена
                 if (amount <= 0.0) {
                     withContext(Dispatchers.Main) {
-                        _state.update { it.copy(error = "Введите сумму транзакции") }
+                        _state.update { it.copy(error = "Введите сумму транзакции", isLoading = false) }
                     }
                     return@launch
                 }
@@ -615,7 +789,8 @@ class AddTransactionViewModel(
                             _state.update {
                                 it.copy(
                                     error = error.message ?: "Ошибка при обновлении транзакции",
-                                    isSuccess = false
+                                    isSuccess = false,
+                                    isLoading = false
                                 )
                             }
                         }
@@ -626,7 +801,8 @@ class AddTransactionViewModel(
                     _state.update {
                         it.copy(
                             error = e.message ?: "Непредвиденная ошибка при обновлении",
-                            isSuccess = false
+                            isSuccess = false,
+                            isLoading = false
                         )
                     }
                 }

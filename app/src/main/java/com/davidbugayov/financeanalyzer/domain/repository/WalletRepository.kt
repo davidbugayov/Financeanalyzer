@@ -62,4 +62,11 @@ interface WalletRepository {
      * @return true, если есть хотя бы один кошелек
      */
     suspend fun hasWallets(): Boolean
+
+    /**
+     * Получает кошельки по списку ID
+     * @param ids Список ID кошельков для получения
+     * @return Список кошельков с указанными ID
+     */
+    suspend fun getWalletsByIds(ids: List<String>): List<Wallet>
 } 

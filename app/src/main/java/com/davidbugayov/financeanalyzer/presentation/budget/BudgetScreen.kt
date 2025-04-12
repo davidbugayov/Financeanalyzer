@@ -62,6 +62,18 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.DatePickerState
+import androidx.compose.material3.rememberDatePickerState
+import androidx.compose.material3.SelectableDates
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.foundation.clickable
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
+import java.util.TimeZone
+import androidx.compose.runtime.DisposableEffect
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -74,13 +86,34 @@ fun BudgetScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    // Обновляем данные при возвращении на экран
+    DisposableEffect(navController) {
+        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
+            // Если текущий экран - BudgetScreen, загружаем данные
+            if (destination.route == Screen.Budget.route) {
+                viewModel.onEvent(BudgetEvent.LoadCategories)
+            }
+        }
+        
+        // Добавляем слушателя
+        navController.addOnDestinationChangedListener(listener)
+        
+        // Загружаем данные при первом входе
+        viewModel.onEvent(BudgetEvent.LoadCategories)
+        
+        // Удаляем слушателя при выходе
+        onDispose {
+            navController.removeOnDestinationChangedListener(listener)
+        }
+    }
+
     // Состояние диалогов
     var showAddCategoryDialog by remember { mutableStateOf(false) }
     var showDistributeIncomeDialog by remember { mutableStateOf(false) }
-    var showAddFundsDialog by remember { mutableStateOf(false) }
     var showSpendFromWalletDialog by remember { mutableStateOf(false) }
     var showTransferDialog by remember { mutableStateOf(false) }
     var showPeriodSettingsDialog by remember { mutableStateOf(false) }
+    var showEditWalletDialog by remember { mutableStateOf(false) }
 
     // Выбранные значения для диалогов
     var selectedWallet by remember { mutableStateOf<Wallet?>(null) }
@@ -104,6 +137,12 @@ fun BudgetScreen(
 
     // Добавляем состояние для меню действий
     var expanded by remember { mutableStateOf(false) }
+
+    // Состояния для диалога редактирования
+    var editWalletName by remember { mutableStateOf("") }
+    var editWalletLimit by remember { mutableStateOf("") }
+    var showDatePickerDialog by remember { mutableStateOf(false) }
+    val dateFormatter = remember { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()) }
 
     Scaffold(
         topBar = {
@@ -149,49 +188,12 @@ fun BudgetScreen(
                     onAddCategoryClick = { showAddCategoryDialog = true }
                 )
 
-                // Переносим заголовок "Мои кошельки" и меню сюда
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = 16.dp, vertical = 8.dp), // Добавляем отступы
-                    horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Text(
-                        text = "Мои кошельки",
-                        style = MaterialTheme.typography.titleLarge
-                    )
-                    
-                    // Меню действий
-                    Box(contentAlignment = Alignment.Center) {
-                        IconButton(onClick = { expanded = true }) {
-                            Icon(
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "Меню действий"
-                            )
-                        }
-                        
-                        DropdownMenu(
-                            expanded = expanded,
-                            onDismissRequest = { expanded = false }
-                        ) {
-                            DropdownMenuItem(
-                                text = { Text("Настройки периода") },
-                                onClick = {
-                                    expanded = false
-                                    showPeriodSettingsDialog = true
-                                }
-                            )
-                            DropdownMenuItem(
-                                text = { Text("Сбросить все периоды") },
-                                onClick = {
-                                    expanded = false
-                                    viewModel.onEvent(BudgetEvent.ResetAllPeriods)
-                                }
-                            )
-                        }
-                    }
-                }
+                // Добавляем простой заголовок
+                Text(
+                    text = "Мои кошельки",
+                    style = MaterialTheme.typography.titleLarge,
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                )
 
                 // Список категорий
                 LazyColumn(
@@ -205,31 +207,48 @@ fun BudgetScreen(
                             category = category,
                             onWalletClick = onNavigateToTransactions,
                             onMenuClick = { categoryFromMenu, action ->
+                                selectedWallet = categoryFromMenu
                                 when (action) {
                                     WalletAction.ADD_FUNDS -> {
-                                        // Открываем диалог добавления средств
-                                        selectedWallet = categoryFromMenu
-                                        walletAmount = ""
-                                        showAddFundsDialog = true
+                                        // Настраиваем ViewModel для добавления дохода
+                                        addTransactionViewModel.setupForIncomeAddition(
+                                            amount = "", // Сумму введет пользователь
+                                            shouldDistribute = false, // Не распределяем автоматически
+                                            lockExpenseSelection = true // Блокируем переключение на расход
+                                        )
+                                        // Устанавливаем категорию, равную имени кошелька
+                                        addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(categoryFromMenu.name))
+                                        
+                                        // Устанавливаем коллбэк для обновления баланса кошелька после добавления дохода
+                                        addTransactionViewModel.onIncomeAddedCallback = { amount ->
+                                            // Добавляем средства в выбранный кошелек
+                                            viewModel.onEvent(BudgetEvent.AddFundsToWallet(categoryFromMenu.id, amount))
+                                        }
+                                        
+                                        // Устанавливаем выбранный кошелек в AddTransactionViewModel
+                                        addTransactionViewModel.setTargetWalletId(categoryFromMenu.id)
+                                        
+                                        // Переходим на экран добавления транзакции
+                                        navController.navigate(Screen.AddTransaction.route)
                                     }
                                     WalletAction.SPEND -> {
-                                        // Открываем диалог списания средств
-                                        selectedWallet = categoryFromMenu
                                         walletAmount = ""
                                         showSpendFromWalletDialog = true
                                     }
                                     WalletAction.TRANSFER -> {
-                                        // Открываем диалог перевода средств
                                         selectedFromWallet = categoryFromMenu
                                         transferAmount = ""
                                         showTransferDialog = true
                                     }
                                     WalletAction.RESET_PERIOD -> {
-                                        // Сбрасываем период
                                         viewModel.onEvent(BudgetEvent.ResetPeriod(categoryFromMenu.id))
                                     }
+                                    WalletAction.EDIT -> {
+                                        editWalletName = categoryFromMenu.name
+                                        editWalletLimit = categoryFromMenu.limit.amount.toPlainString()
+                                        showEditWalletDialog = true
+                                    }
                                     WalletAction.DELETE -> {
-                                        // Удаляем категорию
                                         viewModel.onEvent(BudgetEvent.DeleteCategory(categoryFromMenu))
                                     }
                                 }
@@ -335,58 +354,6 @@ fun BudgetScreen(
                     },
                     dismissButton = {
                         TextButton(onClick = { showDistributeIncomeDialog = false }) {
-                            Text("Отмена")
-                        }
-                    }
-                )
-            }
-
-            // Диалог добавления средств в кошелек
-            if (showAddFundsDialog && selectedWallet != null) {
-                AlertDialog(
-                    onDismissRequest = { showAddFundsDialog = false },
-                    title = { Text("Добавить средства в кошелек") },
-                    text = {
-                        Column {
-                            Text(
-                                text = "Категория: ${selectedWallet!!.name}",
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
-                            )
-
-                            Spacer(modifier = Modifier.height(16.dp))
-
-                            NumberTextField(
-                                value = walletAmount,
-                                onValueChange = { walletAmount = it },
-                                label = { Text("Сумма") },
-                                modifier = Modifier.fillMaxWidth()
-                            )
-                        }
-                    },
-                    confirmButton = {
-                        Button(
-                            onClick = {
-                                val amount = walletAmount.toDoubleOrNull() ?: 0.0
-                                if (amount > 0) {
-                                    selectedWallet?.let { category ->
-                                        viewModel.onEvent(
-                                            BudgetEvent.AddFundsToWallet(
-                                                categoryId = category.id,
-                                                amount = Money(amount)
-                                            )
-                                        )
-                                    }
-                                    walletAmount = ""
-                                    showAddFundsDialog = false
-                                }
-                            }
-                        ) {
-                            Text("Добавить")
-                        }
-                    },
-                    dismissButton = {
-                        TextButton(onClick = { showAddFundsDialog = false }) {
                             Text("Отмена")
                         }
                     }
@@ -724,6 +691,65 @@ fun BudgetScreen(
                     }
                 }
             }
+
+            // Диалог редактирования кошелька
+            if (showEditWalletDialog && selectedWallet != null) {
+                val currentSelectedWallet = selectedWallet!! // Гарантированно не null
+                
+                val editDatePickerState = rememberDatePickerState(
+                    initialSelectedDateMillis = currentSelectedWallet.periodStartDate,
+                    selectableDates = object : SelectableDates {
+                        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                            return true // Разрешаем выбирать любую дату
+                        }
+                    }
+                )
+                
+                EditWalletDialog(
+                    walletName = editWalletName,
+                    onNameChange = { editWalletName = it },
+                    limit = editWalletLimit,
+                    onLimitChange = { editWalletLimit = it },
+                    selectedDateMillis = editDatePickerState.selectedDateMillis,
+                    dateFormatter = dateFormatter,
+                    onShowDatePicker = { showDatePickerDialog = true },
+                    onDismiss = { showEditWalletDialog = false },
+                    onConfirm = {
+                        val newLimit = editWalletLimit.toDoubleOrNull()
+                        val newStartDate = editDatePickerState.selectedDateMillis ?: currentSelectedWallet.periodStartDate
+                        
+                        if (editWalletName.isNotBlank() && newLimit != null) {
+                            val updatedWallet = currentSelectedWallet.copy(
+                                name = editWalletName,
+                                limit = Money(newLimit),
+                                periodStartDate = newStartDate
+                            )
+                            viewModel.onEvent(BudgetEvent.UpdateCategory(updatedWallet))
+                            showEditWalletDialog = false
+                        } else {
+                            // TODO: Показать ошибку валидации
+                        }
+                    }
+                )
+                
+                if (showDatePickerDialog) {
+                    DatePickerDialog(
+                        onDismissRequest = { showDatePickerDialog = false },
+                        confirmButton = {
+                            TextButton(onClick = { showDatePickerDialog = false }) {
+                                Text("OK")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(onClick = { showDatePickerDialog = false }) {
+                                Text("Отмена")
+                            }
+                        }
+                    ) {
+                        DatePicker(state = editDatePickerState)
+                    }
+                }
+            }
         }
     }
 }
@@ -943,4 +969,68 @@ fun BudgetSummaryCard(
             }
         }
     }
+}
+
+@Composable
+fun EditWalletDialog(
+    walletName: String,
+    onNameChange: (String) -> Unit,
+    limit: String,
+    onLimitChange: (String) -> Unit,
+    selectedDateMillis: Long?,
+    dateFormatter: SimpleDateFormat,
+    onShowDatePicker: () -> Unit,
+    onDismiss: () -> Unit,
+    onConfirm: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Редактировать кошелек") },
+        text = {
+            Column {
+                OutlinedTextField(
+                    value = walletName,
+                    onValueChange = onNameChange,
+                    label = { Text("Название кошелька") },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                NumberTextField(
+                    value = limit,
+                    onValueChange = onLimitChange,
+                    label = { Text("Лимит расходов") },
+                    modifier = Modifier.fillMaxWidth()
+                )
+                
+                Spacer(modifier = Modifier.height(16.dp))
+                
+                // Поле для выбора даты начала периода
+                OutlinedTextField(
+                    value = selectedDateMillis?.let { dateFormatter.format(Date(it)) } ?: "Выберите дату",
+                    onValueChange = {}, // Не редактируется напрямую
+                    readOnly = true,
+                    label = { Text("Дата начала периода") },
+                    trailingIcon = {
+                        Icon(
+                            imageVector = Icons.Default.CalendarMonth,
+                            contentDescription = "Выбрать дату",
+                            modifier = Modifier.clickable(onClick = onShowDatePicker)
+                        )
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable(onClick = onShowDatePicker) // Кликабельно всё поле
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onConfirm) { Text("Сохранить") }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) { Text("Отмена") }
+        }
+    )
 } 

@@ -336,24 +336,12 @@ fun MainScreen(startDestination: String = "home") {
                     composable(
                         route = Screen.AddTransaction.route,
                         enterTransition = {
-                            slideIntoContainer(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                ),
-                                towards = AnimatedContentTransitionScope.SlideDirection.Down
-                            ) + fadeIn(
+                            fadeIn(
                                 animationSpec = tween(300, easing = EaseInOut)
                             )
                         },
                         exitTransition = {
-                            slideOutOfContainer(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                ),
-                                towards = AnimatedContentTransitionScope.SlideDirection.Down
-                            ) + fadeOut(
+                            fadeOut(
                                 animationSpec = tween(300, easing = EaseInOut)
                             )
                         }
@@ -365,11 +353,19 @@ fun MainScreen(startDestination: String = "home") {
                         if (previousRoute == Screen.Budget.route) {
                             LaunchedEffect(Unit) {
                                 addTransactionViewModel.setupForIncomeAddition(
+                                    amount = "",
                                     shouldDistribute = false,
                                     lockExpenseSelection = true
                                 )
                                 // Принудительно меняем тип на доход
-                                addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                                // This might be redundant now as setupForIncomeAddition sets isExpense = false
+                                // addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                            }
+                        } else {
+                            // Если переход с любого другого экрана (например, HomeScreen),
+                            // сбрасываем состояние ViewModel до дефолтного (тип "Расход")
+                            LaunchedEffect(Unit) {
+                                addTransactionViewModel.resetToDefaultState()
                             }
                         }
                         

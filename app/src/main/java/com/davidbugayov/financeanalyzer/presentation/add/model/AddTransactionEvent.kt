@@ -45,4 +45,11 @@ sealed class AddTransactionEvent {
     object HideSuccessDialog : AddTransactionEvent()
     object AttachReceipt : AddTransactionEvent()
     object ForceSetIncomeType : AddTransactionEvent()
+    
+    // События для управления добавлением дохода в кошельки
+    object ToggleAddToWallet : AddTransactionEvent() // Переключение флага добавления в кошелек
+    object ShowWalletSelector : AddTransactionEvent() // Показать диалог выбора кошельков
+    object HideWalletSelector : AddTransactionEvent() // Скрыть диалог выбора кошельков
+    data class SelectWallet(val walletId: String, val selected: Boolean) : AddTransactionEvent() // Выбор/отмена выбора кошелька
+    data class SelectWallets(val walletIds: List<String>) : AddTransactionEvent() // Выбор нескольких кошельков
 } 

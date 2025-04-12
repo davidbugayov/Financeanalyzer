@@ -33,9 +33,12 @@ import com.davidbugayov.financeanalyzer.presentation.add.components.CommentField
 import com.davidbugayov.financeanalyzer.presentation.add.components.CustomCategoryDialog
 import com.davidbugayov.financeanalyzer.presentation.add.components.CustomSourceDialog
 import com.davidbugayov.financeanalyzer.presentation.add.components.DateField
+import com.davidbugayov.financeanalyzer.presentation.add.components.NoteField
 import com.davidbugayov.financeanalyzer.presentation.add.components.SourcePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.add.components.SourceSection
 import com.davidbugayov.financeanalyzer.presentation.add.components.TransactionHeader
+import com.davidbugayov.financeanalyzer.presentation.add.components.WalletSelectionSection
+import com.davidbugayov.financeanalyzer.presentation.add.components.WalletSelectorDialog
 import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -228,6 +231,19 @@ fun AddTransactionScreen(
                         viewModel.onEvent(AddTransactionEvent.AttachReceipt)
                     }
                 )
+                
+                // Секция выбора кошельков (показывается только для доходов)
+                WalletSelectionSection(
+                    addToWallet = state.addToWallet,
+                    selectedWallets = state.selectedWallets,
+                    onToggleAddToWallet = {
+                        viewModel.onEvent(AddTransactionEvent.ToggleAddToWallet)
+                    },
+                    onSelectWalletsClick = {
+                        viewModel.onEvent(AddTransactionEvent.ShowWalletSelector)
+                    },
+                    isVisible = !state.isExpense // Показываем только для доходов
+                )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
 
@@ -414,6 +430,23 @@ fun AddTransactionScreen(
                     },
                     onDismiss = {
                         viewModel.onEvent(AddTransactionEvent.HideDeleteSourceConfirmDialog)
+                    }
+                )
+            }
+            
+            // Диалог выбора кошельков для добавления дохода
+            if (state.showWalletSelector) {
+                WalletSelectorDialog(
+                    wallets = viewModel.wallets,
+                    selectedWalletIds = state.selectedWallets,
+                    onWalletSelected = { walletId, selected ->
+                        viewModel.onEvent(AddTransactionEvent.SelectWallet(walletId, selected))
+                    },
+                    onConfirm = {
+                        viewModel.onEvent(AddTransactionEvent.HideWalletSelector)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(AddTransactionEvent.HideWalletSelector)
                     }
                 )
             }

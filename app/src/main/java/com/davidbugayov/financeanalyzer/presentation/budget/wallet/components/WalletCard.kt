@@ -41,6 +41,7 @@ enum class WalletAction {
     SPEND,
     TRANSFER,
     RESET_PERIOD,
+    EDIT,
     DELETE
 }
 
@@ -133,6 +134,13 @@ fun WalletCard(
                             onClick = {
                                 showMenu = false
                                 onMenuClick(category, WalletAction.RESET_PERIOD)
+                            }
+                        )
+                        DropdownMenuItem(
+                            text = { Text("Редактировать кошелек") },
+                            onClick = {
+                                showMenu = false
+                                onMenuClick(category, WalletAction.EDIT)
                             }
                         )
                         DropdownMenuItem(
