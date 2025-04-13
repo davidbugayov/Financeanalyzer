@@ -31,6 +31,7 @@ data class AddTransactionState(
     val isLoading: Boolean = false,
     val error: String? = null,
     val isSuccess: Boolean = false,
+    val successMessage: String = "Операция выполнена успешно",
     val expenseCategories: List<CategoryItem> = emptyList(),
     val incomeCategories: List<CategoryItem> = emptyList(),
     val sources: List<Source> = emptyList(),
@@ -43,5 +44,6 @@ data class AddTransactionState(
     val addToWallet: Boolean = false, // Добавлять ли доход в кошелек (по умолчанию - нет)
     val selectedWallets: List<String> = emptyList(), // Список ID выбранных кошельков
     val showWalletSelector: Boolean = false, // Показывать ли диалог выбора кошельков
-    val targetWalletId: String? = null // ID целевого кошелька для добавления дохода
+    val targetWalletId: String? = null, // ID целевого кошелька для добавления дохода
+    val forceExpense: Boolean = false // Принудительно использовать тип "Расход"
 ) 

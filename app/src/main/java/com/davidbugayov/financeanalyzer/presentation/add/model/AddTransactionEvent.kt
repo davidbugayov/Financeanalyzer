@@ -43,10 +43,11 @@ sealed class AddTransactionEvent {
     object Submit : AddTransactionEvent()
     object ClearError : AddTransactionEvent()
     object HideSuccessDialog : AddTransactionEvent()
-    object AttachReceipt : AddTransactionEvent()
     object ForceSetIncomeType : AddTransactionEvent()
+    object ForceSetExpenseType : AddTransactionEvent()
     
     // События для управления добавлением дохода в кошельки
+    data class SetTargetWalletId(val walletId: String) : AddTransactionEvent() // Установка ID целевого кошелька
     object ToggleAddToWallet : AddTransactionEvent() // Переключение флага добавления в кошелек
     object ShowWalletSelector : AddTransactionEvent() // Показать диалог выбора кошельков
     object HideWalletSelector : AddTransactionEvent() // Скрыть диалог выбора кошельков

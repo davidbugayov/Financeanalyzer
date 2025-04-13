@@ -50,6 +50,7 @@ class BudgetViewModel(
             is BudgetEvent.UpdateCategory -> updateCategory(event.category)
             is BudgetEvent.DeleteCategory -> deleteCategory(event.category)
             is BudgetEvent.ClearError -> clearError()
+            is BudgetEvent.SetError -> setError(event.message)
             is BudgetEvent.DistributeIncome -> distributeIncome(event.amount)
             is BudgetEvent.AddFundsToWallet -> addFundsToWallet(event.categoryId, event.amount)
             is BudgetEvent.SpendFromWallet -> spendFromWallet(event.categoryId, event.amount)
@@ -168,6 +169,10 @@ class BudgetViewModel(
                 }
                 
                 calculateTotals()
+                
+                // Получаем самые свежие транзакции перед обновлением сумм расходов
+                val transactions = transactionRepository.getAllTransactions()
+                Timber.d("Получено ${transactions.size} транзакций для расчета трат кошельков")
                 
                 // Обновляем суммы трат для всех кошельков
                 updateSpentAmounts(wallets)
@@ -322,8 +327,18 @@ class BudgetViewModel(
         }
     }
 
+    /**
+     * Очищает сообщение об ошибке
+     */
     private fun clearError() {
         _state.update { it.copy(error = null) }
+    }
+    
+    /**
+     * Устанавливает сообщение об ошибке
+     */
+    private fun setError(message: String) {
+        _state.update { it.copy(error = message) }
     }
 
     /**

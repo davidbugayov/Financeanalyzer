@@ -91,8 +91,7 @@ fun WalletTransactionsScreen(
             // Настроим экран добавления транзакции
             addTransactionViewModel.setupForIncomeAddition(
                 amount = "",  // Пустая строка для поля суммы
-                shouldDistribute = false,  // Не распределяем автоматически
-                lockExpenseSelection = false // Разрешаем выбрать тип транзакции
+                shouldDistribute = false  // Не распределяем автоматически
             )
             
             // Принудительно установим тип "Расход" и категорию, соответствующую кошельку

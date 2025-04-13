@@ -9,8 +9,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
+import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -235,15 +237,6 @@ fun HomeScreen(
             // Используем анимированную нижнюю навигацию 
             AnimatedBottomNavigationBar(
                 visible = true,
-                onAddClick = {
-                    // Сбрасываем состояние AddTransactionViewModel к дефолтному
-                    addTransactionViewModel.resetToDefaultState()
-                    // Выполняем навигацию
-                    onNavigateToAdd()
-                    feedbackMessage = "Добавление новой транзакции"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
-                },
                 onChartClick = {
                     onNavigateToChart()
                     feedbackMessage = "Переход к графикам"
@@ -264,6 +257,29 @@ fun HomeScreen(
                 },
                 modifier = Modifier.align(Alignment.BottomCenter)
             )
+
+            // Floating Action Button для добавления транзакции
+            FloatingActionButton(
+                onClick = {
+                    // Сбрасываем состояние AddTransactionViewModel к дефолтному
+                    addTransactionViewModel.resetToDefaultState()
+                    // Выполняем навигацию
+                    onNavigateToAdd()
+                    feedbackMessage = "Добавление новой транзакции"
+                    feedbackType = FeedbackType.INFO
+                    showFeedback = true
+                },
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(bottom = 80.dp, end = 16.dp),
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.add_button),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
 
             // Индикатор загрузки с анимацией
             AnimatedVisibility(

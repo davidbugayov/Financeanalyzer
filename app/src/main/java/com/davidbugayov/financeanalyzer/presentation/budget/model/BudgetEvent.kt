@@ -13,6 +13,7 @@ sealed class BudgetEvent {
     data class DeleteCategory(val category: Wallet) : BudgetEvent()
     data object LoadCategories : BudgetEvent()
     data object ClearError : BudgetEvent()
+    data class SetError(val message: String) : BudgetEvent()
 
     // События для работы с кошельками
     data class DistributeIncome(val amount: Money) : BudgetEvent()

@@ -52,6 +52,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 /**
  * Экран добавления новой транзакции в стиле CoinKeeper
@@ -77,15 +78,21 @@ fun AddTransactionScreen(
         viewModel.navigateBackCallback = onNavigateBack
     }
     
-    // Гарантируем, что режим "Доход" будет активен при lockExpenseSelection
-    LaunchedEffect(viewModel.lockExpenseSelection) {
-        if (viewModel.lockExpenseSelection && state.isExpense) {
-            // Если установлена блокировка выбора расхода, но состояние - расход,
-            // принудительно переключаем на доход
+    // Специальная обработка для доходов при переходе с экрана бюджета
+    // (устанавливается forceExpense = false)
+    LaunchedEffect(state.forceExpense) {
+        // Если выставлен флаг forceExpense = false, но состояние isExpense = true
+        // Это означает, что мы должны показать форму для дохода 
+        // (обычно при переходе с экрана бюджета)
+        if (!state.forceExpense && state.isExpense) {
+            // Принудительно переключаем на тип "Доход"
             viewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
         }
     }
-
+    
+    // Этот эффект больше не нужен, так как мы всегда хотим сохранять тип транзакции
+    // как указано в состоянии - расход по умолчанию
+    
     // Очищаем callback при выходе из композиции
     DisposableEffect(Unit) {
         onDispose {
@@ -149,7 +156,7 @@ fun AddTransactionScreen(
                     onToggleTransactionType = {
                         viewModel.onEvent(AddTransactionEvent.ToggleTransactionType)
                     },
-                    lockExpenseSelection = viewModel.lockExpenseSelection
+                    forceExpense = state.forceExpense
                 )
 
                 // Секция "Откуда"
@@ -221,18 +228,18 @@ fun AddTransactionScreen(
                         .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
                 )
 
-                // Поле для комментария с иконкой прикрепления
+                // Поле для комментария без иконки прикрепления
                 CommentField(
                     note = state.note,
                     onNoteChange = { note ->
                         viewModel.onEvent(AddTransactionEvent.SetNote(note))
                     },
-                    onAttachClick = {
-                        viewModel.onEvent(AddTransactionEvent.AttachReceipt)
-                    }
+                    onAttachClick = { /* действие удалено */ }
                 )
                 
                 // Секция выбора кошельков (показывается только для доходов)
+                Timber.d("AddTransactionScreen: isExpense=${state.isExpense}, addToWallet=${state.addToWallet}, selectedWallets=${state.selectedWallets}, targetWalletId=${state.targetWalletId}")
+                
                 WalletSelectionSection(
                     addToWallet = state.addToWallet,
                     selectedWallets = state.selectedWallets,

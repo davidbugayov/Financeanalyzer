@@ -4,10 +4,6 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AttachFile
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -16,13 +12,13 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 /**
- * Поле для комментария с иконкой прикрепления
+ * Поле для комментария без иконки прикрепления
  */
 @Composable
 fun CommentField(
     note: String,
     onNoteChange: (String) -> Unit,
-    onAttachClick: () -> Unit,
+    onAttachClick: () -> Unit, // параметр сохранен для обратной совместимости
     modifier: Modifier = Modifier
 ) {
     Surface(
@@ -42,16 +38,8 @@ fun CommentField(
             NoteField(
                 note = note,
                 onNoteChange = onNoteChange,
-                modifier = Modifier.weight(1f)
+                modifier = Modifier.fillMaxWidth()
             )
-
-            IconButton(onClick = onAttachClick) {
-                Icon(
-                    imageVector = Icons.Default.AttachFile,
-                    contentDescription = "Прикрепить чек",
-                    tint = MaterialTheme.colorScheme.onSurfaceVariant
-                )
-            }
         }
     }
 } 

@@ -33,6 +33,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,6 +75,8 @@ import java.util.Date
 import java.util.Locale
 import java.util.TimeZone
 import androidx.compose.runtime.DisposableEffect
+import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -104,6 +107,21 @@ fun BudgetScreen(
         // Удаляем слушателя при выходе
         onDispose {
             navController.removeOnDestinationChangedListener(listener)
+        }
+    }
+    
+    // Подписываемся на события изменения данных транзакций
+    LaunchedEffect(Unit) {
+        // Получаем репозиторий транзакций через addTransactionViewModel
+        addTransactionViewModel.getTransactionRepository().dataChangeEvents.collect { event ->
+            // При изменении транзакций, обновляем данные
+            when (event) {
+                is DataChangeEvent.TransactionChanged -> {
+                    Timber.d("BudgetScreen: получено событие изменения транзакции, обновляем данные")
+                    viewModel.onEvent(BudgetEvent.LoadCategories)
+                }
+                else -> { /* Игнорируем другие события */ }
+            }
         }
     }
 
@@ -210,30 +228,66 @@ fun BudgetScreen(
                                 selectedWallet = categoryFromMenu
                                 when (action) {
                                     WalletAction.ADD_FUNDS -> {
-                                        // Настраиваем ViewModel для добавления дохода
+                                        // Логируем для отладки
+                                        Timber.d("ADD_FUNDS выбран для кошелька: ${categoryFromMenu.id}, ${categoryFromMenu.name}")
+                                        
+                                        // Сначала устанавливаем выбранный кошелек в AddTransactionViewModel
+                                        addTransactionViewModel.setTargetWalletId(categoryFromMenu.id)
+                                        Timber.d("Целевой кошелек установлен: ${categoryFromMenu.id}")
+                                        
+                                        // Затем настраиваем ViewModel для добавления дохода
                                         addTransactionViewModel.setupForIncomeAddition(
                                             amount = "", // Сумму введет пользователь
-                                            shouldDistribute = false, // Не распределяем автоматически
-                                            lockExpenseSelection = true // Блокируем переключение на расход
+                                            shouldDistribute = false // Не распределяем автоматически
                                         )
+                                        
                                         // Устанавливаем категорию, равную имени кошелька
                                         addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(categoryFromMenu.name))
+                                        Timber.d("Категория установлена: ${categoryFromMenu.name}")
+                                        
+                                        // Явно устанавливаем, что это не расход
+                                        addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                                        Timber.d("Явно установлено тип транзакции как доход")
+
+                                        // Добавляем проверку состояния перед навигацией
+                                        Timber.d("Проверка финального состояния перед навигацией: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
                                         
                                         // Устанавливаем коллбэк для обновления баланса кошелька после добавления дохода
                                         addTransactionViewModel.onIncomeAddedCallback = { amount ->
                                             // Добавляем средства в выбранный кошелек
                                             viewModel.onEvent(BudgetEvent.AddFundsToWallet(categoryFromMenu.id, amount))
+                                            Timber.d("Callback для обновления кошелька установлен: ${categoryFromMenu.id}")
                                         }
-                                        
-                                        // Устанавливаем выбранный кошелек в AddTransactionViewModel
-                                        addTransactionViewModel.setTargetWalletId(categoryFromMenu.id)
                                         
                                         // Переходим на экран добавления транзакции
                                         navController.navigate(Screen.AddTransaction.route)
                                     }
                                     WalletAction.SPEND -> {
-                                        walletAmount = ""
-                                        showSpendFromWalletDialog = true
+                                        // Логируем для отладки
+                                        Timber.d("SPEND выбран для кошелька: ${categoryFromMenu.id}, ${categoryFromMenu.name}")
+                                        
+                                        // Устанавливаем целевой кошелек в AddTransactionViewModel
+                                        addTransactionViewModel.setTargetWalletId(categoryFromMenu.id)
+                                        Timber.d("Целевой кошелек установлен для расхода: ${categoryFromMenu.id}")
+                                        
+                                        // Настраиваем ViewModel для добавления расхода
+                                        addTransactionViewModel.setupForExpenseAddition(
+                                            amount = "", // Сумму введет пользователь
+                                            walletCategory = categoryFromMenu.name // Передаем название кошелька как категорию
+                                        )
+                                        
+                                        // Проверяем состояние после настройки для убеждения в правильности
+                                        Timber.d("Состояние после настройки расхода: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
+                                        
+                                        // Устанавливаем коллбэк для обновления баланса кошелька после добавления расхода
+                                        addTransactionViewModel.onExpenseAddedCallback = { amount ->
+                                            // Списываем средства из выбранного кошелька
+                                            viewModel.onEvent(BudgetEvent.SpendFromWallet(categoryFromMenu.id, amount))
+                                            Timber.d("Callback для обновления кошелька при расходе вызван: ${categoryFromMenu.id}, сумма: $amount")
+                                        }
+                                        
+                                        // Переходим на экран добавления транзакции
+                                        navController.navigate(Screen.AddTransaction.route)
                                     }
                                     WalletAction.TRANSFER -> {
                                         selectedFromWallet = categoryFromMenu
@@ -634,15 +688,22 @@ fun BudgetScreen(
                                 onClick = {
                                     showDistributeConfirmation = false
                                     
+                                    // Проверяем, есть ли кошельки для распределения
+                                    val hasWallets = viewModel.state.value.categories.isNotEmpty()
+                                    if (!hasWallets) {
+                                        viewModel.onEvent(BudgetEvent.SetError("Нет доступных кошельков для распределения"))
+                                        return@Button
+                                    }
+                                    
                                     // Настраиваем экран добавления транзакции для дохода
                                     addTransactionViewModel.setupForIncomeAddition(
                                         amount = tempIncomeAmount,
-                                        shouldDistribute = true,
-                                        lockExpenseSelection = true
+                                        shouldDistribute = true
                                     )
                                     
-                                    // Принудительно устанавливаем режим дохода
-                                    addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                                    // Сбрасываем предыдущие выбранные кошельки и выбираем все существующие
+                                    addTransactionViewModel.clearSelectedWallets()
+                                    addTransactionViewModel.selectAllWalletsWithoutDialog()
                                     
                                     // Устанавливаем callback для автоматического распределения дохода после добавления
                                     addTransactionViewModel.onIncomeAddedCallback = { amount ->
@@ -667,15 +728,17 @@ fun BudgetScreen(
                                 onClick = {
                                     showDistributeConfirmation = false
                                     
-                                    // Навигация без флага автораспределения
+                                    // Настройка ViewModel для добавления дохода без распределения
                                     addTransactionViewModel.setupForIncomeAddition(
                                         amount = tempIncomeAmount,
-                                        shouldDistribute = false,
-                                        lockExpenseSelection = true
+                                        shouldDistribute = false
                                     )
                                     
-                                    // Принудительно устанавливаем режим дохода
-                                    addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                                    // Сбрасываем предыдущие кошельки, если они были выбраны
+                                    addTransactionViewModel.clearSelectedWallets()
+                                    
+                                    // Сбрасываем callback
+                                    addTransactionViewModel.onIncomeAddedCallback = null
                                     
                                     navController.navigate(Screen.AddTransaction.route)
                                 },

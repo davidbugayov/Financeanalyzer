@@ -34,6 +34,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.domain.model.Currency
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -59,23 +60,22 @@ class AddTransactionViewModel(
     // Храним категории, которые были использованы в этой сессии
     private val usedCategories = mutableSetOf<Pair<String, Boolean>>() // category to isExpense
     
-    // Флаг для автоматического распределения дохода
-    private var autoDistributeIncome = false
+    /**
+     * Флаг автоматического распределения дохода по категориям бюджета.
+     * Используется в BudgetScreen при нажатии кнопки "Распределить".
+     */
+    var autoDistributeIncome: Boolean = false
+        private set(value) {
+            field = value
+            Timber.d("autoDistributeIncome установлено в $value")
+        }
+
+    // Ссылка на BudgetViewModel для автоматического распределения дохода
     private var budgetViewModel: com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel? = null
 
-    /**
-     * Флаг блокировки выбора типа транзакции "Расход" 
-     */
-    private var _lockExpenseSelection: Boolean = false
-    val lockExpenseSelection: Boolean get() = _lockExpenseSelection
-
-    /**
-     * Метод для возврата к предыдущему экрану (будет вызываться из AddTransactionScreen)
-     */
-    var navigateBackCallback: (() -> Unit)? = null
-    
-    // Callback, который будет вызван после успешного добавления дохода
-    var onIncomeAddedCallback: ((com.davidbugayov.financeanalyzer.domain.model.Money) -> Unit)? = null
+    // Сохраняем ID целевого кошелька отдельно, чтобы иметь возможность восстановить его
+    var storedTargetWalletId: String? = null
+        private set
 
     // Список доступных кошельков с внутренним MutableStateFlow для обновлений
     private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
@@ -83,10 +83,27 @@ class AddTransactionViewModel(
         get() = _wallets.value
 
     /**
+     * Метод для возврата к предыдущему экрану (будет вызываться из AddTransactionScreen)
+     */
+    var navigateBackCallback: (() -> Unit)? = null
+     
+    // Callback, который будет вызван после успешного добавления дохода
+    var onIncomeAddedCallback: ((com.davidbugayov.financeanalyzer.domain.model.Money) -> Unit)? = null
+     
+    // Callback, который будет вызван после успешного добавления расхода
+    var onExpenseAddedCallback: ((com.davidbugayov.financeanalyzer.domain.model.Money) -> Unit)? = null
+
+    /**
      * Устанавливает ID целевого кошелька для добавления дохода
      * и автоматически включает опцию добавления в кошелек
      */
     fun setTargetWalletId(walletId: String) {
+        Timber.d("setTargetWalletId вызван с ID: $walletId")
+        
+        // Сохраняем ID кошелька в отдельном поле для восстановления состояния
+        storedTargetWalletId = walletId
+        Timber.d("storedTargetWalletId сохранен: $storedTargetWalletId")
+        
         _state.update { 
             it.copy(
                 targetWalletId = walletId,
@@ -94,6 +111,10 @@ class AddTransactionViewModel(
                 selectedWallets = listOf(walletId)
             ) 
         }
+        // Выводим состояние после обновления для проверки
+        Timber.d("После установки targetWalletId: targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}, selectedWallets=${_state.value.selectedWallets}")
+        
+        // Убрал автоматический вызов ForceSetIncomeType, чтобы не переключать тип транзакции автоматически
     }
 
     init {
@@ -160,6 +181,9 @@ class AddTransactionViewModel(
      * Сбрасывает все поля формы до значений по умолчанию
      */
     fun resetFields() {
+        val currentTargetWalletId = _state.value.targetWalletId ?: storedTargetWalletId
+        val useStoredWallet = currentTargetWalletId != null
+        
         _state.update {
             AddTransactionState(
                 // Сохраняем списки категорий и источников
@@ -169,10 +193,17 @@ class AddTransactionViewModel(
                 // Устанавливаем значения по умолчанию для источника
                 source = "Сбер",
                 sourceColor = ColorUtils.SBER_COLOR,
-                // Если установлена блокировка выбора расхода, принудительно устанавливаем тип "Доход"
-                isExpense = if (_lockExpenseSelection) false else it.isExpense,
+                // Всегда устанавливаем тип "Расход" по умолчанию
+                isExpense = true,
                 // Если это доход и установлена блокировка, устанавливаем категорию дохода
-                category = if (_lockExpenseSelection && !it.isExpense) "Зарплата" else ""
+                category = "",
+                // Сохраняем настройки кошелька, если есть сохраненное значение
+                targetWalletId = if (useStoredWallet) currentTargetWalletId else null,
+                addToWallet = if (useStoredWallet) true else false,
+                selectedWallets = if (useStoredWallet && currentTargetWalletId != null) 
+                                     listOf(currentTargetWalletId) 
+                                  else 
+                                     emptyList()
             )
         }
     }
@@ -196,46 +227,146 @@ class AddTransactionViewModel(
      * где не требуется предзаполненное или измененное состояние (например, из HomeScreen).
      */
     fun resetToDefaultState() {
-        _state.update { AddTransactionState() } // Создаем новый экземпляр дефолтного состояния
+        Timber.d("Вызов resetToDefaultState, текущее состояние: targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}, selectedWallets=${_state.value.selectedWallets}, storedTargetWalletId=$storedTargetWalletId, autoDistributeIncome=$autoDistributeIncome")
+        
+        // Сбрасываем флаг автоматического распределения
+        autoDistributeIncome = false
+        
+        // Сохраняем ID кошелька, если он был установлен ранее
+        val currentTargetWalletId = storedTargetWalletId
+        val hasWalletData = currentTargetWalletId != null
+        
+        // Очищаем сохраненный targetWalletId
+        storedTargetWalletId = null
+        
+        // Создаем новое состояние с сохранением необходимых данных
+        _state.update { 
+            AddTransactionState(
+                isExpense = true,
+                // Сохраняем категории и источники из текущего состояния
+                expenseCategories = it.expenseCategories,
+                incomeCategories = it.incomeCategories,
+                sources = it.sources,
+                // Сбрасываем настройки кошельков при новом переходе
+                targetWalletId = null,
+                addToWallet = false,
+                selectedWallets = emptyList()
+            ) 
+        }
+        
+        Timber.d("После resetToDefaultState: targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}, selectedWallets=${_state.value.selectedWallets}, storedTargetWalletId=$storedTargetWalletId")
+        
         loadInitialData() // Перезагружаем кошельки и категории
         onIncomeAddedCallback = null // Сбрасываем коллбэк
     }
 
     /**
-     * Настройка ViewModel для добавления дохода из BudgetScreen.
-     * @param amount Начальная сумма (может быть пустой).
-     * @param shouldDistribute Флаг, указывающий, нужно ли вызывать callback для распределения дохода.
-     * @param lockExpenseSelection Блокирует ли выбор типа "Расход".
+     * Настройка ViewModel для добавления дохода с указанной суммой
+     * и опционального распределения по кошелькам
      */
-    fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean, lockExpenseSelection: Boolean) {
-        // Устанавливаем параметры транзакции как доход
-        _state.update {
-            it.copy(
-                isExpense = false,  // Принудительно установить тип "Доход"
-                amount = amount,
-                title = "Доход", // Предзаполняем заголовок
-                category = "Зарплата" // Предустановленная категория дохода
-            )
-        }
-
+    fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean) {
+        Timber.d("setupForIncomeAddition: amount=$amount, shouldDistribute=$shouldDistribute")
+        Timber.d("Текущее состояние перед setupForIncomeAddition: targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}, selectedWallets=${_state.value.selectedWallets}, isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
+        
         // Устанавливаем флаг автоматического распределения
         autoDistributeIncome = shouldDistribute
-
-        // Устанавливаем флаг блокировки выбора расхода
-        _lockExpenseSelection = lockExpenseSelection
-
-        // Принудительно обновляем состояние ещё раз для гарантии, если выбор расхода заблокирован
-        if (lockExpenseSelection) {
-            _state.update {
-                it.copy(isExpense = false)
-            }
+        
+        // Сохраняем настройки кошелька
+        val currentTargetWalletId = _state.value.targetWalletId
+        val currentSelectedWallets = _state.value.selectedWallets
+        val currentAddToWallet = _state.value.addToWallet || shouldDistribute // Если включено распределение, включаем добавление в кошельки
+        
+        // Принудительно устанавливаем тип дохода
+        _state.update {
+            it.copy(
+                isExpense = false,
+                forceExpense = false,
+                amount = amount,
+                // Важно: восстанавливаем сохраненные значения
+                targetWalletId = currentTargetWalletId,
+                selectedWallets = currentSelectedWallets,
+                addToWallet = currentAddToWallet
+            )
         }
+        
+        // Добавляем дополнительный лог для отладки
+        Timber.d("=== ВНИМАНИЕ: Принудительно установлен доход в setupForIncomeAddition ===")
+        Timber.d("Автоматическое распределение: $shouldDistribute")
+        
+        // Логируем состояние после установки
+        Timber.d("Состояние после setupForIncomeAddition: targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}, selectedWallets=${_state.value.selectedWallets}, isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
+    }
 
-        // Коллбэк для распределения сбрасывается здесь, так как он должен устанавливаться
-        // только если shouldDistribute = true (это делается в BudgetScreen)
-        if (!shouldDistribute) {
-            onIncomeAddedCallback = null
+    /**
+     * Настраивает ViewModel для добавления дохода.
+     * @param amount Предустановленная сумма дохода (если есть).
+     * @param targetWalletId ID кошелька, в который добавляется доход.
+     */
+    fun setupForIncomeAddition(amount: String, targetWalletId: String) {
+        Timber.d("setupForIncomeAddition: amount=$amount, targetWalletId=$targetWalletId")
+        Timber.d("Текущее состояние перед setupForIncomeAddition: isExpense=${_state.value.isExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
+        
+        // Устанавливаем целевой кошелек для дохода
+        onEvent(AddTransactionEvent.SetTargetWalletId(targetWalletId))
+        
+        // Включаем добавление в кошелек
+        if (!_state.value.addToWallet) {
+            onEvent(AddTransactionEvent.ToggleAddToWallet)
         }
+        
+        // Принудительно устанавливаем тип "Доход", но без блокировки переключения
+        onEvent(AddTransactionEvent.ForceSetIncomeType)
+        
+        // Устанавливаем предзаполненную сумму, если есть
+        _state.update {
+            it.copy(
+                amount = amount
+            )
+        }
+        
+        // Добавляем отладочный лог
+        Timber.d("После setupForIncomeAddition: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
+    }
+
+    /**
+     * Настраивает ViewModel для добавления расхода.
+     * @param amount Предустановленная сумма расхода (если есть).
+     * @param walletCategory Категория кошелька для списания.
+     */
+    fun setupForExpenseAddition(amount: String, walletCategory: String) {
+        Timber.d("setupForExpenseAddition: amount=$amount, walletCategory=$walletCategory")
+        Timber.d("Текущее состояние перед setupForExpenseAddition: targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}, isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
+        
+        // Устанавливаем флаг автоматического распределения дохода
+        autoDistributeIncome = false
+        
+        // Выводим лог до вызова ForceSetExpenseType
+        Timber.d("ПЕРЕД вызовом ForceSetExpenseType: isExpense=${_state.value.isExpense}")
+        
+        // Сохраняем текущие настройки кошелька
+        val currentTargetWalletId = _state.value.targetWalletId
+        val currentSelectedWallets = _state.value.selectedWallets
+        val currentAddToWallet = _state.value.addToWallet
+        
+        // Используем событие ForceSetExpenseType
+        onEvent(AddTransactionEvent.ForceSetExpenseType)
+        
+        // Выводим лог сразу после вызова ForceSetExpenseType
+        Timber.d("СРАЗУ ПОСЛЕ вызова ForceSetExpenseType: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
+        
+        // Восстанавливаем настройки кошелька, которые могли быть изменены
+        _state.update {
+            it.copy(
+                amount = amount,
+                category = walletCategory, // Используем название кошелька как категорию
+                targetWalletId = currentTargetWalletId,
+                selectedWallets = currentSelectedWallets,
+                addToWallet = currentAddToWallet
+            )
+        }
+        
+        // Добавляем отладочный лог
+        Timber.d("После setupForExpenseAddition: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
     }
 
     /**
@@ -436,32 +567,85 @@ class AddTransactionViewModel(
             is AddTransactionEvent.SetSourceColor -> {
                 _state.update { it.copy(sourceColor = event.color) }
             }
-            is AddTransactionEvent.AttachReceipt -> {
-                attachReceipt()
-            }
             is AddTransactionEvent.ForceSetIncomeType -> {
-                // Принудительно устанавливаем тип "Доход"
+                val currentTargetWalletId = _state.value.targetWalletId
+                val currentSelectedWallets = _state.value.selectedWallets
+                val currentAddToWallet = _state.value.addToWallet
+                
+                Timber.d("ForceSetIncomeType начало обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
+                Timber.d("Forced income type selection with wallet settings: targetWalletId=$currentTargetWalletId, addToWallet=$currentAddToWallet, selectedWallets=$currentSelectedWallets")
+                
                 _state.update {
                     it.copy(
                         isExpense = false,
-                        // Всегда устанавливаем категорию дохода - "Зарплата"
-                        category = "Зарплата"
+                        forceExpense = false, // Выключаем принудительный расход
+                        // Сохраняем настройки кошелька при принудительном переключении на доход
+                        targetWalletId = currentTargetWalletId,
+                        selectedWallets = currentSelectedWallets,
+                        addToWallet = currentAddToWallet
                     )
                 }
                 
-                // Логируем принудительную установку режима дохода
-                Timber.d("Forced income type selection")
+                Timber.d("ForceSetIncomeType после обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
+            }
+            
+            is AddTransactionEvent.ForceSetExpenseType -> {
+                val currentTargetWalletId = _state.value.targetWalletId
+                val currentSelectedWallets = _state.value.selectedWallets
+                val currentAddToWallet = _state.value.addToWallet
+                
+                Timber.d("ForceSetExpenseType начало обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
+                Timber.d("Forced expense type selection: targetWalletId=$currentTargetWalletId, selectedWallets=$currentSelectedWallets, addToWallet=$currentAddToWallet")
+                
+                _state.update {
+                    it.copy(
+                        isExpense = true,
+                        forceExpense = true, // Включаем принудительный расход
+                        // Сохраняем настройки кошелька при принудительном переключении на расход
+                        targetWalletId = currentTargetWalletId,
+                        selectedWallets = currentSelectedWallets,
+                        addToWallet = currentAddToWallet
+                    )
+                }
+                
+                Timber.d("ForceSetExpenseType после обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
+            }
+            
+            is AddTransactionEvent.SetTargetWalletId -> {
+                _state.update { 
+                    it.copy(
+                        targetWalletId = event.walletId
+                    ) 
+                }
+                Timber.d("Установлен targetWalletId: ${event.walletId}")
             }
             
             // Обработка событий для работы с кошельками
             is AddTransactionEvent.ToggleAddToWallet -> {
-                // Переключить флаг добавления в кошелек
-                _state.update { it.copy(addToWallet = !it.addToWallet) }
+                // Переключаем состояние добавления в кошелек
+                val newAddToWallet = !_state.value.addToWallet
+                
+                // Сохраняем текущие кошельки для предотвращения потери данных
+                val currentSelectedWallets = _state.value.selectedWallets.toMutableList()
+                
+                // Если includeToWallet стал true и у нас есть targetWalletId, но его нет в списке,
+                // добавляем его в список выбранных кошельков
+                val targetWalletId = _state.value.targetWalletId
+                if (newAddToWallet && targetWalletId != null && !currentSelectedWallets.contains(targetWalletId)) {
+                    Timber.d("ToggleAddToWallet: добавляем targetWalletId=$targetWalletId в список выбранных кошельков")
+                    currentSelectedWallets.add(targetWalletId)
+                }
+                
+                // Обновляем состояние
+                _state.update { it.copy(addToWallet = newAddToWallet, selectedWallets = currentSelectedWallets) }
                 
                 // Если включено добавление в кошельки, и список выбранных кошельков пуст,
-                // сразу открываем диалог выбора кошельков
-                if (_state.value.addToWallet && _state.value.selectedWallets.isEmpty()) {
+                // только тогда открываем диалог выбора кошельков
+                if (newAddToWallet && _state.value.selectedWallets.isEmpty()) {
+                    Timber.d("ToggleAddToWallet: открываем диалог выбора кошельков, так как selectedWallets пуст")
                     onEvent(AddTransactionEvent.ShowWalletSelector)
+                } else {
+                    Timber.d("ToggleAddToWallet: не открываем диалог, так как selectedWallets не пуст: ${_state.value.selectedWallets.size} шт.")
                 }
             }
             
@@ -897,22 +1081,6 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Обрабатывает прикрепление чека
-     */
-    private fun attachReceipt() {
-        // Здесь будет логика прикрепления чека
-        // Пока просто логируем действие
-        Timber.d("Прикрепление чека")
-        
-        // Можно показать сообщение пользователю
-        _state.update { 
-            it.copy(
-                note = if (it.note.isBlank()) "Чек прикреплен" else "${it.note} (Чек прикреплен)"
-            )
-        }
-    }
-
-    /**
      * Удаляет категорию
      */
     private fun deleteCategory(category: String) {
@@ -1044,7 +1212,7 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Получает экземпляр репозитория транзакций через Koin
+     * Получает экземпляр TransactionRepository через Koin
      */
     private fun getTransactionRepositoryInstance(): TransactionRepository {
         return org.koin.core.context.GlobalContext.get().get()
@@ -1063,13 +1231,220 @@ class AddTransactionViewModel(
                 try {
                     val homeViewModel = org.koin.core.context.GlobalContext.get()
                         .getOrNull<com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel>()
-                    homeViewModel?.initiateBackgroundDataRefresh()
+                     homeViewModel?.initiateBackgroundDataRefresh()
                 } catch (e: Exception) {
                     // Игнорируем ошибку, если HomeViewModel недоступен
                     Timber.d("HomeViewModel недоступен: ${e.message}")
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при обновлении данных в фоне")
+            }
+        }
+    }
+
+    /**
+     * Валидирует сумму транзакции
+     */
+    private fun validateAmount() {
+        try {
+            val money = Money.fromString(_state.value.amount)
+            val hasInvalidAmount = money.isZero() || _state.value.amount.isBlank()
+            if (hasInvalidAmount) {
+                _state.update { it.copy(amountError = true) }
+            } else {
+                _state.update { it.copy(amountError = false) }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при парсинге суммы: ${_state.value.amount}")
+            _state.update { it.copy(amountError = true) }
+        }
+    }
+
+    // Выбранная валюта (рубль по умолчанию)
+    private val selectedCurrency = Currency.RUB
+
+    /**
+     * Создает объект Transaction из текущего состояния
+     */
+    private fun createTransactionFromState(currentState: AddTransactionState): Transaction {
+        // Получаем сумму из строки
+        val amount = currentState.amount.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
+        
+        // Инвертируем сумму, если это расход
+        val finalAmount = if (currentState.isExpense) -amount else amount
+        
+        // Проверяем, является ли категория "Переводы"
+        val isTransfer = currentState.category == "Переводы"
+        
+        // Создаем объект транзакции
+        return Transaction(
+            id = currentState.transactionToEdit?.id ?: "", // Используем ID существующей транзакции, если редактируем
+            amount = Money(amount = finalAmount, currency = selectedCurrency),
+            date = currentState.selectedDate,
+            note = currentState.note.trim(),
+            category = currentState.category,
+            source = currentState.source,
+            isExpense = currentState.isExpense,
+            sourceColor = currentState.sourceColor,
+            isTransfer = isTransfer
+        )
+    }
+
+    /**
+     * Сохраняет транзакцию
+     */
+    fun saveTransaction() {
+        validateAmount()
+        if (_state.value.amountError) {
+            return
+        }
+
+        Timber.d("Запуск saveTransaction")
+        viewModelScope.launch {
+            try {
+                // Указываем, что идет загрузка
+                _state.update { it.copy(isLoading = true) }
+
+                // Получаем текущие настройки
+                val currentState = _state.value
+
+                // Создаем объект транзакции
+                val transaction = createTransactionFromState(currentState)
+
+                Timber.d("Saving transaction: $transaction")
+                
+                // Сохраняем транзакцию
+                addTransactionUseCase(transaction)
+
+                // Расчитываем сумму для callback
+                val amount = Money(
+                    amount = transaction.amount.amount.toDouble(),
+                    currency = selectedCurrency
+                )
+
+                // Обновляем состояние после сохранения
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        successMessage = if (it.isExpense) {
+                            "Расход успешно добавлен"
+                        } else {
+                            "Доход успешно добавлен"
+                        }
+                    )
+                }
+
+                // Вызываем соответствующий callback
+                if (currentState.isExpense) {
+                    // Отправляем событие о изменении данных перед вызовом колбэка
+                    // чтобы убедиться, что все экраны обновят данные при возвращении
+                    notifyDataChanged(transaction.id)
+                    
+                    // Вызываем callback о добавлении расхода
+                    onExpenseAddedCallback?.invoke(amount)
+                } else {
+                    // Отправляем событие о изменении данных перед вызовом колбэка
+                    // чтобы убедиться, что все экраны обновят данные при возвращении
+                    notifyDataChanged(transaction.id)
+                    
+                    // Вызываем callback о добавлении дохода
+                    onIncomeAddedCallback?.invoke(amount)
+                }
+
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при сохранении транзакции")
+                _state.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message ?: "Неизвестная ошибка"
+                    )
+                }
+            }
+        }
+    }
+
+    /**
+     * Запрашивает принудительное обновление данных у репозитория
+     */
+    private fun notifyDataChanged(transactionId: String) {
+        viewModelScope.launch {
+            try {
+                getTransactionRepositoryInstance().notifyDataChanged(transactionId)
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при запросе обновления данных")
+            }
+        }
+    }
+
+    /**
+     * Публичный метод для доступа к репозиторию транзакций
+     * Используется для подписки на события изменения данных
+     */
+    fun getTransactionRepository(): TransactionRepository {
+        return getTransactionRepositoryInstance()
+    }
+
+    /**
+     * Очищает список выбранных кошельков
+     */
+    fun clearSelectedWallets() {
+        Timber.d("Очистка списка выбранных кошельков")
+        _state.update { it.copy(selectedWallets = emptyList()) }
+    }
+    
+    /**
+     * Выбирает все доступные кошельки
+     */
+    fun selectAllWallets() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Получаем все доступные кошельки
+                val allWallets = walletRepository.getAllWallets()
+                
+                // Собираем их ID
+                val allWalletIds = allWallets.map { it.id }
+                
+                // Включаем флаг добавления в кошельки
+                _state.update { 
+                    it.copy(
+                        selectedWallets = allWalletIds,
+                        addToWallet = true
+                    ) 
+                }
+                
+                Timber.d("Выбраны все кошельки: ${allWalletIds.size} шт.")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при выборе всех кошельков")
+            }
+        }
+    }
+
+    /**
+     * Выбирает все доступные кошельки без показа диалога выбора
+     * Используется при автоматическом выборе кошельков из HomeScreen
+     */
+    fun selectAllWalletsWithoutDialog() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                // Получаем все доступные кошельки
+                val allWallets = walletRepository.getAllWallets()
+                
+                // Собираем их ID
+                val allWalletIds = allWallets.map { it.id }
+                
+                // Включаем флаг добавления в кошельки и добавляем все кошельки
+                // Особенность: НЕ показываем диалог выбора кошельков (showWalletSelector = false)
+                _state.update { 
+                    it.copy(
+                        selectedWallets = allWalletIds,
+                        addToWallet = true,
+                        showWalletSelector = false
+                    ) 
+                }
+                
+                Timber.d("Автоматически выбраны все кошельки без показа диалога: ${allWalletIds.size} шт.")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при автоматическом выборе всех кошельков")
             }
         }
     }
