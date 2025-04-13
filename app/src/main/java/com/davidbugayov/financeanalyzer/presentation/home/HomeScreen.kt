@@ -203,13 +203,58 @@ fun HomeScreen(
                 },
                 titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
+        },
+        bottomBar = {
+            // Используем анимированную нижнюю навигацию 
+            AnimatedBottomNavigationBar(
+                visible = true,
+                onChartClick = {
+                    onNavigateToChart()
+                    feedbackMessage = "Переход к графикам"
+                    feedbackType = FeedbackType.INFO
+                    showFeedback = true
+                },
+                onHistoryClick = {
+                    onNavigateToHistory()
+                    feedbackMessage = "Переход к истории транзакций"
+                    feedbackType = FeedbackType.INFO
+                    showFeedback = true
+                },
+                onBudgetClick = {
+                    onNavigateToWallets()
+                    feedbackMessage = "Переход к кошелькам"
+                    feedbackType = FeedbackType.INFO
+                    showFeedback = true
+                },
+            )
+        },
+        floatingActionButton = {
+            // Floating Action Button для добавления транзакции
+            FloatingActionButton(
+                onClick = {
+                    // Сбрасываем состояние AddTransactionViewModel к дефолтному
+                    addTransactionViewModel.resetToDefaultState()
+                    // Выполняем навигацию
+                    onNavigateToAdd()
+                    feedbackMessage = "Добавление новой транзакции"
+                    feedbackType = FeedbackType.INFO
+                    showFeedback = true
+                },
+                containerColor = MaterialTheme.colorScheme.primary
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Add,
+                    contentDescription = stringResource(R.string.add_button),
+                    tint = MaterialTheme.colorScheme.onPrimary
+                )
+            }
         }
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                // Применяем явно только верхний отступ, чтобы избежать двойных отступов
-                .padding(top = paddingValues.calculateTopPadding())
+                // Применяем явно только внутренние отступы, полученные от Scaffold
+                .padding(paddingValues)
         ) {
             // Адаптивный макет в зависимости от размера экрана
             if (windowSize.isCompact()) {
@@ -233,59 +278,13 @@ fun HomeScreen(
                     onTransactionLongClick = onTransactionLongClick
                 )
             }
-
-            // Используем анимированную нижнюю навигацию 
-            AnimatedBottomNavigationBar(
-                visible = true,
-                onChartClick = {
-                    onNavigateToChart()
-                    feedbackMessage = "Переход к графикам"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
-                },
-                onHistoryClick = {
-                    onNavigateToHistory()
-                    feedbackMessage = "Переход к истории транзакций"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
-                },
-                onBudgetClick = {
-                    onNavigateToWallets()
-                    feedbackMessage = "Переход к кошелькам"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
-                },
-                modifier = Modifier.align(Alignment.BottomCenter)
-            )
-
-            // Floating Action Button для добавления транзакции
-            FloatingActionButton(
-                onClick = {
-                    // Сбрасываем состояние AddTransactionViewModel к дефолтному
-                    addTransactionViewModel.resetToDefaultState()
-                    // Выполняем навигацию
-                    onNavigateToAdd()
-                    feedbackMessage = "Добавление новой транзакции"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
-                },
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(bottom = 80.dp, end = 16.dp),
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.add_button),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
-
+            
             // Индикатор загрузки с анимацией
             AnimatedVisibility(
                 visible = state.isLoading,
                 enter = fadeIn(),
-                exit = fadeOut()
+                exit = fadeOut(),
+                modifier = Modifier.align(Alignment.Center)
             ) {
                 CenteredLoadingIndicator(
                     message = stringResource(R.string.loading_data),
@@ -339,7 +338,7 @@ fun HomeScreen(
                 onDismiss = { showFeedback = false },
                 modifier = Modifier
                     .align(Alignment.TopCenter)
-                    .padding(top = 8.dp)
+                    .padding(top = 8.dp) // Оставляем небольшой отступ сверху
             )
         }
     }
