@@ -42,20 +42,123 @@ fun EditTransactionScreen(
         viewModel.loadTransaction(transactionId)
     }
     
-    // Обработка успешного редактирования
-    if (state.isSuccess) {
+    // Модальные диалоги
+    /*
+    // Диалог успешного редактирования
+    if (state.showSuccessDialog) {
         SuccessDialog(
-            onDismiss = {
-                viewModel.onEvent(BaseTransactionEvent.HideSuccessDialog)
+            message = stringResource(R.string.transaction_edited_success),
+            onDismiss = { 
+                onEvent(EditTransactionEvent.HideSuccessDialog)
+                // Возвращаемся после успешного редактирования
                 onBackClick()
-            },
-            onAddAnother = {
-                viewModel.onEvent(BaseTransactionEvent.HideSuccessDialog)
-                onBackClick()
-            },
-            message = stringResource(R.string.transaction_updated_success)
+            }
         )
     }
+
+    // Диалог выбора категории
+    if (state.dialogState.showCategoryPicker) {
+        CategoryPickerDialog(
+            categories = state.categories,
+            onCategorySelected = { category ->
+                onEvent(EditTransactionEvent.SetCategory(category.name))
+                onEvent(EditTransactionEvent.HideCategoryPicker)
+            },
+            onDismiss = { onEvent(EditTransactionEvent.HideCategoryPicker) },
+            onCreateCustom = { onEvent(EditTransactionEvent.ShowCustomCategoryDialog) }
+        )
+    }
+
+    // Диалог создания кастомной категории
+    if (state.dialogState.showCustomCategoryDialog) {
+        CustomCategoryDialog(
+            onConfirm = { categoryName ->
+                onEvent(EditTransactionEvent.AddCustomCategory(categoryName))
+                onEvent(EditTransactionEvent.HideCustomCategoryDialog)
+            },
+            onDismiss = { onEvent(EditTransactionEvent.HideCustomCategoryDialog) }
+        )
+    }
+
+    // Диалог выбора источника
+    if (state.dialogState.showSourcePicker) {
+        SourcePickerDialog(
+            sources = state.sources,
+            onSourceSelected = { source ->
+                onEvent(EditTransactionEvent.SetSource(source.name))
+                onEvent(EditTransactionEvent.SetSourceColor(source.color))
+                onEvent(EditTransactionEvent.HideSourcePicker)
+            },
+            onDismiss = { onEvent(EditTransactionEvent.HideSourcePicker) },
+            onCreateCustom = { onEvent(EditTransactionEvent.ShowCustomSourceDialog) }
+        )
+    }
+
+    // Диалог создания кастомного источника
+    if (state.dialogState.showCustomSourceDialog) {
+        CustomSourceDialog(
+            onConfirm = { sourceName, color ->
+                onEvent(EditTransactionEvent.AddCustomSource(sourceName, color))
+                onEvent(EditTransactionEvent.HideCustomSourceDialog)
+            },
+            onDismiss = { onEvent(EditTransactionEvent.HideCustomSourceDialog) },
+            onColorClick = { onEvent(EditTransactionEvent.ShowSourceColorPicker) },
+            selectedColor = state.selectedSourceColor
+        )
+    }
+
+    // Диалог выбора цвета для источника
+    if (state.dialogState.showSourceColorPicker) {
+        SourceColorPickerDialog(
+            onColorSelected = { color ->
+                onEvent(EditTransactionEvent.SetSourceColor(color))
+                onEvent(EditTransactionEvent.HideSourceColorPicker)
+            },
+            onDismiss = { onEvent(EditTransactionEvent.HideSourceColorPicker) }
+        )
+    }
+
+    // Диалог подтверждения отмены редактирования
+    if (state.dialogState.showConfirmCancelDialog) {
+        ConfirmCancelDialog(
+            onDismiss = { onEvent(EditTransactionEvent.HideConfirmCancelDialog) },
+            onConfirm = {
+                onEvent(EditTransactionEvent.HideConfirmCancelDialog)
+                navController.popBackStack()
+            }
+        )
+    }
+
+    // Диалог подтверждения удаления категории
+    if (state.dialogState.showDeleteCategoryConfirmationDialog) {
+        val categoryToDelete = state.categoryToDelete
+        if (categoryToDelete != null) {
+            DeleteCategoryConfirmationDialog(
+                categoryName = categoryToDelete.name,
+                onDismiss = { onEvent(EditTransactionEvent.HideDeleteCategoryConfirmationDialog) },
+                onConfirm = {
+                    onEvent(EditTransactionEvent.DeleteCategory(categoryToDelete))
+                    onEvent(EditTransactionEvent.HideDeleteCategoryConfirmationDialog)
+                }
+            )
+        }
+    }
+
+    // Диалог подтверждения удаления источника
+    if (state.dialogState.showDeleteSourceConfirmationDialog) {
+        val sourceToDelete = state.sourceToDelete
+        if (sourceToDelete != null) {
+            DeleteSourceConfirmationDialog(
+                sourceName = sourceToDelete.name,
+                onDismiss = { onEvent(EditTransactionEvent.HideDeleteSourceConfirmationDialog) },
+                onConfirm = {
+                    onEvent(EditTransactionEvent.DeleteSource(sourceToDelete))
+                    onEvent(EditTransactionEvent.HideDeleteSourceConfirmationDialog)
+                }
+            )
+        }
+    }
+    */
     
     Scaffold(
         topBar = {

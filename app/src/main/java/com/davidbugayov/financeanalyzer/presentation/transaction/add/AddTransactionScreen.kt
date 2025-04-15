@@ -3,7 +3,11 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.add
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -39,33 +43,158 @@ fun AddTransactionScreen(
     val viewModel = koinViewModel<AddTransactionViewModel>()
     val state by viewModel.state.collectAsState()
     
-    // Обработка успешного добавления
-    if (state.isSuccess) {
+    // Модальные диалоги
+    /*
+    // Диалог успешного добавления
+    if (state.showSuccessDialog) {
         SuccessDialog(
-            onDismiss = {
-                viewModel.onEvent(BaseTransactionEvent.HideSuccessDialog)
-                onBackClick()
-            },
-            onAddAnother = {
-                viewModel.onEvent(BaseTransactionEvent.HideSuccessDialog)
-                viewModel.resetFields()
-            },
-            message = stringResource(R.string.transaction_added_success)
+            message = stringResource(R.string.transaction_added_success),
+            onDismiss = { onEvent(AddTransactionEvent.HideSuccessDialog) }
         )
     }
+
+    // Диалог выбора категории
+    if (state.dialogState.showCategoryPicker) {
+        CategoryPickerDialog(
+            categories = state.categories,
+            onCategorySelected = { category ->
+                onEvent(AddTransactionEvent.SetCategory(category.name))
+                onEvent(AddTransactionEvent.HideCategoryPicker)
+            },
+            onDismiss = { onEvent(AddTransactionEvent.HideCategoryPicker) },
+            onCreateCustom = { onEvent(AddTransactionEvent.ShowCustomCategoryDialog) }
+        )
+    }
+
+    // Диалог создания кастомной категории
+    if (state.dialogState.showCustomCategoryDialog) {
+        CustomCategoryDialog(
+            onConfirm = { categoryName ->
+                onEvent(AddTransactionEvent.AddCustomCategory(categoryName))
+                onEvent(AddTransactionEvent.HideCustomCategoryDialog)
+            },
+            onDismiss = { onEvent(AddTransactionEvent.HideCustomCategoryDialog) }
+        )
+    }
+
+    // Диалог выбора источника
+    if (state.dialogState.showSourcePicker) {
+        SourcePickerDialog(
+            sources = state.sources,
+            onSourceSelected = { source ->
+                onEvent(AddTransactionEvent.SetSource(source.name))
+                onEvent(AddTransactionEvent.SetSourceColor(source.color))
+                onEvent(AddTransactionEvent.HideSourcePicker)
+            },
+            onDismiss = { onEvent(AddTransactionEvent.HideSourcePicker) },
+            onCreateCustom = { onEvent(AddTransactionEvent.ShowCustomSourceDialog) }
+        )
+    }
+
+    // Диалог создания кастомного источника
+    if (state.dialogState.showCustomSourceDialog) {
+        CustomSourceDialog(
+            onConfirm = { sourceName, color ->
+                onEvent(AddTransactionEvent.AddCustomSource(sourceName, color))
+                onEvent(AddTransactionEvent.HideCustomSourceDialog)
+            },
+            onDismiss = { onEvent(AddTransactionEvent.HideCustomSourceDialog) },
+            onColorClick = { onEvent(AddTransactionEvent.ShowSourceColorPicker) },
+            selectedColor = state.selectedSourceColor
+        )
+    }
+
+    // Диалог выбора цвета для источника
+    if (state.dialogState.showSourceColorPicker) {
+        SourceColorPickerDialog(
+            onColorSelected = { color ->
+                onEvent(AddTransactionEvent.SetSourceColor(color))
+                onEvent(AddTransactionEvent.HideSourceColorPicker)
+            },
+            onDismiss = { onEvent(AddTransactionEvent.HideSourceColorPicker) }
+        )
+    }
+
+    // Диалог подтверждения отмены транзакции
+    if (state.dialogState.showConfirmCancelDialog) {
+        ConfirmCancelDialog(
+            onDismiss = { onEvent(AddTransactionEvent.HideConfirmCancelDialog) },
+            onConfirm = {
+                onEvent(AddTransactionEvent.HideConfirmCancelDialog)
+                navController.popBackStack()
+            }
+        )
+    }
+
+    // Диалог подтверждения удаления категории
+    if (state.dialogState.showDeleteCategoryConfirmationDialog) {
+        val categoryToDelete = state.categoryToDelete
+        if (categoryToDelete != null) {
+            DeleteCategoryConfirmationDialog(
+                categoryName = categoryToDelete.name,
+                onDismiss = { onEvent(AddTransactionEvent.HideDeleteCategoryConfirmationDialog) },
+                onConfirm = {
+                    onEvent(AddTransactionEvent.DeleteCategory(categoryToDelete))
+                    onEvent(AddTransactionEvent.HideDeleteCategoryConfirmationDialog)
+                }
+            )
+        }
+    }
+
+    // Диалог выбора кошельков для добавления дохода
+    if (state.dialogState.showWalletSelector) {
+        WalletSelectorDialog(
+            wallets = state.wallets,
+            selectedWallets = state.selectedWallets,
+            onWalletSelected = { wallet, isSelected ->
+                onEvent(AddTransactionEvent.ToggleWalletSelection(wallet, isSelected))
+            },
+            onDismiss = { onEvent(AddTransactionEvent.HideWalletSelector) },
+            onConfirm = { onEvent(AddTransactionEvent.HideWalletSelector) }
+        )
+    }
+
+    // Диалог подтверждения удаления источника
+    if (state.dialogState.showDeleteSourceConfirmationDialog) {
+        val sourceToDelete = state.sourceToDelete
+        if (sourceToDelete != null) {
+            DeleteSourceConfirmationDialog(
+                sourceName = sourceToDelete.name,
+                onDismiss = { onEvent(AddTransactionEvent.HideDeleteSourceConfirmationDialog) },
+                onConfirm = {
+                    onEvent(AddTransactionEvent.DeleteSource(sourceToDelete))
+                    onEvent(AddTransactionEvent.HideDeleteSourceConfirmationDialog)
+                }
+            )
+        }
+    }
+    */
     
     Scaffold(
         topBar = {
-            AppTopBar(
-                title = stringResource(R.string.add_transaction),
-                showBackButton = true,
-                onBackClick = {
-                    if (state.transactionData.amount.isNotBlank() || 
-                        state.transactionData.category.isNotBlank() ||
-                        state.transactionData.note.isNotBlank()) {
-                        viewModel.onEvent(BaseTransactionEvent.ShowCancelConfirmation)
-                    } else {
-                        onBackClick()
+            TopAppBar(
+                title = { Text(stringResource(R.string.add_transaction)) },
+                navigationIcon = {
+                    IconButton(onClick = { 
+                        if (state.transactionData.hasData) {
+                            viewModel.onEvent(BaseTransactionEvent.ShowConfirmCancelDialog)
+                        } else {
+                            onBackClick()
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
+                        )
+                    }
+                },
+                actions = {
+                    // Добавляем кнопку сброса полей
+                    IconButton(onClick = { viewModel.resetFields() }) {
+                        Icon(
+                            imageVector = Icons.Default.Clear,
+                            contentDescription = stringResource(R.string.clear_fields)
+                        )
                     }
                 }
             )
@@ -75,11 +204,14 @@ fun AddTransactionScreen(
         BaseTransactionScreen(
             state = state,
             onEvent = viewModel::onEvent,
-            onSubmit = { viewModel.onEvent(BaseTransactionEvent.SubmitAddTransaction) },
-            submitButtonText = stringResource(R.string.add_button),
+            onSubmit = { viewModel.onSubmitTransaction() },
             modifier = Modifier
-                .fillMaxSize()
                 .padding(paddingValues)
+                .padding(horizontal = 16.dp),
+            onBackClick = onBackClick,
+            submitButtonText = stringResource(R.string.add_transaction_submit),
+            onTodayClick = { viewModel.setToday() },
+            onYesterdayClick = { viewModel.setYesterday() }
         )
 
         // Добавляем секцию кошельков для доходных операций

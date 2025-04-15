@@ -19,6 +19,14 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Fastfood // Рестораны
+import androidx.compose.material.icons.filled.LocalTaxi // Транспорт
+import androidx.compose.material.icons.filled.Movie // Развлечения
+import androidx.compose.material.icons.filled.ShoppingCart // Продукты
+import androidx.compose.material.icons.filled.AttachMoney // Зарплата
+import androidx.compose.material.icons.filled.Work // Подработка
+import androidx.compose.material.icons.filled.AccountBalance // Депозит
+import androidx.compose.material.icons.filled.MoreHoriz // Другое
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -41,6 +49,10 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.CardElevation
 import androidx.compose.foundation.border
 
 import com.davidbugayov.financeanalyzer.R
@@ -54,14 +66,17 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.ValidationError
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem as DomainCategoryItem
 
 import java.util.Date
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.util.Calendar
 
 /**
  * Базовый экран для добавления/редактирования транзакции
  * Содержит общую логику и UI для обоих экранов
+ * Улучшенный UI/UX с визуальными акцентами и оптимизированной структурой
  *
  * @param state Состояние транзакции
  * @param onEvent Обработчик событий
@@ -93,76 +108,38 @@ fun BaseTransactionScreen(
         sources
     }
 
-    // Дефолтные категории для расходов и доходов
+    // Дефолтные категории для расходов и доходов с иконками
     val displayCategories = if (categories.isEmpty()) {
         if (state.transactionData.isExpense) {
-            listOf(
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Продукты", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                ),
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Рестораны", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                ),
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Транспорт", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                ),
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Развлечения", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                )
-            )
+            // Используем предопределенные категории расходов из CategoriesViewModel
+            com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel.DEFAULT_EXPENSE_CATEGORIES
         } else {
-            listOf(
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Зарплата", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                ),
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Подработка", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                ),
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Депозит", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                ),
-                com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem(
-                    name = "Другое", 
-                    count = 0, 
-                    image = null, 
-                    isCustom = false
-                )
-            )
+            // Используем предопределенные категории доходов из CategoriesViewModel  
+            com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel.DEFAULT_INCOME_CATEGORIES
         }
     } else {
         categories
+    }
+
+    // Функции для быстрого выбора даты (Сегодня/Вчера)
+    val onTodayClick = {
+        val today = Calendar.getInstance().time
+        onEvent(BaseTransactionEvent.SetDate(today))
+    }
+    
+    val onYesterdayClick = {
+        val yesterday = Calendar.getInstance()
+        yesterday.add(Calendar.DAY_OF_YEAR, -1)
+        onEvent(BaseTransactionEvent.SetDate(yesterday.time))
     }
 
     Column(
         modifier = modifier
             .fillMaxSize()
             .verticalScroll(rememberScrollState())
-            .padding(horizontal = 16.dp)
+            .padding(16.dp) // Уменьшенный отступ
     ) {
-        Spacer(modifier = Modifier.height(8.dp))
-        
-        // Верхняя строка с типом транзакции и датой перемещена выше
+        // Верхняя секция с заголовком и типом транзакции (доход/расход)
         TransactionHeader(
             date = state.transactionData.selectedDate,
             isExpense = state.transactionData.isExpense,
@@ -176,43 +153,63 @@ fun BaseTransactionScreen(
                     onEvent(BaseTransactionEvent.ForceSetExpenseType)
                 }
             },
-            forceExpense = false, // Убираем принудительный режим расхода
-            modifier = Modifier.padding(vertical = 8.dp)
+            forceExpense = false,
+            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Секция "Куда" или "Откуда" (в зависимости от типа транзакции)
-        Text(
-            text = if (state.transactionData.isExpense) stringResource(R.string.transaction_to) else stringResource(R.string.transaction_from),
-            style = MaterialTheme.typography.titleMedium,
-            color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-        )
-        
-        // Используем SourceSection с отображением дефолтных источников
-        SourceSection(
-            sources = displaySources.map { sourceItem -> 
-                com.davidbugayov.financeanalyzer.domain.model.Source(
-                    id = 0,
-                    name = sourceItem.name,
-                    color = sourceItem.color,
-                    isCustom = sourceItem.isCustom
+        // Секция выбора источника в карточке с тенью
+        ElevatedCard(
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 2.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp) // Уменьшенный отступ
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp)
+            ) {
+                // Заголовок "Куда" или "Откуда"
+                Text(
+                    text = if (state.transactionData.isExpense) 
+                        stringResource(R.string.transaction_to) 
+                    else 
+                        stringResource(R.string.transaction_from),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.padding(bottom = 12.dp)
                 )
-            },
-            selectedSource = state.transactionData.source,
-            onSourceSelected = { source ->
-                onEvent(BaseTransactionEvent.SetSource(source.name))
-                onEvent(BaseTransactionEvent.SetSourceColor(source.color))
-            },
-            onAddSourceClick = {
-                onEvent(BaseTransactionEvent.ShowSourcePicker)
+                
+                // Используем SourceSection с отображением дефолтных источников
+                SourceSection(
+                    sources = displaySources.map { sourceItem -> 
+                        com.davidbugayov.financeanalyzer.domain.model.Source(
+                            id = 0,
+                            name = sourceItem.name,
+                            color = sourceItem.color,
+                            isCustom = sourceItem.isCustom
+                        )
+                    },
+                    selectedSource = state.transactionData.source,
+                    onSourceSelected = { source ->
+                        onEvent(BaseTransactionEvent.SetSource(source.name))
+                        onEvent(BaseTransactionEvent.SetSourceColor(source.color))
+                    },
+                    onAddSourceClick = {
+                        onEvent(BaseTransactionEvent.ShowSourcePicker)
+                    },
+                    onSourceLongClick = { /* пустой обработчик для совместимости */ }
+                )
             }
-        )
+        }
         
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Секция категорий с использованием дефолтных категорий
+        // Секция выбора категории
         CategorySection(
             categories = displayCategories,
             selectedCategory = state.transactionData.category,
@@ -222,12 +219,11 @@ fun BaseTransactionScreen(
             onAddCategoryClick = {
                 onEvent(BaseTransactionEvent.ShowCategoryPicker)
             },
-            isError = state.validationError is ValidationError.CategoryMissing
+            isError = state.validationError is ValidationError.CategoryMissing,
+            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
         )
         
-        Spacer(modifier = Modifier.height(24.dp))
-        
-        // Поле суммы
+        // Поле ввода суммы с автофокусом и улучшенной валидацией
         AmountField(
             amount = state.transactionData.amount,
             onAmountChange = { onEvent(BaseTransactionEvent.SetAmount(it)) },
@@ -236,42 +232,64 @@ fun BaseTransactionScreen(
                 MaterialTheme.colorScheme.error
             else 
                 MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            autoFocus = true,
+            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Поле выбора даты (перемещено после суммы)
+        // Улучшенное поле выбора даты с кнопками "Сегодня" и "Вчера"
         DateField(
             date = state.transactionData.selectedDate,
             onClick = { onEvent(BaseTransactionEvent.ShowDatePicker) },
-            modifier = Modifier.fillMaxWidth()
+            onTodayClick = onTodayClick,
+            onYesterdayClick = onYesterdayClick,
+            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
         )
         
-        Spacer(modifier = Modifier.height(16.dp))
-        
-        // Поле примечания
-        CommentField(
-            value = state.transactionData.note,
-            onValueChange = { onEvent(BaseTransactionEvent.SetNote(it)) },
-            modifier = Modifier.padding(horizontal = 16.dp)
-        )
-        
-        // Добавление в кошельки (для дохода)
-        if (!state.transactionData.isExpense && !state.editMode) {
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            WalletSelectionSection(
-                addToWallet = state.walletState.addToWallet,
-                selectedWallets = state.walletState.selectedWallets,
-                onToggleAddToWallet = { onEvent(BaseTransactionEvent.ToggleAddToWallet(it)) },
-                onShowWalletSelector = { onEvent(BaseTransactionEvent.ShowWalletSelector) }
+        // Поле примечания в карточке
+        ElevatedCard(
+            shape = RoundedCornerShape(16.dp),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = 1.dp
+            ),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp) // Уменьшенный отступ
+        ) {
+            CommentField(
+                value = state.transactionData.note,
+                onValueChange = { onEvent(BaseTransactionEvent.SetNote(it)) },
+                modifier = Modifier.padding(16.dp)
             )
         }
         
-        Spacer(modifier = Modifier.height(24.dp))
+        // Добавление в кошельки (для дохода)
+        if (!state.transactionData.isExpense && !state.editMode) {
+            ElevatedCard(
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 2.dp
+                ),
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(bottom = 16.dp) // Уменьшенный отступ
+            ) {
+                WalletSelectionSection(
+                    addToWallet = state.walletState.addToWallet,
+                    selectedWallets = state.walletState.selectedWallets,
+                    onToggleAddToWallet = { onEvent(BaseTransactionEvent.ToggleAddToWallet(it)) },
+                    onShowWalletSelector = { onEvent(BaseTransactionEvent.ShowWalletSelector) },
+                    modifier = Modifier.padding(16.dp)
+                )
+            }
+        }
         
-        // Кнопка добавления
+        // Кнопка добавления (более заметная)
         AddButton(
             text = submitButtonText,
             onClick = onSubmit,
@@ -279,7 +297,10 @@ fun BaseTransactionScreen(
                 MaterialTheme.colorScheme.error
             else 
                 MaterialTheme.colorScheme.primary,
-            modifier = Modifier.padding(horizontal = 16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp)
+                .height(56.dp) // Увеличенная высота для лучшей доступности
         )
         
         Spacer(modifier = Modifier.height(24.dp))
@@ -371,9 +392,10 @@ fun WalletSelectionSection(
     addToWallet: Boolean,
     selectedWallets: List<String>,
     onToggleAddToWallet: (Boolean) -> Unit,
-    onShowWalletSelector: () -> Unit
+    onShowWalletSelector: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.padding(horizontal = 16.dp)) {
+    Column(modifier = modifier) {
         Text(
             text = "Настройки кошелька", 
             style = MaterialTheme.typography.titleMedium,
@@ -403,6 +425,7 @@ fun WalletSelectionSection(
             
             androidx.compose.material3.Button(
                 onClick = onShowWalletSelector,
+                shape = RoundedCornerShape(8.dp),
                 modifier = Modifier.fillMaxWidth()
             ) {
                 Text(text = "Выбрать кошельки (${selectedWallets.size})")

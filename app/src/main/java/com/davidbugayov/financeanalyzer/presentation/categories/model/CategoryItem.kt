@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.categories.model
 
+import androidx.compose.runtime.Stable
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Category
 
@@ -8,8 +9,10 @@ import com.davidbugayov.financeanalyzer.domain.model.Category
  *
  * @property name Название категории
  * @property count Количество использований категории (для сортировки по популярности)
+ * @property image Ссылка на изображение категории (если есть)
  * @property isCustom Флаг, указывающий, является ли категория кастомной (созданной пользователем)
  */
+@Stable
 data class CategoryItem(
     val name: String,
     val count: Int = 0,

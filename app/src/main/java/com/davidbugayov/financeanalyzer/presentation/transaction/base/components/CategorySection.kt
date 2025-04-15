@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,96 +20,154 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.R
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem
 
-/**
- * Секция выбора категории
- */
 @Composable
 fun CategorySection(
     categories: List<CategoryItem>,
     selectedCategory: String,
     onCategorySelected: (CategoryItem) -> Unit,
     onAddCategoryClick: () -> Unit,
-    onCategoryLongClick: (CategoryItem) -> Unit = {},
-    isError: Boolean = false
+    modifier: Modifier = Modifier
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
+    Column(modifier = modifier) {
+        // Заголовок секции
         Text(
-            text = stringResource(R.string.category) + " *",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+            text = "Категория",
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = FontWeight.Bold,
+                fontSize = 16.sp
+            ),
+            modifier = Modifier.padding(bottom = 8.dp)
         )
 
+        // Горизонтальный список категорий
         LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            contentPadding = PaddingValues(bottom = 8.dp)
         ) {
+            // Отображаем доступные категории
             items(categories) { category ->
-                CategoryItem(
+                CategoryItemComponent(
                     category = category,
                     isSelected = category.name == selectedCategory,
-                    onClick = { onCategorySelected(category) },
-                    onLongClick = { onCategoryLongClick(category) },
-                    isError = isError && selectedCategory.isBlank()
+                    onClick = { onCategorySelected(category) }
                 )
             }
-
+            
+            // Добавляем кнопку "Добавить категорию"
             item {
-                AddCategoryItem(onClick = onAddCategoryClick)
+                AddCategoryButton(onClick = onAddCategoryClick)
             }
         }
     }
 }
 
-/**
- * Элемент добавления новой категории
- */
 @Composable
-fun AddCategoryItem(onClick: () -> Unit) {
+private fun CategoryItemComponent(
+    category: CategoryItem,
+    isSelected: Boolean,
+    onClick: () -> Unit
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
-            .width(80.dp)
+            .width(65.dp)
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp)
     ) {
+        // Голубой круг с иконкой категории
         Box(
             modifier = Modifier
-                .size(60.dp)
+                .size(50.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
+                .background(Color(0xFF90CAF9)) // Светло-голубой цвет
                 .border(
-                    width = 1.dp,
-                    color = MaterialTheme.colorScheme.outline,
+                    width = if (isSelected) 2.dp else 0.dp,
+                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
         ) {
-            Icon(
-                imageVector = Icons.Default.Add,
-                contentDescription = stringResource(R.string.add_custom_category),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
+            // Иконка или первая буква названия категории
+            if (category.image != null) {
+                // TODO: Здесь должна быть загрузка иконки из ресурсов
+                // Временно используем первую букву
+                Text(
+                    text = category.name.take(1).uppercase(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            } else {
+                Text(
+                    text = category.name.take(1).uppercase(),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
+                )
+            }
         }
-
+        
         Spacer(modifier = Modifier.height(4.dp))
-
+        
+        // Название категории
         Text(
-            text = stringResource(R.string.add_custom_category),
+            text = category.name,
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
+            color = Color.Black
+        )
+    }
+}
+
+@Composable
+private fun AddCategoryButton(onClick: () -> Unit) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(65.dp)
+            .clickable(onClick = onClick)
+    ) {
+        // Серый круг с иконкой плюса
+        Surface(
+            shape = CircleShape,
+            color = Color(0xFFEEEEEE), // Светло-серый
+            contentColor = Color.Gray,
+            modifier = Modifier
+                .size(50.dp)
+                .clip(CircleShape)
+        ) {
+            Box(
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = Icons.Default.Add,
+                    contentDescription = "Добавить категорию",
+                    tint = Color.Gray
+                )
+            }
+        }
+        
+        Spacer(modifier = Modifier.height(4.dp))
+        
+        Text(
+            text = "Добавить",
+            style = MaterialTheme.typography.bodySmall,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            color = Color.Black
         )
     }
 } 

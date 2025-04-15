@@ -44,31 +44,35 @@ class CategoriesViewModel(
     companion object {
         const val OTHER_CATEGORY = "Другое"
         const val TRANSFER_CATEGORY = "Переводы"
+        
+        // Публичные дефолтные категории для доступа из других классов
+        val DEFAULT_EXPENSE_CATEGORIES = listOf(
+            CategoryItem("Продукты",0, Icons.Default.ShoppingCart),
+            CategoryItem("Транспорт",0, Icons.Default.DirectionsCar),
+            CategoryItem("Развлечения",0, Icons.Default.Movie),
+            CategoryItem("Рестораны",0, Icons.Default.Restaurant),
+            CategoryItem("Здоровье",0, Icons.Default.LocalHospital),
+            CategoryItem("Одежда",0, Icons.Default.Checkroom),
+            CategoryItem("Жилье",0, Icons.Default.Home),
+            CategoryItem("Связь",0, Icons.Default.Phone),
+            CategoryItem("Питомец",0, Icons.Default.Pets),
+            CategoryItem("Прочее", 0,Icons.Default.MoreHoriz),
+            CategoryItem("Другое",0, Icons.Default.Add)
+        )
+
+        val DEFAULT_INCOME_CATEGORIES = listOf(
+            CategoryItem("Зарплата",0, Icons.Default.Payments),
+            CategoryItem("Фриланс",0, Icons.Default.Computer),
+            CategoryItem("Подарки",0, Icons.Default.CardGiftcard),
+            CategoryItem("Проценты",0, Icons.AutoMirrored.Filled.TrendingUp),
+            CategoryItem("Аренда",0, Icons.Default.HomeWork),
+            CategoryItem("Прочее", 0,Icons.Default.MoreHoriz),
+            CategoryItem("Другое",0, Icons.Default.Add)
+        )
     }
 
-    private val defaultExpenseCategories = listOf(
-        CategoryItem("Продукты",0, Icons.Default.ShoppingCart),
-        CategoryItem("Транспорт",0, Icons.Default.DirectionsCar),
-        CategoryItem("Развлечения",0, Icons.Default.Movie),
-        CategoryItem("Рестораны",0, Icons.Default.Restaurant),
-        CategoryItem("Здоровье",0, Icons.Default.LocalHospital),
-        CategoryItem("Одежда",0, Icons.Default.Checkroom),
-        CategoryItem("Жилье",0, Icons.Default.Home),
-        CategoryItem("Связь",0, Icons.Default.Phone),
-        CategoryItem("Питомец",0, Icons.Default.Pets),
-        CategoryItem("Прочее", 0,Icons.Default.MoreHoriz),
-        CategoryItem("Другое",0, Icons.Default.Add)
-    )
-
-    private val defaultIncomeCategories = listOf(
-        CategoryItem("Зарплата",0, Icons.Default.Payments),
-        CategoryItem("Фриланс",0, Icons.Default.Computer),
-        CategoryItem("Подарки",0, Icons.Default.CardGiftcard),
-        CategoryItem("Проценты",0, Icons.AutoMirrored.Filled.TrendingUp),
-        CategoryItem("Аренда",0, Icons.Default.HomeWork),
-        CategoryItem("Прочее", 0,Icons.Default.MoreHoriz),
-        CategoryItem("Другое",0, Icons.Default.Add)
-    )
+    private val defaultExpenseCategories = DEFAULT_EXPENSE_CATEGORIES
+    private val defaultIncomeCategories = DEFAULT_INCOME_CATEGORIES
 
     private val _expenseCategories = MutableStateFlow(defaultExpenseCategories)
     val expenseCategories: StateFlow<List<CategoryItem>> = _expenseCategories.asStateFlow()
