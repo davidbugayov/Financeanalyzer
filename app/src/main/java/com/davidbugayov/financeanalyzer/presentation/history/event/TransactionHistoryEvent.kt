@@ -19,6 +19,7 @@ sealed class TransactionHistoryEvent {
     data class SetStartDate(val date: Date) : TransactionHistoryEvent()
     data class SetEndDate(val date: Date) : TransactionHistoryEvent()
     data object ReloadTransactions : TransactionHistoryEvent()
+    data object LoadMoreTransactions : TransactionHistoryEvent()
 
     // События для удаления транзакции
     data class DeleteTransaction(val transaction: Transaction) : TransactionHistoryEvent()

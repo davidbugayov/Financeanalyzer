@@ -1,10 +1,13 @@
 package com.davidbugayov.financeanalyzer.presentation.profile
 
 import android.content.Context
+import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase.ExportAction
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
@@ -12,11 +15,16 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
+import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * ViewModel для экрана профиля.
@@ -35,6 +43,9 @@ class ProfileViewModel(
     // Отдельный StateFlow для темы, который можно наблюдать из MainScreen
     private val _themeMode = MutableStateFlow(ThemeMode.SYSTEM)
     val themeMode: StateFlow<ThemeMode> = _themeMode
+    
+    // Финансовые метрики
+    private val financialMetrics = FinancialMetrics.getInstance()
 
     init {
         // Загружаем настройки уведомлений
@@ -47,6 +58,25 @@ class ProfileViewModel(
         val savedTheme = preferencesManager.getThemeMode()
         _state.update { it.copy(themeMode = savedTheme) }
         _themeMode.value = savedTheme
+        
+        // Подписываемся на обновления метрик
+        viewModelScope.launch {
+            financialMetrics.balance.collect { balance ->
+                _state.update { it.copy(balance = balance) }
+            }
+        }
+        
+        viewModelScope.launch {
+            financialMetrics.totalIncome.collect { income ->
+                _state.update { it.copy(totalIncome = income) }
+            }
+        }
+        
+        viewModelScope.launch {
+            financialMetrics.totalExpense.collect { expense ->
+                _state.update { it.copy(totalExpense = expense) }
+            }
+        }
     }
 
     /**
@@ -56,13 +86,14 @@ class ProfileViewModel(
         when (event) {
             is ProfileEvent.ExportTransactionsToCSV -> {
                 if (context != null) {
-                    exportTransactionsToCSV(context)
+                    exportTransactionsToCSV(context, event.action)
                 }
             }
             is ProfileEvent.ResetExportState -> {
                 _state.update { it.copy(
                     exportSuccess = null,
-                    exportError = null
+                    exportError = null,
+                    exportedFilePath = null
                 ) }
             }
             is ProfileEvent.SetExportError -> {
@@ -154,7 +185,7 @@ class ProfileViewModel(
     /**
      * Экспорт транзакций в CSV файл.
      */
-    private fun exportTransactionsToCSV(context: Context) {
+    private fun exportTransactionsToCSV(context: Context, selectedAction: ExportAction? = null) {
         viewModelScope.launch {
             _state.update { it.copy(isExporting = true) }
             
@@ -166,20 +197,70 @@ class ProfileViewModel(
                         val filePath = exportResult.getOrNull() ?: ""
                         _state.update { it.copy(
                             isExporting = false,
-                            exportSuccess = context.getString(R.string.export_success) +
-                                    "\nФайл сохранен: $filePath"
+                            exportSuccess = context.getString(R.string.export_success),
+                            exportedFilePath = filePath
                         ) }
+                        
+                        // В зависимости от выбранного действия
+                        when (selectedAction) {
+                            ExportAction.SHARE -> {
+                                // Открываем диалог "Поделиться"
+                                val shareIntent = exportTransactionsToCSVUseCase.shareCSVFile(context, filePath)
+                                context.startActivity(Intent.createChooser(shareIntent, "Поделиться файлом"))
+                            }
+                            ExportAction.OPEN -> {
+                                // Открываем файл
+                                try {
+                                    val openIntent = exportTransactionsToCSVUseCase.openCSVFile(context, filePath)
+                                    context.startActivity(openIntent)
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Ошибка открытия файла: ${e.message}")
+                                    _state.update { it.copy(
+                                        exportError = "Не удалось открыть файл. Установите приложение для просмотра CSV-файлов."
+                                    ) }
+                                }
+                            }
+                            ExportAction.SAVE_ONLY -> {
+                                // Просто сохраняем файл, ничего не делаем дополнительно
+                                _state.update { it.copy(
+                                    exportSuccess = context.getString(R.string.export_success) +
+                                            "\nФайл сохранен: ${filePath.substringAfterLast('/')}" +
+                                            "\nПуть: /Downloads"
+                                ) }
+                            }
+                            null -> {
+                                // Для обратной совместимости - если действие не выбрано,
+                                // просто показываем сообщение об успешном экспорте
+                                _state.update { it.copy(
+                                    exportSuccess = context.getString(R.string.export_success) +
+                                            "\nФайл сохранен: ${filePath.substringAfterLast('/')}" +
+                                            "\nПуть: /Downloads"
+                                ) }
+                            }
+                        }
+                        
+                        // Логируем успешный экспорт
+                        AnalyticsUtils.logScreenView("export_success", "csv")
                     } else {
+                        val error = exportResult.exceptionOrNull()
+                        val errorMessage = when {
+                            error is SecurityException -> "Отсутствуют разрешения для сохранения файла. Пожалуйста, предоставьте доступ к хранилищу в настройках."
+                            else -> context.getString(R.string.export_error, error?.message ?: "неизвестная ошибка")
+                        }
+                        
                         _state.update { it.copy(
                             isExporting = false,
-                            exportError = context.getString(R.string.export_error)
+                            exportError = errorMessage
                         ) }
+                        
+                        // Логируем ошибку экспорта
+                        AnalyticsUtils.logScreenView("export_failed", error?.message ?: "unknown")
                     }
                 }
             } catch (e: Exception) {
                 _state.update { it.copy(
                     isExporting = false,
-                    exportError = e.message ?: context.getString(R.string.export_error)
+                    exportError = e.message ?: context.getString(R.string.export_error, "неизвестная ошибка")
                 ) }
             }
         }
@@ -237,54 +318,101 @@ class ProfileViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             
-            when (val result = loadTransactionsUseCase()) {
-                is com.davidbugayov.financeanalyzer.domain.model.Result.Success -> {
-                    val transactions = result.data
-                    
-                    // Рассчитываем общий доход
-                    val totalIncome = transactions
-                        .filter { !it.isExpense }
-                        .map { it.amount }
-                        .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
-                    
-                    // Рассчитываем общие расходы
-                    val totalExpense = transactions
-                        .filter { it.isExpense }
-                        .map { it.amount }
-                        .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
-                    
-                    // Рассчитываем баланс
-                    val balance = totalIncome - totalExpense
-                    
-                    // Рассчитываем норму сбережений (если доход не равен 0)
-                    val savingsRate = if (totalIncome > 0) {
-                        (balance / totalIncome) * 100
-                    } else {
-                        0.0
-                    }
-                    
-                    _state.update { 
-                        it.copy(
+            try {
+                // Используем общий кэш метрик для базовых показателей
+                val totalIncome = financialMetrics.totalIncome.value
+                val totalExpense = financialMetrics.totalExpense.value
+                val balance = financialMetrics.balance.value
+                
+                // Для остальных параметров по-прежнему нужно загружать все транзакции
+                when (val result = loadTransactionsUseCase()) {
+                    is Result.Success -> {
+                        val transactions = result.data
+                        
+                        // Рассчитываем норму сбережений (если есть доход)
+                        val savingsRate = if (!totalIncome.isZero()) {
+                            // Используем метод percentageDifference из Money для расчета процентного изменения
+                            (balance.percentageOf(totalIncome)).coerceIn(0.0, 100.0)
+                        } else {
+                            0.0
+                        }
+                        
+                        // Расчет общего количества транзакций
+                        val totalTransactions = transactions.size
+                        
+                        // Расчет уникальных категорий
+                        val uniqueExpenseCategories = transactions
+                            .filter { it.isExpense }
+                            .map { it.category }
+                            .distinct()
+                            .size
+                        
+                        val uniqueIncomeCategories = transactions
+                            .filter { !it.isExpense }
+                            .map { it.category }
+                            .distinct()
+                            .size
+                        
+                        // Расчет среднего расхода
+                        val expenseTransactions = transactions.filter { it.isExpense }
+                        val avgExpense = if (expenseTransactions.isNotEmpty()) {
+                            // Используем деление на количество транзакций напрямую, без конвертации в Double
+                            totalExpense / expenseTransactions.size
+                        } else {
+                            Money.zero()
+                        }
+                        
+                        // Форматирование среднего расхода с использованием Money
+                        val formattedAvgExpense = avgExpense.format()
+                        
+                        // Расчет количества уникальных источников
+                        val uniqueSources = transactions
+                            .map { it.source }
+                            .distinct()
+                            .size
+                        
+                        // Форматирование диапазона дат
+                        val dateRange = if (transactions.isNotEmpty()) {
+                            val oldestDate = transactions.minByOrNull { it.date }?.date
+                            val newestDate = transactions.maxByOrNull { it.date }?.date
+                            
+                            if (oldestDate != null && newestDate != null) {
+                                val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+                                "${dateFormat.format(oldestDate)} - ${dateFormat.format(newestDate)}"
+                            } else {
+                                "Все время"
+                            }
+                        } else {
+                            "Все время"
+                        }
+
+                        _state.update { it.copy(
                             isLoading = false,
                             totalIncome = totalIncome,
                             totalExpense = totalExpense,
                             balance = balance,
-                            savingsRate = savingsRate
-                        )
+                            savingsRate = savingsRate,
+                            totalTransactions = totalTransactions,
+                            totalExpenseCategories = uniqueExpenseCategories,
+                            totalIncomeCategories = uniqueIncomeCategories,
+                            averageExpense = formattedAvgExpense,
+                            totalSourcesUsed = uniqueSources,
+                            dateRange = dateRange
+                        ) }
                     }
-                }
-                is com.davidbugayov.financeanalyzer.domain.model.Result.Error -> {
-                    // В случае ошибки используем нулевые значения
-                    _state.update { 
-                        it.copy(
+                    is Result.Error -> {
+                        _state.update { it.copy(
                             isLoading = false,
-                            totalIncome = 0.0,
-                            totalExpense = 0.0,
-                            balance = 0.0,
-                            savingsRate = 0.0
-                        )
+                            error = result.exception.message
+                        ) }
                     }
                 }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке финансовой аналитики: ${e.message}")
+                _state.update { it.copy(
+                    isLoading = false,
+                    error = e.message
+                ) }
             }
         }
     }

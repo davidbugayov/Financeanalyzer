@@ -3,14 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.home.components
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Visibility
-import androidx.compose.material.icons.filled.VisibilityOff
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -27,60 +20,46 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
  * Компонент для отображения заголовка списка транзакций.
  *
  * @param currentFilter Текущий фильтр транзакций
- * @param showGroupSummary Флаг отображения сводки по группе
+ * @param showGroupSummary Флаг отображения сводки
  * @param onShowGroupSummaryChange Callback, вызываемый при изменении флага отображения сводки
- * @param onShowAllClick Callback, вызываемый при нажатии на кнопку "Все"
  */
 @Composable
 fun HomeTransactionsHeader(
     currentFilter: TransactionFilter,
     showGroupSummary: Boolean,
     onShowGroupSummaryChange: (Boolean) -> Unit,
-    onShowAllClick: () -> Unit
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
+        // Прямой вызов stringResource для получения текста заголовка
         Text(
             text = when (currentFilter) {
                 TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
                 TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
                 TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
+                TransactionFilter.ALL -> stringResource(R.string.all_transactions)
             },
-            fontSize = 16.sp,
+            fontSize = 15.sp,
             fontWeight = FontWeight.Medium
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        // Текстовая кнопка вместо иконки глаза
+        TextButton(
+            onClick = { onShowGroupSummaryChange(!showGroupSummary) }
         ) {
-            // Кнопка для управления видимостью сводки
-            IconButton(
-                onClick = { onShowGroupSummaryChange(!showGroupSummary) },
-                modifier = Modifier.size(36.dp)
-            ) {
-                Icon(
-                    imageVector = if (showGroupSummary) Icons.Default.Visibility else Icons.Default.VisibilityOff,
-                    contentDescription = stringResource(R.string.show_summary),
-                    modifier = Modifier.size(24.dp)
-                )
-            }
-
-            TextButton(
-                onClick = onShowAllClick,
-                modifier = Modifier.height(36.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.all),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-            }
+            Text(
+                text = if (showGroupSummary) 
+                    stringResource(R.string.hide_summary) 
+                else 
+                    stringResource(R.string.show_summary),
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Medium
+            )
         }
     }
 } 

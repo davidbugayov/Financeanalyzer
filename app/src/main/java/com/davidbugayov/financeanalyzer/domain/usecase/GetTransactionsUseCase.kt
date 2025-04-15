@@ -21,4 +21,19 @@ interface GetTransactionsUseCase {
      * @return Flow с списком транзакций за указанный период
      */
     suspend operator fun invoke(startDate: Date, endDate: Date): Flow<List<Transaction>>
+
+    /**
+     * Получает список всех транзакций.
+     * 
+     * @return Список всех транзакций
+     */
+    suspend fun getAllTransactions(): List<Transaction>
+
+    /**
+     * Получает список транзакций за последние N дней.
+     *
+     * @param days Количество дней для получения транзакций
+     * @return Список транзакций за указанный период
+     */
+    suspend fun getRecentTransactions(days: Int): List<Transaction>
 } 

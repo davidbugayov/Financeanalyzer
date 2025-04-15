@@ -1,62 +1,31 @@
 package com.davidbugayov.financeanalyzer.data.local.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.util.Date
 
 /**
  * Entity для хранения транзакций в базе данных Room.
  * Представляет таблицу transactions в базе данных.
  */
-@Entity(tableName = "transactions")
+@Entity(
+    tableName = "transactions",
+    // Используем id как основной ключ, а id_string как индексированное поле для поиска по строке
+    indices = [androidx.room.Index(value = ["id_string"], unique = true)]
+)
 data class TransactionEntity(
-    @PrimaryKey(autoGenerate = true)
-    val id: Long = 0,
-    val amount: String,
+    @PrimaryKey(autoGenerate = true) val id: Long = 0,
+    @ColumnInfo(name = "id_string") val idString: String, // Строковый ID для поиска
+    val amount: Money,
     val category: String,
     val isExpense: Boolean,
     val date: Date,
-    val note: String?,
-    val source: String = "Наличные"
-) {
-
-    /**
-     * Преобразует Entity в доменную модель
-     */
-    fun toDomain(): Transaction {
-        return Transaction(
-            id = id.toString(),
-            amount = amount.toDouble(),
-            category = category,
-            isExpense = isExpense,
-            date = date,
-            note = note,
-            source = source
-        )
-    }
-
-    companion object {
-
-        /**
-         * Преобразует доменную модель в Entity
-         */
-        fun fromDomain(transaction: Transaction): TransactionEntity {
-            val id = try {
-                transaction.id.toLong()
-            } catch (e: NumberFormatException) {
-                0L
-            }
-            
-            return TransactionEntity(
-                id = id,
-                amount = transaction.amount.toString(),
-                category = transaction.category,
-                isExpense = transaction.isExpense,
-                date = transaction.date,
-                note = transaction.note,
-                source = transaction.source ?: "Наличные"
-            )
-        }
-    }
-} 
+    val note: String? = null,
+    val source: String = "Наличные",
+    val sourceColor: Int = 0,
+    val isTransfer: Boolean = false
+)

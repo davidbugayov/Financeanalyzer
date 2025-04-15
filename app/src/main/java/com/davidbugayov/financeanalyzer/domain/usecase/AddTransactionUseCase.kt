@@ -4,6 +4,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.util.safeCall
+import timber.log.Timber
 
 /**
  * Use case для добавления новой транзакции.
@@ -19,6 +20,7 @@ class AddTransactionUseCase(
      */
     suspend operator fun invoke(transaction: Transaction): Result<Unit> {
         return safeCall {
+            Timber.d("Добавление транзакции: сумма=${transaction.amount}, категория=${transaction.category}")
             repository.addTransaction(transaction)
         }
     }

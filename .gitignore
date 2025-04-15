@@ -49,6 +49,7 @@ app/google-services.json
 # Gradle files
 .gradle/
 build/
+build-cache/
 
 # Proguard files
 proguard/
@@ -69,3 +70,8 @@ lint/intermediates/
 lint/generated/
 lint/outputs/
 lint/tmp/
+
+# IntelliJ
+misc.xml
+deploymentTargetDropDown.xml
+render.experimental.xml

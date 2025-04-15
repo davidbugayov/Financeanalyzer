@@ -1,20 +1,29 @@
 package com.davidbugayov.financeanalyzer
 
 import android.app.Application
-import com.davidbugayov.financeanalyzer.di.addTransactionModule
+import android.util.Log
 import com.davidbugayov.financeanalyzer.di.appModule
+import com.davidbugayov.financeanalyzer.di.budgetModule
 import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.historyModule
 import com.davidbugayov.financeanalyzer.di.homeModule
 import com.davidbugayov.financeanalyzer.di.importModule
+import com.davidbugayov.financeanalyzer.di.onboardingModule
 import com.davidbugayov.financeanalyzer.di.profileModule
+import com.davidbugayov.financeanalyzer.di.transactionModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
+import com.davidbugayov.financeanalyzer.utils.logging.FileLogger
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -24,6 +33,7 @@ class FinanceApp : Application() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
     private lateinit var crashlytics: FirebaseCrashlytics
+    private val appScope = CoroutineScope(Dispatchers.IO)
 
     // Делаем аналитику доступной глобально
     companion object {
@@ -39,37 +49,52 @@ class FinanceApp : Application() {
     override fun onCreate() {
         super.onCreate()
 
-        // Сначала инициализируем Firebase
-        initializeFirebase()
+        try {
+            // Сначала инициализируем обычное логирование Timber
+            TimberInitializer.init(BuildConfig.DEBUG)
+            Timber.d("Timber инициализирован")
+            
+            // Затем инициализируем сохранение логов в файл
+            FileLogger.init(this)
+            Timber.d("FileLogger инициализирован, путь к файлу: ${FileLogger.getLogFilePath()}")
 
-        // Затем инициализируем логирование, когда Firebase уже доступен
-        TimberInitializer.init(BuildConfig.DEBUG)
+            // Инициализируем Firebase
+            initializeFirebase()
 
-        // Инициализируем аналитику и Crashlytics
-        initializeAnalytics()
-        initializeCrashlytics()
+            // Инициализируем аналитику и Crashlytics
+            initializeAnalytics()
+            initializeCrashlytics()
 
-        startKoin {
-            androidLogger()
-            androidContext(this@FinanceApp)
-            modules(
-                appModule,
-                chartModule,
-                homeModule,
-                addTransactionModule,
-                historyModule,
-                profileModule,
-                importModule
-            )
+            startKoin {
+                androidLogger()
+                androidContext(this@FinanceApp)
+                modules(
+                    appModule,
+                    chartModule,
+                    homeModule,
+                    historyModule,
+                    profileModule,
+                    importModule,
+                    onboardingModule,
+                    budgetModule,
+                    transactionModule
+                )
+            }
+            
+            // Инициализируем финансовые метрики
+            initializeFinancialMetrics()
+
+            // Логируем через Timber для проверки отправки в Crashlytics
+            Timber.i("Application initialized")
+
+            // Логируем информацию о запуске приложения
+            CrashlyticsUtils.setCustomKey("app_start_time", System.currentTimeMillis())
+            CrashlyticsUtils.setCustomKey("device_memory", getAvailableMemory())
+            CrashlyticsUtils.setCustomKey("device_language", resources.configuration.locales[0].language)
+        } catch (e: Exception) {
+            // Логирование запуска может перехватить ошибку инициализации
+            Log.e("FinanceApp", "Ошибка инициализации приложения: ${e.message}", e)
         }
-
-        // Логируем через Timber для проверки отправки в Crashlytics
-        Timber.i("Application initialized")
-
-        // Логируем информацию о запуске приложения
-        CrashlyticsUtils.setCustomKey("app_start_time", System.currentTimeMillis())
-        CrashlyticsUtils.setCustomKey("device_memory", getAvailableMemory())
-        CrashlyticsUtils.setCustomKey("device_language", resources.configuration.locales[0].language)
     }
 
     private fun initializeFirebase() {
@@ -138,5 +163,22 @@ class FinanceApp : Application() {
         val runtime = Runtime.getRuntime()
         val maxMemory = runtime.maxMemory() / (1024 * 1024) // В МБ
         return maxMemory
+    }
+
+    /**
+     * Инициализирует финансовые метрики в отдельном потоке
+     */
+    private fun initializeFinancialMetrics() {
+        appScope.launch {
+            try {
+                Timber.i("Initializing financial metrics...")
+                val metrics = FinancialMetrics.getInstance()
+                // Начинаем первоначальный расчет метрик
+                metrics.lazyInitialize()
+            } catch (e: Exception) {
+                Timber.e(e, "Error initializing financial metrics")
+                CrashlyticsUtils.recordException(e)
+            }
+        }
     }
 } 

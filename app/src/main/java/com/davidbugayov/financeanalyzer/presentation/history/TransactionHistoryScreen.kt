@@ -7,13 +7,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.FilterAlt
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -21,25 +21,31 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
-import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
-import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
+import com.davidbugayov.financeanalyzer.presentation.components.EnhancedEmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsDialog
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsHandler
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionDialogState
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
-import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionHistory
+import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionGroupList
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
@@ -48,18 +54,59 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelec
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
+
+/**
+ * Преобразует TransactionHistoryState в TransactionDialogState
+ */
+fun TransactionHistoryState.toTransactionDialogState(): TransactionDialogState {
+    return TransactionDialogState(
+        transactionToDelete = this.transactionToDelete,
+        showDeleteConfirmDialog = this.transactionToDelete != null
+    )
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionHistoryScreen(
     viewModel: TransactionHistoryViewModel,
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToEdit: ((Transaction) -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
+    
+    // Локальное состояние для контекстного меню транзакций
+    var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
+    var showActionsDialog by remember { mutableStateOf(false) }
+    
+    // Функция для обработки событий TransactionEvent
+    val handleTransactionEvent: (TransactionEvent) -> Unit = { event ->
+        when (event) {
+            is TransactionEvent.ShowDeleteConfirmDialog -> {
+                viewModel.onEvent(TransactionHistoryEvent.ShowDeleteConfirmDialog(event.transaction))
+            }
+            is TransactionEvent.HideDeleteConfirmDialog -> {
+                viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog)
+            }
+            is TransactionEvent.DeleteTransaction -> {
+                viewModel.onEvent(TransactionHistoryEvent.DeleteTransaction(event.transaction))
+            }
+            is TransactionEvent.ShowEditDialog -> {
+                // Если есть функция для навигации к экрану редактирования, вызываем ее
+                if (onNavigateToEdit != null) {
+                    onNavigateToEdit(event.transaction)
+                }
+            }
+            else -> {
+                // Другие события пока не обрабатываем
+            }
+        }
+    }
 
     // Логируем открытие экрана истории
     LaunchedEffect(Unit) {
@@ -67,6 +114,14 @@ fun TransactionHistoryScreen(
             screenName = "transaction_history",
             screenClass = "TransactionHistoryScreen"
         )
+        Timber.d("TransactionHistoryScreen открыт, текущий период: ${state.periodType}")
+        viewModel.loadTransactions()
+        viewModel.checkTransactionCount()
+    }
+
+    // Отслеживаем изменения периода
+    LaunchedEffect(state.periodType) {
+        Timber.d("Период изменился на: ${state.periodType}, загружено транзакций: ${state.transactions.size}")
     }
 
     // Получаем список всех категорий из CategoriesViewModel
@@ -100,13 +155,16 @@ fun TransactionHistoryScreen(
             onEndDateClick = {
                 viewModel.onEvent(TransactionHistoryEvent.ShowEndDatePicker)
             },
+            onConfirm = {
+                viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
+            },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
             }
         )
     }
 
-    // Диалог выбора начальной даты
+    // Диалоги выбора дат для кастомного периода
     if (state.showStartDatePicker) {
         DatePickerDialog(
             initialDate = state.startDate,
@@ -120,7 +178,6 @@ fun TransactionHistoryScreen(
         )
     }
 
-    // Диалог выбора конечной даты
     if (state.showEndDatePicker) {
         DatePickerDialog(
             initialDate = state.endDate,
@@ -134,7 +191,7 @@ fun TransactionHistoryScreen(
         )
     }
 
-    // Диалог выбора категории
+    // Диалог выбора категорий
     if (state.showCategoryDialog) {
         CategorySelectionDialog(
             selectedCategories = state.selectedCategories,
@@ -171,18 +228,12 @@ fun TransactionHistoryScreen(
         )
     }
 
-    // Диалог подтверждения удаления транзакции
-    state.transactionToDelete?.let { transaction ->
-        DeleteTransactionDialog(
-            transaction = transaction,
-            onConfirm = {
-                viewModel.onEvent(TransactionHistoryEvent.DeleteTransaction(transaction))
-            },
-            onDismiss = {
-                viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog)
-            }
-        )
-    }
+    // Используем общий компонент для работы с транзакциями
+    TransactionActionsHandler(
+        transactionDialogState = state.toTransactionDialogState(),
+        onEvent = handleTransactionEvent,
+        onNavigateToEdit = onNavigateToEdit
+    )
 
     // Диалог выбора источника
     if (state.showSourceDialog) {
@@ -218,41 +269,67 @@ fun TransactionHistoryScreen(
         )
     }
 
+    // Функция для показа диалога действий с транзакцией
+    fun showTransactionActionsDialog(transaction: Transaction) {
+        selectedTransaction = transaction
+        showActionsDialog = true
+    }
+    
+    // Диалог с действиями для транзакции
+    if (showActionsDialog && selectedTransaction != null) {
+        TransactionActionsDialog(
+            transaction = selectedTransaction!!,
+            onDismiss = { showActionsDialog = false },
+            onDelete = { transaction ->
+                showActionsDialog = false
+                handleTransactionEvent(TransactionEvent.ShowDeleteConfirmDialog(transaction))
+            },
+            onEdit = { transaction ->
+                showActionsDialog = false
+                handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction))
+            }
+        )
+    }
+
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.history_title),
-                showBackButton = true,
-                onBackClick = onNavigateBack,
-                actions = {
-                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }) {
+                title = stringResource(R.string.transaction_history),
+                navigationIcon = {
+                    IconButton(onClick = onNavigateBack) {
                         Icon(
-                            imageVector = Icons.Default.AccountBalance,
-                            contentDescription = stringResource(R.string.select_sources),
-                            tint = if (state.selectedSources.isNotEmpty())
-                                MaterialTheme.colorScheme.primary
-                            else
-                                LocalContentColor.current
-                        )
-                    }
-                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }) {
-                        Icon(
-                            imageVector = Icons.Default.FilterAlt,
-                            contentDescription = stringResource(R.string.select_category),
-                            tint = if (state.selectedCategories.isNotEmpty())
-                                MaterialTheme.colorScheme.primary
-                            else
-                                LocalContentColor.current
-                        )
-                    }
-                    IconButton(onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = stringResource(R.string.select_period)
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
+                            contentDescription = stringResource(R.string.back)
                         )
                     }
                 },
-                titleFontSize = 16
+                actions = {
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterAlt,
+                            contentDescription = stringResource(R.string.select_period)
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.FilterList,
+                            contentDescription = stringResource(R.string.filter_by_category)
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBalance,
+                            contentDescription = stringResource(R.string.filter_by_source)
+                        )
+                    }
+                },
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
         }
     ) { paddingValues ->
@@ -264,7 +341,7 @@ fun TransactionHistoryScreen(
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -280,7 +357,7 @@ fun TransactionHistoryScreen(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = 4.dp),
+                        .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -299,7 +376,7 @@ fun TransactionHistoryScreen(
                                 "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
                             }
                         },
-                        fontSize = 14.sp,
+                        fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium
                     )
@@ -322,9 +399,11 @@ fun TransactionHistoryScreen(
                         error = state.error,
                         onRetry = { viewModel.onEvent(TransactionHistoryEvent.ReloadTransactions) }
                     )
-                } else if (state.filteredTransactions.isEmpty() && !state.isLoading) {
-                    EmptyContent()
-                } else if (!state.isLoading) {
+                } else if (state.isLoading && !state.isLoadingMore) {
+                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                } else if (state.filteredTransactions.isEmpty()) {
+                    EnhancedEmptyContent()
+                } else {
                     // Отображение сгруппированных транзакций
                     val groupedTransactions = viewModel.getGroupedTransactions()
                     val transactionGroups = remember(groupedTransactions) {
@@ -333,13 +412,13 @@ fun TransactionHistoryScreen(
                             // Для доходов
                             val income = transactions
                                 .filter { !it.isExpense }
-                                .map { Money(it.amount) }
+                                .map { it.amount }
                                 .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
                             // Для расходов берем абсолютное значение (без минуса)
                             val expense = transactions
                                 .filter { it.isExpense }
-                                .map { Money(it.amount) }
+                                .map { it.amount }
                                 .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
 
                             // Для баланса: доходы - расходы
@@ -353,17 +432,21 @@ fun TransactionHistoryScreen(
                         }
                     }
 
-                    TransactionHistory(
+                    TransactionGroupList(
                         transactionGroups = transactionGroups,
-                        onTransactionClick = { /* Пока ничего не делаем при клике */ },
+                        onTransactionClick = { transaction -> 
+                            showTransactionActionsDialog(transaction)
+                        },
                         onTransactionLongClick = { transaction ->
-                            viewModel.onEvent(TransactionHistoryEvent.ShowDeleteConfirmDialog(transaction))
-                        }
+                            // Показываем тот же диалог выбора действий, что и при клике
+                            showTransactionActionsDialog(transaction)
+                        },
+                        onLoadMore = {
+                            viewModel.onEvent(TransactionHistoryEvent.LoadMoreTransactions)
+                        },
+                        isLoading = state.isLoadingMore,
+                        hasMoreData = state.hasMoreData
                     )
-                }
-
-                if (state.isLoading) {
-                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                 }
             }
         }

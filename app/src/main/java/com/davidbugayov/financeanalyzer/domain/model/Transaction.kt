@@ -5,27 +5,18 @@ import java.util.UUID
 
 /**
  * Модель данных для транзакции.
- * Представляет финансовую операцию (доход или расход).
+ * Представляет финансовую операцию (доход, расход или перевод).
  */
 data class Transaction(
     val id: String = UUID.randomUUID().toString(),
-    val amount: Double,
+    val amount: Money,
     val category: String,
     val date: Date = Date(),
     val isExpense: Boolean,
     val note: String? = null,
-    val source: String? = null
+    val source: String,
+    val sourceColor: Int,
+    val categoryId: String = "",
+    val title: String = "",
+    val isTransfer: Boolean = false
 )
-
-/**
- * Функция расширения для форматирования суммы транзакции.
- * Возвращает строку с форматированной суммой, включая знак "+" или "-" в зависимости от типа транзакции.
- */
-fun Transaction.amountFormatted(): String {
-    val money = Money(this.amount, Currency.RUB)
-    return if (this.isExpense) {
-        "-${money.formatted()}"
-    } else {
-        "+${money.formatted()}"
-    }
-} 

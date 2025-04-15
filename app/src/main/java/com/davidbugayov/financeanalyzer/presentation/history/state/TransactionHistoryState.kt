@@ -2,7 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.state
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Calendar
@@ -17,6 +17,10 @@ import java.util.Date
  * @property filteredTransactions Отфильтрованный список транзакций по выбранным критериям
  * @property groupedTransactions Группированные транзакции
  * @property isLoading Флаг загрузки данных
+ * @property isLoadingMore Флаг загрузки дополнительных данных при пагинации
+ * @property hasMoreData Флаг наличия дополнительных данных для загрузки
+ * @property currentPage Текущая страница при пагинации
+ * @property pageSize Размер страницы при пагинации
  * @property error Текст ошибки (null если ошибок нет)
  * @property selectedCategories Список выбранных категорий для фильтрации (пустой список для всех категорий)
  * @property selectedSources Список выбранных источников для фильтрации (пустой список для всех источников)
@@ -42,12 +46,16 @@ data class TransactionHistoryState(
     val filteredTransactions: List<Transaction> = emptyList(),
     val groupedTransactions: Map<String, List<Transaction>> = emptyMap(),
     val isLoading: Boolean = false,
+    val isLoadingMore: Boolean = false,
+    val hasMoreData: Boolean = true,
+    val currentPage: Int = 0,
+    val pageSize: Int = 50,
     val error: String? = null,
     val selectedCategories: List<String> = emptyList(),
     val selectedSources: List<String> = emptyList(),
     val groupingType: GroupingType = GroupingType.MONTH,
-    val periodType: PeriodType = PeriodType.MONTH,
-    val startDate: Date = Calendar.getInstance().apply { add(Calendar.MONTH, -1) }.time,
+    val periodType: PeriodType = PeriodType.ALL,
+    val startDate: Date = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time,
     val endDate: Date = Calendar.getInstance().time,
     val categoryStats: Triple<Money, Money, Int?>? = null,
     val showPeriodDialog: Boolean = false,

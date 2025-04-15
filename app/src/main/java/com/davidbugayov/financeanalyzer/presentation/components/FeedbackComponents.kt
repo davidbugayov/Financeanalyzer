@@ -9,8 +9,14 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.collectIsPressedAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,12 +25,19 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.delay
+import com.davidbugayov.financeanalyzer.R
 
 /**
  * Типы уведомлений для обратной связи
@@ -63,7 +76,7 @@ fun FeedbackMessage(
         ) {
             Text(
                 text = message,
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal)),
                 color = when (type) {
                     FeedbackType.SUCCESS -> MaterialTheme.colorScheme.onPrimaryContainer
                     FeedbackType.ERROR -> MaterialTheme.colorScheme.onErrorContainer
@@ -126,4 +139,35 @@ fun Modifier.clickableWithPressEffect(
         onClick()
         onPressChanged(false)
     }
-) 
+)
+
+@Composable
+fun EnhancedEmptyContent() {
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.Center
+    ) {
+        Icon(
+            imageVector = Icons.Default.AccountBalance,
+            contentDescription = stringResource(id = R.string.empty_state),
+            modifier = Modifier
+                .size(128.dp)
+                .padding(dimensionResource(R.dimen.spacing_normal)),
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+        )
+        
+        Text(
+            text = stringResource(id = R.string.empty_transactions),
+            style = MaterialTheme.typography.titleMedium,
+            textAlign = TextAlign.Center
+        )
+        
+        Text(
+            text = stringResource(id = R.string.empty_transactions_description),
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+} 

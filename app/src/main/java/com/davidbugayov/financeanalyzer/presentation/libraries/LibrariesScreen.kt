@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.libraries
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
@@ -9,25 +11,37 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primary
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primaryContainer
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_secondary
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_secondaryContainer
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_dark_primary
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_dark_primaryContainer
 
 /**
  * Экран для отображения списка используемых библиотек.
@@ -40,22 +54,11 @@ fun LibrariesScreen(
 ) {
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = stringResource(R.string.libraries_title),
-                        fontSize = 18.sp,
-                        fontWeight = FontWeight.Medium
-                    )
-                },
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
-                        )
-                    }
-                }
+            AppTopBar(
+                title = stringResource(id = R.string.libraries_title),
+                showBackButton = true,
+                onBackClick = onNavigateBack,
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
             )
         }
     ) { paddingValues ->
@@ -63,14 +66,13 @@ fun LibrariesScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(16.dp)
+            contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_normal))
         ) {
             item {
                 Text(
                     text = stringResource(R.string.libraries_description),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    style = MaterialTheme.typography.bodyLarge,
+                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal))
                 )
             }
             
@@ -79,14 +81,15 @@ fun LibrariesScreen(
                     name = library.name,
                     version = library.version,
                     description = library.description,
-                    license = library.license
+                    license = library.license,
+                    index = getLibraries().indexOf(library)
                 )
                 
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             }
             
             item {
-                Spacer(modifier = Modifier.height(16.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
                 
                 Text(
                     text = stringResource(R.string.licenses_note),
@@ -94,7 +97,7 @@ fun LibrariesScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 
-                Spacer(modifier = Modifier.height(32.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxlarge)))
             }
         }
     }
@@ -106,52 +109,87 @@ fun LibrariesScreen(
  * @param version Версия библиотеки.
  * @param description Описание библиотеки.
  * @param license Лицензия библиотеки.
+ * @param index Индекс элемента в списке, используется для чередования оттенков.
  */
 @Composable
 private fun LibraryItem(
     name: String,
     version: String,
     description: String,
-    license: String
+    license: String,
+    index: Int
 ) {
+    // Определяем градиент цветов в зависимости от четности индекса
+    val gradientColors = if (index % 2 == 0) {
+        listOf(
+            md_theme_light_primary.copy(alpha = 0.9f),
+            md_theme_light_primaryContainer.copy(alpha = 0.3f)
+        )
+    } else {
+        listOf(
+            md_theme_light_secondary.copy(alpha = 0.8f),
+            md_theme_light_secondaryContainer.copy(alpha = 0.3f)
+        )
+    }
+
+    // Определяем цвет текста для заголовка на цветном фоне
+    val textColor = Color.White
+
     Card(
-        modifier = Modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation).div(2)),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface
+        )
     ) {
-        Column(
+        // Заголовок с градиентом
+        Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .background(
+                    brush = Brush.horizontalGradient(gradientColors)
+                )
+                .padding(dimensionResource(R.dimen.spacing_normal))
         ) {
-            Text(
-                text = name,
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Column {
+                Text(
+                    text = name,
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = textColor
+                )
             
-            Text(
-                text = "Версия: $version",
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            
-            Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = "Версия: $version",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = textColor.copy(alpha = 0.9f)
+                )
+            }
+        }
+        
+        // Основное содержимое карточки
+        Column(
+            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
+        ) {
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
             
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium
             )
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
             
             HorizontalDivider()
             
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             
             Text(
-                text = "Лицензия: $license",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                text = stringResource(R.string.license_colon, license),
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.Medium
             )
         }
     }
@@ -191,38 +229,32 @@ private fun getLibraries(): List<Library> {
         ),
         Library(
             name = "Koin",
-            version = "3.4.3",
+            version = "3.5.3",
             description = "Легковесная библиотека для внедрения зависимостей в Kotlin",
             license = "Apache License 2.0"
         ),
         Library(
             name = "Room",
-            version = "2.6.0",
+            version = "2.6.1",
             description = "Библиотека для работы с базами данных SQLite",
             license = "Apache License 2.0"
         ),
         Library(
             name = "Firebase Analytics",
-            version = "21.3.0",
+            version = "32.7.4",
             description = "Библиотека для аналитики и отслеживания пользовательских событий",
             license = "Apache License 2.0"
         ),
         Library(
             name = "Firebase Crashlytics",
-            version = "18.4.3",
+            version = "2.9.9",
             description = "Библиотека для отслеживания сбоев и ошибок в приложении",
             license = "Apache License 2.0"
         ),
         Library(
             name = "Material Components",
-            version = "1.9.0",
+            version = "1.11.0",
             description = "Компоненты Material Design для Android",
-            license = "Apache License 2.0"
-        ),
-        Library(
-            name = "Accompanist",
-            version = "0.30.1",
-            description = "Набор библиотек для расширения возможностей Jetpack Compose",
             license = "Apache License 2.0"
         ),
         Library(
@@ -230,6 +262,31 @@ private fun getLibraries(): List<Library> {
             version = "5.0.1",
             description = "Библиотека для логирования в Android",
             license = "Apache License 2.0"
+        ),
+        Library(
+            name = "PDFBox Android",
+            version = "2.0.27.0",
+            description = "Библиотека для работы с PDF-файлами в Android",
+            license = "Apache License 2.0"
+        ),
+        Library(
+            name = "Apache POI",
+            version = "5.2.3",
+            description = "Библиотека для работы с документами Microsoft Office",
+            license = "Apache License 2.0"
         )
     )
 } 
+
+/**
+ * Горизонтальный разделитель
+ */
+@Composable
+private fun HorizontalDivider() {
+    Surface(
+        modifier = Modifier
+            .fillMaxWidth()
+            .height(dimensionResource(R.dimen.height_divider)),
+        color = MaterialTheme.colorScheme.outlineVariant
+    ) {}
+}

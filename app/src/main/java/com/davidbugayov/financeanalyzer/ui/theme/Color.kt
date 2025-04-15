@@ -67,7 +67,7 @@ val md_theme_dark_onSurfaceVariant = Color(0xFFBDBDBD)
 val md_theme_light_outline = Color(0xFFBDBDBD)
 val md_theme_dark_outline = Color(0xFF757575)
 
-// Income and Expense colors
+// Income and Expense colors - используются для отображения доходов и расходов
 val md_theme_light_income = Color(0xFF4CAF50)
 val md_theme_dark_income = Color(0xFF81C784)
 val md_theme_light_expense = Color(0xFFF44336)
@@ -126,19 +126,11 @@ val OnSurfaceDark = Color(0xFFEEEEEE)
 val IncomeColorDark = Color(0xFF81C784) // Светло-зеленый для доходов
 val ExpenseColorDark = Color(0xFFEF5350) // Светло-красный для расходов
 
-// Общие цвета
-val ErrorColor = Color(0xFFD32F2F)
-val SuccessColor = Color(0xFF388E3C)
-val WarningColor = Color(0xFFFFA000)
-val InfoColor = Color(0xFF1976D2)
-
-val Purple80 = Color(0xFFD0BCFF)
-val PurpleGrey80 = Color(0xFFCCC2DC)
-val Pink80 = Color(0xFFEFB8C8)
-
-val Purple40 = Color(0xFF6650a4)
-val PurpleGrey40 = Color(0xFF625b71)
-val Pink40 = Color(0xFF7D5260)
+// Общие цвета для уведомлений и индикаторов
+val ErrorColor = Color(0xFFD32F2F) // Красный для ошибок
+val SuccessColor = Color(0xFF388E3C) // Зеленый для успеха
+val WarningColor = Color(0xFFFFA000) // Оранжевый для предупреждений
+val InfoColor = Color(0xFF1976D2) // Синий для информации
 
 // Добавляем локальную переменную для цвета кнопки "Добавить"
 val md_theme_light_fab = Color(0xFF5677FC) // Темно-синий для кнопки "Добавить" в светлой теме

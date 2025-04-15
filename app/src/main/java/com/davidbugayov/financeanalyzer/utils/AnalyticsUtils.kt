@@ -54,6 +54,37 @@ object AnalyticsUtils {
     }
 
     /**
+     * Общий метод для логирования произвольного события
+     * @param eventName Название события
+     * @param params Параметры события в виде Map
+     */
+    fun logEvent(eventName: String, params: Map<String, Any>) {
+        try {
+            // Всегда логируем в Timber для отладки
+            Timber.d("Analytics: Event - $eventName, params: $params")
+
+            // Отправляем событие в Firebase Analytics
+            val bundle = Bundle().apply {
+                params.forEach { (key, value) ->
+                    when (value) {
+                        is String -> putString(key, value)
+                        is Int -> putInt(key, value)
+                        is Long -> putLong(key, value)
+                        is Double -> putDouble(key, value)
+                        is Boolean -> putBoolean(key, value)
+                        else -> putString(key, value.toString())
+                    }
+                }
+            }
+
+            getAnalyticsInstance()?.logEvent(eventName, bundle)
+                ?: Timber.d("Событие не отправлено: $eventName, params: $params")
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при логировании события $eventName")
+        }
+    }
+
+    /**
      * Логирует событие просмотра экрана
      * @param screenName Имя экрана
      * @param screenClass Класс экрана

@@ -5,6 +5,7 @@ import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
 import java.util.Locale
+import timber.log.Timber
 
 /**
  * Класс для представления денежных значений.
@@ -17,6 +18,12 @@ data class Money(
     val amount: BigDecimal,
     val currency: Currency = Currency.RUB
 ) {
+
+    init {
+        require(amount.scale() <= currency.decimalPlaces) {
+            "Amount scale (${amount.scale()}) exceeds currency decimal places (${currency.decimalPlaces})"
+        }
+    }
 
     constructor(amount: Double, currency: Currency = Currency.RUB) : this(
         BigDecimal.valueOf(amount).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN),
@@ -45,7 +52,9 @@ data class Money(
      * @throws IllegalArgumentException если валюты не совпадают
      */
     operator fun plus(other: Money): Money {
-        require(currency == other.currency) { "Cannot add Money with different currencies" }
+        require(currency == other.currency) {
+            "Cannot add money with different currencies: $currency and ${other.currency}"
+        }
         return Money(amount.add(other.amount), currency)
     }
 
@@ -56,7 +65,9 @@ data class Money(
      * @throws IllegalArgumentException если валюты не совпадают
      */
     operator fun minus(other: Money): Money {
-        require(currency == other.currency) { "Cannot subtract Money with different currencies" }
+        require(currency == other.currency) {
+            "Cannot subtract money with different currencies: $currency and ${other.currency}"
+        }
         return Money(amount.subtract(other.amount), currency)
     }
 
@@ -66,7 +77,10 @@ data class Money(
      * @return Результат умножения
      */
     operator fun times(multiplier: BigDecimal): Money {
-        return Money(amount.multiply(multiplier), currency)
+        require(multiplier >= BigDecimal.ZERO) {
+            "Multiplier must be non-negative: $multiplier"
+        }
+        return Money(amount.multiply(multiplier).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN), currency)
     }
 
     /**
@@ -164,10 +178,8 @@ data class Money(
      * @return Отформатированная строка
      */
     fun format(showCurrency: Boolean = true, showSign: Boolean = false): String {
-        val symbols = DecimalFormatSymbols(Locale.getDefault())
-        symbols.groupingSeparator = currency.groupingSeparator
-        symbols.decimalSeparator = currency.decimalSeparator
-
+        val locale = Locale.getDefault()
+        
         val pattern = buildString {
             if (showSign) append("+;-")
             append("#,##0")
@@ -176,12 +188,10 @@ data class Money(
                 repeat(currency.decimalPlaces) { append("#") }
             }
         }
-
-        val formatter = DecimalFormat(pattern, symbols)
-        formatter.minimumFractionDigits = 0
-        formatter.maximumFractionDigits = currency.decimalPlaces
+        
+        val formatter = getFormatter(locale, currency, pattern)
         val formattedAmount = formatter.format(amount)
-
+        
         return when {
             !showCurrency -> formattedAmount
             currency.symbolPosition == SymbolPosition.BEFORE -> "${currency.symbol}$formattedAmount"
@@ -291,6 +301,29 @@ data class Money(
     }
 
     companion object {
+        // Кэш для форматтеров денежных значений
+        private val formatters = mutableMapOf<Triple<Locale, Currency, String>, DecimalFormat>()
+        private val symbolsCache = mutableMapOf<Pair<Locale, Currency>, DecimalFormatSymbols>()
+        
+        /**
+         * Получает форматтер для денежного значения, используя кэш для улучшения производительности
+         */
+        private fun getFormatter(locale: Locale, currency: Currency, pattern: String): DecimalFormat {
+            val key = Triple(locale, currency, pattern)
+            return formatters.getOrPut(key) {
+                val symbols = symbolsCache.getOrPut(locale to currency) {
+                    DecimalFormatSymbols(locale).apply {
+                        groupingSeparator = currency.groupingSeparator
+                        decimalSeparator = currency.decimalSeparator
+                    }
+                }
+                
+                DecimalFormat(pattern, symbols).apply {
+                    minimumFractionDigits = 0
+                    maximumFractionDigits = currency.decimalPlaces
+                }
+            }
+        }
 
         /**
          * Создает денежное значение из строки
@@ -298,7 +331,7 @@ data class Money(
          * @param currency Валюта
          * @return Денежное значение
          */
-        fun parse(value: String, currency: Currency = Currency.RUB): Money {
+        fun fromString(value: String, currency: Currency = Currency.RUB): Money {
             val cleanValue = value
                 .replace(currency.symbol, "")
                 .replace(currency.groupingSeparator.toString(), "")
@@ -308,7 +341,8 @@ data class Money(
             return try {
                 Money(BigDecimal(cleanValue), currency)
             } catch (e: NumberFormatException) {
-                Money(BigDecimal.ZERO, currency)
+                Timber.e(e, "Failed to parse amount: $value")
+                throw IllegalArgumentException("Invalid amount format: $value", e)
             }
         }
 
@@ -319,6 +353,26 @@ data class Money(
          */
         fun zero(currency: Currency = Currency.RUB): Money {
             return Money(BigDecimal.ZERO, currency)
+        }
+        
+        /**
+         * Алиас для метода fromString для более читаемого кода
+         * @param value Строка с денежным значением
+         * @param currency Валюта
+         * @return Денежное значение
+         */
+        fun parse(value: String, currency: Currency = Currency.RUB): Money {
+            require(value.isNotBlank()) { "Amount string cannot be blank" }
+            require(value.matches(Regex("""^-?\d+(\.\d+)?$"""))) {
+                "Invalid amount format: $value"
+            }
+            
+            return try {
+                Money(BigDecimal(value).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN), currency)
+            } catch (e: NumberFormatException) {
+                Timber.e(e, "Failed to parse amount: $value")
+                throw IllegalArgumentException("Invalid amount format: $value", e)
+            }
         }
     }
 } 

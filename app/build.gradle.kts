@@ -9,45 +9,6 @@ plugins {
     alias(libs.plugins.firebase.crashlytics)
 }
 
-// Простое решение для копирования google-services.json
-val debugGoogleServices = rootProject.file("google-services.debug.json")
-val releaseGoogleServices = rootProject.file("google-services.release.json")
-val targetGoogleServices = project.file("google-services.json")
-
-tasks.register("copyDebugGoogleServices") {
-    doLast {
-        if (debugGoogleServices.exists()) {
-            debugGoogleServices.copyTo(targetGoogleServices, overwrite = true)
-            println("Copied debug google-services.json")
-        } else {
-            throw GradleException("Debug google-services.json not found at ${debugGoogleServices.absolutePath}")
-        }
-    }
-}
-
-tasks.register("copyReleaseGoogleServices") {
-    doLast {
-        if (releaseGoogleServices.exists()) {
-            releaseGoogleServices.copyTo(targetGoogleServices, overwrite = true)
-            println("Copied release google-services.json")
-        } else {
-            throw GradleException("Release google-services.json not found at ${releaseGoogleServices.absolutePath}")
-        }
-    }
-}
-
-// Задачи processGoogleServices создаются плагином google-services,
-// поэтому нам нужно использовать afterEvaluate
-afterEvaluate {
-    tasks.matching { it.name == "processDebugGoogleServices" }.configureEach {
-        dependsOn("copyDebugGoogleServices")
-    }
-    
-    tasks.matching { it.name == "processReleaseGoogleServices" }.configureEach {
-        dependsOn("copyReleaseGoogleServices")
-    }
-}
-
 fun getKeystoreProperties(): Properties {
     val properties = Properties()
     val propertiesFile = rootProject.file("keystore.properties")
@@ -64,22 +25,25 @@ android {
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
-        //noinspection EditedTargetSdkVersion
         targetSdk = 35
-        versionCode = 14
-        versionName = "2.1"
+        versionCode = 21
+        versionName = "2.6"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
         }
 
-        // Включаем поддержку R8
+        // Room schema location
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+
+        // Enable R8 support
         proguardFiles(
             getDefaultProguardFile("proguard-android-optimize.txt"),
             "proguard-rules.pro"
         )
-
     }
 
     signingConfigs {
@@ -91,7 +55,7 @@ android {
             keyPassword = keystoreProperties.getProperty("keystore.key.password", "")
             storeType = "PKCS12"
 
-            // Проверка наличия всех необходимых свойств
+            // Check that all required properties are present
             val requiredProperties = listOf("keystore.password", "keystore.key.alias", "keystore.key.password")
             requiredProperties.forEach { prop ->
                 if (!keystoreProperties.containsKey(prop)) {
@@ -114,7 +78,7 @@ android {
             multiDexEnabled = false
             buildConfigField("boolean", "DEBUG", "false")
 
-            // Дополнительные оптимизации
+            // Additional optimizations
             ndk {
                 debugSymbolLevel = "FULL"
             }
@@ -126,29 +90,54 @@ android {
             buildConfigField("boolean", "DEBUG", "true")
             resValue("string", "app_name", "Finanalyzer Debug")
 
-            // Включаем инспекцию Compose
+            // Enable Compose inspection
             manifestPlaceholders["enableComposeCompilerReports"] = "true"
         }
     }
 
+    // Specify different google-services.json files for different build types
+    sourceSets {
+        getByName("debug") {
+            assets.srcDir("src/debug/assets")
+            res.srcDir("src/debug/res")
+            java.srcDir("src/debug/java")
+            // google-services.json is located directly in the src/debug/ folder
+        }
+        
+        getByName("release") {
+            assets.srcDir("src/release/assets")
+            res.srcDir("src/release/res")
+            java.srcDir("src/release/java")
+            // google-services.json is located directly in the src/release/ folder
+        }
+    }
+
+    // Compilation optimizations to speed up build
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
+        isCoreLibraryDesugaringEnabled = false
+    }
+
+    // Disable underused instrumentation tests to speed up builds
+    testOptions {
+        execution = "ANDROIDX_TEST_ORCHESTRATOR"
+        unitTests.isIncludeAndroidResources = true
+        unitTests.isReturnDefaultValues = true
     }
 
     kotlinOptions {
         jvmTarget = "17"
-        // Включаем оптимизации компилятора
+        // Enable compiler optimizations
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all",
+            "-Xjvm-default=all", 
             "-Xcontext-receivers",
-            // Добавляем флаги для улучшения работы Compose
+            // Compose optimizations
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.asFile.get()}/compose_metrics",
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.asFile.get()}/compose_reports",
-            // Добавляем флаги для Layout Inspector
             "-P",
             "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=${layout.buildDirectory.asFile.get()}/compose_stability.conf"
         )
@@ -157,11 +146,39 @@ android {
     buildFeatures {
         compose = true
         buildConfig = true
+        // Disable unused features
+        aidl = false
+        renderScript = false
+        shaders = false
+        resValues = true
     }
 
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
+
+    // Enable KSP optimizations
+    applicationVariants.all {
+        kotlin.sourceSets {
+            getByName(name) {
+                kotlin.srcDir("build/generated/ksp/$name/kotlin")
+            }
+        }
+    }
+}
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        // Additional Kotlin optimizations
+        allWarningsAsErrors = false
+        // Speed up incremental compilation
+        incremental = true
+    }
+}
+
+// Optimize build tasks with caching
+tasks.matching { it.name.contains("compile") }.configureEach {
+    outputs.cacheIf { true }
 }
 
 androidComponents {
@@ -179,10 +196,11 @@ dependencies {
     // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.splashscreen)
-    implementation(libs.androidx.constraintlayout)
     implementation(libs.material)
     
     // Compose
@@ -199,7 +217,9 @@ dependencies {
     implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
-    // Явная зависимость для Layout Inspector
+    implementation(libs.androidx.lifecycle.runtime.compose)
+
+    // Explicit dependency for Layout Inspector
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.customview)
     debugImplementation(libs.androidx.customview.poolingcontainer)
@@ -227,11 +247,11 @@ dependencies {
     
     // PDF
     implementation(libs.pdfbox.android)
+    
+    // Excel
+    implementation(libs.poi.core)
+    implementation(libs.poi.ooxml)
 
     // Testing
     testImplementation(libs.junit)
-    androidTestImplementation(libs.androidx.test.junit)
-    androidTestImplementation(libs.androidx.test.espresso)
-    androidTestImplementation(platform(libs.compose.bom))
-    androidTestImplementation(libs.compose.ui.test.junit4)
 }

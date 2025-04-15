@@ -118,7 +118,13 @@ fun ProfileScreen(
                     totalExpense = state.totalExpense,
                     balance = state.balance,
                     savingsRate = state.savingsRate,
-                    onNavigateToChart = onNavigateToChart,
+                    totalTransactions = state.totalTransactions,
+                    totalExpenseCategories = state.totalExpenseCategories,
+                    totalIncomeCategories = state.totalIncomeCategories,
+                    averageExpense = state.averageExpense,
+                    totalSourcesUsed = state.totalSourcesUsed,
+                    dateRange = state.dateRange,
+                    onSavingsRateClick = onNavigateToChart,
                     modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                 )
 
@@ -142,7 +148,7 @@ fun ProfileScreen(
                 AppInfoSection(
                     appVersion = appVersion,
                     buildVersion = buildVersion,
-                    onLibrariesClick = onNavigateToLibraries,
+                    onNavigateToLibraries = onNavigateToLibraries,
                     modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                 )
 
@@ -150,10 +156,11 @@ fun ProfileScreen(
 
                 // Кнопка экспорта данных в CSV
                 ExportButton(
-                    onClick = {
-                        viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV, context)
+                    onClick = { action ->
+                        viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV(action), context)
                     },
                     isExporting = state.isExporting,
+                    showFilePath = state.exportedFilePath,
                     modifier = Modifier
                         .fillMaxWidth(0.8f)
                         .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
@@ -193,7 +200,7 @@ fun ProfileScreen(
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                         Text(
-                            text = "Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Тинькофф, Альфа-Банк, ВТБ, Газпромбанк и Озон Банк.",
+                            text = "Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Озон Банк.",
                             style = MaterialTheme.typography.bodySmall
                         )
 

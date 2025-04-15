@@ -42,9 +42,24 @@ class GroupTransactionsUseCase {
      */
     private fun groupByDay(transactions: List<Transaction>): Map<String, List<Transaction>> {
         val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
-        return transactions
+        val groupedTransactions = transactions
             .sortedByDescending { it.date }
             .groupBy { dateFormat.format(it.date).replaceFirstChar { it.uppercase() } }
+            
+        // Сортируем группы по убыванию даты
+        return groupedTransactions.toList()
+            .sortedByDescending { (key, _) ->
+                // Парсим дату из ключа
+                val parts = key.split(" ")
+                val day = parts.getOrNull(0)?.toIntOrNull() ?: 0
+                val monthName = parts.getOrNull(1) ?: ""
+                val month = getMonthNumber(monthName)
+                val year = parts.getOrNull(2)?.toIntOrNull() ?: 0
+                
+                // Создаем числовое представление для сортировки (год*10000 + месяц*100 + день)
+                year * 10000 + month * 100 + day
+            }
+            .toMap()
     }
 
     /**
@@ -75,7 +90,21 @@ class GroupTransactionsUseCase {
             result[weekKey]?.add(transaction)
         }
 
-        return result
+        // Сортируем группы по убыванию даты
+        return result.toList()
+            .sortedByDescending { (key, _) -> 
+                // Извлекаем год из ключа
+                val year = key.split(" ").lastOrNull()?.toIntOrNull() ?: 0
+                // Извлекаем дату из конца периода (последний день недели)
+                val lastDate = key.split(" ").firstOrNull()?.split("-")?.lastOrNull()?.trim() ?: ""
+                val dateParts = lastDate.split(".")
+                val month = dateParts.getOrNull(1)?.toIntOrNull() ?: 0
+                val day = dateParts.getOrNull(0)?.toIntOrNull() ?: 0
+                
+                // Создаем числовое представление для сортировки (год*10000 + месяц*100 + день)
+                year * 10000 + month * 100 + day
+            }
+            .toMap()
     }
 
     /**
@@ -87,8 +116,41 @@ class GroupTransactionsUseCase {
      */
     private fun groupByMonth(transactions: List<Transaction>): Map<String, List<Transaction>> {
         val format = SimpleDateFormat("MMMM yyyy", Locale("ru"))
-        return transactions
+        val groupedTransactions = transactions
             .sortedByDescending { it.date }
             .groupBy { format.format(it.date).replaceFirstChar { it.uppercase() } }
+        
+        // Сортируем группы (ключи) по убыванию даты
+        return groupedTransactions.toList()
+            .sortedByDescending { (key, _) ->
+                // Разбиваем ключ на месяц и год
+                val parts = key.split(" ")
+                val year = parts.lastOrNull()?.toIntOrNull() ?: 0
+                val month = getMonthNumber(parts.firstOrNull() ?: "")
+                // Создаем числовое представление для сортировки (год*100 + месяц)
+                year * 100 + month
+            }
+            .toMap()
+    }
+
+    /**
+     * Преобразует название месяца на русском языке в числовой формат (1-12)
+     */
+    private fun getMonthNumber(monthName: String): Int {
+        return when (monthName.lowercase()) {
+            "январь" -> 1
+            "февраль" -> 2
+            "март" -> 3
+            "апрель" -> 4
+            "май" -> 5
+            "июнь" -> 6
+            "июль" -> 7
+            "август" -> 8
+            "сентябрь" -> 9
+            "октябрь" -> 10
+            "ноябрь" -> 11
+            "декабрь" -> 12
+            else -> 0
+        }
     }
 } 

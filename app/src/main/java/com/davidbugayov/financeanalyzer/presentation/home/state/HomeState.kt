@@ -13,7 +13,7 @@ data class HomeState(
     val transactions: List<Transaction> = emptyList(),
     val filteredTransactions: List<Transaction> = emptyList(),
     val transactionGroups: List<TransactionGroup> = emptyList(),
-    val isLoading: Boolean = false,
+    val isLoading: Boolean = true,
     val error: String? = null,
     val balance: Money = Money.zero(),
     val income: Money = Money.zero(),
@@ -25,5 +25,6 @@ data class HomeState(
     val filteredIncome: Money = Money.zero(),
     val filteredExpense: Money = Money.zero(),
     val filteredBalance: Money = Money.zero(),
-    val transactionToDelete: Transaction? = null
+    val transactionToDelete: Transaction? = null,
+    val topCategories: Map<String, Money> = emptyMap()
 ) 

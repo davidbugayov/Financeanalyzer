@@ -6,15 +6,18 @@ import com.davidbugayov.financeanalyzer.domain.model.DailyExpense
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartScreenState
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -26,6 +29,7 @@ import java.util.Locale
 class ChartViewModel : ViewModel(), KoinComponent {
 
     private val getTransactionsUseCase: GetTransactionsUseCase by inject()
+    private val repository: TransactionRepository by inject()
     private val _state = MutableStateFlow(
         ChartScreenState(
             startDate = Calendar.getInstance().apply {
@@ -118,29 +122,74 @@ class ChartViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                getTransactionsUseCase(_state.value.startDate, _state.value.endDate)
-                    .catch { e ->
-                        Timber.e(e, "Error loading transactions")
-                        _state.update {
-                            it.copy(
-                                isLoading = false,
-                                error = e.message
-                            )
+                // Сначала запрашиваем только первую страницу (макс. 100 транзакций) для быстрого отображения
+                val initialTransactions = withContext(Dispatchers.IO) {
+                    try {
+                        repository.getTransactionsByDateRangePaginated(
+                            _state.value.startDate,
+                            _state.value.endDate,
+                            PAGE_SIZE,
+                            0
+                        )
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при загрузке первой страницы транзакций")
+                        emptyList()
+                    }
+                }
+                
+                // Обновляем состояние с первой порцией данных для быстрого отображения графиков
+                if (initialTransactions.isNotEmpty()) {
+                    Timber.d("Быстрая загрузка: получено ${initialTransactions.size} транзакций")
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isLoading = false,
+                            error = null,
+                            transactions = initialTransactions,
+                            dailyExpenses = calculateDailyExpenses(initialTransactions)
+                        )
+                    }
+                }
+                
+                // Затем запускаем полную загрузку всех транзакций в фоновом режиме
+                withContext(Dispatchers.IO) {
+                    try {
+                        val totalTransactions = repository.getTransactionsByDateRangePaginated(
+                            _state.value.startDate,
+                            _state.value.endDate,
+                            Int.MAX_VALUE,
+                            0
+                        )
+                        
+                        if (totalTransactions.size > initialTransactions.size) {
+                            Timber.d("Полная загрузка: получено ${totalTransactions.size} транзакций")
+                            withContext(Dispatchers.Main) {
+                                _state.update { currentState ->
+                                    currentState.copy(
+                                        isLoading = false,
+                                        error = null,
+                                        transactions = totalTransactions,
+                                        dailyExpenses = calculateDailyExpenses(totalTransactions)
+                                    )
+                                }
+                            }
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при полной загрузке транзакций")
+                        // Не обновляем состояние ошибки, если у нас уже есть начальные данные
+                        if (initialTransactions.isEmpty()) {
+                            withContext(Dispatchers.Main) {
+                                _state.update {
+                                    it.copy(
+                                        isLoading = false,
+                                        error = e.message
+                                    )
+                                }
+                            }
                         }
                     }
-                    .collectLatest { transactions ->
-                        Timber.d("Loaded ${transactions.size} transactions")
-                        _state.update { currentState ->
-                            currentState.copy(
-                                isLoading = false,
-                                error = null,
-                                transactions = transactions,
-                                dailyExpenses = calculateDailyExpenses(transactions)
-                            )
-                        }
-                    }
+                }
             } catch (e: Exception) {
-                Timber.e(e, "Error loading transactions")
+                Timber.e(e, "Критическая ошибка при загрузке транзакций")
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -221,10 +270,10 @@ class ChartViewModel : ViewModel(), KoinComponent {
             .mapValues { (_, transactions) ->
                 transactions
                     .map { it.amount }
-                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                    .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
             }
             
-        return expensesByCategory.mapValues { (_, amount) -> Money(amount) }
+        return expensesByCategory
     }
 
     fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
@@ -234,52 +283,49 @@ class ChartViewModel : ViewModel(), KoinComponent {
             .mapValues { (_, transactions) ->
                 transactions
                     .map { it.amount }
-                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
+                    .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
             }
             
-        return incomeByCategory.mapValues { (_, amount) -> Money(amount) }
+        return incomeByCategory
     }
 
     private fun calculateDailyExpenses(transactions: List<Transaction>): List<DailyExpense> {
-        Timber.d("Calculating daily expenses for ${transactions.size} transactions")
-        Timber.d("Date range: ${formatDate(_state.value.startDate)} - ${formatDate(_state.value.endDate)}")
-
-        val filteredTransactions = transactions.filter { transaction ->
-            transaction.date.time >= _state.value.startDate.time &&
-                    transaction.date.time <= _state.value.endDate.time
-        }
-
-        Timber.d("Filtered transactions: ${filteredTransactions.size}")
-
-        return filteredTransactions
-            .groupBy { transaction ->
-                Calendar.getInstance().apply {
-                    time = transaction.date
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
+        // Используем IO диспатчер для тяжелых вычислений
+        return try {
+            val filteredTransactions = transactions.filter { transaction ->
+                transaction.date.time >= _state.value.startDate.time &&
+                        transaction.date.time <= _state.value.endDate.time
             }
-            .map { (date, transactionsForDate) ->
-                val expenseAmount = transactionsForDate
-                    .filter { it.isExpense }
-                    .map { it.amount }
-                    .reduceOrNull { acc, amount -> acc + amount } ?: 0.0
 
-                DailyExpense(
-                    date = date,
-                    amount = expenseAmount
-                )
-            }
-            .filter { it.amount.amount.toDouble() > 0 }
-            .sortedBy { it.date }
-            .also { dailyExpenses ->
-                Timber.d("Generated ${dailyExpenses.size} daily expenses (after filtering zero expenses)")
-                dailyExpenses.forEach { expense ->
-                    Timber.d("Daily expense: ${formatDate(expense.date)} - Amount: ${expense.amount}")
+            Timber.d("Отфильтровано ${filteredTransactions.size} транзакций для графиков")
+
+            filteredTransactions
+                .groupBy { transaction ->
+                    Calendar.getInstance().apply {
+                        time = transaction.date
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }.time
                 }
-            }
+                .map { (date, transactionsForDate) ->
+                    val expenseAmount = transactionsForDate
+                        .filter { it.isExpense }
+                        .map { it.amount }
+                        .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
+
+                    DailyExpense(
+                        date = date,
+                        amount = expenseAmount
+                    )
+                }
+                .filter { !it.amount.isZero() }
+                .sortedBy { it.date }
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при расчете ежедневных расходов")
+            emptyList()
+        }
     }
 
     /**
@@ -319,5 +365,9 @@ class ChartViewModel : ViewModel(), KoinComponent {
         super.onCleared()
         Timber.d("onCleared: Resetting date filter")
         resetDateFilter()
+    }
+
+    companion object {
+        private const val PAGE_SIZE = 100 // Размер страницы для начальной загрузки
     }
 } 

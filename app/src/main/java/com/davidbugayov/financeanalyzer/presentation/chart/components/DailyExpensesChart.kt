@@ -71,22 +71,23 @@ fun DailyExpensesChart(
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = dimensionResource(R.dimen.spacing_large), vertical = 8.dp),
+            .padding(horizontal = dimensionResource(R.dimen.spacing_medium), vertical = dimensionResource(R.dimen.spacing_small)),
         shape = MaterialTheme.shapes.medium,
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_large))
+                .padding(dimensionResource(R.dimen.spacing_medium))
         ) {
             Text(
                 text = stringResource(R.string.daily_expenses),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
+                fontSize = MaterialTheme.typography.titleMedium.fontSize.times(0.95f)
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
             if (dailyExpenses.isEmpty()) {
                 Text(
@@ -106,16 +107,15 @@ fun DailyExpensesChart(
                     axisColor = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.3f),
                     modifier = Modifier
                         .fillMaxWidth()
-                        // Увеличиваем высоту для размещения подписей дат
-                        .height(240.dp)
+                        .height(dimensionResource(R.dimen.chart_height))
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                 // Легенда графика - показываем только выбранные транзакции
                 displayedExpenses.forEach { expense ->
                     DailyExpenseItem(expense = expense, color = expenseColor)
-                    Spacer(modifier = Modifier.height(8.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 }
 
                 // Кнопка "Показать все", если есть скрытые транзакции
@@ -171,12 +171,12 @@ private fun ExpensesLineChart(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
+                    .height(dimensionResource(R.dimen.chart_height))
             ) {
                 // Вертикальная ось с подписями сумм
                 Column(
                     modifier = Modifier
-                        .width(50.dp)
+                        .width(dimensionResource(R.dimen.chart_axis_width))
                         .fillMaxHeight(),
                     verticalArrangement = Arrangement.SpaceBetween
                 ) {
@@ -216,14 +216,14 @@ private fun ExpensesLineChart(
                         .horizontalScroll(rememberScrollState())
                 ) {
                     // Определяем минимальную ширину для графика в зависимости от количества точек
-                    val minWidth = max(sortedExpenses.size * 30, 300).dp
+                    val minWidth = max(sortedExpenses.size * 25, 250).dp
 
                     Column {
                         // Сам график
                         Canvas(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(180.dp)
+                                .height(160.dp)
                                 .width(minWidth)
                         ) {
                             val width = size.width
@@ -247,20 +247,24 @@ private fun ExpensesLineChart(
 
                             if (sortedExpenses.size > 1 && maxExpense > 0) {
                                 val xStep = (width - 2 * padding) / (sortedExpenses.size - 1)
+                                val yScale = (height - 2 * padding) / maxExpense
 
-                                // Рисуем линию графика
+                                // Создаем путь для линии графика
                                 val path = Path()
+                                var firstPoint = true
+
                                 sortedExpenses.forEachIndexed { index, expense ->
                                     val x = padding + index * xStep
-                                    val y = height - padding - (expense.amount.amount.toDouble() / maxExpense).toFloat() * (height - 2 * padding)
+                                    val y = height - padding - (expense.amount.amount.toDouble() * yScale).toFloat()
 
-                                    if (index == 0) {
+                                    if (firstPoint) {
                                         path.moveTo(x, y)
+                                        firstPoint = false
                                     } else {
                                         path.lineTo(x, y)
                                     }
 
-                                    // Рисуем точки
+                                    // Рисуем точку
                                     drawCircle(
                                         color = color,
                                         radius = 4f,
@@ -271,47 +275,24 @@ private fun ExpensesLineChart(
                                 // Рисуем линию
                                 drawPath(
                                     path = path,
-                                    color = color.copy(alpha = 0.7f),
+                                    color = color,
                                     style = Stroke(width = 2f)
-                                )
-
-                                // Рисуем заполнение под линией
-                                val fillPath = Path()
-                                fillPath.addPath(path)
-                                fillPath.lineTo(padding + (sortedExpenses.size - 1) * xStep, height - padding)
-                                fillPath.lineTo(padding, height - padding)
-                                fillPath.close()
-
-                                drawPath(
-                                    path = fillPath,
-                                    color = color.copy(alpha = 0.1f)
                                 )
                             }
                         }
 
-                        // Подписи дат внизу
+                        // Подписи дат
                         Row(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .width(minWidth)
-                                .padding(start = 20.dp, end = 20.dp),
+                                .padding(horizontal = 20.dp),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            // Показываем только некоторые даты, чтобы не перегружать график
-                            val datesToShow = if (sortedExpenses.size <= 7) {
-                                sortedExpenses
-                            } else {
-                                // Выбираем равномерно распределенные даты
-                                val step = sortedExpenses.size / 5
-                                sortedExpenses.filterIndexed { index, _ -> index % step == 0 || index == sortedExpenses.size - 1 }
-                            }
-
-                            datesToShow.forEach { expense ->
+                            sortedExpenses.forEach { expense ->
                                 Text(
                                     text = dateFormat.format(expense.date),
                                     style = MaterialTheme.typography.bodySmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                    textAlign = TextAlign.Center
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                             }
                         }
@@ -333,30 +314,28 @@ private fun DailyExpenseItem(
     expense: DailyExpense,
     color: Color
 ) {
-    val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
+    val dateFormat = SimpleDateFormat("dd MMMM", Locale.getDefault()).format(expense.date)
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+        horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Дата
         Text(
-            text = dateFormat.format(expense.date),
+            text = dateFormat,
             style = MaterialTheme.typography.bodyMedium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-            modifier = Modifier.weight(1f)
+            color = MaterialTheme.colorScheme.onSurface
         )
 
-        Spacer(modifier = Modifier.width(8.dp))
-
-        // Сумма без копеек
+        // Сумма
         Text(
-            text = stringResource(R.string.expense_currency_format, expense.amount.format(false)),
+            text = expense.amount.format(),
             style = MaterialTheme.typography.bodyMedium,
-            fontWeight = FontWeight.Medium,
-            color = color
+            color = color,
+            fontWeight = FontWeight.Bold
         )
     }
 } 

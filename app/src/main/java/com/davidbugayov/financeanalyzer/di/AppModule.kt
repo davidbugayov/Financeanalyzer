@@ -3,18 +3,26 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
+import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.utils.EventBus
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.koin.androidApplication
@@ -33,12 +41,14 @@ val appModule = module {
 
     // Preferences
     single { CategoryPreferences.getInstance(androidContext()) }
+    single { SourcePreferences.getInstance(androidContext()) }
     single { CategoryUsagePreferences.getInstance(androidContext()) }
+    single { WalletPreferences.getInstance(androidContext()) }
     single { PreferencesManager(androidContext()) }
 
     // Utils
-    single { EventBus }
     single { AnalyticsUtils }
+    single { FinancialMetrics.getInstance() }
     
     // Repositories
     single<TransactionRepositoryImpl> { TransactionRepositoryImpl(get()) }
@@ -49,24 +59,31 @@ val appModule = module {
     single { LoadTransactionsUseCase(get()) }
     single { AddTransactionUseCase(get()) }
     single { DeleteTransactionUseCase(get()) }
+    single { UpdateTransactionUseCase(get()) }
+    single { FilterTransactionsUseCase() }
+    single { GroupTransactionsUseCase() }
+    single { CalculateCategoryStatsUseCase(get()) }
+    single { ExportTransactionsToCSVUseCase(get()) }
+    single { ImportTransactionsManager(get(), androidContext(), get(), get()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
     viewModel { ChartViewModel() }
-    viewModel {
-        AddTransactionViewModel(
-            application = androidApplication(),
-            addTransactionUseCase = get(),
-            categoriesViewModel = get(),
-            preferencesManager = get()
-        )
-    }
     viewModel {
         ProfileViewModel(
             exportTransactionsToCSVUseCase = get(),
             loadTransactionsUseCase = get(),
             notificationScheduler = get(),
             preferencesManager = get()
+        )
+    }
+    
+    viewModel {
+        HomeViewModel(
+            getTransactionsUseCase = get(),
+            addTransactionUseCase = get(),
+            deleteTransactionUseCase = get(),
+            repository = get()
         )
     }
 

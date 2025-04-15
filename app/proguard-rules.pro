@@ -239,3 +239,36 @@
     private static synthetic *** lambda$*(...);
 }
 -dontwarn java.lang.invoke.LambdaMetafactory
+
+# Правила для PDFBox
+-keep class com.tom_roush.pdfbox.** { *; }
+-dontwarn com.tom_roush.pdfbox.**
+-keep class org.apache.pdfbox.** { *; }
+-dontwarn org.apache.pdfbox.**
+-keep class com.gemalto.jp2.** { *; }
+-dontwarn com.gemalto.jp2.**
+
+# Правила для Apache POI
+-keep class org.apache.poi.** { *; }
+-dontwarn org.apache.poi.**
+-dontwarn java.awt.**
+-dontwarn javax.xml.**
+-dontwarn org.apache.batik.**
+-dontwarn org.apache.xmlbeans.**
+-dontwarn net.sf.saxon.**
+-dontwarn org.osgi.framework.**
+-dontwarn java.awt.Color
+-dontwarn java.awt.geom.**
+-dontwarn java.awt.image.**
+-dontwarn java.awt.color.ColorSpace
+-dontwarn javax.xml.stream.**
+-dontwarn net.sf.saxon.**
+
+# Разрешить доступ к классам по отражению
+-keep class org.apache.poi.ss.** { *; }
+-keep class org.apache.poi.hssf.** { *; }
+-keep class org.apache.poi.xssf.** { *; }
+-keep class org.apache.poi.poifs.** { *; }
+-keep class org.apache.poi.util.** { *; }
+-keep class org.apache.poi.sl.** { *; }
+-keep class org.apache.xmlbeans.** { *; }

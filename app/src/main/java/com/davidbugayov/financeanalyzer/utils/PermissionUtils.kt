@@ -6,6 +6,11 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.Build
 import android.provider.Settings
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.ActivityResultLauncher
+import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
 import androidx.core.net.toUri
 
@@ -30,6 +35,23 @@ object PermissionUtils {
             // До Android 13 отдельное разрешение на уведомления не требуется
             true
         }
+    }
+
+    /**
+     * Создает и возвращает лаунчер для запроса разрешений на уведомления
+     *
+     * @param onPermissionResult Функция обратного вызова, которая будет вызвана с результатом запроса
+     * @return Composable функция, которая возвращает лаунчер для запроса разрешений
+     */
+    @Composable
+    fun rememberNotificationPermissionLauncher(
+        onPermissionResult: (Boolean) -> Unit
+    ): ActivityResultLauncher<String> {
+        val launcher = rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestPermission(),
+            onPermissionResult
+        )
+        return remember { launcher }
     }
 
     /**
@@ -80,16 +102,29 @@ object PermissionUtils {
      */
     fun hasReadExternalStoragePermission(context: Context): Boolean {
         return when {
+            // Для Android 15 (API 35) и выше используем READ_MEDIA_VISUAL_USER_SELECTED
+            Build.VERSION.SDK_INT >= 35 -> { // Android 15
+                try {
+                    // Используем строковые константы для избежания ошибок компиляции на старых SDK
+                    val permission = "android.permission.READ_MEDIA_VISUAL_USER_SELECTED"
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        permission
+                    ) == PackageManager.PERMISSION_GRANTED
+                } catch (e: Exception) {
+                    // Fallback к разрешениям Android 13+
+                    ContextCompat.checkSelfPermission(
+                        context,
+                        Manifest.permission.READ_MEDIA_IMAGES
+                    ) == PackageManager.PERMISSION_GRANTED
+                }
+            }
             // Для Android 13 и выше используем READ_MEDIA_* разрешения
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
                 ContextCompat.checkSelfPermission(
                     context,
                     Manifest.permission.READ_MEDIA_IMAGES
-                ) == PackageManager.PERMISSION_GRANTED ||
-                        ContextCompat.checkSelfPermission(
-                            context,
-                            Manifest.permission.READ_EXTERNAL_STORAGE
-                        ) == PackageManager.PERMISSION_GRANTED
+                ) == PackageManager.PERMISSION_GRANTED
             }
             // Для Android 10-12 используем READ_EXTERNAL_STORAGE
             else -> {
@@ -107,10 +142,19 @@ object PermissionUtils {
      * @return Строка с необходимым разрешением
      */
     fun getReadStoragePermission(): String {
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            Manifest.permission.READ_MEDIA_IMAGES
-        } else {
-            Manifest.permission.READ_EXTERNAL_STORAGE
+        return when {
+            // Для Android 15 (API 35) и выше используем READ_MEDIA_VISUAL_USER_SELECTED
+            Build.VERSION.SDK_INT >= 35 -> {
+                "android.permission.READ_MEDIA_VISUAL_USER_SELECTED" // Используем строковую константу
+            }
+            // Для Android 13 (API 33) и выше используем READ_MEDIA_IMAGES
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                Manifest.permission.READ_MEDIA_IMAGES
+            }
+            // Для более старых версий используем READ_EXTERNAL_STORAGE
+            else -> {
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            }
         }
     }
 } 

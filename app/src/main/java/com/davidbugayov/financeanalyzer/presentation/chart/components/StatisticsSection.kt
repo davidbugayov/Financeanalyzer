@@ -47,9 +47,9 @@ import java.util.Locale
  */
 @Composable
 fun StatisticsSection(
-    avgDailyExpense: Double,
-    avgMonthlyExpense: Double,
-    avgYearlyExpense: Double,
+    avgDailyExpense: Money,
+    avgMonthlyExpense: Money,
+    avgYearlyExpense: Money,
     savingsRate: Double,
     onSavingsRateInfoClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -95,7 +95,7 @@ fun StatisticsSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = Money(avgDailyExpense).format(false),
+                        text = avgDailyExpense.format(false),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = LocalExpenseColor.current
@@ -109,7 +109,7 @@ fun StatisticsSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = Money(avgMonthlyExpense).format(false),
+                        text = avgMonthlyExpense.format(false),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = LocalExpenseColor.current
@@ -131,7 +131,7 @@ fun StatisticsSection(
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Text(
-                        text = Money(avgYearlyExpense).format(false),
+                        text = avgYearlyExpense.format(false),
                         fontSize = 16.sp,
                         fontWeight = FontWeight.Medium,
                         color = LocalExpenseColor.current

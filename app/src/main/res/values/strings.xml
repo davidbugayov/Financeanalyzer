@@ -13,6 +13,7 @@
     <string name="ok">OK</string>
     <string name="cancel">Отмена</string>
     <string name="back">Назад</string>
+    <string name="hide_summary">Скрыть сводку</string>
     <string name="show_summary">Показать сводку</string>
     <string name="expand">Развернуть</string>
     <string name="collapse">Свернуть</string>
@@ -51,12 +52,18 @@
     <string name="filter_today">Сегодня</string>
     <string name="filter_week">Неделя</string>
     <string name="filter_month">Месяц</string>
+    <string name="filter_by_category">Фильтр по категории</string>
+    <string name="filter_by_source">Фильтр по банкам</string>
+    <string name="select_sources">Выберите источники</string>
     <string name="transactions_today">Транзакции за сегодня</string>
     <string name="transactions_week">Транзакции за неделю</string>
     <string name="transactions_month">Транзакции за месяц</string>
+    <string name="all_transactions">Все транзакции</string>
     <string name="no_transactions_today">Нет транзакций за сегодня. Добавьте новую!</string>
     <string name="no_transactions_week">Нет транзакций за неделю. Добавьте новую!</string>
     <string name="no_transactions_month">Нет транзакций за месяц. Добавьте новую!</string>
+    <string name="no_transactions_all">Нет транзакций. Добавьте новую!</string>
+    <string name="showing_last_transactions">Показаны последние транзакции.</string>
     
     <!-- Экран истории -->
     <string name="history_title">История транзакций</string>
@@ -124,6 +131,7 @@
     <string name="confirm">Подтвердить</string>
     <string name="success">Успешно</string>
     <string name="transaction_added_successfully">Транзакция успешно добавлена</string>
+    <string name="transaction_updated_successfully">Транзакция успешно изменена</string>
     <string name="add_another">Добавить еще</string>
     <string name="done">Готово</string>
     <string name="cancel_transaction">Отменить транзакцию</string>
@@ -161,6 +169,16 @@
     <string name="chart_expenses">Расходы</string>
     <string name="currency_format_with_percent" formatted="false">%.2f ₽ (%.1f%%)</string>
 
+    <!-- Analytics strings -->
+    <string name="analytics_title">Финансовая аналитика</string>
+    <string name="total_transactions">Всего транзакций</string>
+    <string name="expense_categories">Категории расходов</string>
+    <string name="income_categories">Категории доходов</string>
+    <string name="average_expense">Средний расход</string>
+    <string name="sources_used">Использовано источников</string>
+    <string name="total_expense">Общий расход</string>
+    <string name="savings_rate">Норма сбережений</string>
+
     <!-- Новые строки для улучшенного экрана финансовой статистики -->
     <string name="top_expense_categories">Топ категорий расходов</string>
     <string name="tap_bar_for_details">Нажмите на столбец для подробностей</string>
@@ -173,7 +191,6 @@
     <string name="yearly_summary">Годовая сводка</string>
     <string name="category_details">Детали категории</string>
     <string name="budget_overview">Обзор бюджета</string>
-    <string name="savings_rate">Норма сбережений</string>
     <string name="spending_by_day">Расходы по дням</string>
     <string name="spending_by_week">Расходы по неделям</string>
     <string name="spending_by_month">Расходы по месяцам</string>
@@ -246,7 +263,6 @@
     <string name="select_all_categories">Выбрать все категории</string>
 
     <!-- Добавленные строковые ресурсы для выбора источников -->
-    <string name="select_sources">Выбрать источники</string>
     <string name="select_all_sources">Выбрать все источники</string>
     <string name="all_sources">Все источники</string>
     <string name="sources">Источники</string>
@@ -260,17 +276,27 @@
     <string name="change_color">Изменить цвет</string>
     <string name="source_error">Выберите источник</string>
 
+    <!-- Диалоги подтверждения удаления -->
+    <string name="delete_source_title">Удаление источника</string>
+    <string name="delete_source_message">Вы уверены, что хотите удалить источник "%1$s"?</string>
+
     <!-- Строки для сводки групп транзакций -->
     <string name="summary">Сводка</string>
-    <string name="total_income">Общий доход</string>
-    <string name="total_expense">Общий расход</string>
     <string name="no_transactions_in_period">Нет транзакций за выбранный период</string>
 
     <!-- Профиль -->
+    <string name="profile_save">Сохранить</string>
+    <string name="profile_cancel">Отмена</string>
+    <string name="profile_settings_section">Настройки приложения</string>
     <string name="export_to_csv">Экспорт данных в CSV</string>
     <string name="export_success">Данные успешно экспортированы</string>
-    <string name="export_error">Ошибка при экспорте данных</string>
     <string name="export_description">Экспортирует все транзакции в CSV файл для использования в Excel или других программах.</string>
+    <string name="export_error">Ошибка при экспорте: %s</string>
+    <string name="export_choose_action">Выберите действие</string>
+    <string name="export_share">Отправить файл</string>
+    <string name="export_open">Открыть файл</string>
+    <string name="export_only_save">Только сохранить</string>
+    <string name="exported_file_path">Файл сохранён: %s</string>
     <string name="profile_analytics_title">Финансовая аналитика</string>
     <string name="profile_settings_title">Настройки</string>
     <string name="profile_theme_title">Тема</string>
@@ -317,6 +343,8 @@
     <string name="select_reminder_time">Выберите время напоминания:</string>
     <string name="reminder_description">Вы будете получать ежедневные напоминания о необходимости внести транзакции в указанное время.</string>
     <string name="notifications_disabled_message">Напоминания отключены. Включите их, чтобы не забывать вносить транзакции.</string>
+    <string name="notification_disabled_title">Уведомления отключены</string>
+    <string name="notification_disabled_description">Для полноценной работы напоминаний включите разрешение на уведомления в настройках приложения</string>
     
     <!-- Информация о приложении -->
     <string name="app_info">О приложении</string>
@@ -326,21 +354,178 @@
     <string name="libraries_title">Используемые библиотеки</string>
     <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
     <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
+    <string name="license_colon">Лицензия: %s</string>
 
     <!-- Разрешения и настройки -->
     <string name="permission_denied">Разрешение отклонено</string>
+    <string name="import_permission_required">Требуется разрешение</string>
     <string name="permission_required">Требуется разрешение</string>
-    <string name="notification_permission_message">Для отправки напоминаний о транзакциях необходимо разрешение на уведомления.</string>
-    <string name="notification_permission_settings_message">Для работы напоминаний необходимо разрешение на уведомления. Вы можете включить их в настройках приложения.</string>
-    <string name="notification_permission_required">Для отправки напоминаний необходимо разрешение на уведомления.</string>
-    <string name="open_settings">Открыть настройки</string>
-    <string name="request_permission">Запросить разрешение</string>
-    <string name="save">Сохранить</string>
-    <string name="selected_time">Выбранное время: %1$d:%2$s</string>
+    
+    <!-- Ошибки форм -->
+    <string name="error_enter_amount">Введите сумму</string>
+    <string name="error_select_category">Выберите категорию</string>
+    <string name="error_amount_missing">Не указана сумма</string>
+    <string name="error_category_missing">Не выбрана категория</string>
+    
+    <!-- Экран редактирования -->
+    <string name="edit_transaction">Редактирование транзакции</string>
+    <string name="add">Добавить</string>
 
-    <!-- Базовые строки -->
-    <string name="loading_error">Ошибка загрузки данных</string>
-    <string name="default_amount">0.00 ₽</string>
+    <!-- Bottom navigation -->
+    <string name="home_tab">Главная</string>
+    <string name="history_tab">История</string>
+    <string name="chart_tab">Графики</string>
+    <string name="add_tab">Добавить</string>
+    <string name="settings_tab">Настройки</string>
+    <string name="select_categories">Выберите категории</string>
+    <string name="category_statistics">Статистика по категории</string>
+    <string name="historical_transaction_stats">Историческая статистика транзакций</string>
+    <string name="transaction_count">Количество транзакций</string>
+    <string name="total_amount">Общая сумма</string>
+    <string name="average_per_transaction">Среднее за транзакцию</string>
+
+    <!-- Import Transactions Screen -->
+    <string name="import_transactions_title">Импорт транзакций</string>
+    <string name="supported_banks_title">Поддерживаемые банки</string>
+    <string name="choose_file_button">Выбрать файл для импорта (CSV, PDF, XLSX)</string>
+    <string name="how_to_import">Как импортировать транзакции</string>
+    <string name="import_instructions">1. Выгрузите выписку в формате CSV или XLSX из вашего банка\n2. Для Альфа-Банка лучше использовать формат XLSX\n3. Для Сбербанка также поддерживается формат PDF\n4. Выберите файл выписки через кнопку ниже\n5. Приложение автоматически определит формат\n6. Дождитесь завершения импорта\n\nНажмите на карточку банка ниже, чтобы узнать как получить выписку.</string>
+    <string name="import_csv_title">Импорт CSV-файлов</string>
+    <string name="csv_requirements_title">Требования к CSV-файлу:</string>
+    <string name="csv_requirements">• Файл должен содержать столбцы: дата, сумма, категория\n• Разделитель полей: запятая или точка с запятой\n• Кодировка: UTF-8\n• Пример: 01.01.2023,1000,Продукты</string>
+    <string name="more_details">Подробнее</string>
+
+    <!-- Banks -->
+    <string name="bank_sberbank">Сбербанк</string>
+    <string name="bank_tinkoff">Т-Банк</string>
+    <string name="bank_alfabank">Альфа-Банк</string>
+    <string name="bank_ozon">Ozon</string>
+    <string name="bank_csv">CSV</string>
+
+    <!-- Import Results -->
+    <string name="import_in_progress">Импорт транзакций…</string>
+    <string name="import_progress_count">%1$d из %2$d транзакций</string>
+    <string name="import_success">Импорт успешно завершен</string>
+    <string name="imported_count">Импортировано: %d транзакций</string>
+    <string name="skipped_count">Пропущено: %d транзакций</string>
+    <string name="import_total_amount">Общая сумма: %d ₽</string>
+    <string name="import_error">Ошибка при импорте</string>
+    <string name="import_unknown_error">Неизвестная ошибка</string>
+    <string name="select_file_prompt">Выберите файл для импорта транзакций</string>
+
+    <!-- Bank Instructions -->
+    <string name="bank_instructions_title">Как получить выписку из %s</string>
+    <string name="unavailable_instructions">Инструкции недоступны для этого банка.</string>
+    <string name="got_it">Понятно</string>
+
+    <!-- Sberbank -->
+    <string name="sberbank_instructions_title">Через мобильное приложение Сбербанк:</string>
+    <string name="sberbank_instructions">1. Войдите в приложение Сбербанк\n2. Перейдите в раздел \"История операций\"\n3. Нажмите \"Выписки и справки\"\n4. Выберите \"Выписка по счету карты\"\n5. Выберите нужную карту\n6. Укажите период, за который нужна выписка\n7. Нажмите \"Сформировать выписку\"\n8. Приложение создаст PDF-файл с выпиской\n9. Импортируйте этот PDF-файл напрямую в приложение</string>
+    <string name="sberbank_note">Наше приложение поддерживает импорт как CSV, так и PDF-файлов выписок Сбербанка. PDF-формат часто удобнее, так как его не нужно дополнительно редактировать.</string>
+
+    <!-- Tinkoff -->
+    <string name="tinkoff_instructions_title">Через мобильное приложение Т-Банк:</string>
+    <string name="tinkoff_instructions">1. Войдите в приложение Т-Банк\n2. Выберите карту\n3. Перейдите в раздел \"Заказать справку\"\n4. Выберите \"Справка с движением средств\"\n5. Выберите русский язык\n6. Выберите счет\n7. Выберите период\n8. Выберите операции\n9. Полученную справку о движении средств сохраните в формате PDF\n10. Импортируйте эту выписку в приложение</string>
+
+    <!-- Alfa-Bank -->
+    <string name="alfabank_instructions_title_mobile">Через мобильное приложение Альфа-Банк:</string>
+    <string name="alfabank_instructions_mobile">1. Войдите в приложение Альфа-Банк\n2. Перейдите в раздел \"История\"\n3. Нажмите на кнопку со стрелкой вниз в правом верхнем углу\n4. В появившемся экране \"Выписка по счету\" выберите счет\n5. Укажите период выписки\n6. Нажмите \"Отправить по email\" или \"Скачать\"\n7. Выберите формат XLSX (Excel)\n8. Загрузите полученный файл в приложение Finanalyzer</string>
+    <string name="alfabank_instructions_title_web">Через Альфа-Банк Онлайн (веб-версия):</string>
+    <string name="alfabank_instructions_web">1. Войдите в личный кабинет Альфа-Банк Онлайн\n2. Выберите счет или карту\n3. Перейдите в \"Выписки\"\n4. Укажите период выписки\n5. Выберите формат \"Excel\"\n6. Скачайте файл\n7. Импортируйте XLSX-файл в приложение</string>
+    <string name="alfabank_note_important">Важно:</string>
+    <string name="alfabank_note">Приложение поддерживает прямой импорт Excel-файлов (.xlsx) из Альфа-Банка без необходимости дополнительной конвертации!</string>
+
+    <!-- Ozon -->
+    <string name="ozon_instructions_title">Через приложение Ozon Банк:</string>
+    <string name="ozon_instructions">1. Войдите в приложение\n2. Выберите карту\n3. Перейдите во вкладку \"Ещё\"\n4. Выберите \"Получить справку\"\n5. Выберите \"О движении средств\"\n6. Выберите язык\n7. Выберите счет\n8. Выберите период\n9. Выберите тип операции\n10. Сохраните справку в формате PDF\n11. Импортируйте полученный файл в приложение</string>
+
+    <!-- CSV Format -->
+    <string name="csv_instructions_title">Формат CSV-файла для импорта:</string>
+    <string name="csv_format_instructions">1. Первая строка должна содержать заголовки столбцов\n2. Обязательные поля: дата, сумма, категория\n3. Дополнительные поля: примечание, источник\n4. Даты должны быть в формате ДД.ММ.ГГГГ</string>
+    <string name="csv_example_title">Пример содержимого файла:</string>
+    <string name="csv_example">Дата,Сумма,Категория,Примечание\n01.01.2023,1000,Продукты,Покупка в магазине\n02.01.2023,-500,Транспорт,Такси\n03.01.2023,5000,Зарплата,Аванс\n04.01.2023,-2500,Развлечения,Кино</string>
+    <string name="csv_note_title">Примечание:</string>
+    <string name="csv_note">Положительные суммы будут импортированы как доходы, отрицательные - как расходы.</string>
+
+    <!-- Budget screen strings -->
+    <string name="budget">Бюджет</string>
+    <string name="budget_transactions">Транзакции</string>
+    <string name="budget_category_transactions">Транзакции категории %s</string>
+    <string name="add_budget_category">Добавить категорию бюджета</string>
+    <string name="budget_limit">Лимит бюджета</string>
+    <string name="budget_spent">Потратить</string>
+    <string name="budget_remaining">Осталось</string>
+    <string name="budget_overspent">Перерасход</string>
+    <string name="budget_category_name">Название категории</string>
+    <string name="budget_category_limit">Лимит категории</string>
+    <string name="budget_category_period">Период</string>
+    <string name="budget_category_add">Добавить</string>
+    <string name="budget_category_edit">Редактировать</string>
+    <string name="budget_category_delete">Удалить</string>
+    <string name="budget_category_delete_confirmation">Вы уверены, что хотите удалить эту категорию бюджета?</string>
+    <string name="budget_category_added">Категория бюджета добавлена</string>
+    <string name="budget_category_updated">Категория бюджета обновлена</string>
+    <string name="budget_category_deleted">Категория бюджета удалена</string>
+    <string name="budget_category_error_name">Введите название категории</string>
+    <string name="budget_category_error_limit">Введите лимит категории</string>
+    <string name="budget_category_error_exists">Категория с таким названием уже существует</string>
+    <string name="budget_category_error_delete">Не удалось удалить категорию</string>
+    <string name="budget_category_error_add">Не удалось добавить категорию</string>
+    <string name="budget_category_error_update">Не удалось обновить категорию</string>
+    <string name="budget_no_categories">Нет категорий бюджета</string>
+    <string name="budget_no_transactions">Нет транзакций в этой категории</string>
+    <string name="budget_add_first_category">Добавьте первую категорию бюджета</string>
+    <string name="budget_direct_expenses">Прямые траты</string>
+    <string name="budget_related_expenses">Связанные траты</string>
+    <string name="budget_total_expenses">Общие расходы</string>
+    <string name="budget_over_budget">от бюджета</string>
+    <string name="statistics">Статистика</string>
+
+    <!-- Icons for budget categories -->
+    <string name="ic_gamepad">ic_gamepad</string>
+    <string name="ic_restaurant">ic_restaurant</string>
+    <string name="ic_receipt">ic_receipt</string>
+
+    <!-- Widget strings -->
+    <string name="default_amount">0,00 ₽</string>
     <string name="default_small_amount">0 ₽</string>
-    <string name="navigation_back">Назад</string>
+
+    <!-- Уведомления и разрешения -->
+    <string name="permission_message_android15">Для отправки уведомлений необходимо разрешение. Пожалуйста, предоставьте его в настройках.</string>
+    <string name="permission_message">Для отправки уведомлений требуется разрешение. Пожалуйста, разрешите отправку уведомлений.</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="notification_permission_settings_message">Разрешение на отправку уведомлений требуется для функционирования приложения. Пожалуйста, разрешите отправку уведомлений в настройках.</string>
+    <string name="notification_permission_message">Для работы с уведомлениями требуется разрешение</string>
+    <string name="request_permission">Запросить разрешение</string>
+    <string name="selected_time">Выбранное время: %1$s</string>
+    <string name="notification_permission_required">Требуется разрешение на отправку уведомлений</string>
+    <string name="save">Сохранить</string>
+
+    <!-- Adding missing string resources -->
+    <string name="category_stats_for_period">Статистика по категориям за %1$s</string>
+    <string name="total_income">Всего доходов: %1$s</string>
+    <string name="net_balance">Баланс: %1$s</string>
+    <string name="savings_rate_title">Норма сбережений</string>
+    <string name="income_header">Доходы</string>
+    <string name="expenses_header">Расходы</string>
+    <string name="savings_amount">Сбережения</string>
+    <string name="empty_state">Пусто</string>
+    <string name="empty_transactions">Транзакции не найдены</string>
+    <string name="empty_transactions_description">Попробуйте изменить фильтры или добавить новые транзакции.</string>
+    <string name="transaction_history">История транзакций</string>
+
+    <!-- Ошибки форм - Добавление -->
+    <string name="amount_required">Введите сумму</string>
+    <string name="category_required">Выберите категорию</string>
+
+    <!-- Добавление недостающих строк -->
+    <string name="add_new">Добавить</string>
+    <string name="note_hint">Примечание (необязательно)</string>
+    <string name="selected_wallets">Выбрано кошельков: %d</string>
+    <string name="select_wallets">Выберите кошельки</string>
+    <string name="add_to_wallets">Добавить в кошельки</string>
+    <string name="transaction_to">Куда</string>
+    <string name="transaction_from">Откуда</string>
+    <string name="transaction_added_success">Транзакция успешно добавлена</string>
+    <string name="transaction_updated_success">Транзакция успешно изменена</string>
 </resources>

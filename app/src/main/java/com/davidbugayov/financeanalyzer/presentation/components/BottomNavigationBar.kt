@@ -8,16 +8,21 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.FilledTonalIconButton
@@ -29,6 +34,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -39,20 +46,32 @@ import com.davidbugayov.financeanalyzer.R
 /**
  * Улучшенная нижняя навигационная панель с анимацией и поддержкой произвольного набора пунктов
  *
- * @param modifier модификатор для управления позиционированием
  * @param visible видима ли панель
  * @param onAddClick обработчик нажатия на кнопку "Добавить"
  * @param onChartClick обработчик нажатия на кнопку "Графики"
  * @param onHistoryClick обработчик нажатия на кнопку "История"
+ * @param onBudgetClick обработчик нажатия на кнопку "Бюджет"
+ * @param modifier модификатор для управления позиционированием
  */
 @Composable
 fun AnimatedBottomNavigationBar(
-    modifier: Modifier = Modifier,
     visible: Boolean = true,
     onAddClick: () -> Unit = {},
     onChartClick: () -> Unit = {},
-    onHistoryClick: () -> Unit = {}
+    onHistoryClick: () -> Unit = {},
+    onBudgetClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
+    // Получаем отступы от системной навигации
+    val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
+    val density = LocalDensity.current
+    
+    // IME Insets для корректной работы с клавиатурой
+    val imeVisible = WindowInsets.ime.getBottom(density) > 0
+    
+    // Не показываем навигацию, если клавиатура видима
+    if (imeVisible) return
+    
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn() + slideInVertically(
@@ -73,65 +92,54 @@ fun AnimatedBottomNavigationBar(
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
-            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.95f),
-            shadowElevation = 4.dp,
-            tonalElevation = 8.dp
+            color = MaterialTheme.colorScheme.surface.copy(alpha = 0.97f),
+            shadowElevation = 0.dp,
+            tonalElevation = dimensionResource(R.dimen.elevation_small)
         ) {
-            // Высота всего контейнера с учетом отступов
-            val containerHeight = 132.dp
-
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(containerHeight)
+                    .padding(
+                        start = dimensionResource(R.dimen.spacing_small),
+                        end = dimensionResource(R.dimen.spacing_small),
+                        top = dimensionResource(R.dimen.spacing_xxsmall),
+                        bottom = dimensionResource(R.dimen.spacing_xxsmall) + navBarPadding.calculateBottomPadding()
+                    )
+                    .heightIn(min = dimensionResource(R.dimen.nav_bar_height)),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                // Размещаем кнопки в Row с равными отступами
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .align(Alignment.Center),
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Используем Box с весом для левой кнопки
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        NavButton(
-                            icon = Icons.Default.BarChart,
-                            text = stringResource(R.string.charts),
-                            onClick = onChartClick,
-                            isMain = false
-                        )
-                    }
+                // Статистика (слева)
+                NavButton(
+                    icon = Icons.Default.Assessment,
+                    text = stringResource(R.string.statistics),
+                    onClick = onChartClick,
+                    isMain = false
+                )
 
-                    // Используем Box с весом для центральной кнопки
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        NavButton(
-                            icon = Icons.Default.Add,
-                            text = stringResource(R.string.add_button),
-                            onClick = onAddClick,
-                            isMain = true
-                        )
-                    }
+                // Бюджет (слева от центра)
+                NavButton(
+                    icon = Icons.Default.AccountBalanceWallet,
+                    text = stringResource(R.string.budget),
+                    onClick = onBudgetClick,
+                    isMain = false
+                )
 
-                    // Используем Box с весом для правой кнопки
-                    Box(
-                        modifier = Modifier.weight(1f),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        NavButton(
-                            icon = Icons.Default.History,
-                            text = stringResource(R.string.history),
-                            onClick = onHistoryClick,
-                            isMain = false
-                        )
-                    }
-                }
+                // Добавить (центр)
+                NavButton(
+                    icon = Icons.Default.Add,
+                    text = stringResource(R.string.add_button),
+                    onClick = onAddClick,
+                    isMain = true
+                )
+
+                // История (справа)
+                NavButton(
+                    icon = Icons.Default.History,
+                    text = stringResource(R.string.history),
+                    onClick = onHistoryClick,
+                    isMain = false
+                )
             }
         }
     }
@@ -154,39 +162,42 @@ private fun NavButton(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .padding(horizontal = dimensionResource(R.dimen.spacing_xxsmall))
+            .widthIn(min = dimensionResource(R.dimen.main_nav_button_size) + dimensionResource(R.dimen.spacing_xxsmall))
     ) {
         if (isMain) {
             FilledIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(64.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.main_nav_button_size))
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = text,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.main_nav_icon_size))
                 )
             }
         } else {
             FilledTonalIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.nav_button_size))
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = text,
-                    modifier = Modifier.size(30.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.nav_icon_size))
                 )
             }
         }
 
-
         Text(
             text = text,
-            fontSize = 14.sp,
+            fontSize = dimensionResource(R.dimen.text_small).value.sp,
             textAlign = TextAlign.Center,
             fontWeight = FontWeight.Medium,
+            modifier = Modifier.padding(top = 2.dp),
             color = MaterialTheme.colorScheme.onSurface,
-            modifier = Modifier.padding(bottom = 8.dp)
+            maxLines = 1
         )
     }
 }

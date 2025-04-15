@@ -5,10 +5,13 @@ import android.net.Uri
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Базовый абстрактный класс для импорта транзакций из выписок различных банков.
@@ -28,81 +31,112 @@ abstract class BankImportUseCase(
      */
     abstract val bankName: String
 
+    // Переменная для хранения последнего прогресса импорта
+    private var currentProgress: ImportResult.Progress? = null
+
     /**
      * Общая реализация импорта, одинаковая для всех банков.
      * Использует шаблонный метод (Template Method) для переопределения специфичной логики.
      */
     override suspend fun invoke(uri: Uri): Flow<ImportResult> = flow {
         try {
-            val inputStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("Не удалось открыть файл")
+            val inputStream = withContext(Dispatchers.IO) {
+                context.contentResolver.openInputStream(uri)
+                    ?: throw IllegalArgumentException("Не удалось открыть файл")
+            }
 
-            val reader = BufferedReader(InputStreamReader(inputStream))
+            val reader = withContext(Dispatchers.IO) {
+                BufferedReader(InputStreamReader(inputStream))
+            }
 
             // Проверяем, что формат файла соответствует ожидаемому для данного банка
-            if (!isValidFormat(reader)) {
-                emit(ImportResult.Error("Формат файла не соответствует формату ${bankName}"))
+            val validFormat = withContext(Dispatchers.IO) {
+                isValidFormat(reader)
+            }
+
+            if (!validFormat) {
+                emit(ImportResult.Error("Формат файла не соответствует формату $bankName"))
                 return@flow
             }
 
             // Заново открываем поток для чтения данных
-            inputStream.close()
-            val dataStream = context.contentResolver.openInputStream(uri)
-                ?: throw IllegalArgumentException("Не удалось открыть файл")
+            withContext(Dispatchers.IO) {
+                inputStream.close()
+            }
 
-            val dataReader = BufferedReader(InputStreamReader(dataStream))
+            val dataStream = withContext(Dispatchers.IO) {
+                context.contentResolver.openInputStream(uri)
+                    ?: throw IllegalArgumentException("Не удалось открыть файл")
+            }
+
+            val dataReader = withContext(Dispatchers.IO) {
+                BufferedReader(InputStreamReader(dataStream))
+            }
 
             // Пропускаем заголовок (количество строк зависит от конкретного банка)
-            skipHeaders(dataReader)
+            withContext(Dispatchers.IO) {
+                skipHeaders(dataReader)
+            }
 
             // Считаем количество строк для отображения прогресса
-            val totalLines = countTransactionLines(uri)
+            val totalLines = withContext(Dispatchers.IO) {
+                countTransactionLines(uri)
+            }
 
             var currentLine = 0
             var importedCount = 0
             var skippedCount = 0
-            var totalAmount = 0.0
+            var totalAmount = Money.zero()
 
             // Читаем и обрабатываем строки с транзакциями
-            dataReader.useLines { lines ->
-                lines.forEach { line ->
-                    if (shouldSkipLine(line)) {
-                        return@forEach
-                    }
+            withContext(Dispatchers.IO) {
+                dataReader.useLines { lines ->
+                    lines.forEach { line ->
+                        if (shouldSkipLine(line)) {
+                            return@forEach
+                        }
 
-                    currentLine++
+                        currentLine++
 
-                    // Эмитим прогресс каждые 10 записей
-                    if (currentLine % 10 == 0) {
-                        emit(
-                            ImportResult.Progress(
+                        try {
+                            // Парсим строку и получаем транзакцию
+                            val transaction = parseLine(line)
+
+                            // Добавляем информацию о банке как источнике
+                            val transactionWithSource = transaction.copy(
+                                source = bankName
+                            )
+
+                            // Сохраняем транзакцию
+                            repository.addTransaction(transactionWithSource)
+
+                            importedCount++
+                            // Учитываем сумму транзакции в общей сумме
+                            totalAmount = if (transactionWithSource.isExpense) 
+                                totalAmount - transactionWithSource.amount 
+                            else 
+                                totalAmount + transactionWithSource.amount
+                        } catch (e: Exception) {
+                            skippedCount++
+                        }
+
+                        // Эмитим прогресс каждые 10 записей
+                        if (currentLine % 10 == 0) {
+                            // Важно: нельзя эмитить из внутреннего контекста - будет ошибка
+                            // Сохраняем данные прогресса для последующего эмита
+                            currentProgress = ImportResult.Progress(
                                 current = currentLine,
                                 total = totalLines,
-                                message = "Импортируется $currentLine из $totalLines транзакций из ${bankName}"
+                                message = "Импортируется $currentLine из $totalLines транзакций из $bankName"
                             )
-                        )
-                    }
-
-                    try {
-                        // Парсим строку и получаем транзакцию
-                        val transaction = parseLine(line)
-
-                        // Добавляем информацию о банке как источнике
-                        val transactionWithSource = transaction.copy(
-                            source = transaction.source ?: bankName
-                        )
-
-                        // Сохраняем транзакцию
-                        repository.addTransaction(transactionWithSource)
-
-                        importedCount++
-                        totalAmount += transactionWithSource.amount
-                    } catch (e: Exception) {
-                        skippedCount++
+                        }
                     }
                 }
             }
 
+            // Эмитим сохраненный прогресс после withContext
+            currentProgress?.let { emit(it) }
+            
             // Отправляем результат успешного импорта
             emit(
                 ImportResult.Success(
@@ -115,7 +149,7 @@ abstract class BankImportUseCase(
         } catch (e: Exception) {
             emit(
                 ImportResult.Error(
-                    message = "Ошибка импорта из ${bankName}: ${e.message}",
+                    message = "Ошибка импорта из $bankName: ${e.message}",
                     exception = e
                 )
             )
@@ -166,8 +200,8 @@ abstract class BankImportUseCase(
      * @param uri URI файла выписки
      * @return Количество строк с транзакциями
      */
-    protected open fun countTransactionLines(uri: Uri): Int {
-        val inputStream = context.contentResolver.openInputStream(uri) ?: return 0
+    protected open suspend fun countTransactionLines(uri: Uri): Int = withContext(Dispatchers.IO) {
+        val inputStream = context.contentResolver.openInputStream(uri) ?: return@withContext 0
         val reader = BufferedReader(InputStreamReader(inputStream))
 
         // Пропускаем заголовки
@@ -184,6 +218,6 @@ abstract class BankImportUseCase(
         }
 
         inputStream.close()
-        return count
+        count
     }
 } 

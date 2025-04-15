@@ -33,6 +33,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 
@@ -94,7 +95,7 @@ fun CategorySelectionDialog(
                                     emptyList()
                                 }
                         }
-                        .padding(vertical = 8.dp),
+                        .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
@@ -126,7 +127,14 @@ fun CategorySelectionDialog(
                     )
                 }
 
-                Spacer(modifier = Modifier.height(8.dp))
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(dimensionResource(R.dimen.divider_height)),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                ) {}
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Группа "Расходы" с выпадающим списком
                 CategoryGroupHeader(
@@ -163,7 +171,14 @@ fun CategorySelectionDialog(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(16.dp))
+                Surface(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(dimensionResource(R.dimen.divider_height)),
+                    color = MaterialTheme.colorScheme.outlineVariant
+                ) {}
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                 // Группа "Доходы" с выпадающим списком
                 CategoryGroupHeader(
@@ -237,7 +252,7 @@ private fun CategoryGroupHeader(
     Row(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -291,7 +306,7 @@ private fun CategoryCheckboxItem(
     Surface(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 2.dp)
+            .padding(vertical = dimensionResource(R.dimen.spacing_small))
             .clip(MaterialTheme.shapes.small)
             .background(
                 if (isSelected) MaterialTheme.colorScheme.primaryContainer
@@ -302,7 +317,7 @@ private fun CategoryCheckboxItem(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = { onToggle(!isSelected) })
-                .padding(8.dp),
+                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Checkbox(
@@ -316,7 +331,7 @@ private fun CategoryCheckboxItem(
                 else color,
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 8.dp)
+                    .padding(start = dimensionResource(R.dimen.spacing_small))
             )
         }
     }

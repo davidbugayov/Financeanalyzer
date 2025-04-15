@@ -23,6 +23,24 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_1
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_2
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_3
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_4
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_5
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_6
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_7
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_8
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_green_9
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_1
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_2
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_3
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_4
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_5
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_6
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_7
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_8
+import com.davidbugayov.financeanalyzer.ui.theme.md_theme_chart_red_9
 
 /**
  * Displays a list of categories with their amounts and percentages.
@@ -45,27 +63,27 @@ fun CategoryList(
     // Используем фиксированные цвета, как в CategoryPieChart
     val colors = if (isIncome) {
         listOf(
-            Color(0xFF66BB6A), // Зеленый
-            Color(0xFF81C784),
-            Color(0xFF4CAF50),
-            Color(0xFF2E7D32),
-            Color(0xFF43A047),
-            Color(0xFF388E3C),
-            Color(0xFF1B5E20),
-            Color(0xFF00C853),
-            Color(0xFF00E676)
+            md_theme_chart_green_1, // Зеленый
+            md_theme_chart_green_2,
+            md_theme_chart_green_3,
+            md_theme_chart_green_4,
+            md_theme_chart_green_5,
+            md_theme_chart_green_6,
+            md_theme_chart_green_7,
+            md_theme_chart_green_8,
+            md_theme_chart_green_9
         )
     } else {
         listOf(
-            Color(0xFFEF5350), // Красный
-            Color(0xFFE57373),
-            Color(0xFFEF9A9A),
-            Color(0xFFD32F2F),
-            Color(0xFFC62828),
-            Color(0xFFB71C1C),
-            Color(0xFFFF8A80),
-            Color(0xFFFF5252),
-            Color(0xFFFF1744)
+            md_theme_chart_red_1, // Красный
+            md_theme_chart_red_2,
+            md_theme_chart_red_3,
+            md_theme_chart_red_4,
+            md_theme_chart_red_5,
+            md_theme_chart_red_6,
+            md_theme_chart_red_7,
+            md_theme_chart_red_8,
+            md_theme_chart_red_9
         )
     }
 
