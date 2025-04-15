@@ -22,7 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem
 
 /**
  * Диалог для выбора категорий (импорта или связывания)

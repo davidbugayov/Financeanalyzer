@@ -17,7 +17,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
@@ -70,16 +69,6 @@ val appModule = module {
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
     viewModel { ChartViewModel() }
-    viewModel {
-        AddTransactionViewModel(
-            application = androidApplication(),
-            addTransactionUseCase = get(),
-            updateTransactionUseCase = get(),
-            categoriesViewModel = get(),
-            sourcePreferences = get(),
-            walletRepository = get()
-        )
-    }
     viewModel {
         ProfileViewModel(
             exportTransactionsToCSVUseCase = get(),

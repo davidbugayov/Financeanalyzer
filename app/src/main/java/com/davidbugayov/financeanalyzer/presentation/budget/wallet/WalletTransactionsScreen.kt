@@ -49,14 +49,14 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -95,8 +95,8 @@ fun WalletTransactionsScreen(
             )
             
             // Принудительно установим тип "Расход" и категорию, соответствующую кошельку
-            addTransactionViewModel.onEvent(AddTransactionEvent.ToggleTransactionType) // Переключаем на расход
-            addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(wallet.name))
+            addTransactionViewModel.onEvent(BaseTransactionEvent.ToggleExpense(true)) // Переключаем на расход
+            addTransactionViewModel.onEvent(BaseTransactionEvent.SetCategory(wallet.name))
             
             // Переходим на экран добавления транзакции
             navController.navigate(Screen.AddTransaction.route)

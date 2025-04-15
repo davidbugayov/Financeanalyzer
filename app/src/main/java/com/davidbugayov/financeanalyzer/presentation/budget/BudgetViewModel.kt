@@ -327,16 +327,10 @@ class BudgetViewModel(
         }
     }
 
-    /**
-     * Очищает сообщение об ошибке
-     */
     private fun clearError() {
         _state.update { it.copy(error = null) }
     }
-    
-    /**
-     * Устанавливает сообщение об ошибке
-     */
+
     private fun setError(message: String) {
         _state.update { it.copy(error = message) }
     }

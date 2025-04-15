@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.add.components
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -24,10 +24,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.R
 
+/**
+ * Диалог создания пользовательского источника
+ */
 @Composable
 fun CustomSourceDialog(
     sourceName: String,
@@ -41,53 +42,65 @@ fun CustomSourceDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text(stringResource(R.string.add_custom_source)) },
+        title = { Text("Новый источник") },
         text = {
-            Column {
+            Column(modifier = Modifier.padding(8.dp)) {
                 OutlinedTextField(
                     value = sourceName,
                     onValueChange = onSourceNameChange,
-                    label = { Text(stringResource(R.string.source_name)) },
+                    label = { Text("Название источника") },
+                    isError = sourceName.trim().length < 2,
                     modifier = Modifier.fillMaxWidth()
                 )
-
+                
+                if (sourceName.trim().length < 2) {
+                    Text(
+                        text = "Название должно содержать минимум 2 символа",
+                        color = Color.Red,
+                        modifier = Modifier.padding(top = 4.dp)
+                    )
+                }
+                
                 Spacer(modifier = Modifier.height(16.dp))
-
+                
                 Row(
+                    verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { showColorPicker = true }
-                        .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                        .padding(top = 16.dp)
                 ) {
+                    Text(
+                        text = "Выберите цвет:",
+                        modifier = Modifier.weight(1f)
+                    )
+                    
                     Box(
                         modifier = Modifier
-                            .padding(end = 8.dp)
-                            .size(24.dp)
+                            .size(40.dp)
                             .clip(CircleShape)
                             .background(Color(color))
+                            .clickable { showColorPicker = true }
                     )
-                    Text(stringResource(R.string.select_color))
                 }
             }
         },
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
-                enabled = sourceName.isNotBlank()
+                enabled = sourceName.trim().length >= 2
             ) {
-                Text(stringResource(R.string.confirm))
+                Text("Добавить")
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                Text("Отмена")
             }
         }
     )
-
+    
     if (showColorPicker) {
-        ColorPickerDialog(
+        SourceColorPickerDialog(
             initialColor = color,
             onColorSelected = { selectedColor ->
                 onColorClick(selectedColor)

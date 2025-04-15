@@ -2,7 +2,10 @@ package com.davidbugayov.financeanalyzer.presentation
 
 import android.Manifest
 import android.app.Activity
+import android.content.pm.PackageManager
 import android.os.Build
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.Spring
@@ -11,21 +14,33 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.windowsizeclass.ExperimentalMaterial3WindowSizeClassApi
+import androidx.compose.material3.windowsizeclass.WindowSizeClass
+import androidx.compose.material3.windowsizeclass.WindowWidthSizeClass
+import androidx.compose.material3.windowsizeclass.calculateWindowSizeClass
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
@@ -36,10 +51,9 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
@@ -56,6 +70,7 @@ import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewMo
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
@@ -66,6 +81,8 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
 
 /**
  * Главный экран приложения, содержащий навигацию между различными разделами.
@@ -81,6 +98,10 @@ fun MainScreen(startDestination: String = "home") {
     val profileViewModel: ProfileViewModel = koinViewModel()
     val onboardingViewModel: OnboardingViewModel = koinViewModel()
     val context = LocalContext.current
+
+    // Состояние для предварительной настройки ViewModel для добавления транзакции
+    var fromWallet by remember { mutableStateOf(false) }
+    var walletToAddTransaction by remember { mutableStateOf<Wallet?>(null) }
 
     // Функция для настройки уведомлений, определена локально
     fun setupNotifications() {
@@ -269,9 +290,20 @@ fun MainScreen(startDestination: String = "home") {
                     ) {
                         HomeScreen(
                             viewModel = homeViewModel,
-                            addTransactionViewModel = addTransactionViewModel,
                             onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                            onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
+                            onNavigateToAdd = {
+                                // Сбрасываем состояние
+                                addTransactionViewModel.resetToDefaultState()
+                                // Проверяем параметры из HomeScreen и запоминаем, что переход с другого экрана
+                                fromWallet = false
+                                walletToAddTransaction = null
+                                // Переходим на экран добавления
+                                navController.navigate(Screen.AddTransaction.route)
+                            },
+                            onNavigateToEdit = { transaction ->
+                                // Вместо вызова loadTransactionForEditing используем навигацию с ID транзакции
+                                navController.navigate(Screen.EditTransaction.createRoute(transaction))
+                            },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
                             onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
                             onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
@@ -330,11 +362,8 @@ fun MainScreen(startDestination: String = "home") {
                             viewModel = koinViewModel<TransactionHistoryViewModel>(),
                             onNavigateBack = { navController.navigateUp() },
                             onNavigateToEdit = { transaction ->
-                                // Сохраним выбранную транзакцию в ViewModel
-                                addTransactionViewModel.loadTransactionForEditing(transaction)
-                                
-                                // Навигация к экрану добавления/редактирования
-                                navController.navigate(Screen.AddTransaction.route)
+                                // Вместо вызова loadTransactionForEditing используем навигацию с ID транзакции
+                                navController.navigate(Screen.EditTransaction.createRoute(transaction.id))
                             }
                         )
                     }
@@ -342,104 +371,44 @@ fun MainScreen(startDestination: String = "home") {
                     composable(
                         route = Screen.AddTransaction.route,
                         enterTransition = {
-                            fadeIn(
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
                                 animationSpec = tween(300, easing = EaseInOut)
                             )
                         },
                         exitTransition = {
-                            fadeOut(
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
                                 animationSpec = tween(300, easing = EaseInOut)
                             )
                         }
                     ) {
-                        // Получаем предыдущий маршрут из стека навигации, чтобы определить источник перехода
-                        val previousRoute = navController.previousBackStackEntry?.destination?.route
-                        
-                        // Добавляем подробное логирование
-                        Timber.d("Переход на AddTransaction с экрана: $previousRoute")
-                        
-                        // Проверяем, приходим ли мы с экрана BudgetScreen, WalletTransactions или Wallets
-                        if (previousRoute == Screen.Budget.route || previousRoute == Screen.Wallets.route) {
-                            // Если переход был из бюджета или кошельков
-                            LaunchedEffect(Unit) {
-                                // Проверяем текущее состояние типа транзакции
-                                val currentIsExpense = addTransactionViewModel.state.value.isExpense
-                                val currentForceExpense = addTransactionViewModel.state.value.forceExpense
-                                
-                                // Используем storedTargetWalletId из AddTransactionViewModel
-                                val storedWalletId = addTransactionViewModel.storedTargetWalletId
-                                val shouldDistribute = addTransactionViewModel.autoDistributeIncome
-                                
-                                Timber.d("Параметры перехода: storedWalletId=$storedWalletId, shouldDistribute=$shouldDistribute, currentIsExpense=$currentIsExpense, currentForceExpense=$currentForceExpense")
-                                
-                                // Если уже установлен расход через forceExpense, сохраняем этот режим
-                                if (currentIsExpense && currentForceExpense) {
-                                    Timber.d("=== Переход из Budget/Wallets - сохраняем режим РАСХОДА ===")
-                                    // Ничего не меняем, оставляем расход как есть
-                                } else {
-                                    // Иначе устанавливаем режим дохода (по умолчанию)
-                                    Timber.d("=== Переход из Budget/Wallets - устанавливаем режим ДОХОДА ===")
-                                    
-                                    if (storedWalletId != null) {
-                                        // Если есть сохраненный ID, используем его
-                                        Timber.d("Используем сохраненный walletId: $storedWalletId")
-                                        
-                                        // Сначала устанавливаем ID целевого кошелька
-                                        addTransactionViewModel.setTargetWalletId(storedWalletId)
-                                    }
-                                    
-                                    // Затем настраиваем для доходной операции
-                                    addTransactionViewModel.setupForIncomeAddition(
-                                        amount = "",
-                                        shouldDistribute = false
-                                    )
-                                    
-                                    // Если включено автоматическое распределение, выбираем все кошельки
-                                    if (shouldDistribute) {
-                                        Timber.d("Включено автоматическое распределение дохода, выбираем все кошельки")
-                                        addTransactionViewModel.clearSelectedWallets()
-                                        addTransactionViewModel.selectAllWallets()
-                                    }
-                                }
-                                
-                                // Проверяем финальное состояние
-                                Timber.d("После настройки из Budget/Wallets: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}")
-                            }
-                        } else if (previousRoute?.startsWith("wallet/") == true) {
-                            // Если переход был из WalletTransactions, извлекаем walletId из маршрута
-                            val walletId = previousRoute.removePrefix("wallet/")
-                            Timber.d("=== Переход из WalletTransactions с walletId=$walletId ===")
-                            
-                            LaunchedEffect(Unit) {
-                                // Сначала устанавливаем ID целевого кошелька
-                                addTransactionViewModel.setTargetWalletId(walletId)
-                                
-                                // Затем настраиваем ViewModel для добавления дохода
-                                addTransactionViewModel.setupForIncomeAddition(
-                                    amount = "",
-                                    shouldDistribute = false
-                                )
-                                
-                                // Дополнительно логируем состояние после установки
-                                Timber.d("После setupForIncomeAddition в MainScreen с walletId: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}")
-                            }
-                        } else {
-                            // Если переход с любого другого экрана (например, HomeScreen),
-                            // настраиваем для расхода с выбором всех кошельков
-                            Timber.d("=== Переход из $previousRoute - устанавливаем режим РАСХОДА со всеми кошельками ===")
-                            LaunchedEffect(Unit) {
+                        // Предустановка параметров кошелька, если открыто из экрана кошелька
+                        LaunchedEffect(Unit) {
+                            if (fromWallet) {
                                 try {
-                                    // Сбрасываем состояние и настраиваем для расхода с автоматическим выбором всех кошельков
-                                    addTransactionViewModel.resetToDefaultState()
-                                    
-                                    // Включаем добавление в кошельки и выбираем все кошельки без показа диалога
-                                    addTransactionViewModel.selectAllWalletsWithoutDialog()
-                                    
-                                    // Форсируем режим расхода (на случай, если где-то сбросится)
-                                    addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetExpenseType)
-                                    
-                                    // Дополнительно логируем состояние после настройки
-                                    Timber.d("После настройки из HomeScreen: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}, showWalletSelector=${addTransactionViewModel.state.value.showWalletSelector}")
+                                    val wallet = walletToAddTransaction
+                                    if (wallet != null) {
+                                        Timber.d("Настройка параметров из экрана кошелька: wallet=${wallet.name}, id=${wallet.id}")
+                                        
+                                        // Инициализируем ToggleAddToWallet с параметром
+                                        addTransactionViewModel.onEvent(BaseTransactionEvent.ToggleAddToWallet(true))
+                                        
+                                        // И для выбора кошелька используем корректное событие
+                                        addTransactionViewModel.onEvent(BaseTransactionEvent.ToggleWalletSelection(wallet.id))
+                                        
+                                        Timber.d("После настройки из HomeScreen: isExpense=${addTransactionViewModel.state.value.transactionData.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, walletState=${addTransactionViewModel.state.value.walletState}")
+                                    }
                                 } catch (e: Exception) {
                                     Timber.e(e, "Ошибка при настройке параметров кошельков")
                                 }
@@ -447,8 +416,7 @@ fun MainScreen(startDestination: String = "home") {
                         }
                         
                         AddTransactionScreen(
-                            viewModel = addTransactionViewModel,
-                            onNavigateBack = {
+                            onBackClick = {
                                 // Используем фоновую загрузку вместо полной перезагрузки
                                 homeViewModel.initiateBackgroundDataRefresh()
                                 
@@ -457,6 +425,53 @@ fun MainScreen(startDestination: String = "home") {
                                 profileViewModel.updateFinancialStatistics()
 
                                 // Просто возвращаемся назад, чтобы вернуться на предыдущий экран
+                                navController.navigateUp()
+                            }
+                        )
+                    }
+                    
+                    // Маршрут для экрана редактирования транзакции
+                    composable(
+                        route = Screen.EditTransaction.route,
+                        arguments = listOf(
+                            navArgument("transactionId") { type = NavType.StringType }
+                        ),
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) {
+                        val transactionId = it.arguments?.getString("transactionId") ?: ""
+                        
+                        EditTransactionScreen(
+                            transactionId = transactionId,
+                            onBackClick = {
+                                // Используем фоновую загрузку вместо полной перезагрузки
+                                homeViewModel.initiateBackgroundDataRefresh()
+                                
+                                // Обновляем графики и статистику напрямую
+                                chartViewModel.loadTransactions()
+                                profileViewModel.updateFinancialStatistics()
+
+                                // Возвращаемся назад
                                 navController.navigateUp()
                             }
                         )

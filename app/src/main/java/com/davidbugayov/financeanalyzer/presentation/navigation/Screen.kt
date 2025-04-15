@@ -16,6 +16,11 @@ sealed class Screen(val route: String) {
 
     /** Экран добавления новой транзакции */
     data object AddTransaction : Screen("add")
+    
+    /** Экран редактирования существующей транзакции */
+    data object EditTransaction : Screen("edit/{transactionId}") {
+        fun createRoute(transactionId: String) = "edit/$transactionId"
+    }
 
     /** Экран с графиками и статистикой */
     data object Chart : Screen("chart")

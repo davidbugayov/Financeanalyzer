@@ -46,6 +46,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayo
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
@@ -59,9 +60,9 @@ import timber.log.Timber
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    addTransactionViewModel: com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel,
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
+    onNavigateToEdit: (String) -> Unit,
     onNavigateToChart: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToBudget: () -> Unit,
@@ -232,8 +233,6 @@ fun HomeScreen(
             // Floating Action Button для добавления транзакции
             FloatingActionButton(
                 onClick = {
-                    // Сбрасываем состояние AddTransactionViewModel к дефолтному
-                    addTransactionViewModel.resetToDefaultState()
                     // Выполняем навигацию
                     onNavigateToAdd()
                     feedbackMessage = "Добавление новой транзакции"
@@ -303,10 +302,8 @@ fun HomeScreen(
                     },
                     onEdit = { transaction ->
                         showActionsDialog = false
-                        // Загружаем транзакцию в ViewModel для редактирования
-                        addTransactionViewModel.loadTransactionForEditing(transaction)
                         // Переходим на экран добавления/редактирования
-                        onNavigateToAdd()
+                        onNavigateToEdit(transaction.id)
                         feedbackMessage = "Редактирование транзакции"
                         feedbackType = FeedbackType.INFO
                         showFeedback = true

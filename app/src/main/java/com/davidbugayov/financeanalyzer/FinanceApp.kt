@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer
 
 import android.app.Application
 import android.util.Log
-import com.davidbugayov.financeanalyzer.di.addTransactionModule
 import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.budgetModule
 import com.davidbugayov.financeanalyzer.di.chartModule
@@ -11,6 +10,7 @@ import com.davidbugayov.financeanalyzer.di.homeModule
 import com.davidbugayov.financeanalyzer.di.importModule
 import com.davidbugayov.financeanalyzer.di.onboardingModule
 import com.davidbugayov.financeanalyzer.di.profileModule
+import com.davidbugayov.financeanalyzer.di.transactionModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
@@ -73,11 +73,11 @@ class FinanceApp : Application() {
                     chartModule,
                     homeModule,
                     historyModule,
-                    addTransactionModule,
                     profileModule,
                     importModule,
                     onboardingModule,
-                    budgetModule
+                    budgetModule,
+                    transactionModule
                 )
             }
             

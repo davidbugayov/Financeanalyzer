@@ -34,6 +34,11 @@ android {
             useSupportLibrary = true
         }
 
+        // Room schema location
+        ksp {
+            arg("room.schemaLocation", "$projectDir/schemas")
+        }
+
         // Enable R8 support
         proguardFiles(
             getDefaultProguardFile("proguard-android-optimize.txt"),

@@ -48,12 +48,11 @@ import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletAction
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
@@ -77,6 +76,7 @@ import java.util.TimeZone
 import androidx.compose.runtime.DisposableEffect
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -242,16 +242,15 @@ fun BudgetScreen(
                                         )
                                         
                                         // Устанавливаем категорию, равную имени кошелька
-                                        addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(categoryFromMenu.name))
+                                        addTransactionViewModel.onEvent(BaseTransactionEvent.SetCategory(categoryFromMenu.name))
                                         Timber.d("Категория установлена: ${categoryFromMenu.name}")
                                         
                                         // Явно устанавливаем, что это не расход
-                                        addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                                        addTransactionViewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType)
                                         Timber.d("Явно установлено тип транзакции как доход")
 
                                         // Добавляем проверку состояния перед навигацией
-                                        Timber.d("Проверка финального состояния перед навигацией: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
-                                        
+
                                         // Устанавливаем коллбэк для обновления баланса кошелька после добавления дохода
                                         addTransactionViewModel.onIncomeAddedCallback = { amount ->
                                             // Добавляем средства в выбранный кошелек
@@ -277,8 +276,7 @@ fun BudgetScreen(
                                         )
                                         
                                         // Проверяем состояние после настройки для убеждения в правильности
-                                        Timber.d("Состояние после настройки расхода: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
-                                        
+
                                         // Устанавливаем коллбэк для обновления баланса кошелька после добавления расхода
                                         addTransactionViewModel.onExpenseAddedCallback = { amount ->
                                             // Списываем средства из выбранного кошелька
@@ -710,6 +708,11 @@ fun BudgetScreen(
                                         viewModel.onEvent(BudgetEvent.DistributeIncome(amount))
                                     }
                                     
+                                    // Явно включаем режим дохода
+                                    addTransactionViewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType)
+                                    
+                                    // Добавляем логирование для отладки
+
                                     // Навигация на экран добавления транзакции
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
@@ -740,6 +743,11 @@ fun BudgetScreen(
                                     // Сбрасываем callback
                                     addTransactionViewModel.onIncomeAddedCallback = null
                                     
+                                    // Явно включаем режим дохода
+                                    addTransactionViewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType)
+                                    
+                                    // Добавляем логирование для отладки
+
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
                                 modifier = Modifier.fillMaxWidth()
