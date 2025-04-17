@@ -44,6 +44,7 @@ import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
+import com.davidbugayov.financeanalyzer.presentation.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
@@ -328,14 +329,9 @@ fun MainScreen(startDestination: String = "home") {
                     ) {
                         TransactionHistoryScreen(
                             viewModel = koinViewModel<TransactionHistoryViewModel>(),
+                            addTransactionViewModel = addTransactionViewModel,
                             onNavigateBack = { navController.navigateUp() },
-                            onNavigateToEdit = { transaction ->
-                                // Сохраним выбранную транзакцию в ViewModel
-                                addTransactionViewModel.loadTransactionForEditing(transaction)
-                                
-                                // Навигация к экрану добавления/редактирования
-                                navController.navigate(Screen.AddTransaction.route)
-                            }
+                            navController = navController
                         )
                     }
                     
@@ -459,6 +455,44 @@ fun MainScreen(startDestination: String = "home") {
                                 // Просто возвращаемся назад, чтобы вернуться на предыдущий экран
                                 navController.navigateUp()
                             }
+                        )
+                    }
+                    
+                    // Экран редактирования транзакции
+                    composable(
+                        route = Screen.EditTransaction.route,
+                        arguments = listOf(
+                            navArgument("transactionId") { type = NavType.StringType }
+                        ),
+                        enterTransition = {
+                            slideIntoContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.Start
+                            ) + fadeIn(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                ),
+                                towards = AnimatedContentTransitionScope.SlideDirection.End
+                            ) + fadeOut(
+                                animationSpec = tween(300, easing = EaseInOut)
+                            )
+                        }
+                    ) { backStackEntry ->
+                        val transactionId = 
+                            backStackEntry.arguments?.getString("transactionId") ?: ""
+                        EditTransactionScreen(
+                            viewModel = addTransactionViewModel,
+                            onNavigateBack = { navController.navigateUp() },
+                            transactionId = transactionId
                         )
                     }
                     

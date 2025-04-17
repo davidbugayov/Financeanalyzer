@@ -1448,4 +1448,39 @@ class AddTransactionViewModel(
             }
         }
     }
+
+    /**
+     * Загружает транзакцию для редактирования по ID
+     */
+    fun loadTransactionForEdit(transactionId: String) {
+        viewModelScope.launch {
+            try {
+                Timber.d("Загрузка транзакции для редактирования с ID: $transactionId")
+                
+                // Загружаем транзакцию из репозитория
+                val transaction = getTransactionRepositoryInstance().getTransactionById(transactionId)
+                
+                if (transaction != null) {
+                    Timber.d("Транзакция найдена, загружаем для редактирования")
+                    loadTransactionForEditing(transaction)
+                } else {
+                    Timber.e("Транзакция с ID $transactionId не найдена")
+                    _state.update { 
+                        it.copy(
+                            error = "Транзакция не найдена",
+                            isLoading = false
+                        ) 
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке транзакции с ID $transactionId")
+                _state.update { 
+                    it.copy(
+                        error = "Ошибка загрузки: ${e.message}",
+                        isLoading = false
+                    ) 
+                }
+            }
+        }
+    }
 } 
