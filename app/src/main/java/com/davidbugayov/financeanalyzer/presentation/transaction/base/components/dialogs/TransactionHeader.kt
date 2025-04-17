@@ -90,7 +90,13 @@ fun TransactionHeader(
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = 0, count = 2),
                     selected = !isExpense,
-                    onClick = { if (isExpense && !forceExpense) onToggleTransactionType() },
+                    onClick = { 
+                        println("CLICK INCOME: isExpense=$isExpense, forceExpense=$forceExpense, condition=${isExpense && !forceExpense}")
+                        if (isExpense && !forceExpense) {
+                            onToggleTransactionType()
+                        }
+                    },
+                    enabled = !forceExpense || !isExpense,
                     colors = SegmentedButtonDefaults.colors(
                         activeContainerColor = incomeColor,
                         activeContentColor = Color.White,
@@ -105,7 +111,13 @@ fun TransactionHeader(
                 SegmentedButton(
                     shape = SegmentedButtonDefaults.itemShape(index = 1, count = 2),
                     selected = isExpense,
-                    onClick = { if (!isExpense) onToggleTransactionType() },
+                    onClick = { 
+                        println("CLICK EXPENSE: isExpense=$isExpense, forceExpense=$forceExpense, condition=${!isExpense}")
+                        if (!isExpense) {
+                            onToggleTransactionType()
+                        }
+                    },
+                    enabled = !forceExpense || isExpense,
                     colors = SegmentedButtonDefaults.colors(
                         activeContainerColor = expenseColor,
                         activeContentColor = Color.White,

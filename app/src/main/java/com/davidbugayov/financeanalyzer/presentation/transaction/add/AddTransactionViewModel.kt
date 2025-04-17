@@ -150,7 +150,8 @@ class AddTransactionViewModel (
      * Сбрасывает состояние до значений по умолчанию
      */
     fun resetToDefaultState() {
-        _state.value = AddTransactionState()
+        _state.value = AddTransactionState(forceExpense = false)
+        Timber.d("State reset: forceExpense=${_state.value.forceExpense}")
     }
 
     /**
@@ -307,13 +308,19 @@ class AddTransactionViewModel (
             }
             is BaseTransactionEvent.ToggleTransactionType -> {
                 val currentIsExpense = _state.value.transactionData.isExpense
+                val currentForceExpense = _state.value.forceExpense
+                Timber.d("BEFORE TOGGLE: isExpense=$currentIsExpense, forceExpense=$currentForceExpense")
+                
                 _state.update { it.copy(
                     transactionData = it.transactionData.copy(
                         isExpense = !currentIsExpense,
                         category = ""
                     ),
+                    forceExpense = false,
                     validationError = if (it.validationError is ValidationError.CategoryMissing) null else it.validationError
                 )}
+                
+                Timber.d("AFTER TOGGLE: isExpense=${!currentIsExpense}, forceExpense=false")
                 Timber.d("Transaction type toggled to: ${if (!currentIsExpense) "Expense" else "Income"}")
             }
             is BaseTransactionEvent.SetSource -> {

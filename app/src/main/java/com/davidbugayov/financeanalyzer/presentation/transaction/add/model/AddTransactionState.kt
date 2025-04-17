@@ -43,7 +43,7 @@ data class AddTransactionState(
     val transactionToEdit: Transaction? = null,
     
     // Флаг для UI логики
-    override val forceExpense: Boolean = true, // По умолчанию расход
+    override val forceExpense: Boolean = false, // Разрешить переключение типа транзакции
     
     // Специфичные для добавления транзакции поля
     val canAddAnother: Boolean = true, // Можно ли добавить еще одну транзакцию

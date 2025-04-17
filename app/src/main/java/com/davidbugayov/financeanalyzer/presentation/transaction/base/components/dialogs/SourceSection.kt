@@ -1,8 +1,10 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -107,6 +109,7 @@ fun SourceSection(
 /**
  * Элемент списка источников с обработчиком долгого нажатия
  */
+@OptIn(ExperimentalFoundationApi::class)
 @Composable
 private fun SourceItem(
     source: Source,
@@ -121,7 +124,7 @@ private fun SourceItem(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(65.dp)
-            .clickable(
+            .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             )

@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
 
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -20,25 +20,15 @@ fun CommentField(
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Surface(
+    Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp
+            .padding(horizontal = 16.dp, vertical = 8.dp)
     ) {
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            NoteField(
-                note = value,
-                onNoteChange = onValueChange,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
+        NoteField(
+            note = value,
+            onNoteChange = onValueChange,
+            modifier = Modifier.fillMaxWidth()
+        )
     }
 } 

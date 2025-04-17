@@ -27,6 +27,9 @@
     <string name="cash_deposit">пополнение</string>
     <string name="loading_data">Загрузка данных…</string>
     <string name="error">Ошибка</string>
+    <string name="clear_fields">Очистить поля</string>
+    <string name="add_transaction_submit">Добавить транзакцию</string>
+    <string name="add_custom_source">Добавить источник</string>
     
     <!-- Главный экран -->
     <string name="app_title">Деньги под Контролем</string>
@@ -271,7 +274,6 @@
     <string name="source">Откуда</string>
     <string name="source_name">Название источника</string>
     <string name="select_source">Выберите источник</string>
-    <string name="add_custom_source">Добавить источник</string>
     <string name="select_color">Выберите цвет</string>
     <string name="change_color">Изменить цвет</string>
     <string name="source_error">Выберите источник</string>

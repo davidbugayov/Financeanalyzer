@@ -3,6 +3,10 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.add
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.filled.Clear
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
@@ -28,7 +32,9 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.DeleteSourceConfirmationDialog
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.SourceColorPickerDialog
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.SourcePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.SourceSection
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.WalletSelectorDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.SourceItem as ModelSourceItem
 import org.koin.androidx.compose.koinViewModel
@@ -36,6 +42,7 @@ import org.koin.androidx.compose.koinViewModel
 /**
  * Экран добавления транзакции
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun AddTransactionScreen(
     onBackClick: () -> Unit
@@ -176,8 +183,8 @@ fun AddTransactionScreen(
                 title = { Text(stringResource(R.string.add_transaction)) },
                 navigationIcon = {
                     IconButton(onClick = { 
-                        if (state.transactionData.hasData) {
-                            viewModel.onEvent(BaseTransactionEvent.ShowConfirmCancelDialog)
+                        if (state.transactionData.amount.isNotEmpty() || state.transactionData.category.isNotEmpty() || state.transactionData.note.isNotEmpty()) {
+                            viewModel.onEvent(BaseTransactionEvent.ShowCancelConfirmation)
                         } else {
                             onBackClick()
                         }
@@ -193,7 +200,7 @@ fun AddTransactionScreen(
                     IconButton(onClick = { viewModel.resetFields() }) {
                         Icon(
                             imageVector = Icons.Default.Clear,
-                            contentDescription = stringResource(R.string.clear_fields)
+                            contentDescription = stringResource(R.string.cancel)
                         )
                     }
                 }
@@ -204,14 +211,11 @@ fun AddTransactionScreen(
         BaseTransactionScreen(
             state = state,
             onEvent = viewModel::onEvent,
-            onSubmit = { viewModel.onSubmitTransaction() },
+            onSubmit = { viewModel.onEvent(BaseTransactionEvent.SubmitAddTransaction) },
             modifier = Modifier
                 .padding(paddingValues)
                 .padding(horizontal = 16.dp),
-            onBackClick = onBackClick,
-            submitButtonText = stringResource(R.string.add_transaction_submit),
-            onTodayClick = { viewModel.setToday() },
-            onYesterdayClick = { viewModel.setYesterday() }
+            submitButtonText = stringResource(R.string.confirm)
         )
 
         // Добавляем секцию кошельков для доходных операций
@@ -222,7 +226,7 @@ fun AddTransactionScreen(
                     .padding(paddingValues)
             ) {
                 androidx.compose.foundation.layout.Spacer(modifier = Modifier.padding(top = 600.dp))
-                com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.WalletSelectionSection(
+                WalletSelectionSection(
                     walletsList = state.walletState.wallets,
                     addToWallet = state.walletState.addToWallet,
                     selectedWallets = state.walletState.selectedWallets,

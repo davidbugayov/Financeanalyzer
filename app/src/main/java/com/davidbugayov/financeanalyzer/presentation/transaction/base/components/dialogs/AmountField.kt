@@ -12,6 +12,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -70,7 +72,7 @@ fun AmountField(
                 contentAlignment = Alignment.CenterEnd,
                 modifier = Modifier.fillMaxWidth()
             ) {
-                OutlinedTextField(
+                TextField(
                     value = amount,
                     onValueChange = { value ->
                         // Принимаем только цифры и точку/запятую для десятичных
@@ -96,10 +98,14 @@ fun AmountField(
                     },
                     isError = isError,
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                    colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = accentColor,
+                    colors = TextFieldDefaults.colors(
                         focusedTextColor = accentColor,
-                        errorBorderColor = MaterialTheme.colorScheme.error
+                        errorContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedIndicatorColor = Color.Transparent,
+                        focusedIndicatorColor = Color.Transparent,
+                        errorIndicatorColor = Color.Transparent
                     ),
                     modifier = Modifier
                         .fillMaxWidth()

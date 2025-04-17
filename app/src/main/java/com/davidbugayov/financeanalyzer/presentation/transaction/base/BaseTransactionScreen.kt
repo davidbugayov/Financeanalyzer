@@ -147,13 +147,9 @@ fun BaseTransactionScreen(
             expenseColor = MaterialTheme.colorScheme.error,
             onDateClick = { onEvent(BaseTransactionEvent.ShowDatePicker) },
             onToggleTransactionType = {
-                if (state.transactionData.isExpense) {
-                    onEvent(BaseTransactionEvent.ForceSetIncomeType)
-                } else {
-                    onEvent(BaseTransactionEvent.ForceSetExpenseType)
-                }
+                onEvent(BaseTransactionEvent.ToggleTransactionType)
             },
-            forceExpense = false,
+            forceExpense = state.forceExpense,
             modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
         )
         
@@ -245,25 +241,12 @@ fun BaseTransactionScreen(
             modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
         )
         
-        // Поле примечания в карточке
-        ElevatedCard(
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 1.dp
-            ),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = 16.dp) // Уменьшенный отступ
-        ) {
-            CommentField(
-                value = state.transactionData.note,
-                onValueChange = { onEvent(BaseTransactionEvent.SetNote(it)) },
-                modifier = Modifier.padding(16.dp)
-            )
-        }
+        // Поле примечания - теперь без обрамления
+        CommentField(
+            value = state.transactionData.note,
+            onValueChange = { onEvent(BaseTransactionEvent.SetNote(it)) },
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
         
         // Добавление в кошельки (для дохода)
         if (!state.transactionData.isExpense && !state.editMode) {
