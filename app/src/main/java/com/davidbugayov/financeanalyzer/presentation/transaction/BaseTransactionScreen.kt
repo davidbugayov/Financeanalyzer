@@ -51,6 +51,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourc
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import timber.log.Timber
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Базовый экран для работы с транзакциями
@@ -60,13 +61,24 @@ import timber.log.Timber
 @Composable
 fun BaseTransactionScreen(
     viewModel: AddTransactionViewModel,
-    categoriesViewModel: CategoriesViewModel,
+    categoriesViewModel: CategoriesViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
-    screenTitle: String,
-    buttonText: String,
+    screenTitle: String = "Добавить транзакцию",
+    buttonText: String = "Добавить",
     isEditMode: Boolean = false
 ) {
+    // Получаем текущее состояние из ViewModel
     val state by viewModel.state.collectAsState()
+
+    // Логируем режим экрана
+    LaunchedEffect(isEditMode) {
+        Timber.d("Экран инициализирован в режиме ${if (isEditMode) "редактирования" else "добавления"} транзакции. editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}")
+    }
+
+    // В режиме редактирования устанавливаем заголовок и текст кнопки
+    val actualScreenTitle = if (isEditMode) "Редактирование транзакции" else screenTitle
+    val actualButtonText = if (isEditMode) "Сохранить" else buttonText
+
     var showCancelConfirmation by remember { mutableStateOf(false) }
 
     // Функция для обработки выхода с экрана
@@ -87,7 +99,7 @@ fun BaseTransactionScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = screenTitle,
+                title = actualScreenTitle,
                 showBackButton = true,
                 onBackClick = {
                     if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
@@ -225,7 +237,7 @@ fun BaseTransactionScreen(
                     onClick = { 
                         viewModel.submitTransaction()
                     },
-                    text = buttonText,
+                    text = actualButtonText,
                     color = currentColor,
                     isLoading = state.isLoading
                 )

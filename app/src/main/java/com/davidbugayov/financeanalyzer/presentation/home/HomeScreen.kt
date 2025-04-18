@@ -65,7 +65,8 @@ fun HomeScreen(
     onNavigateToChart: () -> Unit,
     onNavigateToProfile: () -> Unit,
     onNavigateToBudget: () -> Unit,
-    onNavigateToWallets: () -> Unit = onNavigateToBudget
+    onNavigateToWallets: () -> Unit = onNavigateToBudget,
+    onNavigateToEdit: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -303,10 +304,8 @@ fun HomeScreen(
                     },
                     onEdit = { transaction ->
                         showActionsDialog = false
-                        // Загружаем транзакцию в ViewModel для редактирования
                         addTransactionViewModel.loadTransactionForEditing(transaction)
-                        // Переходим на экран добавления/редактирования
-                        onNavigateToAdd()
+                        onNavigateToEdit(transaction.id)
                         feedbackMessage = "Редактирование транзакции"
                         feedbackType = FeedbackType.INFO
                         showFeedback = true

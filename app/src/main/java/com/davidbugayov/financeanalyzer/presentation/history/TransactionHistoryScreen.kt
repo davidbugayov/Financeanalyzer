@@ -288,7 +288,11 @@ fun TransactionHistoryScreen(
             },
             onEdit = { transaction ->
                 showActionsDialog = false
-                handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction))
+                // Загружаем транзакцию в ViewModel для редактирования
+                addTransactionViewModel.loadTransactionForEditing(transaction)
+                // Переходим на экран редактирования
+                navController.navigate(Screen.EditTransaction.createRoute(transaction.id))
+                Timber.d("Navigating to edit transaction with ID: ${transaction.id}")
             }
         )
     }

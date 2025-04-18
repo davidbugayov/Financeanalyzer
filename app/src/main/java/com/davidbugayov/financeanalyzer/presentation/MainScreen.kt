@@ -39,7 +39,6 @@ import androidx.navigation.navArgument
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
@@ -276,7 +275,8 @@ fun MainScreen(startDestination: String = "home") {
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
                             onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
                             onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
-                            onNavigateToWallets = { navController.navigate(Screen.Wallets.route) }
+                            onNavigateToWallets = { navController.navigate(Screen.Wallets.route) },
+                            onNavigateToEdit = { transactionId -> navController.navigate(Screen.EditTransaction.createRoute(transactionId)) }
                         )
                     }
                     
@@ -431,8 +431,8 @@ fun MainScreen(startDestination: String = "home") {
                                     // Включаем добавление в кошельки и выбираем все кошельки без показа диалога
                                     addTransactionViewModel.selectAllWalletsWithoutDialog()
                                     
-                                    // Форсируем режим расхода (на случай, если где-то сбросится)
-                                    addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetExpenseType)
+                                    // Настраиваем вьюмодель на режим расхода
+                                    addTransactionViewModel.setupForExpenseAddition("", "Списание")
                                     
                                     // Дополнительно логируем состояние после настройки
                                     Timber.d("После настройки из HomeScreen: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}, showWalletSelector=${addTransactionViewModel.state.value.showWalletSelector}")
@@ -489,9 +489,18 @@ fun MainScreen(startDestination: String = "home") {
                     ) { backStackEntry ->
                         val transactionId = 
                             backStackEntry.arguments?.getString("transactionId") ?: ""
+                        
+                        // Логируем переход на экран редактирования
+                        Timber.d("Переход на экран редактирования транзакции: $transactionId")
+                        
+                        // Используем EditTransactionScreen вместо AddTransactionScreen
                         EditTransactionScreen(
-                            viewModel = addTransactionViewModel,
-                            onNavigateBack = { navController.navigateUp() },
+                            viewModel = koinViewModel<AddTransactionViewModel>(),
+                            onNavigateBack = { 
+                                // При возврате обновляем данные и возвращаемся назад
+                                homeViewModel.initiateBackgroundDataRefresh()
+                                navController.navigateUp() 
+                            },
                             transactionId = transactionId
                         )
                     }

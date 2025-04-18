@@ -88,15 +88,11 @@ fun WalletTransactionsScreen(
     // Обработчик нажатия на кнопку "Потратить"
     val navigateToAddTransaction = {
         state.wallet?.let { wallet ->
-            // Настроим экран добавления транзакции
-            addTransactionViewModel.setupForIncomeAddition(
+            // Настроим экран добавления транзакции с именем кошелька в качестве категории
+            addTransactionViewModel.setupForExpenseAddition(
                 amount = "",  // Пустая строка для поля суммы
-                shouldDistribute = false  // Не распределяем автоматически
+                walletCategory = wallet.name  // Используем название кошелька как категорию
             )
-            
-            // Принудительно установим тип "Расход" и категорию, соответствующую кошельку
-            addTransactionViewModel.onEvent(AddTransactionEvent.ToggleTransactionType) // Переключаем на расход
-            addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(wallet.name))
             
             // Переходим на экран добавления транзакции
             navController.navigate(Screen.AddTransaction.route)

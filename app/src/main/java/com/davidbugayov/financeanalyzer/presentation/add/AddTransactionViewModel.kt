@@ -1483,4 +1483,29 @@ class AddTransactionViewModel(
             }
         }
     }
+
+    /**
+     * Загружает транзакцию для редактирования и затем осуществляет навигацию на экран редактирования
+     * @param transaction Транзакция для редактирования
+     * @param onNavigateToEdit Функция для навигации на экран редактирования, принимающая ID транзакции
+     */
+    fun loadTransactionAndNavigateToEdit(transaction: Transaction, onNavigateToEdit: (String) -> Unit) {
+        // Логируем действие
+        Timber.d("Загрузка транзакции для редактирования и навигация: ${transaction.id}")
+        
+        try {
+            // Загружаем транзакцию в текущее состояние
+            loadTransactionForEditing(transaction)
+            
+            // После загрузки переходим на экран редактирования с ID транзакции
+            onNavigateToEdit(transaction.id)
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при подготовке транзакции к редактированию: ${e.message}")
+            _state.update { 
+                it.copy(
+                    error = "Ошибка при подготовке к редактированию: ${e.message}"
+                ) 
+            }
+        }
+    }
 } 

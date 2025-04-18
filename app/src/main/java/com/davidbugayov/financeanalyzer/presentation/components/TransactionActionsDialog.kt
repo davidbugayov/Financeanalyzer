@@ -116,7 +116,7 @@ fun TransactionActionsDialog(
             TextButton(
                 onClick = { 
                     onEdit(transaction)
-                    onDismiss()
+                     onDismiss()
                 }
             ) {
                 Text("Редактировать")

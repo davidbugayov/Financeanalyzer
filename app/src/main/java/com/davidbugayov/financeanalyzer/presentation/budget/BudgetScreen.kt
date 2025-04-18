@@ -246,7 +246,7 @@ fun BudgetScreen(
                                         Timber.d("Категория установлена: ${categoryFromMenu.name}")
                                         
                                         // Явно устанавливаем, что это не расход
-                                        addTransactionViewModel.onEvent(AddTransactionEvent.ForceSetIncomeType)
+                                        addTransactionViewModel.setupForIncomeAddition("", categoryFromMenu.name)
                                         Timber.d("Явно установлено тип транзакции как доход")
 
                                         // Добавляем проверку состояния перед навигацией
