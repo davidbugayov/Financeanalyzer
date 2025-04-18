@@ -24,6 +24,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AmountField
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CategoryPickerDialog
@@ -38,7 +39,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectorDialog
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
@@ -66,7 +66,6 @@ fun BaseTransactionScreen(
     buttonText: String = "Добавить",
     isEditMode: Boolean = false
 ) {
-    // Получаем текущее состояние из ViewModel
     val state by viewModel.state.collectAsState()
 
     // Логируем режим экрана

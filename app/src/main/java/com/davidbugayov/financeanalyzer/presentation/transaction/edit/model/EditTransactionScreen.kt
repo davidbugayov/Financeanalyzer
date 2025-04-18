@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.edit.model
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -11,7 +10,6 @@ import org.koin.androidx.compose.koinViewModel
 
 /**
  * Экран редактирования существующей транзакции
- * Временная имплементация для устранения ошибок компиляции
  */
 @Composable
 fun EditTransactionScreen(
@@ -26,10 +24,6 @@ fun EditTransactionScreen(
             screenName = "edit_transaction",
             screenClass = "EditTransactionScreen"
         )
-
-        // Устанавливаем callback для навигации назад
-        viewModel.navigateBackCallback = onNavigateBack
-        
         // Загружаем транзакцию для редактирования, если передан ID
         transactionId?.let { id ->
             if (id.isNotEmpty()) {
@@ -37,14 +31,6 @@ fun EditTransactionScreen(
             }
         }
     }
-    
-    // Очищаем callback при выходе из композиции
-    DisposableEffect(Unit) {
-        onDispose {
-            viewModel.navigateBackCallback = null
-        }
-    }
-
     // Используем BaseTransactionScreen для отображения UI
     BaseTransactionScreen(
         viewModel = viewModel,

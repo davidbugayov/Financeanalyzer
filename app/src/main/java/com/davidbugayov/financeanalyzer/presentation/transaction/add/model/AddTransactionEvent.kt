@@ -7,7 +7,6 @@ import java.util.Date
  * Следует принципу единственной ответственности (SRP) из SOLID.
  */
 sealed class AddTransactionEvent {
-
     data class SetTitle(val title: String) : AddTransactionEvent()
     data class SetAmount(val amount: String) : AddTransactionEvent()
     data class SetCategory(val category: String) : AddTransactionEvent()
@@ -45,7 +44,6 @@ sealed class AddTransactionEvent {
     object HideSuccessDialog : AddTransactionEvent()
     object ForceSetIncomeType : AddTransactionEvent()
     object ForceSetExpenseType : AddTransactionEvent()
-    
     // События для управления добавлением дохода в кошельки
     data class SetTargetWalletId(val walletId: String) : AddTransactionEvent() // Установка ID целевого кошелька
     object ToggleAddToWallet : AddTransactionEvent() // Переключение флага добавления в кошелек
