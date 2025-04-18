@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.add.components
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -29,54 +28,43 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.domain.model.Source
 
 /**
- * Секция выбора категории
+ * Секция выбора источника средств
  */
 @Composable
-fun CategorySection(
-    categories: List<CategoryItem>,
-    selectedCategory: String,
-    onCategorySelected: (CategoryItem) -> Unit,
-    onAddCategoryClick: () -> Unit,
-    onCategoryLongClick: (CategoryItem) -> Unit = {},
-    isError: Boolean = false
+fun SourceSection(
+    sources: List<Source>,
+    selectedSource: String,
+    onSourceSelected: (Source) -> Unit,
+    onAddSourceClick: () -> Unit,
+    onSourceLongClick: (Source) -> Unit = {}
 ) {
-    Column(modifier = Modifier.fillMaxWidth()) {
-        Text(
-            text = stringResource(R.string.category) + " *",
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
-        )
+    LazyRow(
+        contentPadding = PaddingValues(horizontal = 16.dp),
+        horizontalArrangement = Arrangement.spacedBy(12.dp)
+    ) {
+        items(sources) { source ->
+            SourceItem(
+                source = source,
+                isSelected = source.name == selectedSource,
+                onClick = { onSourceSelected(source) },
+                onLongClick = { onSourceLongClick(source) }
+            )
+        }
 
-        LazyRow(
-            contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
-            items(categories) { category ->
-                CategoryItem(
-                    category = category,
-                    isSelected = category.name == selectedCategory,
-                    onClick = { onCategorySelected(category) },
-                    onLongClick = { onCategoryLongClick(category) },
-                    isError = isError && selectedCategory.isBlank()
-                )
-            }
-
-            item {
-                AddCategoryItem(onClick = onAddCategoryClick)
-            }
+        item {
+            AddSourceItem(onClick = onAddSourceClick)
         }
     }
 }
 
 /**
- * Элемент добавления новой категории
+ * Элемент добавления нового источника
  */
 @Composable
-fun AddCategoryItem(onClick: () -> Unit) {
+fun AddSourceItem(onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
@@ -98,7 +86,7 @@ fun AddCategoryItem(onClick: () -> Unit) {
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
-                contentDescription = stringResource(R.string.add_custom_category),
+                contentDescription = stringResource(R.string.add_custom_source),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
         }
@@ -106,7 +94,7 @@ fun AddCategoryItem(onClick: () -> Unit) {
         Spacer(modifier = Modifier.height(4.dp))
 
         Text(
-            text = stringResource(R.string.add_custom_category),
+            text = stringResource(R.string.add_custom_source),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             maxLines = 1

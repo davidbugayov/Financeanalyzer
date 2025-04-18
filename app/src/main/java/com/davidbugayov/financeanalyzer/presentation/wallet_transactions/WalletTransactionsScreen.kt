@@ -17,9 +17,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
-import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 @Composable

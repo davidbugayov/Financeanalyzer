@@ -46,6 +46,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayo
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
@@ -59,7 +60,7 @@ import timber.log.Timber
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    addTransactionViewModel: com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel,
+    addTransactionViewModel: AddTransactionViewModel,
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit,

@@ -14,7 +14,6 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material3.AlertDialog
@@ -22,8 +21,6 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
@@ -43,17 +40,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletAction
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
@@ -65,7 +61,6 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material.icons.filled.CalendarMonth
@@ -73,7 +68,6 @@ import androidx.compose.foundation.clickable
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
 import androidx.compose.runtime.DisposableEffect
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent

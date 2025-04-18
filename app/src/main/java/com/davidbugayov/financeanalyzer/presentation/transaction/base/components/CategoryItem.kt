@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.add.components
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -22,9 +22,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 
 /**
  * Элемент категории

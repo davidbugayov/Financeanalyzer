@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.add.state
+package com.davidbugayov.financeanalyzer.presentation.transaction.add.state
 
 import java.util.Date
 

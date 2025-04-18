@@ -23,7 +23,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

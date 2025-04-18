@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.add.components
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text

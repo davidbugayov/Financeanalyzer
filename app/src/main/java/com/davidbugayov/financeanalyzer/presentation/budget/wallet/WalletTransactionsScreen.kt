@@ -42,15 +42,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -58,8 +54,6 @@ import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 @Composable
 fun WalletTransactionsScreen(

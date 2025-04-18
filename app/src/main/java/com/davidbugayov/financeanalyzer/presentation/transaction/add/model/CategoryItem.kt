@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.add.model
+package com.davidbugayov.financeanalyzer.presentation.transaction.add.model
 
 import androidx.compose.ui.graphics.vector.ImageVector
 

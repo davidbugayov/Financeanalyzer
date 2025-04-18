@@ -1,13 +1,11 @@
-package com.davidbugayov.financeanalyzer.presentation.add
+package com.davidbugayov.financeanalyzer.presentation.transaction.add
 
 import android.app.Application
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -17,9 +15,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionState
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
@@ -33,7 +30,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
-import java.util.Locale
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 
 /**

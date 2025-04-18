@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.add.components
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 
 /**
  * Диалог выбора категории

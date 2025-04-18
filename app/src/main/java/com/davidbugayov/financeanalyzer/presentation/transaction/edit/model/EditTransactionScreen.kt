@@ -1,26 +1,13 @@
-package com.davidbugayov.financeanalyzer.presentation.edit
+package com.davidbugayov.financeanalyzer.presentation.transaction.edit.model
 
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.style.TextAlign
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 /**
  * Экран редактирования существующей транзакции

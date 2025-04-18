@@ -2,7 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.state
 
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 import java.util.Date
 
 /**

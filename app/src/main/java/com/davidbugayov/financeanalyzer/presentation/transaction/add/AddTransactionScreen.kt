@@ -1,10 +1,9 @@
-package com.davidbugayov.financeanalyzer.presentation.add
+package com.davidbugayov.financeanalyzer.presentation.transaction.add
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils

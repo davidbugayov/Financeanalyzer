@@ -36,14 +36,14 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
-import com.davidbugayov.financeanalyzer.presentation.edit.EditTransactionScreen
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
@@ -65,7 +65,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
  * Главный экран приложения, содержащий навигацию между различными разделами.
