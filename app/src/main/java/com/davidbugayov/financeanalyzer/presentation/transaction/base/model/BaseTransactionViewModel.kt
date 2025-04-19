@@ -5,6 +5,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent> : ViewModel(), TransactionScreenViewModel<S, E> {
     protected abstract val _state: MutableStateFlow<S>
@@ -39,5 +43,65 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, smallWidgetIds)
             context.sendBroadcast(intent)
         }
+    }
+
+    /**
+     * Универсальный метод для обновления баланса кошельков после транзакции (доход/расход)
+     */
+    protected suspend fun updateWalletsAfterTransaction(
+        walletRepository: WalletRepository,
+        walletIds: List<String>,
+        totalAmount: Money,
+        isExpense: Boolean
+    ) {
+        if (walletIds.isEmpty()) return
+        withContext(Dispatchers.IO) {
+            try {
+                val walletsList = walletRepository.getWalletsByIds(walletIds)
+                if (walletsList.isEmpty()) return@withContext
+                val amountPerWallet = totalAmount / walletsList.size
+                for (wallet in walletsList) {
+                    val updatedWallet = wallet.copy(
+                        balance = if (isExpense) wallet.balance.minus(amountPerWallet)
+                                   else wallet.balance.plus(amountPerWallet)
+                    )
+                    walletRepository.updateWallet(updatedWallet)
+                }
+            } catch (e: Exception) {
+                // Можно добавить Timber.e(e) для логирования
+            }
+        }
+    }
+
+    /**
+     * Универсальная валидация обязательных полей (amount, category, source)
+     * Вызывать из наследников для обновления ошибок
+     */
+    protected fun validateBaseFields(
+        amount: String,
+        category: String,
+        source: String,
+        updateState: (amountError: Boolean, categoryError: Boolean, sourceError: Boolean, errorMsg: String?) -> Unit
+    ): Boolean {
+        var isValid = true
+        val amountError = amount.isBlank()
+        val categoryError = category.isBlank()
+        val sourceError = source.isBlank()
+        var errorMsg: String? = null
+        if (amountError) isValid = false
+        if (categoryError) isValid = false
+        if (sourceError) isValid = false
+        errorMsg = when {
+            amountError && categoryError && sourceError -> "Заполните сумму, категорию и источник"
+            amountError && categoryError -> "Заполните сумму и категорию"
+            amountError && sourceError -> "Заполните сумму и источник"
+            categoryError && sourceError -> "Заполните категорию и источник"
+            amountError -> "Введите сумму транзакции"
+            categoryError -> "Выберите категорию"
+            sourceError -> "Выберите источник"
+            else -> null
+        }
+        updateState(amountError, categoryError, sourceError, errorMsg)
+        return isValid
     }
 } 

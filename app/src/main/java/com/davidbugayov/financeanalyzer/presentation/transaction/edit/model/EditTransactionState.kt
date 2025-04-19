@@ -46,5 +46,6 @@ data class EditTransactionState(
     override val showWalletSelector: Boolean = false,
     override val targetWalletId: String? = null,
     override val forceExpense: Boolean = false,
-    val isEdited: Boolean = false
+    val isEdited: Boolean = false,
+    override val sourceError: Boolean = false
 ) : com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState 

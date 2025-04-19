@@ -45,5 +45,6 @@ data class AddTransactionState(
     override val targetWalletId: String? = null, // ID целевого кошелька для добавления дохода
     override val forceExpense: Boolean = false, // Принудительно использовать тип "Расход"
     override val editMode: Boolean = false, // Режим редактирования (по умолчанию выключен)
-    override val transactionToEdit: Transaction? = null // Транзакция для редактирования
+    override val transactionToEdit: Transaction? = null, // Транзакция для редактирования
+    override val sourceError: Boolean = false
 ) : com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState 

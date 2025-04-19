@@ -103,7 +103,8 @@ val appModule = module {
             updateTransactionUseCase = get(),
             transactionRepository = get(),
             categoriesViewModel = get(),
-            sourcePreferences = get()
+            sourcePreferences = get(),
+            walletRepository = get()
         )
     }
 

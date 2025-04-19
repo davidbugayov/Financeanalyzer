@@ -40,8 +40,8 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.delet
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
-    private val categoriesViewModel: CategoriesViewModel,
-    private val sourcePreferences: SourcePreferences,
+    protected val categoriesViewModel: CategoriesViewModel,
+    protected val sourcePreferences: SourcePreferences,
     private val walletRepository: WalletRepository
 ) : BaseTransactionViewModel<AddTransactionState, AddTransactionEvent>() {
 
@@ -51,7 +51,7 @@ class AddTransactionViewModel(
     }
 
     // Храним категории, которые были использованы в этой сессии
-    private val usedCategories = mutableSetOf<Pair<String, Boolean>>() // category to isExpense
+    protected val usedCategories = mutableSetOf<Pair<String, Boolean>>() // category to isExpense
     
     /**
      * Флаг автоматического распределения дохода по категориям бюджета.
@@ -552,7 +552,28 @@ class AddTransactionViewModel(
                 _state.update { it.copy(customSource = event.source) }
             }
             is AddTransactionEvent.AddCustomSource -> {
-                addCustomSource(event.source, event.color)
+                try {
+                    if (event.source.isBlank()) {
+                        _state.update { it.copy(error = "Название источника не может быть пустым") }
+                        return
+                    }
+                    val newSource = Source(name = event.source, color = event.color, isCustom = true)
+                    val updatedSources = addCustomSource(sourcePreferences, _state.value.sources, newSource)
+                    _state.update {
+                        it.copy(
+                            sources = updatedSources,
+                            source = event.source,
+                            sourceColor = event.color,
+                            showSourcePicker = false,
+                            showCustomSourceDialog = false,
+                            customSource = ""
+                        )
+                    }
+                    Timber.d("Custom source added directly: ${newSource.name} with color ${newSource.color}")
+                } catch (e: Exception) {
+                    Timber.e(e, "Error adding custom source: ${e.message}")
+                    _state.update { it.copy(error = "Ошибка при добавлении источника: ${e.message}") }
+                }
             }
             is AddTransactionEvent.SetSourceColor -> {
                 _state.update { it.copy(sourceColor = event.color) }
@@ -671,42 +692,25 @@ class AddTransactionViewModel(
         }
     }
 
-    private fun validateInput(): Boolean {
-        var isValid = true
-
-        viewModelScope.launch {
-            var money = Money.zero()
-
-            try {
-                // Используем parseFormattedAmount для преобразования строки в Money
-                money = Money.fromString(_state.value.amount)
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при парсинге суммы: ${_state.value.amount}")
-            }
-
-            val hasInvalidAmount = money.isZero() || _state.value.amount.isBlank()
-            val hasInvalidCategory = _state.value.category.isBlank()
-
-            val hasErrors = hasInvalidAmount || hasInvalidCategory
-
-            if (hasErrors) {
-                isValid = false
-                _state.update {
-                    it.copy(
-                        amountError = hasInvalidAmount,
-                        categoryError = hasInvalidCategory,
-                        error = when {
-                            hasInvalidAmount && hasInvalidCategory -> "Введите сумму и категорию"
-                            hasInvalidAmount -> "Введите сумму транзакции"
-                            hasInvalidCategory -> "Выберите категорию"
-                            else -> null
-                        }
-                    )
-                }
+    /**
+     * Проверяет валидность введенных данных перед добавлением транзакции
+     */
+    protected fun validateInput(): Boolean {
+        val currentState = _state.value
+        return validateBaseFields(
+            amount = currentState.amount,
+            category = currentState.category,
+            source = currentState.source
+        ) { amountError, categoryError, sourceError, errorMsg ->
+            _state.update {
+                it.copy(
+                    amountError = amountError,
+                    categoryError = categoryError,
+                    sourceError = sourceError,
+                    error = errorMsg
+                )
             }
         }
-
-        return isValid
     }
 
     /**
@@ -783,11 +787,13 @@ class AddTransactionViewModel(
                         
                         // Если это доход и установлен флаг добавления в кошелек
                         if (!currentState.isExpense && currentState.addToWallet) {
-                            // Распределяем доход по выбранным кошелькам
                             if (currentState.selectedWallets.isNotEmpty()) {
-                                addIncomeToWallets(
+                                // Используем универсальный метод из Base
+                                updateWalletsAfterTransaction(
+                                    walletRepository = walletRepository,
                                     walletIds = currentState.selectedWallets,
-                                    totalAmount = Money(amount)
+                                    totalAmount = Money(amount),
+                                    isExpense = false
                                 )
                             }
                         }
@@ -892,9 +898,9 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Добавляет новую пользовательскую категорию
+     * Добавляет пользовательскую категорию в соответствующий список
      */
-    private fun addCustomCategory(category: String) {
+    protected fun addCustomCategory(category: String) {
         if (category.isBlank()) return
         categoriesViewModel.addCustomCategory(category, _state.value.isExpense)
         _state.update {
@@ -908,9 +914,9 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Добавляет новый пользовательский источник
+     * Добавляет пользовательский источник в список источников
      */
-    private fun addCustomSource(source: String, color: Int) {
+    protected fun addCustomSource(source: String, color: Int) {
         try {
             if (source.isBlank()) {
                 _state.update { it.copy(error = "Название источника не может быть пустым") }
@@ -928,15 +934,18 @@ class AddTransactionViewModel(
                     customSource = ""
                 )
             }
+            // Log the source addition for debugging
+            Timber.d("Custom source added: ${newSource.name} with color ${newSource.color}. Updated sources: ${updatedSources.map { it.name }}")
         } catch (e: Exception) {
-            _state.update { it.copy(error = e.message) }
+            Timber.e(e, "Error adding custom source: ${e.message}")
+            _state.update { it.copy(error = "Ошибка при добавлении источника: ${e.message}") }
         }
     }
 
     /**
-     * Удаляет категорию
+     * Удаляет категорию из списка категорий
      */
-    private fun deleteCategory(category: String) {
+    protected fun deleteCategory(category: String) {
         // Проверяем, что категория существует и не равна "Другое"
         if (category == "Другое") {
             _state.update { it.copy(error = "Категорию \"Другое\" нельзя удалить") }
@@ -962,9 +971,9 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Удаляет источник
+     * Удаляет источник из списка источников
      */
-    private fun deleteSource(source: String) {
+    protected fun deleteSource(source: String) {
         // Проверяем, что источник существует и не является стандартным
         if (source == "Сбер" || source == "Наличные" || source == "Т-Банк") {
             _state.update { it.copy(error = "Стандартные источники удалить нельзя") }
@@ -1038,24 +1047,8 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Валидирует сумму транзакции
+     * Выбранная валюта (рубль по умолчанию)
      */
-    private fun validateAmount() {
-        try {
-            val money = Money.fromString(_state.value.amount)
-            val hasInvalidAmount = money.isZero() || _state.value.amount.isBlank()
-            if (hasInvalidAmount) {
-                _state.update { it.copy(amountError = true) }
-            } else {
-                _state.update { it.copy(amountError = false) }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при парсинге суммы: ${_state.value.amount}")
-            _state.update { it.copy(amountError = true) }
-        }
-    }
-
-    // Выбранная валюта (рубль по умолчанию)
     private val selectedCurrency = Currency.RUB
 
     /**
@@ -1089,7 +1082,7 @@ class AddTransactionViewModel(
      * Сохраняет транзакцию
      */
     fun saveTransaction() {
-        validateAmount()
+        validateInput()
         if (_state.value.amountError) {
             return
         }

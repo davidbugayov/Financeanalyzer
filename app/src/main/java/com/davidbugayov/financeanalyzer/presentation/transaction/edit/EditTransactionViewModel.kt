@@ -26,16 +26,22 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.delet
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 
 class EditTransactionViewModel(
     application: Application,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val transactionRepository: TransactionRepository,
     private val categoriesViewModel: CategoriesViewModel,
-    private val sourcePreferences: SourcePreferences
+    private val sourcePreferences: SourcePreferences,
+    private val walletRepository: WalletRepository
 ) : BaseTransactionViewModel<EditTransactionState, EditTransactionEvent>() {
 
-    override val wallets: List<Wallet> = emptyList()
+    private val _wallets = kotlinx.coroutines.flow.MutableStateFlow<List<Wallet>>(emptyList())
+    override val wallets: List<Wallet>
+        get() = _wallets.value
 
     protected override val _state = MutableStateFlow(EditTransactionState())
 
@@ -56,6 +62,15 @@ class EditTransactionViewModel(
             val sources = getInitialSources(sourcePreferences)
             _state.update { it.copy(sources = sources) }
         }
+        // Загружаем кошельки
+        viewModelScope.launch {
+            try {
+                val walletsList = walletRepository.getAllWallets()
+                _wallets.value = walletsList
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке кошельков")
+            }
+        }
     }
 
     override fun onEvent(event: EditTransactionEvent, context: android.content.Context) {
@@ -63,7 +78,13 @@ class EditTransactionViewModel(
             is EditTransactionEvent.LoadTransaction -> loadTransactionForEdit(event.id)
             is EditTransactionEvent.SubmitEdit -> submitTransaction(context)
             is EditTransactionEvent.SetSource -> {
-                _state.update { it.copy(source = event.source) }
+                val selectedSource = _state.value.sources.find { it.name == event.source }
+                _state.update {
+                    it.copy(
+                        source = event.source,
+                        sourceColor = selectedSource?.color ?: it.sourceColor
+                    )
+                }
             }
             is EditTransactionEvent.SetSourceColor -> {
                 _state.update { it.copy(sourceColor = event.color) }
@@ -166,12 +187,33 @@ class EditTransactionViewModel(
             }
             // Обрабатываем ToggleTransactionType
             is EditTransactionEvent.ToggleTransactionType -> {
+                val newIsExpense = !_state.value.isExpense
+                Timber.d("Переключение типа транзакции: isExpense=$newIsExpense (было ${_state.value.isExpense})")
+                
+                // Сохраняем предыдущий источник
+                val previousSource = _state.value.source
+                val previousSourceColor = _state.value.sourceColor
+                
                 _state.update { 
                     it.copy(
-                        isExpense = !it.isExpense,
+                        isExpense = newIsExpense,
                         // Сбрасываем категорию при переключении типа транзакции
                         category = ""
                     )
+                }
+                
+                Timber.d("После переключения: isExpense=${_state.value.isExpense}, source=$previousSource")
+                
+                // Уведомляем систему о смене типа для корректного обновления UI
+                viewModelScope.launch {
+                    kotlinx.coroutines.delay(50) // Небольшая задержка для правильного обновления UI
+                    _state.update {
+                        it.copy(
+                            // Сохраняем прежний источник
+                            source = previousSource,
+                            sourceColor = previousSourceColor
+                        )
+                    }
                 }
             }
             // Обрабатываем SetCategory 
@@ -191,6 +233,30 @@ class EditTransactionViewModel(
             is EditTransactionEvent.SetNote -> {
                 _state.update { it.copy(note = event.note) }
             }
+            // --- ДОБАВЛЯЕМ ОБРАБОТКУ КОШЕЛЬКОВ ---
+            is EditTransactionEvent.ToggleAddToWallet -> {
+                _state.update { it.copy(addToWallet = !it.addToWallet) }
+            }
+            is EditTransactionEvent.ShowWalletSelector -> {
+                _state.update { it.copy(showWalletSelector = true) }
+            }
+            is EditTransactionEvent.HideWalletSelector -> {
+                _state.update { it.copy(showWalletSelector = false) }
+            }
+            is EditTransactionEvent.SelectWallet -> {
+                val updated = if (event.selected) {
+                    _state.value.selectedWallets + event.walletId
+                } else {
+                    _state.value.selectedWallets - event.walletId
+                }
+                _state.update { it.copy(selectedWallets = updated) }
+            }
+            is EditTransactionEvent.HideSuccessDialog -> {
+                _state.update { it.copy(isSuccess = false) }
+            }
+            is EditTransactionEvent.ClearError -> {
+                _state.update { it.copy(error = null) }
+            }
             else -> { /* обработка других событий */ }
         }
     }
@@ -204,44 +270,76 @@ class EditTransactionViewModel(
     }
 
     override fun submitTransaction(context: android.content.Context) {
-        // Показываем индикатор загрузки
-        _state.update { it.copy(isLoading = true) }
-        
-        // Получаем транзакцию для обновления
-        val transactionToUpdate = prepareTransactionForEdit()
-        
-        // Обновляем транзакцию и виджет
-        if (transactionToUpdate != null) {
-            viewModelScope.launch {
-                try {
-                    updateTransactionUseCase(transactionToUpdate)
-                    Timber.d("Транзакция успешно обновлена: ${transactionToUpdate.id}")
-                    
-                    // Обновляем виджет
-                    updateWidget(context)
-                    
-                    // Показываем сообщение об успехе
-                    _state.update { 
-                        it.copy(
-                            isSuccess = true,
-                            error = null,
-                            isLoading = false
-                        ) 
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "Ошибка при обновлении транзакции")
-                    _state.update { 
-                        it.copy(
-                            error = e.message ?: "Ошибка при обновлении транзакции",
-                            isSuccess = false, 
-                            isLoading = false
-                        ) 
+        // Проверка обязательных полей
+        if (validateFields()) {
+            // Показываем индикатор загрузки
+            _state.update { it.copy(isLoading = true) }
+            
+            // Получаем транзакцию для обновления
+            val transactionToUpdate = prepareTransactionForEdit()
+            
+            // Обновляем транзакцию и виджет
+            if (transactionToUpdate != null) {
+                viewModelScope.launch {
+                    try {
+                        updateTransactionUseCase(transactionToUpdate)
+                        Timber.d("Транзакция успешно обновлена: ${transactionToUpdate.id}")
+                        
+                        // Обновляем кошельки, если нужно
+                        val currentState = _state.value
+                        if (currentState.addToWallet && currentState.selectedWallets.isNotEmpty()) {
+                            updateWalletsAfterTransaction(
+                                walletRepository = walletRepository,
+                                walletIds = currentState.selectedWallets,
+                                totalAmount = transactionToUpdate.amount,
+                                isExpense = currentState.isExpense
+                            )
+                        }
+                        // Обновляем виджет
+                        updateWidget(context)
+                        
+                        // Показываем сообщение об успехе
+                        _state.update { 
+                            it.copy(
+                                isSuccess = true,
+                                error = null,
+                                isLoading = false
+                            ) 
+                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при обновлении транзакции")
+                        _state.update { 
+                            it.copy(
+                                error = e.message ?: "Ошибка при обновлении транзакции",
+                                isSuccess = false, 
+                                isLoading = false
+                            ) 
+                        }
                     }
                 }
+            } else {
+                // Если транзакция не найдена, сбрасываем индикатор загрузки
+                _state.update { it.copy(isLoading = false, error = "Транзакция не найдена") }
             }
-        } else {
-            // Если транзакция не найдена, сбрасываем индикатор загрузки
-            _state.update { it.copy(isLoading = false, error = "Транзакция не найдена") }
+        }
+    }
+
+    // Validate required fields
+    private fun validateFields(): Boolean {
+        val currentState = _state.value
+        return validateBaseFields(
+            amount = currentState.amount,
+            category = currentState.category,
+            source = currentState.source
+        ) { amountError, categoryError, sourceError, errorMsg ->
+            _state.update {
+                it.copy(
+                    amountError = amountError,
+                    categoryError = categoryError,
+                    sourceError = sourceError,
+                    error = errorMsg
+                )
+            }
         }
     }
 
@@ -254,18 +352,36 @@ class EditTransactionViewModel(
                 if (transaction != null) {
                     Timber.d("Транзакция найдена: $transaction")
                     
-                    // Форматируем сумму как строку без знака минус
-                    val formattedAmount = transaction.amount.abs().amount.toString()
+                    // Форматируем сумму с помощью метода Money.format
+                    val formattedAmount = transaction.amount.abs().format(showCurrency = false)
                     Timber.d("Форматированная сумма: $formattedAmount (исходная: ${transaction.amount})")
-                    
+
+                    // Проверяем, есть ли категория в списке
+                    val isExpense = transaction.isExpense
+                    val categories = if (isExpense) _state.value.expenseCategories else _state.value.incomeCategories
+                    val categoryName = transaction.category ?: ""
+                    val categoryExists = categories.any { it.name == categoryName }
+                    val updatedCategories = if (!categoryExists && categoryName.isNotBlank()) {
+                        categories + com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem(
+                            name = categoryName,
+                            icon = Icons.Default.MoreHoriz // дефолтная иконка для кастомной категории
+                        )
+                    } else categories
+
+                    if (isExpense) {
+                        _state.update { it.copy(expenseCategories = updatedCategories) }
+                    } else {
+                        _state.update { it.copy(incomeCategories = updatedCategories) }
+                    }
+
                     _state.update { it.copy(
                         transactionToEdit = transaction,
                         title = transaction.title ?: "",
                         amount = formattedAmount,
-                        category = transaction.category ?: "",
+                        category = categoryName,
                         note = transaction.note ?: "",
                         selectedDate = transaction.date,
-                        isExpense = transaction.isExpense,
+                        isExpense = isExpense,
                         source = transaction.source,
                         sourceColor = transaction.sourceColor
                     ) }
@@ -286,11 +402,25 @@ class EditTransactionViewModel(
     private fun prepareTransactionForEdit(): Transaction? {
         val currentState = _state.value
         
+        // Проверка обязательных полей
+        if (currentState.category.isBlank()) {
+            Timber.d("Category is blank, cannot prepare transaction")
+            return null
+        }
+        
+        if (currentState.source.isBlank()) {
+            Timber.d("Source is blank, cannot prepare transaction")
+            return null
+        }
+        
         // Получаем сумму из строки
         val amount = currentState.amount.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
         
         // Инвертируем сумму, если это расход
         val finalAmount = if (currentState.isExpense) -amount else amount
+        
+        // Log the transaction preparation
+        Timber.d("Preparing transaction for edit: category=${currentState.category}, source=${currentState.source}, amount=$finalAmount")
         
         return currentState.transactionToEdit?.copy(
             title = currentState.title,

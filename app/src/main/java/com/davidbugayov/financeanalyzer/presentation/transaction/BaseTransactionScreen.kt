@@ -21,13 +21,21 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
+import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
+import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.AddTransactionEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.EditTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AmountField
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CategoryPickerDialog
@@ -42,20 +50,15 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectorDialog
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
-import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
-import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
-import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.EditTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.TransactionScreenViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import timber.log.Timber
+import java.util.Date
 import org.koin.androidx.compose.koinViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.TransactionScreenViewModel
-import androidx.compose.ui.platform.LocalContext
+import timber.log.Timber
 
 /**
  * Базовый экран для работы с транзакциями
@@ -64,14 +67,14 @@ import androidx.compose.ui.platform.LocalContext
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun <E> BaseTransactionScreen(
-    viewModel: TransactionScreenViewModel<out com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState, E>,
+    viewModel: TransactionScreenViewModel<out BaseTransactionState, E>,
     categoriesViewModel: CategoriesViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
     screenTitle: String = "Добавить транзакцию",
     buttonText: String = "Добавить",
     isEditMode: Boolean = false,
-    eventFactory: (String) -> E, // фабрика событий для универсальности (например, SetCategory)
-    submitEvent: E // событие для сабмита (например, AddTransactionEvent.Submit)
+    eventFactory: (Any) -> E,
+    submitEvent: E
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -153,18 +156,22 @@ fun <E> BaseTransactionScreen(
                         )
                     )
 
+                    Timber.d("Rendering SourceSection with isExpense=" + state.isExpense + ", selectedSource=" + state.source + ", sources count=" + state.sources.size)
+                    
                     SourceSection(
                         sources = state.sources,
                         selectedSource = state.source,
-                        onSourceSelected = { source ->
-                            viewModel.onEvent(eventFactory("SetSource(source.name)"), context)
-                            viewModel.onEvent(eventFactory("SetSourceColor(source.color)"), context)
+                        onSourceSelected = { selectedSource -> 
+                            Timber.d("Source selected directly: " + selectedSource.name + " with color " + selectedSource.color)
+                            viewModel.onEvent(eventFactory(selectedSource), context)
                         },
                         onAddSourceClick = {
+                            Timber.d("Add source button clicked")
                             viewModel.onEvent(eventFactory("ShowCustomSourceDialog"), context)
                         },
-                        onSourceLongClick = { source ->
-                            viewModel.onEvent(eventFactory("ShowDeleteSourceConfirmDialog(source.name)"), context)
+                        onSourceLongClick = { selectedSource -> 
+                            Timber.d("Source long clicked: " + selectedSource.name)
+                            viewModel.onEvent(eventFactory(Pair("DeleteSourceConfirm", selectedSource)), context)
                         }
                     )
                 }
@@ -173,14 +180,16 @@ fun <E> BaseTransactionScreen(
                 CategorySection(
                     categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
                     selectedCategory = state.category,
-                    onCategorySelected = { category ->
-                        viewModel.onEvent(eventFactory("SetCategory(category.name)"), context)
+                    onCategorySelected = { selectedCategory -> 
+                        Timber.d("Category selected directly: " + selectedCategory.name)
+                        viewModel.onEvent(eventFactory(selectedCategory), context)
                     },
                     onAddCategoryClick = {
                         viewModel.onEvent(eventFactory("ShowCustomCategoryDialog"), context)
                     },
-                    onCategoryLongClick = { category ->
-                        viewModel.onEvent(eventFactory("ShowDeleteCategoryConfirmDialog(category.name)"), context)
+                    onCategoryLongClick = { selectedCategory -> 
+                        Timber.d("Category long clicked: " + selectedCategory.name)
+                        viewModel.onEvent(eventFactory(Pair("DeleteCategoryConfirm", selectedCategory)), context)
                     },
                     isError = state.categoryError
                 )
@@ -188,7 +197,8 @@ fun <E> BaseTransactionScreen(
                 // Поле ввода суммы
                 AmountField(
                     amount = state.amount,
-                    onAmountChange = { viewModel.onEvent(eventFactory("SetAmount(it)"), context) },
+                    onAmountChange = { amount -> 
+                        viewModel.onEvent(eventFactory(Pair("SetAmount", amount)), context) },
                     isError = state.amountError,
                     accentColor = currentColor
                 )
@@ -207,8 +217,8 @@ fun <E> BaseTransactionScreen(
                 // Поле для комментария без иконки прикрепления
                 CommentField(
                     note = state.note,
-                    onNoteChange = { note ->
-                        viewModel.onEvent(eventFactory("SetNote(note)"), context)
+                    onNoteChange = { note -> 
+                        viewModel.onEvent(eventFactory(Pair("SetNote", note)), context)
                     },
                     onAttachClick = { /* действие удалено */ }
                 )
@@ -279,16 +289,10 @@ fun <E> BaseTransactionScreen(
             }
 
             if (state.showDatePicker) {
-                val selectedDate = remember { mutableStateOf(state.selectedDate) }
                 DatePickerDialog(
                     initialDate = state.selectedDate,
-                    onDateSelected = { date ->
-                        selectedDate.value = date
-                        if (viewModel is EditTransactionViewModel) {
-                            viewModel.onEvent(EditTransactionEvent.SetDate(date), context)
-                        } else if (viewModel is AddTransactionViewModel) {
-                            viewModel.onEvent(AddTransactionEvent.SetDate(date), context)
-                        }
+                    onDateSelected = { date -> 
+                        viewModel.onEvent(eventFactory(date), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideDatePicker"), context)
@@ -299,8 +303,9 @@ fun <E> BaseTransactionScreen(
             if (state.showCategoryPicker) {
                 CategoryPickerDialog(
                     categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
-                    onCategorySelected = { category ->
-                        viewModel.onEvent(eventFactory("SetCategory(category)"), context)
+                    onCategorySelected = { categoryName ->
+                        Timber.d("Category selected from dialog: $categoryName")
+                        viewModel.onEvent(eventFactory(categoryName), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideCategoryPicker"), context)
@@ -314,11 +319,11 @@ fun <E> BaseTransactionScreen(
             if (state.showCustomCategoryDialog) {
                 CustomCategoryDialog(
                     categoryText = state.customCategory,
-                    onCategoryTextChange = { name ->
-                        viewModel.onEvent(eventFactory("SetCustomCategory(name)"), context)
+                    onCategoryTextChange = { name -> 
+                        viewModel.onEvent(eventFactory(Pair("SetCustomCategoryText", name)), context)
                     },
                     onConfirm = {
-                        viewModel.onEvent(eventFactory("AddCustomCategory(state.customCategory)"), context)
+                        viewModel.onEvent(eventFactory(Pair("AddCustomCategoryConfirm", state.customCategory)), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideCustomCategoryDialog"), context)
@@ -330,7 +335,7 @@ fun <E> BaseTransactionScreen(
                 DeleteCategoryConfirmDialog(
                     category = state.categoryToDelete ?: "",
                     onConfirm = {
-                        viewModel.onEvent(eventFactory("DeleteCategory(state.categoryToDelete ?: \"\")"), context)
+                        viewModel.onEvent(eventFactory(Pair("DeleteCategoryConfirmActual", state.categoryToDelete ?: "")), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideDeleteCategoryConfirmDialog"), context)
@@ -342,7 +347,7 @@ fun <E> BaseTransactionScreen(
                 DeleteSourceConfirmDialog(
                     source = state.sourceToDelete ?: "",
                     onConfirm = {
-                        viewModel.onEvent(eventFactory("DeleteSource(state.sourceToDelete ?: \"\")"), context)
+                        viewModel.onEvent(eventFactory(Pair("DeleteSourceConfirmActual", state.sourceToDelete ?: "")), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideDeleteSourceConfirmDialog"), context)
@@ -354,8 +359,7 @@ fun <E> BaseTransactionScreen(
                 SourcePickerDialog(
                     sources = state.sources,
                     onSourceSelected = { source ->
-                        viewModel.onEvent(eventFactory("SetSource(source.name)"), context)
-                        viewModel.onEvent(eventFactory("SetSourceColor(source.color)"), context)
+                        viewModel.onEvent(eventFactory(source), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideSourcePicker"), context)
@@ -371,13 +375,13 @@ fun <E> BaseTransactionScreen(
                     sourceName = state.customSource,
                     color = state.sourceColor,
                     onSourceNameChange = { name ->
-                        viewModel.onEvent(eventFactory("SetCustomSource(name)"), context)
+                        viewModel.onEvent(eventFactory(Pair("SetCustomSourceName", name)), context)
                     },
                     onColorClick = { selectedColor ->
-                        viewModel.onEvent(eventFactory("SetSourceColor(selectedColor)"), context)
+                        viewModel.onEvent(eventFactory(Pair("SetCustomSourceColor", selectedColor)), context)
                     },
                     onConfirm = {
-                        viewModel.onEvent(eventFactory("AddCustomSource(state.customSource, state.sourceColor)"), context)
+                        viewModel.onEvent(eventFactory(Triple("AddCustomSourceConfirm", state.customSource, state.sourceColor)), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideCustomSourceDialog"), context)
@@ -389,7 +393,7 @@ fun <E> BaseTransactionScreen(
                 ColorPickerDialog(
                     initialColor = state.sourceColor,
                     onColorSelected = { color ->
-                        viewModel.onEvent(eventFactory("SetSourceColor(color)"), context)
+                        viewModel.onEvent(eventFactory(Pair("SetSourceColor", color)), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideColorPicker"), context)
@@ -402,7 +406,7 @@ fun <E> BaseTransactionScreen(
                     wallets = viewModel.wallets,
                     selectedWalletIds = state.selectedWallets,
                     onWalletSelected = { walletId, selected ->
-                        viewModel.onEvent(eventFactory("SelectWallet(walletId, selected)"), context)
+                        viewModel.onEvent(eventFactory(Triple("SelectWallet", walletId, selected)), context)
                     },
                     onConfirm = {
                         viewModel.onEvent(eventFactory("HideWalletSelector"), context)

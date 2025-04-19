@@ -50,4 +50,5 @@ interface BaseTransactionState {
     val showWalletSelector: Boolean
     val targetWalletId: String?
     val forceExpense: Boolean
+    val sourceError: Boolean
 } 

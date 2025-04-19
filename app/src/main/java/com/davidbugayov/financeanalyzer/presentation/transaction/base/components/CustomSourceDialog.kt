@@ -16,6 +16,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -27,6 +29,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
+import timber.log.Timber
 
 @Composable
 fun CustomSourceDialog(
@@ -38,15 +41,32 @@ fun CustomSourceDialog(
     onDismiss: () -> Unit
 ) {
     var showColorPicker by remember { mutableStateOf(false) }
+    
+    // Log when the dialog is opened and closed
+    LaunchedEffect(Unit) {
+        Timber.d("CustomSourceDialog opened with name='$sourceName', color=$color")
+    }
+    
+    DisposableEffect(Unit) {
+        onDispose {
+            Timber.d("CustomSourceDialog closed")
+        }
+    }
 
     AlertDialog(
-        onDismissRequest = onDismiss,
+        onDismissRequest = {
+            Timber.d("CustomSourceDialog dismissed via outside click")
+            onDismiss()
+        },
         title = { Text(stringResource(R.string.add_custom_source)) },
         text = {
             Column {
                 OutlinedTextField(
                     value = sourceName,
-                    onValueChange = onSourceNameChange,
+                    onValueChange = { 
+                        Timber.d("Source name changed to: '$it'")
+                        onSourceNameChange(it) 
+                    },
                     label = { Text(stringResource(R.string.source_name)) },
                     modifier = Modifier.fillMaxWidth()
                 )
@@ -56,7 +76,10 @@ fun CustomSourceDialog(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable { showColorPicker = true }
+                        .clickable { 
+                            Timber.d("Color picker clicked, showing color picker dialog")
+                            showColorPicker = true 
+                        }
                         .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -73,14 +96,20 @@ fun CustomSourceDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = onConfirm,
+                onClick = {
+                    Timber.d("Confirm button clicked with sourceName='$sourceName', color=$color")
+                    onConfirm()
+                },
                 enabled = sourceName.isNotBlank()
             ) {
                 Text(stringResource(R.string.confirm))
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
+            TextButton(onClick = {
+                Timber.d("Cancel button clicked")
+                onDismiss()
+            }) {
                 Text(stringResource(R.string.cancel))
             }
         }
@@ -90,10 +119,14 @@ fun CustomSourceDialog(
         ColorPickerDialog(
             initialColor = color,
             onColorSelected = { selectedColor ->
+                Timber.d("Color selected: $selectedColor")
                 onColorClick(selectedColor)
                 showColorPicker = false
             },
-            onDismiss = { showColorPicker = false }
+            onDismiss = { 
+                Timber.d("Color picker dismissed")
+                showColorPicker = false 
+            }
         )
     }
 } 

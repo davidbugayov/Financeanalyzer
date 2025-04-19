@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,6 +18,8 @@ fun NoteField(
         value = note,
         onValueChange = onNoteChange,
         label = { Text(stringResource(R.string.note_optional)) },
-        modifier = modifier
+        modifier = modifier,
+        singleLine = false,
+        keyboardOptions = KeyboardOptions.Default
     )
 } 
