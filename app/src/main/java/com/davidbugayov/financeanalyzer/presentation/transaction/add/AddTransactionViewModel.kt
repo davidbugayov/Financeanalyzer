@@ -1244,5 +1244,31 @@ class AddTransactionViewModel(
         }
     }
 
+    /**
+     * Загружает транзакцию для редактирования
+     */
+    fun loadTransactionForEditing(transaction: Transaction) {
+        Timber.d("Загрузка транзакции для редактирования: $transaction")
+        
+        // Форматируем сумму как строку без знака минус
+        val formattedAmount = transaction.amount.abs().amount.toString()
+        Timber.d("Форматированная сумма: $formattedAmount (исходная: ${transaction.amount})")
+        
+        _state.update { it.copy(
+            transactionToEdit = transaction,
+            title = transaction.title ?: "",
+            amount = formattedAmount,
+            category = transaction.category ?: "",
+            note = transaction.note ?: "",
+            selectedDate = transaction.date,
+            isExpense = transaction.isExpense,
+            source = transaction.source,
+            sourceColor = transaction.sourceColor,
+            editMode = true
+        ) }
+        
+        Timber.d("Состояние после загрузки: сумма=${_state.value.amount}, дата=${_state.value.selectedDate}, режим редактирования=${_state.value.editMode}")
+    }
+
     protected override val _state = MutableStateFlow(AddTransactionState())
 } 
