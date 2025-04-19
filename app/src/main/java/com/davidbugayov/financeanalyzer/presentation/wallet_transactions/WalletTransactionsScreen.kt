@@ -14,20 +14,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import timber.log.Timber
+import org.koin.androidx.compose.koinViewModel
 
 @Composable
 fun WalletTransactionsScreen(
     walletId: String,
     onNavigateBack: () -> Unit,
-    addTransactionViewModel: AddTransactionViewModel,
-    navController: NavController
+    addTransactionViewModel: AddTransactionViewModel = koinViewModel(),
+    navController: NavController = rememberNavController()
 ) {
+    val context = LocalContext.current
     // Состояние для диалога действий
     var showActionsDialog by remember { mutableStateOf(false) }
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
@@ -50,9 +54,9 @@ fun WalletTransactionsScreen(
             val selectedCategory = object { val name = "Salary" } // Example category
             
             if (isIncome) {
-                addTransactionViewModel.setupForIncomeAddition(amount, selectedCategory.name)
+                addTransactionViewModel.setupForIncomeAddition(amount, selectedCategory.name, context)
             } else {
-                addTransactionViewModel.setupForExpenseAddition(amount, selectedCategory.name)
+                addTransactionViewModel.setupForExpenseAddition(amount, selectedCategory.name, context)
             }
             
             // Function to handle onTransactionClick that would show actions dialog

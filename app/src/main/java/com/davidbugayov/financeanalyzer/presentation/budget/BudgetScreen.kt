@@ -49,7 +49,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletAction
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
@@ -71,6 +71,7 @@ import java.util.Locale
 import androidx.compose.runtime.DisposableEffect
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
+import androidx.compose.ui.platform.LocalContext
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -82,6 +83,7 @@ fun BudgetScreen(
     addTransactionViewModel: AddTransactionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     // Обновляем данные при возвращении на экран
     DisposableEffect(navController) {
@@ -231,16 +233,20 @@ fun BudgetScreen(
                                         
                                         // Затем настраиваем ViewModel для добавления дохода
                                         addTransactionViewModel.setupForIncomeAddition(
-                                            amount = "", // Сумму введет пользователь
-                                            shouldDistribute = false // Не распределяем автоматически
+                                            amount = "",
+                                            shouldDistribute = false
                                         )
                                         
                                         // Устанавливаем категорию, равную имени кошелька
-                                        addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(categoryFromMenu.name))
+                                        addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(categoryFromMenu.name), context = context)
                                         Timber.d("Категория установлена: ${categoryFromMenu.name}")
                                         
                                         // Явно устанавливаем, что это не расход
-                                        addTransactionViewModel.setupForIncomeAddition("", categoryFromMenu.name)
+                                        addTransactionViewModel.setupForIncomeAddition(
+                                            amount = "",
+                                            targetWalletId = categoryFromMenu.id,
+                                            context
+                                        )
                                         Timber.d("Явно установлено тип транзакции как доход")
 
                                         // Добавляем проверку состояния перед навигацией
@@ -266,8 +272,9 @@ fun BudgetScreen(
                                         
                                         // Настраиваем ViewModel для добавления расхода
                                         addTransactionViewModel.setupForExpenseAddition(
-                                            amount = "", // Сумму введет пользователь
-                                            walletCategory = categoryFromMenu.name // Передаем название кошелька как категорию
+                                            amount = "",
+                                            walletCategory = categoryFromMenu.name,
+                                            context
                                         )
                                         
                                         // Проверяем состояние после настройки для убеждения в правильности

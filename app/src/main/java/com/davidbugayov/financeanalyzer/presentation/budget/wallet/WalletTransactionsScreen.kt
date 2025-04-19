@@ -54,6 +54,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
+import androidx.compose.ui.platform.LocalContext
 
 @Composable
 fun WalletTransactionsScreen(
@@ -63,6 +64,7 @@ fun WalletTransactionsScreen(
     addTransactionViewModel: AddTransactionViewModel = koinViewModel(),
     navController: NavController = rememberNavController()
 ) {
+    val context = LocalContext.current
     // Загружаем данные для выбранного кошелька
     LaunchedEffect(walletId) {
         viewModel.onEvent(WalletTransactionsEvent.LoadWallet(walletId))
@@ -85,7 +87,8 @@ fun WalletTransactionsScreen(
             // Настроим экран добавления транзакции с именем кошелька в качестве категории
             addTransactionViewModel.setupForExpenseAddition(
                 amount = "",  // Пустая строка для поля суммы
-                walletCategory = wallet.name  // Используем название кошелька как категорию
+                walletCategory = wallet.name,
+                context = context
             )
             
             // Переходим на экран добавления транзакции

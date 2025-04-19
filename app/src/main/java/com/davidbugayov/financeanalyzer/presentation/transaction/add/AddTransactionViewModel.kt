@@ -1,10 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.add
 
-import android.app.Application
-import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Intent
-import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
@@ -15,7 +12,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.AddTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -31,27 +28,27 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.domain.model.Currency
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.deleteCustomSource
 
 /**
  * ViewModel для экрана добавления транзакции.
  * Следует принципам MVI и Clean Architecture.
  */
 class AddTransactionViewModel(
-    application: Application,
     private val addTransactionUseCase: AddTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val categoriesViewModel: CategoriesViewModel,
     private val sourcePreferences: SourcePreferences,
     private val walletRepository: WalletRepository
-) : AndroidViewModel(application), KoinComponent {
+) : BaseTransactionViewModel<AddTransactionState, AddTransactionEvent>() {
 
     // Расширение для преобразования строки в Double
     private fun String.toDouble(): Double {
         return this.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
     }
-
-    private val _state = MutableStateFlow(AddTransactionState())
-    val state: StateFlow<AddTransactionState> = _state.asStateFlow()
 
     // Храним категории, которые были использованы в этой сессии
     private val usedCategories = mutableSetOf<Pair<String, Boolean>>() // category to isExpense
@@ -75,7 +72,7 @@ class AddTransactionViewModel(
 
     // Список доступных кошельков с внутренним MutableStateFlow для обновлений
     private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
-    val wallets: List<Wallet>
+    override val wallets: List<Wallet>
         get() = _wallets.value
 
     /**
@@ -143,17 +140,11 @@ class AddTransactionViewModel(
      * Инициализирует список источников
      */
     private fun initSources() {
-        // Загружаем сохраненные источники из SourcePreferences
-        val savedSources = sourcePreferences.getCustomSources()
-        
-        // Если есть сохраненные источники, используем их
-        // Иначе используем стандартные источники
-        val sources = if (savedSources.isNotEmpty()) {
-            savedSources
-        } else {
-            ColorUtils.defaultSources
+        if (_state == null) {
+            Timber.e("_state is null in initSources()")
+            return
         }
-        
+        val sources = getInitialSources(sourcePreferences)
         _state.update { it.copy(sources = sources) }
     }
 
@@ -161,14 +152,28 @@ class AddTransactionViewModel(
      * Загружает категории из CategoriesViewModel
      */
     private fun loadCategories() {
+        if (categoriesViewModel == null) {
+            Timber.e("categoriesViewModel is null in loadCategories()")
+            return
+        }
+        
         viewModelScope.launch {
-            categoriesViewModel.expenseCategories.collect { categories ->
-                _state.update { it.copy(expenseCategories = categories) }
+            try {
+                categoriesViewModel.expenseCategories?.collect { categories ->
+                    _state.update { it.copy(expenseCategories = categories) }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке категорий расходов")
             }
         }
+        
         viewModelScope.launch {
-            categoriesViewModel.incomeCategories.collect { categories ->
-                _state.update { it.copy(incomeCategories = categories) }
+            try {
+                categoriesViewModel.incomeCategories?.collect { categories ->
+                    _state.update { it.copy(incomeCategories = categories) }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке категорий доходов")
             }
         }
     }
@@ -176,7 +181,7 @@ class AddTransactionViewModel(
     /**
      * Сбрасывает все поля формы до значений по умолчанию
      */
-    fun resetFields() {
+    override fun resetFields() {
         val currentTargetWalletId = _state.value.targetWalletId ?: storedTargetWalletId
         val useStoredWallet = currentTargetWalletId != null
         
@@ -207,7 +212,7 @@ class AddTransactionViewModel(
     /**
      * Обновляет позиции всех использованных категорий
      */
-    fun updateCategoryPositions() {
+    override fun updateCategoryPositions() {
         viewModelScope.launch {
             usedCategories.forEach { (category, isExpense) ->
                 categoriesViewModel.incrementCategoryUsage(category, isExpense)
@@ -298,29 +303,27 @@ class AddTransactionViewModel(
      * @param amount Предустановленная сумма дохода (если есть).
      * @param targetWalletId ID кошелька, в который добавляется доход.
      */
-    fun setupForIncomeAddition(amount: String, targetWalletId: String) {
+    fun setupForIncomeAddition(amount: String, targetWalletId: String, context: android.content.Context) {
         Timber.d("setupForIncomeAddition: amount=$amount, targetWalletId=$targetWalletId")
+        if (_state == null) {
+            Timber.e("_state is null in setupForIncomeAddition()")
+            return
+        }
         Timber.d("Текущее состояние перед setupForIncomeAddition: isExpense=${_state.value.isExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
-        
         // Устанавливаем целевой кошелек для дохода
-        onEvent(AddTransactionEvent.SetTargetWalletId(targetWalletId))
-        
+        onEvent(AddTransactionEvent.SetTargetWalletId(targetWalletId), context)
         // Включаем добавление в кошелек
         if (!_state.value.addToWallet) {
-            onEvent(AddTransactionEvent.ToggleAddToWallet)
+            onEvent(AddTransactionEvent.ToggleAddToWallet, context)
         }
-        
         // Принудительно устанавливаем тип "Доход", но без блокировки переключения
-        onEvent(AddTransactionEvent.ForceSetIncomeType)
-        
+        onEvent(AddTransactionEvent.ForceSetIncomeType, context)
         // Устанавливаем предзаполненную сумму, если есть
         _state.update {
             it.copy(
                 amount = amount
             )
         }
-        
-        // Добавляем отладочный лог
         Timber.d("После setupForIncomeAddition: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
     }
 
@@ -329,8 +332,12 @@ class AddTransactionViewModel(
      * @param amount Предустановленная сумма расхода (если есть).
      * @param walletCategory Категория кошелька для списания.
      */
-    fun setupForExpenseAddition(amount: String, walletCategory: String) {
+    fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
         Timber.d("setupForExpenseAddition: amount=$amount, walletCategory=$walletCategory")
+        if (_state == null) {
+            Timber.e("_state is null in setupForExpenseAddition()")
+            return
+        }
         Timber.d("Текущее состояние перед setupForExpenseAddition: targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}, isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
         
         // Устанавливаем флаг автоматического распределения дохода
@@ -345,7 +352,7 @@ class AddTransactionViewModel(
         val currentAddToWallet = _state.value.addToWallet
         
         // Используем событие ForceSetExpenseType
-        onEvent(AddTransactionEvent.ForceSetExpenseType)
+        onEvent(AddTransactionEvent.ForceSetExpenseType, context)
         
         // Выводим лог сразу после вызова ForceSetExpenseType
         Timber.d("СРАЗУ ПОСЛЕ вызова ForceSetExpenseType: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
@@ -368,30 +375,22 @@ class AddTransactionViewModel(
     /**
      * Отправляет транзакцию (добавляет новую или обновляет существующую)
      */
-    fun submitTransaction() {
-        // Показываем индикатор загрузки и блокируем кнопку
+    override fun submitTransaction(context: android.content.Context) {
         _state.update { it.copy(isLoading = true) }
-
         viewModelScope.launch {
             if (!validateInput()) {
                 _state.update { it.copy(isLoading = false) }
                 return@launch
             }
-
-            // Если мы в режиме редактирования и у нас есть транзакция для редактирования
-            val currentState = _state.value
-            if (currentState.editMode && currentState.transactionToEdit != null) {
-                updateTransaction()
-            } else {
-                addTransaction()
-            }
+            // Always call addTransaction now
+            addTransaction(context)
         }
     }
 
     /**
      * Обрабатывает события экрана добавления транзакции
      */
-    fun onEvent(event: AddTransactionEvent) {
+    override fun onEvent(event: AddTransactionEvent, context: android.content.Context) {
         when (event) {
             is AddTransactionEvent.SetAmount -> {
                 _state.update { it.copy(amount = event.amount) }
@@ -509,12 +508,7 @@ class AddTransactionViewModel(
             is AddTransactionEvent.DeleteSource -> {
                 deleteSource(event.source)
             }
-            is AddTransactionEvent.Submit -> {
-                if (!validateInput()) {
-                    return
-                }
-                addTransaction()
-            }
+            is AddTransactionEvent.Submit -> submitTransaction(context)
             is AddTransactionEvent.ClearError -> {
                 _state.update { it.copy(error = null) }
             }
@@ -639,7 +633,7 @@ class AddTransactionViewModel(
                 // только тогда открываем диалог выбора кошельков
                 if (newAddToWallet && _state.value.selectedWallets.isEmpty()) {
                     Timber.d("ToggleAddToWallet: открываем диалог выбора кошельков, так как selectedWallets пуст")
-                    onEvent(AddTransactionEvent.ShowWalletSelector)
+                    onEvent(AddTransactionEvent.ShowWalletSelector, context)
                 } else {
                     Timber.d("ToggleAddToWallet: не открываем диалог, так как selectedWallets не пуст: ${_state.value.selectedWallets.size} шт.")
                 }
@@ -741,7 +735,7 @@ class AddTransactionViewModel(
     /**
      * Добавляет новую транзакцию
      */
-    private fun addTransaction() {
+    private fun addTransaction(context: android.content.Context) {
         viewModelScope.launch(Dispatchers.IO) {
             try {
                 val currentState = _state.value
@@ -779,7 +773,7 @@ class AddTransactionViewModel(
                         usedCategories.add(Pair(currentState.category, currentState.isExpense))
 
                         // Обновляем виджет
-                        updateWidget()
+                        updateWidget(context)
 
                         // Запрашиваем обновление данных
                         requestDataRefresh()
@@ -898,99 +892,6 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Обновляет существующую транзакцию
-     */
-    private fun updateTransaction() {
-        viewModelScope.launch(Dispatchers.IO) { // Явно указываем Dispatchers.IO
-            val currentState = _state.value
-
-            try {
-                // Проверяем, есть ли ID транзакции для обновления
-                val transactionId = currentState.transactionToEdit?.id
-                if (transactionId?.isBlank() == true) {
-                    withContext(Dispatchers.Main) {
-                        _state.update { it.copy(error = "ID транзакции не указан", isLoading = false) }
-                    }
-                    return@launch
-                }
-
-                val amount = currentState.amount.toDouble()
-
-                // Проверяем, что сумма введена
-                if (amount <= 0.0) {
-                    withContext(Dispatchers.Main) {
-                        _state.update { it.copy(error = "Введите сумму транзакции", isLoading = false) }
-                    }
-                    return@launch
-                }
-
-                // Инвертируем сумму, если это расход
-                val finalAmount = if (currentState.isExpense) -amount else amount
-
-                // Проверяем, является ли категория "Переводы"
-                val isTransfer = currentState.category == "Переводы"
-
-                // Создаем объект транзакции
-                val transaction = Transaction(
-                    id = transactionId ?: "",
-                    amount = Money(finalAmount),
-                    date = currentState.selectedDate,
-                    note = currentState.note.trim(),
-                    category = currentState.category,
-                    source = currentState.source,
-                    isExpense = currentState.isExpense,
-                    sourceColor = currentState.sourceColor,
-                    isTransfer = isTransfer
-                )
-
-                updateTransactionUseCase(transaction).fold(
-                    onSuccess = {
-                        // Обновляем виджет
-                        updateWidget()
-
-                        // Запрашиваем обновление данных (одним вызовом)
-                        requestDataRefresh()
-
-                        // Обновляем категории
-                        updateCategoryPositions()
-
-                        // Обновляем UI в основном потоке
-                        withContext(Dispatchers.Main) {
-                            _state.update {
-                                it.copy(
-                                    isSuccess = true,
-                                    error = null
-                                )
-                            }
-                        }
-                    },
-                    onFailure = { error ->
-                        withContext(Dispatchers.Main) {
-                            _state.update {
-                                it.copy(
-                                    error = error.message ?: "Ошибка при обновлении транзакции",
-                                    isSuccess = false,
-                                    isLoading = false
-                                )
-                            }
-                        }
-                    }
-                )
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    _state.update {
-                        it.copy(
-                            error = e.message ?: "Непредвиденная ошибка при обновлении",
-                            isSuccess = false,
-                            isLoading = false
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    /**
      * Добавляет новую пользовательскую категорию
      */
     private fun addCustomCategory(category: String) {
@@ -1015,27 +916,11 @@ class AddTransactionViewModel(
                 _state.update { it.copy(error = "Название источника не может быть пустым") }
                 return
             }
-
-            // Создаем новый источник
-            val newSource = Source(
-                name = source,
-                color = color,
-                isCustom = true
-            )
-
-            // Добавляем источник в список
-            val currentSources = _state.value.sources.toMutableList()
-            currentSources.add(newSource)
-            
-            // Сохраняем обновленный список источников в SourcePreferences
-            sourcePreferences.saveCustomSources(currentSources)
-            
-            // Обновляем состояние
-            _state.update { it.copy(sources = currentSources) }
-
-            // Обновляем состояние
+            val newSource = Source(name = source, color = color, isCustom = true)
+            val updatedSources = addCustomSource(sourcePreferences, _state.value.sources, newSource)
             _state.update {
                 it.copy(
+                    sources = updatedSources,
                     source = source,
                     sourceColor = color,
                     showSourcePicker = false,
@@ -1045,34 +930,6 @@ class AddTransactionViewModel(
             }
         } catch (e: Exception) {
             _state.update { it.copy(error = e.message) }
-        }
-    }
-
-    /**
-     * Обновляет виджет баланса после изменения данных, но только если виджеты добавлены на домашний экран
-     */
-    private fun updateWidget() {
-        val context = getApplication<Application>().applicationContext
-        val widgetManager = AppWidgetManager.getInstance(context)
-        val widgetComponent = ComponentName(context, "com.davidbugayov.financeanalyzer.widget.BalanceWidget")
-        val widgetIds = widgetManager.getAppWidgetIds(widgetComponent)
-
-        if (widgetIds.isNotEmpty()) {
-            val intent = Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.BalanceWidget"))
-            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
-            context.sendBroadcast(intent)
-        }
-
-        // Обновляем малый виджет баланса
-        val smallWidgetComponent = ComponentName(context, "com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget")
-        val smallWidgetIds = widgetManager.getAppWidgetIds(smallWidgetComponent)
-
-        if (smallWidgetIds.isNotEmpty()) {
-            val intent = Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget"))
-            intent.action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            intent.putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallWidgetIds)
-            context.sendBroadcast(intent)
         }
     }
 
@@ -1113,76 +970,18 @@ class AddTransactionViewModel(
             _state.update { it.copy(error = "Стандартные источники удалить нельзя") }
             return
         }
-
-        val currentSources = _state.value.sources.toMutableList()
-        val sourceToDelete = currentSources.find { it.name == source }
-
-        if (sourceToDelete != null) {
-            // Удаляем источник из списка
-            currentSources.remove(sourceToDelete)
-
-            // Сохраняем обновленный список источников в SourcePreferences
-            sourcePreferences.saveCustomSources(currentSources)
-
-            // Обновляем состояние
-            _state.update { it.copy(sources = currentSources) }
-
-            // Если это был выбранный источник, меняем на "Сбер"
-            if (_state.value.source == source) {
-                _state.update {
-                    it.copy(
-                        source = "Сбер",
-                        sourceColor = 0xFF21A038.toInt() // Цвет Сбера
-                    )
-                }
+        val updatedSources = deleteCustomSource(sourcePreferences, _state.value.sources, source)
+        _state.update { it.copy(sources = updatedSources) }
+        if (_state.value.source == source) {
+            _state.update {
+                it.copy(
+                    source = "Сбер",
+                    sourceColor = 0xFF21A038.toInt()
+                )
             }
-
-            // Логируем удаление источника
-            AnalyticsUtils.logSourceDeleted(source)
         }
-    }
-
-    /**
-     * Загружает транзакцию для редактирования
-     */
-    fun loadTransactionForEditing(transaction: Transaction) {
-        // Преобразуем сумму в строку с правильным форматированием для поля ввода
-        // Используем абсолютное значение суммы, чтобы не было знака минус перед расходами
-        val amount = Math.abs(transaction.amount.amount.toDouble())
-        val formattedAmount = String.format("%.0f", amount)
-
-        // Логируем действия
-        Timber.d("===== НАЧАЛО ЗАГРУЗКИ ТРАНЗАКЦИИ ДЛЯ РЕДАКТИРОВАНИЯ =====")
-        Timber.d("ID: ${transaction.id}")
-        Timber.d("Сумма оригинальная: ${transaction.amount}")
-        Timber.d("Сумма форматированная: $formattedAmount")
-        Timber.d("Категория: ${transaction.category}")
-        Timber.d("Источник: ${transaction.source}")
-        Timber.d("Дата: ${transaction.date}")
-        Timber.d("Тип транзакции: ${if (transaction.isExpense) "Расход" else "Доход"}")
-        
-        _state.update {
-            it.copy(
-                amount = formattedAmount,
-                category = transaction.category,
-                isExpense = transaction.isExpense,
-                selectedDate = transaction.date,
-                note = transaction.note ?: "",
-                source = transaction.source,
-                sourceColor = it.sources.find { source -> source.name == transaction.source }?.color ?: ColorUtils.SBER_COLOR,
-                editMode = true,
-                transactionToEdit = transaction
-            )
-        }
-
-        // Логируем состояние после загрузки
-        val state = _state.value
-        Timber.d("Состояние после загрузки:")
-        Timber.d("- Сумма в форме: ${state.amount}")
-        Timber.d("- isExpense: ${state.isExpense}")
-        Timber.d("- editMode: ${state.editMode}")
-        Timber.d("- transactionToEdit ID: ${state.transactionToEdit?.id}")
-        Timber.d("===== ЗАВЕРШЕНА ЗАГРУЗКА ТРАНЗАКЦИИ ДЛЯ РЕДАКТИРОВАНИЯ =====")
+        // Логируем удаление источника
+        AnalyticsUtils.logSourceDeleted(source)
     }
 
     /**
@@ -1445,63 +1244,5 @@ class AddTransactionViewModel(
         }
     }
 
-    /**
-     * Загружает транзакцию для редактирования по ID
-     */
-    fun loadTransactionForEdit(transactionId: String) {
-        viewModelScope.launch {
-            try {
-                Timber.d("Загрузка транзакции для редактирования с ID: $transactionId")
-                
-                // Загружаем транзакцию из репозитория
-                val transaction = getTransactionRepositoryInstance().getTransactionById(transactionId)
-                
-                if (transaction != null) {
-                    Timber.d("Транзакция найдена, загружаем для редактирования")
-                    loadTransactionForEditing(transaction)
-                } else {
-                    Timber.e("Транзакция с ID $transactionId не найдена")
-                    _state.update { 
-                        it.copy(
-                            error = "Транзакция не найдена",
-                            isLoading = false
-                        ) 
-                    }
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке транзакции с ID $transactionId")
-                _state.update { 
-                    it.copy(
-                        error = "Ошибка загрузки: ${e.message}",
-                        isLoading = false
-                    ) 
-                }
-            }
-        }
-    }
-
-    /**
-     * Загружает транзакцию для редактирования и затем осуществляет навигацию на экран редактирования
-     * @param transaction Транзакция для редактирования
-     * @param onNavigateToEdit Функция для навигации на экран редактирования, принимающая ID транзакции
-     */
-    fun loadTransactionAndNavigateToEdit(transaction: Transaction, onNavigateToEdit: (String) -> Unit) {
-        // Логируем действие
-        Timber.d("Загрузка транзакции для редактирования и навигация: ${transaction.id}")
-        
-        try {
-            // Загружаем транзакцию в текущее состояние
-            loadTransactionForEditing(transaction)
-            
-            // После загрузки переходим на экран редактирования с ID транзакции
-            onNavigateToEdit(transaction.id)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при подготовке транзакции к редактированию: ${e.message}")
-            _state.update { 
-                it.copy(
-                    error = "Ошибка при подготовке к редактированию: ${e.message}"
-                ) 
-            }
-        }
-    }
+    protected override val _state = MutableStateFlow(AddTransactionState())
 } 

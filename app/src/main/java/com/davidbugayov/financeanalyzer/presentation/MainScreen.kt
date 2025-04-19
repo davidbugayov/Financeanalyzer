@@ -56,6 +56,7 @@ import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewMo
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
@@ -431,7 +432,7 @@ fun MainScreen(startDestination: String = "home") {
                                     addTransactionViewModel.selectAllWalletsWithoutDialog()
                                     
                                     // Настраиваем вьюмодель на режим расхода
-                                    addTransactionViewModel.setupForExpenseAddition("", "Списание")
+                                    addTransactionViewModel.setupForExpenseAddition("", "Списание", context = context)
                                     
                                     // Дополнительно логируем состояние после настройки
                                     Timber.d("После настройки из HomeScreen: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}, showWalletSelector=${addTransactionViewModel.state.value.showWalletSelector}")
@@ -494,7 +495,7 @@ fun MainScreen(startDestination: String = "home") {
                         
                         // Используем EditTransactionScreen вместо AddTransactionScreen
                         EditTransactionScreen(
-                            viewModel = koinViewModel<AddTransactionViewModel>(),
+                            viewModel = koinViewModel<EditTransactionViewModel>(),
                             onNavigateBack = { 
                                 // При возврате обновляем данные и возвращаемся назад
                                 homeViewModel.initiateBackgroundDataRefresh()

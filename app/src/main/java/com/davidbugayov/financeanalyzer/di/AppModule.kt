@@ -72,7 +72,6 @@ val appModule = module {
     viewModel { ChartViewModel() }
     viewModel {
         AddTransactionViewModel(
-            application = androidApplication(),
             addTransactionUseCase = get(),
             updateTransactionUseCase = get(),
             categoriesViewModel = get(),
@@ -95,6 +94,16 @@ val appModule = module {
             addTransactionUseCase = get(),
             deleteTransactionUseCase = get(),
             repository = get()
+        )
+    }
+
+    viewModel {
+        com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel(
+            application = androidApplication(),
+            updateTransactionUseCase = get(),
+            transactionRepository = get(),
+            categoriesViewModel = get(),
+            sourcePreferences = get()
         )
     }
 
