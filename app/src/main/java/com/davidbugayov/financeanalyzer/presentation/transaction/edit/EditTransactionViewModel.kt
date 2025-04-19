@@ -8,7 +8,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.EditTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -34,10 +33,10 @@ class EditTransactionViewModel(
     application: Application,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     private val transactionRepository: TransactionRepository,
-    private val categoriesViewModel: CategoriesViewModel,
-    private val sourcePreferences: SourcePreferences,
+    override val categoriesViewModel: CategoriesViewModel,
+    override val sourcePreferences: SourcePreferences,
     private val walletRepository: WalletRepository
-) : BaseTransactionViewModel<EditTransactionState, EditTransactionEvent>() {
+) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>() {
 
     private val _wallets = kotlinx.coroutines.flow.MutableStateFlow<List<Wallet>>(emptyList())
     override val wallets: List<Wallet>
@@ -73,177 +72,83 @@ class EditTransactionViewModel(
         }
     }
 
-    override fun onEvent(event: EditTransactionEvent, context: android.content.Context) {
+    override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
         when (event) {
-            is EditTransactionEvent.LoadTransaction -> loadTransactionForEdit(event.id)
-            is EditTransactionEvent.SubmitEdit -> submitTransaction(context)
-            is EditTransactionEvent.SetSource -> {
-                val selectedSource = _state.value.sources.find { it.name == event.source }
-                _state.update {
-                    it.copy(
-                        source = event.source,
-                        sourceColor = selectedSource?.color ?: it.sourceColor
-                    )
-                }
-            }
-            is EditTransactionEvent.SetSourceColor -> {
-                _state.update { it.copy(sourceColor = event.color) }
-            }
-            is EditTransactionEvent.ShowSourcePicker -> {
-                _state.update { it.copy(showSourcePicker = true) }
-            }
-            is EditTransactionEvent.HideSourcePicker -> {
-                _state.update { it.copy(showSourcePicker = false) }
-            }
-            is EditTransactionEvent.ShowCustomSourceDialog -> {
-                _state.update { it.copy(showCustomSourceDialog = true) }
-            }
-            is EditTransactionEvent.HideCustomSourceDialog -> {
-                _state.update { it.copy(showCustomSourceDialog = false) }
-            }
-            is EditTransactionEvent.AddCustomSource -> {
-                val newSource = Source(name = event.source, color =  event.color)
-                val updatedSources = addCustomSource(sourcePreferences, _state.value.sources, newSource)
-                _state.update {
-                    it.copy(
-                        sources = updatedSources,
-                        source = event.source,
-                        sourceColor = event.color,
-                        showCustomSourceDialog = false,
-                        customSource = ""
-                    )
-                }
-            }
-            is EditTransactionEvent.SetCustomSource -> {
-                _state.update { it.copy(customSource = event.source) }
-            }
-            is EditTransactionEvent.ShowDeleteSourceConfirmDialog -> {
-                _state.update {
-                    it.copy(
-                        showDeleteSourceConfirmDialog = true,
-                        sourceToDelete = event.source
-                    )
-                }
-            }
-            is EditTransactionEvent.HideDeleteSourceConfirmDialog -> {
-                _state.update {
-                    it.copy(
-                        showDeleteSourceConfirmDialog = false,
-                        sourceToDelete = null
-                    )
-                }
-            }
-            is EditTransactionEvent.DeleteSource -> {
-                val updatedSources = deleteCustomSource(sourcePreferences, _state.value.sources, event.source)
-                _state.update {
-                    it.copy(
-                        sources = updatedSources,
-                        showDeleteSourceConfirmDialog = false,
-                        sourceToDelete = null
-                    )
-                }
-                // Если удалён выбранный источник — сбросить на дефолтный
-                if (_state.value.source == event.source) {
-                    val defaultSource = getInitialSources(sourcePreferences).firstOrNull() ?: ""
-                    _state.update {
-                        it.copy(
-                            source = if (defaultSource is Source) defaultSource.name else "Сбер",
-                            sourceColor = if (defaultSource is Source) defaultSource.color else 0xFF21A038.toInt()
-                        )
-                    }
-                }
-            }
-            is EditTransactionEvent.ShowCustomCategoryDialog -> {
-                _state.update { it.copy(showCustomCategoryDialog = true) }
-            }
-            is EditTransactionEvent.HideCustomCategoryDialog -> {
-                _state.update { it.copy(showCustomCategoryDialog = false, customCategory = "") }
-            }
-            is EditTransactionEvent.SetCustomCategory -> {
-                _state.update { it.copy(customCategory = event.category) }
-            }
-            is EditTransactionEvent.AddCustomCategory -> {
-                if (event.category.isNotBlank()) {
-                    categoriesViewModel.addCustomCategory(event.category, _state.value.isExpense)
-                    _state.update {
-                        it.copy(
-                            category = event.category,
-                            showCategoryPicker = false,
-                            showCustomCategoryDialog = false,
-                            customCategory = ""
-                        )
-                    }
-                }
-            }
-            is EditTransactionEvent.ShowDatePicker -> {
-                _state.update { it.copy(showDatePicker = true) }
-            }
-            is EditTransactionEvent.HideDatePicker -> {
-                _state.update { it.copy(showDatePicker = false) }
-            }
-            is EditTransactionEvent.SetDate -> {
-                _state.update { it.copy(selectedDate = event.date, showDatePicker = false) }
-                Timber.d("Установлена новая дата: ${event.date}")
-            }
-            // Обрабатываем ToggleTransactionType
-            is EditTransactionEvent.ToggleTransactionType -> {
+            is BaseTransactionEvent.LoadTransaction -> loadTransactionForEdit(event.id)
+            is BaseTransactionEvent.SubmitEdit -> submitTransaction(context)
+            else -> handleBaseEvent(event, context)
+        }
+    }
+
+    private fun handleBaseEvent(event: BaseTransactionEvent, context: android.content.Context) {
+        when (event) {
+            is BaseTransactionEvent.LoadTransaction -> loadTransactionForEdit(event.id)
+            is BaseTransactionEvent.SubmitEdit -> submitTransaction(context)
+            is BaseTransactionEvent.SetAmount -> _state.update { it.copy(amount = event.amount) }
+            is BaseTransactionEvent.SetTitle -> _state.update { it.copy(title = event.title) }
+            is BaseTransactionEvent.SetCategory -> _state.update { it.copy(category = event.category, showCategoryPicker = false) }
+            is BaseTransactionEvent.SetNote -> _state.update { it.copy(note = event.note) }
+            is BaseTransactionEvent.SetDate -> _state.update { it.copy(selectedDate = event.date, showDatePicker = false) }
+            is BaseTransactionEvent.ToggleTransactionType -> {
                 val newIsExpense = !_state.value.isExpense
-                Timber.d("Переключение типа транзакции: isExpense=$newIsExpense (было ${_state.value.isExpense})")
-                
-                // Сохраняем предыдущий источник
                 val previousSource = _state.value.source
                 val previousSourceColor = _state.value.sourceColor
-                
-                _state.update { 
-                    it.copy(
-                        isExpense = newIsExpense,
-                        // Сбрасываем категорию при переключении типа транзакции
-                        category = ""
-                    )
-                }
-                
-                Timber.d("После переключения: isExpense=${_state.value.isExpense}, source=$previousSource")
-                
-                // Уведомляем систему о смене типа для корректного обновления UI
+                _state.update { it.copy(isExpense = newIsExpense, category = "") }
                 viewModelScope.launch {
-                    kotlinx.coroutines.delay(50) // Небольшая задержка для правильного обновления UI
+                    kotlinx.coroutines.delay(50)
+                    _state.update { it.copy(source = previousSource, sourceColor = previousSourceColor) }
+                }
+            }
+            is BaseTransactionEvent.ShowDatePicker -> _state.update { it.copy(showDatePicker = true) }
+            is BaseTransactionEvent.HideDatePicker -> _state.update { it.copy(showDatePicker = false) }
+            is BaseTransactionEvent.ShowCategoryPicker -> _state.update { it.copy(showCategoryPicker = true) }
+            is BaseTransactionEvent.HideCategoryPicker -> _state.update { it.copy(showCategoryPicker = false) }
+            is BaseTransactionEvent.ShowCustomCategoryDialog -> _state.update { it.copy(showCustomCategoryDialog = true) }
+            is BaseTransactionEvent.HideCustomCategoryDialog -> _state.update { it.copy(showCustomCategoryDialog = false, customCategory = "") }
+            is BaseTransactionEvent.ShowCancelConfirmation -> _state.update { it.copy(showCancelConfirmation = true) }
+            is BaseTransactionEvent.HideCancelConfirmation -> _state.update { it.copy(showCancelConfirmation = false) }
+            is BaseTransactionEvent.ClearError -> _state.update { it.copy(error = null) }
+            is BaseTransactionEvent.HideSuccessDialog -> _state.update { it.copy(isSuccess = false) }
+            is BaseTransactionEvent.ShowSourcePicker -> _state.update { it.copy(showSourcePicker = true) }
+            is BaseTransactionEvent.HideSourcePicker -> _state.update { it.copy(showSourcePicker = false) }
+            is BaseTransactionEvent.ShowCustomSourceDialog -> _state.update { it.copy(showCustomSourceDialog = true) }
+            is BaseTransactionEvent.HideCustomSourceDialog -> _state.update { it.copy(showCustomSourceDialog = false, customSource = "") }
+            is BaseTransactionEvent.ShowColorPicker -> _state.update { it.copy(showColorPicker = true) }
+            is BaseTransactionEvent.HideColorPicker -> _state.update { it.copy(showColorPicker = false) }
+            is BaseTransactionEvent.SetSource -> {
+                val selectedSource = _state.value.sources.find { it.name == event.source }
+                _state.update { it.copy(source = event.source, sourceColor = selectedSource?.color ?: it.sourceColor) }
+            }
+            is BaseTransactionEvent.SetCustomSource -> _state.update { it.copy(customSource = event.source) }
+            is BaseTransactionEvent.AddCustomSource -> {
+                try {
+                    if (event.source.isBlank()) {
+                        _state.update { it.copy(error = "Название источника не может быть пустым") }
+                        return
+                    }
+                    val newSource = Source(name = event.source, color = event.color, isCustom = true)
+                    val updatedSources = addCustomSource(sourcePreferences, _state.value.sources, newSource)
                     _state.update {
                         it.copy(
-                            // Сохраняем прежний источник
-                            source = previousSource,
-                            sourceColor = previousSourceColor
+                            sources = updatedSources,
+                            source = event.source,
+                            sourceColor = event.color,
+                            showSourcePicker = false,
+                            showCustomSourceDialog = false,
+                            customSource = ""
                         )
                     }
+                    Timber.d("Custom source added directly: ${newSource.name} with color ${newSource.color}")
+                } catch (e: Exception) {
+                    Timber.e(e, "Error adding custom source: ${e.message}")
+                    _state.update { it.copy(error = "Ошибка при добавлении источника: ${e.message}") }
                 }
             }
-            // Обрабатываем SetCategory 
-            is EditTransactionEvent.SetCategory -> {
-                _state.update {
-                    it.copy(
-                        category = event.category,
-                        showCategoryPicker = false
-                    )
-                }
-            }
-            // Обрабатываем SetAmount
-            is EditTransactionEvent.SetAmount -> {
-                _state.update { it.copy(amount = event.amount) }
-            }
-            // Обрабатываем SetNote
-            is EditTransactionEvent.SetNote -> {
-                _state.update { it.copy(note = event.note) }
-            }
-            // --- ДОБАВЛЯЕМ ОБРАБОТКУ КОШЕЛЬКОВ ---
-            is EditTransactionEvent.ToggleAddToWallet -> {
-                _state.update { it.copy(addToWallet = !it.addToWallet) }
-            }
-            is EditTransactionEvent.ShowWalletSelector -> {
-                _state.update { it.copy(showWalletSelector = true) }
-            }
-            is EditTransactionEvent.HideWalletSelector -> {
-                _state.update { it.copy(showWalletSelector = false) }
-            }
-            is EditTransactionEvent.SelectWallet -> {
+            is BaseTransactionEvent.SetSourceColor -> _state.update { it.copy(sourceColor = event.color) }
+            is BaseTransactionEvent.ShowWalletSelector -> _state.update { it.copy(showWalletSelector = true) }
+            is BaseTransactionEvent.HideWalletSelector -> _state.update { it.copy(showWalletSelector = false) }
+            is BaseTransactionEvent.ToggleAddToWallet -> _state.update { it.copy(addToWallet = !_state.value.addToWallet) }
+            is BaseTransactionEvent.SelectWallet -> {
                 val updated = if (event.selected) {
                     _state.value.selectedWallets + event.walletId
                 } else {
@@ -251,13 +156,8 @@ class EditTransactionViewModel(
                 }
                 _state.update { it.copy(selectedWallets = updated) }
             }
-            is EditTransactionEvent.HideSuccessDialog -> {
-                _state.update { it.copy(isSuccess = false) }
-            }
-            is EditTransactionEvent.ClearError -> {
-                _state.update { it.copy(error = null) }
-            }
-            else -> { /* обработка других событий */ }
+            is BaseTransactionEvent.SelectWallets -> _state.update { it.copy(selectedWallets = event.walletIds) }
+            else -> {}
         }
     }
 
@@ -432,5 +332,79 @@ class EditTransactionViewModel(
             source = currentState.source,
             sourceColor = currentState.sourceColor
         )
+    }
+
+    override fun addCustomCategory(category: String) {
+        if (category.isBlank()) return
+        categoriesViewModel.addCustomCategory(category, _state.value.isExpense)
+        _state.update {
+            it.copy(
+                category = category,
+                showCategoryPicker = false,
+                showCustomCategoryDialog = false,
+                customCategory = ""
+            )
+        }
+    }
+
+    override fun deleteCategory(category: String) {
+        if (category == "Другое") {
+            _state.update { it.copy(error = "Категорию \"Другое\" нельзя удалить") }
+            return
+        }
+        viewModelScope.launch {
+            if (_state.value.isExpense) {
+                categoriesViewModel.deleteExpenseCategory(category)
+            } else {
+                categoriesViewModel.deleteIncomeCategory(category)
+            }
+            if (_state.value.category == category) {
+                _state.update { it.copy(category = "") }
+            }
+            com.davidbugayov.financeanalyzer.utils.AnalyticsUtils.logCategoryDeleted(category, _state.value.isExpense)
+        }
+    }
+
+    override fun addCustomSource(source: String, color: Int) {
+        try {
+            if (source.isBlank()) {
+                _state.update { it.copy(error = "Название источника не может быть пустым") }
+                return
+            }
+            val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(name = source, color = color, isCustom = true)
+            val updatedSources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource(sourcePreferences, _state.value.sources, newSource)
+            _state.update {
+                it.copy(
+                    sources = updatedSources,
+                    source = source,
+                    sourceColor = color,
+                    showSourcePicker = false,
+                    showCustomSourceDialog = false,
+                    customSource = ""
+                )
+            }
+            timber.log.Timber.d("Custom source added: ${newSource.name} with color ${newSource.color}. Updated sources: ${updatedSources.map { it.name }}")
+        } catch (e: Exception) {
+            timber.log.Timber.e(e, "Error adding custom source: ${e.message}")
+            _state.update { it.copy(error = "Ошибка при добавлении источника: ${e.message}") }
+        }
+    }
+
+    override fun deleteSource(source: String) {
+        if (source == "Сбер" || source == "Наличные" || source == "Т-Банк") {
+            _state.update { it.copy(error = "Стандартные источники удалить нельзя") }
+            return
+        }
+        val updatedSources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.deleteCustomSource(sourcePreferences, _state.value.sources, source)
+        _state.update { it.copy(sources = updatedSources) }
+        if (_state.value.source == source) {
+            _state.update {
+                it.copy(
+                    source = "Сбер",
+                    sourceColor = 0xFF21A038.toInt()
+                )
+            }
+        }
+        com.davidbugayov.financeanalyzer.utils.AnalyticsUtils.logSourceDeleted(source)
     }
 } 

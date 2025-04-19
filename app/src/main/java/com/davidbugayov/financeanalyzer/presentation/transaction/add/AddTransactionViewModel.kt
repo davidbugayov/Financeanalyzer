@@ -12,7 +12,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -40,10 +40,10 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.delet
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
-    protected val categoriesViewModel: CategoriesViewModel,
-    protected val sourcePreferences: SourcePreferences,
+    override val categoriesViewModel: CategoriesViewModel,
+    override val sourcePreferences: SourcePreferences,
     private val walletRepository: WalletRepository
-) : BaseTransactionViewModel<AddTransactionState, AddTransactionEvent>() {
+) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>() {
 
     // Расширение для преобразования строки в Double
     private fun String.toDouble(): Double {
@@ -311,13 +311,13 @@ class AddTransactionViewModel(
         }
         Timber.d("Текущее состояние перед setupForIncomeAddition: isExpense=${_state.value.isExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
         // Устанавливаем целевой кошелек для дохода
-        onEvent(AddTransactionEvent.SetTargetWalletId(targetWalletId), context)
+        onEvent(BaseTransactionEvent.SetTargetWalletId(targetWalletId), context)
         // Включаем добавление в кошелек
         if (!_state.value.addToWallet) {
-            onEvent(AddTransactionEvent.ToggleAddToWallet, context)
+            onEvent(BaseTransactionEvent.ToggleAddToWallet, context)
         }
         // Принудительно устанавливаем тип "Доход", но без блокировки переключения
-        onEvent(AddTransactionEvent.ForceSetIncomeType, context)
+        onEvent(BaseTransactionEvent.ForceSetIncomeType, context)
         // Устанавливаем предзаполненную сумму, если есть
         _state.update {
             it.copy(
@@ -352,7 +352,7 @@ class AddTransactionViewModel(
         val currentAddToWallet = _state.value.addToWallet
         
         // Используем событие ForceSetExpenseType
-        onEvent(AddTransactionEvent.ForceSetExpenseType, context)
+        onEvent(BaseTransactionEvent.ForceSetExpenseType, context)
         
         // Выводим лог сразу после вызова ForceSetExpenseType
         Timber.d("СРАЗУ ПОСЛЕ вызова ForceSetExpenseType: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
@@ -390,168 +390,52 @@ class AddTransactionViewModel(
     /**
      * Обрабатывает события экрана добавления транзакции
      */
-    override fun onEvent(event: AddTransactionEvent, context: android.content.Context) {
+    override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
         when (event) {
-            is AddTransactionEvent.SetAmount -> {
-                _state.update { it.copy(amount = event.amount) }
-            }
-            is AddTransactionEvent.SetTitle -> {
-                _state.update { it.copy(title = event.title) }
-            }
-            is AddTransactionEvent.SetCategory -> {
-                _state.update {
-                    it.copy(
-                        category = event.category,
-                        showCategoryPicker = false,
-                        categoryError = false // Сбрасываем ошибку при выборе категории
-                    )
-                }
-                // Добавляем категорию в список использованных
-                usedCategories.add(event.category to _state.value.isExpense)
-            }
-            is AddTransactionEvent.SetNote -> {
-                _state.update { it.copy(note = event.note) }
-            }
-            is AddTransactionEvent.SetDate -> {
-                _state.update {
-                    it.copy(
-                        selectedDate = event.date,
-                        showDatePicker = false
-                    )
-                }
-            }
-            is AddTransactionEvent.SetCustomCategory -> {
-                _state.update { it.copy(customCategory = event.category) }
-            }
-            is AddTransactionEvent.AddCustomCategory -> {
-                addCustomCategory(event.category)
-            }
-            is AddTransactionEvent.ToggleTransactionType -> {
-                _state.update {
-                    it.copy(
-                        isExpense = !it.isExpense,
-                        // Сбрасываем категорию при переключении типа транзакции
-                        category = "",
-                        categoryError = false
-                    )
-                }
-            }
-            is AddTransactionEvent.ShowDatePicker -> {
-                _state.update { it.copy(showDatePicker = true) }
-            }
-            is AddTransactionEvent.HideDatePicker -> {
-                _state.update { it.copy(showDatePicker = false) }
-            }
-            is AddTransactionEvent.ShowCategoryPicker -> {
-                _state.update { it.copy(showCategoryPicker = true) }
-            }
-            is AddTransactionEvent.HideCategoryPicker -> {
-                _state.update { it.copy(showCategoryPicker = false) }
-            }
-            is AddTransactionEvent.ShowCustomCategoryDialog -> {
-                _state.update { it.copy(showCustomCategoryDialog = true) }
-            }
-            is AddTransactionEvent.HideCustomCategoryDialog -> {
-                _state.update {
-                    it.copy(
-                        showCustomCategoryDialog = false,
-                        customCategory = ""
-                    )
-                }
-            }
-            is AddTransactionEvent.ShowCancelConfirmation -> {
-                _state.update { it.copy(showCancelConfirmation = true) }
-            }
-            is AddTransactionEvent.HideCancelConfirmation -> {
-                _state.update { it.copy(showCancelConfirmation = false) }
-            }
-            is AddTransactionEvent.ShowDeleteCategoryConfirmDialog -> {
-                _state.update {
-                    it.copy(
-                        categoryToDelete = event.category,
-                        showDeleteCategoryConfirmDialog = true
-                    )
-                }
-            }
+            is BaseTransactionEvent.Submit -> submitTransaction(context)
+            else -> handleBaseEvent(event, context)
+        }
+    }
 
-            is AddTransactionEvent.HideDeleteCategoryConfirmDialog -> {
-                _state.update {
-                    it.copy(
-                        categoryToDelete = null,
-                        showDeleteCategoryConfirmDialog = false
-                    )
+    private fun handleBaseEvent(event: BaseTransactionEvent, context: android.content.Context) {
+        when (event) {
+            is BaseTransactionEvent.SetAmount -> _state.update { it.copy(amount = event.amount) }
+            is BaseTransactionEvent.SetTitle -> _state.update { it.copy(title = event.title) }
+            is BaseTransactionEvent.SetCategory -> _state.update { it.copy(category = event.category, showCategoryPicker = false) }
+            is BaseTransactionEvent.SetNote -> _state.update { it.copy(note = event.note) }
+            is BaseTransactionEvent.SetDate -> _state.update { it.copy(selectedDate = event.date, showDatePicker = false) }
+            is BaseTransactionEvent.ToggleTransactionType -> {
+                val newIsExpense = !_state.value.isExpense
+                val previousSource = _state.value.source
+                val previousSourceColor = _state.value.sourceColor
+                _state.update { it.copy(isExpense = newIsExpense, category = "") }
+                viewModelScope.launch {
+                    kotlinx.coroutines.delay(50)
+                    _state.update { it.copy(source = previousSource, sourceColor = previousSourceColor) }
                 }
             }
-
-            is AddTransactionEvent.DeleteCategory -> {
-                deleteCategory(event.category)
+            is BaseTransactionEvent.ShowDatePicker -> _state.update { it.copy(showDatePicker = true) }
+            is BaseTransactionEvent.HideDatePicker -> _state.update { it.copy(showDatePicker = false) }
+            is BaseTransactionEvent.ShowCategoryPicker -> _state.update { it.copy(showCategoryPicker = true) }
+            is BaseTransactionEvent.HideCategoryPicker -> _state.update { it.copy(showCategoryPicker = false) }
+            is BaseTransactionEvent.ShowCustomCategoryDialog -> _state.update { it.copy(showCustomCategoryDialog = true) }
+            is BaseTransactionEvent.HideCustomCategoryDialog -> _state.update { it.copy(showCustomCategoryDialog = false, customCategory = "") }
+            is BaseTransactionEvent.ShowCancelConfirmation -> _state.update { it.copy(showCancelConfirmation = true) }
+            is BaseTransactionEvent.HideCancelConfirmation -> _state.update { it.copy(showCancelConfirmation = false) }
+            is BaseTransactionEvent.ClearError -> _state.update { it.copy(error = null) }
+            is BaseTransactionEvent.HideSuccessDialog -> _state.update { it.copy(isSuccess = false) }
+            is BaseTransactionEvent.ShowSourcePicker -> _state.update { it.copy(showSourcePicker = true) }
+            is BaseTransactionEvent.HideSourcePicker -> _state.update { it.copy(showSourcePicker = false) }
+            is BaseTransactionEvent.ShowCustomSourceDialog -> _state.update { it.copy(showCustomSourceDialog = true) }
+            is BaseTransactionEvent.HideCustomSourceDialog -> _state.update { it.copy(showCustomSourceDialog = false, customSource = "") }
+            is BaseTransactionEvent.ShowColorPicker -> _state.update { it.copy(showColorPicker = true) }
+            is BaseTransactionEvent.HideColorPicker -> _state.update { it.copy(showColorPicker = false) }
+            is BaseTransactionEvent.SetSource -> {
+                val selectedSource = _state.value.sources.find { it.name == event.source }
+                _state.update { it.copy(source = event.source, sourceColor = selectedSource?.color ?: it.sourceColor) }
             }
-
-            is AddTransactionEvent.ShowDeleteSourceConfirmDialog -> {
-                _state.update {
-                    it.copy(
-                        sourceToDelete = event.source,
-                        showDeleteSourceConfirmDialog = true
-                    )
-                }
-            }
-
-            is AddTransactionEvent.HideDeleteSourceConfirmDialog -> {
-                _state.update {
-                    it.copy(
-                        sourceToDelete = null,
-                        showDeleteSourceConfirmDialog = false
-                    )
-                }
-            }
-
-            is AddTransactionEvent.DeleteSource -> {
-                deleteSource(event.source)
-            }
-            is AddTransactionEvent.Submit -> submitTransaction(context)
-            is AddTransactionEvent.ClearError -> {
-                _state.update { it.copy(error = null) }
-            }
-            is AddTransactionEvent.HideSuccessDialog -> {
-                _state.update { it.copy(isSuccess = false) }
-                // Сбрасываем поля при нажатии "Добавить еще"
-                resetFields()
-            }
-            is AddTransactionEvent.ShowSourcePicker -> {
-                _state.update { it.copy(showSourcePicker = true) }
-            }
-            is AddTransactionEvent.HideSourcePicker -> {
-                _state.update { it.copy(showSourcePicker = false) }
-            }
-            is AddTransactionEvent.ShowCustomSourceDialog -> {
-                _state.update { it.copy(showCustomSourceDialog = true) }
-            }
-            is AddTransactionEvent.HideCustomSourceDialog -> {
-                _state.update {
-                    it.copy(
-                        showCustomSourceDialog = false,
-                        customSource = ""
-                    )
-                }
-            }
-            is AddTransactionEvent.ShowColorPicker -> {
-                _state.update { it.copy(showColorPicker = true) }
-            }
-            is AddTransactionEvent.HideColorPicker -> {
-                _state.update { it.copy(showColorPicker = false) }
-            }
-            is AddTransactionEvent.SetSource -> {
-                _state.update {
-                    it.copy(
-                        source = event.source,
-                        showSourcePicker = false
-                    )
-                }
-            }
-            is AddTransactionEvent.SetCustomSource -> {
-                _state.update { it.copy(customSource = event.source) }
-            }
-            is AddTransactionEvent.AddCustomSource -> {
+            is BaseTransactionEvent.SetCustomSource -> _state.update { it.copy(customSource = event.source) }
+            is BaseTransactionEvent.AddCustomSource -> {
                 try {
                     if (event.source.isBlank()) {
                         _state.update { it.copy(error = "Название источника не может быть пустым") }
@@ -575,120 +459,20 @@ class AddTransactionViewModel(
                     _state.update { it.copy(error = "Ошибка при добавлении источника: ${e.message}") }
                 }
             }
-            is AddTransactionEvent.SetSourceColor -> {
-                _state.update { it.copy(sourceColor = event.color) }
-            }
-            is AddTransactionEvent.ForceSetIncomeType -> {
-                val currentTargetWalletId = _state.value.targetWalletId
-                val currentSelectedWallets = _state.value.selectedWallets
-                val currentAddToWallet = _state.value.addToWallet
-                
-                Timber.d("ForceSetIncomeType начало обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
-                Timber.d("Forced income type selection with wallet settings: targetWalletId=$currentTargetWalletId, addToWallet=$currentAddToWallet, selectedWallets=$currentSelectedWallets")
-                
-                _state.update {
-                    it.copy(
-                        isExpense = false,
-                        forceExpense = false, // Выключаем принудительный расход
-                        // Сохраняем настройки кошелька при принудительном переключении на доход
-                        targetWalletId = currentTargetWalletId,
-                        selectedWallets = currentSelectedWallets,
-                        addToWallet = currentAddToWallet
-                    )
-                }
-                
-                Timber.d("ForceSetIncomeType после обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
-            }
-            
-            is AddTransactionEvent.ForceSetExpenseType -> {
-                val currentTargetWalletId = _state.value.targetWalletId
-                val currentSelectedWallets = _state.value.selectedWallets
-                val currentAddToWallet = _state.value.addToWallet
-                
-                Timber.d("ForceSetExpenseType начало обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}")
-                Timber.d("Forced expense type selection: targetWalletId=$currentTargetWalletId, selectedWallets=$currentSelectedWallets, addToWallet=$currentAddToWallet")
-                
-                _state.update {
-                    it.copy(
-                        isExpense = true,
-                        forceExpense = true, // Включаем принудительный расход
-                        // Сохраняем настройки кошелька при принудительном переключении на расход
-                        targetWalletId = currentTargetWalletId,
-                        selectedWallets = currentSelectedWallets,
-                        addToWallet = currentAddToWallet
-                    )
-                }
-                
-                Timber.d("ForceSetExpenseType после обработки: isExpense=${_state.value.isExpense}, forceExpense=${_state.value.forceExpense}, targetWalletId=${_state.value.targetWalletId}, addToWallet=${_state.value.addToWallet}")
-            }
-            
-            is AddTransactionEvent.SetTargetWalletId -> {
-                _state.update { 
-                    it.copy(
-                        targetWalletId = event.walletId
-                    ) 
-                }
-                Timber.d("Установлен targetWalletId: ${event.walletId}")
-            }
-            
-            // Обработка событий для работы с кошельками
-            is AddTransactionEvent.ToggleAddToWallet -> {
-                // Переключаем состояние добавления в кошелек
-                val newAddToWallet = !_state.value.addToWallet
-                
-                // Сохраняем текущие кошельки для предотвращения потери данных
-                val currentSelectedWallets = _state.value.selectedWallets.toMutableList()
-                
-                // Если includeToWallet стал true и у нас есть targetWalletId, но его нет в списке,
-                // добавляем его в список выбранных кошельков
-                val targetWalletId = _state.value.targetWalletId
-                if (newAddToWallet && targetWalletId != null && !currentSelectedWallets.contains(targetWalletId)) {
-                    Timber.d("ToggleAddToWallet: добавляем targetWalletId=$targetWalletId в список выбранных кошельков")
-                    currentSelectedWallets.add(targetWalletId)
-                }
-                
-                // Обновляем состояние
-                _state.update { it.copy(addToWallet = newAddToWallet, selectedWallets = currentSelectedWallets) }
-                
-                // Если включено добавление в кошельки, и список выбранных кошельков пуст,
-                // только тогда открываем диалог выбора кошельков
-                if (newAddToWallet && _state.value.selectedWallets.isEmpty()) {
-                    Timber.d("ToggleAddToWallet: открываем диалог выбора кошельков, так как selectedWallets пуст")
-                    onEvent(AddTransactionEvent.ShowWalletSelector, context)
+            is BaseTransactionEvent.SetSourceColor -> _state.update { it.copy(sourceColor = event.color) }
+            is BaseTransactionEvent.ShowWalletSelector -> _state.update { it.copy(showWalletSelector = true) }
+            is BaseTransactionEvent.HideWalletSelector -> _state.update { it.copy(showWalletSelector = false) }
+            is BaseTransactionEvent.ToggleAddToWallet -> _state.update { it.copy(addToWallet = !_state.value.addToWallet) }
+            is BaseTransactionEvent.SelectWallet -> {
+                val updated = if (event.selected) {
+                    _state.value.selectedWallets + event.walletId
                 } else {
-                    Timber.d("ToggleAddToWallet: не открываем диалог, так как selectedWallets не пуст: ${_state.value.selectedWallets.size} шт.")
+                    _state.value.selectedWallets - event.walletId
                 }
+                _state.update { it.copy(selectedWallets = updated) }
             }
-            
-            is AddTransactionEvent.ShowWalletSelector -> {
-                _state.update { it.copy(showWalletSelector = true) }
-                // Здесь можно загрузить список кошельков, если он еще не загружен
-                loadWallets()
-            }
-            
-            is AddTransactionEvent.HideWalletSelector -> {
-                _state.update { it.copy(showWalletSelector = false) }
-            }
-            
-            is AddTransactionEvent.SelectWallet -> {
-                val currentSelected = _state.value.selectedWallets.toMutableList()
-                
-                if (event.selected) {
-                    // Добавляем кошелек, если его еще нет в списке
-                    if (!currentSelected.contains(event.walletId)) {
-                        currentSelected.add(event.walletId)
-                    }
-                } else {
-                    // Удаляем кошелек из списка
-                    currentSelected.remove(event.walletId)
-                }
-                
-                _state.update { it.copy(selectedWallets = currentSelected) }
-            }
-            
-            is AddTransactionEvent.SelectWallets -> {
-                _state.update { it.copy(selectedWallets = event.walletIds) }
-            }
+            is BaseTransactionEvent.SelectWallets -> _state.update { it.copy(selectedWallets = event.walletIds) }
+            else -> {}
         }
     }
 
@@ -898,114 +682,10 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Добавляет пользовательскую категорию в соответствующий список
-     */
-    protected fun addCustomCategory(category: String) {
-        if (category.isBlank()) return
-        categoriesViewModel.addCustomCategory(category, _state.value.isExpense)
-        _state.update {
-            it.copy(
-                category = category,
-                showCategoryPicker = false,
-                showCustomCategoryDialog = false,
-                customCategory = ""
-            )
-        }
-    }
-
-    /**
-     * Добавляет пользовательский источник в список источников
-     */
-    protected fun addCustomSource(source: String, color: Int) {
-        try {
-            if (source.isBlank()) {
-                _state.update { it.copy(error = "Название источника не может быть пустым") }
-                return
-            }
-            val newSource = Source(name = source, color = color, isCustom = true)
-            val updatedSources = addCustomSource(sourcePreferences, _state.value.sources, newSource)
-            _state.update {
-                it.copy(
-                    sources = updatedSources,
-                    source = source,
-                    sourceColor = color,
-                    showSourcePicker = false,
-                    showCustomSourceDialog = false,
-                    customSource = ""
-                )
-            }
-            // Log the source addition for debugging
-            Timber.d("Custom source added: ${newSource.name} with color ${newSource.color}. Updated sources: ${updatedSources.map { it.name }}")
-        } catch (e: Exception) {
-            Timber.e(e, "Error adding custom source: ${e.message}")
-            _state.update { it.copy(error = "Ошибка при добавлении источника: ${e.message}") }
-        }
-    }
-
-    /**
-     * Удаляет категорию из списка категорий
-     */
-    protected fun deleteCategory(category: String) {
-        // Проверяем, что категория существует и не равна "Другое"
-        if (category == "Другое") {
-            _state.update { it.copy(error = "Категорию \"Другое\" нельзя удалить") }
-            return
-        }
-
-        viewModelScope.launch {
-            // Удаляем категорию с учетом типа транзакции
-            if (_state.value.isExpense) {
-                categoriesViewModel.deleteExpenseCategory(category)
-            } else {
-                categoriesViewModel.deleteIncomeCategory(category)
-            }
-
-            // Если это была выбранная категория, очищаем выбор
-            if (_state.value.category == category) {
-                _state.update { it.copy(category = "") }
-            }
-
-            // Логируем удаление категории
-            AnalyticsUtils.logCategoryDeleted(category, _state.value.isExpense)
-        }
-    }
-
-    /**
-     * Удаляет источник из списка источников
-     */
-    protected fun deleteSource(source: String) {
-        // Проверяем, что источник существует и не является стандартным
-        if (source == "Сбер" || source == "Наличные" || source == "Т-Банк") {
-            _state.update { it.copy(error = "Стандартные источники удалить нельзя") }
-            return
-        }
-        val updatedSources = deleteCustomSource(sourcePreferences, _state.value.sources, source)
-        _state.update { it.copy(sources = updatedSources) }
-        if (_state.value.source == source) {
-            _state.update {
-                it.copy(
-                    source = "Сбер",
-                    sourceColor = 0xFF21A038.toInt()
-                )
-            }
-        }
-        // Логируем удаление источника
-        AnalyticsUtils.logSourceDeleted(source)
-    }
-
-    /**
-     * Метод для возврата к предыдущему экрану
-     */
-    private fun returnToPreviousScreen() {
-        navigateBackCallback?.invoke()
-    }
-
-    /**
      * Запрашивает принудительное обновление данных у репозитория
-     * Это нужно для мгновенного обновления UI на других экранах
      */
-    private suspend fun requestDataRefresh() {
-        withContext(Dispatchers.IO) {
+    private fun requestDataRefresh() {
+        viewModelScope.launch {
             try {
                 getTransactionRepositoryInstance().notifyDataChanged(null)
             } catch (e: Exception) {
@@ -1264,4 +944,78 @@ class AddTransactionViewModel(
     }
 
     protected override val _state = MutableStateFlow(AddTransactionState())
+
+    override fun addCustomCategory(category: String) {
+        if (category.isBlank()) return
+        categoriesViewModel.addCustomCategory(category, _state.value.isExpense)
+        _state.update {
+            it.copy(
+                category = category,
+                showCategoryPicker = false,
+                showCustomCategoryDialog = false,
+                customCategory = ""
+            )
+        }
+    }
+
+    override fun deleteCategory(category: String) {
+        if (category == "Другое") {
+            _state.update { it.copy(error = "Категорию \"Другое\" нельзя удалить") }
+            return
+        }
+        viewModelScope.launch {
+            if (_state.value.isExpense) {
+                categoriesViewModel.deleteExpenseCategory(category)
+            } else {
+                categoriesViewModel.deleteIncomeCategory(category)
+            }
+            if (_state.value.category == category) {
+                _state.update { it.copy(category = "") }
+            }
+            com.davidbugayov.financeanalyzer.utils.AnalyticsUtils.logCategoryDeleted(category, _state.value.isExpense)
+        }
+    }
+
+    override fun addCustomSource(source: String, color: Int) {
+        try {
+            if (source.isBlank()) {
+                _state.update { it.copy(error = "Название источника не может быть пустым") }
+                return
+            }
+            val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(name = source, color = color, isCustom = true)
+            val updatedSources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource(sourcePreferences, _state.value.sources, newSource)
+            _state.update {
+                it.copy(
+                    sources = updatedSources,
+                    source = source,
+                    sourceColor = color,
+                    showSourcePicker = false,
+                    showCustomSourceDialog = false,
+                    customSource = ""
+                )
+            }
+            timber.log.Timber.d("Custom source added: ${newSource.name} with color ${newSource.color}. Updated sources: ${updatedSources.map { it.name }}")
+        } catch (e: Exception) {
+            timber.log.Timber.e(e, "Error adding custom source: ${e.message}")
+            _state.update { it.copy(error = "Ошибка при добавлении источника: ${e.message}") }
+        }
+    }
+
+    override fun deleteSource(source: String) {
+        if (source == "Сбер" || source == "Наличные" || source == "Т-Банк") {
+            _state.update { it.copy(error = "Стандартные источники удалить нельзя") }
+            return
+        }
+        val updatedSources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.deleteCustomSource(sourcePreferences, _state.value.sources, source)
+        _state.update { it.copy(sources = updatedSources) }
+        if (_state.value.source == source) {
+            _state.update {
+                it.copy(
+                    source = "Сбер",
+                    sourceColor = 0xFF21A038.toInt()
+                )
+            }
+        }
+        com.davidbugayov.financeanalyzer.utils.AnalyticsUtils.logSourceDeleted(source)
+    }
 } 

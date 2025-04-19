@@ -8,11 +8,12 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import java.util.Date
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.defaultTransactionEventFactory
 
 /**
  * Экран добавления новой транзакции
@@ -44,7 +45,7 @@ fun AddTransactionScreen(
         // (обычно при переходе с экрана бюджета)
         if (!viewModel.state.value.forceExpense && viewModel.state.value.isExpense) {
             // Принудительно переключаем на тип "Доход"
-            viewModel.onEvent(AddTransactionEvent.ForceSetIncomeType, context)
+            viewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType, context)
         }
     }
     
@@ -63,67 +64,7 @@ fun AddTransactionScreen(
         screenTitle = "Новая транзакция",
         buttonText = "Добавить",
         isEditMode = false,
-        eventFactory = { eventData ->
-            when (eventData) {
-                is Source -> AddTransactionEvent.SetSourceColor(eventData.color)
-                is CategoryItem -> AddTransactionEvent.SetCategory(eventData.name)
-                is Date -> AddTransactionEvent.SetDate(eventData)
-                is String -> when (eventData) {
-                    "ShowDatePicker" -> AddTransactionEvent.ShowDatePicker
-                    "ToggleTransactionType" -> AddTransactionEvent.ToggleTransactionType
-                    "ShowCustomSourceDialog" -> AddTransactionEvent.ShowCustomSourceDialog
-                    "ShowCustomCategoryDialog" -> AddTransactionEvent.ShowCustomCategoryDialog
-                    "ToggleAddToWallet" -> AddTransactionEvent.ToggleAddToWallet
-                    "ShowWalletSelector" -> AddTransactionEvent.ShowWalletSelector
-                    "ClearError" -> AddTransactionEvent.ClearError
-                    "HideSuccessDialog" -> AddTransactionEvent.HideSuccessDialog
-                    "HideDatePicker" -> AddTransactionEvent.HideDatePicker
-                    "HideCategoryPicker" -> AddTransactionEvent.HideCategoryPicker
-                    "HideCustomCategoryDialog" -> AddTransactionEvent.HideCustomCategoryDialog
-                    "HideDeleteCategoryConfirmDialog" -> AddTransactionEvent.HideDeleteCategoryConfirmDialog
-                    "HideDeleteSourceConfirmDialog" -> AddTransactionEvent.HideDeleteSourceConfirmDialog
-                    "HideSourcePicker" -> AddTransactionEvent.HideSourcePicker
-                    "HideCustomSourceDialog" -> AddTransactionEvent.HideCustomSourceDialog
-                    "HideColorPicker" -> AddTransactionEvent.HideColorPicker
-                    "HideWalletSelector" -> AddTransactionEvent.HideWalletSelector
-                    else -> AddTransactionEvent.Submit
-                }
-                is Pair<*, *> -> when (eventData.first as? String) {
-                    "DeleteSourceConfirm" -> {
-                        val source = eventData.second as? Source
-                        AddTransactionEvent.ShowDeleteSourceConfirmDialog(source?.name ?: "")
-                    }
-                    "DeleteCategoryConfirm" -> {
-                        val category = eventData.second as? CategoryItem
-                        AddTransactionEvent.ShowDeleteCategoryConfirmDialog(category?.name ?: "")
-                    }
-                    "SetAmount" -> AddTransactionEvent.SetAmount(eventData.second as String)
-                    "SetNote" -> AddTransactionEvent.SetNote(eventData.second as String)
-                    "SetCustomCategoryText" -> AddTransactionEvent.SetCustomCategory(eventData.second as String)
-                    "AddCustomCategoryConfirm" -> AddTransactionEvent.AddCustomCategory(eventData.second as String)
-                    "DeleteCategoryConfirmActual" -> AddTransactionEvent.DeleteCategory(eventData.second as String)
-                    "DeleteSourceConfirmActual" -> AddTransactionEvent.DeleteSource(eventData.second as String)
-                    "SetCustomSourceName" -> AddTransactionEvent.SetCustomSource(eventData.second as String)
-                    "SetCustomSourceColor" -> AddTransactionEvent.SetSourceColor(eventData.second as Int)
-                    "SetSourceColor" -> AddTransactionEvent.SetSourceColor(eventData.second as Int)
-                    else -> AddTransactionEvent.Submit
-                }
-                is Triple<*, *, *> -> when (eventData.first as? String) {
-                    "AddCustomSourceConfirm" -> {
-                        val name = eventData.second as String
-                        val color = eventData.third as Int
-                        AddTransactionEvent.AddCustomSource(name, color)
-                    }
-                    "SelectWallet" -> {
-                        val walletId = eventData.second as String
-                        val selected = eventData.third as Boolean
-                        AddTransactionEvent.SelectWallet(walletId, selected)
-                    }
-                    else -> AddTransactionEvent.Submit
-                }
-                else -> AddTransactionEvent.Submit
-            }
-        },
-        submitEvent = AddTransactionEvent.Submit
+        eventFactory = defaultTransactionEventFactory(false),
+        submitEvent = BaseTransactionEvent.Submit
     )
 }

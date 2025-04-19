@@ -9,11 +9,19 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
+import timber.log.Timber
+import kotlinx.coroutines.flow.update
+import androidx.lifecycle.viewModelScope
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent> : ViewModel(), TransactionScreenViewModel<S, E> {
     protected abstract val _state: MutableStateFlow<S>
     override val state: StateFlow<S> get() = _state.asStateFlow()
     override val wallets: List<Wallet> = emptyList()
+
+    // Добавляю protected поля для работы с категориями и источниками
+    protected abstract val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+    protected abstract val sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 
     // Вся обработка событий теперь только в наследниках
     abstract override fun onEvent(event: E, context: android.content.Context)
@@ -104,4 +112,24 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         updateState(amountError, categoryError, sourceError, errorMsg)
         return isValid
     }
+
+    /**
+     * Добавляет пользовательскую категорию в соответствующий список
+     */
+    protected abstract fun addCustomCategory(category: String)
+
+    /**
+     * Удаляет категорию из списка категорий
+     */
+    protected abstract fun deleteCategory(category: String)
+
+    /**
+     * Добавляет пользовательский источник в список источников
+     */
+    protected abstract fun addCustomSource(source: String, color: Int)
+
+    /**
+     * Удаляет источник из списка источников
+     */
+    protected abstract fun deleteSource(source: String)
 } 

@@ -49,7 +49,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletCard
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletAction
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.AddTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import org.koin.androidx.compose.koinViewModel
@@ -238,7 +238,7 @@ fun BudgetScreen(
                                         )
                                         
                                         // Устанавливаем категорию, равную имени кошелька
-                                        addTransactionViewModel.onEvent(AddTransactionEvent.SetCategory(categoryFromMenu.name), context = context)
+                                        addTransactionViewModel.onEvent(BaseTransactionEvent.SetCategory(categoryFromMenu.name), context = context)
                                         Timber.d("Категория установлена: ${categoryFromMenu.name}")
                                         
                                         // Явно устанавливаем, что это не расход

@@ -51,7 +51,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectorDialog
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.EditTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.TransactionScreenViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor

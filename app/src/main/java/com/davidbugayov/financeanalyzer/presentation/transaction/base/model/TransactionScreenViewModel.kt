@@ -51,4 +51,67 @@ interface BaseTransactionState {
     val targetWalletId: String?
     val forceExpense: Boolean
     val sourceError: Boolean
+}
+
+fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent = { eventData ->
+    when (eventData) {
+        is com.davidbugayov.financeanalyzer.domain.model.Source -> BaseTransactionEvent.SetSource(eventData.name)
+        is com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem -> BaseTransactionEvent.SetCategory(eventData.name)
+        is java.util.Date -> BaseTransactionEvent.SetDate(eventData)
+        is String -> when (eventData) {
+            if (isEditMode) "SubmitEdit" else "Submit" -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
+            "ShowDatePicker" -> BaseTransactionEvent.ShowDatePicker
+            "HideDatePicker" -> BaseTransactionEvent.HideDatePicker
+            "ShowSourcePicker" -> BaseTransactionEvent.ShowSourcePicker
+            "HideSourcePicker" -> BaseTransactionEvent.HideSourcePicker
+            "ShowCustomSourceDialog" -> BaseTransactionEvent.ShowCustomSourceDialog
+            "HideCustomSourceDialog" -> BaseTransactionEvent.HideCustomSourceDialog
+            "ShowCustomCategoryDialog" -> BaseTransactionEvent.ShowCustomCategoryDialog
+            "HideCustomCategoryDialog" -> BaseTransactionEvent.HideCustomCategoryDialog
+            "ToggleTransactionType" -> BaseTransactionEvent.ToggleTransactionType
+            "HideDeleteCategoryConfirmDialog" -> BaseTransactionEvent.HideDeleteCategoryConfirmDialog
+            "HideDeleteSourceConfirmDialog" -> BaseTransactionEvent.HideDeleteSourceConfirmDialog
+            "ClearError" -> BaseTransactionEvent.ClearError
+            "HideSuccessDialog" -> BaseTransactionEvent.HideSuccessDialog
+            "HideColorPicker" -> BaseTransactionEvent.HideColorPicker
+            "HideWalletSelector" -> BaseTransactionEvent.HideWalletSelector
+            "ToggleAddToWallet" -> BaseTransactionEvent.ToggleAddToWallet
+            "ShowWalletSelector" -> BaseTransactionEvent.ShowWalletSelector
+            else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
+        }
+        is Pair<*, *> -> when (eventData.first as? String) {
+            "DeleteSourceConfirm" -> {
+                val source = eventData.second as? com.davidbugayov.financeanalyzer.domain.model.Source
+                BaseTransactionEvent.ShowDeleteSourceConfirmDialog(source?.name ?: "")
+            }
+            "DeleteCategoryConfirm" -> {
+                val category = eventData.second as? com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+                BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(category?.name ?: "")
+            }
+            "SetAmount" -> BaseTransactionEvent.SetAmount(eventData.second as String)
+            "SetNote" -> BaseTransactionEvent.SetNote(eventData.second as String)
+            "SetCustomCategoryText" -> BaseTransactionEvent.SetCustomCategory(eventData.second as String)
+            "AddCustomCategoryConfirm" -> BaseTransactionEvent.AddCustomCategory(eventData.second as String)
+            "DeleteCategoryConfirmActual" -> BaseTransactionEvent.DeleteCategory(eventData.second as String)
+            "DeleteSourceConfirmActual" -> BaseTransactionEvent.DeleteSource(eventData.second as String)
+            "SetCustomSourceName" -> BaseTransactionEvent.SetCustomSource(eventData.second as String)
+            "SetCustomSourceColor" -> BaseTransactionEvent.SetSourceColor(eventData.second as Int)
+            "SetSourceColor" -> BaseTransactionEvent.SetSourceColor(eventData.second as Int)
+            else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
+        }
+        is Triple<*, *, *> -> when (eventData.first as? String) {
+            "AddCustomSourceConfirm" -> {
+                val name = eventData.second as String
+                val color = eventData.third as Int
+                BaseTransactionEvent.AddCustomSource(name, color)
+            }
+            "SelectWallet" -> {
+                val walletId = eventData.second as String
+                val selected = eventData.third as Boolean
+                BaseTransactionEvent.SelectWallet(walletId, selected)
+            }
+            else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
+        }
+        else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
+    }
 } 
