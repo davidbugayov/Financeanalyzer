@@ -1,19 +1,14 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.edit.model
+package com.davidbugayov.financeanalyzer.presentation.transaction.edit
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.BaseTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import java.util.Date
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.defaultTransactionEventFactory
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 
 /**
  * Экран редактирования существующей транзакции
@@ -25,8 +20,6 @@ fun EditTransactionScreen(
     onNavigateBack: () -> Unit,
     transactionId: String? = null
 ) {
-    // Get context at the Composable level
-    val context = LocalContext.current
 
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
@@ -35,7 +28,7 @@ fun EditTransactionScreen(
         )
         transactionId?.let {
             if (it.isNotEmpty()) {
-                viewModel.loadTransactionForEdit(it)
+                viewModel.loadTransactionForEditById(it)
             }
         }
     }

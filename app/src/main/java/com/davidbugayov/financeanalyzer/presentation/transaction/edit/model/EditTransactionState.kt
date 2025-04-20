@@ -4,6 +4,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.util.Date
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionState
 
 /**
  * Состояние экрана редактирования транзакции.
@@ -48,4 +49,4 @@ data class EditTransactionState(
     override val forceExpense: Boolean = false,
     val isEdited: Boolean = false,
     override val sourceError: Boolean = false
-) : com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState 
+) : BaseTransactionState

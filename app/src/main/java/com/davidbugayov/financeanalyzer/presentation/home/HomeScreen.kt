@@ -47,6 +47,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLay
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
@@ -61,6 +62,7 @@ import timber.log.Timber
 fun HomeScreen(
     viewModel: HomeViewModel,
     addTransactionViewModel: AddTransactionViewModel,
+    editTransactionViewModel: EditTransactionViewModel,
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit,
@@ -305,7 +307,7 @@ fun HomeScreen(
                     },
                     onEdit = { transaction ->
                         showActionsDialog = false
-                        addTransactionViewModel.loadTransactionForEditing(transaction)
+                        editTransactionViewModel.loadTransactionForEdit(transaction)
                         onNavigateToEdit(transaction.id)
                         feedbackMessage = "Редактирование транзакции"
                         feedbackType = FeedbackType.INFO

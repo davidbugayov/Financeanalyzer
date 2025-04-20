@@ -4,16 +4,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.platform.LocalContext
-import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.BaseTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import java.util.Date
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.defaultTransactionEventFactory
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 
 /**
  * Экран добавления новой транзакции

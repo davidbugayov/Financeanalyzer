@@ -8,7 +8,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
  */
 data class TransactionDialogState(
     /** Транзакция для редактирования */
-    val transactionToEdit: Transaction? = null,
+    val transactionToEdit: String? = null,
     
     /** Показывать ли диалог редактирования */
     val showEditDialog: Boolean = false,

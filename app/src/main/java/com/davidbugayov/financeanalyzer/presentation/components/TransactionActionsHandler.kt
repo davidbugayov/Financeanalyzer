@@ -19,7 +19,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 fun TransactionActionsHandler(
     transactionDialogState: TransactionDialogState,
     onEvent: (TransactionEvent) -> Unit,
-    onNavigateToEdit: ((Transaction) -> Unit)? = null
+    onNavigateToEdit: ((String) -> Unit)? = null
 ) {
     // Диалог подтверждения удаления транзакции
     if (transactionDialogState.showDeleteConfirmDialog && transactionDialogState.transactionToDelete != null) {
@@ -35,12 +35,12 @@ fun TransactionActionsHandler(
         )
     }
     
-    // Если транзакция для редактирования выбрана и есть функция навигации, переходим к редактированию
+    // Если ID транзакции для редактирования выбран и есть функция навигации, переходим к редактированию
     if (transactionDialogState.showEditDialog && transactionDialogState.transactionToEdit != null) {
-        val transaction = transactionDialogState.transactionToEdit
+        val transactionId = transactionDialogState.transactionToEdit
         if (onNavigateToEdit != null) {
             // Переходим к экрану редактирования
-            onNavigateToEdit(transaction)
+            onNavigateToEdit(transactionId)
             // Сбрасываем состояние
             onEvent(TransactionEvent.HideEditDialog)
         }

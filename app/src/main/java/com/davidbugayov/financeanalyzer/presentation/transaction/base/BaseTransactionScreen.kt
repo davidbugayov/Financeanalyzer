@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction
+package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -13,7 +13,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -25,7 +24,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
@@ -34,8 +32,6 @@ import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
 import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AmountField
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CategoryPickerDialog
@@ -50,12 +46,8 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.TransactionHeader
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectorDialog
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.TransactionScreenViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import java.util.Date
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 

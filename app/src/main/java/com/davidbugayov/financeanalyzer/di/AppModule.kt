@@ -73,7 +73,6 @@ val appModule = module {
     viewModel {
         AddTransactionViewModel(
             addTransactionUseCase = get(),
-            updateTransactionUseCase = get(),
             categoriesViewModel = get(),
             sourcePreferences = get(),
             walletRepository = get()
@@ -99,7 +98,6 @@ val appModule = module {
 
     viewModel {
         com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel(
-            application = androidApplication(),
             updateTransactionUseCase = get(),
             transactionRepository = get(),
             categoriesViewModel = get(),

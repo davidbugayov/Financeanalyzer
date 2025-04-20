@@ -21,6 +21,7 @@ import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
 
@@ -28,7 +29,7 @@ import org.koin.androidx.compose.koinViewModel
 fun WalletTransactionsScreen(
     walletId: String,
     onNavigateBack: () -> Unit,
-    addTransactionViewModel: AddTransactionViewModel = koinViewModel(),
+    editTransactionViewModel: EditTransactionViewModel = koinViewModel(),
     navController: NavController = rememberNavController()
 ) {
     val context = LocalContext.current
@@ -54,9 +55,9 @@ fun WalletTransactionsScreen(
             val selectedCategory = object { val name = "Salary" } // Example category
             
             if (isIncome) {
-                addTransactionViewModel.setupForIncomeAddition(amount, selectedCategory.name, context)
+                editTransactionViewModel.setupForIncomeAddition(amount, selectedCategory.name, context)
             } else {
-                addTransactionViewModel.setupForExpenseAddition(amount, selectedCategory.name, context)
+                editTransactionViewModel.setupForExpenseAddition(amount, selectedCategory.name, context)
             }
             
             // Function to handle onTransactionClick that would show actions dialog
@@ -79,7 +80,7 @@ fun WalletTransactionsScreen(
                         showActionsDialog = false
                         selectedTransaction?.let { transaction ->
                             // Загружаем транзакцию в ViewModel для редактирования
-                            addTransactionViewModel.loadTransactionForEditing(transaction)
+                            editTransactionViewModel.loadTransactionForEdit(transaction)
                             // Переходим на экран редактирования транзакции
                             navController.navigate(Screen.EditTransaction.createRoute(transaction.id))
                             Timber.d("Navigating to edit transaction with ID: ${transaction.id}")

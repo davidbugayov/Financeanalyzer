@@ -43,7 +43,7 @@ import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionScreen
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
@@ -78,6 +78,7 @@ fun MainScreen(startDestination: String = "home") {
     val homeViewModel: HomeViewModel = koinViewModel()
     val chartViewModel: ChartViewModel = koinViewModel()
     val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
+    val editTransactionViewModel: EditTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
     val onboardingViewModel: OnboardingViewModel = koinViewModel()
     val context = LocalContext.current
@@ -270,6 +271,7 @@ fun MainScreen(startDestination: String = "home") {
                         HomeScreen(
                             viewModel = homeViewModel,
                             addTransactionViewModel = addTransactionViewModel,
+                            editTransactionViewModel = editTransactionViewModel,
                             onNavigateToHistory = { navController.navigate(Screen.History.route) },
                             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
@@ -329,7 +331,7 @@ fun MainScreen(startDestination: String = "home") {
                     ) {
                         TransactionHistoryScreen(
                             viewModel = koinViewModel<TransactionHistoryViewModel>(),
-                            addTransactionViewModel = addTransactionViewModel,
+                            editTransactionViewModel = editTransactionViewModel,
                             onNavigateBack = { navController.navigateUp() },
                             navController = navController
                         )
@@ -394,7 +396,7 @@ fun MainScreen(startDestination: String = "home") {
                                     if (shouldDistribute) {
                                         Timber.d("Включено автоматическое распределение дохода, выбираем все кошельки")
                                         addTransactionViewModel.clearSelectedWallets()
-                                        addTransactionViewModel.selectAllWallets()
+                                        addTransactionViewModel.selectAllWallets(context)
                                     }
                                 }
                                 
@@ -429,7 +431,7 @@ fun MainScreen(startDestination: String = "home") {
                                     addTransactionViewModel.resetToDefaultState()
                                     
                                     // Включаем добавление в кошельки и выбираем все кошельки без показа диалога
-                                    addTransactionViewModel.selectAllWalletsWithoutDialog()
+                                    addTransactionViewModel.selectAllWallets(context)
                                     
                                     // Настраиваем вьюмодель на режим расхода
                                     addTransactionViewModel.setupForExpenseAddition("", "Списание", context = context)

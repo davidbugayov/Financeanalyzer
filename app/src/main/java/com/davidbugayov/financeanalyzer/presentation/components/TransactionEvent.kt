@@ -20,7 +20,7 @@ sealed class TransactionEvent {
     /**
      * Показать диалог редактирования транзакции
      */
-    data class ShowEditDialog(val transaction: Transaction) : TransactionEvent()
+    data class ShowEditDialog(val transactionId: String) : TransactionEvent()
     
     /**
      * Скрыть диалог редактирования транзакции

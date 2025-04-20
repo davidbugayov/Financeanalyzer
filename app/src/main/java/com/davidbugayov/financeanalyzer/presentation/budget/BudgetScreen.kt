@@ -704,7 +704,7 @@ fun BudgetScreen(
                                     
                                     // Сбрасываем предыдущие выбранные кошельки и выбираем все существующие
                                     addTransactionViewModel.clearSelectedWallets()
-                                    addTransactionViewModel.selectAllWalletsWithoutDialog()
+                                    addTransactionViewModel.selectAllWallets(context)
                                     
                                     // Устанавливаем callback для автоматического распределения дохода после добавления
                                     addTransactionViewModel.onIncomeAddedCallback = { amount ->

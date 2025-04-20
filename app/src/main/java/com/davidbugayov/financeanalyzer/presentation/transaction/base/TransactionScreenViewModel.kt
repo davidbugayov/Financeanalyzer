@@ -1,7 +1,8 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.model
+package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
 import kotlinx.coroutines.flow.StateFlow
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 
 interface TransactionScreenViewModel<S, E> {
     val state: StateFlow<S>
@@ -10,6 +11,8 @@ interface TransactionScreenViewModel<S, E> {
     fun resetFields()
     fun updateCategoryPositions()
     fun submitTransaction(context: android.content.Context)
+    fun clearSelectedWallets()
+    fun selectAllWallets(context: android.content.Context)
 }
 
 interface BaseTransactionState {

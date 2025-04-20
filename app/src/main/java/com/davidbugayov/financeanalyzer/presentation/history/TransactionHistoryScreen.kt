@@ -63,6 +63,7 @@ import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -78,7 +79,7 @@ fun TransactionHistoryState.toTransactionDialogState(): TransactionDialogState {
 @Composable
 fun TransactionHistoryScreen(
     viewModel: TransactionHistoryViewModel,
-    addTransactionViewModel: AddTransactionViewModel,
+    editTransactionViewModel: EditTransactionViewModel,
     onNavigateBack: () -> Unit,
     navController: NavController
 ) {
@@ -105,7 +106,7 @@ fun TransactionHistoryScreen(
             }
             is TransactionEvent.ShowEditDialog -> {
                 // Навигация на экран редактирования
-                navController.navigate(Screen.EditTransaction.createRoute(event.transaction.id))
+                navController.navigate(Screen.EditTransaction.createRoute(event.transactionId))
             }
             is TransactionEvent.HideEditDialog -> {
                 // Ничего не делаем, так как мы переходим на новый экран
@@ -238,8 +239,12 @@ fun TransactionHistoryScreen(
     TransactionActionsHandler(
         transactionDialogState = state.toTransactionDialogState(),
         onEvent = { event -> handleTransactionEvent(event) },
-        onNavigateToEdit = { transaction ->
-            handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction))
+        onNavigateToEdit = { transactionId ->
+            // Загружаем транзакцию в ViewModel для редактирования
+            editTransactionViewModel.loadTransactionForEditById(transactionId)
+            // Переходим на экран редактирования
+            navController.navigate(Screen.EditTransaction.createRoute(transactionId))
+            Timber.d("Navigating to edit transaction with ID: $transactionId")
         }
     )
 
@@ -288,11 +293,8 @@ fun TransactionHistoryScreen(
             },
             onEdit = { transaction ->
                 showActionsDialog = false
-                // Загружаем транзакцию в ViewModel для редактирования
-                addTransactionViewModel.loadTransactionForEditing(transaction)
-                // Переходим на экран редактирования
-                navController.navigate(Screen.EditTransaction.createRoute(transaction.id))
-                Timber.d("Navigating to edit transaction with ID: ${transaction.id}")
+                // Загружаем транзакцию в ViewModel для редактирования и переходим на экран редактирования
+                handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction.id))
             }
         )
     }
@@ -441,11 +443,13 @@ fun TransactionHistoryScreen(
                     TransactionGroupList(
                         transactionGroups = transactionGroups,
                         onTransactionClick = { transaction -> 
-                            handleTransactionEvent(TransactionEvent.ShowDeleteConfirmDialog(transaction))
+                            selectedTransaction = transaction
+                            showActionsDialog = true
                         },
                         onTransactionLongClick = { transaction ->
                             // Показываем тот же диалог выбора действий, что и при клике
-                            handleTransactionEvent(TransactionEvent.ShowDeleteConfirmDialog(transaction))
+                            selectedTransaction = transaction
+                            showActionsDialog = true
                         },
                         onLoadMore = {
                             viewModel.onEvent(TransactionHistoryEvent.LoadMoreTransactions)

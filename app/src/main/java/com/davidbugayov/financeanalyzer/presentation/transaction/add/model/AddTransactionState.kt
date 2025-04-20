@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.add.model
 
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionState
 import java.util.Date
 
 /**
@@ -47,4 +48,4 @@ data class AddTransactionState(
     override val editMode: Boolean = false, // Режим редактирования (по умолчанию выключен)
     override val transactionToEdit: Transaction? = null, // Транзакция для редактирования
     override val sourceError: Boolean = false
-) : com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState 
+) : BaseTransactionState
