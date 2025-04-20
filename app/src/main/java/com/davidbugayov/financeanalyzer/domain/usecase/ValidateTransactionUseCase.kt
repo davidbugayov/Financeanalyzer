@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase
 
+import timber.log.Timber
+
 class ValidateTransactionUseCase {
     data class Result(
         val isValid: Boolean,
@@ -10,20 +12,17 @@ class ValidateTransactionUseCase {
     )
 
     operator fun invoke(amount: String, category: String, source: String): Result {
+        Timber.d("Validating transaction: amount='$amount', category='$category', source='$source'")
+        
         val amountError = amount.isBlank()
-        val categoryError = category.isBlank()
-        val sourceError = source.isBlank()
-        val isValid = !amountError && !categoryError && !sourceError
-        val errorMsg = when {
-            amountError && categoryError && sourceError -> "Заполните сумму, категорию и источник"
-            amountError && categoryError -> "Заполните сумму и категорию"
-            amountError && sourceError -> "Заполните сумму и источник"
-            categoryError && sourceError -> "Заполните категорию и источник"
-            amountError -> "Введите сумму транзакции"
-            categoryError -> "Выберите категорию"
-            sourceError -> "Выберите источник"
-            else -> null
-        }
+        val categoryError = false
+        val sourceError = false
+        val isValid = !amountError
+        
+        val errorMsg = if (amountError) "Введите сумму транзакции" else null
+        
+        Timber.d("Validation result: isValid=$isValid, amountError=$amountError, categoryError=$categoryError, sourceError=$sourceError, errorMsg=$errorMsg")
+        
         return Result(isValid, amountError, categoryError, sourceError, errorMsg)
     }
 } 

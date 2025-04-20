@@ -54,6 +54,7 @@ interface BaseTransactionState {
     val targetWalletId: String?
     val forceExpense: Boolean
     val sourceError: Boolean
+    val preventAutoSubmit: Boolean
 }
 
 fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent = { eventData ->

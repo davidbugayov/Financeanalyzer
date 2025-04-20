@@ -66,4 +66,20 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null
     ) : AppException(message ?: "Неизвестная ошибка", cause)
+    
+    companion object {
+        /**
+         * Преобразует стандартное исключение в AppException
+         */
+        fun mapException(exception: Throwable): AppException {
+            return when (exception) {
+                is AppException -> exception
+                is java.net.UnknownHostException, 
+                is java.net.ConnectException,
+                is java.net.SocketTimeoutException -> Network.Connection(exception)
+                is java.io.IOException -> FileSystem.ReadError(cause = exception)
+                else -> Unknown(exception.message, exception)
+            }
+        }
+    }
 } 

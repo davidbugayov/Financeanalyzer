@@ -34,7 +34,8 @@ fun SourceItem(
     source: Source,
     isSelected: Boolean,
     onClick: () -> Unit,
-    onLongClick: () -> Unit
+    onLongClick: () -> Unit,
+    isError: Boolean = false
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,10 +51,23 @@ fun SourceItem(
             modifier = Modifier
                 .size(60.dp)
                 .clip(CircleShape)
-                .background(Color(source.color))
+                .background(
+                    if (isError) 
+                        Color(0xFFFFCDD2)
+                    else 
+                        Color(source.color)
+                )
                 .border(
-                    width = if (isSelected) 3.dp else 0.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                    width = when {
+                        isSelected -> 3.dp
+                        isError -> 3.dp
+                        else -> 0.dp
+                    },
+                    color = when {
+                        isSelected -> MaterialTheme.colorScheme.primary
+                        isError -> Color(0xFFE57373)
+                        else -> Color.Transparent
+                    },
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
@@ -61,7 +75,7 @@ fun SourceItem(
             // Здесь можно добавить иконку для источника
             Text(
                 text = source.name.first().toString(),
-                color = Color.White,
+                color = if (isError) Color.Red else Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )
@@ -73,7 +87,8 @@ fun SourceItem(
             text = source.name,
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
+            color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface
         )
     }
 } 

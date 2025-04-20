@@ -30,6 +30,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 /**
  * ViewModel для управления категориями транзакций.
@@ -76,6 +77,7 @@ class CategoriesViewModel(
     val incomeCategories: StateFlow<List<CategoryItem>> = _incomeCategories.asStateFlow()
 
     init {
+        Timber.d("[CategoriesVM] CategoriesViewModel создан: $this")
         loadCategories()
     }
 

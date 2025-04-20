@@ -78,12 +78,12 @@ val appModule = module {
     viewModel { ChartViewModel() }
     viewModel {
         AddTransactionViewModel(
+            validateTransactionUseCase = get(),
+            prepareTransactionUseCase = get(),
             addTransactionUseCase = get(),
             categoriesViewModel = get(),
             sourcePreferences = get(),
-            walletRepository = get(),
-            validateTransactionUseCase = get(),
-            prepareTransactionUseCase = get()
+            walletRepository = get()
         )
     }
     viewModel {

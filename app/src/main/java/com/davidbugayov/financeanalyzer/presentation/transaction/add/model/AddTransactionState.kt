@@ -47,5 +47,8 @@ data class AddTransactionState(
     override val forceExpense: Boolean = false, // Принудительно использовать тип "Расход"
     override val editMode: Boolean = false, // Режим редактирования (по умолчанию выключен)
     override val transactionToEdit: Transaction? = null, // Транзакция для редактирования
-    override val sourceError: Boolean = false
+    override val sourceError: Boolean = false,
+    override val preventAutoSubmit: Boolean = false, // Предотвращать автоматическую отправку формы
+    val walletError: Boolean = false,
+    val dateError: Boolean = false
 ) : BaseTransactionState

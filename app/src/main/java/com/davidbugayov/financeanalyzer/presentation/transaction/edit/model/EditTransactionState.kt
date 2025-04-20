@@ -48,5 +48,7 @@ data class EditTransactionState(
     override val targetWalletId: String? = null,
     override val forceExpense: Boolean = false,
     val isEdited: Boolean = false,
-    override val sourceError: Boolean = false
+    override val sourceError: Boolean = false,
+    override val preventAutoSubmit: Boolean = false,
+    val walletError: Boolean = false
 ) : BaseTransactionState

@@ -46,7 +46,9 @@ fun CategorySection(
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.category) + " *",
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.titleMedium.copy(
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+            ),
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
             color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
         )

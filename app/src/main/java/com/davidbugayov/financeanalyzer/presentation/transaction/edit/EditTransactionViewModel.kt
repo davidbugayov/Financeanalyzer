@@ -26,7 +26,9 @@ import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.PrepareTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
-import kotlin.Result as KotlinResult
+import kotlin.Result
+import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
+import java.util.Date
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -44,6 +46,9 @@ class EditTransactionViewModel(
 ) {
 
     protected override val _state = MutableStateFlow(EditTransactionState())
+    // Флаг для блокировки автоматической отправки формы
+    private var blockAutoSubmit = false
+    
     override val wallets: List<Wallet>
         get() = emptyList() // Используйте loadWallets из базового класса
 
@@ -54,18 +59,76 @@ class EditTransactionViewModel(
 
     fun loadTransaction(id: String) {
         viewModelScope.launch {
-            val result = getTransactionByIdUseCase(id)
-            if (result.isSuccess) {
-                val transaction = result.getOrNull()
-                if (transaction != null) {
-                    _state.update { it.copy(transactionToEdit = transaction) }
-                } else {
-                    _state.update { it.copy(error = "Транзакция не найдена") }
+            try {
+                val result = getTransactionByIdUseCase(id)
+                if (result is DomainResult.Success) {
+                    val transaction = result.data
+                    if (transaction != null) {
+                        _state.update { it.copy(transactionToEdit = transaction) }
+                    } else {
+                        _state.update { it.copy(error = "Транзакция не найдена") }
+                    }
+                } else if (result is DomainResult.Error) {
+                    _state.update { it.copy(error = result.exception.message) }
                 }
-            } else {
-                _state.update { it.copy(error = result.exceptionOrNull()?.message) }
+            } catch (e: Exception) {
+                _state.update { it.copy(error = e.message ?: "Неизвестная ошибка") }
             }
         }
+    }
+
+    private fun validateInput(
+        walletId: String?,
+        amount: String,
+        note: String,
+        date: Date,
+        sourceColor: Int,
+        source: String,
+        categoryId: String,
+        isExpense: Boolean
+    ): Boolean {
+        val validationBuilder = ValidationBuilder()
+        // Reset errors
+        _state.update {
+            it.copy(
+                walletError = false,
+                amountError = false,
+                categoryError = false,
+                sourceError = false
+            )
+        }
+        // Check wallet
+        if (walletId.isNullOrBlank()) {
+            validationBuilder.addWalletError()
+        }
+        // Check amount
+        if (amount.isBlank()) {
+            validationBuilder.addAmountError()
+        } else {
+            try {
+                val amountValue = amount.replace(",", ".").toDouble()
+                if (amountValue <= 0) {
+                    validationBuilder.addAmountError()
+                }
+            } catch (e: Exception) {
+                validationBuilder.addAmountError()
+            }
+        }
+        // Check category
+        if (categoryId.isBlank()) {
+            validationBuilder.addCategoryError()
+        }
+        // No validation for source - allowing empty sources
+        val validationResult = validationBuilder.build()
+        _state.update {
+            it.copy(
+                walletError = validationResult.hasWalletError,
+                amountError = validationResult.hasAmountError,
+                categoryError = validationResult.hasCategoryError,
+                sourceError = validationResult.hasSourceError
+            )
+        }
+        return validationResult.isValid
     }
 
     fun validateInputData(amount: String, category: String, source: String, updateState: (ValidateTransactionUseCase.Result) -> Unit): Boolean {
@@ -74,42 +137,29 @@ class EditTransactionViewModel(
         return result.isValid
     }
 
-    fun submit() {
-        val s = _state.value
-        val isValid = validateInputData(s.amount, s.category, s.source) { result ->
-            _state.update {
-                it.copy(
-                    amountError = result.amountError,
-                    categoryError = result.categoryError,
-                    sourceError = result.sourceError,
-                    error = result.errorMessage
-                )
-            }
-        }
-        if (!isValid) return
-
-        val transaction = prepareTransactionUseCase(
-            id = s.transactionToEdit?.id,
-            title = s.title,
-            amount = s.amount,
-            category = s.category,
-            note = s.note,
-            date = s.selectedDate,
-            isExpense = s.isExpense,
-            source = s.source,
-            sourceColor = s.sourceColor,
-            isTransfer = s.category == "Переводы"
-        ) ?: run {
-            _state.update { it.copy(error = "Ошибка подготовки транзакции") }
-            return
-        }
-
+    fun submit(preventAutoSubmit: Boolean = false) {
         viewModelScope.launch {
-            val result = updateTransactionUseCase(transaction)
-            if (result is DomainResult.Success) {
-                _state.update { it.copy(isSuccess = true, error = null) }
-            } else if (result is DomainResult.Error) {
-                _state.update { it.copy(error = result.exception.message) }
+            val currentState = _state.value
+            val transaction = prepareTransactionForEdit() ?: return@launch
+
+            // Validate input
+            val isValid = validateInput(
+                walletId = currentState.targetWalletId,
+                amount = currentState.amount,
+                note = currentState.note,
+                date = currentState.selectedDate,
+                sourceColor = currentState.sourceColor,
+                source = currentState.source,
+                categoryId = currentState.category,
+                isExpense = currentState.isExpense
+            )
+            if (!isValid) return@launch
+
+            try {
+                val result = updateTransactionUseCase(transaction)
+                // You can update state or show a message here if needed
+            } catch (e: Exception) {
+                // You can update state or show a message here if needed
             }
         }
     }
@@ -179,7 +229,18 @@ class EditTransactionViewModel(
 
     override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
         // Обрабатываем события UI
-        handleBaseEvent(event, context)
+        when (event) {
+            is BaseTransactionEvent.SubmitEdit -> {
+                submit()
+            }
+            is BaseTransactionEvent.ResetAmountOnly -> {
+                _state.update { it.copy(amount = "", amountError = false) }
+            }
+            is BaseTransactionEvent.PreventAutoSubmit -> {
+                blockAutoSubmit = true
+            }
+            else -> handleBaseEvent(event, context)
+        }
     }
 
     override fun updateCategoryPositions() {
@@ -230,7 +291,8 @@ class EditTransactionViewModel(
         showWalletSelector: Boolean,
         targetWalletId: String?,
         forceExpense: Boolean,
-        sourceError: Boolean
+        sourceError: Boolean,
+        preventAutoSubmit: Boolean
     ): EditTransactionState {
         return EditTransactionState(
             title = title,
@@ -270,7 +332,8 @@ class EditTransactionViewModel(
             showWalletSelector = showWalletSelector,
             targetWalletId = targetWalletId,
             forceExpense = forceExpense,
-            sourceError = sourceError
+            sourceError = sourceError,
+            preventAutoSubmit = preventAutoSubmit
         )
     }
 }

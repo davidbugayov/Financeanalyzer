@@ -48,7 +48,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.components.Category
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionGroupList
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelectionDialog
@@ -175,6 +175,7 @@ fun TransactionHistoryScreen(
     if (state.showStartDatePicker) {
         DatePickerDialog(
             initialDate = state.startDate,
+            maxDate = minOf(state.endDate, java.util.Calendar.getInstance().time),
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
@@ -188,6 +189,8 @@ fun TransactionHistoryScreen(
     if (state.showEndDatePicker) {
         DatePickerDialog(
             initialDate = state.endDate,
+            minDate = state.startDate,
+            maxDate = java.util.Calendar.getInstance().time,
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)

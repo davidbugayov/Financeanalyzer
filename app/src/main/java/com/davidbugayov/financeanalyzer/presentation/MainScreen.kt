@@ -77,7 +77,6 @@ fun MainScreen(startDestination: String = "home") {
     val layoutDirection = LocalLayoutDirection.current
     val homeViewModel: HomeViewModel = koinViewModel()
     val chartViewModel: ChartViewModel = koinViewModel()
-    val addTransactionViewModel: AddTransactionViewModel = koinViewModel()
     val editTransactionViewModel: EditTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
     val onboardingViewModel: OnboardingViewModel = koinViewModel()
@@ -270,7 +269,6 @@ fun MainScreen(startDestination: String = "home") {
                     ) {
                         HomeScreen(
                             viewModel = homeViewModel,
-                            addTransactionViewModel = addTransactionViewModel,
                             editTransactionViewModel = editTransactionViewModel,
                             onNavigateToHistory = { navController.navigate(Screen.History.route) },
                             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
@@ -350,114 +348,7 @@ fun MainScreen(startDestination: String = "home") {
                             )
                         }
                     ) {
-                        // Получаем предыдущий маршрут из стека навигации, чтобы определить источник перехода
-                        val previousRoute = navController.previousBackStackEntry?.destination?.route
-                        
-                        // Добавляем подробное логирование
-                        Timber.d("Переход на AddTransaction с экрана: $previousRoute")
-                        
-                        // Проверяем, приходим ли мы с экрана BudgetScreen, WalletTransactions или Wallets
-                        if (previousRoute == Screen.Budget.route || previousRoute == Screen.Wallets.route) {
-                            // Если переход был из бюджета или кошельков
-                            LaunchedEffect(Unit) {
-                                // Проверяем текущее состояние типа транзакции
-                                val currentIsExpense = addTransactionViewModel.state.value.isExpense
-                                val currentForceExpense = addTransactionViewModel.state.value.forceExpense
-                                
-                                // Используем storedTargetWalletId из AddTransactionViewModel
-                                val storedWalletId = addTransactionViewModel.storedTargetWalletId
-                                val shouldDistribute = addTransactionViewModel.autoDistributeIncome
-                                
-                                Timber.d("Параметры перехода: storedWalletId=$storedWalletId, shouldDistribute=$shouldDistribute, currentIsExpense=$currentIsExpense, currentForceExpense=$currentForceExpense")
-                                
-                                // Если уже установлен расход через forceExpense, сохраняем этот режим
-                                if (currentIsExpense && currentForceExpense) {
-                                    Timber.d("=== Переход из Budget/Wallets - сохраняем режим РАСХОДА ===")
-                                    // Ничего не меняем, оставляем расход как есть
-                                } else {
-                                    // Иначе устанавливаем режим дохода (по умолчанию)
-                                    Timber.d("=== Переход из Budget/Wallets - устанавливаем режим ДОХОДА ===")
-                                    
-                                    if (storedWalletId != null) {
-                                        // Если есть сохраненный ID, используем его
-                                        Timber.d("Используем сохраненный walletId: $storedWalletId")
-                                        
-                                        // Сначала устанавливаем ID целевого кошелька
-                                        addTransactionViewModel.setTargetWalletId(storedWalletId)
-                                    }
-                                    
-                                    // Затем настраиваем для доходной операции
-                                    addTransactionViewModel.setupForIncomeAddition(
-                                        amount = "",
-                                        shouldDistribute = false
-                                    )
-                                    
-                                    // Если включено автоматическое распределение, выбираем все кошельки
-                                    if (shouldDistribute) {
-                                        Timber.d("Включено автоматическое распределение дохода, выбираем все кошельки")
-                                        addTransactionViewModel.clearSelectedWallets()
-                                        addTransactionViewModel.selectAllWallets(context)
-                                    }
-                                }
-                                
-                                // Проверяем финальное состояние
-                                Timber.d("После настройки из Budget/Wallets: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}")
-                            }
-                        } else if (previousRoute?.startsWith("wallet/") == true) {
-                            // Если переход был из WalletTransactions, извлекаем walletId из маршрута
-                            val walletId = previousRoute.removePrefix("wallet/")
-                            Timber.d("=== Переход из WalletTransactions с walletId=$walletId ===")
-                            
-                            LaunchedEffect(Unit) {
-                                // Сначала устанавливаем ID целевого кошелька
-                                addTransactionViewModel.setTargetWalletId(walletId)
-                                
-                                // Затем настраиваем ViewModel для добавления дохода
-                                addTransactionViewModel.setupForIncomeAddition(
-                                    amount = "",
-                                    shouldDistribute = false
-                                )
-                                
-                                // Дополнительно логируем состояние после установки
-                                Timber.d("После setupForIncomeAddition в MainScreen с walletId: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}")
-                            }
-                        } else {
-                            // Если переход с любого другого экрана (например, HomeScreen),
-                            // настраиваем для расхода с выбором всех кошельков
-                            Timber.d("=== Переход из $previousRoute - устанавливаем режим РАСХОДА со всеми кошельками ===")
-                            LaunchedEffect(Unit) {
-                                try {
-                                    // Сбрасываем состояние и настраиваем для расхода с автоматическим выбором всех кошельков
-                                    addTransactionViewModel.resetToDefaultState()
-                                    
-                                    // Включаем добавление в кошельки и выбираем все кошельки без показа диалога
-                                    addTransactionViewModel.selectAllWallets(context)
-                                    
-                                    // Настраиваем вьюмодель на режим расхода
-                                    addTransactionViewModel.setupForExpenseAddition("", "Списание", context = context)
-                                    
-                                    // Дополнительно логируем состояние после настройки
-                                    Timber.d("После настройки из HomeScreen: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, selectedWallets=${addTransactionViewModel.state.value.selectedWallets}, showWalletSelector=${addTransactionViewModel.state.value.showWalletSelector}")
-                                } catch (e: Exception) {
-                                    Timber.e(e, "Ошибка при настройке параметров кошельков")
-                                }
-                            }
-                        }
-                        
-                        AddTransactionScreen(
-                            viewModel = addTransactionViewModel,
-                            onNavigateBack = {
-                                // Используем фоновую загрузку вместо полной перезагрузки
-                                homeViewModel.initiateBackgroundDataRefresh()
-                                
-                                // Обновляем графики и статистику напрямую
-                                chartViewModel.loadTransactions()
-                                profileViewModel.updateFinancialStatistics()
-
-                                // Просто возвращаемся назад, чтобы вернуться на предыдущий экран
-                                navController.navigateUp()
-                            }
-                        )
+                        AddTransactionScreen(onNavigateBack = { navController.popBackStack() })
                     }
                     
                     // Экран редактирования транзакции
@@ -489,17 +380,16 @@ fun MainScreen(startDestination: String = "home") {
                             )
                         }
                     ) { backStackEntry ->
-                        val transactionId = 
-                            backStackEntry.arguments?.getString("transactionId") ?: ""
-                        
+                        val transactionId = backStackEntry.arguments?.getString("transactionId")
+                        if (transactionId.isNullOrBlank()) {
+                            Timber.e("transactionId is null or blank, не открываем экран редактирования")
+                            return@composable
+                        }
                         // Логируем переход на экран редактирования
                         Timber.d("Переход на экран редактирования транзакции: $transactionId")
-                        
-                        // Используем EditTransactionScreen вместо AddTransactionScreen
                         EditTransactionScreen(
                             viewModel = koinViewModel<EditTransactionViewModel>(),
                             onNavigateBack = { 
-                                // При возврате обновляем данные и возвращаемся назад
                                 homeViewModel.initiateBackgroundDataRefresh()
                                 navController.navigateUp() 
                             },
@@ -708,7 +598,6 @@ fun MainScreen(startDestination: String = "home") {
                         WalletTransactionsScreen(
                             walletId = walletId,
                             onNavigateBack = { navController.navigateUp() },
-                            addTransactionViewModel = addTransactionViewModel,
                             navController = navController
                         )
                     }
@@ -749,8 +638,7 @@ fun MainScreen(startDestination: String = "home") {
                                     )
                                 )
                             },
-                            viewModel = koinViewModel<BudgetViewModel>(),
-                            addTransactionViewModel = addTransactionViewModel
+                            viewModel = koinViewModel<BudgetViewModel>()
                         )
                     }
 
@@ -788,7 +676,6 @@ fun MainScreen(startDestination: String = "home") {
                         WalletTransactionsScreen(
                             walletId = walletId,
                             onNavigateBack = { navController.navigateUp() },
-                            addTransactionViewModel = addTransactionViewModel,
                             navController = navController
                         )
                     }

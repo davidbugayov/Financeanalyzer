@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -39,23 +40,34 @@ fun SourceSection(
     selectedSource: String,
     onSourceSelected: (Source) -> Unit,
     onAddSourceClick: () -> Unit,
-    onSourceLongClick: (Source) -> Unit = {}
+    onSourceLongClick: (Source) -> Unit = {},
+    isError: Boolean = false
 ) {
-    LazyRow(
-        contentPadding = PaddingValues(horizontal = 16.dp),
-        horizontalArrangement = Arrangement.spacedBy(12.dp)
-    ) {
-        items(sources) { source ->
-            SourceItem(
-                source = source,
-                isSelected = source.name == selectedSource,
-                onClick = { onSourceSelected(source) },
-                onLongClick = { onSourceLongClick(source) }
-            )
-        }
+    Column(modifier = Modifier.fillMaxWidth()) {
+        Text(
+            text = stringResource(R.string.source) + " *",
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+        )
+        
+        LazyRow(
+            contentPadding = PaddingValues(horizontal = 16.dp),
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
+        ) {
+            items(sources) { source ->
+                SourceItem(
+                    source = source,
+                    isSelected = source.name == selectedSource,
+                    onClick = { onSourceSelected(source) },
+                    onLongClick = { onSourceLongClick(source) },
+                    isError = isError && selectedSource.isBlank()
+                )
+            }
 
-        item {
-            AddSourceItem(onClick = onAddSourceClick)
+            item {
+                AddSourceItem(onClick = onAddSourceClick)
+            }
         }
     }
 }

@@ -22,6 +22,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 
@@ -51,16 +52,21 @@ fun CategoryItem(
             modifier = Modifier
                 .size(dimensionResource(R.dimen.category_icon_size))
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(
+                    when {
+                        isError -> Color(0xFFFFCDD2) // Светло-красный фон при ошибке
+                        else -> MaterialTheme.colorScheme.primaryContainer
+                    }
+                )
                 .border(
                     width = when {
                         isSelected -> dimensionResource(R.dimen.border_width_large)
-                        isError -> dimensionResource(R.dimen.border_width_medium)
+                        isError -> 3.dp // Увеличенная ширина рамки при ошибке
                         else -> dimensionResource(R.dimen.border_width_none)
                     },
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.primary
-                        isError -> MaterialTheme.colorScheme.error
+                        isError -> Color(0xFFE57373) // Красный цвет рамки при ошибке
                         else -> Color.Transparent
                     },
                     shape = CircleShape
@@ -70,7 +76,7 @@ fun CategoryItem(
             Icon(
                 imageVector = category.icon,
                 contentDescription = category.name,
-                tint = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer
+                tint = if (isError) Color.Red else MaterialTheme.colorScheme.onPrimaryContainer
             )
         }
 
@@ -81,7 +87,7 @@ fun CategoryItem(
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+            color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface
         )
     }
 } 

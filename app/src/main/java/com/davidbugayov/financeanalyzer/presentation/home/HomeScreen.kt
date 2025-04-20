@@ -46,7 +46,6 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayo
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
@@ -61,7 +60,6 @@ import timber.log.Timber
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
-    addTransactionViewModel: AddTransactionViewModel,
     editTransactionViewModel: EditTransactionViewModel,
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
@@ -236,9 +234,7 @@ fun HomeScreen(
             // Floating Action Button для добавления транзакции
             FloatingActionButton(
                 onClick = {
-                    // Сбрасываем состояние AddTransactionViewModel к дефолтному
-                    addTransactionViewModel.resetToDefaultState()
-                    // Выполняем навигацию
+                    // Просто навигация на экран добавления транзакции
                     onNavigateToAdd()
                     feedbackMessage = "Добавление новой транзакции"
                     feedbackType = FeedbackType.INFO
@@ -308,10 +304,15 @@ fun HomeScreen(
                     onEdit = { transaction ->
                         showActionsDialog = false
                         editTransactionViewModel.loadTransactionForEdit(transaction)
-                        onNavigateToEdit(transaction.id)
-                        feedbackMessage = "Редактирование транзакции"
-                        feedbackType = FeedbackType.INFO
-                        showFeedback = true
+                        if (transaction.id.isNotBlank()) {
+                            onNavigateToEdit(transaction.id)
+                            feedbackMessage = "Редактирование транзакции"
+                            feedbackType = FeedbackType.INFO
+                            showFeedback = true
+                        } else {
+                            Timber.e("Попытка навигации на экран редактирования с пустым transactionId!")
+                            // Можно показать Snackbar или Toast
+                        }
                     }
                 )
             }

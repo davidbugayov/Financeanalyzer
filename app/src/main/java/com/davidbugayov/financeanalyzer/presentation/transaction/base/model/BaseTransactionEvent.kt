@@ -50,4 +50,6 @@ sealed class BaseTransactionEvent {
     object ForceSetIncomeType : BaseTransactionEvent()
     object ForceSetExpenseType : BaseTransactionEvent()
     data class LoadTransaction(val id: String) : BaseTransactionEvent()
+    object ResetAmountOnly : BaseTransactionEvent()
+    object PreventAutoSubmit : BaseTransactionEvent()
 } 

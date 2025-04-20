@@ -29,6 +29,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
     // Вся обработка событий теперь только в наследниках
     abstract override fun onEvent(event: E, context: android.content.Context)
+    /**
+     * Метод для отправки транзакции, вызываемый из UI.
+     * Реализуется в наследниках.
+     */
     abstract override fun submitTransaction(context: android.content.Context)
 
     open fun updateWidget(context: android.content.Context) {
@@ -224,10 +228,37 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         viewModelScope.launch {
             categoriesViewModel.expenseCategories.collect { categories ->
                 _state.update { state -> 
-                    copyState(state, expenseCategories = categories)
+                    // Выбираем первую категорию, если категория еще не выбрана
+                    val firstCategory = if (state.category.isBlank() && categories.isNotEmpty()) {
+                        categories.first().name
+                    } else {
+                        state.category
+                    }
+                    
+                    // Обновляем список категорий, чтобы первая имела флаг wasSelected=true
+                    val updatedCategories = if (categories.isNotEmpty()) {
+                        categories.mapIndexed { index, categoryItem ->
+                            if (index == 0 || categoryItem.name == firstCategory) {
+                                // Устанавливаем флаг wasSelected=true для первой категории 
+                                // или для категории, которая соответствует выбранной
+                                categoryItem.copy(wasSelected = true)
+                            } else {
+                                categoryItem
+                            }
+                        }
+                    } else {
+                        categories
+                    }
+                    
+                    copyState(
+                        state, 
+                        expenseCategories = updatedCategories,
+                        category = firstCategory
+                    )
                 }
             }
         }
+        
         viewModelScope.launch {
             categoriesViewModel.incomeCategories.collect { categories ->
                 _state.update { state -> 
@@ -235,10 +266,17 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
         }
+        
         viewModelScope.launch {
             val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences)
             _state.update { state -> 
-                copyState(state, sources = sources)
+                val firstSource = sources.firstOrNull()
+                copyState(
+                    state, 
+                    sources = sources,
+                    source = firstSource?.name ?: "",
+                    sourceColor = firstSource?.color ?: 0
+                )
             }
         }
     }
@@ -415,7 +453,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         showWalletSelector: Boolean = state.showWalletSelector,
         targetWalletId: String? = state.targetWalletId,
         forceExpense: Boolean = state.forceExpense,
-        sourceError: Boolean = state.sourceError
+        sourceError: Boolean = state.sourceError,
+        preventAutoSubmit: Boolean = state.preventAutoSubmit
     ): S
 
     /**

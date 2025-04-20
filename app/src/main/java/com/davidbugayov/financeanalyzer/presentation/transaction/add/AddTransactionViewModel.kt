@@ -29,6 +29,8 @@ import org.koin.core.component.inject
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.PrepareTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
+import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
+import java.util.Date
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -49,6 +51,8 @@ class AddTransactionViewModel(
 ) {
 
     protected override val _state = MutableStateFlow(AddTransactionState())
+    // Флаг для блокировки автоматической отправки формы при "Добавить еще"
+    private var blockAutoSubmit = false
 
     // Расширение для преобразования строки в Double
     private fun String.toDouble(): Double {
@@ -61,9 +65,16 @@ class AddTransactionViewModel(
         get() = _wallets.value
 
     init {
+        Timber.d("[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel")
+        // Сбросить категорию перед загрузкой
+        _state.update { it.copy(category = "") }
         // Загружаем категории
         loadInitialData()
-
+        // Принудительно выставить дефолтную категорию после инициализации (после collect)
+        viewModelScope.launch {
+            kotlinx.coroutines.delay(150)
+            setDefaultCategoryIfNeeded(force = true)
+        }
         // Загружаем список кошельков
         viewModelScope.launch {
             try {
@@ -99,28 +110,55 @@ class AddTransactionViewModel(
      * Загружает категории из CategoriesViewModel
      */
     private fun loadCategories() {
+        Timber.d("[VM] loadCategories() вызван, categoriesViewModel: $categoriesViewModel")
         if (categoriesViewModel == null) {
             Timber.e("categoriesViewModel is null in loadCategories()")
             return
         }
-        
         viewModelScope.launch {
             try {
-                categoriesViewModel.expenseCategories?.collect { categories ->
+                categoriesViewModel.expenseCategories.collect { categories ->
+                    Timber.d("[VM] collect: expenseCategories обновились, size=${categories.size}, isExpense=${_state.value.isExpense}, category='${_state.value.category}'")
                     _state.update { it.copy(expenseCategories = categories) }
+                    if (_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
+                        Timber.d("[VM] collect: Выставляю первую категорию расходов: ${categories.first().name}")
+                        _state.update { it.copy(category = categories.first().name) }
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке категорий расходов")
             }
         }
-        
         viewModelScope.launch {
             try {
-                categoriesViewModel.incomeCategories?.collect { categories ->
+                categoriesViewModel.incomeCategories.collect { categories ->
+                    Timber.d("[VM] collect: incomeCategories обновились, size=${categories.size}, isExpense=${_state.value.isExpense}, category='${_state.value.category}'")
                     _state.update { it.copy(incomeCategories = categories) }
+                    if (!_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
+                        Timber.d("[VM] collect: Выставляю первую категорию доходов: ${categories.first().name}")
+                        _state.update { it.copy(category = categories.first().name) }
+                    }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке категорий доходов")
+            }
+        }
+    }
+
+    private fun setDefaultCategoryIfNeeded(force: Boolean = false) {
+        _state.update { current ->
+            if (current.isExpense && current.expenseCategories.isNotEmpty() &&
+                (force || current.category.isBlank() || current.expenseCategories.none { it.name == current.category })
+            ) {
+                Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию расходов: ${current.expenseCategories.first().name}")
+                current.copy(category = current.expenseCategories.first().name)
+            } else if (!current.isExpense && current.incomeCategories.isNotEmpty() &&
+                (force || current.category.isBlank() || current.incomeCategories.none { it.name == current.category })
+            ) {
+                Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию доходов: ${current.incomeCategories.first().name}")
+                current.copy(category = current.incomeCategories.first().name)
+            } else {
+                current
             }
         }
     }
@@ -464,7 +502,8 @@ class AddTransactionViewModel(
         showWalletSelector: Boolean,
         targetWalletId: String?,
         forceExpense: Boolean,
-        sourceError: Boolean
+        sourceError: Boolean,
+        preventAutoSubmit: Boolean
     ): AddTransactionState {
         return AddTransactionState(
             title = title,
@@ -504,7 +543,8 @@ class AddTransactionViewModel(
             showWalletSelector = showWalletSelector,
             targetWalletId = targetWalletId,
             forceExpense = forceExpense,
-            sourceError = sourceError
+            sourceError = sourceError,
+            preventAutoSubmit = preventAutoSubmit
         )
     }
 
@@ -517,49 +557,144 @@ class AddTransactionViewModel(
         return result.isValid
     }
 
-    fun submit() {
-        val s = _state.value
-        val isValid = validateInputData(s.amount, s.category, s.source) { result ->
-            _state.update {
-                it.copy(
-                    amountError = result.amountError,
-                    categoryError = result.categoryError,
-                    sourceError = result.sourceError,
-                    error = result.errorMessage
-                )
+    private fun validateInput(
+        walletId: String?,
+        amount: String,
+        note: String,
+        date: Date,
+        sourceColor: Int,
+        source: String,
+        categoryId: String,
+        isExpense: Boolean
+    ): Boolean {
+        val validationBuilder = ValidationBuilder()
+        // Reset errors
+        _state.update {
+            it.copy(
+                walletError = false,
+                amountError = false,
+                categoryError = false,
+                sourceError = false,
+                dateError = false
+            )
+        }
+        // Check wallet
+        if (walletId.isNullOrBlank()) {
+            validationBuilder.addWalletError()
+        }
+        // Check amount
+        if (amount.isBlank()) {
+            validationBuilder.addAmountError()
+        } else {
+            try {
+                val amountValue = amount.replace(",", ".").toDouble()
+                if (amountValue <= 0) {
+                    validationBuilder.addAmountError()
+                }
+            } catch (e: Exception) {
+                validationBuilder.addAmountError()
             }
         }
-        if (!isValid) return
+        // Check category
+        if (categoryId.isBlank()) {
+            validationBuilder.addCategoryError()
+        }
+        // Check date (не должна быть в будущем)
+        var dateError = false
+        val today = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 0)
+            set(java.util.Calendar.MINUTE, 0)
+            set(java.util.Calendar.SECOND, 0)
+            set(java.util.Calendar.MILLISECOND, 0)
+        }.time
+        if (date.after(today)) {
+            dateError = true
+        }
+        // No validation for source - allowing empty sources
+        val validationResult = validationBuilder.build()
+        _state.update {
+            it.copy(
+                walletError = validationResult.hasWalletError,
+                amountError = validationResult.hasAmountError,
+                categoryError = validationResult.hasCategoryError,
+                sourceError = validationResult.hasSourceError,
+                dateError = dateError
+            )
+        }
+        return validationResult.isValid && !dateError
+    }
 
-        val transaction = prepareTransactionUseCase(
-            id = null,
-            title = s.title,
-            amount = s.amount,
-            category = s.category,
-            note = s.note,
-            date = s.selectedDate,
-            isExpense = s.isExpense,
-            source = s.source,
-            sourceColor = s.sourceColor,
-            isTransfer = s.category == "Переводы"
-        ) ?: run {
-            _state.update { it.copy(error = "Ошибка подготовки транзакции") }
+    fun submit(preventAutoSubmit: Boolean = false) {
+        if (preventAutoSubmit) {
+            _state.update { it.copy(preventAutoSubmit = true) }
             return
         }
 
-        viewModelScope.launch {
-            val result = addTransactionUseCase(transaction)
-            if (result is DomainResult.Success) {
-                _state.update { it.copy(isSuccess = true, error = null) }
-            } else if (result is DomainResult.Error) {
-                _state.update { it.copy(error = result.exception.message) }
+        try {
+            val amountStr = _state.value.amount
+            if (amountStr.isBlank()) {
+                // Если сумма не введена, только подсветить поле суммы, но без диалога ошибки
+                _state.update { state ->
+                    state.copy(
+                        amountError = true
+                    )
+                }
+                return
             }
+
+            // Проверяем валидацию
+            val s = _state.value
+            val validationResult = validateInput(
+                walletId = s.targetWalletId,
+                amount = s.amount,
+                note = s.note,
+                date = s.selectedDate,
+                sourceColor = s.sourceColor,
+                source = s.source,
+                categoryId = s.category,
+                isExpense = s.isExpense
+            )
+            
+            if (!validationResult) {
+                return
+            }
+
+            // Если сумма введена, продолжаем со стандартной логикой 
+            // создания и сохранения транзакции
+            val transaction = createTransactionFromState(_state.value)
+            
+            viewModelScope.launch {
+                val result = addTransactionUseCase(transaction)
+                if (result is DomainResult.Success) {
+                    _state.update { it.copy(isSuccess = true, error = null) }
+                } else if (result is DomainResult.Error) {
+                    _state.update { it.copy(error = result.exception.message) }
+                }
+            }
+        } catch (e: Exception) {
+            // Общая обработка исключений, но не показываем диалог
+            e.printStackTrace()
+            _state.update { it.copy(error = e.message ?: "Неизвестная ошибка") }
         }
     }
 
     override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
-        // Обрабатываем события от UI
-        handleBaseEvent(event, context)
+        when (event) {
+            is BaseTransactionEvent.ToggleTransactionType -> {
+                _state.update { it.copy(isExpense = !it.isExpense, category = "") }
+                setDefaultCategoryIfNeeded()
+            }
+            is BaseTransactionEvent.Submit -> {
+                submit()
+            }
+            is BaseTransactionEvent.ResetAmountOnly -> {
+                _state.update { it.copy(amount = "", amountError = false) }
+            }
+            is BaseTransactionEvent.PreventAutoSubmit -> {
+                blockAutoSubmit = true
+            }
+            else -> handleBaseEvent(event, context)
+        }
     }
 
     override fun updateCategoryPositions() {

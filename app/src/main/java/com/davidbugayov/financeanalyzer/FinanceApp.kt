@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer
 
 import android.app.Application
 import android.util.Log
-import com.davidbugayov.financeanalyzer.di.addTransactionModule
 import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.budgetModule
 import com.davidbugayov.financeanalyzer.di.chartModule
@@ -73,7 +72,6 @@ class FinanceApp : Application() {
                     chartModule,
                     homeModule,
                     historyModule,
-                    addTransactionModule,
                     profileModule,
                     importModule,
                     onboardingModule,

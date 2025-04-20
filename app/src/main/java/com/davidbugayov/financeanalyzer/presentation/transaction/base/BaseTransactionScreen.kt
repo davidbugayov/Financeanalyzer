@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -23,6 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Color
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -74,6 +83,11 @@ fun <E> BaseTransactionScreen(
     LaunchedEffect(isEditMode) {
         Timber.d("Экран инициализирован в режиме ${if (isEditMode) "редактирования" else "добавления"} транзакции. editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}")
     }
+    
+    // Логируем состояние ошибок
+    LaunchedEffect(state.categoryError, state.sourceError, state.amountError) {
+        Timber.d("Состояние ошибок: categoryError=${state.categoryError}, sourceError=${state.sourceError}, amountError=${state.amountError}")
+    }
 
     // В режиме редактирования устанавливаем заголовок и текст кнопки
     val actualScreenTitle = if (isEditMode) "Редактирование транзакции" else screenTitle
@@ -81,6 +95,11 @@ fun <E> BaseTransactionScreen(
 
     var showCancelConfirmation by remember { mutableStateOf(false) }
 
+    // Цвета для типов транзакций
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    val currentColor = if (state.isExpense) expenseColor else incomeColor
+    
     // Функция для обработки выхода с экрана
     fun handleExit() {
         // Обновляем позиции категорий перед выходом
@@ -91,11 +110,6 @@ fun <E> BaseTransactionScreen(
         onNavigateBack()
     }
 
-    // Цвета для типов транзакций
-    val incomeColor = LocalIncomeColor.current
-    val expenseColor = LocalExpenseColor.current
-    val currentColor = if (state.isExpense) expenseColor else incomeColor
-    
     Scaffold(
         topBar = {
             AppTopBar(
@@ -137,18 +151,9 @@ fun <E> BaseTransactionScreen(
                     forceExpense = state.forceExpense
                 )
 
-                // Секция "Откуда"
-                Column(modifier = Modifier.fillMaxWidth()) {
-                    Text(
-                        text = if (state.isExpense) stringResource(R.string.source) else "Куда",
-                        modifier = Modifier.padding(
-                            horizontal = dimensionResource(R.dimen.spacing_normal),
-                            vertical = dimensionResource(R.dimen.spacing_medium)
-                        )
-                    )
-
+                // Секция "Откуда/Куда" (Source) - теперь первая
+                Column {
                     Timber.d("Rendering SourceSection with isExpense=" + state.isExpense + ", selectedSource=" + state.source + ", sources count=" + state.sources.size)
-                    
                     SourceSection(
                         sources = state.sources,
                         selectedSource = state.source,
@@ -163,36 +168,43 @@ fun <E> BaseTransactionScreen(
                         onSourceLongClick = { selectedSource -> 
                             Timber.d("Source long clicked: " + selectedSource.name)
                             viewModel.onEvent(eventFactory(Pair("DeleteSourceConfirm", selectedSource)), context)
-                        }
+                        },
+                        isError = state.sourceError
                     )
                 }
 
-                // Секция категорий с передачей состояния ошибки
-                CategorySection(
-                    categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
-                    selectedCategory = state.category,
-                    onCategorySelected = { selectedCategory -> 
-                        Timber.d("Category selected directly: " + selectedCategory.name)
-                        viewModel.onEvent(eventFactory(selectedCategory), context)
-                    },
-                    onAddCategoryClick = {
-                        viewModel.onEvent(eventFactory("ShowCustomCategoryDialog"), context)
-                    },
-                    onCategoryLongClick = { selectedCategory -> 
-                        Timber.d("Category long clicked: " + selectedCategory.name)
-                        viewModel.onEvent(eventFactory(Pair("DeleteCategoryConfirm", selectedCategory)), context)
-                    },
-                    isError = state.categoryError
-                )
+                // Секция категорий - теперь вторая
+                Column {
+                    CategorySection(
+                        categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
+                        selectedCategory = state.category,
+                        onCategorySelected = { selectedCategory -> 
+                            Timber.d("Category selected directly: " + selectedCategory.name)
+                            // Создаем копию с установленным флагом wasSelected
+                            val selectedWithFlag = selectedCategory.copy(wasSelected = true)
+                            viewModel.onEvent(eventFactory(selectedWithFlag), context)
+                        },
+                        onAddCategoryClick = {
+                            viewModel.onEvent(eventFactory("ShowCustomCategoryDialog"), context)
+                        },
+                        onCategoryLongClick = { selectedCategory -> 
+                            Timber.d("Category long clicked: " + selectedCategory.name)
+                            viewModel.onEvent(eventFactory(Pair("DeleteCategoryConfirm", selectedCategory)), context)
+                        },
+                        isError = state.categoryError
+                    )
+                }
 
                 // Поле ввода суммы
-                AmountField(
-                    amount = state.amount,
-                    onAmountChange = { amount -> 
-                        viewModel.onEvent(eventFactory(Pair("SetAmount", amount)), context) },
-                    isError = state.amountError,
-                    accentColor = currentColor
-                )
+                Column {
+                    AmountField(
+                        amount = state.amount,
+                        onAmountChange = { amount -> 
+                            viewModel.onEvent(eventFactory(Pair("SetAmount", amount)), context) },
+                        isError = state.amountError,
+                        accentColor = currentColor
+                    )
+                }
 
                 // Поле выбора даты
                 DateField(
@@ -267,21 +279,29 @@ fun <E> BaseTransactionScreen(
             }
 
             if (state.isSuccess) {
-                SuccessDialog(
-                    onDismiss = {
-                        viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
-                        handleExit()
-                    },
-                    onAddAnother = {
-                        viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
-                    },
-                    isEditMode = isEditMode
-                )
+                AnimatedVisibility(visible = state.isSuccess, enter = scaleIn(animationSpec = tween(400)), exit = scaleOut(animationSpec = tween(400))) {
+                    SuccessDialog(
+                        onDismiss = {
+                            viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
+                            handleExit()
+                        },
+                        onAddAnother = {
+                            // Сначала скрываем диалог успеха
+                            viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
+                            // Затем сбрасываем только сумму
+                            viewModel.onEvent(eventFactory("ResetAmountOnly"), context)
+                            // Предотвращаем автоматическую отправку
+                            viewModel.onEvent(eventFactory("PreventAutoSubmit"), context)
+                        },
+                        isEditMode = isEditMode
+                    )
+                }
             }
 
             if (state.showDatePicker) {
                 DatePickerDialog(
                     initialDate = state.selectedDate,
+                    maxDate = java.util.Date(),
                     onDateSelected = { date -> 
                         viewModel.onEvent(eventFactory(date), context)
                     },

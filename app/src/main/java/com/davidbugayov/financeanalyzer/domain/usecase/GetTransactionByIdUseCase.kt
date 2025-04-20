@@ -2,6 +2,8 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.model.Result
+import com.davidbugayov.financeanalyzer.domain.model.AppException
 
 class GetTransactionByIdUseCase(
     private val transactionRepository: TransactionRepository
@@ -9,10 +11,13 @@ class GetTransactionByIdUseCase(
     suspend operator fun invoke(id: String): Result<Transaction> {
         return try {
             val transaction = transactionRepository.getTransactionById(id)
-            if (transaction != null) Result.success(transaction)
-            else Result.failure(Exception("Транзакция не найдена"))
+            if (transaction != null) {
+                Result.success(transaction)
+            } else {
+                Result.error(AppException.Data.NotFound("Транзакция с id=$id не найдена"))
+            }
         } catch (e: Exception) {
-            Result.failure(e)
+            Result.error(AppException.mapException(e))
         }
     }
 } 
