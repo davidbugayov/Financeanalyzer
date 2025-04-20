@@ -16,5 +16,14 @@ val addTransactionModule = module {
     factory { UpdateTransactionUseCase(get()) }
 
     // ViewModels
-    viewModel { AddTransactionViewModel(get(), get(), get(), get()) }
+    viewModel { 
+        AddTransactionViewModel(
+            validateTransactionUseCase = get(),
+            prepareTransactionUseCase = get(),
+            addTransactionUseCase = get(),
+            categoriesViewModel = get(),
+            sourcePreferences = get(),
+            walletRepository = get()
+        ) 
+    }
 } 

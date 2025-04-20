@@ -17,6 +17,9 @@ import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.PrepareTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
@@ -66,6 +69,9 @@ val appModule = module {
     single { CalculateCategoryStatsUseCase(get()) }
     single { ExportTransactionsToCSVUseCase(get()) }
     single { ImportTransactionsManager(get(), androidContext(), get(), get()) }
+    single { ValidateTransactionUseCase() }
+    single { PrepareTransactionUseCase() }
+    single { GetTransactionByIdUseCase(get()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
@@ -75,7 +81,9 @@ val appModule = module {
             addTransactionUseCase = get(),
             categoriesViewModel = get(),
             sourcePreferences = get(),
-            walletRepository = get()
+            walletRepository = get(),
+            validateTransactionUseCase = get(),
+            prepareTransactionUseCase = get()
         )
     }
     viewModel {
@@ -99,10 +107,12 @@ val appModule = module {
     viewModel {
         com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel(
             updateTransactionUseCase = get(),
-            transactionRepository = get(),
+            getTransactionByIdUseCase = get(),
             categoriesViewModel = get(),
             sourcePreferences = get(),
-            walletRepository = get()
+            walletRepository = get(),
+            validateTransactionUseCase = get(),
+            prepareTransactionUseCase = get()
         )
     }
 

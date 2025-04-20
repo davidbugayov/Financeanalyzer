@@ -26,12 +26,17 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getIn
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.PrepareTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 
 /**
  * ViewModel для экрана добавления транзакции.
  * Следует принципам MVI и Clean Architecture.
  */
 class AddTransactionViewModel(
+    private val validateTransactionUseCase: ValidateTransactionUseCase,
+    private val prepareTransactionUseCase: PrepareTransactionUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
     categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
     sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences,
@@ -39,7 +44,8 @@ class AddTransactionViewModel(
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
-    walletRepository
+    walletRepository,
+    validateTransactionUseCase
 ) {
 
     protected override val _state = MutableStateFlow(AddTransactionState())
@@ -123,14 +129,7 @@ class AddTransactionViewModel(
      * Отправляет транзакцию (добавляет новую или обновляет существующую)
      */
     override fun submitTransaction(context: android.content.Context) {
-        _state.update { it.copy(isLoading = true) }
-        viewModelScope.launch {
-            if (!validateInput()) {
-                _state.update { it.copy(isLoading = false) }
-                return@launch
-            }
-            addTransaction(context)
-        }
+        submit()
     }
 
     /**
@@ -317,7 +316,17 @@ class AddTransactionViewModel(
      * Сохраняет транзакцию
      */
     fun saveTransaction() {
-        validateInput()
+        val s = _state.value
+        validateInputData(s.amount, s.category, s.source) { result ->
+            _state.update {
+                it.copy(
+                    amountError = result.amountError,
+                    categoryError = result.categoryError,
+                    sourceError = result.sourceError,
+                    error = result.errorMessage
+                )
+            }
+        }
         if (_state.value.amountError) {
             return
         }
@@ -500,38 +509,52 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Реализация проверки валидации
+     * Проверка валидации ввода
      */
-    override fun validateInput(): Boolean {
-        val currentState = _state.value
-        var isValid = true
-        val amountError = currentState.amount.isBlank()
-        val categoryError = currentState.category.isBlank()
-        val sourceError = currentState.source.isBlank()
-        var errorMsg: String? = null
-        if (amountError) isValid = false
-        if (categoryError) isValid = false
-        if (sourceError) isValid = false
-        errorMsg = when {
-            amountError && categoryError && sourceError -> "Заполните сумму, категорию и источник"
-            amountError && categoryError -> "Заполните сумму и категорию"
-            amountError && sourceError -> "Заполните сумму и источник"
-            categoryError && sourceError -> "Заполните категорию и источник"
-            amountError -> "Введите сумму транзакции"
-            categoryError -> "Выберите категорию"
-            sourceError -> "Выберите источник"
-            else -> null
+    fun validateInputData(amount: String, category: String, source: String, updateState: (ValidateTransactionUseCase.Result) -> Unit): Boolean {
+        val result = validateTransactionUseCase(amount, category, source)
+        updateState(result)
+        return result.isValid
+    }
+
+    fun submit() {
+        val s = _state.value
+        val isValid = validateInputData(s.amount, s.category, s.source) { result ->
+            _state.update {
+                it.copy(
+                    amountError = result.amountError,
+                    categoryError = result.categoryError,
+                    sourceError = result.sourceError,
+                    error = result.errorMessage
+                )
+            }
         }
-        _state.update { state ->
-            copyState(
-                state,
-                amountError = amountError,
-                categoryError = categoryError,
-                sourceError = sourceError,
-                error = errorMsg
-            )
+        if (!isValid) return
+
+        val transaction = prepareTransactionUseCase(
+            id = null,
+            title = s.title,
+            amount = s.amount,
+            category = s.category,
+            note = s.note,
+            date = s.selectedDate,
+            isExpense = s.isExpense,
+            source = s.source,
+            sourceColor = s.sourceColor,
+            isTransfer = s.category == "Переводы"
+        ) ?: run {
+            _state.update { it.copy(error = "Ошибка подготовки транзакции") }
+            return
         }
-        return isValid
+
+        viewModelScope.launch {
+            val result = addTransactionUseCase(transaction)
+            if (result is DomainResult.Success) {
+                _state.update { it.copy(isSuccess = true, error = null) }
+            } else if (result is DomainResult.Error) {
+                _state.update { it.copy(error = result.exception.message) }
+            }
+        }
     }
 
     override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {

@@ -22,17 +22,25 @@ import timber.log.Timber
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.PrepareTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
+import kotlin.Result as KotlinResult
 
 class EditTransactionViewModel(
+    private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
+    private val validateTransactionUseCase: ValidateTransactionUseCase,
+    private val prepareTransactionUseCase: PrepareTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
-    private val transactionRepository: TransactionRepository,
     categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
     sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences,
     walletRepository: com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
-    walletRepository
+    walletRepository,
+    validateTransactionUseCase
 ) {
 
     protected override val _state = MutableStateFlow(EditTransactionState())
@@ -44,24 +52,70 @@ class EditTransactionViewModel(
         // Можно вызвать loadWallets(walletRepository) при необходимости
     }
 
-    override fun submitTransaction(context: android.content.Context) {
-        if (validateInput()) {
-            _state.update { it.copy(isLoading = true) }
-            val transactionToUpdate = prepareTransactionForEdit()
-            if (transactionToUpdate != null) {
-                viewModelScope.launch {
-                    try {
-                        updateTransactionUseCase(transactionToUpdate)
-                        updateWidget(context)
-                        _state.update { it.copy(isSuccess = true, error = null, isLoading = false) }
-                    } catch (e: Exception) {
-                        _state.update { it.copy(error = e.message ?: "Ошибка при обновлении транзакции", isSuccess = false, isLoading = false) }
-                    }
+    fun loadTransaction(id: String) {
+        viewModelScope.launch {
+            val result = getTransactionByIdUseCase(id)
+            if (result.isSuccess) {
+                val transaction = result.getOrNull()
+                if (transaction != null) {
+                    _state.update { it.copy(transactionToEdit = transaction) }
+                } else {
+                    _state.update { it.copy(error = "Транзакция не найдена") }
                 }
             } else {
-                _state.update { it.copy(isLoading = false, error = "Транзакция не найдена") }
+                _state.update { it.copy(error = result.exceptionOrNull()?.message) }
             }
         }
+    }
+
+    fun validateInputData(amount: String, category: String, source: String, updateState: (ValidateTransactionUseCase.Result) -> Unit): Boolean {
+        val result = validateTransactionUseCase(amount, category, source)
+        updateState(result)
+        return result.isValid
+    }
+
+    fun submit() {
+        val s = _state.value
+        val isValid = validateInputData(s.amount, s.category, s.source) { result ->
+            _state.update {
+                it.copy(
+                    amountError = result.amountError,
+                    categoryError = result.categoryError,
+                    sourceError = result.sourceError,
+                    error = result.errorMessage
+                )
+            }
+        }
+        if (!isValid) return
+
+        val transaction = prepareTransactionUseCase(
+            id = s.transactionToEdit?.id,
+            title = s.title,
+            amount = s.amount,
+            category = s.category,
+            note = s.note,
+            date = s.selectedDate,
+            isExpense = s.isExpense,
+            source = s.source,
+            sourceColor = s.sourceColor,
+            isTransfer = s.category == "Переводы"
+        ) ?: run {
+            _state.update { it.copy(error = "Ошибка подготовки транзакции") }
+            return
+        }
+
+        viewModelScope.launch {
+            val result = updateTransactionUseCase(transaction)
+            if (result is DomainResult.Success) {
+                _state.update { it.copy(isSuccess = true, error = null) }
+            } else if (result is DomainResult.Error) {
+                _state.update { it.copy(error = result.exception.message) }
+            }
+        }
+    }
+
+    override fun submitTransaction(context: android.content.Context) {
+        submit()
     }
 
     // Загрузка транзакции для редактирования
@@ -87,18 +141,20 @@ class EditTransactionViewModel(
 
         Timber.d("Состояние после загрузки: сумма=${_state.value.amount}, дата=${_state.value.selectedDate}, режим редактирования=${_state.value.editMode}")
     }
-    
+
     // Загрузка транзакции для редактирования по ID
     fun loadTransactionForEditById(transactionId: String) {
         viewModelScope.launch {
             try {
-                val transaction = transactionRepository.getTransactionById(transactionId)
+                loadTransaction(transactionId)
+                val transaction = _state.value.transactionToEdit
                 if (transaction != null) {
                     loadTransactionForEdit(transaction)
                 } else {
                     _state.update { it.copy(error = "Транзакция не найдена") }
                 }
             } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке транзакции: ${e.message}")
                 _state.update { it.copy(error = "Ошибка при загрузке транзакции: ${e.message}") }
             }
         }
@@ -124,41 +180,6 @@ class EditTransactionViewModel(
     override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
         // Обрабатываем события UI
         handleBaseEvent(event, context)
-    }
-
-    /**
-     * Реализация проверки валидации
-     */
-    override protected fun validateInput(): Boolean {
-        val currentState = _state.value
-        var isValid = true
-        val amountError = currentState.amount.isBlank()
-        val categoryError = currentState.category.isBlank()
-        val sourceError = currentState.source.isBlank()
-        var errorMsg: String? = null
-        if (amountError) isValid = false
-        if (categoryError) isValid = false
-        if (sourceError) isValid = false
-        errorMsg = when {
-            amountError && categoryError && sourceError -> "Заполните сумму, категорию и источник"
-            amountError && categoryError -> "Заполните сумму и категорию"
-            amountError && sourceError -> "Заполните сумму и источник"
-            categoryError && sourceError -> "Заполните категорию и источник"
-            amountError -> "Введите сумму транзакции"
-            categoryError -> "Выберите категорию"
-            sourceError -> "Выберите источник"
-            else -> null
-        }
-        _state.update { state ->
-            copyState(
-                state,
-                amountError = amountError,
-                categoryError = categoryError,
-                sourceError = sourceError,
-                error = errorMsg
-            )
-        }
-        return isValid
     }
 
     override fun updateCategoryPositions() {

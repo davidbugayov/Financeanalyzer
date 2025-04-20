@@ -15,11 +15,13 @@ import kotlinx.coroutines.launch
 import androidx.lifecycle.viewModelScope
 import android.graphics.Color
 import java.util.*
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
     protected val sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences,
-    protected val walletRepository: WalletRepository
+    protected val walletRepository: WalletRepository,
+    private val validateTransactionUseCase: ValidateTransactionUseCase
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
     protected abstract val _state: MutableStateFlow<S>
     override val state: StateFlow<S> get() = _state.asStateFlow()
@@ -205,7 +207,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     // --- Общая валидация ---
-    protected abstract fun validateInput(): Boolean
+    protected fun validateInput(
+        amount: String,
+        category: String,
+        source: String,
+        updateState: (ValidateTransactionUseCase.Result) -> Unit
+    ): Boolean {
+        val result = validateTransactionUseCase(amount, category, source)
+        updateState(result)
+        return result.isValid
+    }
 
     // --- Общая инициализация данных (кошельки, категории, источники) ---
     open fun loadInitialData() {
