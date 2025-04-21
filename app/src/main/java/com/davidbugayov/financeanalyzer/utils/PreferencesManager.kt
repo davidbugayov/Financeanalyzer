@@ -51,6 +51,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_TRANSACTION_REMINDER_ENABLED = "transaction_reminder_enabled"
         private const val KEY_APP_INSTALLATION_TIME = "app_installation_time"
         private const val KEY_FIRST_LAUNCH_DONE = "first_launch_done"
+        private const val KEY_IMPORT_INFO_DISMISSED = "import_info_dismissed"
     }
 
     /**
@@ -142,5 +143,13 @@ class PreferencesManager(context: Context) {
         }
         
         return false
+    }
+
+    fun getImportInfoDismissed(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IMPORT_INFO_DISMISSED, false)
+    }
+
+    fun setImportInfoDismissed(value: Boolean) {
+        sharedPreferences.edit { putBoolean(KEY_IMPORT_INFO_DISMISSED, value) }
     }
 } 

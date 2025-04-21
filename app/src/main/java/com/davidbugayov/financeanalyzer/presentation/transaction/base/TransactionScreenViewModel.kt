@@ -88,6 +88,8 @@ fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTr
             "HideWalletSelector" -> BaseTransactionEvent.HideWalletSelector
             "ToggleAddToWallet" -> BaseTransactionEvent.ToggleAddToWallet
             "ShowWalletSelector" -> BaseTransactionEvent.ShowWalletSelector
+            "PreventAutoSubmit" -> BaseTransactionEvent.PreventAutoSubmit
+            "ResetAmountOnly" -> BaseTransactionEvent.ResetAmountOnly
             else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
         }
         is Pair<*, *> -> when (eventData.first as? String) {

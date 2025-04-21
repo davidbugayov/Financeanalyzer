@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -10,6 +11,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -20,6 +22,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
@@ -61,7 +64,16 @@ import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material.icons.filled.MoreHoriz
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.delay
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.material3.IconButton
+import androidx.compose.material.icons.filled.Close
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import androidx.compose.material3.Surface
 
 /**
  * Базовый экран для работы с транзакциями
@@ -81,6 +93,10 @@ fun <E> BaseTransactionScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
+    val preferencesManager = remember(context) { PreferencesManager(context) }
+    var showImportInfo by remember {
+        mutableStateOf(!preferencesManager.getImportInfoDismissed())
+    }
 
     // Логируем режим экрана
     LaunchedEffect(isEditMode) {
@@ -113,6 +129,8 @@ fun <E> BaseTransactionScreen(
         onNavigateBack()
     }
 
+    val scope = rememberCoroutineScope()
+
     Scaffold(
         topBar = {
             AppTopBar(
@@ -139,6 +157,8 @@ fun <E> BaseTransactionScreen(
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
             ) {
+                ImportInfoBanner()
+
                 // Заголовок с датой и типом транзакции
                 TransactionHeader(
                     date = state.selectedDate,
@@ -243,14 +263,15 @@ fun <E> BaseTransactionScreen(
                     onSelectWalletsClick = {
                         viewModel.onEvent(eventFactory("ShowWalletSelector"), context)
                     },
-                    isVisible = !state.isExpense // Показываем только для доходов
+                    isVisible = !state.isExpense && viewModel.wallets.isNotEmpty() // Показываем только для доходов и если есть кошельки
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
 
                 // Кнопка добавления/сохранения
                 AddButton(
-                    onClick = { 
+                    onClick = {
+                        Timber.d("UI: Кнопка 'Добавить' нажата")
                         viewModel.onEvent(submitEvent, context)
                     },
                     text = actualButtonText,
@@ -291,12 +312,10 @@ fun <E> BaseTransactionScreen(
                             handleExit()
                         },
                         onAddAnother = {
-                            // Сначала скрываем диалог успеха
-                            viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
-                            // Затем сбрасываем только сумму
-                            viewModel.onEvent(eventFactory("ResetAmountOnly"), context)
-                            // Предотвращаем автоматическую отправку
+                            Timber.d("UI: Нажато 'Добавить еще'")
                             viewModel.onEvent(eventFactory("PreventAutoSubmit"), context)
+                            viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
+                            viewModel.onEvent(eventFactory("ResetAmountOnly"), context)
                         },
                         isEditMode = isEditMode
                     )
@@ -441,6 +460,53 @@ fun <E> BaseTransactionScreen(
                         viewModel.onEvent(eventFactory("HideWalletSelector"), context)
                     }
                 )
+            }
+        }
+    }
+}
+
+@Composable
+fun ImportInfoBanner(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val preferencesManager = remember(context) { PreferencesManager(context) }
+    var visible by remember { mutableStateOf(!preferencesManager.getImportInfoDismissed()) }
+
+    if (visible) {
+        Surface(
+            color = MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.25f),
+            tonalElevation = 2.dp,
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = dimensionResource(R.dimen.spacing_normal), vertical = 8.dp)
+        ) {
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(12.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Default.CloudUpload,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(end = 8.dp)
+                )
+                Text(
+                    text = "Вы можете импортировать транзакции из других банков. Для этого перейдите в профиль и выберите 'Импортировать транзакции' внизу экрана.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSecondaryContainer,
+                    modifier = Modifier.weight(1f)
+                )
+                IconButton(onClick = {
+                    preferencesManager.setImportInfoDismissed(true)
+                    visible = false
+                }) {
+                    Icon(
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Закрыть",
+                        tint = MaterialTheme.colorScheme.onSecondaryContainer
+                    )
+                }
             }
         }
     }

@@ -52,8 +52,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
 ) {
 
     protected override val _state = MutableStateFlow(AddTransactionState())
-    // Флаг для блокировки автоматической отправки формы при "Добавить еще"
-    private var blockAutoSubmit = false
 
     // Расширение для преобразования строки в Double
     private fun String.toDouble(): Double {
@@ -354,9 +352,13 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
         // Проверяем, является ли категория "Переводы"
         val isTransfer = currentState.category == "Переводы"
         
+        // Генерируем UUID для новой транзакции, если id не задан
+        val transactionId = currentState.transactionToEdit?.id ?: java.util.UUID.randomUUID().toString()
+        Timber.d("Используем ID транзакции: $transactionId (новый: ${currentState.transactionToEdit == null})")
+        
         // Создаем объект транзакции
         return Transaction(
-            id = currentState.transactionToEdit?.id ?: "", // Используем ID существующей транзакции, если редактируем
+            id = transactionId,
             amount = Money(amount = finalAmount, currency = selectedCurrency),
             date = currentState.selectedDate,
             note = currentState.note.trim(),
@@ -510,36 +512,42 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                 dateError = false
             )
         }
-        // Check wallet
-        if (walletId.isNullOrBlank()) {
+        // Check wallet - только для доходов с включенным addToWallet
+        if (!isExpense && _state.value.addToWallet && walletId.isNullOrBlank()) {
+            Timber.d("Ошибка: не выбран кошелек для дохода с addToWallet=true")
             validationBuilder.addWalletError()
         }
         // Check amount
         if (amount.isBlank()) {
+            Timber.d("Ошибка: сумма не введена")
             validationBuilder.addAmountError()
         } else {
             try {
                 val amountValue = amount.replace(",", ".").toDouble()
                 if (amountValue <= 0) {
+                    Timber.d("Ошибка: сумма должна быть больше нуля")
                     validationBuilder.addAmountError()
                 }
             } catch (e: Exception) {
+                Timber.d("Ошибка: невозможно преобразовать сумму в число")
                 validationBuilder.addAmountError()
             }
         }
         // Check category
         if (categoryId.isBlank()) {
+            Timber.d("Ошибка: категория не выбрана")
             validationBuilder.addCategoryError()
         }
         // Check date (не должна быть в будущем)
         var dateError = false
         val today = java.util.Calendar.getInstance().apply {
-            set(java.util.Calendar.HOUR_OF_DAY, 0)
-            set(java.util.Calendar.MINUTE, 0)
-            set(java.util.Calendar.SECOND, 0)
-            set(java.util.Calendar.MILLISECOND, 0)
+            set(java.util.Calendar.HOUR_OF_DAY, 23)
+            set(java.util.Calendar.MINUTE, 59)
+            set(java.util.Calendar.SECOND, 59)
+            set(java.util.Calendar.MILLISECOND, 999)
         }.time
         if (date.after(today)) {
+            Timber.d("Ошибка: дата в будущем")
             dateError = true
         }
         // No validation for source - allowing empty sources
@@ -557,15 +565,22 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
     }
 
     fun submit(preventAutoSubmit: Boolean = false) {
-        if (preventAutoSubmit) {
-            _state.update { it.copy(preventAutoSubmit = true) }
+        Timber.d("[VM] submit() вызван. preventAutoSubmit=${_state.value.preventAutoSubmit}")
+        if (_state.value.preventAutoSubmit) {
+            Timber.d("[VM] submit(): preventAutoSubmit=true, сбрасываем и выходим")
+            _state.update { it.copy(preventAutoSubmit = false) }
             return
         }
 
+        Timber.d("Submit вызван, начинаем обработку")
+        
         try {
             val amountStr = _state.value.amount
+            Timber.d("Проверка суммы: '$amountStr'")
+            
             if (amountStr.isBlank()) {
                 // Если сумма не введена, только подсветить поле суммы, но без диалога ошибки
+                Timber.d("Сумма не введена, подсвечиваем ошибку")
                 _state.update { state ->
                     state.copy(
                         amountError = true
@@ -576,6 +591,8 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
 
             // Проверяем валидацию
             val s = _state.value
+            Timber.d("Начинаем валидацию: walletId=${s.targetWalletId}, amount=${s.amount}, category=${s.category}, source=${s.source}")
+            
             val validationResult = validateInput(
                 walletId = s.targetWalletId,
                 amount = s.amount,
@@ -587,30 +604,42 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                 isExpense = s.isExpense
             )
             
+            Timber.d("Результат валидации: $validationResult")
+            
             if (!validationResult) {
+                Timber.d("Валидация не пройдена, прерываем")
                 return
             }
 
             // Если сумма введена, продолжаем со стандартной логикой 
             // создания и сохранения транзакции
+            Timber.d("Создаем транзакцию из состояния")
             val transaction = createTransactionFromState(_state.value)
+            Timber.d("Созданная транзакция: $transaction")
             
             viewModelScope.launch {
+                Timber.d("Вызываем addTransactionUseCase")
                 val result = addTransactionUseCase(transaction)
+                Timber.d("Результат выполнения addTransactionUseCase: $result")
+                
                 if (result is DomainResult.Success) {
+                    Timber.d("[VM] Транзакция успешно добавлена, isSuccess=true")
                     _state.update { it.copy(isSuccess = true, error = null) }
                 } else if (result is DomainResult.Error) {
+                    Timber.e("Ошибка: ${result.exception.message}")
                     _state.update { it.copy(error = result.exception.message) }
                 }
             }
         } catch (e: Exception) {
             // Общая обработка исключений, но не показываем диалог
+            Timber.e(e, "Исключение при обработке submit")
             e.printStackTrace()
             _state.update { it.copy(error = e.message ?: "Неизвестная ошибка") }
         }
     }
 
     override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
+        Timber.d("[VM] onEvent: $event")
         when (event) {
             is BaseTransactionEvent.ToggleTransactionType -> {
                 _state.update { it.copy(isExpense = !it.isExpense, category = "") }
@@ -635,13 +664,16 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                 newState
             }
             is BaseTransactionEvent.Submit -> {
+                Timber.d("[VM] onEvent: Submit")
                 submit()
             }
             is BaseTransactionEvent.ResetAmountOnly -> {
-                _state.update { it.copy(amount = "", amountError = false) }
+                Timber.d("[VM] onEvent: ResetAmountOnly")
+                _state.update { it.copy(amount = "", amountError = false, note = "", isSuccess = false, preventAutoSubmit = false) }
             }
             is BaseTransactionEvent.PreventAutoSubmit -> {
-                blockAutoSubmit = true
+                Timber.d("[VM] onEvent: PreventAutoSubmit")
+                _state.update { it.copy(preventAutoSubmit = true) }
             }
             is BaseTransactionEvent.AddCustomSource -> {
                 val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
@@ -661,6 +693,16 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                         customSource = "",
                         sourceColor = com.davidbugayov.financeanalyzer.utils.ColorUtils.CASH_COLOR,
                         source = newSource.name
+                    )
+                }
+            }
+            is BaseTransactionEvent.ToggleAddToWallet -> {
+                val newAddToWallet = !_state.value.addToWallet
+                val allWalletIds = wallets.map { it.id }
+                _state.update {
+                    it.copy(
+                        addToWallet = newAddToWallet,
+                        selectedWallets = if (newAddToWallet && it.selectedWallets.isEmpty()) allWalletIds else it.selectedWallets
                     )
                 }
             }
