@@ -499,4 +499,7 @@
     <string name="ic_gamepad">ic_gamepad</string>
     <string name="ic_restaurant">ic_restaurant</string>
     <string name="ic_receipt">ic_receipt</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="select_icon">Выберите иконку</string>
 </resources>

@@ -59,6 +59,9 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 
 /**
  * Базовый экран для работы с транзакциями
@@ -334,11 +337,17 @@ fun <E> BaseTransactionScreen(
             }
 
             if (state.showCustomCategoryDialog) {
+                val addState = state as? AddTransactionState
                 CustomCategoryDialog(
                     categoryText = state.customCategory,
-                    onCategoryTextChange = { name -> 
+                    onCategoryTextChange = { name ->
                         viewModel.onEvent(eventFactory(Pair("SetCustomCategoryText", name)), context)
                     },
+                    selectedIcon = addState?.customCategoryIcon ?: Icons.Default.MoreHoriz,
+                    onIconSelected = { icon ->
+                        viewModel.onEvent(eventFactory(Pair("SetCustomCategoryIcon", icon)), context)
+                    },
+                    availableIcons = addState?.availableCategoryIcons ?: emptyList(),
                     onConfirm = {
                         viewModel.onEvent(eventFactory(Pair("AddCustomCategoryConfirm", state.customCategory)), context)
                     },

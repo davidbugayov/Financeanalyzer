@@ -3,6 +3,9 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.base
 import kotlinx.coroutines.flow.StateFlow
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
 
 interface TransactionScreenViewModel<S, E> {
     val state: StateFlow<S>
@@ -57,6 +60,8 @@ interface BaseTransactionState {
     val preventAutoSubmit: Boolean
     val selectedExpenseCategory: String
     val selectedIncomeCategory: String
+    val customCategoryIcon: ImageVector
+    val availableCategoryIcons: List<ImageVector>
 }
 
 fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent = { eventData ->
@@ -105,6 +110,7 @@ fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTr
             "SetCustomSourceName" -> BaseTransactionEvent.SetCustomSource(eventData.second as String)
             "SetCustomSourceColor" -> BaseTransactionEvent.SetSourceColor(eventData.second as Int)
             "SetSourceColor" -> BaseTransactionEvent.SetSourceColor(eventData.second as Int)
+            "SetCustomCategoryIcon" -> BaseTransactionEvent.SetCustomCategoryIcon(eventData.second as ImageVector)
             else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
         }
         is Triple<*, *, *> -> when (eventData.first as? String) {

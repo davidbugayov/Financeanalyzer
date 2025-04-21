@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.model
 
 import java.util.Date
+import androidx.compose.ui.graphics.vector.ImageVector
 
 sealed class BaseTransactionEvent {
     data class SetTitle(val title: String) : BaseTransactionEvent()
@@ -27,6 +28,7 @@ sealed class BaseTransactionEvent {
     object HideCategoryPicker : BaseTransactionEvent()
     object ShowCustomCategoryDialog : BaseTransactionEvent()
     object HideCustomCategoryDialog : BaseTransactionEvent()
+    data class SetCustomCategoryIcon(val icon: ImageVector) : BaseTransactionEvent()
     object ShowCancelConfirmation : BaseTransactionEvent()
     object HideCancelConfirmation : BaseTransactionEvent()
     object ShowSourcePicker : BaseTransactionEvent()

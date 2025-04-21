@@ -4,6 +4,13 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionState
 import java.util.Date
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
+import androidx.compose.ui.unit.dp
 
 /**
  * Состояние экрана добавления транзакции.
@@ -52,5 +59,57 @@ data class AddTransactionState(
     val walletError: Boolean = false,
     val dateError: Boolean = false,
     override val selectedExpenseCategory: String = "",
-    override val selectedIncomeCategory: String = ""
+    override val selectedIncomeCategory: String = "",
+    override val customCategoryIcon: ImageVector = Icons.Default.MoreHoriz,
+    override val availableCategoryIcons: List<ImageVector> = listOf(
+        Icons.Default.MoreHoriz,
+        Icons.Default.Add,
+        Icons.Default.ShoppingCart,
+        Icons.Default.Fastfood,
+        Icons.Default.Home,
+        Icons.Default.DirectionsCar,
+        Icons.Default.Movie,
+        Icons.Default.Restaurant,
+        Icons.Default.LocalHospital,
+        Icons.Default.Work,
+        Icons.Default.School,
+        Icons.Default.Flight,
+        Icons.Default.Pets,
+        Icons.Default.CardGiftcard,
+        Icons.Default.SportsSoccer,
+        Icons.Default.Phone,
+        Icons.Default.Computer,
+        Icons.Default.CreditCard,
+        Icons.Default.AttachMoney,
+        Icons.Default.Savings,
+        Icons.Default.EmojiEvents,
+        Icons.Default.LocalCafe,
+        Icons.Default.LocalAtm,
+        Icons.Default.ChildCare,
+        Icons.Default.LocalBar,
+        Icons.Default.LocalGasStation,
+        Icons.Default.LocalLaundryService,
+        Icons.Default.LocalLibrary,
+        Icons.Default.LocalMall,
+        Icons.Default.LocalPharmacy,
+        Icons.Default.LocalPizza,
+        Icons.Default.LocalPlay,
+        Icons.Default.LocalPostOffice,
+        Icons.Default.LocalPrintshop,
+        Icons.Default.LocalTaxi,
+        Icons.Default.LocalFlorist,
+        Icons.Default.LocalGroceryStore,
+        Icons.Default.MonetizationOn,
+        Icons.Default.Receipt,
+        Icons.Default.SportsBasketball,
+        Icons.Default.SportsTennis,
+        Icons.Default.Train,
+        Icons.Default.Wifi,
+        Icons.Default.Watch,
+        Icons.Default.WbSunny,
+        Icons.Default.Star,
+        Icons.Default.Favorite,
+        Icons.Default.DirectionsBus,
+        Icons.Default.StarBorder
+    )
 ) : BaseTransactionState

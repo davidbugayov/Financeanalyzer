@@ -22,10 +22,13 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.foundation.layout.size
 
 /**
  * Диалог выбора категории
@@ -110,6 +113,9 @@ fun CategoryItemButton(
 fun CustomCategoryDialog(
     categoryText: String,
     onCategoryTextChange: (String) -> Unit,
+    selectedIcon: ImageVector,
+    onIconSelected: (ImageVector) -> Unit,
+    availableIcons: List<ImageVector>,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -117,13 +123,42 @@ fun CustomCategoryDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.add_category)) },
         text = {
-            OutlinedTextField(
-                value = categoryText,
-                onValueChange = onCategoryTextChange,
-                label = { Text(stringResource(R.string.category_name)) },
-                singleLine = true,
-                modifier = Modifier.fillMaxWidth()
-            )
+            Column {
+                OutlinedTextField(
+                    value = categoryText,
+                    onValueChange = onCategoryTextChange,
+                    label = { Text(stringResource(R.string.category_name)) },
+                    singleLine = true,
+                    modifier = Modifier.fillMaxWidth()
+                )
+                Spacer(modifier = Modifier.height(16.dp))
+                Text(text = stringResource(R.string.select_icon), style = MaterialTheme.typography.bodyMedium)
+                Spacer(modifier = Modifier.height(8.dp))
+                LazyVerticalGrid(
+                    columns = GridCells.Fixed(5),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    modifier = Modifier.height(180.dp)
+                ) {
+                    items(availableIcons) { icon ->
+                        Surface(
+                            shape = MaterialTheme.shapes.medium,
+                            color = if (icon == selectedIcon) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent,
+                            border = if (icon == selectedIcon) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                            modifier = Modifier
+                                .aspectRatio(1f)
+                                .clickable { onIconSelected(icon) }
+                        ) {
+                            Icon(
+                                imageVector = icon,
+                                contentDescription = null,
+                                tint = if (icon == selectedIcon) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                                modifier = Modifier.padding(12.dp).size(28.dp)
+                            )
+                        }
+                    }
+                }
+            }
         },
         confirmButton = {
             TextButton(

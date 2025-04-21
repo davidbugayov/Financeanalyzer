@@ -24,7 +24,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreHoriz
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.PrepareTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import kotlin.Result
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
@@ -33,7 +32,6 @@ import java.util.Date
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
     private val validateTransactionUseCase: ValidateTransactionUseCase,
-    private val prepareTransactionUseCase: PrepareTransactionUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
     sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences,
@@ -294,9 +292,11 @@ class EditTransactionViewModel(
         sourceError: Boolean,
         preventAutoSubmit: Boolean,
         selectedExpenseCategory: String,
-        selectedIncomeCategory: String
+        selectedIncomeCategory: String,
+        customCategoryIcon: androidx.compose.ui.graphics.vector.ImageVector,
+        availableCategoryIcons: List<androidx.compose.ui.graphics.vector.ImageVector>
     ): EditTransactionState {
-        return EditTransactionState(
+        return state.copy(
             title = title,
             amount = amount,
             amountError = amountError,

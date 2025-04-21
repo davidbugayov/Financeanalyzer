@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import androidx.compose.ui.graphics.vector.ImageVector
 
 /**
  * ViewModel для управления категориями транзакций.
@@ -137,20 +138,20 @@ class CategoriesViewModel(
     /**
      * Добавляет новую пользовательскую категорию
      */
-    fun addCustomCategory(category: String, isExpense: Boolean) {
+    fun addCustomCategory(category: String, isExpense: Boolean, icon: ImageVector = Icons.Default.MoreHoriz) {
         if (category.isBlank()) return
 
         viewModelScope.launch {
             if (isExpense) {
                 categoryPreferences.addExpenseCategory(category)
-                val customCategory = CategoryItem(category, Icons.Default.MoreHoriz)
+                val customCategory = CategoryItem(category, icon)
                 val currentCategories = _expenseCategories.value.toMutableList()
                 // Добавляем перед "Другое"
                 currentCategories.add(currentCategories.size - 1, customCategory)
                 _expenseCategories.value = currentCategories
             } else {
                 categoryPreferences.addIncomeCategory(category)
-                val customCategory = CategoryItem(category, Icons.Default.MoreHoriz)
+                val customCategory = CategoryItem(category, icon)
                 val currentCategories = _incomeCategories.value.toMutableList()
                 // Добавляем перед "Другое"
                 currentCategories.add(currentCategories.size - 1, customCategory)

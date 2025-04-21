@@ -27,18 +27,19 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCu
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.PrepareTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
 import java.util.Date
+import androidx.compose.ui.graphics.vector.ImageVector
+import java.time.LocalDate
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 
 /**
  * ViewModel для экрана добавления транзакции.
  * Следует принципам MVI и Clean Architecture.
  */
-class AddTransactionViewModel(
+ class AddTransactionViewModel(
     private val validateTransactionUseCase: ValidateTransactionUseCase,
-    private val prepareTransactionUseCase: PrepareTransactionUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
     categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
     sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences,
@@ -479,96 +480,6 @@ class AddTransactionViewModel(
         _state.update { it.copy(selectedWallets = emptyList()) }
     }
 
-    
-    override fun copyState(
-        state: AddTransactionState,
-        title: String,
-        amount: String,
-        amountError: Boolean,
-        category: String,
-        categoryError: Boolean,
-        note: String,
-        selectedDate: java.util.Date,
-        isExpense: Boolean,
-        showDatePicker: Boolean,
-        showCategoryPicker: Boolean,
-        showCustomCategoryDialog: Boolean,
-        showCancelConfirmation: Boolean,
-        customCategory: String,
-        showSourcePicker: Boolean,
-        showCustomSourceDialog: Boolean,
-        customSource: String,
-        source: String,
-        sourceColor: Int,
-        showColorPicker: Boolean,
-        isLoading: Boolean,
-        error: String?,
-        isSuccess: Boolean,
-        successMessage: String,
-        expenseCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem>,
-        incomeCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem>,
-        sources: List<com.davidbugayov.financeanalyzer.domain.model.Source>,
-        categoryToDelete: String?,
-        sourceToDelete: String?,
-        showDeleteCategoryConfirmDialog: Boolean,
-        showDeleteSourceConfirmDialog: Boolean,
-        editMode: Boolean,
-        transactionToEdit: com.davidbugayov.financeanalyzer.domain.model.Transaction?,
-        addToWallet: Boolean,
-        selectedWallets: List<String>,
-        showWalletSelector: Boolean,
-        targetWalletId: String?,
-        forceExpense: Boolean,
-        sourceError: Boolean,
-        preventAutoSubmit: Boolean,
-        selectedExpenseCategory: String,
-        selectedIncomeCategory: String
-    ): AddTransactionState {
-        return AddTransactionState(
-            title = title,
-            amount = amount,
-            amountError = amountError,
-            category = category,
-            categoryError = categoryError,
-            note = note,
-            selectedDate = selectedDate,
-            isExpense = isExpense,
-            showDatePicker = showDatePicker,
-            showCategoryPicker = showCategoryPicker,
-            showCustomCategoryDialog = showCustomCategoryDialog,
-            showCancelConfirmation = showCancelConfirmation,
-            customCategory = customCategory,
-            showSourcePicker = showSourcePicker,
-            showCustomSourceDialog = showCustomSourceDialog,
-            customSource = customSource,
-            source = source,
-            sourceColor = sourceColor,
-            showColorPicker = showColorPicker,
-            isLoading = isLoading,
-            error = error,
-            isSuccess = isSuccess,
-            successMessage = successMessage,
-            expenseCategories = expenseCategories,
-            incomeCategories = incomeCategories,
-            sources = sources,
-            categoryToDelete = categoryToDelete,
-            sourceToDelete = sourceToDelete,
-            showDeleteCategoryConfirmDialog = showDeleteCategoryConfirmDialog,
-            showDeleteSourceConfirmDialog = showDeleteSourceConfirmDialog,
-            editMode = editMode,
-            transactionToEdit = transactionToEdit,
-            addToWallet = addToWallet,
-            selectedWallets = selectedWallets,
-            showWalletSelector = showWalletSelector,
-            targetWalletId = targetWalletId,
-            forceExpense = forceExpense,
-            sourceError = sourceError,
-            preventAutoSubmit = preventAutoSubmit,
-            selectedExpenseCategory = selectedExpenseCategory,
-            selectedIncomeCategory = selectedIncomeCategory
-        )
-    }
-
     /**
      * Проверка валидации ввода
      */
@@ -732,11 +643,125 @@ class AddTransactionViewModel(
             is BaseTransactionEvent.PreventAutoSubmit -> {
                 blockAutoSubmit = true
             }
+            is BaseTransactionEvent.AddCustomSource -> {
+                val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
+                    name = event.source,
+                    color = event.color,
+                    isCustom = true
+                )
+                val updatedSources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource(
+                    sourcePreferences,
+                    _state.value.sources,
+                    newSource
+                )
+                _state.update {
+                    it.copy(
+                        sources = updatedSources,
+                        showCustomSourceDialog = false,
+                        customSource = "",
+                        sourceColor = com.davidbugayov.financeanalyzer.utils.ColorUtils.CASH_COLOR,
+                        source = newSource.name
+                    )
+                }
+            }
             else -> handleBaseEvent(event, context)
         }
     }
 
     override fun updateCategoryPositions() {
         // no-op: логика обновления категорий универсальна и реализована в базовом классе
+    }
+
+    override fun copyState(
+        state: AddTransactionState,
+        title: String,
+        amount: String,
+        amountError: Boolean,
+        category: String,
+        categoryError: Boolean,
+        note: String,
+        selectedDate: Date,
+        isExpense: Boolean,
+        showDatePicker: Boolean,
+        showCategoryPicker: Boolean,
+        showCustomCategoryDialog: Boolean,
+        showCancelConfirmation: Boolean,
+        customCategory: String,
+        showSourcePicker: Boolean,
+        showCustomSourceDialog: Boolean,
+        customSource: String,
+        source: String,
+        sourceColor: Int,
+        showColorPicker: Boolean,
+        isLoading: Boolean,
+        error: String?,
+        isSuccess: Boolean,
+        successMessage: String,
+        expenseCategories: List<CategoryItem>,
+        incomeCategories: List<CategoryItem>,
+        sources: List<Source>,
+        categoryToDelete: String?,
+        sourceToDelete: String?,
+        showDeleteCategoryConfirmDialog: Boolean,
+        showDeleteSourceConfirmDialog: Boolean,
+        editMode: Boolean,
+        transactionToEdit: Transaction?,
+        addToWallet: Boolean,
+        selectedWallets: List<String>,
+        showWalletSelector: Boolean,
+        targetWalletId: String?,
+        forceExpense: Boolean,
+        sourceError: Boolean,
+        preventAutoSubmit: Boolean,
+        selectedExpenseCategory: String,
+        selectedIncomeCategory: String,
+        customCategoryIcon: ImageVector,
+        availableCategoryIcons: List<ImageVector>
+    ): AddTransactionState {
+        return state.copy(
+            title = title,
+            amount = amount,
+            amountError = amountError,
+            category = category,
+            categoryError = categoryError,
+            note = note,
+            selectedDate = selectedDate,
+            isExpense = isExpense,
+            showDatePicker = showDatePicker,
+            showCategoryPicker = showCategoryPicker,
+            showCustomCategoryDialog = showCustomCategoryDialog,
+            showCancelConfirmation = showCancelConfirmation,
+            customCategory = customCategory,
+            showSourcePicker = showSourcePicker,
+            showCustomSourceDialog = showCustomSourceDialog,
+            customSource = customSource,
+            source = source,
+            sourceColor = sourceColor,
+            showColorPicker = showColorPicker,
+            isLoading = isLoading,
+            error = error,
+            isSuccess = isSuccess,
+            successMessage = successMessage,
+            expenseCategories = expenseCategories,
+            incomeCategories = incomeCategories,
+            sources = sources,
+            categoryToDelete = categoryToDelete,
+            sourceToDelete = sourceToDelete,
+            showDeleteCategoryConfirmDialog = showDeleteCategoryConfirmDialog,
+            showDeleteSourceConfirmDialog = showDeleteSourceConfirmDialog,
+            editMode = editMode,
+            transactionToEdit = transactionToEdit,
+            addToWallet = addToWallet,
+            selectedWallets = selectedWallets,
+            showWalletSelector = showWalletSelector,
+            targetWalletId = targetWalletId,
+            forceExpense = forceExpense,
+            sourceError = sourceError,
+            preventAutoSubmit = preventAutoSubmit,
+            selectedExpenseCategory = selectedExpenseCategory,
+            selectedIncomeCategory = selectedIncomeCategory,
+            customCategoryIcon = customCategoryIcon,
+            availableCategoryIcons = availableCategoryIcons
+        )
     }
 } 

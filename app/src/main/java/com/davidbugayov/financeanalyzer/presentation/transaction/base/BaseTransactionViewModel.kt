@@ -16,6 +16,58 @@ import androidx.lifecycle.viewModelScope
 import android.graphics.Color
 import java.util.*
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.Fastfood
+import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.DirectionsCar
+import androidx.compose.material.icons.filled.Movie
+import androidx.compose.material.icons.filled.Restaurant
+import androidx.compose.material.icons.filled.LocalHospital
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.material.icons.filled.School
+import androidx.compose.material.icons.filled.Flight
+import androidx.compose.material.icons.filled.Pets
+import androidx.compose.material.icons.filled.CardGiftcard
+import androidx.compose.material.icons.filled.SportsSoccer
+import androidx.compose.material.icons.filled.Phone
+import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.CreditCard
+import androidx.compose.material.icons.filled.AttachMoney
+import androidx.compose.material.icons.filled.Savings
+import androidx.compose.material.icons.filled.EmojiEvents
+import androidx.compose.material.icons.filled.LocalCafe
+import androidx.compose.material.icons.filled.LocalAtm
+import androidx.compose.material.icons.filled.ChildCare
+import androidx.compose.material.icons.filled.LocalBar
+import androidx.compose.material.icons.filled.LocalGasStation
+import androidx.compose.material.icons.filled.LocalLaundryService
+import androidx.compose.material.icons.filled.LocalLibrary
+import androidx.compose.material.icons.filled.LocalMall
+import androidx.compose.material.icons.filled.LocalPharmacy
+import androidx.compose.material.icons.filled.LocalPizza
+import androidx.compose.material.icons.filled.LocalPlay
+import androidx.compose.material.icons.filled.LocalPostOffice
+import androidx.compose.material.icons.filled.LocalPrintshop
+import androidx.compose.material.icons.filled.LocalTaxi
+import androidx.compose.material.icons.filled.LocalFlorist
+import androidx.compose.material.icons.filled.LocalGroceryStore
+import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.material.icons.filled.Receipt
+import androidx.compose.material.icons.filled.SportsBasketball
+import androidx.compose.material.icons.filled.SportsTennis
+import androidx.compose.material.icons.filled.Train
+import androidx.compose.material.icons.filled.Wifi
+import androidx.compose.material.icons.filled.Watch
+import androidx.compose.material.icons.filled.WbSunny
+import androidx.compose.material.icons.filled.Star
+import androidx.compose.material.icons.filled.Favorite
+import androidx.compose.material.icons.filled.DirectionsBus
+import androidx.compose.material.icons.filled.StarBorder
+import androidx.compose.ui.graphics.vector.ImageVector
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
@@ -100,7 +152,39 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 amountError = false,
                 categoryError = false,
                 sourceError = false,
-                error = null
+                error = null,
+                showDatePicker = false,
+                showCategoryPicker = false,
+                showCustomCategoryDialog = false,
+                showCancelConfirmation = false,
+                showSourcePicker = false,
+                showCustomSourceDialog = false,
+                showColorPicker = false,
+                isLoading = false,
+                isSuccess = false,
+                successMessage = "",
+                expenseCategories = state.expenseCategories,
+                incomeCategories = state.incomeCategories,
+                sources = state.sources,
+                categoryToDelete = null,
+                sourceToDelete = null,
+                showDeleteCategoryConfirmDialog = false,
+                showDeleteSourceConfirmDialog = false,
+                editMode = false,
+                transactionToEdit = null,
+                addToWallet = false,
+                selectedWallets = emptyList(),
+                showWalletSelector = false,
+                targetWalletId = null,
+                forceExpense = false,
+                preventAutoSubmit = false,
+                selectedExpenseCategory = "",
+                selectedIncomeCategory = "",
+                customCategory = "",
+                sourceColor = 0,
+                customSource = "",
+                customCategoryIcon = state.customCategoryIcon,
+                availableCategoryIcons = state.availableCategoryIcons
             )
         }
     }
@@ -206,6 +290,24 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             is BaseTransactionEvent.SelectWallets -> _state.update { state -> 
                 copyState(state, selectedWallets = event.walletIds) 
             }
+            is BaseTransactionEvent.SetCustomCategoryIcon -> _state.update { state ->
+                if (state is com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState)
+                    state.copy(customCategoryIcon = event.icon) as S
+                else state
+            }
+            is BaseTransactionEvent.SetCustomCategory -> _state.update { state ->
+                copyState(state, customCategory = event.category)
+            }
+            is BaseTransactionEvent.AddCustomCategory -> {
+                val icon = if (_state.value is AddTransactionState) (_state.value as AddTransactionState).customCategoryIcon else Icons.Default.MoreHoriz
+                val category = event.category
+                if (category.isNotBlank()) {
+                    categoriesViewModel?.addCustomCategory(category, _state.value.isExpense, icon)
+                }
+                _state.update { state ->
+                    copyState(state, showCustomCategoryDialog = false, customCategory = "")
+                }
+            }
             else -> {}
         }
     }
@@ -227,20 +329,17 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         // Реализация загрузки категорий и источников
         viewModelScope.launch {
             categoriesViewModel.expenseCategories.collect { categories ->
-                _state.update { state -> 
+                _state.update { state ->
                     // Выбираем первую категорию, если категория еще не выбрана
                     val firstCategory = if (state.category.isBlank() && categories.isNotEmpty()) {
                         categories.first().name
                     } else {
                         state.category
                     }
-                    
                     // Обновляем список категорий, чтобы первая имела флаг wasSelected=true
                     val updatedCategories = if (categories.isNotEmpty()) {
                         categories.mapIndexed { index, categoryItem ->
                             if (index == 0 || categoryItem.name == firstCategory) {
-                                // Устанавливаем флаг wasSelected=true для первой категории 
-                                // или для категории, которая соответствует выбранной
                                 categoryItem.copy(wasSelected = true)
                             } else {
                                 categoryItem
@@ -249,11 +348,47 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     } else {
                         categories
                     }
-                    
                     copyState(
-                        state, 
+                        state,
                         expenseCategories = updatedCategories,
-                        category = firstCategory
+                        category = firstCategory,
+                        showDatePicker = false,
+                        showCategoryPicker = false,
+                        showCustomCategoryDialog = false,
+                        showCancelConfirmation = false,
+                        showSourcePicker = false,
+                        showCustomSourceDialog = false,
+                        showColorPicker = false,
+                        isLoading = false,
+                        isSuccess = false,
+                        successMessage = "",
+                        sourceColor = 0,
+                        customSource = "",
+                        source = "",
+                        addToWallet = false,
+                        selectedWallets = emptyList(),
+                        showWalletSelector = false,
+                        targetWalletId = null,
+                        forceExpense = false,
+                        sourceError = false,
+                        preventAutoSubmit = false,
+                        selectedExpenseCategory = "",
+                        selectedIncomeCategory = "",
+                        customCategory = "",
+                        incomeCategories = state.incomeCategories,
+                        sources = state.sources,
+                        categoryToDelete = null,
+                        sourceToDelete = null,
+                        showDeleteCategoryConfirmDialog = false,
+                        showDeleteSourceConfirmDialog = false,
+                        editMode = false,
+                        transactionToEdit = null,
+                        amountError = false,
+                        categoryError = false,
+                        note = state.note,
+                        selectedDate = state.selectedDate,
+                        customCategoryIcon = state.customCategoryIcon,
+                        availableCategoryIcons = state.availableCategoryIcons
                     )
                 }
             }
@@ -269,13 +404,42 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         
         viewModelScope.launch {
             val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences)
-            _state.update { state -> 
+            _state.update { state ->
                 val firstSource = sources.firstOrNull()
                 copyState(
-                    state, 
+                    state,
                     sources = sources,
                     source = firstSource?.name ?: "",
-                    sourceColor = firstSource?.color ?: 0
+                    sourceColor = firstSource?.color ?: 0,
+                    showDatePicker = false,
+                    showCategoryPicker = false,
+                    showCustomCategoryDialog = false,
+                    showCancelConfirmation = false,
+                    showSourcePicker = false,
+                    showCustomSourceDialog = false,
+                    showColorPicker = false,
+                    isLoading = false,
+                    isSuccess = false,
+                    successMessage = "",
+                    sourceError = false,
+                    preventAutoSubmit = false,
+                    selectedExpenseCategory = "",
+                    selectedIncomeCategory = "",
+                    customCategory = "",
+                    expenseCategories = state.expenseCategories,
+                    incomeCategories = state.incomeCategories,
+                    categoryToDelete = null,
+                    sourceToDelete = null,
+                    showDeleteCategoryConfirmDialog = false,
+                    showDeleteSourceConfirmDialog = false,
+                    editMode = false,
+                    transactionToEdit = null,
+                    amountError = false,
+                    categoryError = false,
+                    note = state.note,
+                    selectedDate = state.selectedDate,
+                    customCategoryIcon = state.customCategoryIcon,
+                    availableCategoryIcons = state.availableCategoryIcons
                 )
             }
         }
@@ -456,7 +620,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         sourceError: Boolean = state.sourceError,
         preventAutoSubmit: Boolean = state.preventAutoSubmit,
         selectedExpenseCategory: String = state.selectedExpenseCategory,
-        selectedIncomeCategory: String = state.selectedIncomeCategory
+        selectedIncomeCategory: String = state.selectedIncomeCategory,
+        customCategoryIcon: ImageVector = state.customCategoryIcon,
+        availableCategoryIcons: List<ImageVector> = state.availableCategoryIcons
     ): S
 
     /**
@@ -466,6 +632,61 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         _state.update { currentState ->
             val (_, newState) = block(currentState)
             newState
+        }
+    }
+
+    fun getMaterialIconByName(name: String): ImageVector {
+        return when (name) {
+            "MoreHoriz" -> Icons.Default.MoreHoriz
+            "Add" -> Icons.Default.Add
+            "ShoppingCart" -> Icons.Default.ShoppingCart
+            "Fastfood" -> Icons.Default.Fastfood
+            "Home" -> Icons.Default.Home
+            "DirectionsCar" -> Icons.Default.DirectionsCar
+            "Movie" -> Icons.Default.Movie
+            "Restaurant" -> Icons.Default.Restaurant
+            "LocalHospital" -> Icons.Default.LocalHospital
+            "Work" -> Icons.Default.Work
+            "School" -> Icons.Default.School
+            "Flight" -> Icons.Default.Flight
+            "Pets" -> Icons.Default.Pets
+            "CardGiftcard" -> Icons.Default.CardGiftcard
+            "SportsSoccer" -> Icons.Default.SportsSoccer
+            "Phone" -> Icons.Default.Phone
+            "Computer" -> Icons.Default.Computer
+            "CreditCard" -> Icons.Default.CreditCard
+            "AttachMoney" -> Icons.Default.AttachMoney
+            "Savings" -> Icons.Default.Savings
+            "EmojiEvents" -> Icons.Default.EmojiEvents
+            "LocalCafe" -> Icons.Default.LocalCafe
+            "LocalAtm" -> Icons.Default.LocalAtm
+            "ChildCare" -> Icons.Default.ChildCare
+            "LocalBar" -> Icons.Default.LocalBar
+            "LocalGasStation" -> Icons.Default.LocalGasStation
+            "LocalLaundryService" -> Icons.Default.LocalLaundryService
+            "LocalLibrary" -> Icons.Default.LocalLibrary
+            "LocalMall" -> Icons.Default.LocalMall
+            "LocalPharmacy" -> Icons.Default.LocalPharmacy
+            "LocalPizza" -> Icons.Default.LocalPizza
+            "LocalPlay" -> Icons.Default.LocalPlay
+            "LocalPostOffice" -> Icons.Default.LocalPostOffice
+            "LocalPrintshop" -> Icons.Default.LocalPrintshop
+            "LocalTaxi" -> Icons.Default.LocalTaxi
+            "LocalFlorist" -> Icons.Default.LocalFlorist
+            "LocalGroceryStore" -> Icons.Default.LocalGroceryStore
+            "MonetizationOn" -> Icons.Default.MonetizationOn
+            "Receipt" -> Icons.Default.Receipt
+            "SportsBasketball" -> Icons.Default.SportsBasketball
+            "SportsTennis" -> Icons.Default.SportsTennis
+            "Train" -> Icons.Default.Train
+            "Wifi" -> Icons.Default.Wifi
+            "Watch" -> Icons.Default.Watch
+            "WbSunny" -> Icons.Default.WbSunny
+            "Star" -> Icons.Default.Star
+            "Favorite" -> Icons.Default.Favorite
+            "DirectionsBus" -> Icons.Default.DirectionsBus
+            "StarBorder" -> Icons.Default.StarBorder
+            else -> Icons.Default.MoreHoriz
         }
     }
 
