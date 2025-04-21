@@ -50,5 +50,7 @@ data class AddTransactionState(
     override val sourceError: Boolean = false,
     override val preventAutoSubmit: Boolean = false, // Предотвращать автоматическую отправку формы
     val walletError: Boolean = false,
-    val dateError: Boolean = false
+    val dateError: Boolean = false,
+    override val selectedExpenseCategory: String = "",
+    override val selectedIncomeCategory: String = ""
 ) : BaseTransactionState

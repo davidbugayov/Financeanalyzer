@@ -55,6 +55,8 @@ interface BaseTransactionState {
     val forceExpense: Boolean
     val sourceError: Boolean
     val preventAutoSubmit: Boolean
+    val selectedExpenseCategory: String
+    val selectedIncomeCategory: String
 }
 
 fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent = { eventData ->
@@ -84,6 +86,8 @@ fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTr
             else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
         }
         is Pair<*, *> -> when (eventData.first as? String) {
+            "SetExpenseCategory" -> BaseTransactionEvent.SetExpenseCategory(eventData.second as String)
+            "SetIncomeCategory" -> BaseTransactionEvent.SetIncomeCategory(eventData.second as String)
             "DeleteSourceConfirm" -> {
                 val source = eventData.second as? com.davidbugayov.financeanalyzer.domain.model.Source
                 BaseTransactionEvent.ShowDeleteSourceConfirmDialog(source?.name ?: "")

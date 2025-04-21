@@ -177,12 +177,14 @@ fun <E> BaseTransactionScreen(
                 Column {
                     CategorySection(
                         categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
-                        selectedCategory = state.category,
+                        selectedCategory = if (state.isExpense) state.selectedExpenseCategory else state.selectedIncomeCategory,
                         onCategorySelected = { selectedCategory -> 
                             Timber.d("Category selected directly: " + selectedCategory.name)
-                            // Создаем копию с установленным флагом wasSelected
-                            val selectedWithFlag = selectedCategory.copy(wasSelected = true)
-                            viewModel.onEvent(eventFactory(selectedWithFlag), context)
+                            if (state.isExpense) {
+                                viewModel.onEvent(eventFactory(Pair("SetExpenseCategory", selectedCategory.name)), context)
+                            } else {
+                                viewModel.onEvent(eventFactory(Pair("SetIncomeCategory", selectedCategory.name)), context)
+                            }
                         },
                         onAddCategoryClick = {
                             viewModel.onEvent(eventFactory("ShowCustomCategoryDialog"), context)
@@ -316,7 +318,11 @@ fun <E> BaseTransactionScreen(
                     categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
                     onCategorySelected = { categoryName ->
                         Timber.d("Category selected from dialog: $categoryName")
-                        viewModel.onEvent(eventFactory(categoryName), context)
+                        if (state.isExpense) {
+                            viewModel.onEvent(eventFactory(Pair("SetExpenseCategory", categoryName)), context)
+                        } else {
+                            viewModel.onEvent(eventFactory(Pair("SetIncomeCategory", categoryName)), context)
+                        }
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory("HideCategoryPicker"), context)

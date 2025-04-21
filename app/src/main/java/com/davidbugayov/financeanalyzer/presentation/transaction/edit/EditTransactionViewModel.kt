@@ -292,7 +292,9 @@ class EditTransactionViewModel(
         targetWalletId: String?,
         forceExpense: Boolean,
         sourceError: Boolean,
-        preventAutoSubmit: Boolean
+        preventAutoSubmit: Boolean,
+        selectedExpenseCategory: String,
+        selectedIncomeCategory: String
     ): EditTransactionState {
         return EditTransactionState(
             title = title,
@@ -333,7 +335,9 @@ class EditTransactionViewModel(
             targetWalletId = targetWalletId,
             forceExpense = forceExpense,
             sourceError = sourceError,
-            preventAutoSubmit = preventAutoSubmit
+            preventAutoSubmit = preventAutoSubmit,
+            selectedExpenseCategory = selectedExpenseCategory,
+            selectedIncomeCategory = selectedIncomeCategory
         )
     }
 }

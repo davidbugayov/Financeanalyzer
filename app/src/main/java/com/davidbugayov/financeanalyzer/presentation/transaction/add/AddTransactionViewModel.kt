@@ -122,7 +122,10 @@ class AddTransactionViewModel(
                     _state.update { it.copy(expenseCategories = categories) }
                     if (_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
                         Timber.d("[VM] collect: Выставляю первую категорию расходов: ${categories.first().name}")
-                        _state.update { it.copy(category = categories.first().name) }
+                        _state.update { it.copy(
+                            category = categories.first().name,
+                            selectedExpenseCategory = categories.first().name
+                        ) }
                     }
                 }
             } catch (e: Exception) {
@@ -136,7 +139,10 @@ class AddTransactionViewModel(
                     _state.update { it.copy(incomeCategories = categories) }
                     if (!_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
                         Timber.d("[VM] collect: Выставляю первую категорию доходов: ${categories.first().name}")
-                        _state.update { it.copy(category = categories.first().name) }
+                        _state.update { it.copy(
+                            category = categories.first().name,
+                            selectedIncomeCategory = categories.first().name
+                        ) }
                     }
                 }
             } catch (e: Exception) {
@@ -147,16 +153,27 @@ class AddTransactionViewModel(
 
     private fun setDefaultCategoryIfNeeded(force: Boolean = false) {
         _state.update { current ->
-            if (current.isExpense && current.expenseCategories.isNotEmpty() &&
-                (force || current.category.isBlank() || current.expenseCategories.none { it.name == current.category })
-            ) {
-                Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию расходов: ${current.expenseCategories.first().name}")
-                current.copy(category = current.expenseCategories.first().name)
-            } else if (!current.isExpense && current.incomeCategories.isNotEmpty() &&
-                (force || current.category.isBlank() || current.incomeCategories.none { it.name == current.category })
-            ) {
-                Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию доходов: ${current.incomeCategories.first().name}")
-                current.copy(category = current.incomeCategories.first().name)
+            if (current.isExpense && current.expenseCategories.isNotEmpty()) {
+                // Если категория уже выбрана и есть в списке — не менять
+                if (!force && current.selectedExpenseCategory.isNotBlank() && current.expenseCategories.any { it.name == current.selectedExpenseCategory }) {
+                    current.copy(category = current.selectedExpenseCategory)
+                } else {
+                    Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию расходов: ${current.expenseCategories.first().name}")
+                    current.copy(
+                        category = current.expenseCategories.first().name,
+                        selectedExpenseCategory = current.expenseCategories.first().name
+                    )
+                }
+            } else if (!current.isExpense && current.incomeCategories.isNotEmpty()) {
+                if (!force && current.selectedIncomeCategory.isNotBlank() && current.incomeCategories.any { it.name == current.selectedIncomeCategory }) {
+                    current.copy(category = current.selectedIncomeCategory)
+                } else {
+                    Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию доходов: ${current.incomeCategories.first().name}")
+                    current.copy(
+                        category = current.incomeCategories.first().name,
+                        selectedIncomeCategory = current.incomeCategories.first().name
+                    )
+                }
             } else {
                 current
             }
@@ -503,7 +520,9 @@ class AddTransactionViewModel(
         targetWalletId: String?,
         forceExpense: Boolean,
         sourceError: Boolean,
-        preventAutoSubmit: Boolean
+        preventAutoSubmit: Boolean,
+        selectedExpenseCategory: String,
+        selectedIncomeCategory: String
     ): AddTransactionState {
         return AddTransactionState(
             title = title,
@@ -544,7 +563,9 @@ class AddTransactionViewModel(
             targetWalletId = targetWalletId,
             forceExpense = forceExpense,
             sourceError = sourceError,
-            preventAutoSubmit = preventAutoSubmit
+            preventAutoSubmit = preventAutoSubmit,
+            selectedExpenseCategory = selectedExpenseCategory,
+            selectedIncomeCategory = selectedIncomeCategory
         )
     }
 
@@ -683,6 +704,24 @@ class AddTransactionViewModel(
             is BaseTransactionEvent.ToggleTransactionType -> {
                 _state.update { it.copy(isExpense = !it.isExpense, category = "") }
                 setDefaultCategoryIfNeeded()
+            }
+            is BaseTransactionEvent.SetExpenseCategory -> _state.update { state ->
+                val newState = state.copy(
+                    category = event.category,
+                    selectedExpenseCategory = event.category
+                )
+                Timber.d("[VM] SetExpenseCategory: selectedExpenseCategory теперь: ${event.category}")
+                Timber.d("[VM] Список категорий: ${state.expenseCategories.map { it.name }}")
+                newState
+            }
+            is BaseTransactionEvent.SetIncomeCategory -> _state.update { state ->
+                val newState = state.copy(
+                    category = event.category,
+                    selectedIncomeCategory = event.category
+                )
+                Timber.d("[VM] SetIncomeCategory: selectedIncomeCategory теперь: ${event.category}")
+                Timber.d("[VM] Список категорий: ${state.incomeCategories.map { it.name }}")
+                newState
             }
             is BaseTransactionEvent.Submit -> {
                 submit()

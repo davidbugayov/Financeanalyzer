@@ -36,21 +36,22 @@ fun CategoryItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    isError: Boolean = false
+    isError: Boolean = false,
+    modifier: Modifier = Modifier
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(dimensionResource(R.dimen.category_item_width))
+        modifier = modifier
+            .width(56.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(vertical = dimensionResource(R.dimen.spacing_medium))
+            .padding(vertical = 2.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(dimensionResource(R.dimen.category_icon_size))
+                .size(36.dp)
                 .clip(CircleShape)
                 .background(
                     when {
@@ -60,9 +61,9 @@ fun CategoryItem(
                 )
                 .border(
                     width = when {
-                        isSelected -> dimensionResource(R.dimen.border_width_large)
-                        isError -> 3.dp // Увеличенная ширина рамки при ошибке
-                        else -> dimensionResource(R.dimen.border_width_none)
+                        isSelected -> 2.dp
+                        isError -> 2.dp
+                        else -> 0.dp
                     },
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.primary
@@ -76,15 +77,16 @@ fun CategoryItem(
             Icon(
                 imageVector = category.icon,
                 contentDescription = category.name,
-                tint = if (isError) Color.Red else MaterialTheme.colorScheme.onPrimaryContainer
+                tint = if (isError) Color.Red else MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.size(20.dp)
             )
         }
 
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
+        Spacer(modifier = Modifier.height(2.dp))
 
         Text(
             text = category.name,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             maxLines = 1,
             color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface

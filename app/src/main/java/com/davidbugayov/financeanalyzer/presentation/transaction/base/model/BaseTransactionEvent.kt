@@ -52,4 +52,6 @@ sealed class BaseTransactionEvent {
     data class LoadTransaction(val id: String) : BaseTransactionEvent()
     object ResetAmountOnly : BaseTransactionEvent()
     object PreventAutoSubmit : BaseTransactionEvent()
+    data class SetExpenseCategory(val category: String) : BaseTransactionEvent()
+    data class SetIncomeCategory(val category: String) : BaseTransactionEvent()
 } 

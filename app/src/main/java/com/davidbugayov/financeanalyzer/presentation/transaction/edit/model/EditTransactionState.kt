@@ -50,5 +50,7 @@ data class EditTransactionState(
     val isEdited: Boolean = false,
     override val sourceError: Boolean = false,
     override val preventAutoSubmit: Boolean = false,
-    val walletError: Boolean = false
+    val walletError: Boolean = false,
+    override val selectedExpenseCategory: String = "",
+    override val selectedIncomeCategory: String = ""
 ) : BaseTransactionState

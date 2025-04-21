@@ -454,7 +454,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         targetWalletId: String? = state.targetWalletId,
         forceExpense: Boolean = state.forceExpense,
         sourceError: Boolean = state.sourceError,
-        preventAutoSubmit: Boolean = state.preventAutoSubmit
+        preventAutoSubmit: Boolean = state.preventAutoSubmit,
+        selectedExpenseCategory: String = state.selectedExpenseCategory,
+        selectedIncomeCategory: String = state.selectedIncomeCategory
     ): S
 
     /**
