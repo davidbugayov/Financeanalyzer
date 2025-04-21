@@ -35,7 +35,6 @@ fun EditTransactionScreen(
 
     BaseTransactionScreen(
         viewModel = viewModel,
-        categoriesViewModel = categoriesViewModel,
         onNavigateBack = onNavigateBack,
         screenTitle = "Редактирование транзакции",
         buttonText = "Сохранить",

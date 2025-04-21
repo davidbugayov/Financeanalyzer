@@ -93,19 +93,27 @@ fun <E> BaseTransactionScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
-    val preferencesManager = remember(context) { PreferencesManager(context) }
-    var showImportInfo by remember {
-        mutableStateOf(!preferencesManager.getImportInfoDismissed())
-    }
 
     // Логируем режим экрана
     LaunchedEffect(isEditMode) {
         Timber.d("Экран инициализирован в режиме ${if (isEditMode) "редактирования" else "добавления"} транзакции. editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}")
     }
-    
     // Логируем состояние ошибок
     LaunchedEffect(state.categoryError, state.sourceError, state.amountError) {
         Timber.d("Состояние ошибок: categoryError=${state.categoryError}, sourceError=${state.sourceError}, amountError=${state.amountError}")
+    }
+
+    // Специальная обработка для типа транзакции на основе forceExpense
+    LaunchedEffect(viewModel.state.value.forceExpense) {
+        Timber.d("forceExpense изменен: ${viewModel.state.value.forceExpense}")
+        // Если forceExpense=true и isExpense=false, переключаем на расход
+        if (viewModel.state.value.forceExpense && !viewModel.state.value.isExpense) {
+            viewModel.onEvent(eventFactory("ToggleTransactionType"), context)
+        }
+        // Если forceExpense=false и isExpense=true, переключаем на доход
+        else if (!viewModel.state.value.forceExpense && viewModel.state.value.isExpense) {
+            viewModel.onEvent(eventFactory("ToggleTransactionType"), context)
+        }
     }
 
     // В режиме редактирования устанавливаем заголовок и текст кнопки
@@ -118,7 +126,7 @@ fun <E> BaseTransactionScreen(
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val currentColor = if (state.isExpense) expenseColor else incomeColor
-    
+
     // Функция для обработки выхода с экрана
     fun handleExit() {
         // Обновляем позиции категорий перед выходом
@@ -128,8 +136,6 @@ fun <E> BaseTransactionScreen(
         // Возвращаемся назад
         onNavigateBack()
     }
-
-    val scope = rememberCoroutineScope()
 
     Scaffold(
         topBar = {
@@ -205,8 +211,12 @@ fun <E> BaseTransactionScreen(
                             Timber.d("Category selected directly: " + selectedCategory.name)
                             if (state.isExpense) {
                                 viewModel.onEvent(eventFactory(Pair("SetExpenseCategory", selectedCategory.name)), context)
+                                // Обновление счетчика использования категории расходов
+                                categoriesViewModel.incrementCategoryUsage(selectedCategory.name, true)
                             } else {
                                 viewModel.onEvent(eventFactory(Pair("SetIncomeCategory", selectedCategory.name)), context)
+                                // Обновление счетчика использования категории доходов
+                                categoriesViewModel.incrementCategoryUsage(selectedCategory.name, false)
                             }
                         },
                         onAddCategoryClick = {
@@ -342,8 +352,12 @@ fun <E> BaseTransactionScreen(
                         Timber.d("Category selected from dialog: $categoryName")
                         if (state.isExpense) {
                             viewModel.onEvent(eventFactory(Pair("SetExpenseCategory", categoryName)), context)
+                            // Обновление счетчика использования категории расходов через диалог
+                            categoriesViewModel.incrementCategoryUsage(categoryName, true)
                         } else {
                             viewModel.onEvent(eventFactory(Pair("SetIncomeCategory", categoryName)), context)
+                            // Обновление счетчика использования категории доходов через диалог
+                            categoriesViewModel.incrementCategoryUsage(categoryName, false)
                         }
                     },
                     onDismiss = {

@@ -33,14 +33,14 @@ fun AddTransactionScreen(
         viewModel.navigateBackCallback = onNavigateBack
     }
     
-    // Специальная обработка для доходов при переходе с экрана бюджета
-    // (устанавливается forceExpense = false)
+    // Обработка типа транзакции на основе forceExpense
+    // Теперь по умолчанию forceExpense = true (расход)
     LaunchedEffect(viewModel.state.value.forceExpense) {
-        // Если выставлен флаг forceExpense = false, но состояние isExpense = true
-        // Это означает, что мы должны показать форму для дохода 
-        // (обычно при переходе с экрана бюджета)
-        if (!viewModel.state.value.forceExpense && viewModel.state.value.isExpense) {
-            // Принудительно переключаем на тип "Доход"
+        // Если forceExpense = true, устанавливаем расход
+        // Если forceExpense = false, устанавливаем доход
+        if (viewModel.state.value.forceExpense) {
+            viewModel.onEvent(BaseTransactionEvent.ForceSetExpenseType, context)
+        } else {
             viewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType, context)
         }
     }
@@ -55,7 +55,6 @@ fun AddTransactionScreen(
     // Используем BaseTransactionScreen для отображения UI
     BaseTransactionScreen(
         viewModel = viewModel,
-        categoriesViewModel = categoriesViewModel,
         onNavigateBack = onNavigateBack,
         screenTitle = "Новая транзакция",
         buttonText = "Добавить",
