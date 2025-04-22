@@ -22,7 +22,7 @@ import timber.log.Timber
     entities = [
         TransactionEntity::class
     ],
-    version = 14,
+    version = 15,
     exportSchema = true
 )
 @TypeConverters(DateConverter::class, MoneyConverter::class)
@@ -294,11 +294,64 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 14 на версию 15
+         * Исправляет структуру таблицы transactions для соответствия с TransactionEntity
+         */
+        private val MIGRATION_14_15 = object : Migration(14, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Создаем временную таблицу с правильной схемой
+                db.execSQL(
+                    """
+                    CREATE TABLE transactions_temp (
+                        id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
+                        id_string TEXT NOT NULL,
+                        amount TEXT NOT NULL,
+                        category TEXT NOT NULL,
+                        isExpense INTEGER NOT NULL,
+                        date INTEGER NOT NULL,
+                        note TEXT,
+                        source TEXT NOT NULL DEFAULT 'Наличные',
+                        sourceColor INTEGER NOT NULL DEFAULT 0,
+                        isTransfer INTEGER NOT NULL DEFAULT 0
+                    )
+                """
+                )
+
+                // Копируем данные из старой таблицы в новую
+                db.execSQL(
+                    """
+                    INSERT INTO transactions_temp (id, id_string, amount, category, isExpense, date, note, source, sourceColor, isTransfer)
+                    SELECT id, id_string, amount, category, isExpense, date, note, source, sourceColor, isTransfer FROM transactions
+                """
+                )
+
+                // Удаляем старую таблицу
+                db.execSQL("DROP TABLE transactions")
+
+                // Переименовываем временную таблицу
+                db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+
+                // Создаем индекс для id_string
+                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)")
+
+                Timber.i("Выполнена миграция с версии 14 на 15, структура таблицы соответствует TransactionEntity")
+            }
+        }
+
         // Миграция с 14 на 13 (для обратной совместимости при откате версии)
         private val MIGRATION_14_13 = object : Migration(14, 13) {
-            override fun migrate(database: SupportSQLiteDatabase) {
+            override fun migrate(db: SupportSQLiteDatabase) {
                 // Пустая миграция, так как структура в версии 13 уже должна быть совместима
                 // Здесь можно добавить обратные изменения, если в версии 14 были внесены изменения в схему
+            }
+        }
+
+        // Миграция с 15 на 14 (для обратной совместимости при откате версии)
+        private val MIGRATION_15_14 = object : Migration(15, 14) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Пустая миграция, так как структура в версии 14 уже должна быть совместима
+                Timber.i("Выполнена миграция с версии 15 на 14 (обратная совместимость)")
             }
         }
 
@@ -332,7 +385,9 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_11_12,
                         MIGRATION_12_13,
                         MIGRATION_13_14,
-                        MIGRATION_14_13
+                        MIGRATION_14_13,
+                        MIGRATION_14_15,
+                        MIGRATION_15_14
                     )
                     .fallbackToDestructiveMigration()
                     .addCallback(object : Callback() {
@@ -349,7 +404,8 @@ abstract class AppDatabase : RoomDatabase() {
                                     date INTEGER NOT NULL,
                                     note TEXT,
                                     source TEXT NOT NULL DEFAULT 'Наличные',
-                                    sourceColor INTEGER NOT NULL DEFAULT 0
+                                    sourceColor INTEGER NOT NULL DEFAULT 0,
+                                    isTransfer INTEGER NOT NULL DEFAULT 0
                                 )
                             """)
                             

@@ -47,20 +47,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
+import kotlin.experimental.ExperimentalTypeInference
 
+@OptIn(ExperimentalTypeInference::class)
 @Composable
 fun WalletTransactionsScreen(
     walletId: String,
@@ -69,6 +66,7 @@ fun WalletTransactionsScreen(
     addTransactionViewModel: AddTransactionViewModel = koinViewModel(),
     navController: NavController = rememberNavController()
 ) {
+    val context = LocalContext.current
     // Загружаем данные для выбранного кошелька
     LaunchedEffect(walletId) {
         viewModel.onEvent(WalletTransactionsEvent.LoadWallet(walletId))
@@ -86,17 +84,14 @@ fun WalletTransactionsScreen(
     val expenseCategories by categoriesViewModel.expenseCategories.collectAsState()
 
     // Обработчик нажатия на кнопку "Потратить"
-    val navigateToAddTransaction = {
+    val navigateToAddTransaction: () -> Unit = {
         state.wallet?.let { wallet ->
-            // Настроим экран добавления транзакции
-            addTransactionViewModel.setupForIncomeAddition(
+            // Настроим экран добавления транзакции с именем кошелька в качестве категории
+            addTransactionViewModel.setupForExpenseAddition(
                 amount = "",  // Пустая строка для поля суммы
-                shouldDistribute = false  // Не распределяем автоматически
+                walletCategory = wallet.name,
+                context = context
             )
-            
-            // Принудительно установим тип "Расход" и категорию, соответствующую кошельку
-            addTransactionViewModel.onEvent(BaseTransactionEvent.ToggleExpense(true)) // Переключаем на расход
-            addTransactionViewModel.onEvent(BaseTransactionEvent.SetCategory(wallet.name))
             
             // Переходим на экран добавления транзакции
             navController.navigate(Screen.AddTransaction.route)
@@ -271,7 +266,7 @@ fun WalletTransactionsScreen(
                         // Кнопка "Потратить из кошелька"
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
-                            onClick = navigateToAddTransaction as () -> Unit,
+                            onClick = navigateToAddTransaction,
                             modifier = Modifier.fillMaxWidth(),
                             shape = RoundedCornerShape(8.dp)
                         ) {

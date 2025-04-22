@@ -30,6 +30,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
@@ -37,6 +38,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
+import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.components.EnhancedEmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsDialog
@@ -47,7 +49,6 @@ import com.davidbugayov.financeanalyzer.presentation.history.components.Category
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionGroupList
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
@@ -55,6 +56,8 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelec
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import timber.log.Timber
@@ -75,35 +78,38 @@ fun TransactionHistoryState.toTransactionDialogState(): TransactionDialogState {
 @Composable
 fun TransactionHistoryScreen(
     viewModel: TransactionHistoryViewModel,
+    editTransactionViewModel: EditTransactionViewModel,
     onNavigateBack: () -> Unit,
-    onNavigateToEdit: ((Transaction) -> Unit)? = null
+    navController: NavController
 ) {
     val state by viewModel.state.collectAsState()
     
     // Локальное состояние для контекстного меню транзакций
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
-    
-    // Функция для обработки событий TransactionEvent
-    val handleTransactionEvent: (TransactionEvent) -> Unit = { event ->
+
+    // Функция для обработки событий транзакций
+    fun handleTransactionEvent(event: TransactionEvent) {
         when (event) {
             is TransactionEvent.ShowDeleteConfirmDialog -> {
-                viewModel.onEvent(TransactionHistoryEvent.ShowDeleteConfirmDialog(event.transaction))
+                showActionsDialog = true
+                selectedTransaction = event.transaction
             }
             is TransactionEvent.HideDeleteConfirmDialog -> {
-                viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog)
+                showActionsDialog = false
+                selectedTransaction = null
             }
             is TransactionEvent.DeleteTransaction -> {
                 viewModel.onEvent(TransactionHistoryEvent.DeleteTransaction(event.transaction))
+                showActionsDialog = false
             }
             is TransactionEvent.ShowEditDialog -> {
-                // Если есть функция для навигации к экрану редактирования, вызываем ее
-                if (onNavigateToEdit != null) {
-                    onNavigateToEdit(event.transaction)
-                }
+                // Навигация на экран редактирования
+                navController.navigate(Screen.EditTransaction.createRoute(event.transactionId))
             }
-            else -> {
-                // Другие события пока не обрабатываем
+
+            is TransactionEvent.HideEditDialog -> {
+                // Ничего не делаем, так как мы переходим на новый экран
             }
         }
     }
@@ -168,6 +174,7 @@ fun TransactionHistoryScreen(
     if (state.showStartDatePicker) {
         DatePickerDialog(
             initialDate = state.startDate,
+            maxDate = minOf(state.endDate, java.util.Calendar.getInstance().time),
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetStartDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
@@ -181,6 +188,8 @@ fun TransactionHistoryScreen(
     if (state.showEndDatePicker) {
         DatePickerDialog(
             initialDate = state.endDate,
+            minDate = state.startDate,
+            maxDate = java.util.Calendar.getInstance().time,
             onDateSelected = { date ->
                 viewModel.onEvent(TransactionHistoryEvent.SetEndDate(date))
                 viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
@@ -231,8 +240,14 @@ fun TransactionHistoryScreen(
     // Используем общий компонент для работы с транзакциями
     TransactionActionsHandler(
         transactionDialogState = state.toTransactionDialogState(),
-        onEvent = handleTransactionEvent,
-        onNavigateToEdit = onNavigateToEdit
+        onEvent = { event -> handleTransactionEvent(event) },
+        onNavigateToEdit = { transactionId ->
+            // Загружаем транзакцию в ViewModel для редактирования
+            editTransactionViewModel.loadTransactionForEditById(transactionId)
+            // Переходим на экран редактирования
+            navController.navigate(Screen.EditTransaction.createRoute(transactionId))
+            Timber.d("Navigating to edit transaction with ID: $transactionId")
+        }
     )
 
     // Диалог выбора источника
@@ -269,12 +284,6 @@ fun TransactionHistoryScreen(
         )
     }
 
-    // Функция для показа диалога действий с транзакцией
-    fun showTransactionActionsDialog(transaction: Transaction) {
-        selectedTransaction = transaction
-        showActionsDialog = true
-    }
-    
     // Диалог с действиями для транзакции
     if (showActionsDialog && selectedTransaction != null) {
         TransactionActionsDialog(
@@ -286,7 +295,8 @@ fun TransactionHistoryScreen(
             },
             onEdit = { transaction ->
                 showActionsDialog = false
-                handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction))
+                // Загружаем транзакцию в ViewModel для редактирования и переходим на экран редактирования
+                handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction.id))
             }
         )
     }
@@ -434,12 +444,14 @@ fun TransactionHistoryScreen(
 
                     TransactionGroupList(
                         transactionGroups = transactionGroups,
-                        onTransactionClick = { transaction -> 
-                            showTransactionActionsDialog(transaction)
+                        onTransactionClick = { transaction ->
+                            selectedTransaction = transaction
+                            showActionsDialog = true
                         },
                         onTransactionLongClick = { transaction ->
                             // Показываем тот же диалог выбора действий, что и при клике
-                            showTransactionActionsDialog(transaction)
+                            selectedTransaction = transaction
+                            showActionsDialog = true
                         },
                         onLoadMore = {
                             viewModel.onEvent(TransactionHistoryEvent.LoadMoreTransactions)

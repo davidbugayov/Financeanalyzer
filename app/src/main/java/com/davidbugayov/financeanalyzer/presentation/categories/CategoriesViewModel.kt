@@ -4,12 +4,11 @@ import android.app.Application
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.CardGiftcard
 import androidx.compose.material.icons.filled.Checkroom
 import androidx.compose.material.icons.filled.Computer
+import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.DirectionsCar
 import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.HomeWork
 import androidx.compose.material.icons.filled.LocalHospital
 import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.material.icons.filled.Movie
@@ -18,17 +17,21 @@ import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Phone
 import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
+import androidx.compose.material.icons.filled.SwapHoriz
+import androidx.compose.material.icons.filled.Work
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
+import timber.log.Timber
 
 /**
  * ViewModel для управления категориями транзакций.
@@ -41,38 +44,32 @@ class CategoriesViewModel(
     private val categoryPreferences: CategoryPreferences by inject()
     private val categoryUsagePreferences: CategoryUsagePreferences by inject()
 
-    companion object {
-        const val OTHER_CATEGORY = "Другое"
-        const val TRANSFER_CATEGORY = "Переводы"
-        
-        // Публичные дефолтные категории для доступа из других классов
-        val DEFAULT_EXPENSE_CATEGORIES = listOf(
-            CategoryItem("Продукты",0, Icons.Default.ShoppingCart),
-            CategoryItem("Транспорт",0, Icons.Default.DirectionsCar),
-            CategoryItem("Развлечения",0, Icons.Default.Movie),
-            CategoryItem("Рестораны",0, Icons.Default.Restaurant),
-            CategoryItem("Здоровье",0, Icons.Default.LocalHospital),
-            CategoryItem("Одежда",0, Icons.Default.Checkroom),
-            CategoryItem("Жилье",0, Icons.Default.Home),
-            CategoryItem("Связь",0, Icons.Default.Phone),
-            CategoryItem("Питомец",0, Icons.Default.Pets),
-            CategoryItem("Прочее", 0,Icons.Default.MoreHoriz),
-            CategoryItem("Другое",0, Icons.Default.Add)
-        )
+    private val defaultExpenseCategories = listOf(
+        CategoryItem("Продукты", Icons.Default.ShoppingCart),
+        CategoryItem("Транспорт", Icons.Default.DirectionsCar),
+        CategoryItem("Развлечения", Icons.Default.Movie),
+        CategoryItem("Рестораны", Icons.Default.Restaurant),
+        CategoryItem("Здоровье", Icons.Default.LocalHospital),
+        CategoryItem("Одежда", Icons.Default.Checkroom),
+        CategoryItem("Жилье", Icons.Default.Home),
+        CategoryItem("Связь", Icons.Default.Phone),
+        CategoryItem("Питомец", Icons.Default.Pets),
+        CategoryItem("Услуги", Icons.Default.Work),
+        CategoryItem("Благотворительность", Icons.Default.Payments),
+        CategoryItem("Кредит", Icons.Default.CreditCard),
+        CategoryItem("Переводы", Icons.Default.SwapHoriz),
+        CategoryItem("Другое", Icons.Default.Add)
+    )
 
-        val DEFAULT_INCOME_CATEGORIES = listOf(
-            CategoryItem("Зарплата",0, Icons.Default.Payments),
-            CategoryItem("Фриланс",0, Icons.Default.Computer),
-            CategoryItem("Подарки",0, Icons.Default.CardGiftcard),
-            CategoryItem("Проценты",0, Icons.AutoMirrored.Filled.TrendingUp),
-            CategoryItem("Аренда",0, Icons.Default.HomeWork),
-            CategoryItem("Прочее", 0,Icons.Default.MoreHoriz),
-            CategoryItem("Другое",0, Icons.Default.Add)
-        )
-    }
-
-    private val defaultExpenseCategories = DEFAULT_EXPENSE_CATEGORIES
-    private val defaultIncomeCategories = DEFAULT_INCOME_CATEGORIES
+    private val defaultIncomeCategories = listOf(
+        CategoryItem("Зарплата", Icons.Default.Payments),
+        CategoryItem("Фриланс", Icons.Default.Computer),
+        CategoryItem("Подарки", Icons.Default.Payments),
+        CategoryItem("Проценты", Icons.AutoMirrored.Filled.TrendingUp),
+        CategoryItem("Аренда", Icons.Default.Work),
+        CategoryItem("Прочее", Icons.Default.MoreHoriz),
+        CategoryItem("Другое", Icons.Default.Add)
+    )
 
     private val _expenseCategories = MutableStateFlow(defaultExpenseCategories)
     val expenseCategories: StateFlow<List<CategoryItem>> = _expenseCategories.asStateFlow()
@@ -81,6 +78,7 @@ class CategoriesViewModel(
     val incomeCategories: StateFlow<List<CategoryItem>> = _incomeCategories.asStateFlow()
 
     init {
+        Timber.d("[CategoriesVM] CategoriesViewModel создан: $this")
         loadCategories()
     }
 
@@ -100,19 +98,19 @@ class CategoriesViewModel(
 
             // Фильтруем дефолтные категории, исключая удаленные
             val filteredDefaultExpenseCategories = defaultExpenseCategories.filter {
-                !deletedDefaultExpenseCategories.contains(it.name) && it.name != OTHER_CATEGORY
+                !deletedDefaultExpenseCategories.contains(it.name) && it.name != "Другое"
             }
 
             val filteredDefaultIncomeCategories = defaultIncomeCategories.filter {
-                !deletedDefaultIncomeCategories.contains(it.name) && it.name != OTHER_CATEGORY
+                !deletedDefaultIncomeCategories.contains(it.name) && it.name != "Другое"
             }
 
             // Добавляем пользовательские категории
             val customExpenseCategories = savedExpenseCategories.map {
-                CategoryItem(it, 0,Icons.Default.MoreHoriz, true)
+                CategoryItem(it, Icons.Default.MoreHoriz)
             }
             val customIncomeCategories = savedIncomeCategories.map {
-                CategoryItem(it, 0,Icons.Default.MoreHoriz, true)
+                CategoryItem(it, Icons.Default.MoreHoriz)
             }
 
             // Всегда оставляем категорию "Другое" в конце списка
@@ -140,20 +138,20 @@ class CategoriesViewModel(
     /**
      * Добавляет новую пользовательскую категорию
      */
-    fun addCustomCategory(category: String, isExpense: Boolean) {
+    fun addCustomCategory(category: String, isExpense: Boolean, icon: ImageVector = Icons.Default.MoreHoriz) {
         if (category.isBlank()) return
 
         viewModelScope.launch {
             if (isExpense) {
                 categoryPreferences.addExpenseCategory(category)
-                val customCategory = CategoryItem(category, 0,Icons.Default.MoreHoriz, true)
+                val customCategory = CategoryItem(category, icon)
                 val currentCategories = _expenseCategories.value.toMutableList()
                 // Добавляем перед "Другое"
                 currentCategories.add(currentCategories.size - 1, customCategory)
                 _expenseCategories.value = currentCategories
             } else {
                 categoryPreferences.addIncomeCategory(category)
-                val customCategory = CategoryItem(category, 0,Icons.Default.MoreHoriz, true)
+                val customCategory = CategoryItem(category, icon)
                 val currentCategories = _incomeCategories.value.toMutableList()
                 // Добавляем перед "Другое"
                 currentCategories.add(currentCategories.size - 1, customCategory)
@@ -169,7 +167,7 @@ class CategoriesViewModel(
         viewModelScope.launch {
             if (isExpense) {
                 // Проверяем, является ли категория дефолтной
-                val isDefaultCategory = defaultExpenseCategories.any { it.name == category && it.name != OTHER_CATEGORY }
+                val isDefaultCategory = defaultExpenseCategories.any { it.name == category && it.name != "Другое" }
 
                 if (isDefaultCategory) {
                     // Если это дефолтная категория, добавляем ее в список удаленных дефолтных категорий
@@ -183,7 +181,7 @@ class CategoriesViewModel(
                 _expenseCategories.value = _expenseCategories.value.filterNot { it.name == category }
             } else {
                 // Проверяем, является ли категория дефолтной
-                val isDefaultCategory = defaultIncomeCategories.any { it.name == category && it.name != OTHER_CATEGORY }
+                val isDefaultCategory = defaultIncomeCategories.any { it.name == category && it.name != "Другое" }
 
                 if (isDefaultCategory) {
                     // Если это дефолтная категория, добавляем ее в список удаленных дефолтных категорий
@@ -229,45 +227,11 @@ class CategoriesViewModel(
     }
 
     /**
-     * Добавляет новую пользовательскую категорию расходов
-     */
-    fun addExpenseCategory(category: String) {
-        addCustomCategory(category, true)
-    }
-
-    /**
-     * Добавляет новую пользовательскую категорию доходов
-     */
-    fun addIncomeCategory(category: String) {
-        addCustomCategory(category, false)
-    }
-
-    /**
-     * Удаляет категорию расходов
-     */
-    fun removeExpenseCategory(category: String) {
-        // Не даем удалить "Другое"
-        if (category == OTHER_CATEGORY) return
-
-        removeCategory(category, true)
-    }
-
-    /**
-     * Удаляет категорию доходов
-     */
-    fun removeIncomeCategory(category: String) {
-        // Не даем удалить "Другое"
-        if (category == OTHER_CATEGORY) return
-
-        removeCategory(category, false)
-    }
-
-    /**
      * Удаляет категорию расходов (для использования в TransactionHistoryViewModel)
      */
     fun deleteExpenseCategory(category: String) {
         // Не даем удалить "Другое"
-        if (category == OTHER_CATEGORY) return
+        if (category == "Другое") return
 
         removeCategory(category, true)
     }
@@ -277,7 +241,7 @@ class CategoriesViewModel(
      */
     fun deleteIncomeCategory(category: String) {
         // Не даем удалить "Другое"
-        if (category == OTHER_CATEGORY) return
+        if (category == "Другое") return
 
         removeCategory(category, false)
     }

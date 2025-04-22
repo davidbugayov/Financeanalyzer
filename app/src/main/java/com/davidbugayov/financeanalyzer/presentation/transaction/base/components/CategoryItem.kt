@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -20,12 +20,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.style.TextAlign
-import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
+import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 
 /**
  * Элемент категории
@@ -37,62 +34,60 @@ fun CategoryItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
+    modifier: Modifier = Modifier,
     isError: Boolean = false
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(dimensionResource(R.dimen.category_item_width))
+        modifier = modifier
+            .width(56.dp)
             .combinedClickable(
                 onClick = onClick,
                 onLongClick = onLongClick
             )
-            .padding(vertical = dimensionResource(R.dimen.spacing_medium))
+            .padding(vertical = 2.dp)
     ) {
         Box(
             modifier = Modifier
-                .size(dimensionResource(R.dimen.category_icon_size))
+                .size(36.dp)
                 .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.primaryContainer)
+                .background(
+                    when {
+                        isError -> Color(0xFFFFCDD2) // Светло-красный фон при ошибке
+                        else -> MaterialTheme.colorScheme.primaryContainer
+                    }
+                )
                 .border(
                     width = when {
-                        isSelected -> dimensionResource(R.dimen.border_width_large)
-                        isError -> dimensionResource(R.dimen.border_width_medium)
-                        else -> dimensionResource(R.dimen.border_width_none)
+                        isSelected -> 2.dp
+                        isError -> 2.dp
+                        else -> 0.dp
                     },
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.primary
-                        isError -> MaterialTheme.colorScheme.error
+                        isError -> Color(0xFFE57373) // Красный цвет рамки при ошибке
                         else -> Color.Transparent
                     },
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
         ) {
-            if (category.image != null) {
-                Icon(
-                    imageVector = category.image,
-                    contentDescription = category.name,
-                    tint = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            } else {
-                // Первая буква названия категории
-                Text(
-                    text = category.name.take(1).uppercase(),
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onPrimaryContainer
-                )
-            }
+            Icon(
+                imageVector = category.icon,
+                contentDescription = category.name,
+                tint = if (isError) Color.Red else MaterialTheme.colorScheme.onPrimaryContainer,
+                modifier = Modifier.size(20.dp)
+            )
         }
 
-        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
+        Spacer(modifier = Modifier.height(2.dp))
 
         Text(
             text = category.name,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+            color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface
         )
     }
 } 

@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -28,52 +28,67 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
 /**
  * Элемент источника средств
  */
-//@OptIn(ExperimentalFoundationApi::class)
-//@Composable
-//fun SourceItem(
-//    source: Source,
-//    isSelected: Boolean,
-//    onClick: () -> Unit,
-//    onLongClick: () -> Unit
-//) {
-//    Column(
-//        horizontalAlignment = Alignment.CenterHorizontally,
-//        modifier = Modifier
-//            .width(80.dp)
-//            .combinedClickable(
-//                onClick = onClick,
-//                onLongClick = onLongClick
-//            )
-//            .padding(vertical = 8.dp)
-//    ) {
-//        Box(
-//            modifier = Modifier
-//                .size(60.dp)
-//                .clip(CircleShape)
-//                .background(Color(source.color))
-//                .border(
-//                    width = if (isSelected) 3.dp else 0.dp,
-//                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
-//                    shape = CircleShape
-//                ),
-//            contentAlignment = Alignment.Center
-//        ) {
-//            // Здесь можно добавить иконку для источника
-//            Text(
-//                text = source.name.first().toString(),
-//                color = Color.White,
-//                fontSize = 24.sp,
-//                fontWeight = FontWeight.Bold
-//            )
-//        }
-//
-//        Spacer(modifier = Modifier.height(4.dp))
-//
-//        Text(
-//            text = source.name,
-//            style = MaterialTheme.typography.bodyMedium,
-//            textAlign = TextAlign.Center,
-//            maxLines = 1
-//        )
-//    }
-//}
+@OptIn(ExperimentalFoundationApi::class)
+@Composable
+fun SourceItem(
+    source: Source,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    onLongClick: () -> Unit,
+    isError: Boolean = false
+) {
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .width(80.dp)
+            .combinedClickable(
+                onClick = onClick,
+                onLongClick = onLongClick
+            )
+            .padding(vertical = 8.dp)
+    ) {
+        Box(
+            modifier = Modifier
+                .size(60.dp)
+                .clip(CircleShape)
+                .background(
+                    if (isError)
+                        Color(0xFFFFCDD2)
+                    else
+                        Color(source.color)
+                )
+                .border(
+                    width = when {
+                        isSelected -> 3.dp
+                        isError -> 3.dp
+                        else -> 0.dp
+                    },
+                    color = when {
+                        isSelected -> MaterialTheme.colorScheme.primary
+                        isError -> Color(0xFFE57373)
+                        else -> Color.Transparent
+                    },
+                    shape = CircleShape
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            // Здесь можно добавить иконку для источника
+            Text(
+                text = source.name.first().toString(),
+                color = if (isError) Color.Red else Color.White,
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+        }
+
+        Spacer(modifier = Modifier.height(4.dp))
+
+        Text(
+            text = source.name,
+            style = MaterialTheme.typography.bodyMedium,
+            textAlign = TextAlign.Center,
+            maxLines = 1,
+            color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface
+        )
+    }
+} 

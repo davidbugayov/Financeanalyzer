@@ -6,168 +6,168 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem
+import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import timber.log.Timber
 
+/**
+ * Секция выбора категории
+ */
 @Composable
 fun CategorySection(
     categories: List<CategoryItem>,
     selectedCategory: String,
     onCategorySelected: (CategoryItem) -> Unit,
     onAddCategoryClick: () -> Unit,
-    modifier: Modifier = Modifier
+    onCategoryLongClick: (CategoryItem) -> Unit = {},
+    isError: Boolean = false
 ) {
-    Column(modifier = modifier) {
-        // Заголовок секции
+    val maxRows = 2
+    val columns = 4
+    val maxVisibleCategories = maxRows * columns - 1 // 7 категорий + 1 кнопка
+    val showExpand = categories.size > maxVisibleCategories
+    val (expanded, setExpanded) = remember { mutableStateOf(false) }
+    val visibleCategories = if (expanded || !showExpand) categories else categories.take(maxVisibleCategories)
+
+    Column(modifier = Modifier.fillMaxWidth()) {
         Text(
-            text = "Категория",
+            text = stringResource(R.string.category) + " *",
             style = MaterialTheme.typography.titleMedium.copy(
-                fontWeight = FontWeight.Bold,
-                fontSize = 16.sp
+                fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
             ),
-            modifier = Modifier.padding(bottom = 8.dp)
+            modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
         )
 
-        // Горизонтальный список категорий
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
-            contentPadding = PaddingValues(bottom = 8.dp)
+        LazyVerticalGrid(
+            columns = GridCells.Fixed(columns),
+            modifier = Modifier
+                .fillMaxWidth()
+                .then(
+                    if (expanded || !showExpand) Modifier.heightIn(max = 400.dp)
+                    else Modifier.height(120.dp)
+                ),
+            horizontalArrangement = Arrangement.spacedBy(4.dp),
+            verticalArrangement = Arrangement.spacedBy(4.dp),
+            userScrollEnabled = expanded || !showExpand
         ) {
-            // Отображаем доступные категории
-            items(categories) { category ->
-                CategoryItemComponent(
+            items(visibleCategories) { category ->
+                CategoryItem(
                     category = category,
                     isSelected = category.name == selectedCategory,
-                    onClick = { onCategorySelected(category) }
+                    onClick = { onCategorySelected(category) },
+                    onLongClick = {
+                        Timber.d("Category long pressed: ${category.name}")
+                        onCategoryLongClick(category)
+                    },
+                    isError = isError && selectedCategory.isBlank(),
+                    modifier = Modifier
+                        .width(64.dp)
+                        .padding(vertical = 2.dp)
                 )
             }
-            
-            // Добавляем кнопку "Добавить категорию"
             item {
-                AddCategoryButton(onClick = onAddCategoryClick)
+                AddCategoryItem(
+                    onClick = onAddCategoryClick,
+                    modifier = Modifier
+                        .width(64.dp)
+                        .padding(vertical = 2.dp)
+                )
+            }
+        }
+        if (showExpand) {
+            Spacer(modifier = Modifier.height(4.dp))
+            if (!expanded) {
+                Text(
+                    text = "Показать ещё",
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { setExpanded(true) }
+                        .padding(vertical = 4.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            } else {
+                Text(
+                    text = "Скрыть",
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clickable { setExpanded(false) }
+                        .padding(vertical = 4.dp),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.bodyMedium
+                )
             }
         }
     }
 }
 
+/**
+ * Элемент добавления новой категории
+ */
 @Composable
-private fun CategoryItemComponent(
-    category: CategoryItem,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
+fun AddCategoryItem(onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(65.dp)
+        modifier = modifier
+            .width(56.dp)
             .clickable(onClick = onClick)
+            .padding(vertical = 2.dp)
     ) {
-        // Голубой круг с иконкой категории
         Box(
             modifier = Modifier
-                .size(50.dp)
+                .size(36.dp)
                 .clip(CircleShape)
-                .background(Color(0xFF90CAF9)) // Светло-голубой цвет
+                .background(MaterialTheme.colorScheme.surfaceVariant)
                 .border(
-                    width = if (isSelected) 2.dp else 0.dp,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent,
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline,
                     shape = CircleShape
                 ),
             contentAlignment = Alignment.Center
         ) {
-            // Иконка или первая буква названия категории
-            if (category.image != null) {
-                // TODO: Здесь должна быть загрузка иконки из ресурсов
-                // Временно используем первую букву
-                Text(
-                    text = category.name.take(1).uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            } else {
-                Text(
-                    text = category.name.take(1).uppercase(),
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = Color.White
-                )
-            }
+            Icon(
+                imageVector = Icons.Default.Add,
+                contentDescription = stringResource(R.string.add_custom_category),
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.size(20.dp)
+            )
         }
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
-        // Название категории
-        Text(
-            text = category.name,
-            style = MaterialTheme.typography.bodySmall,
-            textAlign = TextAlign.Center,
-            maxLines = 1,
-            color = Color.Black
-        )
-    }
-}
 
-@Composable
-private fun AddCategoryButton(onClick: () -> Unit) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(65.dp)
-            .clickable(onClick = onClick)
-    ) {
-        // Серый круг с иконкой плюса
-        Surface(
-            shape = CircleShape,
-            color = Color(0xFFEEEEEE), // Светло-серый
-            contentColor = Color.Gray,
-            modifier = Modifier
-                .size(50.dp)
-                .clip(CircleShape)
-        ) {
-            Box(
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = Icons.Default.Add,
-                    contentDescription = "Добавить категорию",
-                    tint = Color.Gray
-                )
-            }
-        }
-        
-        Spacer(modifier = Modifier.height(4.dp))
-        
+        Spacer(modifier = Modifier.height(2.dp))
+
         Text(
-            text = "Добавить",
+            text = stringResource(R.string.add_custom_category),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            maxLines = 1,
-            color = Color.Black
+            maxLines = 1
         )
     }
 } 

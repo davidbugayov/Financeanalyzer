@@ -19,7 +19,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
@@ -77,7 +76,10 @@ fun TransactionActionsDialog(
                     Box(
                         modifier = Modifier
                             .size(12.dp)
-                            .background(Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense)), CircleShape)
+                            .background(
+                                Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense)),
+                                CircleShape
+                            )
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     

@@ -3,11 +3,8 @@ package com.davidbugayov.financeanalyzer.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 
 /**
  * Менеджер для работы с SharedPreferences.
@@ -51,6 +48,7 @@ class PreferencesManager(context: Context) {
         private const val KEY_TRANSACTION_REMINDER_ENABLED = "transaction_reminder_enabled"
         private const val KEY_APP_INSTALLATION_TIME = "app_installation_time"
         private const val KEY_FIRST_LAUNCH_DONE = "first_launch_done"
+        private const val KEY_IMPORT_INFO_DISMISSED = "import_info_dismissed"
     }
 
     /**
@@ -142,5 +140,13 @@ class PreferencesManager(context: Context) {
         }
         
         return false
+    }
+
+    fun getImportInfoDismissed(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IMPORT_INFO_DISMISSED, false)
+    }
+
+    fun setImportInfoDismissed(value: Boolean) {
+        sharedPreferences.edit { putBoolean(KEY_IMPORT_INFO_DISMISSED, value) }
     }
 } 

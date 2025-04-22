@@ -1,38 +1,46 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
 
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.DropdownMenu
-import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,42 +49,29 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.navigation.NavController
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletCard
-import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletAction
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
+import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletAction
+import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletCard
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import org.koin.androidx.compose.koinViewModel
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.foundation.text.KeyboardOptions
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.DatePickerState
-import androidx.compose.material3.rememberDatePickerState
-import androidx.compose.material3.SelectableDates
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.foundation.clickable
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.TimeZone
-import androidx.compose.runtime.DisposableEffect
-import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -88,6 +83,7 @@ fun BudgetScreen(
     addTransactionViewModel: AddTransactionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
+    val context = LocalContext.current
 
     // Обновляем данные при возвращении на экран
     DisposableEffect(navController) {
@@ -120,7 +116,6 @@ fun BudgetScreen(
                     Timber.d("BudgetScreen: получено событие изменения транзакции, обновляем данные")
                     viewModel.onEvent(BudgetEvent.LoadCategories)
                 }
-                else -> { /* Игнорируем другие события */ }
             }
         }
     }
@@ -146,15 +141,9 @@ fun BudgetScreen(
     var transferAmount by remember { mutableStateOf("") }
     var periodDuration by remember { mutableStateOf(state.selectedPeriodDuration.toString()) }
 
-    // Состояние выпадающего меню категории
-    var categoryMenuExpanded by remember { mutableStateOf(false) }
-
     // Добавляем новый диалог для подтверждения распределения дохода
     var showDistributeConfirmation by remember { mutableStateOf(false) }
     var tempIncomeAmount by remember { mutableStateOf("") }
-
-    // Добавляем состояние для меню действий
-    var expanded by remember { mutableStateOf(false) }
 
     // Состояния для диалога редактирования
     var editWalletName by remember { mutableStateOf("") }
@@ -237,20 +226,25 @@ fun BudgetScreen(
                                         
                                         // Затем настраиваем ViewModel для добавления дохода
                                         addTransactionViewModel.setupForIncomeAddition(
-                                            amount = "", // Сумму введет пользователь
-                                            shouldDistribute = false // Не распределяем автоматически
+                                            amount = "",
+                                            shouldDistribute = false
                                         )
                                         
                                         // Устанавливаем категорию, равную имени кошелька
-                                        addTransactionViewModel.onEvent(BaseTransactionEvent.SetCategory(categoryFromMenu.name))
+                                        addTransactionViewModel.onEvent(BaseTransactionEvent.SetCategory(categoryFromMenu.name), context = context)
                                         Timber.d("Категория установлена: ${categoryFromMenu.name}")
                                         
                                         // Явно устанавливаем, что это не расход
-                                        addTransactionViewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType)
+                                        addTransactionViewModel.setupForIncomeAddition(
+                                            amount = "",
+                                            targetWalletId = categoryFromMenu.id,
+                                            context
+                                        )
                                         Timber.d("Явно установлено тип транзакции как доход")
 
                                         // Добавляем проверку состояния перед навигацией
-
+                                        Timber.d("Проверка финального состояния перед навигацией: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
+                                        
                                         // Устанавливаем коллбэк для обновления баланса кошелька после добавления дохода
                                         addTransactionViewModel.onIncomeAddedCallback = { amount ->
                                             // Добавляем средства в выбранный кошелек
@@ -271,12 +265,14 @@ fun BudgetScreen(
                                         
                                         // Настраиваем ViewModel для добавления расхода
                                         addTransactionViewModel.setupForExpenseAddition(
-                                            amount = "", // Сумму введет пользователь
-                                            walletCategory = categoryFromMenu.name // Передаем название кошелька как категорию
+                                            amount = "",
+                                            walletCategory = categoryFromMenu.name,
+                                            context
                                         )
                                         
                                         // Проверяем состояние после настройки для убеждения в правильности
-
+                                        Timber.d("Состояние после настройки расхода: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
+                                        
                                         // Устанавливаем коллбэк для обновления баланса кошелька после добавления расхода
                                         addTransactionViewModel.onExpenseAddedCallback = { amount ->
                                             // Списываем средства из выбранного кошелька
@@ -701,18 +697,13 @@ fun BudgetScreen(
                                     
                                     // Сбрасываем предыдущие выбранные кошельки и выбираем все существующие
                                     addTransactionViewModel.clearSelectedWallets()
-                                    addTransactionViewModel.selectAllWalletsWithoutDialog()
+                                    addTransactionViewModel.selectAllWallets(context)
                                     
                                     // Устанавливаем callback для автоматического распределения дохода после добавления
                                     addTransactionViewModel.onIncomeAddedCallback = { amount ->
                                         viewModel.onEvent(BudgetEvent.DistributeIncome(amount))
                                     }
                                     
-                                    // Явно включаем режим дохода
-                                    addTransactionViewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType)
-                                    
-                                    // Добавляем логирование для отладки
-
                                     // Навигация на экран добавления транзакции
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
@@ -743,11 +734,6 @@ fun BudgetScreen(
                                     // Сбрасываем callback
                                     addTransactionViewModel.onIncomeAddedCallback = null
                                     
-                                    // Явно включаем режим дохода
-                                    addTransactionViewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType)
-                                    
-                                    // Добавляем логирование для отладки
-
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
                                 modifier = Modifier.fillMaxWidth()

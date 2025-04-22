@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,6 +16,8 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,7 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.SourceColorPickerDialog
+import timber.log.Timber
 
 /**
  * Диалог создания пользовательского источника
@@ -40,19 +46,36 @@ fun CustomSourceDialog(
 ) {
     var showColorPicker by remember { mutableStateOf(false) }
 
+    // Log when the dialog is opened and closed
+    LaunchedEffect(Unit) {
+        Timber.d("CustomSourceDialog opened with name='$sourceName', color=$color")
+    }
+
+    DisposableEffect(Unit) {
+        onDispose {
+            Timber.d("CustomSourceDialog closed")
+        }
+    }
+
     AlertDialog(
-        onDismissRequest = onDismiss,
-        title = { Text("Новый источник") },
+        onDismissRequest = {
+            Timber.d("CustomSourceDialog dismissed via outside click")
+            onDismiss()
+        },
+        title = { Text(stringResource(R.string.add_custom_source)) },
         text = {
             Column(modifier = Modifier.padding(8.dp)) {
                 OutlinedTextField(
                     value = sourceName,
-                    onValueChange = onSourceNameChange,
-                    label = { Text("Название источника") },
+                    onValueChange = {
+                        Timber.d("Source name changed to: '$it'")
+                        onSourceNameChange(it)
+                    },
+                    label = { Text(stringResource(R.string.source_name)) },
                     isError = sourceName.trim().length < 2,
                     modifier = Modifier.fillMaxWidth()
                 )
-                
+
                 if (sourceName.trim().length < 2) {
                     Text(
                         text = "Название должно содержать минимум 2 символа",
@@ -60,20 +83,24 @@ fun CustomSourceDialog(
                         modifier = Modifier.padding(top = 4.dp)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = 16.dp)
+                        .clickable {
+                            Timber.d("Color picker clicked, showing color picker dialog")
+                            showColorPicker = true
+                        }
+                        .padding(vertical = 8.dp)
                 ) {
                     Text(
                         text = "Выберите цвет:",
                         modifier = Modifier.weight(1f)
                     )
-                    
+
                     Box(
                         modifier = Modifier
                             .size(40.dp)
@@ -86,27 +113,37 @@ fun CustomSourceDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = onConfirm,
+                onClick = {
+                    Timber.d("Confirm button clicked with sourceName='$sourceName', color=$color")
+                    onConfirm()
+                },
                 enabled = sourceName.trim().length >= 2
             ) {
                 Text("Добавить")
             }
         },
         dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text("Отмена")
+            TextButton(onClick = {
+                Timber.d("Cancel button clicked")
+                onDismiss()
+            }) {
+                Text(stringResource(R.string.cancel))
             }
         }
     )
-    
+
     if (showColorPicker) {
         SourceColorPickerDialog(
             initialColor = color,
             onColorSelected = { selectedColor ->
+                Timber.d("Color selected: $selectedColor")
                 onColorClick(selectedColor)
                 showColorPicker = false
             },
-            onDismiss = { showColorPicker = false }
+            onDismiss = {
+                Timber.d("Color picker dismissed")
+                showColorPicker = false
+            }
         )
     }
 } 

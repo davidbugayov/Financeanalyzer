@@ -13,14 +13,17 @@ import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUse
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
@@ -65,10 +68,21 @@ val appModule = module {
     single { CalculateCategoryStatsUseCase(get()) }
     single { ExportTransactionsToCSVUseCase(get()) }
     single { ImportTransactionsManager(get(), androidContext(), get(), get()) }
+    single { ValidateTransactionUseCase() }
+    single { GetTransactionByIdUseCase(get()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
     viewModel { ChartViewModel() }
+    viewModel {
+        AddTransactionViewModel(
+            validateTransactionUseCase = get(),
+            addTransactionUseCase = get(),
+            categoriesViewModel = get(),
+            sourcePreferences = get(),
+            walletRepository = get()
+        )
+    }
     viewModel {
         ProfileViewModel(
             exportTransactionsToCSVUseCase = get(),
@@ -84,6 +98,17 @@ val appModule = module {
             addTransactionUseCase = get(),
             deleteTransactionUseCase = get(),
             repository = get()
+        )
+    }
+
+    viewModel {
+        com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel(
+            updateTransactionUseCase = get(),
+            getTransactionByIdUseCase = get(),
+            categoriesViewModel = get(),
+            sourcePreferences = get(),
+            walletRepository = get(),
+            validateTransactionUseCase = get()
         )
     }
 

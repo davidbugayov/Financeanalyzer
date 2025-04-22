@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,7 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.KeyboardArrowRight
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import timber.log.Timber
 
 /**
@@ -34,7 +33,6 @@ import timber.log.Timber
  * @param onToggleAddToWallet Обработчик переключения флага добавления в кошельки
  * @param onSelectWalletsClick Обработчик нажатия на кнопку выбора кошельков
  * @param isVisible Отображать ли секцию (только для доходов)
- * @param walletsList Полный список доступных кошельков
  * @param targetWalletName Название целевого кошелька (если есть)
  */
 @Composable
@@ -44,7 +42,6 @@ fun WalletSelectionSection(
     onToggleAddToWallet: () -> Unit,
     onSelectWalletsClick: () -> Unit,
     isVisible: Boolean,
-    walletsList: List<Wallet> = emptyList(),
     targetWalletName: String? = null
 ) {
     // Добавляем логирование состояния
@@ -79,7 +76,6 @@ fun WalletSelectionSection(
                 SelectWalletsButton(
                     selectedWallets = selectedWallets,
                     onClick = onSelectWalletsClick,
-                    walletsList = walletsList,
                     targetWalletName = targetWalletName
                 )
             }
@@ -96,7 +92,6 @@ fun WalletSelectionSection(
 private fun SelectWalletsButton(
     selectedWallets: List<String>,
     onClick: () -> Unit,
-    walletsList: List<Wallet>,
     targetWalletName: String?
 ) {
     val text = if (selectedWallets.isEmpty()) {
@@ -148,7 +143,7 @@ private fun WalletSelectorButton(
         Spacer(modifier = Modifier.width(4.dp))
         
         Icon(
-            imageVector = Icons.Default.KeyboardArrowRight,
+            imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = "Выбрать кошельки",
             tint = MaterialTheme.colorScheme.onSecondaryContainer
         )

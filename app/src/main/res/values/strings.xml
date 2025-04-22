@@ -27,9 +27,6 @@
     <string name="cash_deposit">пополнение</string>
     <string name="loading_data">Загрузка данных…</string>
     <string name="error">Ошибка</string>
-    <string name="clear_fields">Очистить поля</string>
-    <string name="add_transaction_submit">Добавить транзакцию</string>
-    <string name="add_custom_source">Добавить источник</string>
     
     <!-- Главный экран -->
     <string name="app_title">Деньги под Контролем</string>
@@ -179,6 +176,7 @@
     <string name="income_categories">Категории доходов</string>
     <string name="average_expense">Средний расход</string>
     <string name="sources_used">Использовано источников</string>
+    <string name="total_income">Общий доход</string>
     <string name="total_expense">Общий расход</string>
     <string name="savings_rate">Норма сбережений</string>
 
@@ -274,13 +272,10 @@
     <string name="source">Откуда</string>
     <string name="source_name">Название источника</string>
     <string name="select_source">Выберите источник</string>
+    <string name="add_custom_source">Добавить источник</string>
     <string name="select_color">Выберите цвет</string>
     <string name="change_color">Изменить цвет</string>
     <string name="source_error">Выберите источник</string>
-
-    <!-- Диалоги подтверждения удаления -->
-    <string name="delete_source_title">Удаление источника</string>
-    <string name="delete_source_message">Вы уверены, что хотите удалить источник "%1$s"?</string>
 
     <!-- Строки для сводки групп транзакций -->
     <string name="summary">Сводка</string>
@@ -362,16 +357,33 @@
     <string name="permission_denied">Разрешение отклонено</string>
     <string name="import_permission_required">Требуется разрешение</string>
     <string name="permission_required">Требуется разрешение</string>
-    
-    <!-- Ошибки форм -->
-    <string name="error_enter_amount">Введите сумму</string>
-    <string name="error_select_category">Выберите категорию</string>
-    <string name="error_amount_missing">Не указана сумма</string>
-    <string name="error_category_missing">Не выбрана категория</string>
-    
-    <!-- Экран редактирования -->
-    <string name="edit_transaction">Редактирование транзакции</string>
-    <string name="add">Добавить</string>
+    <string name="notification_permission_message">Для отправки напоминаний о транзакциях необходимо разрешение на уведомления.</string>
+    <string name="notification_permission_settings_message">Для работы напоминаний необходимо разрешение на уведомления. Вы можете включить их в настройках приложения.</string>
+    <string name="notification_permission_required">Для отправки напоминаний необходимо разрешение на уведомления.</string>
+    <string name="permission_message_android15">Для импорта файлов необходим доступ к выбранным вами файлам. Пожалуйста, предоставьте разрешение.</string>
+    <string name="permission_message">Для импорта файлов необходим доступ к хранилищу. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="request_permission">Запросить разрешение</string>
+    <string name="save">Сохранить</string>
+    <string name="selected_time">Выбранное время: %1$d:%2$s</string>
+
+    <!-- Базовые строки -->
+    <string name="loading_error">Ошибка загрузки данных</string>
+    <string name="default_amount">0.00 ₽</string>
+    <string name="default_small_amount">0 ₽</string>
+    <string name="navigation_back">Назад</string>
+    <string name="transaction_history">История транзакций</string>
+
+    <!-- Savings Rate Dialog -->
+    <string name="savings_rate_title">Норма сбережений</string>
+    <string name="income_header">Доходы</string>
+    <string name="expenses_header">Расходы</string>
+    <string name="savings_amount">Сумма сбережений</string>
+
+    <!-- EmptyContent strings -->
+    <string name="empty_state">Пустое состояние</string>
+    <string name="empty_transactions">Нет транзакций</string>
+    <string name="empty_transactions_description">Добавьте свою первую транзакцию, нажав на кнопку "+"</string>
 
     <!-- Bottom navigation -->
     <string name="home_tab">Главная</string>
@@ -488,46 +500,9 @@
     <string name="ic_restaurant">ic_restaurant</string>
     <string name="ic_receipt">ic_receipt</string>
 
-    <!-- Widget strings -->
-    <string name="default_amount">0,00 ₽</string>
-    <string name="default_small_amount">0 ₽</string>
+    <!-- New strings for FinanceChartScreen -->
+    <string name="select_icon">Выберите иконку</string>
 
-    <!-- Уведомления и разрешения -->
-    <string name="permission_message_android15">Для отправки уведомлений необходимо разрешение. Пожалуйста, предоставьте его в настройках.</string>
-    <string name="permission_message">Для отправки уведомлений требуется разрешение. Пожалуйста, разрешите отправку уведомлений.</string>
-    <string name="open_settings">Открыть настройки</string>
-    <string name="notification_permission_settings_message">Разрешение на отправку уведомлений требуется для функционирования приложения. Пожалуйста, разрешите отправку уведомлений в настройках.</string>
-    <string name="notification_permission_message">Для работы с уведомлениями требуется разрешение</string>
-    <string name="request_permission">Запросить разрешение</string>
-    <string name="selected_time">Выбранное время: %1$s</string>
-    <string name="notification_permission_required">Требуется разрешение на отправку уведомлений</string>
-    <string name="save">Сохранить</string>
-
-    <!-- Adding missing string resources -->
-    <string name="category_stats_for_period">Статистика по категориям за %1$s</string>
-    <string name="total_income">Всего доходов: %1$s</string>
-    <string name="net_balance">Баланс: %1$s</string>
-    <string name="savings_rate_title">Норма сбережений</string>
-    <string name="income_header">Доходы</string>
-    <string name="expenses_header">Расходы</string>
-    <string name="savings_amount">Сбережения</string>
-    <string name="empty_state">Пусто</string>
-    <string name="empty_transactions">Транзакции не найдены</string>
-    <string name="empty_transactions_description">Попробуйте изменить фильтры или добавить новые транзакции.</string>
-    <string name="transaction_history">История транзакций</string>
-
-    <!-- Ошибки форм - Добавление -->
-    <string name="amount_required">Введите сумму</string>
-    <string name="category_required">Выберите категорию</string>
-
-    <!-- Добавление недостающих строк -->
-    <string name="add_new">Добавить</string>
-    <string name="note_hint">Примечание (необязательно)</string>
-    <string name="selected_wallets">Выбрано кошельков: %d</string>
-    <string name="select_wallets">Выберите кошельки</string>
-    <string name="add_to_wallets">Добавить в кошельки</string>
-    <string name="transaction_to">Куда</string>
-    <string name="transaction_from">Откуда</string>
-    <string name="transaction_added_success">Транзакция успешно добавлена</string>
-    <string name="transaction_updated_success">Транзакция успешно изменена</string>
+    <!-- Sources strings -->
+    <string name="delete_source">Удалить источник</string>
 </resources>

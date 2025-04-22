@@ -3,18 +3,28 @@ package com.davidbugayov.financeanalyzer.presentation.components
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
+import kotlinx.coroutines.launch
 import java.util.Date
 
 /**
  * Диалог выбора даты.
  *
  * @param initialDate Начальная дата для отображения в календаре
+ * @param minDate Минимальная дата для ограничения выбора
+ * @param maxDate Максимальная дата для ограничения выбора
  * @param onDateSelected Callback, вызываемый при выборе даты
  * @param onDismiss Callback, вызываемый при закрытии диалога
  */
@@ -22,12 +32,40 @@ import java.util.Date
 @Composable
 fun DatePickerDialog(
     initialDate: Date,
+    minDate: Date? = null,
+    maxDate: Date? = null,
     onDateSelected: (Date) -> Unit,
     onDismiss: () -> Unit
 ) {
     val datePickerState = rememberDatePickerState(
         initialSelectedDateMillis = initialDate.time
     )
+    val snackbarHostState = remember { SnackbarHostState() }
+    val coroutineScope = rememberCoroutineScope()
+
+    // Показывать Snackbar сразу при выборе недопустимой даты
+    LaunchedEffect(datePickerState.selectedDateMillis) {
+        datePickerState.selectedDateMillis?.let { millis ->
+            val selectedDate = Date(millis)
+            val isValid = (minDate == null || selectedDate >= minDate) &&
+                    (maxDate == null || selectedDate <= maxDate)
+            if (!isValid) {
+                coroutineScope.launch {
+                    snackbarHostState.showSnackbar(
+                        if (minDate != null && selectedDate < minDate) {
+                            "Дата раньше минимально допустимой"
+                        } else if (maxDate != null && selectedDate > maxDate) {
+                            "Дата позже максимально допустимой"
+                        } else {
+                            "Недопустимая дата"
+                        }
+                    )
+                }
+            } else {
+                snackbarHostState.currentSnackbarData?.dismiss()
+            }
+        }
+    }
 
     DatePickerDialog(
         onDismissRequest = onDismiss,
@@ -35,9 +73,25 @@ fun DatePickerDialog(
             TextButton(
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
-                        onDateSelected(Date(millis))
+                        val selectedDate = Date(millis)
+                        val isValid = (minDate == null || selectedDate >= minDate) &&
+                                (maxDate == null || selectedDate <= maxDate)
+                        if (isValid) {
+                            onDateSelected(selectedDate)
+                        } else {
+                            coroutineScope.launch {
+                                snackbarHostState.showSnackbar(
+                                    if (minDate != null && selectedDate < minDate) {
+                                        "Дата раньше минимально допустимой"
+                                    } else if (maxDate != null && selectedDate > maxDate) {
+                                        "Дата позже максимально допустимой"
+                                    } else {
+                                        "Недопустимая дата"
+                                    }
+                                )
+                            }
+                        }
                     }
-                    onDismiss()
                 }
             ) {
                 Text(stringResource(R.string.confirm))
@@ -49,6 +103,21 @@ fun DatePickerDialog(
             }
         }
     ) {
-        DatePicker(state = datePickerState)
+        androidx.compose.foundation.layout.Column {
+            DatePicker(
+                state = datePickerState
+            )
+            SnackbarHost(
+                hostState = snackbarHostState,
+                snackbar = { data ->
+                    Snackbar(
+                        containerColor = MaterialTheme.colorScheme.errorContainer,
+                        contentColor = MaterialTheme.colorScheme.onErrorContainer,
+                        shape = MaterialTheme.shapes.medium,
+                        content = { Text(data.visuals.message) }
+                    )
+                }
+            )
+        }
     }
 } 

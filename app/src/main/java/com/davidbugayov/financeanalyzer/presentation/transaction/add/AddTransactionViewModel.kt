@@ -1,506 +1,557 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.add
 
-import android.app.Application
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.Category
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.DialogStateTransaction
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.EditingState
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.SourceItem
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.TransactionData
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.ValidationError
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.WalletState
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources
+import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 import java.util.Date
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Category
+import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 
 /**
  * ViewModel для экрана добавления транзакции.
- * Расширяет BaseTransactionViewModel и добавляет специфичную логику для добавления новых транзакций.
+ * Следует принципам MVI и Clean Architecture.
  */
-class AddTransactionViewModel (
-    application: Application,
-    addTransactionUseCase: AddTransactionUseCase,
-    updateTransactionUseCase: UpdateTransactionUseCase,
+class AddTransactionViewModel(
+    private val addTransactionUseCase: AddTransactionUseCase,
+    validateTransactionUseCase: ValidateTransactionUseCase,
     categoriesViewModel: CategoriesViewModel,
-    walletRepository: WalletRepository,
-    override val txRepository: TransactionRepository
-) : BaseTransactionViewModel(
-    application,
-    addTransactionUseCase,
-    updateTransactionUseCase,
+    sourcePreferences: SourcePreferences,
+    walletRepository: WalletRepository
+) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
+    sourcePreferences,
     walletRepository,
-    txRepository
+    validateTransactionUseCase
 ) {
 
-    // Состояние ViewModel с приведением к специфичному типу
-    override val _state: MutableStateFlow<AddTransactionState> by lazy { 
-        MutableStateFlow(AddTransactionState()) 
+    override val _state = MutableStateFlow(AddTransactionState())
+
+    // Расширение для преобразования строки в Double
+    private fun String.toDouble(): Double {
+        return this.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
     }
-    override val state: StateFlow<AddTransactionState> by lazy { 
-        _state.asStateFlow() 
-    }
-    
-    // Коллбэки для обновления кошельков
-    override var onIncomeAddedCallback: ((Money) -> Unit)? = null
-    override var onExpenseAddedCallback: ((Money) -> Unit)? = null
-    
-    /**
-     * Устанавливает целевой кошелек для транзакции
-     */
-    fun setTargetWalletId(walletId: String) {
-        _state.update { 
-            it.copy(
-                transactionData = it.transactionData.copy(targetWalletId = walletId) 
-            ) 
+
+    // Список доступных кошельков с внутренним MutableStateFlow для обновлений
+    private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
+    override val wallets: List<Wallet>
+        get() = _wallets.value
+
+    init {
+        Timber.d("[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel")
+        // Сбросить категорию перед загрузкой
+        _state.update { it.copy(category = "") }
+        // Загружаем категории
+        loadInitialData()
+        // Принудительно выставить дефолтную категорию после инициализации (после collect)
+        viewModelScope.launch {
+            kotlinx.coroutines.delay(150)
+            setDefaultCategoryIfNeeded(force = true)
         }
-        Timber.d("Установлен целевой кошелек: $walletId")
-    }
-    
-    /**
-     * Настраивает ViewModel для добавления дохода
-     */
-    fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean) {
-        _state.update {
-            it.copy(
-                transactionData = it.transactionData.copy(
-                    amount = amount,
-                    isExpense = false // Доход, а не расход
-                ),
-                forceExpense = false,
-                walletState = it.walletState.copy(addToWallet = !shouldDistribute) 
-            )
+        // Загружаем список кошельков
+        viewModelScope.launch {
+            try {
+                val walletsList = walletRepository.getAllWallets()
+                _wallets.value = walletsList
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке кошельков")
+            }
         }
-        Timber.d("Настроен для добавления дохода: amount=$amount, shouldDistribute=$shouldDistribute")
     }
-    
+
     /**
-     * Настраивает ViewModel для добавления расхода
+     * Инициализируем данные для экрана
      */
-    fun setupForExpenseAddition(amount: String, walletCategory: String) {
-        _state.update {
-            it.copy(
-                transactionData = it.transactionData.copy(
-                    amount = amount,
-                    category = walletCategory,
-                    isExpense = true // Расход
-                ),
-                forceExpense = true,
-                walletState = it.walletState.copy(addToWallet = true) 
-            )
-        }
-        Timber.d("Настроен для добавления расхода: amount=$amount, category=$walletCategory")
+    override fun loadInitialData() {
+        loadCategories()
+        initSources()
     }
-    
+
+    /**
+     * Инициализирует список источников
+     */
+    private fun initSources() {
+        val sources = getInitialSources(sourcePreferences)
+        _state.update { it.copy(sources = sources) }
+    }
+
+    /**
+     * Загружает категории из CategoriesViewModel
+     */
+    private fun loadCategories() {
+        viewModelScope.launch {
+            try {
+                categoriesViewModel.expenseCategories.collect { categories ->
+                    Timber.d("[VM] collect: expenseCategories обновились, size=${categories.size}, isExpense=${_state.value.isExpense}, category='${_state.value.category}'")
+                    _state.update { it.copy(expenseCategories = categories) }
+                    if (_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
+                        Timber.d("[VM] collect: Выставляю первую категорию расходов: ${categories.first().name}")
+                        _state.update {
+                            it.copy(
+                                category = categories.first().name,
+                                selectedExpenseCategory = categories.first().name
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке категорий расходов")
+            }
+        }
+        viewModelScope.launch {
+            try {
+                categoriesViewModel.incomeCategories.collect { categories ->
+                    Timber.d("[VM] collect: incomeCategories обновились, size=${categories.size}, isExpense=${_state.value.isExpense}, category='${_state.value.category}'")
+                    _state.update { it.copy(incomeCategories = categories) }
+                    if (!_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
+                        Timber.d("[VM] collect: Выставляю первую категорию доходов: ${categories.first().name}")
+                        _state.update {
+                            it.copy(
+                                category = categories.first().name,
+                                selectedIncomeCategory = categories.first().name
+                            )
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке категорий доходов")
+            }
+        }
+    }
+
+    override fun setDefaultCategoryIfNeeded(force: Boolean) {
+        _state.update { current ->
+            if (current.isExpense && current.expenseCategories.isNotEmpty()) {
+                // Если категория уже выбрана и есть в списке — не менять
+                if (!force && current.selectedExpenseCategory.isNotBlank() && current.expenseCategories.any { it.name == current.selectedExpenseCategory }) {
+                    current.copy(category = current.selectedExpenseCategory)
+                } else {
+                    Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию расходов: ${current.expenseCategories.first().name}")
+                    current.copy(
+                        category = current.expenseCategories.first().name,
+                        selectedExpenseCategory = current.expenseCategories.first().name
+                    )
+                }
+            } else if (!current.isExpense && current.incomeCategories.isNotEmpty()) {
+                if (!force && current.selectedIncomeCategory.isNotBlank() && current.incomeCategories.any { it.name == current.selectedIncomeCategory }) {
+                    current.copy(category = current.selectedIncomeCategory)
+                } else {
+                    Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию доходов: ${current.incomeCategories.first().name}")
+                    current.copy(
+                        category = current.incomeCategories.first().name,
+                        selectedIncomeCategory = current.incomeCategories.first().name
+                    )
+                }
+            } else {
+                current
+            }
+        }
+    }
+
+    /**
+     * Отправляет транзакцию (добавляет новую или обновляет существующую)
+     */
+    override fun submitTransaction(context: android.content.Context) {
+        submit()
+    }
+
+    /**
+     * Получает экземпляр TransactionRepository через Koin
+     */
+    private fun getTransactionRepositoryInstance(): TransactionRepository {
+        val repository: TransactionRepository by inject(TransactionRepository::class.java)
+        return repository
+    }
+
+    /**
+     * Выбранная валюта (рубль по умолчанию)
+     */
+    private val selectedCurrency = Currency.RUB
+
+    /**
+     * Создает объект Transaction из текущего состояния
+     */
+    private fun createTransactionFromState(currentState: AddTransactionState): Transaction {
+        // Получаем сумму из строки
+        val amount = currentState.amount.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
+
+        // Инвертируем сумму, если это расход
+        val finalAmount = if (currentState.isExpense) -amount else amount
+
+        // Проверяем, является ли категория "Переводы"
+        val isTransfer = currentState.category == "Переводы"
+
+        // Генерируем UUID для новой транзакции, если id не задан
+        val transactionId = currentState.transactionToEdit?.id ?: java.util.UUID.randomUUID().toString()
+        Timber.d("Используем ID транзакции: $transactionId (новый: ${currentState.transactionToEdit == null})")
+
+        // Создаем объект транзакции
+        return Transaction(
+            id = transactionId,
+            amount = Money(amount = finalAmount, currency = selectedCurrency),
+            date = currentState.selectedDate,
+            note = currentState.note.trim(),
+            category = currentState.category,
+            source = currentState.source,
+            isExpense = currentState.isExpense,
+            sourceColor = currentState.sourceColor,
+            isTransfer = isTransfer
+        )
+    }
+
+    /**
+     * Публичный метод для доступа к репозиторию транзакций
+     * Используется для подписки на события изменения данных
+     */
+    fun getTransactionRepository(): TransactionRepository {
+        return getTransactionRepositoryInstance()
+    }
+
     /**
      * Очищает список выбранных кошельков
      */
-    fun clearSelectedWallets() {
+    override fun clearSelectedWallets() {
+        Timber.d("Очистка списка выбранных кошельков")
+        _state.update { it.copy(selectedWallets = emptyList()) }
+    }
+
+    private fun validateInput(
+        walletId: String?,
+        amount: String,
+        date: Date,
+        categoryId: String,
+        isExpense: Boolean
+    ): Boolean {
+        val validationBuilder = ValidationBuilder()
+        // Reset errors
         _state.update {
             it.copy(
-                walletState = it.walletState.copy(
-                    selectedWalletIds = emptyList(),
-                    selectedWallets = emptyList()
-                )
+                walletError = false,
+                amountError = false,
+                categoryError = false,
+                sourceError = false,
+                dateError = false
             )
         }
-        Timber.d("Очищен список выбранных кошельков")
-    }
-    
-    /**
-     * Выбирает все кошельки без показа диалога
-     */
-    fun selectAllWalletsWithoutDialog() {
-        val allWalletIds = state.value.walletState.wallets.map { it.id }
+
+        // Check wallet - only for income with addToWallet enabled
+        if (!isExpense && _state.value.addToWallet && walletId.isNullOrBlank()) {
+            Timber.d("Ошибка: не выбран кошелек для дохода с addToWallet=true")
+            validationBuilder.addWalletError()
+        }
+
+        // Check amount
+        if (amount.isBlank()) {
+            Timber.d("Ошибка: сумма не введена")
+            validationBuilder.addAmountError()
+        } else {
+            try {
+                val amountValue = amount.replace(",", ".").toDouble()
+                if (amountValue <= 0) {
+                    Timber.d("Ошибка: сумма должна быть больше нуля")
+                    validationBuilder.addAmountError()
+                }
+            } catch (e: Exception) {
+                Timber.d("Ошибка: невозможно преобразовать сумму в число")
+                validationBuilder.addAmountError()
+            }
+        }
+
+        // Check category
+        if (categoryId.isBlank()) {
+            Timber.d("Ошибка: категория не выбрана")
+            validationBuilder.addCategoryError()
+        }
+
+        // Check date (не должна быть в будущем)
+        var dateError = false
+        val today = java.util.Calendar.getInstance().apply {
+            set(java.util.Calendar.HOUR_OF_DAY, 23)
+            set(java.util.Calendar.MINUTE, 59)
+            set(java.util.Calendar.SECOND, 59)
+            set(java.util.Calendar.MILLISECOND, 999)
+        }.time
+
+        if (date.after(today)) {
+            Timber.d("Ошибка: дата в будущем")
+            dateError = true
+        }
+
+        // No validation for source - allowing empty sources
+        val validationResult = validationBuilder.build()
         _state.update {
             it.copy(
-                walletState = it.walletState.copy(
-                    selectedWalletIds = allWalletIds,
-                    selectedWallets = allWalletIds.mapNotNull { id -> 
-                        state.value.walletState.wallets.find { wallet -> wallet.id == id }?.name
-                    }
-                )
+                walletError = validationResult.hasWalletError,
+                amountError = validationResult.hasAmountError,
+                categoryError = validationResult.hasCategoryError,
+                sourceError = validationResult.hasSourceError,
+                dateError = dateError
             )
         }
-        Timber.d("Выбраны все кошельки без диалога: ${allWalletIds.size} кошельков")
+
+        return validationResult.isValid && !dateError
     }
 
-    /**
-     * Сбрасывает состояние до значений по умолчанию
-     */
-    fun resetToDefaultState() {
-        _state.value = AddTransactionState(forceExpense = false)
-        Timber.d("State reset: forceExpense=${_state.value.forceExpense}")
-    }
-
-    /**
-     * Сбрасывает поля формы, но сохраняет категории и источники
-     */
-    fun resetFields() {
-        val currentState = _state.value
-        _state.update {
-            it.copy(
-                transactionData = it.transactionData.copy(
-                    amount = "",
-                    category = "",
-                    note = "",
-                    isExpense = true
-                ),
-                dialogStateTransaction = it.dialogStateTransaction.copy(
-                    showDatePicker = false,
-                    showCategoryPicker = false,
-                    showCustomCategoryDialog = false,
-                    showCancelConfirmation = false,
-                    showSourcePicker = false,
-                    showCustomSourceDialog = false,
-                    showColorPicker = false,
-                    showDeleteCategoryConfirmation = false,
-                    showDeleteSourceConfirmation = false
-                ),
-                validationError = null,
-                isSuccess = false
-            )
-        }
-    }
-
-    /**
-     * Обновляет категории расходов
-     */
-    override fun updateExpenseCategories(categories: List<Any>) {
-        try {
-            val convertedCategories = categories.map { category ->
-                if (category is com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem) {
-                   CategoryItem(
-                        name = category.name,
-                        count = category.count,
-                        image = Icons.Default.Category,
-                        isCustom = category.isCustom
-                    )
-                } else {
-                    category as CategoryItem
-                }
-            }
-            
-            if (_state != null) {
-                _state.update { it.copy(expenseCategories = convertedCategories) }
-            } else {
-                Timber.e("_state is null in updateExpenseCategories")
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error updating expense categories")
-        }
-    }
-
-    /**
-     * Обновляет категории доходов
-     */
-    override fun updateIncomeCategories(categories: List<Any>) {
-        try {
-            val convertedCategories = categories.map { category ->
-                if (category is com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem) {
-                    CategoryItem(
-                        name = category.name,
-                        count = category.count,
-                        image = Icons.Default.Category,
-                        isCustom = category.isCustom
-                    )
-                } else {
-                    category as CategoryItem
-                }
-            }
-            
-            if (_state != null) {
-                _state.update { it.copy(incomeCategories = convertedCategories) }
-            } else {
-                Timber.e("_state is null in updateIncomeCategories")
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error updating income categories")
-        }
-    }
-
-    /**
-     * Устанавливает ошибку валидации
-     */
-    override fun setValidationError(error: ValidationError) {
-        _state.update { it.copy(validationError = error) }
-    }
-
-    /**
-     * Обработчик событий - ПЕРЕОПРЕДЕЛЕН
-     */
-    override fun onEvent(event: BaseTransactionEvent) {
-        when (event) {
-            // === Обработка событий специфичных для AddTransactionViewModel ===
-            is BaseTransactionEvent.SubmitAddTransaction -> {
-                submitTransaction()
-            }
-            is BaseTransactionEvent.ToggleAddAnotherOption -> {
-                _state.update { it.copy(canAddAnother = !it.canAddAnother) }
-            }
-            is BaseTransactionEvent.ToggleAddToWallet -> {
-                _state.update {
-                    it.copy(
-                        walletState = it.walletState.copy(addToWallet = event.add)
-                    )
-                }
-                Timber.d("AddToWallet toggled: ${event.add}")
-            }
-            is BaseTransactionEvent.SelectWallets -> {
-                _state.update {
-                    it.copy(
-                        walletState = it.walletState.copy(
-                            selectedWalletIds = event.walletIds,
-                            selectedWallets = event.walletIds.mapNotNull { id ->
-                                state.value.walletState.wallets.find { wallet -> wallet.id == id }?.name
-                            }
-                        )
-                    )
-                }
-                Timber.d("Selected wallets: ${event.walletIds}")
-            }
-            is BaseTransactionEvent.SetCustomSourceName -> {
-                 _state.update {
-                    it.copy(editingState = it.editingState.copy(sourceName = event.name))
-                 }
-            }
-
-            // === Обработка базовых событий ===
-            is BaseTransactionEvent.SetAmount -> {
-                _state.update { it.copy(
-                    transactionData = it.transactionData.copy(amount = event.amount),
-                    validationError = if (it.validationError is ValidationError.AmountMissing) null else it.validationError
-                )}
-            }
-            is BaseTransactionEvent.SetCategory -> {
-                _state.update { it.copy(
-                    transactionData = it.transactionData.copy(category = event.category),
-                    validationError = if (it.validationError is ValidationError.CategoryMissing) null else it.validationError
-                )}
-                usedCategories.add(Pair(event.category, _state.value.transactionData.isExpense))
-            }
-            is BaseTransactionEvent.SetNote -> {
-                _state.update { it.copy(transactionData = it.transactionData.copy(note = event.note)) }
-            }
-            is BaseTransactionEvent.SetDate -> {
-                _state.update { it.copy(transactionData = it.transactionData.copy(selectedDate = event.date)) }
-            }
-            is BaseTransactionEvent.ToggleTransactionType -> {
-                val currentIsExpense = _state.value.transactionData.isExpense
-                val currentForceExpense = _state.value.forceExpense
-                Timber.d("BEFORE TOGGLE: isExpense=$currentIsExpense, forceExpense=$currentForceExpense")
-                
-                _state.update { it.copy(
-                    transactionData = it.transactionData.copy(
-                        isExpense = !currentIsExpense,
-                        category = ""
-                    ),
-                    forceExpense = false,
-                    validationError = if (it.validationError is ValidationError.CategoryMissing) null else it.validationError
-                )}
-                
-                Timber.d("AFTER TOGGLE: isExpense=${!currentIsExpense}, forceExpense=false")
-                Timber.d("Transaction type toggled to: ${if (!currentIsExpense) "Expense" else "Income"}")
-            }
-            is BaseTransactionEvent.SetSource -> {
-                _state.update { it.copy(
-                    transactionData = it.transactionData.copy(source = event.source)
-                )}
-            }
-            is BaseTransactionEvent.SetSourceColor -> {
-                 _state.update {
-                    it.copy(
-                        transactionData = it.transactionData.copy(sourceColor = event.color),
-                        editingState = it.editingState.copy(sourceColor = event.color)
-                    )
-                 }
-            }
-            is BaseTransactionEvent.AddCustomCategory -> {
-                viewModelScope.launch {
-                    val isExpense = state.value.transactionData.isExpense
-                    categoriesViewModel.addCustomCategory(event.name, isExpense)
-                    onEvent(BaseTransactionEvent.SetCategory(event.name))
-                }
-            }
-            is BaseTransactionEvent.AddCustomSource -> {
-                viewModelScope.launch {
-                    val newSource = Source(name = event.name, color = event.color, isCustom = true)
-                    Timber.d("Adding custom source: $newSource - Repository logic needed")
-                    _state.update {
-                        it.copy(sources = it.sources + SourceItem(name = newSource.name, color = newSource.color, isCustom = true))
-                    }
-                    onEvent(BaseTransactionEvent.SetSource(newSource.name))
-                    onEvent(BaseTransactionEvent.SetSourceColor(newSource.color))
-                }
-            }
-            is BaseTransactionEvent.SetCategoryToDelete -> {
-                _state.update { it.copy(editingState = it.editingState.copy(categoryToDelete = event.category)) }
-            }
-            is BaseTransactionEvent.DeleteCategory -> {
-                 viewModelScope.launch {
-                    val isExpense = state.value.expenseCategories.any { it.name == event.name }
-                    categoriesViewModel.removeCategory(event.name, isExpense)
-                 }
-            }
-            is BaseTransactionEvent.SetSourceToDelete -> {
-                 _state.update { it.copy(editingState = it.editingState.copy(sourceToDelete = event.source)) }
-            }
-            is BaseTransactionEvent.DeleteSource -> {
-                 Timber.d("Deleting source: ${event.name} - Repository logic needed")
-                 _state.update {
-                     it.copy(sources = it.sources.filterNot { source -> source.name == event.name })
-                 }
-            }
-            // Dialog visibility toggles
-            is BaseTransactionEvent.ShowDatePicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showDatePicker = true)) }
-            is BaseTransactionEvent.HideDatePicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showDatePicker = false)) }
-            is BaseTransactionEvent.ShowCategoryPicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCategoryPicker = true)) }
-            is BaseTransactionEvent.HideCategoryPicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCategoryPicker = false)) }
-            is BaseTransactionEvent.ShowCustomCategoryDialog -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCustomCategoryDialog = true, showCategoryPicker = false)) }
-            is BaseTransactionEvent.HideCustomCategoryDialog -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCustomCategoryDialog = false)) }
-            is BaseTransactionEvent.ShowCancelConfirmation -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCancelConfirmation = true)) }
-            is BaseTransactionEvent.HideCancelConfirmation -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCancelConfirmation = false)) }
-            is BaseTransactionEvent.ShowSourcePicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showSourcePicker = true)) }
-            is BaseTransactionEvent.HideSourcePicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showSourcePicker = false)) }
-            is BaseTransactionEvent.ShowCustomSourceDialog -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCustomSourceDialog = true, showSourcePicker = false)) }
-            is BaseTransactionEvent.HideCustomSourceDialog -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showCustomSourceDialog = false)) }
-            is BaseTransactionEvent.ShowColorPicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showColorPicker = true)) }
-            is BaseTransactionEvent.HideColorPicker -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showColorPicker = false)) }
-            is BaseTransactionEvent.ShowDeleteCategoryConfirmation -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showDeleteCategoryConfirmation = true, showCategoryPicker = false)) }
-            is BaseTransactionEvent.HideDeleteCategoryConfirmation -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showDeleteCategoryConfirmation = false)) }
-            is BaseTransactionEvent.ShowDeleteSourceConfirmation -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showDeleteSourceConfirmation = true, showSourcePicker = false)) }
-            is BaseTransactionEvent.HideDeleteSourceConfirmation -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showDeleteSourceConfirmation = false)) }
-            is BaseTransactionEvent.ShowWalletSelector -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showWalletSelector = true)) }
-            is BaseTransactionEvent.HideWalletSelector -> _state.update { it.copy(dialogStateTransaction = it.dialogStateTransaction.copy(showWalletSelector = false)) }
-            is BaseTransactionEvent.HideSuccessDialog -> _state.update { it.copy(isSuccess = false) }
-            is BaseTransactionEvent.Reset -> resetFields()
-            // Другие события, которые могут встречаться
-            else -> {
-                Timber.d("Unhandled event in AddTransactionViewModel: $event")
-            }
-        }
-    }
-    
-    /**
-     * Подготавливает и добавляет новую транзакцию
-     */
-    private fun submitTransaction() {
-        if (!validateInput(_state.value)) {
+    private fun submit() {
+        if (_state.value.preventAutoSubmit) {
+            Timber.d("preventAutoSubmit is true, skipping submission")
+            _state.update { it.copy(preventAutoSubmit = false) }
             return
         }
-        
-        _state.update { it.copy(isLoading = true) }
-        
-        viewModelScope.launch {
-            try {
-                val currentState = _state.value
-                val amount = Money.fromString(currentState.transactionData.amount).amount
-                val finalAmount = if (currentState.transactionData.isExpense) -amount else amount
-                val isTransfer = currentState.transactionData.category == "Переводы"
-                
-                val newTransaction = Transaction(
-                    id = "",
-                    amount = Money(finalAmount),
-                    date = currentState.transactionData.selectedDate,
-                    note = currentState.transactionData.note.trim(),
-                    category = currentState.transactionData.category,
-                    source = currentState.transactionData.source,
-                    isExpense = currentState.transactionData.isExpense,
-                    sourceColor = currentState.transactionData.sourceColor,
-                    isTransfer = isTransfer
-                )
-                
-                Timber.d("Добавление транзакции: amount=${newTransaction.amount}, isExpense=${newTransaction.isExpense}")
-                
-                try {
-                    val result = addTransactionUseCase(newTransaction)
-                    
-                    when (result) {
-                        is Result.Success<*> -> {
-                            Timber.d("Транзакция успешно добавлена: ${result.data}")
-                            updateWidget()
-                            requestDataRefresh()
-                            usedCategories.add(Pair(currentState.transactionData.category, currentState.transactionData.isExpense))
-                            updateCategoryPositions()
-                            
-                            _state.update {
-                                it.copy(
-                                    isLoading = false,
-                                    isSuccess = true,
-                                    validationError = null
-                                )
-                            }
-                        }
-                        is Result.Error -> {
-                            val error = result.exception
-                            Timber.e("Ошибка при добавлении транзакции: ${error.message}")
-                            _state.update {
-                                it.copy(
-                                    isLoading = false,
-                                    validationError = ValidationError.General("Ошибка: ${error.message ?: "Неизвестная ошибка"}"),
-                                    isSuccess = false
-                                )
-                            }
-                        }
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "Ошибка при добавлении транзакции")
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            validationError = ValidationError.General("Ошибка: ${e.message ?: "Неизвестная ошибка"}"),
-                            isSuccess = false
-                        )
-                    }
-                }
-            } catch (e: NumberFormatException) { 
-                 Timber.e(e, "Ошибка парсинга суммы: ${state.value.transactionData.amount}")
-                 _state.update {
-                     it.copy(
-                         isLoading = false,
-                         validationError = ValidationError.AmountMissing,
-                         isSuccess = false
-                     )
-                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Неожиданная ошибка при добавлении транзакции")
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        validationError = ValidationError.General("Неожиданная ошибка: ${e.message ?: "Неизвестная ошибка"}"),
-                        isSuccess = false
+
+        Timber.d("Submit called, starting processing")
+
+        try {
+            val amountStr = _state.value.amount
+            Timber.d("Checking amount: '$amountStr'")
+
+            if (amountStr.isBlank()) {
+                // Если сумма не введена, только подсветить поле суммы, но без диалога ошибки
+                Timber.d("Amount is blank, highlighting error")
+                _state.update { state ->
+                    state.copy(
+                        amountError = true
                     )
                 }
+                return
             }
+
+            // Проверяем валидацию
+            val s = _state.value
+            Timber.d("Starting validation: walletId=${s.targetWalletId}, amount=${s.amount}, category=${s.category}, source=${s.source}")
+
+            val validationResult = validateInput(
+                walletId = s.targetWalletId,
+                amount = s.amount,
+                date = s.selectedDate,
+                categoryId = s.category,
+                isExpense = s.isExpense
+            )
+
+            Timber.d("Validation result: $validationResult")
+
+            if (!validationResult) {
+                Timber.d("Validation failed, aborting")
+                return
+            }
+
+            // Если сумма введена, продолжаем со стандартной логикой 
+            // создания и сохранения транзакции
+            Timber.d("Validation passed, creating transaction")
+            val transaction = createTransactionFromState(_state.value)
+            Timber.d("Transaction created: id=${transaction.id}, amount=${transaction.amount}, category=${transaction.category}")
+
+            viewModelScope.launch {
+                Timber.d("Launching coroutine to add transaction")
+                try {
+                    val result = addTransactionUseCase(transaction)
+                    Timber.d("Transaction add result: $result")
+
+                    if (result is DomainResult.Success) {
+                        Timber.d("Transaction added successfully")
+                        _state.update { it.copy(isSuccess = true, error = null) }
+                    } else if (result is DomainResult.Error) {
+                        Timber.e("Error adding transaction: ${result.exception.message}")
+                        _state.update { it.copy(error = result.exception.message) }
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Exception in coroutine while adding transaction")
+                    _state.update { it.copy(error = e.message ?: "Unknown error adding transaction") }
+                }
+            }
+        } catch (e: Exception) {
+            // Общая обработка исключений, но не показываем диалог
+            Timber.e(e, "Exception during submit processing")
+            e.printStackTrace()
+            _state.update { it.copy(error = e.message ?: "Unknown error") }
         }
     }
 
-    /**
-     * Метод для получения репозитория транзакций.
-     * Переопределен для BudgetScreen
-     */
-    override fun getTransactionRepository(): TransactionRepository {
-        return txRepository
+    override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
+        when (event) {
+            is BaseTransactionEvent.ToggleTransactionType -> {
+                _state.update { it.copy(isExpense = !it.isExpense, category = "") }
+                setDefaultCategoryIfNeeded(force = true)
+            }
+
+            is BaseTransactionEvent.SetExpenseCategory -> _state.update { state ->
+                val newState = state.copy(
+                    category = event.category,
+                    selectedExpenseCategory = event.category
+                )
+                newState
+            }
+
+            is BaseTransactionEvent.SetIncomeCategory -> _state.update { state ->
+                val newState = state.copy(
+                    category = event.category,
+                    selectedIncomeCategory = event.category
+                )
+                newState
+            }
+
+            is BaseTransactionEvent.Submit -> {
+                submit()
+            }
+
+            is BaseTransactionEvent.ResetAmountOnly -> {
+                _state.update { it.copy(amount = "", amountError = false, note = "", isSuccess = false, preventAutoSubmit = false) }
+            }
+
+            is BaseTransactionEvent.PreventAutoSubmit -> {
+                _state.update { it.copy(preventAutoSubmit = true) }
+            }
+
+            is BaseTransactionEvent.AddCustomSource -> {
+                val newSource = Source(
+                    name = event.source,
+                    color = event.color,
+                    isCustom = true
+                )
+                val updatedSources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource(
+                    sourcePreferences,
+                    _state.value.sources,
+                    newSource
+                )
+                _state.update {
+                    it.copy(
+                        sources = updatedSources,
+                        showCustomSourceDialog = false,
+                        customSource = "",
+                        sourceColor = com.davidbugayov.financeanalyzer.utils.ColorUtils.CASH_COLOR,
+                        source = newSource.name
+                    )
+                }
+            }
+
+            is BaseTransactionEvent.ToggleAddToWallet -> {
+                val newAddToWallet = !_state.value.addToWallet
+                val allWalletIds = wallets.map { it.id }
+                _state.update {
+                    it.copy(
+                        addToWallet = newAddToWallet,
+                        selectedWallets = if (newAddToWallet && it.selectedWallets.isEmpty()) allWalletIds else it.selectedWallets
+                    )
+                }
+            }
+
+            else -> handleBaseEvent(event, context)
+        }
+    }
+
+    override fun updateCategoryPositions() {
+        // no-op: логика обновления категорий универсальна и реализована в базовом классе
+    }
+
+    override fun copyState(
+        state: AddTransactionState,
+        title: String,
+        amount: String,
+        amountError: Boolean,
+        category: String,
+        categoryError: Boolean,
+        note: String,
+        selectedDate: Date,
+        isExpense: Boolean,
+        showDatePicker: Boolean,
+        showCategoryPicker: Boolean,
+        showCustomCategoryDialog: Boolean,
+        showCancelConfirmation: Boolean,
+        customCategory: String,
+        showSourcePicker: Boolean,
+        showCustomSourceDialog: Boolean,
+        customSource: String,
+        source: String,
+        sourceColor: Int,
+        showColorPicker: Boolean,
+        isLoading: Boolean,
+        error: String?,
+        isSuccess: Boolean,
+        successMessage: String,
+        expenseCategories: List<CategoryItem>,
+        incomeCategories: List<CategoryItem>,
+        sources: List<Source>,
+        categoryToDelete: String?,
+        sourceToDelete: String?,
+        showDeleteCategoryConfirmDialog: Boolean,
+        showDeleteSourceConfirmDialog: Boolean,
+        editMode: Boolean,
+        transactionToEdit: Transaction?,
+        addToWallet: Boolean,
+        selectedWallets: List<String>,
+        showWalletSelector: Boolean,
+        targetWalletId: String?,
+        forceExpense: Boolean,
+        sourceError: Boolean,
+        preventAutoSubmit: Boolean,
+        selectedExpenseCategory: String,
+        selectedIncomeCategory: String,
+        customCategoryIcon: ImageVector,
+        availableCategoryIcons: List<ImageVector>
+    ): AddTransactionState {
+        return state.copy(
+            title = title,
+            amount = amount,
+            amountError = amountError,
+            category = category,
+            categoryError = categoryError,
+            note = note,
+            selectedDate = selectedDate,
+            isExpense = isExpense,
+            showDatePicker = showDatePicker,
+            showCategoryPicker = showCategoryPicker,
+            showCustomCategoryDialog = showCustomCategoryDialog,
+            showCancelConfirmation = showCancelConfirmation,
+            customCategory = customCategory,
+            showSourcePicker = showSourcePicker,
+            showCustomSourceDialog = showCustomSourceDialog,
+            customSource = customSource,
+            source = source,
+            sourceColor = sourceColor,
+            showColorPicker = showColorPicker,
+            isLoading = isLoading,
+            error = error,
+            isSuccess = isSuccess,
+            successMessage = successMessage,
+            expenseCategories = expenseCategories,
+            incomeCategories = incomeCategories,
+            sources = sources,
+            categoryToDelete = categoryToDelete,
+            sourceToDelete = sourceToDelete,
+            showDeleteCategoryConfirmDialog = showDeleteCategoryConfirmDialog,
+            showDeleteSourceConfirmDialog = showDeleteSourceConfirmDialog,
+            editMode = editMode,
+            transactionToEdit = transactionToEdit,
+            addToWallet = addToWallet,
+            selectedWallets = selectedWallets,
+            showWalletSelector = showWalletSelector,
+            targetWalletId = targetWalletId,
+            forceExpense = forceExpense,
+            sourceError = sourceError,
+            preventAutoSubmit = preventAutoSubmit,
+            selectedExpenseCategory = selectedExpenseCategory,
+            selectedIncomeCategory = selectedIncomeCategory,
+            customCategoryIcon = customCategoryIcon,
+            availableCategoryIcons = availableCategoryIcons
+        )
     }
 } 

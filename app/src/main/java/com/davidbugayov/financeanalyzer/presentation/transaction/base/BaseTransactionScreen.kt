@@ -1,8 +1,9 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
+package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
-// Explicitly list all required imports based on usage
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -11,419 +12,564 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Fastfood // Рестораны
-import androidx.compose.material.icons.filled.LocalTaxi // Транспорт
-import androidx.compose.material.icons.filled.Movie // Развлечения
-import androidx.compose.material.icons.filled.ShoppingCart // Продукты
-import androidx.compose.material.icons.filled.AttachMoney // Зарплата
-import androidx.compose.material.icons.filled.Work // Подработка
-import androidx.compose.material.icons.filled.AccountBalance // Депозит
-import androidx.compose.material.icons.filled.MoreHoriz // Другое
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.CloudUpload
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.layout.*
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
-import androidx.compose.material3.CardElevation
-import androidx.compose.foundation.border
-
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.AddButton
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.AmountField
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.CategorySection
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.SourceSection
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.TransactionHeader
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.DateField
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs.CommentField
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionState
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.ValidationError
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryItem as DomainCategoryItem
-
-import java.util.Date
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.Calendar
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
+import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
+import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AddButton
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AmountField
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CategoryPickerDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CategorySection
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.ColorPickerDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CommentField
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CustomCategoryDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.CustomSourceDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.DateField
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.SourcePickerDialog
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.SourceSection
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.TransactionHeader
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectionSection
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.WalletSelectorDialog
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import kotlinx.coroutines.launch
+import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 /**
- * Базовый экран для добавления/редактирования транзакции
- * Содержит общую логику и UI для обоих экранов
- * Улучшенный UI/UX с визуальными акцентами и оптимизированной структурой
- *
- * @param state Состояние транзакции
- * @param onEvent Обработчик событий
- * @param onSubmit Обработчик отправки формы
- * @param submitButtonText Текст кнопки отправки
- * @param modifier Модификатор для корневого элемента
+ * Базовый экран для работы с транзакциями
+ * Служит основой для AddTransactionScreen и EditTransactionScreen
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BaseTransactionScreen(
-    state: BaseTransactionState,
-    onEvent: (BaseTransactionEvent) -> Unit,
-    onSubmit: () -> Unit,
-    submitButtonText: String,
-    modifier: Modifier = Modifier
+fun <E> BaseTransactionScreen(
+    viewModel: TransactionScreenViewModel<out BaseTransactionState, E>,
+    categoriesViewModel: CategoriesViewModel = koinViewModel(),
+    onNavigateBack: () -> Unit,
+    screenTitle: String = "Добавить транзакцию",
+    buttonText: String = "Добавить",
+    isEditMode: Boolean = false,
+    eventFactory: (Any) -> E,
+    submitEvent: E
 ) {
-    val categories = if (state.transactionData.isExpense) state.expenseCategories else state.incomeCategories
-    val sources = state.sources
+    val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
 
-    // Создаем дефолтные источники, если список пуст
-    val displaySources = if (sources.isEmpty()) {
-        listOf(
-            com.davidbugayov.financeanalyzer.presentation.transaction.base.model.SourceItem("Сбер", 0xFF4CAF50.toInt(), false),
-            com.davidbugayov.financeanalyzer.presentation.transaction.base.model.SourceItem("Т-Банк", 0xFFFFEB3B.toInt(), false),
-            com.davidbugayov.financeanalyzer.presentation.transaction.base.model.SourceItem("Альфа", 0xFFF44336.toInt(), false),
-            com.davidbugayov.financeanalyzer.presentation.transaction.base.model.SourceItem("Наличные", 0xFF9E9E9E.toInt(), false)
-        )
-    } else {
-        sources
+    // Логируем режим экрана
+    LaunchedEffect(isEditMode) {
+        Timber.d("Экран инициализирован в режиме ${if (isEditMode) "редактирования" else "добавления"} транзакции. editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}")
+    }
+    // Логируем состояние ошибок
+    LaunchedEffect(state.categoryError, state.sourceError, state.amountError) {
+        Timber.d("Состояние ошибок: categoryError=${state.categoryError}, sourceError=${state.sourceError}, amountError=${state.amountError}")
     }
 
-    // Дефолтные категории для расходов и доходов с иконками
-    val displayCategories = if (categories.isEmpty()) {
-        if (state.transactionData.isExpense) {
-            // Используем предопределенные категории расходов из CategoriesViewModel
-            com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel.DEFAULT_EXPENSE_CATEGORIES
-        } else {
-            // Используем предопределенные категории доходов из CategoriesViewModel  
-            com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel.DEFAULT_INCOME_CATEGORIES
+    // Специальная обработка для типа транзакции на основе forceExpense
+    LaunchedEffect(state.forceExpense) {
+        Timber.d("forceExpense изменен: ${state.forceExpense}")
+        // Если forceExpense=true и isExpense=false, переключаем на расход
+        if (state.forceExpense && !state.isExpense) {
+            viewModel.onEvent(eventFactory("ToggleTransactionType"), context)
         }
-    } else {
-        categories
+        // Если forceExpense=false и isExpense=true, переключаем на доход
+        else if (!state.forceExpense && state.isExpense) {
+            viewModel.onEvent(eventFactory("ToggleTransactionType"), context)
+        }
     }
 
-    // Функции для быстрого выбора даты (Сегодня/Вчера)
-    val onTodayClick = {
-        val today = Calendar.getInstance().time
-        onEvent(BaseTransactionEvent.SetDate(today))
-    }
-    
-    val onYesterdayClick = {
-        val yesterday = Calendar.getInstance()
-        yesterday.add(Calendar.DAY_OF_YEAR, -1)
-        onEvent(BaseTransactionEvent.SetDate(yesterday.time))
+    // В режиме редактирования устанавливаем заголовок и текст кнопки
+    val actualScreenTitle = if (isEditMode) "Редактирование транзакции" else screenTitle
+    val actualButtonText = if (isEditMode) "Сохранить" else buttonText
+
+    var showCancelConfirmation by remember { mutableStateOf(false) }
+
+    // Цвета для типов транзакций
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    val currentColor = if (state.isExpense) expenseColor else incomeColor
+
+    // Функция для обработки выхода с экрана
+    fun handleExit() {
+        // Обновляем позиции категорий перед выходом
+        viewModel.updateCategoryPositions()
+        // Сбрасываем поля
+        viewModel.resetFields()
+        // Возвращаемся назад
+        onNavigateBack()
     }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())
-            .padding(16.dp) // Уменьшенный отступ
-    ) {
-        // Верхняя секция с заголовком и типом транзакции (доход/расход)
-        TransactionHeader(
-            date = state.transactionData.selectedDate,
-            isExpense = state.transactionData.isExpense,
-            incomeColor = MaterialTheme.colorScheme.primary,
-            expenseColor = MaterialTheme.colorScheme.error,
-            onDateClick = { onEvent(BaseTransactionEvent.ShowDatePicker) },
-            onToggleTransactionType = {
-                onEvent(BaseTransactionEvent.ToggleTransactionType)
-            },
-            forceExpense = state.forceExpense,
-            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
-        )
-        
-        // Секция выбора источника в карточке с тенью
-        ElevatedCard(
-            shape = RoundedCornerShape(16.dp),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 2.dp
-            ),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            ),
+    Scaffold(
+        topBar = {
+            AppTopBar(
+                title = actualScreenTitle,
+                showBackButton = true,
+                onBackClick = {
+                    if (state.title.isNotBlank() || state.amount.isNotBlank() || state.category.isNotBlank() || state.note.isNotBlank()) {
+                        showCancelConfirmation = true
+                    } else {
+                        handleExit()
+                    }
+                },
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+            )
+        }
+    ) { paddingValues ->
+        Box(
             modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+            ) {
+                ImportInfoBanner()
+
+                // Заголовок с датой и типом транзакции
+                TransactionHeader(
+                    date = state.selectedDate,
+                    isExpense = state.isExpense,
+                    incomeColor = incomeColor,
+                    expenseColor = expenseColor,
+                    onDateClick = {
+                        viewModel.onEvent(eventFactory("ShowDatePicker"), context)
+                    },
+                    onToggleTransactionType = {
+                        viewModel.onEvent(eventFactory("ToggleTransactionType"), context)
+                    },
+                    forceExpense = state.forceExpense
+                )
+
+                // Секция "Откуда/Куда" (Source) - теперь первая
+                Column {
+                    Timber.d("Rendering SourceSection with isExpense=" + state.isExpense + ", selectedSource=" + state.source + ", sources count=" + state.sources.size)
+                    SourceSection(
+                        sources = state.sources,
+                        selectedSource = state.source,
+                        onSourceSelected = { selectedSource ->
+                            Timber.d("Source selected directly: " + selectedSource.name + " with color " + selectedSource.color)
+                            viewModel.onEvent(eventFactory(selectedSource), context)
+                        },
+                        onAddSourceClick = {
+                            Timber.d("Add source button clicked")
+                            viewModel.onEvent(eventFactory("ShowCustomSourceDialog"), context)
+                        },
+                        onSourceLongClick = { selectedSource ->
+                            Timber.d("Source long clicked: " + selectedSource.name)
+                            viewModel.onEvent(eventFactory(Pair("DeleteSourceConfirm", selectedSource)), context)
+                        },
+                        isError = state.sourceError
+                    )
+                }
+
+                // Секция категорий - теперь вторая
+                Column {
+                    CategorySection(
+                        categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
+                        selectedCategory = if (state.isExpense) state.selectedExpenseCategory else state.selectedIncomeCategory,
+                        onCategorySelected = { selectedCategory ->
+                            Timber.d("Category selected directly: " + selectedCategory.name)
+                            if (state.isExpense) {
+                                viewModel.onEvent(eventFactory(Pair("SetExpenseCategory", selectedCategory.name)), context)
+                                // Обновление счетчика использования категории расходов
+                                categoriesViewModel.incrementCategoryUsage(selectedCategory.name, true)
+                            } else {
+                                viewModel.onEvent(eventFactory(Pair("SetIncomeCategory", selectedCategory.name)), context)
+                                // Обновление счетчика использования категории доходов
+                                categoriesViewModel.incrementCategoryUsage(selectedCategory.name, false)
+                            }
+                        },
+                        onAddCategoryClick = {
+                            viewModel.onEvent(eventFactory("ShowCustomCategoryDialog"), context)
+                        },
+                        onCategoryLongClick = { selectedCategory ->
+                            Timber.d("Category long click in BaseTransactionScreen: " + selectedCategory.name)
+                            // Don't allow long press on "Другое" and "Переводы"
+                            if (selectedCategory.name != "Другое" && selectedCategory.name != "Переводы") {
+                                viewModel.onEvent(eventFactory(Pair("DeleteCategoryConfirm", selectedCategory)), context)
+                            } else {
+                                Timber.d("Ignoring long press on protected category: " + selectedCategory.name)
+                            }
+                        },
+                        isError = state.categoryError
+                    )
+                }
+
+                // Поле ввода суммы
+                Column {
+                    AmountField(
+                        amount = state.amount,
+                        onAmountChange = { amount ->
+                            viewModel.onEvent(eventFactory(Pair("SetAmount", amount)), context)
+                        },
+                        isError = state.amountError,
+                        accentColor = currentColor
+                    )
+                }
+
+                // Поле выбора даты
+                DateField(
+                    date = state.selectedDate,
+                    onClick = {
+                        viewModel.onEvent(eventFactory("ShowDatePicker"), context)
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
+                )
+
+                // Поле для комментария без иконки прикрепления
+                CommentField(
+                    note = state.note,
+                    onNoteChange = { note ->
+                        viewModel.onEvent(eventFactory(Pair("SetNote", note)), context)
+                    }
+                )
+
+                // Секция выбора кошельков (показывается только для доходов)
+                Timber.d("BaseTransactionScreen: isExpense=${state.isExpense}, addToWallet=${state.addToWallet}, selectedWallets=${state.selectedWallets}, targetWalletId=${state.targetWalletId}")
+                
+                WalletSelectionSection(
+                    addToWallet = state.addToWallet,
+                    selectedWallets = state.selectedWallets,
+                    onToggleAddToWallet = {
+                        viewModel.onEvent(eventFactory("ToggleAddToWallet"), context)
+                    },
+                    onSelectWalletsClick = {
+                        viewModel.onEvent(eventFactory("ShowWalletSelector"), context)
+                    },
+                    isVisible = !state.isExpense && viewModel.wallets.isNotEmpty() // Показываем только для доходов и если есть кошельки
+                )
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
+
+                // Кнопка добавления/сохранения
+                AddButton(
+                    onClick = {
+                        Timber.d("UI: Кнопка 'Добавить' нажата")
+                        viewModel.onEvent(submitEvent, context)
+                    },
+                    text = actualButtonText,
+                    color = currentColor,
+                    isLoading = state.isLoading
+                )
+
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
+            }
+
+            // Диалоги
+            if (showCancelConfirmation) {
+                CancelConfirmationDialog(
+                    onConfirm = {
+                        showCancelConfirmation = false
+                        handleExit()
+                    },
+                    onDismiss = {
+                        showCancelConfirmation = false
+                    }
+                )
+            }
+
+            if (state.error != null) {
+                ErrorDialog(
+                    message = state.error!!,
+                    onDismiss = {
+                        viewModel.onEvent(eventFactory("ClearError"), context)
+                    }
+                )
+            }
+
+            if (state.isSuccess) {
+                AnimatedVisibility(
+                    visible = state.isSuccess,
+                    enter = scaleIn(animationSpec = tween(400)),
+                    exit = scaleOut(animationSpec = tween(400))
+                ) {
+                    SuccessDialog(
+                        message = "Транзакция успешно сохранена!",
+                        onDismiss = {
+                            viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
+                            handleExit()
+                        },
+                        onAddAnother = {
+                            Timber.d("UI: Нажато 'Добавить еще'")
+                            viewModel.onEvent(eventFactory("PreventAutoSubmit"), context)
+                            viewModel.onEvent(eventFactory("HideSuccessDialog"), context)
+                            viewModel.onEvent(eventFactory("ResetAmountOnly"), context)
+                        }
+                    )
+                }
+            }
+
+            if (state.showDatePicker) {
+                DatePickerDialog(
+                    initialDate = state.selectedDate,
+                    maxDate = java.util.Date(),
+                    onDateSelected = { date ->
+                        viewModel.onEvent(eventFactory(date), context)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(eventFactory("HideDatePicker"), context)
+                    }
+                )
+            }
+
+            if (state.showCategoryPicker) {
+                CategoryPickerDialog(
+                    categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
+                    onCategorySelected = { categoryName ->
+                        Timber.d("Category selected from dialog: $categoryName")
+                        if (state.isExpense) {
+                            viewModel.onEvent(eventFactory(Pair("SetExpenseCategory", categoryName)), context)
+                            // Обновление счетчика использования категории расходов через диалог
+                            categoriesViewModel.incrementCategoryUsage(categoryName, true)
+                        } else {
+                            viewModel.onEvent(eventFactory(Pair("SetIncomeCategory", categoryName)), context)
+                            // Обновление счетчика использования категории доходов через диалог
+                            categoriesViewModel.incrementCategoryUsage(categoryName, false)
+                        }
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(eventFactory("HideCategoryPicker"), context)
+                    },
+                    onCustomCategoryClick = {
+                        viewModel.onEvent(eventFactory("ShowCustomCategoryDialog"), context)
+                    }
+                )
+            }
+
+            if (state.showCustomCategoryDialog) {
+                val addState = state as? AddTransactionState
+                CustomCategoryDialog(
+                    categoryText = state.customCategory,
+                    onCategoryTextChange = { name ->
+                        viewModel.onEvent(eventFactory(Pair("SetCustomCategoryText", name)), context)
+                    },
+                    selectedIcon = addState?.customCategoryIcon ?: Icons.Default.MoreHoriz,
+                    onIconSelected = { icon ->
+                        viewModel.onEvent(eventFactory(Pair("SetCustomCategoryIcon", icon)), context)
+                    },
+                    availableIcons = addState?.availableCategoryIcons ?: emptyList(),
+                    onConfirm = {
+                        viewModel.onEvent(eventFactory(Pair("AddCustomCategoryConfirm", state.customCategory)), context)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(eventFactory("HideCustomCategoryDialog"), context)
+                    }
+                )
+            }
+
+            if (state.showDeleteCategoryConfirmDialog) {
+                state.categoryToDelete?.let { category ->
+                    AlertDialog(
+                        onDismissRequest = { viewModel.onEvent(eventFactory("HideDeleteCategoryConfirmDialog"), context) },
+                        title = { Text("Удаление категории") },
+                        text = { Text("Вы уверены, что хотите удалить категорию '$category'?") },
+                        confirmButton = {
+                            Button(
+                                onClick = { viewModel.onEvent(eventFactory(Pair("DeleteCategoryConfirmActual", category)), context) }
+                            ) {
+                                Text("Удалить")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = { viewModel.onEvent(eventFactory("HideDeleteCategoryConfirmDialog"), context) }
+                            ) {
+                                Text("Отмена")
+                            }
+                        }
+                    )
+                }
+            }
+
+            if (state.showDeleteSourceConfirmDialog) {
+                state.sourceToDelete?.let { source ->
+                    AlertDialog(
+                        onDismissRequest = { viewModel.onEvent(eventFactory("HideDeleteSourceConfirmDialog"), context) },
+                        title = { Text("Удаление источника") },
+                        text = { Text("Вы уверены, что хотите удалить источник '$source'?") },
+                        confirmButton = {
+                            Button(
+                                onClick = { viewModel.onEvent(eventFactory(Pair("DeleteSourceConfirmActual", source)), context) }
+                            ) {
+                                Text("Удалить")
+                            }
+                        },
+                        dismissButton = {
+                            TextButton(
+                                onClick = { viewModel.onEvent(eventFactory("HideDeleteSourceConfirmDialog"), context) }
+                            ) {
+                                Text("Отмена")
+                            }
+                        }
+                    )
+                }
+            }
+
+            if (state.showSourcePicker) {
+                SourcePickerDialog(
+                    sources = state.sources,
+                    onSourceSelected = { viewModel.onEvent(eventFactory(Pair("SetSource", it.name)), context) },
+                    onAddCustomSource = { viewModel.onEvent(eventFactory("ShowCustomSourceDialog"), context) },
+                    onDismiss = { viewModel.onEvent(eventFactory("HideSourcePicker"), context) },
+                    onDeleteSource = { sourceName ->
+                        Timber.d("Delete source requested: $sourceName")
+                        viewModel.onEvent(eventFactory(Pair("ShowDeleteSourceConfirmDialog", sourceName)), context)
+                    }
+                )
+            }
+
+            if (state.showCustomSourceDialog) {
+                CustomSourceDialog(
+                    sourceName = state.customSource,
+                    color = state.sourceColor,
+                    onSourceNameChange = { name ->
+                        viewModel.onEvent(eventFactory(Pair("SetCustomSourceName", name)), context)
+                    },
+                    onColorClick = { selectedColor ->
+                        viewModel.onEvent(eventFactory(Pair("SetCustomSourceColor", selectedColor)), context)
+                    },
+                    onConfirm = {
+                        viewModel.onEvent(eventFactory(Triple("AddCustomSourceConfirm", state.customSource, state.sourceColor)), context)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(eventFactory("HideCustomSourceDialog"), context)
+                    }
+                )
+            }
+
+            if (state.showColorPicker) {
+                ColorPickerDialog(
+                    initialColor = state.sourceColor,
+                    onColorSelected = { color ->
+                        viewModel.onEvent(eventFactory(Pair("SetSourceColor", color)), context)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(eventFactory("HideColorPicker"), context)
+                    }
+                )
+            }
+
+            if (state.showWalletSelector) {
+                WalletSelectorDialog(
+                    wallets = viewModel.wallets,
+                    selectedWalletIds = state.selectedWallets,
+                    onWalletSelected = { walletId, selected ->
+                        viewModel.onEvent(eventFactory(Triple("SelectWallet", walletId, selected)), context)
+                    },
+                    onConfirm = {
+                        viewModel.onEvent(eventFactory("HideWalletSelector"), context)
+                    },
+                    onDismiss = {
+                        viewModel.onEvent(eventFactory("HideWalletSelector"), context)
+                    }
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ImportInfoBanner(modifier: Modifier = Modifier) {
+    val context = LocalContext.current
+    val preferencesManager = remember(context) { PreferencesManager(context) }
+    var visible by remember { mutableStateOf(!preferencesManager.getImportInfoDismissed()) }
+    val coroutineScope = rememberCoroutineScope()
+
+    if (visible) {
+        Surface(
+            color = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.9f),
+            tonalElevation = 4.dp,
+            shadowElevation = 2.dp,
+            modifier = modifier
                 .fillMaxWidth()
-                .padding(bottom = 16.dp) // Уменьшенный отступ
+                .padding(horizontal = dimensionResource(R.dimen.spacing_normal), vertical = 12.dp)
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(16.dp)
             ) {
-                // Заголовок "Куда" или "Откуда"
-                Text(
-                    text = if (state.transactionData.isExpense) 
-                        stringResource(R.string.transaction_to) 
-                    else 
-                        stringResource(R.string.transaction_from),
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    modifier = Modifier.padding(bottom = 12.dp)
-                )
-                
-                // Используем SourceSection с отображением дефолтных источников
-                SourceSection(
-                    sources = displaySources.map { sourceItem -> 
-                        com.davidbugayov.financeanalyzer.domain.model.Source(
-                            id = 0,
-                            name = sourceItem.name,
-                            color = sourceItem.color,
-                            isCustom = sourceItem.isCustom
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CloudUpload,
+                        contentDescription = null,
+                        tint = MaterialTheme.colorScheme.primary,
+                        modifier = Modifier.padding(end = 12.dp)
+                    )
+                    Text(
+                        text = "Новая функция!",
+                        style = MaterialTheme.typography.titleMedium,
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
+                        modifier = Modifier.weight(1f)
+                    )
+                    IconButton(onClick = {
+                        coroutineScope.launch {
+                            preferencesManager.setImportInfoDismissed(true)
+                            visible = false
+                        }
+                    }) {
+                        Icon(
+                            imageVector = Icons.Default.Close,
+                            contentDescription = "Закрыть",
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                    },
-                    selectedSource = state.transactionData.source,
-                    onSourceSelected = { source ->
-                        onEvent(BaseTransactionEvent.SetSource(source.name))
-                        onEvent(BaseTransactionEvent.SetSourceColor(source.color))
-                    },
-                    onAddSourceClick = {
-                        onEvent(BaseTransactionEvent.ShowSourcePicker)
-                    },
-                    onSourceLongClick = { /* пустой обработчик для совместимости */ }
-                )
-            }
-        }
-        
-        // Секция выбора категории
-        CategorySection(
-            categories = displayCategories,
-            selectedCategory = state.transactionData.category,
-            onCategorySelected = { category -> 
-                onEvent(BaseTransactionEvent.SetCategory(category.name))
-            },
-            onAddCategoryClick = {
-                onEvent(BaseTransactionEvent.ShowCategoryPicker)
-            },
-            isError = state.validationError is ValidationError.CategoryMissing,
-            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
-        )
-        
-        // Поле ввода суммы с автофокусом и улучшенной валидацией
-        AmountField(
-            amount = state.transactionData.amount,
-            onAmountChange = { onEvent(BaseTransactionEvent.SetAmount(it)) },
-            isError = state.validationError is ValidationError.AmountMissing,
-            accentColor = if (state.transactionData.isExpense) 
-                MaterialTheme.colorScheme.error
-            else 
-                MaterialTheme.colorScheme.primary,
-            autoFocus = true,
-            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
-        )
-        
-        // Улучшенное поле выбора даты с кнопками "Сегодня" и "Вчера"
-        DateField(
-            date = state.transactionData.selectedDate,
-            onClick = { onEvent(BaseTransactionEvent.ShowDatePicker) },
-            onTodayClick = onTodayClick,
-            onYesterdayClick = onYesterdayClick,
-            modifier = Modifier.padding(bottom = 16.dp) // Уменьшенный отступ
-        )
-        
-        // Поле примечания - теперь без обрамления
-        CommentField(
-            value = state.transactionData.note,
-            onValueChange = { onEvent(BaseTransactionEvent.SetNote(it)) },
-            modifier = Modifier.padding(bottom = 16.dp)
-        )
-        
-        // Добавление в кошельки (для дохода)
-        if (!state.transactionData.isExpense && !state.editMode) {
-            ElevatedCard(
-                shape = RoundedCornerShape(16.dp),
-                elevation = CardDefaults.cardElevation(
-                    defaultElevation = 2.dp
-                ),
-                colors = CardDefaults.cardColors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = 16.dp) // Уменьшенный отступ
-            ) {
-                WalletSelectionSection(
-                    addToWallet = state.walletState.addToWallet,
-                    selectedWallets = state.walletState.selectedWallets,
-                    onToggleAddToWallet = { onEvent(BaseTransactionEvent.ToggleAddToWallet(it)) },
-                    onShowWalletSelector = { onEvent(BaseTransactionEvent.ShowWalletSelector) },
-                    modifier = Modifier.padding(16.dp)
-                )
-            }
-        }
-        
-        // Кнопка добавления (более заметная)
-        AddButton(
-            text = submitButtonText,
-            onClick = onSubmit,
-            color = if (state.transactionData.isExpense) 
-                MaterialTheme.colorScheme.error
-            else 
-                MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-                .height(56.dp) // Увеличенная высота для лучшей доступности
-        )
-        
-        Spacer(modifier = Modifier.height(24.dp))
-    }
-
-    // DatePickerDialog
-    if (state.dialogStateTransaction.showDatePicker) {
-        val datePickerState = rememberDatePickerState(
-            initialSelectedDateMillis = state.transactionData.selectedDate.time
-        )
-                
-        DatePickerDialog(
-            onDismissRequest = { onEvent(BaseTransactionEvent.HideDatePicker) },
-            confirmButton = {
-                TextButton(onClick = {
-                    datePickerState.selectedDateMillis?.let { millis ->
-                        onEvent(BaseTransactionEvent.SetDate(Date(millis)))
                     }
-                    onEvent(BaseTransactionEvent.HideDatePicker)
-                }) {
-                    Text("OK")
                 }
-            },
-            dismissButton = {
-                TextButton(onClick = { onEvent(BaseTransactionEvent.HideDatePicker) }) {
-                    Text("Отмена")
-                }
-            }
-        ) {
-            DatePicker(state = datePickerState)
-        }
-    }
-}
 
-@Composable
-fun WalletAddSwitch(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
-    androidx.compose.material3.Switch(
-        checked = checked,
-        onCheckedChange = onCheckedChange,
-        colors = androidx.compose.material3.SwitchDefaults.colors(
-            checkedThumbColor = MaterialTheme.colorScheme.primary,
-            checkedTrackColor = MaterialTheme.colorScheme.primaryContainer,
-            uncheckedThumbColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            uncheckedTrackColor = MaterialTheme.colorScheme.surfaceVariant
-        )
-    )
-}
+                Spacer(modifier = Modifier.height(8.dp))
 
-@Composable
-fun WalletSelectionButton(
-    selectedCount: Int,
-    onClick: () -> Unit
-) {
-    Surface(
-        shape = RoundedCornerShape(12.dp),
-        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick)
-    ) {
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier.padding(16.dp)
-        ) {
-            Text(
-                text = if (selectedCount > 0) 
-                    stringResource(R.string.selected_wallets, selectedCount)
-                else 
-                    stringResource(R.string.select_wallets),
-                style = MaterialTheme.typography.bodyLarge,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            
-            Icon(
-                imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = null,
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-    }
-}
+                Text(
+                    text = "Вы можете импортировать транзакции из других банков автоматически! Это упростит учет ваших финансов.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
 
-@Composable
-fun WalletSelectionSection(
-    addToWallet: Boolean,
-    selectedWallets: List<String>,
-    onToggleAddToWallet: (Boolean) -> Unit,
-    onShowWalletSelector: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Column(modifier = modifier) {
-        Text(
-            text = "Настройки кошелька", 
-            style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(bottom = 8.dp)
-        )
-        
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween,
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 8.dp)
-        ) {
-            Text(
-                text = "Добавить в кошелек",
-                style = MaterialTheme.typography.bodyLarge
-            )
-            
-            androidx.compose.material3.Switch(
-                checked = addToWallet,
-                onCheckedChange = onToggleAddToWallet
-            )
-        }
-        
-        if (addToWallet) {
-            Spacer(modifier = Modifier.height(8.dp))
-            
-            androidx.compose.material3.Button(
-                onClick = onShowWalletSelector,
-                shape = RoundedCornerShape(8.dp),
-                modifier = Modifier.fillMaxWidth()
-            ) {
-                Text(text = "Выбрать кошельки (${selectedWallets.size})")
+                Spacer(modifier = Modifier.height(12.dp))
+
+                Text(
+                    text = "Для этого перейдите в профиль и выберите 'Импортировать транзакции' внизу экрана.",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                )
             }
         }
     }
-}
-
-/**
- * Преобразует SourceItem из модели BaseTransactionState в Source для компонентов UI
- */
-private fun com.davidbugayov.financeanalyzer.presentation.transaction.base.model.SourceItem.toSource(): com.davidbugayov.financeanalyzer.domain.model.Source {
-    return com.davidbugayov.financeanalyzer.domain.model.Source(
-        name = this.name,
-        color = this.color,
-        isCustom = this.isCustom
-    )
 } 

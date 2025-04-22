@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer
 
 import android.app.Application
-import android.util.Log
 import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.budgetModule
 import com.davidbugayov.financeanalyzer.di.chartModule
@@ -10,7 +9,6 @@ import com.davidbugayov.financeanalyzer.di.homeModule
 import com.davidbugayov.financeanalyzer.di.importModule
 import com.davidbugayov.financeanalyzer.di.onboardingModule
 import com.davidbugayov.financeanalyzer.di.profileModule
-import com.davidbugayov.financeanalyzer.di.transactionModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
@@ -22,7 +20,6 @@ import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
@@ -76,8 +73,7 @@ class FinanceApp : Application() {
                     profileModule,
                     importModule,
                     onboardingModule,
-                    budgetModule,
-                    transactionModule
+                    budgetModule
                 )
             }
             
@@ -93,7 +89,7 @@ class FinanceApp : Application() {
             CrashlyticsUtils.setCustomKey("device_language", resources.configuration.locales[0].language)
         } catch (e: Exception) {
             // Логирование запуска может перехватить ошибку инициализации
-            Log.e("FinanceApp", "Ошибка инициализации приложения: ${e.message}", e)
+            Timber.e("Ошибка инициализации приложения: ${e.message}", e)
         }
     }
 

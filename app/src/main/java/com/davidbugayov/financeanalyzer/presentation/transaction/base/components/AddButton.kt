@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.transaction.base.components.dialogs
+package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -27,8 +27,8 @@ import com.davidbugayov.financeanalyzer.R
 fun AddButton(
     onClick: () -> Unit,
     color: Color,
-    text: String? = null,
     modifier: Modifier = Modifier,
+    text: String? = null,
     isLoading: Boolean = false
 ) {
     Button(
