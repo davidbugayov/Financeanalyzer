@@ -27,5 +27,8 @@ data class TransactionEntity(
     val note: String? = null,
     val source: String = "Наличные",
     val sourceColor: Int = 0,
-    val isTransfer: Boolean = false
+    val isTransfer: Boolean = false,
+    val categoryId: String = "",
+    val title: String = "",
+    @ColumnInfo(name = "wallet_ids") val walletIds: List<String>? = null
 )

@@ -9,6 +9,7 @@ import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.MoneyConverter
+import com.davidbugayov.financeanalyzer.data.local.converter.StringListConverter
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Currency
@@ -22,10 +23,10 @@ import timber.log.Timber
     entities = [
         TransactionEntity::class
     ],
-    version = 15,
+    version = 16,
     exportSchema = true
 )
-@TypeConverters(DateConverter::class, MoneyConverter::class)
+@TypeConverters(DateConverter::class, MoneyConverter::class, StringListConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
     /**
@@ -355,6 +356,36 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
 
+        /**
+         * Миграция с версии 15 на версию 16
+         * Добавляет поля walletIds, categoryId и title в таблицу transactions
+         */
+        private val MIGRATION_15_16 = object : Migration(15, 16) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Добавляем колонку wallet_ids (для хранения списка ID кошельков)
+                db.execSQL("ALTER TABLE transactions ADD COLUMN wallet_ids TEXT DEFAULT NULL")
+                
+                // Добавляем колонку categoryId (для хранения ID категории/кошелька)
+                db.execSQL("ALTER TABLE transactions ADD COLUMN categoryId TEXT NOT NULL DEFAULT ''")
+                
+                // Добавляем колонку title (для хранения заголовка транзакции)
+                db.execSQL("ALTER TABLE transactions ADD COLUMN title TEXT NOT NULL DEFAULT ''")
+
+                Timber.i("Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title")
+            }
+        }
+
+        /**
+         * Миграция с версии 16 на версию 15 (для обратной совместимости при откате версии)
+         */
+        private val MIGRATION_16_15 = object : Migration(16, 15) {
+            override fun migrate(db: SupportSQLiteDatabase) {
+                // Обратная миграция не удаляет колонки, так как это может привести к потере данных
+                // Просто обновляем версию схемы
+                Timber.i("Выполнена миграция с версии 16 на 15 (обратная совместимость)")
+            }
+        }
+
         @Volatile
         private var INSTANCE: AppDatabase? = null
 
@@ -387,7 +418,9 @@ abstract class AppDatabase : RoomDatabase() {
                         MIGRATION_13_14,
                         MIGRATION_14_13,
                         MIGRATION_14_15,
-                        MIGRATION_15_14
+                        MIGRATION_15_14,
+                        MIGRATION_15_16,
+                        MIGRATION_16_15
                     )
                     .fallbackToDestructiveMigration()
                     .addCallback(object : Callback() {
@@ -405,7 +438,10 @@ abstract class AppDatabase : RoomDatabase() {
                                     note TEXT,
                                     source TEXT NOT NULL DEFAULT 'Наличные',
                                     sourceColor INTEGER NOT NULL DEFAULT 0,
-                                    isTransfer INTEGER NOT NULL DEFAULT 0
+                                    isTransfer INTEGER NOT NULL DEFAULT 0,
+                                    categoryId TEXT NOT NULL DEFAULT '',
+                                    title TEXT NOT NULL DEFAULT '',
+                                    wallet_ids TEXT DEFAULT NULL
                                 )
                             """)
                             

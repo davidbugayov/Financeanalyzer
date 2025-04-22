@@ -576,7 +576,10 @@ class TransactionRepositoryImpl(
                 note = transaction.note,
                 source = transaction.source,
                 sourceColor = transaction.sourceColor,
-                isTransfer = transaction.isTransfer
+                isTransfer = transaction.isTransfer,
+                categoryId = transaction.categoryId,
+                title = transaction.title,
+                walletIds = transaction.walletIds
             )
 
             Timber.d("Сущность создана: id=${entity.id}, idString=${entity.idString}")
@@ -681,8 +684,8 @@ class TransactionRepositoryImpl(
     }
     
     /**
-     * Создает доменную модель Transaction из сущности базы данных.
-     * @param entity Сущность базы данных.
+     * Преобразует сущность в доменную модель.
+     * @param entity Сущность транзакции.
      * @return Доменная модель транзакции.
      */
     private fun mapEntityToDomain(entity: TransactionEntity): Transaction {
@@ -695,7 +698,10 @@ class TransactionRepositoryImpl(
             note = entity.note,
             source = entity.source,
             sourceColor = entity.sourceColor,
-            isTransfer = entity.isTransfer
+            isTransfer = entity.isTransfer,
+            categoryId = entity.categoryId,
+            title = entity.title,
+            walletIds = entity.walletIds
         )
     }
     
@@ -737,7 +743,10 @@ class TransactionRepositoryImpl(
             note = domain.note,
             source = domain.source,
             sourceColor = domain.sourceColor,
-            isTransfer = domain.isTransfer
+            isTransfer = domain.isTransfer,
+            categoryId = domain.categoryId,
+            title = domain.title,
+            walletIds = domain.walletIds
         )
 
         Timber.d("Создана сущность: id=${entity.id}, idString=${entity.idString}")
