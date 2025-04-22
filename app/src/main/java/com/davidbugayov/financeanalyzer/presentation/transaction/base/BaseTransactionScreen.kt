@@ -89,11 +89,53 @@ fun <E> BaseTransactionScreen(
 
     // Логируем режим экрана
     LaunchedEffect(isEditMode) {
-        Timber.d("Экран инициализирован в режиме ${if (isEditMode) "редактирования" else "добавления"} транзакции. editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}")
+        Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Инициализирован в режиме ${if (isEditMode) "редактирования" else "добавления"}. editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}")
+        
+        if (isEditMode && state.transactionToEdit != null) {
+            val transaction = state.transactionToEdit!!
+            Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Данные загруженной транзакции: ID=${transaction.id}, amount=${transaction.amount}, category=${transaction.category}, source=${transaction.source}, date=${transaction.date}")
+            Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Текущее состояние полей: amount=${state.amount}, category=${state.category}, source=${state.source}, isExpense=${state.isExpense}")
+        }
     }
     // Логируем состояние ошибок
     LaunchedEffect(state.categoryError, state.sourceError, state.amountError) {
         Timber.d("Состояние ошибок: categoryError=${state.categoryError}, sourceError=${state.sourceError}, amountError=${state.amountError}")
+    }
+
+    // Отслеживаем изменения в загруженной транзакции
+    LaunchedEffect(state.transactionToEdit, state.amount, state.category, state.source) {
+        if (isEditMode && state.transactionToEdit != null) {
+            Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Изменение состояния: amount=${state.amount}, category=${state.category}, source=${state.source}, isExpense=${state.isExpense}")
+        }
+    }
+
+    // Отображение диалога с ошибкой, если она есть
+    if (state.error != null) {
+        AlertDialog(
+            onDismissRequest = {
+                // Очищаем ошибку при закрытии диалога
+                viewModel.onEvent(eventFactory("ClearError"), context)
+            },
+            title = { 
+                Text(
+                    text = "Ошибка", 
+                    style = MaterialTheme.typography.titleLarge
+                ) 
+            },
+            text = { 
+                Text(
+                    text = state.error ?: "Произошла неизвестная ошибка",
+                    style = MaterialTheme.typography.bodyMedium
+                ) 
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    viewModel.onEvent(eventFactory("ClearError"), context)
+                }) {
+                    Text("OK")
+                }
+            }
+        )
     }
 
     // Специальная обработка для типа транзакции на основе forceExpense
@@ -299,15 +341,6 @@ fun <E> BaseTransactionScreen(
                     },
                     onDismiss = {
                         showCancelConfirmation = false
-                    }
-                )
-            }
-
-            if (state.error != null) {
-                ErrorDialog(
-                    message = state.error!!,
-                    onDismiss = {
-                        viewModel.onEvent(eventFactory("ClearError"), context)
                     }
                 )
             }

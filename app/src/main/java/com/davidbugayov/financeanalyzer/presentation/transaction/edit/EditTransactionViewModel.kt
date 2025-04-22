@@ -49,17 +49,38 @@ class EditTransactionViewModel(
     }
 
     fun loadTransaction(id: String) {
+        Timber.d("ТРАНЗАКЦИЯ: Внутри loadTransaction, ID=$id")
+        
         viewModelScope.launch {
             try {
+                Timber.d("ТРАНЗАКЦИЯ: Вызов getTransactionByIdUseCase для ID=$id")
                 val result = getTransactionByIdUseCase(id)
+                Timber.d("ТРАНЗАКЦИЯ: Результат getTransactionByIdUseCase: $result")
+                
                 if (result is DomainResult.Success) {
                     val transaction = result.data
-                    _state.update { it.copy(transactionToEdit = transaction) }
+                    Timber.d("ТРАНЗАКЦИЯ: Успешно получена транзакция: сумма=${transaction.amount}, категория=${transaction.category}")
+                    
+                    // Устанавливаем режим редактирования и саму транзакцию
+                    _state.update { it.copy(
+                        transactionToEdit = transaction,
+                        editMode = true
+                    )}
+                    
+                    Timber.d("ТРАНЗАКЦИЯ: После обновления state: transactionToEdit=${_state.value.transactionToEdit?.id}, editMode=${_state.value.editMode}")
                 } else if (result is DomainResult.Error) {
-                    _state.update { it.copy(error = result.exception.message) }
+                    Timber.e("ТРАНЗАКЦИЯ: Ошибка в useCase: ${result.exception.message}")
+                    _state.update { it.copy(
+                        error = result.exception.message,
+                        isLoading = false
+                    )}
                 }
             } catch (e: Exception) {
-                _state.update { it.copy(error = e.message ?: "Неизвестная ошибка") }
+                Timber.e(e, "ТРАНЗАКЦИЯ: Исключение в loadTransaction: ${e.message}")
+                _state.update { it.copy(
+                    error = e.message ?: "Неизвестная ошибка",
+                    isLoading = false
+                )}
             }
         }
     }
@@ -70,6 +91,8 @@ class EditTransactionViewModel(
         categoryId: String
     ): Boolean {
         val validationBuilder = ValidationBuilder()
+        val currentState = _state.value
+        
         // Reset errors
         _state.update {
             it.copy(
@@ -79,10 +102,12 @@ class EditTransactionViewModel(
                 sourceError = false
             )
         }
-        // Check wallet
-        if (walletId.isNullOrBlank()) {
+        
+        // Check wallet only if addToWallet is true
+        if (currentState.addToWallet && walletId.isNullOrBlank()) {
             validationBuilder.addWalletError()
         }
+        
         // Check amount
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
@@ -96,10 +121,12 @@ class EditTransactionViewModel(
                 validationBuilder.addAmountError()
             }
         }
+        
         // Check category
         if (categoryId.isBlank()) {
             validationBuilder.addCategoryError()
         }
+        
         // No validation for source - allowing empty sources
         val validationResult = validationBuilder.build()
         _state.update {
@@ -116,7 +143,15 @@ class EditTransactionViewModel(
     fun submit() {
         viewModelScope.launch {
             val currentState = _state.value
-            val transaction = prepareTransactionForEdit() ?: return@launch
+            
+            // Установим флаг загрузки
+            _state.update { it.copy(isLoading = true) }
+            
+            val transaction = prepareTransactionForEdit() ?: run {
+                // Если транзакция не подготовлена, снимаем флаг загрузки
+                _state.update { it.copy(isLoading = false) }
+                return@launch
+            }
 
             // Validate input
             val isValid = validateInput(
@@ -124,13 +159,36 @@ class EditTransactionViewModel(
                 amount = currentState.amount,
                 categoryId = currentState.category
             )
-            if (!isValid) return@launch
+            
+            if (!isValid) {
+                // Если валидация не прошла, снимаем флаг загрузки
+                _state.update { it.copy(isLoading = false) }
+                return@launch
+            }
 
             try {
+                Timber.d("ТРАНЗАКЦИЯ: Обновление транзакции начато: ${transaction.id}")
+                // Обновляем транзакцию через useCase
                 updateTransactionUseCase(transaction)
-                // You can update state or show a message here if needed
+                
+                // Показываем успешное обновление
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        isSuccess = true,
+                        successMessage = "Транзакция успешно обновлена"
+                    ) 
+                }
+                Timber.d("ТРАНЗАКЦИЯ: Обновление транзакции успешно завершено")
             } catch (e: Exception) {
-                // You can update state or show a message here if needed
+                Timber.e(e, "ТРАНЗАКЦИЯ: Ошибка при обновлении транзакции: ${e.message}")
+                // Показываем ошибку и снимаем флаг загрузки
+                _state.update { 
+                    it.copy(
+                        isLoading = false,
+                        error = "Ошибка при обновлении транзакции: ${e.message}"
+                    ) 
+                }
             }
         }
     }
@@ -141,11 +199,17 @@ class EditTransactionViewModel(
 
     // Загрузка транзакции для редактирования
     fun loadTransactionForEdit(transaction: Transaction) {
-        Timber.d("Загрузка транзакции для редактирования: $transaction")
+        Timber.d("ТРАНЗАКЦИЯ: Начало loadTransactionForEdit: $transaction")
 
         // Форматируем сумму как строку без знака минус
         val formattedAmount = transaction.amount.abs().amount.toString()
-        Timber.d("Форматированная сумма: $formattedAmount (исходная: ${transaction.amount})")
+        Timber.d("ТРАНЗАКЦИЯ: Форматированная сумма: $formattedAmount (исходная: ${transaction.amount})")
+
+        // Определяем какую категорию установить в зависимости от типа транзакции
+        val selectedExpenseCategory = if (transaction.isExpense) transaction.category else ""
+        val selectedIncomeCategory = if (!transaction.isExpense) transaction.category else ""
+        
+        Timber.d("ТРАНЗАКЦИЯ: selectedExpenseCategory=$selectedExpenseCategory, selectedIncomeCategory=$selectedIncomeCategory")
 
         _state.update {
             it.copy(
@@ -158,36 +222,84 @@ class EditTransactionViewModel(
                 isExpense = transaction.isExpense,
                 source = transaction.source,
                 sourceColor = transaction.sourceColor,
-                editMode = true
+                editMode = true,
+                selectedExpenseCategory = selectedExpenseCategory,
+                selectedIncomeCategory = selectedIncomeCategory
             )
         }
 
-        Timber.d("Состояние после загрузки: сумма=${_state.value.amount}, дата=${_state.value.selectedDate}, режим редактирования=${_state.value.editMode}")
+        Timber.d("ТРАНЗАКЦИЯ: После loadTransactionForEdit: сумма=${_state.value.amount}, " +
+                "дата=${_state.value.selectedDate}, editMode=${_state.value.editMode}, " +
+                "source=${_state.value.source}, category=${_state.value.category}, " +
+                "isExpense=${_state.value.isExpense}, " +
+                "selectedExpenseCategory=${_state.value.selectedExpenseCategory}, " +
+                "selectedIncomeCategory=${_state.value.selectedIncomeCategory}")
     }
 
     // Загрузка транзакции для редактирования по ID
     fun loadTransactionForEditById(transactionId: String) {
+        Timber.d("ТРАНЗАКЦИЯ: Начало загрузки транзакции ID=$transactionId")
+        _state.update { it.copy(isLoading = true) }
+        
         viewModelScope.launch {
             try {
+                Timber.d("ТРАНЗАКЦИЯ: Вызов loadTransaction для ID=$transactionId")
                 loadTransaction(transactionId)
+                
+                // Добавляем задержку для завершения асинхронной загрузки транзакции
+                kotlinx.coroutines.delay(500)
+                
                 val transaction = _state.value.transactionToEdit
+                Timber.d("ТРАНЗАКЦИЯ: Результат загрузки transaction=${transaction?.id}, state.editMode=${_state.value.editMode}")
+                
                 if (transaction != null) {
+                    Timber.d("ТРАНЗАКЦИЯ: Загружена, id=${transaction.id}, сумма=${transaction.amount}, категория=${transaction.category}")
                     loadTransactionForEdit(transaction)
+                    // Обязательно отключаем индикатор загрузки после успешной загрузки
+                    _state.update { it.copy(isLoading = false) }
+                    Timber.d("ТРАНЗАКЦИЯ: После loadTransactionForEdit, editMode=${_state.value.editMode}, сумма=${_state.value.amount}")
                 } else {
-                    _state.update { it.copy(error = "Транзакция не найдена") }
+                    Timber.e("ТРАНЗАКЦИЯ: НЕ НАЙДЕНА с ID=$transactionId")
+                    _state.update { 
+                        it.copy(
+                            error = "Транзакция не найдена",
+                            isLoading = false
+                        )
+                    }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке транзакции: ${e.message}")
-                _state.update { it.copy(error = "Ошибка при загрузке транзакции: ${e.message}") }
+                Timber.e(e, "ТРАНЗАКЦИЯ: Ошибка при загрузке транзакции: ${e.message}")
+                _state.update { 
+                    it.copy(
+                        error = "Ошибка при загрузке транзакции: ${e.message}",
+                        isLoading = false
+                    )
+                }
             }
         }
     }
 
     private fun prepareTransactionForEdit(): Transaction? {
         val currentState = _state.value
-        if (currentState.category.isBlank() || currentState.source.isBlank()) return null
+        // Only category is required, source can be kept from original transaction
+        if (currentState.category.isBlank()) {
+            // Display validation error
+            _state.update { it.copy(categoryError = true) }
+            return null
+        }
+        
+        // Convert amount to double
         val amount = currentState.amount.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
+        if (amount <= 0) {
+            // Display validation error
+            _state.update { it.copy(amountError = true) }
+            return null
+        }
+        
         val finalAmount = if (currentState.isExpense) -amount else amount
+        val sourceToUse = if (currentState.source.isBlank()) currentState.transactionToEdit?.source ?: "" else currentState.source
+        val sourceColorToUse = if (currentState.source.isBlank()) currentState.transactionToEdit?.sourceColor ?: 0 else currentState.sourceColor
+        
         return currentState.transactionToEdit?.copy(
             title = currentState.title,
             amount = Money(finalAmount),
@@ -195,8 +307,8 @@ class EditTransactionViewModel(
             note = currentState.note,
             date = currentState.selectedDate,
             isExpense = currentState.isExpense,
-            source = currentState.source,
-            sourceColor = currentState.sourceColor
+            source = sourceToUse,
+            sourceColor = sourceColorToUse
         )
     }
 
@@ -213,6 +325,41 @@ class EditTransactionViewModel(
 
             is BaseTransactionEvent.PreventAutoSubmit -> {
                 blockAutoSubmit = true
+            }
+            
+            is BaseTransactionEvent.SetExpenseCategory -> _state.update { state ->
+                val newState = state.copy(
+                    category = event.category,
+                    selectedExpenseCategory = event.category
+                )
+                newState
+            }
+
+            is BaseTransactionEvent.SetIncomeCategory -> _state.update { state ->
+                val newState = state.copy(
+                    category = event.category,
+                    selectedIncomeCategory = event.category
+                )
+                newState
+            }
+            
+            is BaseTransactionEvent.ToggleTransactionType -> {
+                Timber.d("ТРАНЗАКЦИЯ: Переключение типа транзакции с ${_state.value.isExpense} на ${!_state.value.isExpense}")
+                
+                // Сохраняем ID транзакции для лога
+                val transactionId = _state.value.transactionToEdit?.id
+                
+                _state.update { 
+                    it.copy(
+                        isExpense = !it.isExpense,
+                        category = "" // Сбрасываем категорию при смене типа
+                    ) 
+                }
+                
+                // Устанавливаем категорию по умолчанию для нового типа транзакции
+                setDefaultCategoryIfNeeded(force = true)
+                
+                Timber.d("ТРАНЗАКЦИЯ: После переключения типа - isExpense=${_state.value.isExpense}, category=${_state.value.category}, transactionId=$transactionId")
             }
 
             else -> handleBaseEvent(event, context)
@@ -317,5 +464,16 @@ class EditTransactionViewModel(
             selectedExpenseCategory = selectedExpenseCategory,
             selectedIncomeCategory = selectedIncomeCategory
         )
+    }
+
+    // Установка ошибки с отключением индикатора загрузки
+    fun setError(errorMessage: String) {
+        Timber.e("ТРАНЗАКЦИЯ: установка ошибки: $errorMessage")
+        _state.update { 
+            it.copy(
+                error = errorMessage,
+                isLoading = false
+            )
+        }
     }
 }

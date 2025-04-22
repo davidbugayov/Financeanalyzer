@@ -122,4 +122,18 @@ class SourcePreferences private constructor(context: Context) {
             saveDeletedDefaultSources(sources)
         }
     }
+
+    /**
+     * Удаляет источник средств по имени
+     */
+    fun deleteSource(sourceName: String) {
+        val sources = getCustomSources().toMutableList()
+        val found = sources.find { it.name == sourceName }
+        if (found != null && sources.remove(found)) {
+            saveCustomSources(sources)
+            Timber.d("Source deleted: $sourceName")
+        } else {
+            Timber.d("Source not found for deletion: $sourceName")
+        }
+    }
 } 

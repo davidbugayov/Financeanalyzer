@@ -1,7 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -9,7 +7,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -231,8 +228,14 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
             is BaseTransactionEvent.SetSource -> {
                 val selectedSource = _state.value.sources.find { it.name == event.source }
-                _state.update { state ->
-                    copyState(state, source = event.source, sourceColor = selectedSource?.color ?: state.sourceColor)
+                if (selectedSource != null) {
+                    _state.update { state ->
+                        copyState(
+                            state,
+                            source = selectedSource.name,
+                            sourceColor = selectedSource.color
+                        )
+                    }
                 }
             }
 
@@ -276,22 +279,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
             is BaseTransactionEvent.SetCustomCategoryIcon -> {
                 // Более безопасная реализация без использования приведения типов
-                val state = _state.value
-
-                // Обрабатываем только если состояние поддерживает customCategoryIcon
-                if (state is AddTransactionState) {
-                    // Создаем новый объект AddTransactionState
-                    val newState = state.copy(customCategoryIcon = event.icon)
-
-                    // Обновляем состояние
-                    _state.update {
-                        // Используем текущее значение _state, которое может быть уже обновлено к этому моменту
-                        // Но т.к. только что сделали копию, безопасно использовать ее как новое значение
-                        @Suppress("UNCHECKED_CAST")
-                        newState as S
-                    }
-                } else {
-                    Timber.w("SetCustomCategoryIcon event received but state is not AddTransactionState")
+                _state.update { state ->
+                    copyState(state, customCategoryIcon = event.icon)
                 }
             }
 
@@ -300,12 +289,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             }
 
             is BaseTransactionEvent.AddCustomCategory -> {
-                val icon =
-                    if (_state.value is AddTransactionState) (_state.value as AddTransactionState).customCategoryIcon else Icons.Default.MoreHoriz
+                val icon = _state.value.customCategoryIcon
                 val category = event.category
+                
                 if (category.isNotBlank()) {
                     categoriesViewModel.addCustomCategory(category, _state.value.isExpense, icon)
                 }
+                
                 _state.update { state ->
                     copyState(state, showCustomCategoryDialog = false, customCategory = "")
                 }
@@ -325,67 +315,62 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 val category = event.category
                 if (category.isNotBlank()) {
                     val isExpense = _state.value.isExpense
-
+                
                     // Не даем удалить "Другое" и "Переводы"
                     if (category != "Другое" && category != "Переводы") {
-                        if (isExpense) {
-                            Timber.d("Deleting expense category: $category")
-                            categoriesViewModel.deleteExpenseCategory(category)
-                        } else {
-                            Timber.d("Deleting income category: $category")
-                            categoriesViewModel.deleteIncomeCategory(category)
-                        }
-
-                        // Если текущая выбранная категория - это удаляемая категория, сбрасываем ее
-                        if (_state.value.category == category) {
-                            // Сбрасываем текущую категорию, чтобы пользователь выбрал новую
-                            _state.update { state ->
-                                val newState = if (isExpense) {
-                                    copyState(state, category = "", selectedExpenseCategory = "")
-                                } else {
-                                    copyState(state, category = "", selectedIncomeCategory = "")
-                                }
-                                newState
+                        viewModelScope.launch {
+                            if (isExpense) {
+                                Timber.d("Deleting expense category: $category")
+                                categoriesViewModel.deleteExpenseCategory(category)
+                            } else {
+                                Timber.d("Deleting income category: $category")
+                                categoriesViewModel.deleteIncomeCategory(category)
                             }
-                            // Устанавливаем первую доступную категорию
-                            setDefaultCategoryIfNeeded(true)
+                        
+                            // Если текущая выбранная категория - это удаляемая категория, сбрасываем ее
+                            if (_state.value.category == category) {
+                                // Сбрасываем текущую категорию, чтобы пользователь выбрал новую
+                                _state.update { state ->
+                                    val newState = if (isExpense) {
+                                        copyState(state, category = "", selectedExpenseCategory = "")
+                                    } else {
+                                        copyState(state, category = "", selectedIncomeCategory = "")
+                                    }
+                                    newState
+                                }
+                            }
                         }
                     } else {
                         Timber.d("Attempted to delete protected category: $category")
                     }
-
-                    // Скрываем диалог подтверждения удаления
-                    _state.update { state ->
-                        copyState(state, showDeleteCategoryConfirmDialog = false, categoryToDelete = null)
-                    }
+                }
+                // Скрываем диалог подтверждения удаления
+                _state.update { state ->
+                    copyState(state, showDeleteCategoryConfirmDialog = false, categoryToDelete = null)
                 }
             }
 
             is BaseTransactionEvent.DeleteSource -> {
                 val sourceName = event.source
                 if (sourceName.isNotBlank()) {
-                    // Получаем список защищенных источников (можно настроить по вашим требованиям)
+                    // Получаем список защищенных источников
                     val protectedSources = listOf("Наличные", "Карта")
-
+                
                     if (!protectedSources.contains(sourceName)) {
                         Timber.d("Deleting source: $sourceName")
-
-                        // Удаляем источник из списка
-                        val updatedSources = _state.value.sources.filter { it.name != sourceName }
-
-                        // Сохраняем обновленный список источников
+                    
+                        // Удаляем источник
                         viewModelScope.launch {
                             try {
-                                sourcePreferences.saveCustomSources(updatedSources)
-
-                                // Обновляем состояние с новым списком источников
-                                _state.update { state ->
-                                    copyState(state, sources = updatedSources)
-                                }
-
+                                // Удаляем источник из предпочтений
+                                sourcePreferences.deleteSource(sourceName)
+                                
+                                // Перезагружаем список источников
+                                loadSources()
+                                
                                 // Если текущий источник - это удаляемый источник, сбрасываем его
                                 if (_state.value.source == sourceName) {
-                                    val firstSource = updatedSources.firstOrNull()
+                                    val firstSource = _state.value.sources.firstOrNull()
                                     _state.update { state ->
                                         copyState(
                                             state,
@@ -401,11 +386,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     } else {
                         Timber.d("Attempted to delete protected source: $sourceName")
                     }
-
-                    // Скрываем диалог подтверждения удаления
-                    _state.update { state ->
-                        copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
-                    }
+                }
+                // Скрываем диалог подтверждения удаления
+                _state.update { state ->
+                    copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
                 }
             }
 
@@ -775,4 +759,31 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         customCategoryIcon: ImageVector = state.customCategoryIcon,
         availableCategoryIcons: List<ImageVector> = state.availableCategoryIcons
     ): S
+
+    // Utility methods
+    
+    /**
+     * Очищает сообщение об ошибке
+     */
+    protected fun clearError() {
+        _state.update { state ->
+            copyState(state, error = null)
+        }
+    }
+    
+    /**
+     * Загружает список источников средств
+     */
+    protected fun loadSources() {
+        viewModelScope.launch {
+            try {
+                val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences)
+                _state.update { state ->
+                    copyState(state, sources = sources)
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке источников: ${e.message}")
+            }
+        }
+    }
 } 
