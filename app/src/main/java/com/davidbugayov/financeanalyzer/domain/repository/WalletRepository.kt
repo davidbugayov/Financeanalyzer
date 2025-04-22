@@ -69,4 +69,11 @@ interface WalletRepository {
      * @return Список кошельков с указанными ID
      */
     suspend fun getWalletsByIds(ids: List<String>): List<Wallet>
+    
+    /**
+     * Получает кошельки, связанные с транзакцией
+     * @param transactionId ID транзакции
+     * @return Список кошельков, связанных с данной транзакцией
+     */
+    suspend fun getWalletsForTransaction(transactionId: String): List<Wallet>
 } 

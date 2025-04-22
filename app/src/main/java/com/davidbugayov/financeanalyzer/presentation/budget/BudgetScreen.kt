@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -15,13 +16,15 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Refresh
+import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
@@ -32,6 +35,7 @@ import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
@@ -49,6 +53,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
@@ -72,6 +77,8 @@ import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import java.math.BigDecimal
+import androidx.compose.ui.draw.clip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -169,7 +176,7 @@ fun BudgetScreen(
                     }
                     IconButton(onClick = { showPeriodSettingsDialog = true }) {
                         Icon(
-                            imageVector = Icons.Default.Refresh,
+                            imageVector = Icons.Default.CalendarMonth,
                             contentDescription = "Настройки периода"
                         )
                     }
@@ -186,14 +193,115 @@ fun BudgetScreen(
             Column(
                 modifier = Modifier.fillMaxSize()
             ) {
-                // Сводка бюджета
-                BudgetSummaryCard(
-                    totalLimit = state.totalLimit,
-                    totalSpent = state.totalSpent,
-                    totalWalletBalance = state.totalWalletBalance,
-                    periodDuration = state.selectedPeriodDuration,
-                    onAddCategoryClick = { showAddCategoryDialog = true }
-                )
+                // Улучшенный блок сводки бюджета
+                Card(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
+                    shape = RoundedCornerShape(24.dp),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface
+                    )
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp)
+                    ) {
+                        Text(
+                            text = "Сводка бюджета",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        )
+                        
+                        Row(
+                            verticalAlignment = Alignment.CenterVertically,
+                            modifier = Modifier.padding(bottom = 16.dp)
+                        ) {
+                            Box(
+                                modifier = Modifier
+                                    .size(24.dp)
+                                    .background(Color(0xFF4F6BED).copy(alpha = 0.15f), CircleShape),
+                                contentAlignment = Alignment.Center
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Rounded.Schedule,
+                                    contentDescription = null,
+                                    tint = Color(0xFF4F6BED),
+                                    modifier = Modifier.size(16.dp)
+                                )
+                            }
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Расчетный период: ${state.selectedPeriodDuration} дней",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
+                        }
+                        
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
+                        ) {
+                            BudgetInfoCard(
+                                title = "Общий лимит",
+                                value = "${state.totalLimit.amount.toInt()} ₽",
+                                containerColor = Color(0xFF4F6BED).copy(alpha = 0.9f),
+                                contentColor = Color.White,
+                                modifier = Modifier.weight(1f)
+                            )
+                            
+                            Spacer(modifier = Modifier.width(8.dp))
+                            
+                            BudgetInfoCard(
+                                title = "Потрачено",
+                                value = "${state.totalSpent.amount.toInt()} ₽",
+                                containerColor = Color(0xFF66B1FF).copy(alpha = 0.9f),
+                                contentColor = Color.White,
+                                modifier = Modifier.weight(1f)
+                            )
+                            
+                            Spacer(modifier = Modifier.width(8.dp))
+                            
+                            BudgetInfoCard(
+                                title = "Баланс",
+                                value = "${state.totalWalletBalance.amount.toInt()} ₽",
+                                containerColor = Color(0xFF4ECDC4).copy(alpha = 0.9f),
+                                contentColor = Color.White,
+                                modifier = Modifier.weight(1f)
+                            )
+                        }
+
+                        // Кнопка добавления кошелька
+                        Button(
+                            onClick = { showAddCategoryDialog = true },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                            shape = RoundedCornerShape(12.dp),
+                            colors = ButtonDefaults.buttonColors(
+                                containerColor = Color(0xFF4F6BED).copy(alpha = 0.1f)
+                            )
+                        ) {
+                            Icon(
+                                imageVector = Icons.Default.Add,
+                                contentDescription = null,
+                                tint = Color(0xFF4F6BED),
+                                modifier = Modifier.size(18.dp)
+                            )
+                            Spacer(modifier = Modifier.width(8.dp))
+                            Text(
+                                text = "Добавить кошелек",
+                                color = Color(0xFF4F6BED),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.SemiBold
+                                )
+                            )
+                        }
+                    }
+                }
 
                 // Добавляем простой заголовок
                 Text(
@@ -211,96 +319,8 @@ fun BudgetScreen(
                 ) {
                     items(state.categories) { category ->
                         WalletCard(
-                            category = category,
-                            onWalletClick = onNavigateToTransactions,
-                            onMenuClick = { categoryFromMenu, action ->
-                                selectedWallet = categoryFromMenu
-                                when (action) {
-                                    WalletAction.ADD_FUNDS -> {
-                                        // Логируем для отладки
-                                        Timber.d("ADD_FUNDS выбран для кошелька: ${categoryFromMenu.id}, ${categoryFromMenu.name}")
-                                        
-                                        // Сначала устанавливаем выбранный кошелек в AddTransactionViewModel
-                                        addTransactionViewModel.setTargetWalletId(categoryFromMenu.id)
-                                        Timber.d("Целевой кошелек установлен: ${categoryFromMenu.id}")
-                                        
-                                        // Затем настраиваем ViewModel для добавления дохода
-                                        addTransactionViewModel.setupForIncomeAddition(
-                                            amount = "",
-                                            shouldDistribute = false
-                                        )
-                                        
-                                        // Устанавливаем категорию, равную имени кошелька
-                                        addTransactionViewModel.onEvent(BaseTransactionEvent.SetCategory(categoryFromMenu.name), context = context)
-                                        Timber.d("Категория установлена: ${categoryFromMenu.name}")
-                                        
-                                        // Явно устанавливаем, что это не расход
-                                        addTransactionViewModel.setupForIncomeAddition(
-                                            amount = "",
-                                            targetWalletId = categoryFromMenu.id,
-                                            context
-                                        )
-                                        Timber.d("Явно установлено тип транзакции как доход")
-
-                                        // Добавляем проверку состояния перед навигацией
-                                        Timber.d("Проверка финального состояния перед навигацией: isExpense=${addTransactionViewModel.state.value.isExpense}, forceExpense=${addTransactionViewModel.state.value.forceExpense}, addToWallet=${addTransactionViewModel.state.value.addToWallet}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
-                                        
-                                        // Устанавливаем коллбэк для обновления баланса кошелька после добавления дохода
-                                        addTransactionViewModel.onIncomeAddedCallback = { amount ->
-                                            // Добавляем средства в выбранный кошелек
-                                            viewModel.onEvent(BudgetEvent.AddFundsToWallet(categoryFromMenu.id, amount))
-                                            Timber.d("Callback для обновления кошелька установлен: ${categoryFromMenu.id}")
-                                        }
-                                        
-                                        // Переходим на экран добавления транзакции
-                                        navController.navigate(Screen.AddTransaction.route)
-                                    }
-                                    WalletAction.SPEND -> {
-                                        // Логируем для отладки
-                                        Timber.d("SPEND выбран для кошелька: ${categoryFromMenu.id}, ${categoryFromMenu.name}")
-                                        
-                                        // Устанавливаем целевой кошелек в AddTransactionViewModel
-                                        addTransactionViewModel.setTargetWalletId(categoryFromMenu.id)
-                                        Timber.d("Целевой кошелек установлен для расхода: ${categoryFromMenu.id}")
-                                        
-                                        // Настраиваем ViewModel для добавления расхода
-                                        addTransactionViewModel.setupForExpenseAddition(
-                                            amount = "",
-                                            walletCategory = categoryFromMenu.name,
-                                            context
-                                        )
-                                        
-                                        // Проверяем состояние после настройки для убеждения в правильности
-                                        Timber.d("Состояние после настройки расхода: isExpense=${addTransactionViewModel.state.value.isExpense}, targetWalletId=${addTransactionViewModel.state.value.targetWalletId}")
-                                        
-                                        // Устанавливаем коллбэк для обновления баланса кошелька после добавления расхода
-                                        addTransactionViewModel.onExpenseAddedCallback = { amount ->
-                                            // Списываем средства из выбранного кошелька
-                                            viewModel.onEvent(BudgetEvent.SpendFromWallet(categoryFromMenu.id, amount))
-                                            Timber.d("Callback для обновления кошелька при расходе вызван: ${categoryFromMenu.id}, сумма: $amount")
-                                        }
-                                        
-                                        // Переходим на экран добавления транзакции
-                                        navController.navigate(Screen.AddTransaction.route)
-                                    }
-                                    WalletAction.TRANSFER -> {
-                                        selectedFromWallet = categoryFromMenu
-                                        transferAmount = ""
-                                        showTransferDialog = true
-                                    }
-                                    WalletAction.RESET_PERIOD -> {
-                                        viewModel.onEvent(BudgetEvent.ResetPeriod(categoryFromMenu.id))
-                                    }
-                                    WalletAction.EDIT -> {
-                                        editWalletName = categoryFromMenu.name
-                                        editWalletLimit = categoryFromMenu.limit.amount.toPlainString()
-                                        showEditWalletDialog = true
-                                    }
-                                    WalletAction.DELETE -> {
-                                        viewModel.onEvent(BudgetEvent.DeleteCategory(categoryFromMenu))
-                                    }
-                                }
-                            }
+                            wallet = category,
+                            onClick = { onNavigateToTransactions(category.id) }
                         )
                     }
                 }
@@ -812,22 +832,68 @@ fun BudgetScreen(
 }
 
 @Composable
-fun BudgetSummaryCard(
-    totalLimit: Money,
-    totalSpent: Money,
-    totalWalletBalance: Money,
-    periodDuration: Int,
-    onAddCategoryClick: () -> Unit
+fun BudgetInfoCard(
+    title: String,
+    value: String,
+    containerColor: Color,
+    contentColor: Color,
+    modifier: Modifier = Modifier
 ) {
+    Card(
+        modifier = modifier
+            .padding(vertical = 4.dp),
+        shape = RoundedCornerShape(16.dp),
+        colors = CardDefaults.cardColors(
+            containerColor = containerColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+    ) {
+        Column(
+            modifier = Modifier
+                .padding(vertical = 16.dp, horizontal = 12.dp),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = title,
+                style = MaterialTheme.typography.bodySmall,
+                color = contentColor.copy(alpha = 0.8f)
+            )
+            Text(
+                text = value,
+                style = MaterialTheme.typography.titleLarge,
+                fontWeight = FontWeight.Bold,
+                color = contentColor,
+                modifier = Modifier.padding(top = 4.dp)
+            )
+        }
+    }
+}
+
+@Composable
+fun WalletCard(
+    wallet: Wallet,
+    onClick: () -> Unit
+) {
+    val percentUsed = if (wallet.limit.amount > BigDecimal.ZERO) {
+        ((wallet.spent.amount / wallet.limit.amount) * BigDecimal("100")).toInt().coerceIn(0, 100)
+    } else 0
+
+    val progressColor = when {
+        percentUsed > 90 -> MaterialTheme.colorScheme.error
+        percentUsed > 70 -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+        percentUsed > 50 -> MaterialTheme.colorScheme.tertiary
+        else -> MaterialTheme.colorScheme.primary
+    }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp),
-        shape = RoundedCornerShape(20.dp),
+            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .clickable { onClick() },
+        shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            contentColor = MaterialTheme.colorScheme.onSurfaceVariant
+            containerColor = MaterialTheme.colorScheme.surface
         )
     ) {
         Column(
@@ -835,194 +901,94 @@ fun BudgetSummaryCard(
                 .fillMaxWidth()
                 .padding(20.dp)
         ) {
-            Text(
-                text = "Сводка бюджета",
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-
-            Spacer(modifier = Modifier.height(16.dp))
-            
             Row(
                 modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Icon(
-                    imageVector = Icons.Default.Refresh,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(18.dp)
-                )
-                Spacer(modifier = Modifier.width(8.dp))
-                Text(
-                    text = "Расчетный период: $periodDuration дней",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f)
-                )
+                Row(verticalAlignment = Alignment.CenterVertically) {
+                    Box(
+                        modifier = Modifier
+                            .size(44.dp)
+                            .background(
+                                color = Color(0xFF4F6BED), // Можно заменить на wallet.color
+                                shape = CircleShape
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.AccountBalanceWallet, // Можно заменить на другую иконку
+                            contentDescription = null,
+                            tint = Color.White,
+                            modifier = Modifier.size(24.dp)
+                        )
+                    }
+                    Spacer(modifier = Modifier.width(12.dp))
+                    Text(
+                        text = wallet.name,
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                }
+                IconButton(onClick = { /* TODO: show menu */ }) {
+                    Icon(
+                        imageVector = Icons.Default.MoreVert,
+                        contentDescription = "Опции"
+                    )
+                }
             }
-
-            Spacer(modifier = Modifier.height(20.dp))
-
-            // Карточки с основной информацией
+            Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                // Общий лимит
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(90.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.7f)
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Общий лимит",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = totalLimit.format(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
-                        )
-                    }
-                }
-                
-                Spacer(modifier = Modifier.width(8.dp))
-                
-                // Потрачено
-                val spentColor = if (totalSpent > totalLimit) 
-                    MaterialTheme.colorScheme.errorContainer 
-                else 
-                    MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.7f)
-                
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(90.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = spentColor
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Потрачено",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = if (totalSpent > totalLimit) 
-                                MaterialTheme.colorScheme.onErrorContainer 
-                            else 
-                                MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = totalSpent.format(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (totalSpent > totalLimit) 
-                                MaterialTheme.colorScheme.onErrorContainer 
-                            else 
-                                MaterialTheme.colorScheme.onSecondaryContainer
-                        )
-                    }
-                }
-                
-                Spacer(modifier = Modifier.width(8.dp))
-                
-                // Баланс
-                val balanceColor = if (totalWalletBalance < Money.zero()) 
-                    MaterialTheme.colorScheme.errorContainer 
-                else 
-                    MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.7f)
-                
-                Card(
-                    modifier = Modifier
-                        .weight(1f)
-                        .height(90.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    colors = CardDefaults.cardColors(
-                        containerColor = balanceColor
-                    ),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .padding(12.dp)
-                            .fillMaxWidth(),
-                        horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
-                    ) {
-                        Text(
-                            text = "Баланс",
-                            style = MaterialTheme.typography.labelMedium,
-                            color = if (totalWalletBalance < Money.zero())
-                                MaterialTheme.colorScheme.onErrorContainer
-                            else
-                                MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                        Spacer(modifier = Modifier.height(4.dp))
-                        Text(
-                            text = totalWalletBalance.format(),
-                            style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = if (totalWalletBalance < Money.zero())
-                                MaterialTheme.colorScheme.onErrorContainer
-                            else
-                                MaterialTheme.colorScheme.onTertiaryContainer
-                        )
-                    }
-                }
-            }
-            
-            Spacer(modifier = Modifier.height(16.dp))
-            
-            // Кнопка добавления кошелька
-            Button(
-                onClick = onAddCategoryClick,
-                modifier = Modifier.fillMaxWidth(),
-                shape = RoundedCornerShape(12.dp),
-                contentPadding = PaddingValues(vertical = 12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                Text(
+                    text = "Потрачено: ${wallet.spent.amount.toInt()} ₽",
+                    style = MaterialTheme.typography.bodyMedium
                 )
+                Text(
+                    text = "Лимит: ${wallet.limit.amount.toInt()} ₽",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            LinearProgressIndicator(
+                progress = { percentUsed / 100f },
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(6.dp)
+                    .clip(RoundedCornerShape(3.dp)),
+                color = progressColor,
+                trackColor = MaterialTheme.colorScheme.surfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = "$percentUsed% использовано",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Spacer(modifier = Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(
-                    horizontalArrangement = Arrangement.Center,
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Icon(
-                        imageVector = Icons.Default.Add,
-                        contentDescription = "Добавить кошелек"
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = "Добавить кошелек",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
-                    )
-                }
+                Icon(
+                    imageVector = Icons.Default.AccountBalanceWallet,
+                    contentDescription = null,
+                    tint = Color(0xFF4F6BED),
+                    modifier = Modifier.size(16.dp)
+                )
+                Spacer(modifier = Modifier.width(4.dp))
+                Text(
+                    text = "Кошелёк: ${wallet.balance.amount.toInt()} ₽",
+                    style = MaterialTheme.typography.titleMedium.copy(
+                        color = Color(0xFF4F6BED),
+                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                    ),
+                    fontWeight = FontWeight.Medium
+                )
             }
         }
     }

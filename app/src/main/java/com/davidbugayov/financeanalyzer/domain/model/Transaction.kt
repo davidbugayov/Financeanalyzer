@@ -18,5 +18,6 @@ data class Transaction(
     val sourceColor: Int,
     val categoryId: String = "",
     val title: String = "",
-    val isTransfer: Boolean = false
+    val isTransfer: Boolean = false,
+    val walletIds: List<String>? = null
 )

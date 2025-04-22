@@ -204,6 +204,13 @@ class AddTransactionViewModel(
         val transactionId = currentState.transactionToEdit?.id ?: java.util.UUID.randomUUID().toString()
         Timber.d("Используем ID транзакции: $transactionId (новый: ${currentState.transactionToEdit == null})")
 
+        // Получаем список ID кошельков для сохранения в транзакции
+        val selectedWalletIds = getWalletIdsForTransaction(
+            isExpense = currentState.isExpense,
+            addToWallet = currentState.addToWallet,
+            selectedWallets = currentState.selectedWallets
+        )
+
         // Создаем объект транзакции
         return Transaction(
             id = transactionId,
@@ -214,7 +221,8 @@ class AddTransactionViewModel(
             source = currentState.source,
             isExpense = currentState.isExpense,
             sourceColor = currentState.sourceColor,
-            isTransfer = isTransfer
+            isTransfer = isTransfer,
+            walletIds = selectedWalletIds
         )
     }
 
@@ -369,6 +377,11 @@ class AddTransactionViewModel(
                     if (result is DomainResult.Success) {
                         Timber.d("Transaction added successfully")
                         _state.update { it.copy(isSuccess = true, error = null) }
+                        
+                        // Обновляем балансы кошельков, если это доход и выбраны кошельки
+                        if (!transaction.isExpense && transaction.walletIds != null && transaction.walletIds.isNotEmpty()) {
+                            updateWalletsBalance(transaction.walletIds, transaction.amount)
+                        }
                     } else if (result is DomainResult.Error) {
                         Timber.e("Error adding transaction: ${result.exception.message}")
                         _state.update { it.copy(error = result.exception.message) }
@@ -444,13 +457,28 @@ class AddTransactionViewModel(
             }
 
             is BaseTransactionEvent.ToggleAddToWallet -> {
-                val newAddToWallet = !_state.value.addToWallet
-                val allWalletIds = wallets.map { it.id }
+                val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
+                    currentAddToWallet = _state.value.addToWallet,
+                    currentSelectedWallets = _state.value.selectedWallets
+                )
+                
                 _state.update {
                     it.copy(
                         addToWallet = newAddToWallet,
-                        selectedWallets = if (newAddToWallet && it.selectedWallets.isEmpty()) allWalletIds else it.selectedWallets
+                        selectedWallets = newSelectedWallets
                     )
+                }
+            }
+            
+            is BaseTransactionEvent.SelectWallet -> {
+                val updatedWallets = handleSelectWallet(
+                    walletId = event.walletId,
+                    selected = event.selected,
+                    currentSelectedWallets = _state.value.selectedWallets
+                )
+                
+                _state.update {
+                    it.copy(selectedWallets = updatedWallets)
                 }
             }
 

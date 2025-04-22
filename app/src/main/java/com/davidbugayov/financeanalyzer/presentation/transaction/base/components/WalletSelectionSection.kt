@@ -78,6 +78,20 @@ fun WalletSelectionSection(
                     onClick = onSelectWalletsClick,
                     targetWalletName = targetWalletName
                 )
+                
+                // Добавляем явный вывод о том, сколько кошельков выбрано
+                if (selectedWallets.isNotEmpty()) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        text = if (selectedWallets.size == 1) {
+                            "Выбран 1 кошелек"
+                        } else {
+                            "Выбрано ${selectedWallets.size} кошельков"
+                        },
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                }
             }
             
             Spacer(modifier = Modifier.height(16.dp))

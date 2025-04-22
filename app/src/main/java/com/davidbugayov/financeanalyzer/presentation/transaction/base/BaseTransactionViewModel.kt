@@ -83,9 +83,193 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     walletRepository.updateWallet(updatedWallet)
                 }
             } catch (e: Exception) {
-                // Можно добавить Timber.e(e) для логирования
+                Timber.e(e, "Ошибка при обновлении кошельков после транзакции")
             }
         }
+    }
+    
+    /**
+     * Обновляет балансы кошельков после добавления доходной транзакции
+     * @param walletIds Список ID кошельков для обновления
+     * @param amount Сумма дохода
+     */
+    protected fun updateWalletsBalance(walletIds: List<String>, amount: Money) {
+        if (walletIds.isEmpty()) return
+        
+        viewModelScope.launch {
+            try {
+                // Если кошельков несколько, делим сумму равномерно между ними
+                val amountPerWallet = if (walletIds.size > 1) {
+                    amount.div(walletIds.size)
+                } else {
+                    amount
+                }
+                
+                Timber.d("Обновление баланса кошельков: ${walletIds.size} кошельков, сумма на кошелек: $amountPerWallet")
+                
+                // Получаем кошельки по ID
+                val walletsList = walletRepository.getWalletsByIds(walletIds)
+                
+                // Обновляем баланс каждого кошелька
+                walletsList.forEach { wallet ->
+                    val updatedWallet = wallet.copy(
+                        balance = wallet.balance.plus(amountPerWallet)
+                    )
+                    Timber.d("Обновляем кошелек ${wallet.name}: старый баланс=${wallet.balance}, новый баланс=${updatedWallet.balance}")
+                    walletRepository.updateWallet(updatedWallet)
+                }
+                
+                Timber.d("Балансы кошельков успешно обновлены")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при обновлении баланса кошельков")
+            }
+        }
+    }
+
+    /**
+     * Обновляет балансы кошельков после редактирования доходной транзакции
+     * @param walletIds Список ID кошельков для обновления
+     * @param amount Новая сумма дохода
+     * @param originalTransaction Исходная транзакция до редактирования
+     */
+    protected fun updateWalletsBalance(walletIds: List<String>, amount: Money, originalTransaction: com.davidbugayov.financeanalyzer.domain.model.Transaction?) {
+        viewModelScope.launch {
+            try {
+                // Если кошельков несколько, делим сумму равномерно между ними
+                val amountPerWallet = if (walletIds.size > 1) {
+                    amount.div(walletIds.size)
+                } else {
+                    amount
+                }
+                
+                Timber.d("Обновление баланса кошельков: ${walletIds.size} кошельков, сумма на кошелек: $amountPerWallet")
+                
+                // Получаем кошельки по ID
+                val walletsList = walletRepository.getWalletsByIds(walletIds)
+                
+                // Если есть исходная транзакция и у нее были кошельки, сначала откатываем изменения
+                if (originalTransaction != null && originalTransaction.walletIds != null && originalTransaction.walletIds.isNotEmpty()) {
+                    val originalAmount = originalTransaction.amount
+                    val originalWalletIds = originalTransaction.walletIds
+                    val originalAmountPerWallet = if (originalWalletIds.size > 1) {
+                        originalAmount.div(originalWalletIds.size)
+                    } else {
+                        originalAmount
+                    }
+                    
+                    Timber.d("Откат изменений для ${originalWalletIds.size} оригинальных кошельков, сумма: $originalAmountPerWallet")
+                    
+                    // Получаем исходные кошельки
+                    val originalWallets = walletRepository.getWalletsByIds(originalWalletIds)
+                    
+                    // Откатываем изменения в исходных кошельках
+                    originalWallets.forEach { wallet ->
+                        val updatedWallet = wallet.copy(
+                            balance = wallet.balance.minus(originalAmountPerWallet)
+                        )
+                        Timber.d("Откат для кошелька ${wallet.name}: баланс ${wallet.balance} -> ${updatedWallet.balance}")
+                        walletRepository.updateWallet(updatedWallet)
+                    }
+                }
+                
+                // Обновляем баланс каждого кошелька с новыми данными
+                walletsList.forEach { wallet ->
+                    val updatedWallet = wallet.copy(
+                        balance = wallet.balance.plus(amountPerWallet)
+                    )
+                    Timber.d("Обновляем кошелек ${wallet.name}: старый баланс=${wallet.balance}, новый баланс=${updatedWallet.balance}")
+                    walletRepository.updateWallet(updatedWallet)
+                }
+                
+                Timber.d("Балансы кошельков успешно обновлены")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при обновлении баланса кошельков: ${e.message}")
+            }
+        }
+    }
+    
+    /**
+     * Определяет список кошельков для сохранения в транзакции
+     * @param isExpense Является ли транзакция расходом
+     * @param addToWallet Флаг добавления в кошельки
+     * @param selectedWallets Список выбранных кошельков
+     * @return Список ID кошельков или null
+     */
+    protected fun getWalletIdsForTransaction(
+        isExpense: Boolean,
+        addToWallet: Boolean,
+        selectedWallets: List<String>
+    ): List<String>? {
+        return if (!isExpense && addToWallet && selectedWallets.isNotEmpty()) {
+            Timber.d("Сохраняем выбранные кошельки: ${selectedWallets.size} шт.")
+            selectedWallets
+        } else {
+            Timber.d("Не сохраняем кошельки: isExpense=$isExpense, addToWallet=$addToWallet, selectedWallets=${selectedWallets.size}")
+            null
+        }
+    }
+    
+    /**
+     * Загружает кошельки
+     */
+    open fun loadWallets() {
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                val result = walletRepository.getAllWallets()
+                Timber.d("Загружено ${result.size} кошельков")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке кошельков")
+            }
+        }
+    }
+    
+    /**
+     * Обрабатывает событие переключения флага "Добавить в кошельки"
+     * @param currentAddToWallet Текущее значение флага
+     * @param currentSelectedWallets Текущие выбранные кошельки
+     * @return Пара (новое значение флага, новый список выбранных кошельков)
+     */
+    protected fun handleToggleAddToWallet(
+        currentAddToWallet: Boolean,
+        currentSelectedWallets: List<String>
+    ): Pair<Boolean, List<String>> {
+        val newAddToWallet = !currentAddToWallet
+        
+        return if (newAddToWallet) {
+            // При включении автоматически выбираем все кошельки, если список пуст
+            val allWalletIds = wallets.map { it.id }
+            Timber.d("Включение кошельков, автоматический выбор всех ${allWalletIds.size} кошельков")
+            Pair(true, allWalletIds)
+        } else {
+            // При отключении очищаем список
+            Timber.d("Отключение кошельков")
+            Pair(false, emptyList())
+        }
+    }
+    
+    /**
+     * Обрабатывает событие выбора кошелька
+     * @param walletId ID кошелька
+     * @param selected Выбран или отменен выбор
+     * @param currentSelectedWallets Текущие выбранные кошельки
+     * @return Новый список выбранных кошельков
+     */
+    protected fun handleSelectWallet(
+        walletId: String,
+        selected: Boolean,
+        currentSelectedWallets: List<String>
+    ): List<String> {
+        Timber.d("SelectWallet событие - walletId=$walletId, selected=$selected")
+        
+        val updatedWallets = if (selected) {
+            currentSelectedWallets + walletId
+        } else {
+            currentSelectedWallets - walletId
+        }
+        
+        Timber.d("Обновление списка выбранных кошельков: было ${currentSelectedWallets.size}, стало ${updatedWallets.size}")
+        
+        return updatedWallets
     }
 
     // --- Сброс полей экрана транзакций ---
@@ -403,6 +587,14 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
             }
 
+            is BaseTransactionEvent.ForceSetIncomeType -> _state.update { state ->
+                copyState(state, isExpense = false)
+            }
+
+            is BaseTransactionEvent.ForceSetExpenseType -> _state.update { state ->
+                copyState(state, isExpense = true)
+            }
+
             else -> {}
         }
     }
@@ -579,20 +771,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         }
     }
 
-    open fun loadWallets() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val walletsList = walletRepository.getAllWallets()
-                // _wallets.value = walletsList // если нужно хранить локально
-                _state.update { state ->
-                    copyState(state, selectedWallets = walletsList.map { it.id })
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке кошельков")
-            }
-        }
-    }
-
     // --- Универсальные поля и коллбэки для работы с транзакциями ---
     protected val usedCategories = mutableSetOf<Pair<String, Boolean>>()
     open var autoDistributeIncome: Boolean = false
@@ -603,81 +781,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         protected set
     open var budgetViewModel: com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel? = null
     open var navigateBackCallback: (() -> Unit)? = null
-
-    // --- Универсальные методы для настройки и сброса состояния ---
-    open fun setTargetWalletId(walletId: String) {
-        storedTargetWalletId = walletId
-        _state.update { state ->
-            copyState(
-                state,
-                targetWalletId = walletId,
-                addToWallet = true,
-                selectedWallets = listOf(walletId)
-            )
-        }
-    }
-
-    open fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean) {
-        autoDistributeIncome = shouldDistribute
-        val currentTargetWalletId = _state.value.targetWalletId
-        val currentSelectedWallets = _state.value.selectedWallets
-        val currentAddToWallet = _state.value.addToWallet || shouldDistribute
-        _state.update { state ->
-            copyState(
-                state,
-                isExpense = false,
-                forceExpense = false,
-                amount = amount,
-                targetWalletId = currentTargetWalletId,
-                selectedWallets = currentSelectedWallets,
-                addToWallet = currentAddToWallet
-            )
-        }
-    }
-
-    open fun setupForIncomeAddition(amount: String, targetWalletId: String, context: android.content.Context) {
-        setTargetWalletId(targetWalletId)
-        if (!_state.value.addToWallet) {
-            handleBaseEvent(BaseTransactionEvent.ToggleAddToWallet, context)
-        }
-        handleBaseEvent(BaseTransactionEvent.ForceSetIncomeType, context)
-        _state.update { state ->
-            copyState(state, amount = amount)
-        }
-    }
-
-    open fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
-        autoDistributeIncome = false
-        val currentTargetWalletId = _state.value.targetWalletId
-        val currentSelectedWallets = _state.value.selectedWallets
-        val currentAddToWallet = _state.value.addToWallet
-        handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
-        _state.update { state ->
-            copyState(
-                state,
-                amount = amount,
-                category = walletCategory,
-                targetWalletId = currentTargetWalletId,
-                selectedWallets = currentSelectedWallets,
-                addToWallet = currentAddToWallet
-            )
-        }
-    }
-
-    open fun resetToDefaultState() {
-        autoDistributeIncome = false
-        storedTargetWalletId = null
-        _state.update { state ->
-            copyState(
-                state,
-                isExpense = true,
-                targetWalletId = null,
-                addToWallet = false,
-                selectedWallets = emptyList()
-            )
-        }
-        onIncomeAddedCallback = null
-    }
 
     override fun updateCategoryPositions() {
         viewModelScope.launch {
@@ -785,5 +888,80 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 Timber.e(e, "Ошибка при загрузке источников: ${e.message}")
             }
         }
+    }
+
+    // --- Универсальные методы для настройки и сброса состояния ---
+    open fun setTargetWalletId(walletId: String) {
+        storedTargetWalletId = walletId
+        _state.update { state ->
+            copyState(
+                state,
+                targetWalletId = walletId,
+                addToWallet = true,
+                selectedWallets = listOf(walletId)
+            )
+        }
+    }
+
+    open fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean) {
+        autoDistributeIncome = shouldDistribute
+        val currentTargetWalletId = _state.value.targetWalletId
+        val currentSelectedWallets = _state.value.selectedWallets
+        val currentAddToWallet = _state.value.addToWallet || shouldDistribute
+        _state.update { state ->
+            copyState(
+                state,
+                isExpense = false,
+                forceExpense = false,
+                amount = amount,
+                targetWalletId = currentTargetWalletId,
+                selectedWallets = currentSelectedWallets,
+                addToWallet = currentAddToWallet
+            )
+        }
+    }
+
+    open fun setupForIncomeAddition(amount: String, targetWalletId: String, context: android.content.Context) {
+        setTargetWalletId(targetWalletId)
+        if (!_state.value.addToWallet) {
+            handleBaseEvent(BaseTransactionEvent.ToggleAddToWallet, context)
+        }
+        handleBaseEvent(BaseTransactionEvent.ForceSetIncomeType, context)
+        _state.update { state ->
+            copyState(state, amount = amount)
+        }
+    }
+
+    open fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
+        autoDistributeIncome = false
+        val currentTargetWalletId = _state.value.targetWalletId
+        val currentSelectedWallets = _state.value.selectedWallets
+        val currentAddToWallet = _state.value.addToWallet
+        handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
+        _state.update { state ->
+            copyState(
+                state,
+                amount = amount,
+                category = walletCategory,
+                targetWalletId = currentTargetWalletId,
+                selectedWallets = currentSelectedWallets,
+                addToWallet = currentAddToWallet
+            )
+        }
+    }
+
+    open fun resetToDefaultState() {
+        autoDistributeIncome = false
+        storedTargetWalletId = null
+        _state.update { state ->
+            copyState(
+                state,
+                isExpense = true,
+                targetWalletId = null,
+                addToWallet = false,
+                selectedWallets = emptyList()
+            )
+        }
+        onIncomeAddedCallback = null
     }
 } 

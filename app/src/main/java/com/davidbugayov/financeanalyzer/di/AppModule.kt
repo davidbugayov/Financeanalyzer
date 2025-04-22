@@ -6,8 +6,10 @@ import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreference
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
+import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
@@ -57,6 +59,14 @@ val appModule = module {
     single<TransactionRepositoryImpl> { TransactionRepositoryImpl(get()) }
     single<TransactionRepository> { get<TransactionRepositoryImpl>() }
     single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
+    
+    // Создаем WalletRepositoryImpl с доступом к TransactionRepository
+    single<WalletRepository> {
+        WalletRepositoryImpl(
+            walletPreferences = get(),
+            transactionRepository = get()
+        )
+    }
 
     // Use cases
     single { LoadTransactionsUseCase(get()) }
