@@ -1,11 +1,9 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
-import kotlinx.coroutines.flow.StateFlow
+import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
+import kotlinx.coroutines.flow.StateFlow
 
 interface TransactionScreenViewModel<S, E> {
     val state: StateFlow<S>
@@ -95,6 +93,8 @@ fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTr
         is Pair<*, *> -> when (eventData.first as? String) {
             "SetExpenseCategory" -> BaseTransactionEvent.SetExpenseCategory(eventData.second as String)
             "SetIncomeCategory" -> BaseTransactionEvent.SetIncomeCategory(eventData.second as String)
+            "SetSource" -> BaseTransactionEvent.SetSource(eventData.second as String)
+            "ShowDeleteSourceConfirmDialog" -> BaseTransactionEvent.ShowDeleteSourceConfirmDialog(eventData.second as String)
             "DeleteSourceConfirm" -> {
                 val source = eventData.second as? com.davidbugayov.financeanalyzer.domain.model.Source
                 BaseTransactionEvent.ShowDeleteSourceConfirmDialog(source?.name ?: "")

@@ -3,13 +3,14 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 
 /**
  * Экран добавления новой транзакции
@@ -18,10 +19,11 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTra
 @Composable
 fun AddTransactionScreen(
     viewModel: AddTransactionViewModel = koinViewModel(),
-    categoriesViewModel: CategoriesViewModel = koinViewModel(),
     onNavigateBack: () -> Unit
 ) {
     val context = LocalContext.current
+    val state by viewModel.state.collectAsState()
+    
     // Логируем открытие экрана добавления транзакции
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
@@ -35,10 +37,10 @@ fun AddTransactionScreen(
     
     // Обработка типа транзакции на основе forceExpense
     // Теперь по умолчанию forceExpense = true (расход)
-    LaunchedEffect(viewModel.state.value.forceExpense) {
+    LaunchedEffect(state.forceExpense) {
         // Если forceExpense = true, устанавливаем расход
         // Если forceExpense = false, устанавливаем доход
-        if (viewModel.state.value.forceExpense) {
+        if (state.forceExpense) {
             viewModel.onEvent(BaseTransactionEvent.ForceSetExpenseType, context)
         } else {
             viewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType, context)

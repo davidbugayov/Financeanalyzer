@@ -1,73 +1,25 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreHoriz
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.update
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import kotlinx.coroutines.launch
-import androidx.lifecycle.viewModelScope
-import android.graphics.Color
-import java.util.*
-import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Fastfood
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.Work
-import androidx.compose.material.icons.filled.School
-import androidx.compose.material.icons.filled.Flight
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.CardGiftcard
-import androidx.compose.material.icons.filled.SportsSoccer
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.AttachMoney
-import androidx.compose.material.icons.filled.Savings
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.LocalCafe
-import androidx.compose.material.icons.filled.LocalAtm
-import androidx.compose.material.icons.filled.ChildCare
-import androidx.compose.material.icons.filled.LocalBar
-import androidx.compose.material.icons.filled.LocalGasStation
-import androidx.compose.material.icons.filled.LocalLaundryService
-import androidx.compose.material.icons.filled.LocalLibrary
-import androidx.compose.material.icons.filled.LocalMall
-import androidx.compose.material.icons.filled.LocalPharmacy
-import androidx.compose.material.icons.filled.LocalPizza
-import androidx.compose.material.icons.filled.LocalPlay
-import androidx.compose.material.icons.filled.LocalPostOffice
-import androidx.compose.material.icons.filled.LocalPrintshop
-import androidx.compose.material.icons.filled.LocalTaxi
-import androidx.compose.material.icons.filled.LocalFlorist
-import androidx.compose.material.icons.filled.LocalGroceryStore
-import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.SportsBasketball
-import androidx.compose.material.icons.filled.SportsTennis
-import androidx.compose.material.icons.filled.Train
-import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.Watch
-import androidx.compose.material.icons.filled.WbSunny
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material.icons.filled.DirectionsBus
-import androidx.compose.material.icons.filled.StarBorder
-import androidx.compose.ui.graphics.vector.ImageVector
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.util.Date
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
@@ -290,10 +242,25 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             is BaseTransactionEvent.SelectWallets -> _state.update { state -> 
                 copyState(state, selectedWallets = event.walletIds) 
             }
-            is BaseTransactionEvent.SetCustomCategoryIcon -> _state.update { state ->
-                if (state is com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState)
-                    state.copy(customCategoryIcon = event.icon) as S
-                else state
+            is BaseTransactionEvent.SetCustomCategoryIcon -> {
+                // Более безопасная реализация без использования приведения типов
+                val state = _state.value
+
+                // Обрабатываем только если состояние поддерживает customCategoryIcon
+                if (state is AddTransactionState) {
+                    // Создаем новый объект AddTransactionState
+                    val newState = state.copy(customCategoryIcon = event.icon)
+
+                    // Обновляем состояние
+                    _state.update {
+                        // Используем текущее значение _state, которое может быть уже обновлено к этому моменту
+                        // Но т.к. только что сделали копию, безопасно использовать ее как новое значение
+                        @Suppress("UNCHECKED_CAST")
+                        newState as S
+                    }
+                } else {
+                    Timber.w("SetCustomCategoryIcon event received but state is not AddTransactionState")
+                }
             }
             is BaseTransactionEvent.SetCustomCategory -> _state.update { state ->
                 copyState(state, customCategory = event.category)
@@ -302,13 +269,160 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 val icon = if (_state.value is AddTransactionState) (_state.value as AddTransactionState).customCategoryIcon else Icons.Default.MoreHoriz
                 val category = event.category
                 if (category.isNotBlank()) {
-                    categoriesViewModel?.addCustomCategory(category, _state.value.isExpense, icon)
+                    categoriesViewModel.addCustomCategory(category, _state.value.isExpense, icon)
                 }
                 _state.update { state ->
                     copyState(state, showCustomCategoryDialog = false, customCategory = "")
                 }
             }
+
+            is BaseTransactionEvent.ShowDeleteCategoryConfirmDialog -> {
+                _state.update { state ->
+                    copyState(state, categoryToDelete = event.category, showDeleteCategoryConfirmDialog = true)
+                }
+            }
+
+            is BaseTransactionEvent.HideDeleteCategoryConfirmDialog -> _state.update { state ->
+                copyState(state, showDeleteCategoryConfirmDialog = false, categoryToDelete = null)
+            }
+
+            is BaseTransactionEvent.DeleteCategory -> {
+                val category = event.category
+                if (category.isNotBlank()) {
+                    val isExpense = _state.value.isExpense
+
+                    // Не даем удалить "Другое" и "Переводы"
+                    if (category != "Другое" && category != "Переводы") {
+                        if (isExpense) {
+                            Timber.d("Deleting expense category: $category")
+                            categoriesViewModel.deleteExpenseCategory(category)
+                        } else {
+                            Timber.d("Deleting income category: $category")
+                            categoriesViewModel.deleteIncomeCategory(category)
+                        }
+
+                        // Если текущая выбранная категория - это удаляемая категория, сбрасываем ее
+                        if (_state.value.category == category) {
+                            // Сбрасываем текущую категорию, чтобы пользователь выбрал новую
+                            _state.update { state ->
+                                val newState = if (isExpense) {
+                                    copyState(state, category = "", selectedExpenseCategory = "")
+                                } else {
+                                    copyState(state, category = "", selectedIncomeCategory = "")
+                                }
+                                newState
+                            }
+                            // Устанавливаем первую доступную категорию
+                            setDefaultCategoryIfNeeded(true)
+                        }
+                    } else {
+                        Timber.d("Attempted to delete protected category: $category")
+                    }
+
+                    // Скрываем диалог подтверждения удаления
+                    _state.update { state ->
+                        copyState(state, showDeleteCategoryConfirmDialog = false, categoryToDelete = null)
+                    }
+                }
+            }
+
+            is BaseTransactionEvent.DeleteSource -> {
+                val sourceName = event.source
+                if (sourceName.isNotBlank()) {
+                    // Получаем список защищенных источников (можно настроить по вашим требованиям)
+                    val protectedSources = listOf("Наличные", "Карта")
+
+                    if (!protectedSources.contains(sourceName)) {
+                        Timber.d("Deleting source: $sourceName")
+
+                        // Удаляем источник из списка
+                        val updatedSources = _state.value.sources.filter { it.name != sourceName }
+
+                        // Сохраняем обновленный список источников
+                        viewModelScope.launch {
+                            try {
+                                sourcePreferences.saveCustomSources(updatedSources)
+
+                                // Обновляем состояние с новым списком источников
+                                _state.update { state ->
+                                    copyState(state, sources = updatedSources)
+                                }
+
+                                // Если текущий источник - это удаляемый источник, сбрасываем его
+                                if (_state.value.source == sourceName) {
+                                    val firstSource = updatedSources.firstOrNull()
+                                    _state.update { state ->
+                                        copyState(
+                                            state,
+                                            source = firstSource?.name ?: "",
+                                            sourceColor = firstSource?.color ?: 0
+                                        )
+                                    }
+                                }
+                            } catch (e: Exception) {
+                                Timber.e(e, "Error deleting source")
+                            }
+                        }
+                    } else {
+                        Timber.d("Attempted to delete protected source: $sourceName")
+                    }
+
+                    // Скрываем диалог подтверждения удаления
+                    _state.update { state ->
+                        copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
+                    }
+                }
+            }
+
+            is BaseTransactionEvent.ShowDeleteSourceConfirmDialog -> {
+                _state.update { state ->
+                    copyState(state, sourceToDelete = event.source, showDeleteSourceConfirmDialog = true)
+                }
+            }
+
+            is BaseTransactionEvent.HideDeleteSourceConfirmDialog -> _state.update { state ->
+                copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
+            }
             else -> {}
+        }
+    }
+
+    /**
+     * Sets a default category based on transaction type if none is selected
+     * @param force If true, force selection of the first category even if one is already selected
+     */
+    open fun setDefaultCategoryIfNeeded(force: Boolean = false) {
+        _state.update { current ->
+            if (current.isExpense && current.expenseCategories.isNotEmpty()) {
+                // If a category is already selected and in the list - don't change it
+                if (!force && current.selectedExpenseCategory.isNotBlank() &&
+                    current.expenseCategories.any { it.name == current.selectedExpenseCategory }
+                ) {
+                    copyState(current, category = current.selectedExpenseCategory)
+                } else {
+                    Timber.d("Setting default expense category: ${current.expenseCategories.first().name}")
+                    copyState(
+                        current,
+                        category = current.expenseCategories.first().name,
+                        selectedExpenseCategory = current.expenseCategories.first().name
+                    )
+                }
+            } else if (!current.isExpense && current.incomeCategories.isNotEmpty()) {
+                if (!force && current.selectedIncomeCategory.isNotBlank() &&
+                    current.incomeCategories.any { it.name == current.selectedIncomeCategory }
+                ) {
+                    copyState(current, category = current.selectedIncomeCategory)
+                } else {
+                    Timber.d("Setting default income category: ${current.incomeCategories.first().name}")
+                    copyState(
+                        current,
+                        category = current.incomeCategories.first().name,
+                        selectedIncomeCategory = current.incomeCategories.first().name
+                    )
+                }
+            } else {
+                current
+            }
         }
     }
 
@@ -454,7 +568,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(state, selectedWallets = walletsList.map { it.id })
                 }
             } catch (e: Exception) {
-                timber.log.Timber.e(e, "Ошибка при загрузке кошельков")
+                Timber.e(e, "Ошибка при загрузке кошельков")
             }
         }
     }
@@ -463,8 +577,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected val usedCategories = mutableSetOf<Pair<String, Boolean>>()
     open var autoDistributeIncome: Boolean = false
         protected set
-    open var onIncomeAddedCallback: ((com.davidbugayov.financeanalyzer.domain.model.Money) -> Unit)? = null
-    open var onExpenseAddedCallback: ((com.davidbugayov.financeanalyzer.domain.model.Money) -> Unit)? = null
+    open var onIncomeAddedCallback: ((Money) -> Unit)? = null
+    open var onExpenseAddedCallback: ((Money) -> Unit)? = null
     open var storedTargetWalletId: String? = null
         protected set
     open var budgetViewModel: com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel? = null
@@ -504,9 +618,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     open fun setupForIncomeAddition(amount: String, targetWalletId: String, context: android.content.Context) {
         setTargetWalletId(targetWalletId)
         if (!_state.value.addToWallet) {
-            handleBaseEvent(com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent.ToggleAddToWallet, context)
+            handleBaseEvent(BaseTransactionEvent.ToggleAddToWallet, context)
         }
-        handleBaseEvent(com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent.ForceSetIncomeType, context)
+        handleBaseEvent(BaseTransactionEvent.ForceSetIncomeType, context)
         _state.update { state -> 
             copyState(state, amount = amount)
         }
@@ -517,7 +631,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         val currentTargetWalletId = _state.value.targetWalletId
         val currentSelectedWallets = _state.value.selectedWallets
         val currentAddToWallet = _state.value.addToWallet
-        handleBaseEvent(com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent.ForceSetExpenseType, context)
+        handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
         _state.update { state ->
             copyState(
                 state,
@@ -545,7 +659,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         onIncomeAddedCallback = null
     }
 
-    open override fun updateCategoryPositions() {
+    override fun updateCategoryPositions() {
         viewModelScope.launch {
             usedCategories.forEach { (category, isExpense) ->
                 categoriesViewModel.incrementCategoryUsage(category, isExpense)
@@ -586,7 +700,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         category: String = state.category,
         categoryError: Boolean = state.categoryError,
         note: String = state.note,
-        selectedDate: java.util.Date = state.selectedDate,
+                                     selectedDate: Date = state.selectedDate,
         isExpense: Boolean = state.isExpense,
         showDatePicker: Boolean = state.showDatePicker,
         showCategoryPicker: Boolean = state.showCategoryPicker,
@@ -624,70 +738,4 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         customCategoryIcon: ImageVector = state.customCategoryIcon,
         availableCategoryIcons: List<ImageVector> = state.availableCategoryIcons
     ): S
-
-    /**
-     * Обновляет состояние через _state.update, вызывая метод copyState для генерации нового состояния.
-     */
-    protected fun updateState(block: (S) -> Pair<S, S>) {
-        _state.update { currentState ->
-            val (_, newState) = block(currentState)
-            newState
-        }
-    }
-
-    fun getMaterialIconByName(name: String): ImageVector {
-        return when (name) {
-            "MoreHoriz" -> Icons.Default.MoreHoriz
-            "Add" -> Icons.Default.Add
-            "ShoppingCart" -> Icons.Default.ShoppingCart
-            "Fastfood" -> Icons.Default.Fastfood
-            "Home" -> Icons.Default.Home
-            "DirectionsCar" -> Icons.Default.DirectionsCar
-            "Movie" -> Icons.Default.Movie
-            "Restaurant" -> Icons.Default.Restaurant
-            "LocalHospital" -> Icons.Default.LocalHospital
-            "Work" -> Icons.Default.Work
-            "School" -> Icons.Default.School
-            "Flight" -> Icons.Default.Flight
-            "Pets" -> Icons.Default.Pets
-            "CardGiftcard" -> Icons.Default.CardGiftcard
-            "SportsSoccer" -> Icons.Default.SportsSoccer
-            "Phone" -> Icons.Default.Phone
-            "Computer" -> Icons.Default.Computer
-            "CreditCard" -> Icons.Default.CreditCard
-            "AttachMoney" -> Icons.Default.AttachMoney
-            "Savings" -> Icons.Default.Savings
-            "EmojiEvents" -> Icons.Default.EmojiEvents
-            "LocalCafe" -> Icons.Default.LocalCafe
-            "LocalAtm" -> Icons.Default.LocalAtm
-            "ChildCare" -> Icons.Default.ChildCare
-            "LocalBar" -> Icons.Default.LocalBar
-            "LocalGasStation" -> Icons.Default.LocalGasStation
-            "LocalLaundryService" -> Icons.Default.LocalLaundryService
-            "LocalLibrary" -> Icons.Default.LocalLibrary
-            "LocalMall" -> Icons.Default.LocalMall
-            "LocalPharmacy" -> Icons.Default.LocalPharmacy
-            "LocalPizza" -> Icons.Default.LocalPizza
-            "LocalPlay" -> Icons.Default.LocalPlay
-            "LocalPostOffice" -> Icons.Default.LocalPostOffice
-            "LocalPrintshop" -> Icons.Default.LocalPrintshop
-            "LocalTaxi" -> Icons.Default.LocalTaxi
-            "LocalFlorist" -> Icons.Default.LocalFlorist
-            "LocalGroceryStore" -> Icons.Default.LocalGroceryStore
-            "MonetizationOn" -> Icons.Default.MonetizationOn
-            "Receipt" -> Icons.Default.Receipt
-            "SportsBasketball" -> Icons.Default.SportsBasketball
-            "SportsTennis" -> Icons.Default.SportsTennis
-            "Train" -> Icons.Default.Train
-            "Wifi" -> Icons.Default.Wifi
-            "Watch" -> Icons.Default.Watch
-            "WbSunny" -> Icons.Default.WbSunny
-            "Star" -> Icons.Default.Star
-            "Favorite" -> Icons.Default.Favorite
-            "DirectionsBus" -> Icons.Default.DirectionsBus
-            "StarBorder" -> Icons.Default.StarBorder
-            else -> Icons.Default.MoreHoriz
-        }
-    }
-
 } 

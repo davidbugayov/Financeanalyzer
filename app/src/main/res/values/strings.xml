@@ -502,4 +502,7 @@
 
     <!-- New strings for FinanceChartScreen -->
     <string name="select_icon">Выберите иконку</string>
+
+    <!-- Sources strings -->
+    <string name="delete_source">Удалить источник</string>
 </resources>

@@ -36,14 +36,11 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
@@ -56,6 +53,8 @@ import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewMo
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler

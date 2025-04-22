@@ -1,49 +1,42 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.add
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
+import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import kotlinx.coroutines.Dispatchers
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources
+import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
+import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource
-import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
-import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
-import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
 import java.util.Date
-import androidx.compose.ui.graphics.vector.ImageVector
-import java.time.LocalDate
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 
 /**
  * ViewModel для экрана добавления транзакции.
  * Следует принципам MVI и Clean Architecture.
  */
- class AddTransactionViewModel(
-    private val validateTransactionUseCase: ValidateTransactionUseCase,
+class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
-    categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
-    sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences,
-    walletRepository: com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+    validateTransactionUseCase: ValidateTransactionUseCase,
+    categoriesViewModel: CategoriesViewModel,
+    sourcePreferences: SourcePreferences,
+    walletRepository: WalletRepository
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
@@ -51,7 +44,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
     validateTransactionUseCase
 ) {
 
-    protected override val _state = MutableStateFlow(AddTransactionState())
+    override val _state = MutableStateFlow(AddTransactionState())
 
     // Расширение для преобразования строки в Double
     private fun String.toDouble(): Double {
@@ -97,10 +90,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
      * Инициализирует список источников
      */
     private fun initSources() {
-        if (_state == null) {
-            Timber.e("_state is null in initSources()")
-            return
-        }
         val sources = getInitialSources(sourcePreferences)
         _state.update { it.copy(sources = sources) }
     }
@@ -109,11 +98,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
      * Загружает категории из CategoriesViewModel
      */
     private fun loadCategories() {
-        Timber.d("[VM] loadCategories() вызван, categoriesViewModel: $categoriesViewModel")
-        if (categoriesViewModel == null) {
-            Timber.e("categoriesViewModel is null in loadCategories()")
-            return
-        }
         viewModelScope.launch {
             try {
                 categoriesViewModel.expenseCategories.collect { categories ->
@@ -121,10 +105,12 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                     _state.update { it.copy(expenseCategories = categories) }
                     if (_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
                         Timber.d("[VM] collect: Выставляю первую категорию расходов: ${categories.first().name}")
-                        _state.update { it.copy(
-                            category = categories.first().name,
-                            selectedExpenseCategory = categories.first().name
-                        ) }
+                        _state.update {
+                            it.copy(
+                                category = categories.first().name,
+                                selectedExpenseCategory = categories.first().name
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -138,10 +124,12 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                     _state.update { it.copy(incomeCategories = categories) }
                     if (!_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
                         Timber.d("[VM] collect: Выставляю первую категорию доходов: ${categories.first().name}")
-                        _state.update { it.copy(
-                            category = categories.first().name,
-                            selectedIncomeCategory = categories.first().name
-                        ) }
+                        _state.update {
+                            it.copy(
+                                category = categories.first().name,
+                                selectedIncomeCategory = categories.first().name
+                            )
+                        }
                     }
                 }
             } catch (e: Exception) {
@@ -150,7 +138,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
         }
     }
 
-    private fun setDefaultCategoryIfNeeded(force: Boolean = false) {
+    override fun setDefaultCategoryIfNeeded(force: Boolean) {
         _state.update { current ->
             if (current.isExpense && current.expenseCategories.isNotEmpty()) {
                 // Если категория уже выбрана и есть в списке — не менять
@@ -187,151 +175,11 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
     }
 
     /**
-     * Добавляет новую транзакцию
-     */
-    private fun addTransaction(context: android.content.Context) {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                val currentState = _state.value
-                val amount = currentState.amount.toDouble()
-
-                // Проверяем, что сумма введена
-                if (amount <= 0.0) {
-                    withContext(Dispatchers.Main) {
-                        _state.update { it.copy(error = "Введите сумму транзакции", isLoading = false) }
-                    }
-                    return@launch
-                }
-
-                // Инвертируем сумму, если это расход
-                val finalAmount = if (currentState.isExpense) -amount else amount
-
-                // Проверяем, является ли категория "Переводы"
-                val isTransfer = currentState.category == "Переводы"
-
-                // Создаем объект транзакции
-                val transaction = Transaction(
-                    amount = Money(finalAmount),
-                    date = currentState.selectedDate,
-                    note = currentState.note.trim(),
-                    category = currentState.category,
-                    source = currentState.source,
-                    isExpense = currentState.isExpense,
-                    sourceColor = currentState.sourceColor,
-                    isTransfer = isTransfer
-                )
-
-                addTransactionUseCase(transaction).fold(
-                    onSuccess = {
-                        // Обновляем виджет
-                        updateWidget(context)
-
-                        // Запрашиваем обновление данных
-                        requestDataRefresh()
-
-                        // Обновляем категории
-                        updateCategoryPositions()
-                        
-                        // Если это доход и установлен флаг добавления в кошелек
-                        if (!currentState.isExpense && currentState.addToWallet) {
-                            if (currentState.selectedWallets.isNotEmpty()) {
-                                // Используем универсальный метод из Base
-                                updateWalletsAfterTransaction(
-                                    walletIds = currentState.selectedWallets,
-                                    totalAmount = Money(amount),
-                                    isExpense = false
-                                )
-                            }
-                        }
-                        
-                        // Проверяем, нужно ли распределить доход по бюджету или обновить конкретный кошелек
-                        if (!currentState.isExpense) {
-                            val incomeAmount = Money(amount)
-                            
-                            // Вызываем callback для обновления баланса кошелька или распределения дохода
-                            onIncomeAddedCallback?.invoke(incomeAmount)
-                            Timber.d("Вызван callback для обновления баланса кошелька: ${currentState.targetWalletId}")
-                        }
-
-                        // Обновляем UI в основном потоке
-                        withContext(Dispatchers.Main) {
-                            _state.update {
-                                it.copy(
-                                    isSuccess = true,
-                                    error = null
-                                )
-                            }
-                        }
-                    },
-                    onFailure = { exception ->
-                        withContext(Dispatchers.Main) {
-                            _state.update {
-                                it.copy(
-                                    error = exception.message ?: "Ошибка при добавлении транзакции",
-                                    isSuccess = false,
-                                    isLoading = false
-                                )
-                            }
-                        }
-                    }
-                )
-            } catch (e: Exception) {
-                withContext(Dispatchers.Main) {
-                    _state.update {
-                        it.copy(
-                            error = e.message ?: "Непредвиденная ошибка при добавлении транзакции",
-                            isSuccess = false,
-                            isLoading = false
-                        )
-                    }
-                }
-            }
-        }
-    }
-
-    /**
-     * Запрашивает принудительное обновление данных у репозитория
-     */
-    private fun requestDataRefresh() {
-        viewModelScope.launch {
-            try {
-                getTransactionRepositoryInstance().notifyDataChanged(null)
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при запросе обновления данных")
-                // Продолжаем выполнение даже при ошибке
-            }
-        }
-    }
-
-    /**
      * Получает экземпляр TransactionRepository через Koin
      */
     private fun getTransactionRepositoryInstance(): TransactionRepository {
-        return org.koin.core.context.GlobalContext.get().get()
-    }
-
-    /**
-     * Запрашивает принудительное обновление данных в фоне
-     */
-    private fun requestDataRefreshInBackground() {
-        viewModelScope.launch(Dispatchers.IO) {
-            try {
-                // Одиночный запрос на обновление данных
-                getTransactionRepositoryInstance().notifyDataChanged(null)
-
-                // Пытаемся уведомить HomeViewModel (но только если это не приведет к ошибке)
-                try {
-                    val homeViewModel = org.koin.core.context.GlobalContext.get()
-                        .getOrNull<com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel>()
-                     homeViewModel?.initiateBackgroundDataRefresh()
-                } catch (e: Exception) {
-                    // Игнорируем ошибку, если HomeViewModel недоступен
-                    Timber.d("HomeViewModel недоступен: ${e.message}")
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при обновлении данных в фоне")
-            }
-        }
+        val repository: TransactionRepository by inject(TransactionRepository::class.java)
+        return repository
     }
 
     /**
@@ -345,17 +193,17 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
     private fun createTransactionFromState(currentState: AddTransactionState): Transaction {
         // Получаем сумму из строки
         val amount = currentState.amount.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
-        
+
         // Инвертируем сумму, если это расход
         val finalAmount = if (currentState.isExpense) -amount else amount
-        
+
         // Проверяем, является ли категория "Переводы"
         val isTransfer = currentState.category == "Переводы"
-        
+
         // Генерируем UUID для новой транзакции, если id не задан
         val transactionId = currentState.transactionToEdit?.id ?: java.util.UUID.randomUUID().toString()
         Timber.d("Используем ID транзакции: $transactionId (новый: ${currentState.transactionToEdit == null})")
-        
+
         // Создаем объект транзакции
         return Transaction(
             id = transactionId,
@@ -368,102 +216,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
             sourceColor = currentState.sourceColor,
             isTransfer = isTransfer
         )
-    }
-
-    /**
-     * Сохраняет транзакцию
-     */
-    fun saveTransaction() {
-        val s = _state.value
-        validateInputData(s.amount, s.category, s.source) { result ->
-            _state.update {
-                it.copy(
-                    amountError = result.amountError,
-                    categoryError = result.categoryError,
-                    sourceError = result.sourceError,
-                    error = result.errorMessage
-                )
-            }
-        }
-        if (_state.value.amountError) {
-            return
-        }
-
-        Timber.d("Запуск saveTransaction")
-        viewModelScope.launch {
-            try {
-                // Указываем, что идет загрузка
-                _state.update { it.copy(isLoading = true) }
-
-                // Получаем текущие настройки
-                val currentState = _state.value
-
-                // Создаем объект транзакции
-                val transaction = createTransactionFromState(currentState)
-
-                Timber.d("Saving transaction: $transaction")
-                
-                // Сохраняем транзакцию
-                addTransactionUseCase(transaction)
-
-                // Расчитываем сумму для callback
-                val amount = Money(
-                    amount = transaction.amount.amount.toDouble(),
-                    currency = selectedCurrency
-                )
-
-                // Обновляем состояние после сохранения
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        successMessage = if (it.isExpense) {
-                            "Расход успешно добавлен"
-                        } else {
-                            "Доход успешно добавлен"
-                        }
-                    )
-                }
-
-                // Вызываем соответствующий callback
-                if (currentState.isExpense) {
-                    // Отправляем событие о изменении данных перед вызовом колбэка
-                    // чтобы убедиться, что все экраны обновят данные при возвращении
-                    notifyDataChanged(transaction.id)
-                    
-                    // Вызываем callback о добавлении расхода
-                    onExpenseAddedCallback?.invoke(amount)
-                } else {
-                    // Отправляем событие о изменении данных перед вызовом колбэка
-                    // чтобы убедиться, что все экраны обновят данные при возвращении
-                    notifyDataChanged(transaction.id)
-                    
-                    // Вызываем callback о добавлении дохода
-                    onIncomeAddedCallback?.invoke(amount)
-                }
-
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при сохранении транзакции")
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        error = e.message ?: "Неизвестная ошибка"
-                    )
-                }
-            }
-        }
-    }
-
-    /**
-     * Запрашивает принудительное обновление данных у репозитория
-     */
-    private fun notifyDataChanged(transactionId: String) {
-        viewModelScope.launch {
-            try {
-                getTransactionRepositoryInstance().notifyDataChanged(transactionId)
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при запросе обновления данных")
-            }
-        }
     }
 
     /**
@@ -482,22 +234,10 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
         _state.update { it.copy(selectedWallets = emptyList()) }
     }
 
-    /**
-     * Проверка валидации ввода
-     */
-    fun validateInputData(amount: String, category: String, source: String, updateState: (ValidateTransactionUseCase.Result) -> Unit): Boolean {
-        val result = validateTransactionUseCase(amount, category, source)
-        updateState(result)
-        return result.isValid
-    }
-
     private fun validateInput(
         walletId: String?,
         amount: String,
-        note: String,
         date: Date,
-        sourceColor: Int,
-        source: String,
         categoryId: String,
         isExpense: Boolean
     ): Boolean {
@@ -512,11 +252,13 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                 dateError = false
             )
         }
-        // Check wallet - только для доходов с включенным addToWallet
+
+        // Check wallet - only for income with addToWallet enabled
         if (!isExpense && _state.value.addToWallet && walletId.isNullOrBlank()) {
             Timber.d("Ошибка: не выбран кошелек для дохода с addToWallet=true")
             validationBuilder.addWalletError()
         }
+
         // Check amount
         if (amount.isBlank()) {
             Timber.d("Ошибка: сумма не введена")
@@ -533,11 +275,13 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                 validationBuilder.addAmountError()
             }
         }
+
         // Check category
         if (categoryId.isBlank()) {
             Timber.d("Ошибка: категория не выбрана")
             validationBuilder.addCategoryError()
         }
+
         // Check date (не должна быть в будущем)
         var dateError = false
         val today = java.util.Calendar.getInstance().apply {
@@ -546,10 +290,12 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
             set(java.util.Calendar.SECOND, 59)
             set(java.util.Calendar.MILLISECOND, 999)
         }.time
+
         if (date.after(today)) {
             Timber.d("Ошибка: дата в будущем")
             dateError = true
         }
+
         // No validation for source - allowing empty sources
         val validationResult = validationBuilder.build()
         _state.update {
@@ -561,26 +307,26 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                 dateError = dateError
             )
         }
+
         return validationResult.isValid && !dateError
     }
 
-    fun submit(preventAutoSubmit: Boolean = false) {
-        Timber.d("[VM] submit() вызван. preventAutoSubmit=${_state.value.preventAutoSubmit}")
+    private fun submit() {
         if (_state.value.preventAutoSubmit) {
-            Timber.d("[VM] submit(): preventAutoSubmit=true, сбрасываем и выходим")
+            Timber.d("preventAutoSubmit is true, skipping submission")
             _state.update { it.copy(preventAutoSubmit = false) }
             return
         }
 
-        Timber.d("Submit вызван, начинаем обработку")
-        
+        Timber.d("Submit called, starting processing")
+
         try {
             val amountStr = _state.value.amount
-            Timber.d("Проверка суммы: '$amountStr'")
-            
+            Timber.d("Checking amount: '$amountStr'")
+
             if (amountStr.isBlank()) {
                 // Если сумма не введена, только подсветить поле суммы, но без диалога ошибки
-                Timber.d("Сумма не введена, подсвечиваем ошибку")
+                Timber.d("Amount is blank, highlighting error")
                 _state.update { state ->
                     state.copy(
                         amountError = true
@@ -591,92 +337,92 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
 
             // Проверяем валидацию
             val s = _state.value
-            Timber.d("Начинаем валидацию: walletId=${s.targetWalletId}, amount=${s.amount}, category=${s.category}, source=${s.source}")
-            
+            Timber.d("Starting validation: walletId=${s.targetWalletId}, amount=${s.amount}, category=${s.category}, source=${s.source}")
+
             val validationResult = validateInput(
                 walletId = s.targetWalletId,
                 amount = s.amount,
-                note = s.note,
                 date = s.selectedDate,
-                sourceColor = s.sourceColor,
-                source = s.source,
                 categoryId = s.category,
                 isExpense = s.isExpense
             )
-            
-            Timber.d("Результат валидации: $validationResult")
-            
+
+            Timber.d("Validation result: $validationResult")
+
             if (!validationResult) {
-                Timber.d("Валидация не пройдена, прерываем")
+                Timber.d("Validation failed, aborting")
                 return
             }
 
             // Если сумма введена, продолжаем со стандартной логикой 
             // создания и сохранения транзакции
-            Timber.d("Создаем транзакцию из состояния")
+            Timber.d("Validation passed, creating transaction")
             val transaction = createTransactionFromState(_state.value)
-            Timber.d("Созданная транзакция: $transaction")
-            
+            Timber.d("Transaction created: id=${transaction.id}, amount=${transaction.amount}, category=${transaction.category}")
+
             viewModelScope.launch {
-                Timber.d("Вызываем addTransactionUseCase")
-                val result = addTransactionUseCase(transaction)
-                Timber.d("Результат выполнения addTransactionUseCase: $result")
-                
-                if (result is DomainResult.Success) {
-                    Timber.d("[VM] Транзакция успешно добавлена, isSuccess=true")
-                    _state.update { it.copy(isSuccess = true, error = null) }
-                } else if (result is DomainResult.Error) {
-                    Timber.e("Ошибка: ${result.exception.message}")
-                    _state.update { it.copy(error = result.exception.message) }
+                Timber.d("Launching coroutine to add transaction")
+                try {
+                    val result = addTransactionUseCase(transaction)
+                    Timber.d("Transaction add result: $result")
+
+                    if (result is DomainResult.Success) {
+                        Timber.d("Transaction added successfully")
+                        _state.update { it.copy(isSuccess = true, error = null) }
+                    } else if (result is DomainResult.Error) {
+                        Timber.e("Error adding transaction: ${result.exception.message}")
+                        _state.update { it.copy(error = result.exception.message) }
+                    }
+                } catch (e: Exception) {
+                    Timber.e(e, "Exception in coroutine while adding transaction")
+                    _state.update { it.copy(error = e.message ?: "Unknown error adding transaction") }
                 }
             }
         } catch (e: Exception) {
             // Общая обработка исключений, но не показываем диалог
-            Timber.e(e, "Исключение при обработке submit")
+            Timber.e(e, "Exception during submit processing")
             e.printStackTrace()
-            _state.update { it.copy(error = e.message ?: "Неизвестная ошибка") }
+            _state.update { it.copy(error = e.message ?: "Unknown error") }
         }
     }
 
     override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
-        Timber.d("[VM] onEvent: $event")
         when (event) {
             is BaseTransactionEvent.ToggleTransactionType -> {
                 _state.update { it.copy(isExpense = !it.isExpense, category = "") }
-                setDefaultCategoryIfNeeded()
+                setDefaultCategoryIfNeeded(force = true)
             }
+
             is BaseTransactionEvent.SetExpenseCategory -> _state.update { state ->
                 val newState = state.copy(
                     category = event.category,
                     selectedExpenseCategory = event.category
                 )
-                Timber.d("[VM] SetExpenseCategory: selectedExpenseCategory теперь: ${event.category}")
-                Timber.d("[VM] Список категорий: ${state.expenseCategories.map { it.name }}")
                 newState
             }
+
             is BaseTransactionEvent.SetIncomeCategory -> _state.update { state ->
                 val newState = state.copy(
                     category = event.category,
                     selectedIncomeCategory = event.category
                 )
-                Timber.d("[VM] SetIncomeCategory: selectedIncomeCategory теперь: ${event.category}")
-                Timber.d("[VM] Список категорий: ${state.incomeCategories.map { it.name }}")
                 newState
             }
+
             is BaseTransactionEvent.Submit -> {
-                Timber.d("[VM] onEvent: Submit")
                 submit()
             }
+
             is BaseTransactionEvent.ResetAmountOnly -> {
-                Timber.d("[VM] onEvent: ResetAmountOnly")
                 _state.update { it.copy(amount = "", amountError = false, note = "", isSuccess = false, preventAutoSubmit = false) }
             }
+
             is BaseTransactionEvent.PreventAutoSubmit -> {
-                Timber.d("[VM] onEvent: PreventAutoSubmit")
                 _state.update { it.copy(preventAutoSubmit = true) }
             }
+
             is BaseTransactionEvent.AddCustomSource -> {
-                val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
+                val newSource = Source(
                     name = event.source,
                     color = event.color,
                     isCustom = true
@@ -696,6 +442,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                     )
                 }
             }
+
             is BaseTransactionEvent.ToggleAddToWallet -> {
                 val newAddToWallet = !_state.value.addToWallet
                 val allWalletIds = wallets.map { it.id }
@@ -706,6 +453,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
                     )
                 }
             }
+
             else -> handleBaseEvent(event, context)
         }
     }
