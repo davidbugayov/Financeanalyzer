@@ -248,27 +248,129 @@
 -keep class com.gemalto.jp2.** { *; }
 -dontwarn com.gemalto.jp2.**
 
-# Правила для Apache POI
+# ПОЛНОСТЬЮ СОХРАНЯЕМ ВСЕ КЛАССЫ, СВЯЗАННЫЕ С POI, БЕЗ МИНИФИКАЦИИ
 -keep class org.apache.poi.** { *; }
--dontwarn org.apache.poi.**
--dontwarn java.awt.**
--dontwarn javax.xml.**
--dontwarn org.apache.batik.**
--dontwarn org.apache.xmlbeans.**
--dontwarn net.sf.saxon.**
--dontwarn org.osgi.framework.**
--dontwarn java.awt.Color
--dontwarn java.awt.geom.**
--dontwarn java.awt.image.**
--dontwarn java.awt.color.ColorSpace
--dontwarn javax.xml.stream.**
--dontwarn net.sf.saxon.**
-
-# Разрешить доступ к классам по отражению
--keep class org.apache.poi.ss.** { *; }
--keep class org.apache.poi.hssf.** { *; }
--keep class org.apache.poi.xssf.** { *; }
--keep class org.apache.poi.poifs.** { *; }
--keep class org.apache.poi.util.** { *; }
--keep class org.apache.poi.sl.** { *; }
 -keep class org.apache.xmlbeans.** { *; }
+-keep class org.openxmlformats.** { *; }
+-keep class schemaorg_apache_xmlbeans.** { *; }
+-keep class com.microsoft.schemas.** { *; }
+-keep class org.w3c.** { *; }
+-keep class org.xml.** { *; }
+-keep class org.etsi.** { *; }
+-keep class javax.xml.** { *; }
+-keep class net.sf.saxon.** { *; }
+
+# Не предупреждать об отсутствующих классах для POI
+-dontwarn org.apache.poi.**
+-dontwarn org.apache.xmlbeans.**
+-dontwarn org.openxmlformats.**
+-dontwarn com.microsoft.schemas.**
+-dontwarn org.etsi.**
+-dontwarn org.w3c.**
+-dontwarn org.xml.**
+-dontwarn net.sf.saxon.**
+-dontwarn javax.xml.**
+-dontwarn java.awt.**
+-dontwarn org.osgi.**
+-dontwarn org.osgi.framework.**
+-dontwarn org.apache.commons.logging.**
+-dontwarn org.apache.logging.**
+-dontwarn org.apache.logging.log4j.**
+-dontwarn org.slf4j.**
+
+# Блокируем инициализацию Log4j - замена на пустые методы
+-assumenosideeffects class org.apache.logging.log4j.LogManager {
+    ** getContext(...);
+    ** getLogger(...);
+    ** getFormatterLogger(...);
+}
+
+-assumenosideeffects class org.apache.logging.log4j.** {
+    ** *(...);
+}
+
+-assumenosideeffects class org.apache.logging.log4j.status.StatusLogger {
+    ** *(...);
+}
+
+-assumenosideeffects class org.apache.logging.log4j.spi.AbstractLogger {
+    ** *(...);
+}
+
+# Keep Apache POI classes
+-keep class org.apache.poi.** { *; }
+-keep class org.apache.xmlbeans.** { *; }
+-keep class org.openxmlformats.** { *; }
+-keep class com.microsoft.schemas.** { *; }
+-keep class schemaorg_apache_xmlbeans.** { *; }
+-keep class org.apache.commons.** { *; }
+-keep class org.w3c.dom.** { *; }
+
+# Keep Log4j classes
+-keep class org.apache.logging.log4j.** { *; }
+
+# Keep XML parsers needed by POI
+-dontwarn javax.xml.**
+-dontwarn org.apache.commons.**
+-dontwarn org.apache.xmlbeans.**
+-dontwarn org.apache.poi.**
+-dontwarn org.openxmlformats.**
+-dontwarn org.w3c.**
+-dontwarn org.xml.sax.**
+
+# Keep special POI factory methods
+-keepclassmembers class org.apache.poi.** { 
+  public static ** createRelationship(**); 
+  public static ** getRelationshipById(**);
+  public static ** createDocument(**);
+}
+
+# Keep all Apache POI classes and their methods
+-keep class org.apache.poi.** { *; }
+-keep class org.apache.xmlbeans.** { *; }
+-keep class org.openxmlformats.** { *; }
+-keep class org.apache.commons.** { *; }
+-keep class com.zaxxer.** { *; }
+-keep class javax.xml.** { *; }
+-keep class org.xml.** { *; }
+-keep class org.w3c.** { *; }
+
+# Keep all XML-related libraries used by POI
+-dontwarn javax.xml.**
+-dontwarn org.apache.xml.**
+-dontwarn org.apache.xmlbeans.**
+-dontwarn org.w3c.dom.**
+-dontwarn org.etsi.**
+-dontwarn javax.activation.**
+-dontwarn org.openxmlformats.**
+-dontwarn org.slf4j.**
+-dontwarn org.apache.log4j.**
+-dontwarn org.apache.logging.**
+-dontwarn org.apache.commons.compress.**
+-dontwarn com.zaxxer.**
+
+# Specifically keep classes needed for XLSX parsing
+-keep class org.apache.poi.xssf.usermodel.** { *; }
+-keep class org.apache.poi.ss.usermodel.** { *; }
+-keep class org.apache.poi.util.** { *; }
+-keep class org.apache.poi.ooxml.** { *; }
+-keep class org.apache.poi.poifs.** { *; }
+-keep class org.apache.poi.hssf.** { *; }
+
+# Keep constructors that might be called via reflection
+-keepclassmembers class org.apache.poi.** {
+  public <init>(...);
+}
+
+# Keep POI factory methods
+-keepclassmembers class org.apache.poi.ss.usermodel.WorkbookFactory {
+  public static * create(...);
+}
+
+# Don't note errors about missing optional classes
+-dontnote org.apache.poi.**
+-dontnote org.apache.xmlbeans.**
+-dontnote javax.xml.**
+
+# Keep R8 from potentially optimizing away classes that are accessed via reflection
+-keepattributes InnerClasses,Signature,*Annotation*

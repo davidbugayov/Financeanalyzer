@@ -47,6 +47,9 @@ class FinanceApp : Application() {
         super.onCreate()
 
         try {
+            // Сначала инициализируем параметры для POI, Log4j и других библиотек
+            initializeExternalLibraries()
+            
             // Сначала инициализируем обычное логирование Timber
             TimberInitializer.init(BuildConfig.DEBUG)
             Timber.d("Timber инициализирован")
@@ -176,5 +179,76 @@ class FinanceApp : Application() {
                 CrashlyticsUtils.recordException(e)
             }
         }
+    }
+
+    /**
+     * Инициализирует настройки для внешних библиотек
+     * Позволяет избежать проблем с логированием при сборке Release
+     */
+    private fun initializeExternalLibraries() {
+        try {
+            // Отключаем логирование для Apache POI
+            System.setProperty("org.apache.poi.util.POILogger", "org.apache.poi.util.NullLogger")
+            
+            // Блокируем доступ к javax.xml.transform в Log4j, который вызывает проблемы в Android
+            System.setProperty("javax.xml.transform.TransformerFactory", 
+                               "org.apache.xalan.processor.TransformerFactoryImpl")
+            
+            // Копируем конфигурацию Log4j в доступное место
+            copyLog4jConfigFile()
+            
+            // Отключаем Log4j полностью
+            System.setProperty("org.apache.logging.log4j.simplelog.StatusLogger.level", "OFF")
+            System.setProperty("org.apache.logging.log4j.level", "OFF")
+            System.setProperty("log4j2.disable.jmx", "true")
+            System.setProperty("log4j.configurationFile", getLog4jConfigPath())
+            System.setProperty("org.apache.logging.log4j.LogManager.StatusLogger.level", "OFF")
+            
+            // Отключаем другие логгеры
+            System.setProperty("org.apache.commons.logging.Log", "org.apache.commons.logging.impl.NoOpLog")
+            System.setProperty("org.slf4j.simpleLogger.defaultLogLevel", "OFF")
+            
+            // Не пытаемся явно загружать проблемные классы
+            Timber.d("Внешние библиотеки инициализированы, логирование отключено")
+        } catch (e: Exception) {
+            // Игнорируем любые ошибки, чтобы не блокировать запуск приложения
+            Timber.e(e, "Ошибка при инициализации внешних библиотек")
+        }
+    }
+
+    /**
+     * Копирует файл конфигурации log4j2-off.xml из assets в директорию приложения
+     */
+    private fun copyLog4jConfigFile() {
+        try {
+            val configFile = getLog4jConfigPath()
+            val file = java.io.File(configFile)
+            
+            // Если файл уже существует, пропускаем копирование
+            if (file.exists()) {
+                return
+            }
+            
+            // Создаем директорию, если она не существует
+            file.parentFile?.mkdirs()
+            
+            // Копируем файл из assets
+            assets.open("log4j2-off.xml").use { input ->
+                java.io.FileOutputStream(file).use { output ->
+                    input.copyTo(output)
+                }
+            }
+            
+            Timber.d("Файл конфигурации log4j2-off.xml скопирован в ${file.absolutePath}")
+        } catch (e: Exception) {
+            Timber.w(e, "Не удалось скопировать файл конфигурации log4j2-off.xml")
+        }
+    }
+    
+    /**
+     * Возвращает путь к файлу конфигурации Log4j
+     */
+    private fun getLog4jConfigPath(): String {
+        return "${filesDir.absolutePath}/log4j2-off.xml"
     }
 } 

@@ -87,7 +87,114 @@ class AlfaBankImportUseCase(
             "xlsx" -> {
                 // Для XLSX используем специальный метод импорта
                 Timber.d("АЛЬФА-ИМПОРТ: Обнаружен файл XLSX, используем специальный импорт для Excel")
-                importFromExcel(uri) { result -> emit(result) }
+                try {
+                    importFromExcel(uri) { result -> emit(result) }
+                } catch (e: Throwable) {
+                    // Если произошла ошибка при импорте XLSX, логируем ее
+                    Timber.e(e, "АЛЬФА-ИМПОРТ: Ошибка при импорте XLSX, пробуем альтернативный метод")
+                    
+                    // Пробуем прочитать XLSX как текстовый файл (если это экспорт с разделителями)
+                    try {
+                        Timber.d("АЛЬФА-ИМПОРТ: Пробуем обработать XLSX как текстовый файл")
+                        emit(ImportResult.Progress(current = 20, total = 100, message = "Пробуем альтернативный метод импорта..."))
+                        
+                        // Открываем файл как текстовый и пробуем прочитать
+                        val inputStream = context.contentResolver.openInputStream(uri)
+                            ?: throw IllegalArgumentException("Не удалось открыть файл")
+                        
+                        val reader = BufferedReader(InputStreamReader(inputStream))
+                        
+                        if (isValidFormat(reader)) {
+                            Timber.d("АЛЬФА-ИМПОРТ: XLSX файл имеет текстовый формат, который можно обработать")
+                            
+                            // Заново открываем поток для чтения данных
+                            inputStream.close()
+                            
+                            val dataStream = context.contentResolver.openInputStream(uri)
+                                ?: throw IllegalArgumentException("Не удалось открыть файл")
+                            
+                            val dataReader = BufferedReader(InputStreamReader(dataStream))
+                            
+                            // Пропускаем заголовок
+                            skipHeaders(dataReader)
+                            
+                            // Считаем количество строк для отображения прогресса
+                            val totalLines = countTransactionLines(uri)
+                            
+                            var currentLine = 0
+                            var importedCount = 0
+                            var skippedCount = 0
+                            var totalAmount = Money.zero()
+                            
+                            // Читаем и обрабатываем строки с транзакциями
+                            dataReader.useLines { lines ->
+                                lines.forEach { line ->
+                                    if (shouldSkipLine(line)) {
+                                        return@forEach
+                                    }
+                                    
+                                    currentLine++
+                                    
+                                    try {
+                                        // Парсим строку и получаем транзакцию
+                                        val transaction = parseLine(line)
+                                        
+                                        // Добавляем информацию о банке как источнике
+                                        val transactionWithSource = transaction.copy(
+                                            source = bankName
+                                        )
+                                        
+                                        // Сохраняем только транзакции с положительной суммой
+                                        if (transactionWithSource.amount > Money.zero()) {
+                                            repository.addTransaction(transactionWithSource)
+                                            
+                                            importedCount++
+                                            // Учитываем сумму транзакции в общей сумме
+                                            totalAmount = if (transactionWithSource.isExpense) 
+                                                totalAmount - transactionWithSource.amount 
+                                            else 
+                                                totalAmount + transactionWithSource.amount
+                                        } else {
+                                            skippedCount++
+                                            Timber.d("АЛЬФА-ИМПОРТ: Пропущена транзакция с нулевой суммой")
+                                        }
+                                    } catch (e: Exception) {
+                                        skippedCount++
+                                        Timber.e(e, "АЛЬФА-ИМПОРТ: Ошибка при обработке строки $currentLine: ${e.message}")
+                                    }
+                                    
+                                    // Эмитим прогресс каждые 10 записей
+                                    if (currentLine % 10 == 0) {
+                                        emit(ImportResult.Progress(
+                                            current = currentLine,
+                                            total = totalLines,
+                                            message = "Импортируется $currentLine из $totalLines транзакций из $bankName"
+                                        ))
+                                    }
+                                }
+                            }
+                            
+                            if (importedCount > 0) {
+                                // Отправляем результат успешного импорта
+                                emit(
+                                    ImportResult.Success(
+                                        importedCount = importedCount,
+                                        skippedCount = skippedCount,
+                                        totalAmount = totalAmount
+                                    )
+                                )
+                            } else {
+                                emit(ImportResult.Error("Не найдено транзакций для импорта в файле (альтернативный метод)"))
+                            }
+                        } else {
+                            Timber.d("АЛЬФА-ИМПОРТ: XLSX файл не удалось прочитать как текстовый")
+                            emit(ImportResult.Error("Не удалось обработать XLSX файл. Попробуйте экспортировать выписку в формате CSV или TXT."))
+                        }
+                    } catch (fallbackError: Exception) {
+                        Timber.e(fallbackError, "АЛЬФА-ИМПОРТ: Альтернативный метод тоже не сработал")
+                        emit(ImportResult.Error("Не удалось обработать XLSX файл: ${e.message}\nАльтернативный метод не сработал: ${fallbackError.message}"))
+                    }
+                }
             }
             else -> {
                 // Для CSV и других форматов используем стандартный метод с фильтрацией
@@ -279,59 +386,71 @@ class AlfaBankImportUseCase(
         val transactions = mutableListOf<Transaction>()
         
         try {
-            // Открываем Excel файл
-            val workbook = XSSFWorkbook(inputStream)
-            Timber.d("АЛЬФА-ИМПОРТ: XLSX файл успешно открыт, количество листов: ${workbook.numberOfSheets}")
+            // Отключаем логирование POI, чтобы избежать проблем
+            System.setProperty("org.apache.poi.util.POILogger", "org.apache.poi.util.NullLogger")
             
-            // Обрабатываем первый лист (обычно выписка на первом листе)
-            val sheet = workbook.getSheetAt(0)
-            Timber.d("АЛЬФА-ИМПОРТ: Обрабатываем лист: ${sheet.sheetName}, общее число строк: ${sheet.lastRowNum + 1}")
-            
-            // Находим заголовки колонок
-            val headerRow = findHeaderRow(sheet)
-            if (headerRow != null) {
-                Timber.d("АЛЬФА-ИМПОРТ: Найдена строка с заголовками на позиции: ${headerRow.rowNum}")
+            // Открываем Excel файл с использованием try-with-resources
+            XSSFWorkbook(inputStream).use { wb ->
+                Timber.d("АЛЬФА-ИМПОРТ: XLSX файл успешно открыт, количество листов: ${wb.numberOfSheets}")
                 
-                // Определяем индексы нужных колонок
-                val columnIndices = findColumnIndices(headerRow)
-                Timber.d("АЛЬФА-ИМПОРТ: Определены индексы колонок: $columnIndices")
+                // Обрабатываем первый лист (обычно выписка на первом листе)
+                val sheet = wb.getSheetAt(0)
+                Timber.d("АЛЬФА-ИМПОРТ: Обрабатываем лист: ${sheet.sheetName}, общее число строк: ${sheet.lastRowNum + 1}")
                 
-                // Обрабатываем строки с данными
-                var processedRows = 0
-                var skippedRows = 0
-                
-                for (rowIndex in headerRow.rowNum + 1 until sheet.lastRowNum + 1) {
-                    val row = sheet.getRow(rowIndex) ?: continue
+                // Находим заголовки колонок
+                val headerRow = findHeaderRow(sheet)
+                if (headerRow != null) {
+                    Timber.d("АЛЬФА-ИМПОРТ: Найдена строка с заголовками на позиции: ${headerRow.rowNum}")
                     
-                    // Пропускаем пустые строки или строки с итогами
-                    if (shouldSkipExcelRow(row)) {
-                        skippedRows++
-                        continue
-                    }
+                    // Определяем индексы нужных колонок
+                    val columnIndices = findColumnIndices(headerRow)
+                    Timber.d("АЛЬФА-ИМПОРТ: Определены индексы колонок: $columnIndices")
                     
-                    try {
-                        // Преобразуем строку Excel в транзакцию
-                        val transaction = parseExcelRow(row, columnIndices)
-                        transactions.add(transaction)
-                        processedRows++
+                    // Обрабатываем строки с данными
+                    var processedRows = 0
+                    var skippedRows = 0
+                    
+                    for (rowIndex in headerRow.rowNum + 1 until sheet.lastRowNum + 1) {
+                        val row = sheet.getRow(rowIndex) ?: continue
                         
-                        if (processedRows % 10 == 0) {
-                            Timber.d("АЛЬФА-ИМПОРТ: Обработано $processedRows строк из XLSX")
+                        // Пропускаем пустые строки или строки с итогами
+                        if (shouldSkipExcelRow(row)) {
+                            skippedRows++
+                            continue
                         }
-                    } catch (e: Exception) {
-                        Timber.w(e, "АЛЬФА-ИМПОРТ: Ошибка при обработке строки Excel №${rowIndex}")
-                        skippedRows++
+                        
+                        try {
+                            // Преобразуем строку Excel в транзакцию
+                            val transaction = parseExcelRow(row, columnIndices)
+                            transactions.add(transaction)
+                            processedRows++
+                            
+                            if (processedRows % 10 == 0) {
+                                Timber.d("АЛЬФА-ИМПОРТ: Обработано $processedRows строк из XLSX")
+                            }
+                        } catch (e: Exception) {
+                            Timber.w(e, "АЛЬФА-ИМПОРТ: Ошибка при обработке строки Excel №${rowIndex}")
+                            skippedRows++
+                        }
                     }
+                    
+                    Timber.d("АЛЬФА-ИМПОРТ: Всего обработано $processedRows строк, пропущено $skippedRows строк")
+                } else {
+                    Timber.w("АЛЬФА-ИМПОРТ: Не найдена строка с заголовками в файле")
                 }
-                
-                Timber.d("АЛЬФА-ИМПОРТ: Всего обработано $processedRows строк, пропущено $skippedRows строк")
-            } else {
-                Timber.w("АЛЬФА-ИМПОРТ: Не найдена строка с заголовками в файле")
             }
             
-            workbook.close()
-        } catch (e: Exception) {
-            Timber.e(e, "АЛЬФА-ИМПОРТ: Ошибка при парсинге Excel файла")
+            Timber.d("АЛЬФА-ИМПОРТ: Excel файл успешно закрыт")
+        } catch (e: Throwable) {
+            // Ловим любые ошибки, включая Error
+            Timber.e(e, "АЛЬФА-ИМПОРТ: Ошибка при парсинге Excel файла: ${e.javaClass.name} - ${e.message}")
+        } finally {
+            // Закрываем поток входных данных в блоке finally
+            try {
+                inputStream.close()
+            } catch (e: Exception) {
+                // Игнорируем ошибки при закрытии
+            }
         }
         
         Timber.d("АЛЬФА-ИМПОРТ: Итого найдено транзакций: ${transactions.size}")

@@ -56,6 +56,7 @@ import com.davidbugayov.financeanalyzer.R
 @Composable
 fun AnimatedBottomNavigationBar(
     visible: Boolean = true,
+    onAddClick: () -> Unit = {},
     onChartClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onBudgetClick: () -> Unit,
@@ -116,12 +117,20 @@ fun AnimatedBottomNavigationBar(
                     isMain = false
                 )
 
-                // Бюджет (центр)
+                // Бюджет (слева от центра)
                 NavButton(
                     icon = Icons.Default.AccountBalanceWallet,
                     text = stringResource(R.string.budget),
                     onClick = onBudgetClick,
                     isMain = false
+                )
+
+                // Добавить (центр)
+                NavButton(
+                    icon = Icons.Default.Add,
+                    text = stringResource(R.string.add_button),
+                    onClick = onAddClick,
+                    isMain = true
                 )
 
                 // История (справа)

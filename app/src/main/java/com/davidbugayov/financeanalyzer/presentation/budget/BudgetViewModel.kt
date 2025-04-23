@@ -218,7 +218,7 @@ class BudgetViewModel(
                         // чтобы избежать NullPointerException для кошельков без этого поля
                         val updatedWallet = wallet.copy(
                             spent = totalSpent,
-                            linkedCategories = wallet.linkedCategories ?: emptyList()
+                            linkedCategories = wallet.linkedCategories
                         )
                         walletRepository.updateWallet(updatedWallet)
                     }

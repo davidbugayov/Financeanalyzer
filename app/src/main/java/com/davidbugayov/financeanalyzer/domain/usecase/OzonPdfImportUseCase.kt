@@ -235,10 +235,7 @@ class OzonPdfImportUseCase(
                     
                     // Получаем дату операции
                     val date = parseDate(dateString)
-                    
-                    // Ищем код документа для идентификации транзакции
-                    val documentId = extractDocumentId(line)
-                    
+
                     // Собираем полное описание транзакции
                     val fullDescriptionBuilder = StringBuilder()
                     fullDescriptionBuilder.append(extractDescription(line))

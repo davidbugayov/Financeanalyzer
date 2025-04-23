@@ -173,6 +173,7 @@ data class Money(
 
     /**
      * Форматирует денежное значение в строку с учетом валюты
+     * 
      * @param showCurrency Показывать ли символ валюты
      * @param showSign Показывать ли знак + для положительных значений
      * @return Отформатированная строка
@@ -180,18 +181,25 @@ data class Money(
     fun format(showCurrency: Boolean = true, showSign: Boolean = false): String {
         val locale = Locale.getDefault()
         
-        val pattern = buildString {
-            if (showSign) append("+;-")
-            append("#,##0")
+        // Создаем базовый паттерн форматирования для положительных чисел
+        val positivePattern = if (showSign) "+#,##0" else "#,##0"
+        
+        // Добавляем десятичные знаки, если нужно
+        val patternWithDecimals = StringBuilder(positivePattern).apply {
             if (currency.decimalPlaces > 0) {
                 append(".")
-                repeat(currency.decimalPlaces) { append("#") }
+                repeat(currency.decimalPlaces) { append("0") }
             }
-        }
+        }.toString()
         
-        val formatter = getFormatter(locale, currency, pattern)
+        // Полный паттерн с отрицательным форматом
+        val fullPattern = "$patternWithDecimals;-$patternWithDecimals"
+        
+        // Получаем форматтер и форматируем сумму
+        val formatter = getFormatter(locale, currency, fullPattern)
         val formattedAmount = formatter.format(amount)
         
+        // Добавляем символ валюты, если нужно
         return when {
             !showCurrency -> formattedAmount
             currency.symbolPosition == SymbolPosition.BEFORE -> "${currency.symbol}$formattedAmount"

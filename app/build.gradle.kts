@@ -165,6 +165,16 @@ android {
             }
         }
     }
+    
+    // Exclude POI and related libraries from minification
+    packagingOptions {
+        resources {
+            excludes.add("META-INF/**")
+        }
+        jniLibs {
+            useLegacyPackaging = true
+        }
+    }
 }
 
 tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
@@ -248,9 +258,15 @@ dependencies {
     // PDF
     implementation(libs.pdfbox.android)
     
-    // Excel
-    implementation(libs.poi.core)
-    implementation(libs.poi.ooxml)
+    // Excel - Keep POI and related libraries from being minified
+    implementation(libs.poi.core) {
+        exclude(group = "stax", module = "stax-api")
+        exclude(group = "javax.xml.stream", module = "stax-api")
+    }
+    implementation(libs.poi.ooxml) {
+        exclude(group = "stax", module = "stax-api")
+        exclude(group = "javax.xml.stream", module = "stax-api")
+    }
 
     // Testing
     testImplementation(libs.junit)

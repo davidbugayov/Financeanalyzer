@@ -139,11 +139,11 @@ class FinancialMetrics private constructor() : KoinComponent {
                     Timber.d("Загружено из кэша: доход=$income, расход=$expense, баланс=$bal")
                 } else {
                     Timber.d("Кэш устарел, пересчитываем метрики")
-                    recalculateStats(false)
+                    recalculateStats()
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке начальных статистических данных")
-                recalculateStats(false)
+                recalculateStats()
             } finally {
                 _isLoading.value = false
             }
@@ -249,7 +249,7 @@ class FinancialMetrics private constructor() : KoinComponent {
      * 
      * @param updatePreferences если true, то обновляет кэш в SharedPreferences
      */
-    fun recalculateStats(updatePreferences: Boolean = true) {
+    fun recalculateStats() {
         scope.launch {
             _isLoading.value = true
             

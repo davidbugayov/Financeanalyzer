@@ -307,10 +307,7 @@ class SberbankPdfImportUseCase(
                     val category = determineCategory(transactionBlock)
                     
                     val note = extractNoteFromDescription(transactionBlock)
-                    
-                    // Определяем категорию
-                    val categoryIndex = standardCategories.indexOf(category)
-                    
+
                     // Проверяем, является ли транзакция переводом
                     val isTransfer = category == "Переводы" || category == "Перевод на карту" || 
                                    transactionBlock.lowercase().contains("перевод")
