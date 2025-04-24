@@ -6,7 +6,6 @@ import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
@@ -63,21 +62,12 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
             launchAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
 
             // Создаем PendingIntent для запуска приложения
-            val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    launchAppIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
-                )
-            } else {
-                PendingIntent.getActivity(
-                    context,
-                    0,
-                    launchAppIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT
-                )
-            }
+            val pendingIntent = PendingIntent.getActivity(
+                context,
+                0,
+                launchAppIntent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            )
 
             // Устанавливаем обработчик нажатия на весь виджет
             views.setOnClickPendingIntent(R.id.widget_balance, pendingIntent)

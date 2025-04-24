@@ -21,6 +21,7 @@ import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
@@ -34,7 +35,7 @@ import timber.log.Timber
 class FinanceActivity : ComponentActivity() {
     
     // Начальный экран для навигации
-    private var startDestination = "home"
+    private var startDestination = Screen.Home.route
     
     override fun onCreate(savedInstanceState: Bundle?) {
         // Устанавливаем сплеш-скрин перед вызовом super.onCreate()
@@ -44,7 +45,7 @@ class FinanceActivity : ComponentActivity() {
         
         // Обрабатываем deep links
         handleIntent(intent)
-        
+
         // Проверяем разрешение на использование точных будильников
         checkExactAlarmPermission()
 
@@ -102,7 +103,7 @@ class FinanceActivity : ComponentActivity() {
             }
         }
     }
-    
+
     /**
      * Обрабатывает входящий intent и определяет начальный экран
      */

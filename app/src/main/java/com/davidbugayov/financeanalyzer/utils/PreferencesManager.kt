@@ -149,4 +149,23 @@ class PreferencesManager(context: Context) {
     fun setImportInfoDismissed(value: Boolean) {
         sharedPreferences.edit { putBoolean(KEY_IMPORT_INFO_DISMISSED, value) }
     }
+    
+    /**
+     * Получает boolean-значение из SharedPreferences
+     * @param key Ключ, по которому хранится значение
+     * @param defaultValue Значение по умолчанию
+     * @return Сохраненное значение или defaultValue
+     */
+    fun getBooleanPreference(key: String, defaultValue: Boolean): Boolean {
+        return sharedPreferences.getBoolean(key, defaultValue)
+    }
+    
+    /**
+     * Сохраняет boolean-значение в SharedPreferences
+     * @param key Ключ, по которому будет храниться значение
+     * @param value Значение для сохранения
+     */
+    fun setBooleanPreference(key: String, value: Boolean) {
+        sharedPreferences.edit { putBoolean(key, value) }
+    }
 } 

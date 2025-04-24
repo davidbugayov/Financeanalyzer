@@ -458,8 +458,7 @@ class AddTransactionViewModel(
 
             is BaseTransactionEvent.ToggleAddToWallet -> {
                 val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
-                    currentAddToWallet = _state.value.addToWallet,
-                    currentSelectedWallets = _state.value.selectedWallets
+                    currentAddToWallet = _state.value.addToWallet
                 )
                 
                 _state.update {

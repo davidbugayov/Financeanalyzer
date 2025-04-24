@@ -67,7 +67,7 @@
                 <category android:name="android.intent.category.DEFAULT" />
                 <data android:scheme="financeanalyzer" />
             </intent-filter>
-            
+
             <!-- Объявление ярлыков -->
             <meta-data
                 android:name="android.app.shortcuts"

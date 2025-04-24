@@ -1,12 +1,8 @@
 package com.davidbugayov.financeanalyzer.presentation.onboarding
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.spring
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.Image
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +33,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,7 +44,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import com.google.accompanist.pager.ExperimentalPagerApi
+import com.google.accompanist.pager.HorizontalPager
+import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.launch
 
 /**
  * Экран онбординга, показывающий основные возможности приложения.
@@ -55,10 +56,9 @@ import kotlinx.coroutines.delay
  *
  * @param onFinish Колбэк, вызываемый при завершении онбординга
  */
+@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(onFinish: () -> Unit) {
-    var currentPage by remember { mutableIntStateOf(0) }
-    
     // Список страниц онбординга с их содержимым
     val pages = listOf(
         OnboardingPage(
@@ -88,11 +88,18 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         )
     )
     
+    val pagerState = rememberPagerState()
+    val coroutineScope = rememberCoroutineScope()
+    
     // Автоматическое переключение страниц каждые 4 секунды, если не на последней странице
-    LaunchedEffect(currentPage) {
-        if (currentPage < pages.size - 1) {
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage < pages.size - 1) {
             delay(4000)
-            currentPage++
+            if (pagerState.currentPage < pages.size - 1) {
+                coroutineScope.launch {
+                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                }
+            }
         }
     }
     
@@ -108,23 +115,21 @@ fun OnboardingScreen(onFinish: () -> Unit) {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.SpaceBetween
         ) {
-            // Контент страницы
-            Column(
+            // Контент страницы с пейджером для свайпа
+            HorizontalPager(
+                count = pages.size,
+                state = pagerState,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
-            ) {
+                    .fillMaxWidth()
+            ) { position ->
                 Box(
                     modifier = Modifier
-                        .padding(bottom = 32.dp)
+                        .fillMaxSize()
+                        .padding(bottom = 32.dp),
+                    contentAlignment = Alignment.Center
                 ) {
-                    pages.forEachIndexed { index, page ->
-                        if (currentPage == index) {
-                            OnboardingPageContent(page)
-                        }
-                    }
+                    OnboardingPageContent(pages[position])
                 }
             }
             
@@ -143,8 +148,8 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 ) {
                     pages.forEachIndexed { index, _ ->
                         val width by animateDpAsState(
-                            targetValue = if (currentPage == index) 24.dp else 10.dp,
-                            animationSpec = spring(dampingRatio = Spring.DampingRatioMediumBouncy),
+                            targetValue = if (pagerState.currentPage == index) 24.dp else 10.dp,
+                            animationSpec = tween(400, easing = EaseInOut),
                             label = "indicator"
                         )
                         
@@ -155,7 +160,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                                 .height(10.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    if (currentPage == index) 
+                                    if (pagerState.currentPage == index) 
                                         MaterialTheme.colorScheme.primary 
                                     else 
                                         MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
@@ -174,9 +179,13 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    if (currentPage > 0) {
+                    if (pagerState.currentPage > 0) {
                         TextButton(
-                            onClick = { currentPage-- }
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage - 1)
+                                }
+                            }
                         ) {
                             Text("Назад")
                         }
@@ -184,9 +193,13 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                         Spacer(modifier = Modifier.width(64.dp))
                     }
                     
-                    if (currentPage < pages.size - 1) {
+                    if (pagerState.currentPage < pages.size - 1) {
                         Button(
-                            onClick = { currentPage++ }
+                            onClick = {
+                                coroutineScope.launch {
+                                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                                }
+                            }
                         ) {
                             Text("Далее")
                         }
@@ -203,7 +216,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 }
                 
                 // Кнопка пропустить
-                if (currentPage < pages.size - 1) {
+                if (pagerState.currentPage < pages.size - 1) {
                     TextButton(
                         onClick = onFinish,
                         modifier = Modifier.padding(top = 8.dp)

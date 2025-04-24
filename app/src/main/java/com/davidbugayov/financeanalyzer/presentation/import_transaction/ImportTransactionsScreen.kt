@@ -5,6 +5,14 @@ import android.net.Uri
 import android.os.Build
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -20,10 +28,9 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -45,6 +52,7 @@ import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.Im
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
+import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 
 /**
@@ -62,7 +70,6 @@ fun ImportTransactionsScreen(
     profileViewModel: ProfileViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val snackbarHostState = remember { SnackbarHostState() }
     val themeMode = profileViewModel.themeMode.collectAsState().value
 
     // Получаем состояние из ViewModel в соответствии с MVI
@@ -72,6 +79,20 @@ fun ImportTransactionsScreen(
     var showBankInstructionDialog by remember { mutableStateOf(false) }
     var selectedBank by remember { mutableStateOf("") }
     var showPermissionSettingsDialog by remember { mutableStateOf(false) }
+    
+    // Состояние для анимаций
+    var showInstructions by remember { mutableStateOf(false) }
+    var showBanksList by remember { mutableStateOf(false) }
+    var showButton by remember { mutableStateOf(false) }
+    
+    // Запускаем анимацию с задержкой для каскадного эффекта
+    LaunchedEffect(Unit) {
+        showInstructions = true
+        delay(200)
+        showBanksList = true
+        delay(200)
+        showButton = true
+    }
 
     // Функция для обработки выбранного URI по MVI паттерну
     fun processUri(selectedUri: Uri?) {
@@ -109,7 +130,7 @@ fun ImportTransactionsScreen(
             val activity = context as? Activity
             val permission = PermissionUtils.getReadStoragePermission()
 
-            if (activity != null && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (activity != null) {
                 if (!activity.shouldShowRequestPermissionRationale(permission)) {
                     showPermissionSettingsDialog = true
                 }
@@ -122,7 +143,7 @@ fun ImportTransactionsScreen(
         // Диалог для перехода в настройки приложения
         if (showPermissionSettingsDialog) {
             PermissionDialog(
-                isAndroid15OrHigher = Build.VERSION.SDK_INT >= 35,
+                isAndroid15OrHigher = true,
                 onOpenSettings = {
                     PermissionUtils.openApplicationSettings(context)
                     showPermissionSettingsDialog = false
@@ -132,7 +153,6 @@ fun ImportTransactionsScreen(
         }
 
         Scaffold(
-            snackbarHost = { SnackbarHost(snackbarHostState) },
             topBar = {
                 AppTopBar(
                     title = stringResource(R.string.import_transactions_title),
@@ -151,54 +171,105 @@ fun ImportTransactionsScreen(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_medium))
             ) {
-                // Инструкции по импорту
-                ImportInstructions()
+                // Инструкции по импорту с анимацией
+                AnimatedVisibility(
+                    visible = showInstructions,
+                    enter = fadeIn(animationSpec = tween(700)) + 
+                            slideInVertically(
+                                initialOffsetY = { -50 },
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            )
+                ) {
+                    ImportInstructions()
+                }
 
-                // Секция с банками
-                Text(
-                    text = stringResource(R.string.supported_banks_title),
-                    style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.fillMaxWidth()
-                )
+                // Секция с банками с анимацией
+                AnimatedVisibility(
+                    visible = showBanksList,
+                    enter = fadeIn(animationSpec = tween(700)) + 
+                            expandVertically(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            )
+                ) {
+                    Column {
+                        Text(
+                            text = stringResource(R.string.supported_banks_title),
+                            style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
+                            modifier = Modifier.fillMaxWidth()
+                        )
 
-                BanksList(
-                    onBankClick = { bankName ->
-                        selectedBank = bankName
-                        showBankInstructionDialog = true
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
+
+                        BanksList(
+                            onBankClick = { bankName ->
+                                selectedBank = bankName
+                                showBankInstructionDialog = true
+                            }
+                        )
                     }
-                )
+                }
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
 
-                // Кнопка выбора файла
-                Button(
-                    onClick = {
-                        if (Build.VERSION.SDK_INT >= 35) {
-                            // Для Android 15+ используем ContentResolver напрямую
-                            getContentLauncher.launch("*/*")
-                        } else {
-                            // Для старых версий проверяем разрешения
-                            if (PermissionUtils.hasReadExternalStoragePermission(context)) {
-                                filePickerLauncher.launch(arrayOf("text/csv", "application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                            } else {
-                                val permission = PermissionUtils.getReadStoragePermission()
-                                storagePermissionLauncher.launch(permission)
-                            }
-                        }
-                    },
-                    modifier = Modifier.fillMaxWidth(),
-                    enabled = !state.isLoading
+                // Кнопка выбора файла с анимацией
+                AnimatedVisibility(
+                    visible = showButton,
+                    enter = fadeIn(animationSpec = tween(700)) + 
+                            slideInVertically(
+                                initialOffsetY = { 50 },
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            )
                 ) {
-                    Icon(
-                        imageVector = Icons.Default.CloudUpload,
-                        contentDescription = null,
-                        modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
-                    )
-                    Text(text = stringResource(R.string.choose_file_button))
+                    Button(
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= 35) {
+                                // Для Android 15+ используем ContentResolver напрямую
+                                getContentLauncher.launch("*/*")
+                            } else {
+                                // Для старых версий проверяем разрешения
+                                if (PermissionUtils.hasReadExternalStoragePermission(context)) {
+                                    filePickerLauncher.launch(arrayOf("text/csv", "application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                                } else {
+                                    val permission = PermissionUtils.getReadStoragePermission()
+                                    storagePermissionLauncher.launch(permission)
+                                }
+                            }
+                        },
+                        modifier = Modifier.fillMaxWidth(),
+                        enabled = !state.isLoading
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudUpload,
+                            contentDescription = null,
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
+                        )
+                        Text(text = stringResource(R.string.choose_file_button))
+                    }
                 }
 
-                // Отображение результатов импорта
-                ImportResultsSection(state)
+                // Отображение результатов импорта с анимацией
+                AnimatedVisibility(
+                    visible = state.successCount > 0 || state.isLoading || state.error != null,
+                    enter = fadeIn(animationSpec = tween(500)) + 
+                            expandVertically(
+                                animationSpec = spring(
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    stiffness = Spring.StiffnessLow
+                                )
+                            ),
+                    exit = fadeOut(animationSpec = tween(300))
+                ) {
+                    ImportResultsSection(state)
+                }
             }
             
             // Диалог с инструкциями по получению выписки из банка

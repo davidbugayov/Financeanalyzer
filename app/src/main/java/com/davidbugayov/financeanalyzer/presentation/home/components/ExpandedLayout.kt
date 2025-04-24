@@ -111,7 +111,8 @@ fun ExpandedLayout(
                                 HomeGroupSummary(
                                     filteredTransactions = state.filteredTransactions,
                                     totalIncome = state.filteredIncome,
-                                    totalExpense = state.filteredExpense
+                                    totalExpense = state.filteredExpense,
+                                    currentFilter = state.currentFilter
                                 )
                             }
                         }

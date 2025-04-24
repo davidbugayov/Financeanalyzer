@@ -236,9 +236,6 @@ fun HomeScreen(
                 onClick = {
                     // Просто навигация на экран добавления транзакции
                     onNavigateToAdd()
-                    feedbackMessage = "Добавление новой транзакции"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
                 },
                 containerColor = MaterialTheme.colorScheme.primary
             ) {
@@ -306,9 +303,6 @@ fun HomeScreen(
                         editTransactionViewModel.loadTransactionForEdit(transaction)
                         if (transaction.id.isNotBlank()) {
                             onNavigateToEdit(transaction.id)
-                            feedbackMessage = "Редактирование транзакции"
-                            feedbackType = FeedbackType.INFO
-                            showFeedback = true
                         } else {
                             Timber.e("Попытка навигации на экран редактирования с пустым transactionId!")
                             // Можно показать Snackbar или Toast

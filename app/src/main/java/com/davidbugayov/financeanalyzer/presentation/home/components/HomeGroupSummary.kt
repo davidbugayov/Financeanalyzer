@@ -65,7 +65,7 @@ fun HomeGroupSummary(
     val titleToday = "Сводка за сегодня"
     val titleWeek = "Сводка за неделю"
     val titleMonth = "Сводка за месяц"
-    val titleAll = stringResource(R.string.summary)
+    val titleAll = "Сводка за все время"
 
     // Определяем заголовок периода в зависимости от фильтра
     val periodTitle = remember(currentFilter) {

@@ -53,6 +53,7 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import java.time.LocalDate
 
 /**
  * Компонент для отображения сгруппированных транзакций с поддержкой пагинации.
@@ -142,7 +143,10 @@ fun TransactionGroupList(
                     TransactionItem(
                         transaction = transaction,
                         onClick = { onTransactionClick(transaction) },
-                        onLongClick = { onTransactionLongClick(transaction) }
+                        onLongClick = { onTransactionLongClick(transaction) },
+                        showDivider = false,
+                        animationDelay = 0L,
+                        isAnimated = false
                     )
                     
                     HorizontalDivider(

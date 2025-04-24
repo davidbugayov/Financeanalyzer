@@ -35,12 +35,6 @@ class BudgetViewModel(
         // Загружаем категории бюджета
         loadBudgetCategories()
         calculateTotals()
-        
-        // Создаем тестовый кошелек через небольшую задержку,
-        // чтобы дать время на загрузку существующих кошельков
-        viewModelScope.launch {
-            createSampleWallets()
-        }
     }
 
     fun onEvent(event: BudgetEvent) {
@@ -62,94 +56,6 @@ class BudgetViewModel(
             is BudgetEvent.SetPeriodDuration -> setPeriodDuration(event.days)
             is BudgetEvent.ResetPeriod -> resetPeriod(event.categoryId)
             is BudgetEvent.ResetAllPeriods -> resetAllPeriods()
-        }
-    }
-
-    /**
-     * Создает образцы кошельков, если их еще нет
-     */
-    private fun createSampleWallets() {
-        viewModelScope.launch {
-            try {
-                // Проверяем, есть ли уже кошельки
-                if (_state.value.categories.isEmpty()) {
-                    Timber.d("Создаем тестовый кошелек")
-                    
-                    // Создаем только один тестовый кошелек - "Развлечения"
-                    val entertainmentWalletId = UUID.randomUUID().toString()
-                    val entertainmentWallet = Wallet(
-                        name = "Развлечения", 
-                        limit = Money(3000.0), 
-                        spent = Money(500.0), 
-                        id = entertainmentWalletId,
-                        balance = Money(2500.0),
-                        // Связанные категории
-                        linkedCategories = listOf("Кино", "Игры", "Рестораны", "Театр", "Концерты")
-                    )
-                    
-                    // Добавляем кошелек в репозиторий
-                    walletRepository.addWallet(entertainmentWallet)
-                    
-                    // Добавляем несколько транзакций для этого кошелька
-                    try {
-                        // Транзакция "Кино"
-                        transactionRepository.addTransaction(
-                            Transaction(
-                                amount = Money(-250.0),
-                                category = "Кино",
-                                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -2) }.time,
-                                isExpense = true,
-                                note = "Поход в кинотеатр",
-                                source = "Сбер",
-                                sourceColor = 0xFF21A038.toInt(),
-                                categoryId = entertainmentWalletId
-                            )
-                        )
-                        
-                        // Транзакция "Рестораны"
-                        transactionRepository.addTransaction(
-                            Transaction(
-                                amount = Money(-150.0),
-                                category = "Рестораны",
-                                date = Calendar.getInstance().apply { add(Calendar.DAY_OF_MONTH, -1) }.time,
-                                isExpense = true,
-                                note = "Кофе и десерт",
-                                source = "Наличные",
-                                sourceColor = 0xFF777777.toInt(),
-                                categoryId = entertainmentWalletId
-                            )
-                        )
-                        
-                        // Транзакция "Игры"
-                        transactionRepository.addTransaction(
-                            Transaction(
-                                amount = Money(-100.0),
-                                category = "Игры",
-                                date = Calendar.getInstance().time,
-                                isExpense = true,
-                                note = "Покупка игры в Steam",
-                                source = "Т-Банк",
-                                sourceColor = 0xFFCF102D.toInt(),
-                                categoryId = entertainmentWalletId
-                            )
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при создании тестовых транзакций")
-                    }
-                    
-                    // Перезагружаем кошельки
-                    loadBudgetCategories()
-                    
-                    Timber.d("Тестовый кошелек создан")
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при создании тестового кошелька")
-                _state.update { 
-                    it.copy(
-                        error = e.message ?: "Ошибка при создании тестового кошелька"
-                    )
-                }
-            }
         }
     }
 
@@ -369,7 +275,7 @@ class BudgetViewModel(
                     // Обновляем баланс кошелька
                     val updatedWallet = wallet.copy(
                         balance = wallet.balance.plus(amountToAdd),
-                        linkedCategories = wallet.linkedCategories ?: emptyList()
+                        linkedCategories = wallet.linkedCategories
                     )
                     
                     // Сохраняем обновленный кошелек
@@ -403,7 +309,7 @@ class BudgetViewModel(
                 // Обновляем баланс кошелька
                 val updatedWallet = wallet.copy(
                     balance = wallet.balance.plus(amount),
-                    linkedCategories = wallet.linkedCategories ?: emptyList()
+                    linkedCategories = wallet.linkedCategories
                 )
                 
                 // Сохраняем обновленный кошелек
@@ -447,7 +353,7 @@ class BudgetViewModel(
                 val updatedWallet = wallet.copy(
                     balance = wallet.balance.minus(amount),
                     spent = wallet.spent.plus(amount),
-                    linkedCategories = wallet.linkedCategories ?: emptyList()
+                    linkedCategories = wallet.linkedCategories
                 )
                 
                 // Сохраняем обновленный кошелек
@@ -491,12 +397,12 @@ class BudgetViewModel(
                 // Обновляем балансы кошельков
                 val updatedFromWallet = fromWallet.copy(
                     balance = fromWallet.balance.minus(amount),
-                    linkedCategories = fromWallet.linkedCategories ?: emptyList()
+                    linkedCategories = fromWallet.linkedCategories
                 )
                 
                 val updatedToWallet = toWallet.copy(
                     balance = toWallet.balance.plus(amount),
-                    linkedCategories = toWallet.linkedCategories ?: emptyList()
+                    linkedCategories = toWallet.linkedCategories
                 )
                 
                 // Сохраняем обновленные кошельки
@@ -531,7 +437,7 @@ class BudgetViewModel(
                 wallets.forEach { wallet ->
                     val updatedWallet = wallet.copy(
                         periodDuration = days,
-                        linkedCategories = wallet.linkedCategories ?: emptyList()
+                        linkedCategories = wallet.linkedCategories
                     )
                     walletRepository.updateWallet(updatedWallet)
                 }
@@ -567,7 +473,7 @@ class BudgetViewModel(
                 val updatedWallet = wallet.copy(
                     periodStartDate = System.currentTimeMillis(),
                     spent = Money(0.0),
-                    linkedCategories = wallet.linkedCategories ?: emptyList()
+                    linkedCategories = wallet.linkedCategories
                 )
                 
                 // Сохраняем обновленный кошелек
@@ -602,7 +508,7 @@ class BudgetViewModel(
                     val updatedWallet = wallet.copy(
                         periodStartDate = System.currentTimeMillis(),
                         spent = Money(0.0),
-                        linkedCategories = wallet.linkedCategories ?: emptyList()
+                        linkedCategories = wallet.linkedCategories
                     )
                     walletRepository.updateWallet(updatedWallet)
                 }

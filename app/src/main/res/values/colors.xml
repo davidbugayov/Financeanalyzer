@@ -9,11 +9,8 @@
 
     <!-- Цвета для доходов и расходов -->
     <color name="income">#4CAF50</color>
-    <color name="income_dark">#388E3C</color>
-    <color name="income_light">#81C784</color>
     <color name="expense">#F44336</color>
     <color name="expense_dark">#D32F2F</color>
-    <color name="expense_light">#E57373</color>
 
     <!-- Цвета состояний -->
     <color name="success">#4CAF50</color>

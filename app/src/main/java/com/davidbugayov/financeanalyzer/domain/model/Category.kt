@@ -40,34 +40,5 @@ data class Category(
                 isCustom = isCustom
             )
         }
-        
-        /**
-         * Предопределенные категории расходов
-         */
-        val EXPENSE_CATEGORIES = listOf(
-            expense("Продукты"),
-            expense("Транспорт"),
-            expense("Развлечения"),
-            expense("Здоровье"),
-            expense("Кафе и рестораны"),
-            expense("Одежда"),
-            expense("Коммунальные услуги"),
-            expense("Подписки"),
-            expense("Образование"),
-            expense("Переводы"),
-            expense("Прочее")
-        )
-        
-        /**
-         * Предопределенные категории доходов
-         */
-        val INCOME_CATEGORIES = listOf(
-            income("Зарплата"),
-            income("Фриланс"),
-            income("Подарки"),
-            income("Проценты"),
-            income("Переводы"),
-            income("Прочее")
-        )
     }
 } 

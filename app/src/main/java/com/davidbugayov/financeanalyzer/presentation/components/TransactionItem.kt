@@ -1,7 +1,15 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -31,10 +39,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +59,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 // Определяем цвета как константы на верхнем уровне
 private val IncomeColorVal = Color(ColorUtils.INCOME_COLOR)
@@ -61,13 +75,14 @@ private fun getDateFormatter(): SimpleDateFormat {
 private val CATEGORY_ICON_CACHE = mutableMapOf<Pair<String, Boolean>, ImageVector>()
 
 /**
- * Универсальный компонент для отображения транзакции в списке.
- * Поддерживает как простой клик, так и передачу транзакции в обработчики.
- *
+ * Элемент списка транзакций с оптимизацией производительности
+ * 
  * @param transaction Транзакция для отображения
- * @param onClick Обработчик клика по транзакции (с передачей транзакции или без)
- * @param onLongClick Обработчик долгого нажатия на транзакцию (с передачей транзакции или без)
+ * @param onClick Обработчик клика по элементу
+ * @param onLongClick Обработчик долгого нажатия по элементу
  * @param showDivider Показывать разделитель после элемента
+ * @param animationDelay Задержка анимации при появлении (для создания эффекта каскада)
+ * @param isAnimated Включить анимацию
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -75,7 +90,9 @@ fun TransactionItem(
     transaction: Transaction,
     onClick: (Transaction) -> Unit = {},
     onLongClick: (Transaction) -> Unit = {},
-    showDivider: Boolean = true
+    showDivider: Boolean = true,
+    animationDelay: Long = 0,
+    isAnimated: Boolean = true
 ) {
     // Используем константы для цветов
     val incomeColor = IncomeColorVal
@@ -113,7 +130,40 @@ fun TransactionItem(
     val onClickStable = remember(onClick) { onClick }
     val onLongClickStable = remember(onLongClick) { onLongClick }
     
-    Column {
+    // Состояние для анимации
+    var visible by remember { mutableStateOf(false) }
+    
+    // Запускаем анимацию с задержкой
+    LaunchedEffect(Unit) {
+        if (animationDelay > 0) {
+            delay(animationDelay)
+        }
+        visible = true
+    }
+    
+    // Анимация перехода для каждого элемента
+    val animatedAlpha by animateFloatAsState(
+        targetValue = if (visible || !isAnimated) 1f else 0f,
+        animationSpec = tween(durationMillis = 300),
+        label = "alpha"
+    )
+    
+    val animatedOffset by animateFloatAsState(
+        targetValue = if (visible || !isAnimated) 0f else 20f, 
+        animationSpec = spring(
+            dampingRatio = Spring.DampingRatioMediumBouncy,
+            stiffness = Spring.StiffnessMedium
+        ),
+        label = "offset"
+    )
+    
+    Column(
+        modifier = Modifier
+            .graphicsLayer {
+                alpha = if (isAnimated) animatedAlpha else 1f
+                translationY = if (isAnimated) animatedOffset else 0f
+            }
+    ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -276,8 +326,10 @@ fun getCategoryInfo(
         }
     }
     
-    // Сохраняем иконку в кэш для будущего использования
-    CATEGORY_ICON_CACHE[cacheKey] = icon
+    // Обновляем кэш только для часто используемых категорий
+    if (category.length < 15) { // Ограничение на длину для экономии памяти
+        CATEGORY_ICON_CACHE[cacheKey] = icon
+    }
     
     return CategoryInfo(icon, bgColor)
 } 

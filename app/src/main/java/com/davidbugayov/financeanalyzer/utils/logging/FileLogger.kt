@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.utils.logging
 
 import android.content.Context
-import android.os.Environment
 import android.util.Log
 import com.davidbugayov.financeanalyzer.BuildConfig
 import timber.log.Timber
@@ -38,7 +37,7 @@ object FileLogger {
         val message: String
     ) {
         override fun toString(): String {
-            val formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.getDefault())
+            val formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
             val timeString = formatter.format(Date(timestamp))
             return "[$timeString] $level/$tag: $message"
         }
@@ -60,15 +59,15 @@ object FileLogger {
             }
 
             // Имя файла с текущей датой/временем
-            val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
+            val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US)
             val fileName = "log_${dateFormat.format(Date())}.txt"
             logFile = File(logsDir, fileName)
             
             isInitialized = true
             
-            // Информация о запуске логгера через обычный Log
+            // Информация о запуске логгера через Timber
             val initMessage = "FileLogger инициализирован. Лог файл: ${logFile?.absolutePath}"
-            Log.i("FileLogger", initMessage)
+            Timber.i(initMessage)
             
             // Добавляем запись в буфер
             val entry = LogEntry(
@@ -85,7 +84,7 @@ object FileLogger {
                 Timber.plant(FileLoggingTree())
             }
         } catch (e: Exception) {
-            Log.e("FileLogger", "Ошибка инициализации: ${e.message}")
+            Timber.e(e, "Ошибка инициализации")
         }
     }
 
@@ -96,7 +95,7 @@ object FileLogger {
     fun log(priority: Int, tag: String, message: String) {
         // Защита от рекурсии
         if (isLogging.getAndSet(true)) {
-            Log.println(priority, "FileLogger", "Предотвращена рекурсия при логировании $tag: $message")
+            Timber.w("Предотвращена рекурсия при логировании $tag: $message")
             isLogging.set(false)
             return
         }
@@ -114,7 +113,7 @@ object FileLogger {
      */
     private fun logDirectly(priority: Int, tag: String, message: String) {
         if (!isInitialized) {
-            Log.println(priority, tag, message)
+            Timber.log(priority, message)
             return
         }
         
@@ -162,7 +161,7 @@ object FileLogger {
                     output.flush()
                 }
             } catch (e: IOException) {
-                Log.e("FileLogger", "Ошибка записи в файл: ${e.message}")
+                Timber.e(e, "Ошибка записи в файл")
             }
         }
     }
@@ -211,7 +210,7 @@ object FileLogger {
                 }
             } catch (e: Exception) {
                 // В случае ошибки, логируем через стандартный механизм
-                Log.e("FileLoggingTree", "Ошибка при логировании: ${e.message}")
+                Timber.e(e, "Ошибка при логировании")
             }
         }
     }

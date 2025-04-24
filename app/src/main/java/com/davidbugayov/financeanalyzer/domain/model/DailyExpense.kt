@@ -11,13 +11,4 @@ import java.util.Date
 data class DailyExpense(
     val date: Date,
     val amount: Money
-) {
-
-    /**
-     * Конструктор для обратной совместимости с Double
-     */
-    constructor(date: Date, amount: Double) : this(
-        date = date,
-        amount = Money(amount)
-    )
-}
+)

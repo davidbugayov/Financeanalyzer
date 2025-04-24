@@ -11,6 +11,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTra
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 /**
  * Экран добавления новой транзакции
@@ -19,13 +20,16 @@ import org.koin.androidx.compose.koinViewModel
 @Composable
 fun AddTransactionScreen(
     viewModel: AddTransactionViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit
+    onNavigateBack: () -> Unit,
+    onNavigateToImport: (() -> Unit)? = null
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
 
     // Логируем открытие экрана добавления транзакции
     LaunchedEffect(Unit) {
+        Timber.d("AddTransactionScreen: Screen opened, onNavigateToImport is ${if (onNavigateToImport != null) "provided" else "null"}")
+        
         AnalyticsUtils.logScreenView(
             screenName = "add_transaction",
             screenClass = "AddTransactionScreen"
@@ -62,6 +66,7 @@ fun AddTransactionScreen(
         buttonText = "Добавить",
         isEditMode = false,
         eventFactory = defaultTransactionEventFactory(false),
-        submitEvent = BaseTransactionEvent.Submit
+        submitEvent = BaseTransactionEvent.Submit,
+        onNavigateToImport = onNavigateToImport
     )
 }

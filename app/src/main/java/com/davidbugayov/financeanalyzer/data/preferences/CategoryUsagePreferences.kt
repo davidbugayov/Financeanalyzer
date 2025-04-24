@@ -119,32 +119,4 @@ class CategoryUsagePreferences private constructor(context: Context) {
         usageMap[category] = currentCount + 1
         saveIncomeCategoriesUsage(usageMap)
     }
-
-    /**
-     * Получает количество использований категории расходов
-     * @param category Название категории
-     * @return Количество использований категории
-     */
-    fun getExpenseCategoryUsageCount(category: String): Int {
-        return loadExpenseCategoriesUsage()[category] ?: 0
-    }
-
-    /**
-     * Получает количество использований категории доходов
-     * @param category Название категории
-     * @return Количество использований категории
-     */
-    fun getIncomeCategoryUsageCount(category: String): Int {
-        return loadIncomeCategoriesUsage()[category] ?: 0
-    }
-
-    /**
-     * Сбрасывает статистику использования всех категорий
-     */
-    fun resetAllUsageStatistics() {
-        prefs.edit {
-            putString(KEY_EXPENSE_CATEGORIES_USAGE, null)
-            putString(KEY_INCOME_CATEGORIES_USAGE, null)
-        }
-    }
 } 

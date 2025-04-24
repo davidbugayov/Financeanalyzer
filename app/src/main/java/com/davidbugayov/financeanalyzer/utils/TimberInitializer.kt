@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.utils
 import android.util.Log
 import com.davidbugayov.financeanalyzer.FinanceApp
 import timber.log.Timber
+import android.annotation.SuppressLint
 
 /**
  * Инициализатор для настройки логирования
@@ -110,8 +111,12 @@ private class CrashReportingTree : Timber.Tree() {
         } catch (e: Exception) {
             // В случае ошибки при логировании, выводим в стандартный лог
             // Используем стандартный Log, так как Timber может вызвать рекурсию
-            Log.e("CrashReportingTree", "Ошибка при логировании: ${e.message}")
-            Log.println(priority, tag ?: "NO_TAG", message)
+            @SuppressLint("LogNotTimber")
+            fun logError() {
+                Log.e("CrashReportingTree", "Ошибка при логировании: ${e.message}")
+                Log.println(priority, tag ?: "NO_TAG", message)
+            }
+            logError()
         }
     }
 } 

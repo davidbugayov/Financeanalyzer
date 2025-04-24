@@ -104,12 +104,10 @@ class EditTransactionViewModel(
     }
 
     private fun validateInput(
-        walletId: String?,
         amount: String,
         categoryId: String
     ): Boolean {
         val validationBuilder = ValidationBuilder()
-        val currentState = _state.value
         
         // Reset errors
         _state.update {
@@ -119,12 +117,6 @@ class EditTransactionViewModel(
                 categoryError = false,
                 sourceError = false
             )
-        }
-        
-        // Check wallet only if addToWallet is true and it's an income transaction
-        if (!currentState.isExpense && currentState.addToWallet && currentState.selectedWallets.isEmpty()) {
-            validationBuilder.addWalletError()
-            Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - не выбраны кошельки")
         }
         
         // Check amount
@@ -204,7 +196,6 @@ class EditTransactionViewModel(
 
             // Validate input
             val isValid = validateInput(
-                walletId = currentState.targetWalletId,
                 amount = currentState.amount,
                 categoryId = currentState.category
             )
@@ -481,8 +472,7 @@ class EditTransactionViewModel(
             
             is BaseTransactionEvent.ToggleAddToWallet -> {
                 val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
-                    currentAddToWallet = _state.value.addToWallet,
-                    currentSelectedWallets = _state.value.selectedWallets
+                    currentAddToWallet = _state.value.addToWallet
                 )
                 
                 _state.update {

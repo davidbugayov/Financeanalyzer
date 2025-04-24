@@ -7,6 +7,8 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.EaseInOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -73,19 +75,13 @@ fun AnimatedBottomNavigationBar(
     
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn() + slideInVertically(
+        enter = fadeIn(animationSpec = tween(400, easing = EaseInOut)) + slideInVertically(
             initialOffsetY = { it },
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
+            animationSpec = tween(400, easing = EaseInOut)
         ),
-        exit = fadeOut() + slideOutVertically(
+        exit = fadeOut(animationSpec = tween(400, easing = EaseInOut)) + slideOutVertically(
             targetOffsetY = { it },
-            animationSpec = spring(
-                dampingRatio = Spring.DampingRatioMediumBouncy,
-                stiffness = Spring.StiffnessLow
-            )
+            animationSpec = tween(400, easing = EaseInOut)
         ),
         modifier = modifier
     ) {

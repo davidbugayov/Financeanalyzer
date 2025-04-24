@@ -229,6 +229,10 @@ dependencies {
     debugImplementation(libs.compose.ui.test.manifest)
     implementation(libs.androidx.lifecycle.runtime.compose)
 
+    // Accompanist
+    implementation(libs.accompanist.pager)
+    implementation(libs.accompanist.pager.indicators)
+    
     // Explicit dependency for Layout Inspector
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.customview)

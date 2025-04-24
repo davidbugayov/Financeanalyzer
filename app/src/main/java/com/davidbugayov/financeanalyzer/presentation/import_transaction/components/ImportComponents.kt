@@ -9,6 +9,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material3.AlertDialog
@@ -29,8 +31,12 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsState
+import com.davidbugayov.financeanalyzer.ui.animation.DialogTransitions
 
 /**
  * Компонент с инструкциями по импорту
@@ -321,23 +327,52 @@ fun BankInstructionDialog(
     bankName: String,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
-        title = {
-            Text(
-                text = stringResource(R.string.bank_instructions_title, bankName),
-                style = MaterialTheme.typography.titleMedium
-            )
-        },
-        text = {
-            BankInstructionsContent(bankName)
-        },
-        confirmButton = {
-            Button(onClick = onDismiss) {
-                Text(stringResource(R.string.got_it))
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        androidx.compose.animation.AnimatedVisibility(
+            visible = true,
+            enter = DialogTransitions.fadeInWithScale(),
+            exit = DialogTransitions.fadeOutWithScale()
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .padding(dimensionResource(R.dimen.spacing_small)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
+                ) {
+                    Text(
+                        text = stringResource(R.string.bank_instructions_title, bankName),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                    
+                    // Содержимое инструкции
+                    BankInstructionsContent(bankName)
+                    
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                    
+                    // Кнопка закрытия
+                    Button(
+                        onClick = onDismiss,
+                        modifier = Modifier.align(Alignment.End)
+                    ) {
+                        Text(stringResource(R.string.got_it))
+                    }
+                }
             }
         }
-    )
+    }
 }
 
 /**
@@ -366,27 +401,64 @@ fun PermissionDialog(
     onOpenSettings: () -> Unit,
     onDismiss: () -> Unit
 ) {
-    AlertDialog(
+    Dialog(
         onDismissRequest = onDismiss,
-        title = { Text(text = stringResource(R.string.import_permission_required)) },
-        text = {
-            Text(
-                text = if (isAndroid15OrHigher) {
-                    stringResource(R.string.permission_message_android15)
-                } else {
-                    stringResource(R.string.permission_message)
+        properties = DialogProperties(
+            dismissOnBackPress = true,
+            dismissOnClickOutside = true,
+            usePlatformDefaultWidth = false
+        )
+    ) {
+        androidx.compose.animation.AnimatedVisibility(
+            visible = true,
+            enter = DialogTransitions.fadeInWithScale(),
+            exit = DialogTransitions.fadeOutWithScale()
+        ) {
+            Card(
+                modifier = Modifier
+                    .fillMaxWidth(0.9f)
+                    .padding(dimensionResource(R.dimen.spacing_small)),
+                shape = RoundedCornerShape(16.dp)
+            ) {
+                Column(
+                    modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
+                ) {
+                    Text(
+                        text = stringResource(R.string.import_permission_required),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold
+                    )
+                    
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                    
+                    Text(
+                        text = if (isAndroid15OrHigher) {
+                            stringResource(R.string.permission_message_android15)
+                        } else {
+                            stringResource(R.string.permission_message)
+                        },
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                    
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
+                    
+                    // Кнопки действий
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.End
+                    ) {
+                        TextButton(onClick = onDismiss) {
+                            Text(stringResource(R.string.cancel))
+                        }
+                        
+                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
+                        
+                        Button(onClick = onOpenSettings) {
+                            Text(stringResource(R.string.open_settings))
+                        }
+                    }
                 }
-            )
-        },
-        confirmButton = {
-            Button(onClick = onOpenSettings) {
-                Text(stringResource(R.string.open_settings))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
             }
         }
-    )
+    }
 } 

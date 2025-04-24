@@ -1,6 +1,6 @@
 [versions]
 # Plugins
-androidGradlePlugin = "8.9.1"
+androidGradlePlugin = "8.9.2"
 kotlin = "1.9.22"
 googleServices = "4.4.2"
 firebaseCrashlytics = "2.9.9"
@@ -20,6 +20,9 @@ customViewPoolingContainer = "1.0.0"
 composeBom = "2024.02.00"
 composeCompiler = "1.5.8"
 composeUiTooling = "1.7.8"
+
+# Accompanist
+accompanist = "0.32.0"
 
 # Firebase
 firebaseBom = "32.7.4"
@@ -77,6 +80,10 @@ compose-foundation = { group = "androidx.compose.foundation", name = "foundation
 compose-runtime = { group = "androidx.compose.runtime", name = "runtime" }
 compose-runtime-livedata = { group = "androidx.compose.runtime", name = "runtime-livedata" }
 compose-animation = { group = "androidx.compose.animation", name = "animation" }
+
+# Accompanist
+accompanist-pager = { group = "com.google.accompanist", name = "accompanist-pager", version.ref = "accompanist" }
+accompanist-pager-indicators = { group = "com.google.accompanist", name = "accompanist-pager-indicators", version.ref = "accompanist" }
 
 # Firebase
 firebase-bom = { group = "com.google.firebase", name = "firebase-bom", version.ref = "firebaseBom" }

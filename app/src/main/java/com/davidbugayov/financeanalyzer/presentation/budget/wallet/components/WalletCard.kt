@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import kotlin.math.min
 import java.math.BigDecimal
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 
 // Перечисление действий для меню кошелька
 enum class WalletAction {
@@ -160,11 +161,11 @@ fun WalletCard(
                 1.0
             ).toFloat()
             LinearProgressIndicator(
-                progress = progressValue,
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(vertical = 8.dp)
                     .height(6.dp),
+                progress = { progressValue },
                 color = if (category.spent.amount >= category.limit.amount) Color.Red else MaterialTheme.colorScheme.primary,
                 trackColor = MaterialTheme.colorScheme.surfaceVariant
             )
@@ -223,7 +224,7 @@ fun WalletCard(
                 }
                 
                 Icon(
-                    imageVector = Icons.Default.KeyboardArrowRight,
+                    imageVector = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = "Подробнее",
                     tint = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
                 )

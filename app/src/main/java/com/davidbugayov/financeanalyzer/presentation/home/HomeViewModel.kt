@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
@@ -435,7 +436,7 @@ class HomeViewModel(
     }
 
     /**
-     * Генерирует и сохраняет тестовые данные
+     * Генерирует и сохраняет тестовые данные (только в Debug-сборке)
      */
     private fun generateAndSaveTestData() {
         viewModelScope.launch {

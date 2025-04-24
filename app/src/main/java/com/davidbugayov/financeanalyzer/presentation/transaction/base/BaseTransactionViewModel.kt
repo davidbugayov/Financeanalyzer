@@ -226,12 +226,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     /**
      * Обрабатывает событие переключения флага "Добавить в кошельки"
      * @param currentAddToWallet Текущее значение флага
-     * @param currentSelectedWallets Текущие выбранные кошельки
      * @return Пара (новое значение флага, новый список выбранных кошельков)
      */
     protected fun handleToggleAddToWallet(
-        currentAddToWallet: Boolean,
-        currentSelectedWallets: List<String>
+        currentAddToWallet: Boolean
     ): Pair<Boolean, List<String>> {
         val newAddToWallet = !currentAddToWallet
         
