@@ -1,3 +1,4 @@
+@file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
 package com.davidbugayov.financeanalyzer.presentation.onboarding
 
 import androidx.compose.animation.core.EaseInOut
