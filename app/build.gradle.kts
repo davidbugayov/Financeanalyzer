@@ -167,9 +167,9 @@ android {
     }
     
     // Exclude POI and related libraries from minification
-    packagingOptions {
+    packaging {
         resources {
-            excludes.add("META-INF/**")
+            excludes += "META-INF/**"
         }
         jniLibs {
             useLegacyPackaging = true
