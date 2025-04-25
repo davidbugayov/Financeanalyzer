@@ -15,13 +15,15 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.FileDownload
 import androidx.compose.material.icons.filled.Notifications
-import androidx.compose.material.icons.automirrored.filled.ShowChart
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
@@ -31,22 +33,14 @@ import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 
@@ -56,7 +50,6 @@ import kotlinx.coroutines.launch
  *
  * @param onFinish Колбэк, вызываемый при завершении онбординга
  */
-@OptIn(ExperimentalPagerApi::class)
 @Composable
 fun OnboardingScreen(onFinish: () -> Unit) {
     // Список страниц онбординга с их содержимым
@@ -87,8 +80,8 @@ fun OnboardingScreen(onFinish: () -> Unit) {
             icon = Icons.Default.Notifications
         )
     )
-    
-    val pagerState = rememberPagerState()
+
+    val pagerState = rememberPagerState(pageCount = { pages.size })
     val coroutineScope = rememberCoroutineScope()
     
     // Автоматическое переключение страниц каждые 4 секунды, если не на последней странице
@@ -117,7 +110,6 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         ) {
             // Контент страницы с пейджером для свайпа
             HorizontalPager(
-                count = pages.size,
                 state = pagerState,
                 modifier = Modifier
                     .weight(1f)
@@ -160,9 +152,9 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                                 .height(10.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    if (pagerState.currentPage == index) 
-                                        MaterialTheme.colorScheme.primary 
-                                    else 
+                                    if (pagerState.currentPage == index)
+                                        MaterialTheme.colorScheme.primary
+                                    else
                                         MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                                 )
                         )

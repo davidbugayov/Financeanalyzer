@@ -2,8 +2,8 @@ package com.davidbugayov.financeanalyzer.presentation.budget.wallet
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsState
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,11 +11,8 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
+import timber.log.Timber
 
 /**
  * ViewModel для экрана транзакций кошелька
@@ -63,7 +60,7 @@ class WalletTransactionsViewModel(
                     val updatedWallet = wallet.copy(
                         spent = wallet.spent.copy(amount = java.math.BigDecimal.ZERO),
                         periodStartDate = now,
-                        linkedCategories = wallet.linkedCategories ?: emptyList()
+                        linkedCategories = wallet.linkedCategories
                     )
                     
                     walletRepository.updateWallet(updatedWallet)
@@ -122,7 +119,7 @@ class WalletTransactionsViewModel(
                     val baseMatch = transaction.category == wallet.name || transaction.categoryId == wallet.id
                     
                     // Проверяем наличие в связанных категориях
-                    val linkedCategories = wallet.linkedCategories ?: emptyList()
+                    val linkedCategories = wallet.linkedCategories
                     val linkedCategoryMatch = linkedCategories.isNotEmpty() && 
                         (linkedCategories.contains(transaction.category) || 
                          linkedCategories.contains(transaction.categoryId))

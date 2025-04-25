@@ -9,10 +9,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Person
-import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -65,8 +63,6 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToBudget: () -> Unit,
-    onNavigateToWallets: () -> Unit = onNavigateToBudget,
     onNavigateToEdit: (String) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -192,9 +188,9 @@ fun HomeScreen(
                     IconButton(
                         onClick = {
                             onNavigateToProfile()
-                            feedbackMessage = "Переход к профилю"
-                            feedbackType = FeedbackType.INFO
-                            showFeedback = true
+                            // feedbackMessage = "Переход к профилю"
+                            // feedbackType = FeedbackType.INFO
+                            // showFeedback = true
                         }
                     ) {
                         Icon(
@@ -212,39 +208,23 @@ fun HomeScreen(
                 visible = true,
                 onChartClick = {
                     onNavigateToChart()
-                    feedbackMessage = "Переход к графикам"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
+                    // feedbackMessage = "Переход к графикам"
+                    // feedbackType = FeedbackType.INFO
+                    // showFeedback = true
                 },
                 onHistoryClick = {
                     onNavigateToHistory()
-                    feedbackMessage = "Переход к истории транзакций"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
+                    // feedbackMessage = "Переход к истории транзакций"
+                    // feedbackType = FeedbackType.INFO
+                    // showFeedback = true
                 },
-                onBudgetClick = {
-                    onNavigateToWallets()
-                    feedbackMessage = "Переход к кошелькам"
-                    feedbackType = FeedbackType.INFO
-                    showFeedback = true
+                onAddClick = {
+                    onNavigateToAdd()
+                    // feedbackMessage = "Добавить транзакцию"
+                    // feedbackType = FeedbackType.INFO
+                    // showFeedback = true
                 },
             )
-        },
-        floatingActionButton = {
-            // Floating Action Button для добавления транзакции
-            FloatingActionButton(
-                onClick = {
-                    // Просто навигация на экран добавления транзакции
-                    onNavigateToAdd()
-                },
-                containerColor = MaterialTheme.colorScheme.primary
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.Add,
-                    contentDescription = stringResource(R.string.add_button),
-                    tint = MaterialTheme.colorScheme.onPrimary
-                )
-            }
         }
     ) { paddingValues ->
         Box(

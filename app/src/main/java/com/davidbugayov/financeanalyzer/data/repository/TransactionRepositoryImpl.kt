@@ -19,10 +19,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Calendar
-import java.util.Collections
 import java.util.Date
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.util.concurrent.ConcurrentHashMap
 
 /**
  * Абстрактная политика кэширования для различных типов данных.
@@ -220,40 +218,6 @@ class TransactionRepositoryImpl(
             Timber.e(e, "Ошибка при получении всех транзакций: ${e.message}")
             emptyList()
         }
-    }
-
-    /**
-     * Обновляет кэши транзакций по месяцам и неделям
-     */
-    private fun updateMonthlyAndWeeklyCache(transactions: List<Transaction>) {
-        transactionCache.put(ALL_TRANSACTIONS_KEY, transactions)
-        val groupedByMonth = transactions.groupBy { transaction ->
-            val calendar = Calendar.getInstance()
-            calendar.time = transaction.date
-            val year = calendar.get(Calendar.YEAR)
-            val month = calendar.get(Calendar.MONTH) + 1
-            "$year-${month.toString().padStart(2, '0')}"
-        }
-        
-        // Обновляем кэш месяцев
-        groupedByMonth.forEach { (key, value) -> 
-            monthlyTransactionsCache.put(key, value)
-        }
-        
-        val groupedByWeek = transactions.groupBy { transaction ->
-            val calendar = Calendar.getInstance()
-            calendar.time = transaction.date
-            val year = calendar.get(Calendar.YEAR)
-            val week = calendar.get(Calendar.WEEK_OF_YEAR)
-            "$year-W${week.toString().padStart(2, '0')}"
-        }
-        
-        // Обновляем кэш недель
-        groupedByWeek.forEach { (key, value) -> 
-            weeklyTransactionsCache.put(key, value)
-        }
-        
-        Timber.d("Кэши обновлены: ${groupedByMonth.size} месяцев, ${groupedByWeek.size} недель")
     }
 
     /**
@@ -522,7 +486,7 @@ class TransactionRepositoryImpl(
             val entity = mapDomainToEntity(transaction)
             val id = dao.insertTransaction(entity)
             invalidateMainCache() // Инвалидируем основной кэш вместо полной очистки
-            FinancialMetrics.getInstance().invalidateMetrics()
+            FinancialMetrics.getInstance().recalculateStats()
             internalNotifyDataChanged(transaction.id) // Уведомляем об изменении
             Timber.d("Транзакция добавлена: ID=$id")
             return@withContext id.toString()
@@ -599,7 +563,7 @@ class TransactionRepositoryImpl(
 
             // Инвалидируем метрики
             try {
-                FinancialMetrics.getInstance().invalidateMetrics()
+                FinancialMetrics.getInstance().recalculateStats()
                 Timber.d("Метрики сброшены")
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при сбросе метрик: ${e.message}")
@@ -647,7 +611,7 @@ class TransactionRepositoryImpl(
         try {
             dao.deleteTransactionById(id)
             invalidateMainCache() // Инвалидируем основной кэш
-            FinancialMetrics.getInstance().invalidateMetrics()
+            FinancialMetrics.getInstance().recalculateStats()
             internalNotifyDataChanged(id) // Уведомляем об изменении
             Timber.d("Транзакция удалена по ID: $id")
         } catch (e: Exception) {

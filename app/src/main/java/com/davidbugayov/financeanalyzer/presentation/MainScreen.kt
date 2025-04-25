@@ -5,8 +5,6 @@ import android.app.Activity
 import android.os.Build
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -41,6 +39,7 @@ import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
+import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
@@ -279,8 +278,6 @@ fun MainScreen(startDestination: String = "home") {
                             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
                             onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                            onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
-                            onNavigateToWallets = { navController.navigate(Screen.Wallets.route) },
                             onNavigateToEdit = { transactionId -> navController.navigate(Screen.EditTransaction.createRoute(transactionId)) }
                         )
                     }
@@ -465,7 +462,19 @@ fun MainScreen(startDestination: String = "home") {
                             onNavigateBack = { navController.popBackStack() },
                             onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                            onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
+                            onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
+                            onNavigateToExportImport = { navController.navigate(Screen.ExportImport.route) }
+                        )
+                    }
+
+                    // Экран экспорт и импорт
+                    composable("export_import") {
+                        ExportImportScreen(
+                            onNavigateBack = { navController.popBackStack() },
+                            onImportClick = {
+                                navController.navigate(Screen.ImportTransactions.route)
+                            },
+                            viewModel = profileViewModel
                         )
                     }
 

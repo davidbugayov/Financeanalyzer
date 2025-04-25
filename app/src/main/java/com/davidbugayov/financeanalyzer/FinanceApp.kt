@@ -3,12 +3,9 @@ package com.davidbugayov.financeanalyzer
 import android.app.Application
 import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.budgetModule
-import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.historyModule
-import com.davidbugayov.financeanalyzer.di.homeModule
 import com.davidbugayov.financeanalyzer.di.importModule
 import com.davidbugayov.financeanalyzer.di.onboardingModule
-import com.davidbugayov.financeanalyzer.di.profileModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
@@ -70,10 +67,7 @@ class FinanceApp : Application() {
                 androidContext(this@FinanceApp)
                 modules(
                     appModule,
-                    chartModule,
-                    homeModule,
                     historyModule,
-                    profileModule,
                     importModule,
                     onboardingModule,
                     budgetModule
@@ -92,7 +86,7 @@ class FinanceApp : Application() {
             CrashlyticsUtils.setCustomKey("device_language", resources.configuration.locales[0].language)
         } catch (e: Exception) {
             // Логирование запуска может перехватить ошибку инициализации
-            Timber.e("Ошибка инициализации приложения: ${e.message}", e)
+            Timber.e(e, "Ошибка инициализации приложения: ${e.message}")
         }
     }
 
@@ -173,7 +167,7 @@ class FinanceApp : Application() {
                 Timber.i("Initializing financial metrics...")
                 val metrics = FinancialMetrics.getInstance()
                 // Начинаем первоначальный расчет метрик
-                metrics.lazyInitialize()
+                metrics.recalculateStats()
             } catch (e: Exception) {
                 Timber.e(e, "Error initializing financial metrics")
                 CrashlyticsUtils.recordException(e)

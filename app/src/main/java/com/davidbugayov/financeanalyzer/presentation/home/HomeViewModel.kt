@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.presentation.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
@@ -11,7 +10,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -27,16 +25,12 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
-import java.math.BigDecimal
 import java.util.Calendar
-import kotlin.math.abs
-import java.time.LocalDateTime
 
 /**
  * ViewModel для главного экрана.
  * Следует принципам MVI и Clean Architecture.
  *
- * @property getTransactionsUseCase UseCase для загрузки транзакций
  * @property addTransactionUseCase UseCase для добавления новых транзакций
  * @property deleteTransactionUseCase UseCase для удаления транзакций
  * @property repository Репозиторий для прямого доступа к транзакциям с поддержкой пагинации и подпиской на изменения
@@ -44,7 +38,6 @@ import java.time.LocalDateTime
  * @property state Публичный StateFlow для наблюдения за состоянием экрана
  */
 class HomeViewModel(
-    private val getTransactionsUseCase: GetTransactionsUseCase,
     private val addTransactionUseCase: AddTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val repository: TransactionRepository
@@ -85,11 +78,6 @@ class HomeViewModel(
     
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
-
-    // Добавляем константу TAG для логов
-    companion object {
-        private const val TAG = "HomeViewModel"
-    }
 
     init {
         Timber.d("HomeViewModel initialized")
@@ -251,7 +239,7 @@ class HomeViewModel(
                 Timber.d("Инициирована фоновая загрузка метрик (без перезагрузки транзакций)")
                 // Просим FinancialMetrics запланировать проверку в фоне
                 // Это обновит глобальные метрики, которые HomeViewModel слушает через StateFlow
-                financialMetrics.lazyInitialize(priority = true)
+                financialMetrics.recalculateStats()
                 
                 // УДАЛЯЕМ ЛОГИКУ ПРОВЕРКИ И ПЕРЕЗАГРУЗКИ ТРАНЗАКЦИЙ ЗДЕСЬ
                 // // Проверяем, нужно ли загружать транзакции полностью
@@ -359,6 +347,13 @@ class HomeViewModel(
                     financialMetrics.getCurrentBalance()
                 )
 
+                // Проверяем, что баланс действительно равен разнице доходов и расходов
+                val calculatedBalance = metricsResult.first - metricsResult.second
+                if (calculatedBalance != metricsResult.third) {
+                    Timber.w("Баланс не соответствует разнице между доходами и расходами. Корректируем...")
+                    financialMetrics.recalculateStats()
+                }
+
                 // 3. Обновляем состояние с загруженными транзакциями и метриками
                 Timber.d("Загружено ${transactions.size} транзакций за последние $loadedPeriod дней")
                 _state.update { 
@@ -393,6 +388,7 @@ class HomeViewModel(
                 }
             } finally {
                 isLoadingInProgress = false
+                _state.update { it.copy(isLoading = false) }
             }
         }
     }
@@ -444,9 +440,9 @@ class HomeViewModel(
                 Timber.d("Generating test data")
                 // Устанавливаем флаг загрузки
                 _state.update { it.copy(isLoading = true) }
-                
-                // Генерируем 100 транзакций за последний месяц
-                val testTransactions = TestDataGenerator.generateTransactions(100)
+
+                // Генерируем 10 транзакций за последний месяц
+                val testTransactions = TestDataGenerator.generateTransactions(10)
 
                 var hasError = false
                 testTransactions.forEach { transaction ->
@@ -556,6 +552,23 @@ class HomeViewModel(
         // Рассчитываем сумму доходов, расходов и баланс для отфильтрованных транзакций
         val (filteredIncome, filteredExpense, filteredBalance) = calculateStats(filteredTransactions)
 
+        // Подробное логирование для диагностики
+        Timber.d("[DIAG] FILTER: ${filter.name}, транзакций: ${filteredTransactions.size}")
+        filteredTransactions.forEach {
+            Timber.d("[DIAG] TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}")
+        }
+        Timber.d("[DIAG] STATS: income=${filteredIncome.formatted()}, expense=${filteredExpense.formatted()}, balance=${filteredBalance.formatted()}")
+
+        // Если фильтр установлен в "Все", синхронизируем метрики с фильтрацией
+        if (filter == TransactionFilter.ALL && filteredTransactions.isNotEmpty()) {
+            val currentMetricsBalance = financialMetrics.getCurrentBalance()
+            if (filteredBalance != currentMetricsBalance) {
+                Timber.d("Обнаружено расхождение общего баланса: в метриках ${currentMetricsBalance.formatted()}, в фильтре ${filteredBalance.formatted()}")
+                // Принудительно пересчитываем метрики, если есть расхождение
+                financialMetrics.recalculateStats()
+            }
+        }
+
         val transactionGroups = groupTransactionsByDate(filteredTransactions)
         _state.update { it.copy(
             filteredTransactions = filteredTransactions, 
@@ -565,6 +578,11 @@ class HomeViewModel(
             filteredBalance = filteredBalance,
             isLoading = false  // Отключаем индикатор загрузки после обновления данных
         ) }
+
+        if (filter == TransactionFilter.ALL) {
+            Timber.d("[DIAG] HomeViewModel транзакций: ${filteredTransactions.size}")
+            filteredTransactions.forEach { Timber.d("[DIAG] HVM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") }
+        }
     }
 
     /**
@@ -588,33 +606,29 @@ class HomeViewModel(
      */
     private fun calculateStats(transactions: List<Transaction>): Triple<Money, Money, Money> {
         if (transactions.isEmpty()) {
+            Timber.d("[DIAG] calculateStats: пустой список транзакций")
             return Triple(Money.zero(), Money.zero(), Money.zero())
         }
 
         // Проверяем, есть ли эти транзакции в кэше
         val cachedStats = statsCache[transactions]
         if (cachedStats != null) {
+            Timber.d("[DIAG] calculateStats: используем кэш")
             return cachedStats
         }
 
-        // Используем fold для более функционального и лаконичного кода
         val income = transactions
             .filter { !it.isExpense }
             .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-            
         val expense = transactions
             .filter { it.isExpense }
             .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-
-        // Вычисляем баланс как разницу между доходами и расходами
         val balance = income - expense
 
-        // Создаем Triple с Money объектами для возврата
+        Timber.d("[DIAG] calculateStats: income=${income.formatted()}, expense=${expense.formatted()}, balance=${balance.formatted()}")
+
         val result = Triple(income, expense, balance)
-
-        // Кэшируем результат для будущих запросов
         statsCache[transactions] = result
-
         return result
     }
 

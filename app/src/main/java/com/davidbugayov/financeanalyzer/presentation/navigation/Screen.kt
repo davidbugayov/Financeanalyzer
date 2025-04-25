@@ -45,4 +45,7 @@ sealed class Screen(val route: String) {
     data object WalletTransactions : Screen("wallet/{walletId}") {
         fun createRoute(walletId: String) = "wallet/$walletId"
     }
+
+    /** Экран экспорт и импорт данных */
+    data object ExportImport : Screen("export_import")
 } 

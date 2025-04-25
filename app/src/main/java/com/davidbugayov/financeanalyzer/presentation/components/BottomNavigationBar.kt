@@ -1,14 +1,12 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.EaseInOut
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.core.EaseInOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,12 +20,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.FilledIconButton
-import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -52,7 +48,6 @@ import com.davidbugayov.financeanalyzer.R
  * @param onAddClick обработчик нажатия на кнопку "Добавить"
  * @param onChartClick обработчик нажатия на кнопку "Графики"
  * @param onHistoryClick обработчик нажатия на кнопку "История"
- * @param onBudgetClick обработчик нажатия на кнопку "Бюджет"
  * @param modifier модификатор для управления позиционированием
  */
 @Composable
@@ -60,7 +55,7 @@ fun AnimatedBottomNavigationBar(
     visible: Boolean = true,
     onChartClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
-    onBudgetClick: () -> Unit,
+    onAddClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     // Получаем отступы от системной навигации
@@ -108,24 +103,21 @@ fun AnimatedBottomNavigationBar(
                 NavButton(
                     icon = Icons.Default.Assessment,
                     text = stringResource(R.string.statistics),
-                    onClick = onChartClick,
-                    isMain = false
+                    onClick = onChartClick
                 )
 
-                // Бюджет (центр)
+                // Добавить (центр)
                 NavButton(
-                    icon = Icons.Default.AccountBalanceWallet,
-                    text = stringResource(R.string.budget),
-                    onClick = onBudgetClick,
-                    isMain = false
+                    icon = Icons.Default.Add,
+                    text = "Добавить",
+                    onClick = onAddClick
                 )
 
                 // История (справа)
                 NavButton(
                     icon = Icons.Default.History,
                     text = stringResource(R.string.history),
-                    onClick = onHistoryClick,
-                    isMain = false
+                    onClick = onHistoryClick
                 )
             }
         }
@@ -138,14 +130,12 @@ fun AnimatedBottomNavigationBar(
  * @param icon иконка кнопки
  * @param text текст под кнопкой
  * @param onClick обработчик нажатия
- * @param isMain является ли кнопка главной (будет выделена)
  */
 @Composable
 private fun NavButton(
     icon: ImageVector,
     text: String,
     onClick: () -> Unit,
-    isMain: Boolean = false
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -153,7 +143,6 @@ private fun NavButton(
             .padding(horizontal = dimensionResource(R.dimen.spacing_xxsmall))
             .widthIn(min = dimensionResource(R.dimen.main_nav_button_size) + dimensionResource(R.dimen.spacing_xxsmall))
     ) {
-        if (isMain) {
             FilledIconButton(
                 onClick = onClick,
                 modifier = Modifier.size(dimensionResource(R.dimen.main_nav_button_size))
@@ -164,18 +153,6 @@ private fun NavButton(
                     modifier = Modifier.size(dimensionResource(R.dimen.main_nav_icon_size))
                 )
             }
-        } else {
-            FilledTonalIconButton(
-                onClick = onClick,
-                modifier = Modifier.size(dimensionResource(R.dimen.nav_button_size))
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = text,
-                    modifier = Modifier.size(dimensionResource(R.dimen.nav_icon_size))
-                )
-            }
-        }
 
         Text(
             text = text,
