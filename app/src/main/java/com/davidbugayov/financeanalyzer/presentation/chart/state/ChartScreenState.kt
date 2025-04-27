@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.state
 
 import com.davidbugayov.financeanalyzer.domain.model.DailyExpense
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Date
@@ -20,6 +21,8 @@ import java.util.Date
  * @property dailyExpenses Список ежедневных расходов
  * @property showExpenses Флаг отображения расходов (true) или доходов (false)
  * @property periodType Тип выбранного периода
+ * @property income Суммарные доходы
+ * @property expense Суммарные расходы
  */
 data class ChartScreenState(
     val isLoading: Boolean = false,
@@ -33,5 +36,7 @@ data class ChartScreenState(
     val showSavingsRateInfo: Boolean = false,
     val dailyExpenses: List<DailyExpense> = emptyList(),
     val showExpenses: Boolean = true,
-    val periodType: PeriodType = PeriodType.MONTH
+    val periodType: PeriodType = PeriodType.MONTH,
+    val income: Money? = null,
+    val expense: Money? = null
 ) 

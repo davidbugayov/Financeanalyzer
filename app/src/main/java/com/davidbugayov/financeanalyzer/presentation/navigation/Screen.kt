@@ -24,6 +24,9 @@ sealed class Screen(val route: String) {
 
     /** Экран с графиками и статистикой */
     data object Chart : Screen("chart")
+
+    /** Экран с подробной финансовой статистикой */
+    data object FinancialStatistics : Screen("financial_statistics")
     
     /** Экран профиля пользователя */
     data object Profile : Screen("profile")

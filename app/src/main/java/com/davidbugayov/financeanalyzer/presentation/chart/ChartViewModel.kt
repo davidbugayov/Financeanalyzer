@@ -5,19 +5,16 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.DailyExpense
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartScreenState
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
-import kotlinx.coroutines.Dispatchers
+import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
@@ -50,6 +47,8 @@ class ChartViewModel : ViewModel(), KoinComponent {
     )
     val state: StateFlow<ChartScreenState> = _state
 
+    private var allTransactions: List<Transaction> = emptyList()
+
     init {
         Timber.d("Initializing with date range: ${formatDate(_state.value.startDate)} - ${formatDate(_state.value.endDate)}")
         resetDateFilter()
@@ -63,11 +62,27 @@ class ChartViewModel : ViewModel(), KoinComponent {
     fun handleIntent(intent: ChartIntent) {
         when (intent) {
             is ChartIntent.LoadTransactions -> loadTransactions()
-            is ChartIntent.UpdateStartDate -> updateStartDate(intent.date)
-            is ChartIntent.UpdateEndDate -> updateEndDate(intent.date)
+            is ChartIntent.UpdateStartDate -> {
+                _state.value = _state.value.copy(
+                    startDate = intent.date,
+                    periodType = PeriodType.CUSTOM
+                )
+                updateTransactionsWithPeriod(allTransactions)
+            }
+
+            is ChartIntent.UpdateEndDate -> {
+                _state.value = _state.value.copy(
+                    endDate = intent.date,
+                    periodType = PeriodType.CUSTOM
+                )
+                updateTransactionsWithPeriod(allTransactions)
+            }
             is ChartIntent.UpdateDateRange -> updateDateRange(intent.startDate, intent.endDate)
             is ChartIntent.ToggleExpenseView -> toggleExpenseView(intent.showExpenses)
-            is ChartIntent.SetPeriodType -> setPeriodType(intent.periodType)
+            is ChartIntent.SetPeriodType -> {
+                _state.value = _state.value.copy(periodType = intent.periodType)
+                updatePeriodDates(intent.periodType)
+            }
             is ChartIntent.ShowPeriodDialog -> _state.update { it.copy(showPeriodDialog = true) }
             is ChartIntent.HidePeriodDialog -> _state.update { it.copy(showPeriodDialog = false) }
             is ChartIntent.ShowStartDatePicker -> _state.update { it.copy(showStartDatePicker = true) }
@@ -122,78 +137,39 @@ class ChartViewModel : ViewModel(), KoinComponent {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
-                // Сначала запрашиваем только первую страницу (макс. 100 транзакций) для быстрого отображения
-                val initialTransactions = withContext(Dispatchers.IO) {
-                    try {
-                        repository.getTransactionsByDateRangePaginated(
-                            _state.value.startDate,
-                            _state.value.endDate,
-                            PAGE_SIZE,
-                            0
-                        )
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при загрузке первой страницы транзакций")
-                        emptyList()
-                    }
+                allTransactions = repository.getAllTransactions()
+
+                // Устанавливаем период по умолчанию (текущий месяц)
+                val calendar = Calendar.getInstance()
+                // Первый день месяца
+                calendar.set(Calendar.DAY_OF_MONTH, 1)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                val firstDayOfMonth = calendar.time
+
+                // Последний день месяца
+                calendar.add(Calendar.MONTH, 1)
+                calendar.add(Calendar.DAY_OF_MONTH, -1)
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
+                val lastDayOfMonth = calendar.time
+
+                _state.update { currentState ->
+                    currentState.copy(
+                        startDate = firstDayOfMonth,
+                        endDate = lastDayOfMonth
+                    )
                 }
-                
-                // Обновляем состояние с первой порцией данных для быстрого отображения графиков
-                if (initialTransactions.isNotEmpty()) {
-                    Timber.d("Быстрая загрузка: получено ${initialTransactions.size} транзакций")
-                    _state.update { currentState ->
-                        currentState.copy(
-                            isLoading = false,
-                            error = null,
-                            transactions = initialTransactions,
-                            dailyExpenses = calculateDailyExpenses(initialTransactions)
-                        )
-                    }
-                }
-                
-                // Затем запускаем полную загрузку всех транзакций в фоновом режиме
-                withContext(Dispatchers.IO) {
-                    try {
-                        val totalTransactions = repository.getTransactionsByDateRangePaginated(
-                            _state.value.startDate,
-                            _state.value.endDate,
-                            Int.MAX_VALUE,
-                            0
-                        )
-                        
-                        if (totalTransactions.size > initialTransactions.size) {
-                            Timber.d("Полная загрузка: получено ${totalTransactions.size} транзакций")
-                            withContext(Dispatchers.Main) {
-                                _state.update { currentState ->
-                                    currentState.copy(
-                                        isLoading = false,
-                                        error = null,
-                                        transactions = totalTransactions,
-                                        dailyExpenses = calculateDailyExpenses(totalTransactions)
-                                    )
-                                }
-                            }
-                        }
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при полной загрузке транзакций")
-                        // Не обновляем состояние ошибки, если у нас уже есть начальные данные
-                        if (initialTransactions.isEmpty()) {
-                            withContext(Dispatchers.Main) {
-                                _state.update {
-                                    it.copy(
-                                        isLoading = false,
-                                        error = e.message
-                                    )
-                                }
-                            }
-                        }
-                    }
-                }
+
+                updateTransactionsWithPeriod(allTransactions)
             } catch (e: Exception) {
-                Timber.e(e, "Критическая ошибка при загрузке транзакций")
+                Timber.e(e, "Error loading transactions")
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = e.message
+                        error = e.message ?: "Неизвестная ошибка при загрузке данных"
                     )
                 }
             }
@@ -365,6 +341,58 @@ class ChartViewModel : ViewModel(), KoinComponent {
         super.onCleared()
         Timber.d("onCleared: Resetting date filter")
         resetDateFilter()
+    }
+
+    private fun updateTransactionsWithPeriod(transactions: List<Transaction>) {
+        val filteredTransactions = filterTransactionsByPeriod(transactions, _state.value.startDate, _state.value.endDate)
+
+        // Вычисляем сумму доходов и расходов
+        val income = calculateTotalIncome(filteredTransactions)
+        val expense = calculateTotalExpense(filteredTransactions)
+
+        _state.value = _state.value.copy(
+            transactions = filteredTransactions,
+            isLoading = false,
+            income = income,
+            expense = expense
+        )
+    }
+
+    /**
+     * Вычисляет общую сумму доходов
+     */
+    private fun calculateTotalIncome(transactions: List<Transaction>): Money {
+        return transactions
+            .filter { !it.isExpense }
+            .map { it.amount }
+            .fold(Money.zero()) { acc, money -> acc + money }
+    }
+
+    /**
+     * Вычисляет общую сумму расходов
+     */
+    private fun calculateTotalExpense(transactions: List<Transaction>): Money {
+        return transactions
+            .filter { it.isExpense }
+            .map { it.amount }
+            .fold(Money.zero()) { acc, money -> acc + money }
+    }
+
+    private fun filterTransactionsByPeriod(
+        transactions: List<Transaction>,
+        startDate: Date,
+        endDate: Date
+    ): List<Transaction> {
+        return transactions.filter { it.date in startDate..endDate }
+    }
+
+    private fun updatePeriodDates(periodType: PeriodType) {
+        val (start, end) = DateUtils.getPeriodDates(periodType)
+        _state.value = _state.value.copy(
+            startDate = start,
+            endDate = end
+        )
+        updateTransactionsWithPeriod(allTransactions)
     }
 
     companion object {

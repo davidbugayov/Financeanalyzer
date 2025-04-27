@@ -34,14 +34,18 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
-import com.davidbugayov.financeanalyzer.presentation.chart.FinanceChartScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedFinanceChartScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialStatisticsScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartScreenState
 import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
+import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
@@ -64,6 +68,8 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**
  * Главный экран приложения, содержащий навигацию между различными разделами.
@@ -207,6 +213,20 @@ fun MainScreen(startDestination: String = "home") {
             // Светлые иконки для темной темы, темные иконки для светлой темы
             controller.isAppearanceLightStatusBars = !isDarkTheme
             controller.isAppearanceLightNavigationBars = !isDarkTheme
+        }
+    }
+
+    /**
+     * Получение форматированного текста периода
+     */
+    fun getPeriodText(state: ChartScreenState): String {
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+
+        return when (state.periodType) {
+            PeriodType.ALL -> "Все время"
+            PeriodType.DAY -> dateFormat.format(state.startDate)
+            PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
+                "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
         }
     }
 
@@ -425,8 +445,50 @@ fun MainScreen(startDestination: String = "home") {
                             ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
                         }
                     ) {
-                        FinanceChartScreen(
+                        // Используем улучшенный экран графиков
+                        EnhancedFinanceChartScreen(
                             viewModel = chartViewModel,
+                            onNavigateBack = { navController.popBackStack() },
+                            onNavigateToStatistics = { transactions, income, expense, period ->
+                                // Переход на экран финансовой статистики
+                                navController.navigate(Screen.FinancialStatistics.route)
+                            }
+                        )
+                    }
+
+                    // Экран финансовой статистики
+                    composable(
+                        route = Screen.FinancialStatistics.route,
+                        enterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(400, easing = EaseInOut)
+                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
+                        },
+                        exitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(400, easing = EaseInOut)
+                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
+                        },
+                        popEnterTransition = {
+                            slideIntoContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
+                                animationSpec = tween(400, easing = EaseInOut)
+                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
+                        },
+                        popExitTransition = {
+                            slideOutOfContainer(
+                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
+                                animationSpec = tween(400, easing = EaseInOut)
+                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
+                        }
+                    ) {
+                        FinancialStatisticsScreen(
+                            transactions = chartViewModel.state.value.transactions,
+                            income = chartViewModel.state.value.income ?: Money.zero(),
+                            expense = chartViewModel.state.value.expense ?: Money.zero(),
+                            period = getPeriodText(chartViewModel.state.value),
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }
