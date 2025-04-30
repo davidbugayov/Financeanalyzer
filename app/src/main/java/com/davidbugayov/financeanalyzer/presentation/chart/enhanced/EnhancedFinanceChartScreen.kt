@@ -618,16 +618,19 @@ private fun CategoryPieChartAdapter(
     showExpenses: Boolean = !isIncome,
     onShowExpensesChange: (Boolean) -> Unit = {}
 ) {
+    // Сохраняем текущее значение типа отображения
+    var currentShowExpenses by remember(showExpenses) { mutableStateOf(showExpenses) }
+    
     // Получаем нужное количество цветов для диаграммы
     val colors = com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.PieChartUtils
-        .getCategoryColors(data.size, isIncome)
+        .getCategoryColors(data.size, !currentShowExpenses)
     
     // Convert Map<String, Money> to List<PieChartData>
     val pieChartDataList = data.entries.mapIndexed { index, entry ->
         val categoryName = entry.key
         val amount = entry.value.amount.toFloat()
         // Create a simple Category object with ID based on index
-        val category = if (isIncome) {
+        val category = if (!currentShowExpenses) {
             Category.income(name = categoryName)
         } else {
             Category.expense(name = categoryName)
@@ -636,7 +639,7 @@ private fun CategoryPieChartAdapter(
         // Используем цвет из полученной палитры вместо одного цвета для всех категорий
         val color = colors.getOrElse(index) { 
             // Если вдруг индекс вышел за пределы, генерируем новый цвет
-            if (isIncome) {
+            if (!currentShowExpenses) {
                 Color(0xFF66BB6A + (index * 1000)) // Разные оттенки зеленого для доходов
             } else {
                 Color(0xFFEF5350 + (index * 1000)) // Разные оттенки красного для расходов
@@ -676,8 +679,11 @@ private fun CategoryPieChartAdapter(
                 }
             },
             modifier = modifier,
-            showExpenses = showExpenses,
-            onShowExpensesChange = onShowExpensesChange
+            showExpenses = currentShowExpenses,
+            onShowExpensesChange = { newShowExpenses ->
+                currentShowExpenses = newShowExpenses
+                onShowExpensesChange(newShowExpenses)
+            }
         )
     }
 }

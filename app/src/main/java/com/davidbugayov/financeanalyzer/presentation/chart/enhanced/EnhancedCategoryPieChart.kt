@@ -80,7 +80,7 @@ fun EnhancedCategoryPieChart(
     onShowExpensesChange: (Boolean) -> Unit = {}
 ) {
     // Filter out items with zero or negative percentages
-    val filteredData = remember(items) {
+    val filteredData = remember(items, showExpenses) {
         items.filter { it.percentage > 0f }
     }
     
@@ -107,8 +107,8 @@ fun EnhancedCategoryPieChart(
     
     Log.d("[D]", "EnhancedCategoryPieChart: общая сумма ${totalMoney.formatForDisplay()}")
     
-    // State for selected indices
-    val selectedIndices = remember(selectedIndex, filteredData) { 
+    // State for selected indices - сбрасываем при смене типа (доходы/расходы)
+    val selectedIndices = remember(selectedIndex, filteredData, showExpenses) { 
         mutableStateOf(
             if (selectedIndex != null && selectedIndex >= 0 && selectedIndex < filteredData.size) 
                 setOf(selectedIndex) 
@@ -130,12 +130,12 @@ fun EnhancedCategoryPieChart(
     val isIncome = filteredData.firstOrNull()?.category?.isExpense == false
     
     // Use this color for center text
-    val centerTextColor = MaterialTheme.colorScheme.onSurface
+    val centerTextColor = MaterialTheme.colorScheme.onBackground
     
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.background
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -467,10 +467,15 @@ private fun DrawPieChart(
 ) {
     val animatedProgress = remember { Animatable(0f) }
     val surfaceColor = MaterialTheme.colorScheme.surface
+    val backgroundColor = MaterialTheme.colorScheme.background
     
     Log.d("[D]", "DrawPieChart: инициализация с ${data.size} элементами, выбрано: ${selectedIndices.size}")
     
-    LaunchedEffect(data) {
+    LaunchedEffect(data, isIncome) {
+        animatedProgress.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(0) // Мгновенно сбрасываем прогресс
+        )
         animatedProgress.animateTo(
             targetValue = 1f,
             animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing)
@@ -478,7 +483,7 @@ private fun DrawPieChart(
     }
     
     // Рассчитываем углы секторов для отрисовки и обработки кликов
-    val sectorAngles = remember(data) {
+    val sectorAngles = remember(data, isIncome) {
         val angles = mutableListOf<Triple<Float, Float, Float>>() // startAngle, sweepAngle, percentage
         var currentAngle = 0f
         var totalPercentage = 0f
@@ -509,34 +514,33 @@ private fun DrawPieChart(
         angles
     }
     
+    // Уникальный ключ для поддержки обновления pointerInput при изменении типа диаграммы
+    val pointerInputKey = remember(isIncome) { System.currentTimeMillis() }
+    
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-        Canvas(
+    Canvas(
             modifier = Modifier
-                .fillMaxSize()
+            .fillMaxSize()
                 .padding(5.dp)
-                .pointerInput(Unit) {
-                    detectTapGestures { offset ->
+            .pointerInput(pointerInputKey) {
+                detectTapGestures { offset ->
+                        Log.d("[D]", "PieChart: обнаружен клик с ключом $pointerInputKey, isIncome = $isIncome, всего секторов: ${sectorAngles.size}")
+                        
                         val size = this.size
                         val radius = min(size.width, size.height) / 2f * 0.95f
                         val innerRadius = radius * 0.55f
-                        val center = Offset(size.width / 2f, size.height / 2f)
+                    val center = Offset(size.width / 2f, size.height / 2f)
                         
                         // Проверяем расстояние от центра
                         val distanceFromCenter = (offset - center).getDistance()
                         
-                        // Если клик в центральную область - сбрасываем выбор
-                        if (distanceFromCenter <= innerRadius) {
-                            Log.d("[D]", "PieChart: клик в центральную область, сбрасываем выбор")
+                        // Если клик в центральную область или за пределами диаграммы - сбрасываем выбор
+                        if (distanceFromCenter <= innerRadius || distanceFromCenter > radius) {
+                            Log.d("[D]", "PieChart: клик за пределами активной области, сбрасываем выбор")
                             if (selectedIndices.isNotEmpty()) onSectorClick(-1)
-                            return@detectTapGestures
-                        }
-                        
-                        // Если клик за пределами диаграммы - игнорируем
-                        if (distanceFromCenter > radius) {
-                            Log.d("[D]", "PieChart: клик за пределами диаграммы, игнорируем")
                             return@detectTapGestures
                         }
                         
@@ -620,6 +624,8 @@ private fun DrawPieChart(
                             Log.d("[D]", "PieChart: выбран сектор №$selectedSector '${data[selectedSector].name}'")
                         } else {
                             Log.d("[D]", "PieChart: сектор не найден")
+                            // Если сектор не найден и есть выбранный элемент - сбрасываем выбор
+                            if (selectedIndices.isNotEmpty()) onSectorClick(-1)
                         }
                         
                         onSectorClick(selectedSector)
@@ -631,20 +637,6 @@ private fun DrawPieChart(
             val radius = min(size.width, size.height) / 2f * 0.95f
             val innerRadius = radius * 0.55f
             val center = Offset(size.width / 2f, size.height / 2f)
-            
-            // Рисуем координатные оси для отладки
-            drawLine(
-                color = Color.Gray.copy(alpha = 0.3f),
-                start = Offset(center.x, center.y - radius * 1.1f),
-                end = Offset(center.x, center.y + radius * 1.1f),
-                strokeWidth = 1f
-            )
-            drawLine(
-                color = Color.Gray.copy(alpha = 0.3f),
-                start = Offset(center.x - radius * 1.1f, center.y),
-                end = Offset(center.x + radius * 1.1f, center.y),
-                strokeWidth = 1f
-            )
             
             // Рисуем все секторы
             sectorAngles.forEachIndexed { index, (startAngle, sweepAngle, _) ->
@@ -661,7 +653,7 @@ private fun DrawPieChart(
                     startAngle = startAngle,
                     sweepAngle = animatedSweepAngle,
                     color = data[index].color,
-                    holeColor = surfaceColor,
+                    holeColor = backgroundColor, // Используем цвет фона для отверстия пончика
                     addOutline = isSelected,
                     alpha = 1f  // Всегда полная непрозрачность для всех секторов
                 )
@@ -669,7 +661,7 @@ private fun DrawPieChart(
             
             // Дополнительно рисуем полный круг в центре для чистого фона
             drawCircle(
-                color = surfaceColor,
+                color = backgroundColor,
                 radius = innerRadius,
                 center = center
             )
@@ -713,20 +705,20 @@ private fun DrawCategoryLegend(
             val money = Money(BigDecimal.valueOf(item.amount.toDouble()))
             
             // Строка категории
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
                     .clickable { onItemClick(originalIndex) }
                     .background(
                         if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                         else Color.Transparent
                     )
                     .padding(vertical = 12.dp, horizontal = 8.dp), // Увеличиваем padding для удобства нажатия
-                verticalAlignment = Alignment.CenterVertically
-            ) {
+            verticalAlignment = Alignment.CenterVertically
+        ) {
                 // Цветной индикатор категории
-                Box(
-                    modifier = Modifier
+            Box(
+                modifier = Modifier
                         .size(16.dp)
                         .background(
                             color = item.color,
@@ -735,7 +727,7 @@ private fun DrawCategoryLegend(
                 )
                 
                 // Название категории
-                Text(
+            Text(
                     text = item.name,
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
@@ -743,12 +735,12 @@ private fun DrawCategoryLegend(
                     modifier = Modifier
                         .padding(start = 12.dp)
                         .weight(1f),
-                    maxLines = 1,
+                maxLines = 1,
                     overflow = TextOverflow.Ellipsis
-                )
+            )
             
                 // Сумма
-                Text(
+            Text(
                     text = money.formatForDisplay(),
                     style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.SemiBold
@@ -757,9 +749,9 @@ private fun DrawCategoryLegend(
                 )
                 
                 // Процент
-                Text(
+            Text(
                     text = String.format("%.1f%%", item.percentage),
-                    style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyMedium,
                     color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.width(55.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.End
