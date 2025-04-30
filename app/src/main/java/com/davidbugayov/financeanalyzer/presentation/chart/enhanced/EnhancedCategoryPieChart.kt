@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
 
+import android.util.Log
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -55,7 +56,6 @@ import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.PieChartUtilsExt
 import androidx.compose.foundation.layout.Arrangement
 import java.math.BigDecimal
 import kotlin.math.atan2
@@ -84,8 +84,11 @@ fun EnhancedCategoryPieChart(
         items.filter { it.percentage > 0f }
     }
     
+    Log.d("[D]", "EnhancedCategoryPieChart: инициализация с ${items.size} элементами, отфильтровано до ${filteredData.size}")
+    
     if (filteredData.isEmpty()) {
         // Show empty state if no valid data
+        Log.d("[D]", "EnhancedCategoryPieChart: нет данных для отображения")
         Box(
             modifier = modifier.fillMaxWidth(),
             contentAlignment = Alignment.Center
@@ -101,6 +104,8 @@ fun EnhancedCategoryPieChart(
     // Calculate total amount from the filtered data
     val totalAmount = filteredData.sumOf { it.amount.toDouble() }.toFloat()
     val totalMoney = Money(BigDecimal.valueOf(totalAmount.toDouble()))
+    
+    Log.d("[D]", "EnhancedCategoryPieChart: общая сумма ${totalMoney.formatForDisplay()}")
     
     // State for selected indices
     val selectedIndices = remember(selectedIndex, filteredData) { 
@@ -264,14 +269,14 @@ private fun DrawScope.drawInnerText(
             val amountPaint = android.graphics.Paint().apply {
                 color = centerTextColor.toArgb()
                 textAlign = android.graphics.Paint.Align.CENTER
-                textSize = min(size.width, size.height) * 0.10f
+                textSize = min(size.width, size.height) * 0.13f // Увеличиваем размер суммы
                 isFakeBoldText = true
                 isAntiAlias = true
                 letterSpacing = 0.02f
             }
             
             // Сумма располагается выше центра
-            val amountY = center.y - amountPaint.descent() * 2
+            val amountY = center.y - amountPaint.descent() * 1.5f
             
             canvas.nativeCanvas.drawText(
                 itemMoney.formatForDisplay(),
@@ -282,23 +287,22 @@ private fun DrawScope.drawInnerText(
             
             // Рисуем название категории под суммой с цветом категории
             val categoryPaint = android.graphics.Paint().apply {
-                color = selectedItem.color.toArgb()
+                color = selectedItem.color.toArgb() 
                 textAlign = android.graphics.Paint.Align.CENTER
-                textSize = min(size.width, size.height) * 0.07f
+                textSize = min(size.width, size.height) * 0.09f // Увеличиваем размер названия категории
                 isFakeBoldText = true
                 isAntiAlias = true
-                letterSpacing = 0.01f
             }
             
             // Обрезаем слишком длинные названия категорий
-            val categoryName = if (selectedItem.name.length > 12) {
-                "${selectedItem.name.take(10)}..."
+            val categoryName = if (selectedItem.name.length > 15) {
+                "${selectedItem.name.take(12)}..."
             } else {
                 selectedItem.name
             }
             
-            // Название категории располагается ровно по центру
-            val categoryY = center.y + categoryPaint.descent()
+            // Название категории чуть ниже центра
+            val categoryY = center.y + categoryPaint.descent() * 0.5f
             
             canvas.nativeCanvas.drawText(
                 categoryName,
@@ -309,14 +313,15 @@ private fun DrawScope.drawInnerText(
             
             // Рисуем процент ниже названия категории
             val percentPaint = android.graphics.Paint().apply {
-                color = selectedItem.color.copy(alpha = 0.8f).toArgb()
+                color = selectedItem.color.copy(alpha = 0.9f).toArgb()
                 textAlign = android.graphics.Paint.Align.CENTER
-                textSize = min(size.width, size.height) * 0.06f
+                textSize = min(size.width, size.height) * 0.07f
                 isAntiAlias = true
+                isFakeBoldText = true
             }
             
             // Процент располагается ниже названия категории
-            val percentY = categoryY + percentPaint.descent() * 3
+            val percentY = categoryY + percentPaint.descent() * 2.5f
             
             canvas.nativeCanvas.drawText(
                 String.format("%.1f%%", selectedItem.percentage),
@@ -332,14 +337,14 @@ private fun DrawScope.drawInnerText(
             val amountPaint = android.graphics.Paint().apply {
                 color = centerTextColor.toArgb()
                 textAlign = android.graphics.Paint.Align.CENTER
-                textSize = min(size.width, size.height) * 0.10f
+                textSize = min(size.width, size.height) * 0.13f // Увеличиваем размер
                 isFakeBoldText = true
                 isAntiAlias = true
                 letterSpacing = 0.02f
             }
             
             // Сумма располагается выше центра
-            val amountY = center.y - amountPaint.descent()
+            val amountY = center.y - amountPaint.descent() * 0.5f
             
             canvas.nativeCanvas.drawText(
                 totalMoney.formatForDisplay(),
@@ -356,14 +361,13 @@ private fun DrawScope.drawInnerText(
                     android.graphics.Color.parseColor("#E53935") // Красный для расходов
                 }
                 textAlign = android.graphics.Paint.Align.CENTER
-                textSize = min(size.width, size.height) * 0.07f
+                textSize = min(size.width, size.height) * 0.09f // Увеличиваем размер
                 isFakeBoldText = true
                 isAntiAlias = true
-                letterSpacing = 0.01f
             }
             
             // Тип располагается ниже суммы
-            val typeY = center.y + typePaint.descent() * 2
+            val typeY = center.y + typePaint.descent() * 2.5f
             
             canvas.nativeCanvas.drawText(
                 if (isIncome) "Доход" else "Расход",
@@ -373,6 +377,81 @@ private fun DrawScope.drawInnerText(
             )
         }
     }
+}
+
+private fun getClickedSectorIndex(
+    angle: Float,
+    sectorAngles: List<Triple<Float, Float, Float>>
+): Int {
+    // Сначала проверяем секторы с очень маленьким углом (менее 5%)
+    // Для них используем увеличенную область обнаружения
+    Log.d("[D]", "PieChart: обрабатываем клик по углу: $angle, всего секторов: ${sectorAngles.size}")
+    
+    // Подробный лог всех секторов для отладки
+    sectorAngles.forEachIndexed { idx, (start, sweep, percent) ->
+        val end = (start + sweep) % 360f
+        Log.d("[D]", "PieChart: сектор №$idx: от $start° до $end° (размер $sweep°), процент: $percent%")
+    }
+    
+    // Починим расчет углов
+    // При проверке малых секторов, используем увеличенную область
+    for (i in sectorAngles.indices) {
+        val (startAngle, sweepAngle, percentage) = sectorAngles[i]
+        
+        // Вычисляем конечный угол сектора
+        val endAngle = (startAngle + sweepAngle) % 360f
+        
+        // Если сектор очень маленький (менее 5%), проверяем с увеличенной областью
+        if (percentage < 5.0f) {
+            // Центральный угол сектора
+            val midAngle = if (endAngle > startAngle) {
+                startAngle + sweepAngle / 2
+            } else {
+                // Если сектор пересекает 0°/360°
+                (startAngle + sweepAngle / 2) % 360f
+            }
+            
+            // Увеличиваем угол сектора в 3 раза для детекции клика, но не более 30 градусов
+            val effectiveSweep = kotlin.math.min(sweepAngle * 3.0f, 30f)
+            
+            // Проверяем расстояние от угла клика до центра сектора
+            val distance = kotlin.math.min(
+                kotlin.math.abs((angle - midAngle + 360) % 360),
+                kotlin.math.abs((midAngle - angle + 360) % 360)
+            )
+            
+            // Если угол находится в пределах половины эффективного угла от центра сектора
+            if (distance <= effectiveSweep / 2) {
+                Log.d("[D]", "PieChart: обнаружен малый сектор №$i, процент: $percentage, начальный угол: $startAngle, угол сектора: $sweepAngle, эффективный угол: $effectiveSweep, расстояние: $distance")
+                return i
+            }
+        }
+    }
+    
+    // Если не найдены маленькие секторы, проверяем все секторы как обычно
+    for (i in sectorAngles.indices) {
+        val (startAngle, sweepAngle, percentage) = sectorAngles[i]
+        
+        // Вычисляем конечный угол сектора
+        val endAngle = (startAngle + sweepAngle) % 360f
+        
+        // Определяем, находится ли угол клика в этом секторе
+        val inSector = if (endAngle < startAngle) {
+            // Сектор пересекает линию 0°/360°
+            angle >= startAngle || angle < endAngle
+        } else {
+            // Обычный случай
+            angle >= startAngle && angle < endAngle
+        }
+        
+        if (inSector) {
+            Log.d("[D]", "PieChart: обнаружен обычный сектор №$i, процент: $percentage, начальный угол: $startAngle, конечный угол: $endAngle, угол сектора: $sweepAngle, угол клика: $angle")
+            return i
+        }
+    }
+    
+    Log.d("[D]", "PieChart: сектор не найден для угла: $angle")
+    return -1
 }
 
 @Composable
@@ -387,40 +466,46 @@ private fun DrawPieChart(
     centerTextColor: Color
 ) {
     val animatedProgress = remember { Animatable(0f) }
-    
-    // Get the surface color outside of Canvas DrawScope since MaterialTheme can only be accessed in a Composable context
     val surfaceColor = MaterialTheme.colorScheme.surface
+    
+    Log.d("[D]", "DrawPieChart: инициализация с ${data.size} элементами, выбрано: ${selectedIndices.size}")
     
     LaunchedEffect(data) {
         animatedProgress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(
-                durationMillis = 800,
-                easing = FastOutSlowInEasing
-            )
+            animationSpec = tween(durationMillis = 800, easing = FastOutSlowInEasing)
         )
     }
     
-    // Логгируем данные секторов для отладки
-    LaunchedEffect(data) {
-        timber.log.Timber.d("Данные диаграммы:")
-        data.forEachIndexed { index, item ->
-            timber.log.Timber.d("Сектор $index: ${item.name}, ${item.percentage}%, ${item.amount}")
-        }
-    }
-    
-    // Улучшенное отслеживание углов секторов для использования при клике
+    // Рассчитываем углы секторов для отрисовки и обработки кликов
     val sectorAngles = remember(data) {
         val angles = mutableListOf<Triple<Float, Float, Float>>() // startAngle, sweepAngle, percentage
         var currentAngle = 0f
+        var totalPercentage = 0f
         
-        data.forEach { item ->
-            // Используем процент для расчета угла сектора
-            val sweepAngle = item.percentage * 360f / 100f
-            angles.add(Triple(currentAngle, sweepAngle, item.percentage))
-            currentAngle += sweepAngle
+        // Сначала вычисляем общую сумму процентов
+        val totalPercent = data.sumOf { it.percentage.toDouble() }.toFloat()
+        Log.d("[D]", "PieChart: общая сумма процентов: $totalPercent%")
+        
+        // Нормализуем до 100% для корректного отображения
+        val normalizationFactor = if (totalPercent > 0) 100f / totalPercent else 1f
+        
+        data.forEachIndexed { index, item ->
+            // Нормализуем процент
+            val normalizedPercentage = item.percentage * normalizationFactor
+            val sweepAngle = normalizedPercentage * 3.6f // 360 / 100 = 3.6
+            
+            // Гарантируем минимальный угол для маленьких секторов при отрисовке - не менее 1°
+            val effectiveSweepAngle = kotlin.math.max(sweepAngle, 1f)
+            
+            angles.add(Triple(currentAngle, effectiveSweepAngle, normalizedPercentage))
+            currentAngle += effectiveSweepAngle
+            totalPercentage += normalizedPercentage
+            
+            Log.d("[D]", "Сектор №$index: '${item.name}' $normalizedPercentage%, угол: $effectiveSweepAngle°, от ${currentAngle - effectiveSweepAngle}° до ${currentAngle}°")
         }
         
+        Log.d("[D]", "PieChart: итоговая сумма процентов: $totalPercentage%, итоговый угол: $currentAngle°")
         angles
     }
     
@@ -428,92 +513,116 @@ private fun DrawPieChart(
         modifier = modifier,
         contentAlignment = Alignment.Center
     ) {
-    Canvas(
+        Canvas(
             modifier = Modifier
-            .fillMaxSize()
+                .fillMaxSize()
                 .padding(5.dp)
-            .pointerInput(Unit) {
-                detectTapGestures { offset ->
+                .pointerInput(Unit) {
+                    detectTapGestures { offset ->
                         val size = this.size
                         val radius = min(size.width, size.height) / 2f * 0.95f
                         val innerRadius = radius * 0.55f
                         val center = Offset(size.width / 2f, size.height / 2f)
                         
-                        // Проверяем, клик был внутри пончика или нет
+                        // Проверяем расстояние от центра
                         val distanceFromCenter = (offset - center).getDistance()
                         
-                        timber.log.Timber.d("Клик: x=${offset.x}, y=${offset.y}, центр: x=${center.x}, y=${center.y}, расстояние=$distanceFromCenter")
-                        
+                        // Если клик в центральную область - сбрасываем выбор
                         if (distanceFromCenter <= innerRadius) {
-                            // Клик в центральную область - сбрасываем выделение
-                            timber.log.Timber.d("Клик в центральную область")
-                            if (selectedIndices.isNotEmpty()) {
-                                onSectorClick(-1)
-                            }
-                            return@detectTapGestures
-                        }
-                    
-                        if (distanceFromCenter > radius) {
-                            // Клик за пределами диаграммы
-                            timber.log.Timber.d("Клик за пределами диаграммы")
+                            Log.d("[D]", "PieChart: клик в центральную область, сбрасываем выбор")
+                            if (selectedIndices.isNotEmpty()) onSectorClick(-1)
                             return@detectTapGestures
                         }
                         
-                        // Определяем угол клика относительно центра
+                        // Если клик за пределами диаграммы - игнорируем
+                        if (distanceFromCenter > radius) {
+                            Log.d("[D]", "PieChart: клик за пределами диаграммы, игнорируем")
+                            return@detectTapGestures
+                        }
+                        
+                        // Вычисляем угол клика
+                        // В Canvas угол 0° направлен вправо и увеличивается против часовой стрелки
                         val dx = offset.x - center.x
                         val dy = offset.y - center.y
                         
-                        // Угол в радианах от -π до π
-                        val radianAngle = atan2(dy, dx)
+                        // Вычисляем угол в радианах и конвертируем в градусы
+                        val angleRad = atan2(dy, dx)
+                        var angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
                         
-                        // Преобразуем в градусы от 0 до 360
-                        var angle = radianAngle * 180f / kotlin.math.PI.toFloat()
-                        if (angle < 0) angle += 360f
+                        // Нормализуем в диапазон [0, 360)
+                        if (angleDeg < 0) angleDeg += 360f
                         
-                        // Преобразуем в систему координат Canvas (0 градусов вверху, по часовой стрелке)
-                        // В Canvas угол 0 находится справа и увеличивается против часовой стрелки
-                        // Поэтому нам нужно перевести в противоположную систему координат
-                        var canvasAngle = (90f - angle) % 360f
-                        if (canvasAngle < 0) canvasAngle += 360f
+                        // Определяем квадрант для отладки
+                        val quadrant = when {
+                            dx >= 0 && dy < 0 -> "I (верх-право)"
+                            dx < 0 && dy < 0 -> "II (верх-лево)"
+                            dx < 0 && dy >= 0 -> "III (низ-лево)"
+                            else -> "IV (низ-право)"
+                        }
                         
-                        timber.log.Timber.d("Угол клика (градусы): $angle°")
-                        timber.log.Timber.d("Угол клика (canvas): $canvasAngle°")
+                        Log.d("[D]", "PieChart: клик - координаты: (${offset.x}, ${offset.y}), квадрант: $quadrant, угол: $angleDeg°")
                         
-                        // Улучшенная логика определения сектора
-                        // Мы будем учитывать не только углы, но и минимальный размер сектора для удобства выбора
+                        // Прямой поиск по секторам
+                        var selectedSector = -1
                         
                         // Перебираем все секторы
-                        var bestMatchIndex = -1
-                        var minAngleDiff = Float.MAX_VALUE
-                        for (i in sectorAngles.indices) {
-                            val (startAngle, sweepAngle, percentage) = sectorAngles[i]
-                            val sectorMiddleAngle = (startAngle + sweepAngle / 2) % 360f
+                        sectorAngles.forEachIndexed { index, (start, sweep, percentage) ->
+                            val end = (start + sweep) % 360f
+                            val containsAngle = if (end < start) {
+                                // Сектор пересекает границу 0°/360°
+                                angleDeg in start..360f || angleDeg in 0f..end
+                            } else {
+                                // Обычный случай
+                                angleDeg in start..end
+                            }
                             
-                            // Для очень маленьких секторов (менее 5%) увеличиваем "область клика"
-                            val effectiveSweepAngle = if (percentage < 5f) sweepAngle * 1.5f else sweepAngle
-                            val halfEffectiveSweep = effectiveSweepAngle / 2
-                            
-                            // Рассчитываем разницу между углом клика и центром сектора
-                            var angleDiff = kotlin.math.abs(sectorMiddleAngle - canvasAngle)
-                            // Учитываем переход через 0/360 градусов
-                            if (angleDiff > 180f) angleDiff = 360f - angleDiff
-                            
-                            timber.log.Timber.d("Сектор $i (${data[i].name}): центр=$sectorMiddleAngle°, разница=$angleDiff°")
-                            
-                            // Проверяем, находится ли угол клика в диапазоне сектора с учетом эффективного угла
-                            if (angleDiff <= halfEffectiveSweep || angleDiff < minAngleDiff) {
-                                minAngleDiff = angleDiff
-                                bestMatchIndex = i
+                            if (containsAngle) {
+                                selectedSector = index
+                                Log.d("[D]", "PieChart: угол $angleDeg° попадает в сектор №$index (${data[index].name}) - от $start° до $end°")
+                                return@forEachIndexed
                             }
                         }
                         
-                        // Выбираем наиболее подходящий сектор
-                        if (bestMatchIndex >= 0) {
-                            timber.log.Timber.d("ВЫБРАН сектор $bestMatchIndex: ${data[bestMatchIndex].name}")
-                            onSectorClick(bestMatchIndex)
-                        } else {
-                            timber.log.Timber.d("Сектор не найден для угла $canvasAngle°")
+                        // Если обычный алгоритм не нашел сектор, проверяем малые секторы с увеличенной зоной
+                        if (selectedSector == -1) {
+                            sectorAngles.forEachIndexed { index, (start, sweep, percentage) ->
+                                if (percentage < 5.0f) {
+                                    // Для маленьких секторов (менее 5%) увеличиваем зону обнаружения
+                                    val end = (start + sweep) % 360f
+                                    // Центр сектора
+                                    val midAngle = if (end < start) {
+                                        (start + 180f) % 360f
+                                    } else {
+                                        (start + sweep / 2f) % 360f
+                                    }
+                                    
+                                    // Увеличиваем область до максимум 30°, но не менее размера сектора
+                                    val effectiveAngle = kotlin.math.min(sweep * 3f, 30f)
+                                    val halfEffective = effectiveAngle / 2f
+                                    
+                                    // Проверка расстояния от центра сектора до места клика
+                                    val distance = kotlin.math.min(
+                                        kotlin.math.abs((angleDeg - midAngle + 360f) % 360f),
+                                        kotlin.math.abs((midAngle - angleDeg + 360f) % 360f)
+                                    )
+                                    
+                                    if (distance <= halfEffective) {
+                                        selectedSector = index
+                                        Log.d("[D]", "PieChart: малый сектор №$index (${data[index].name}) обнаружен, расстояние = $distance°, допустимое = $halfEffective°")
+                                        return@forEachIndexed
+                                    }
+                                }
+                            }
                         }
+                        
+                        // Уведомляем о выбранном секторе
+                        if (selectedSector >= 0) {
+                            Log.d("[D]", "PieChart: выбран сектор №$selectedSector '${data[selectedSector].name}'")
+                        } else {
+                            Log.d("[D]", "PieChart: сектор не найден")
+                        }
+                        
+                        onSectorClick(selectedSector)
                     }
                 }
         ) {
@@ -523,15 +632,28 @@ private fun DrawPieChart(
             val innerRadius = radius * 0.55f
             val center = Offset(size.width / 2f, size.height / 2f)
             
-            // Рисуем все секторы по сохраненным углам
+            // Рисуем координатные оси для отладки
+            drawLine(
+                color = Color.Gray.copy(alpha = 0.3f),
+                start = Offset(center.x, center.y - radius * 1.1f),
+                end = Offset(center.x, center.y + radius * 1.1f),
+                strokeWidth = 1f
+            )
+            drawLine(
+                color = Color.Gray.copy(alpha = 0.3f),
+                start = Offset(center.x - radius * 1.1f, center.y),
+                end = Offset(center.x + radius * 1.1f, center.y),
+                strokeWidth = 1f
+            )
+            
+            // Рисуем все секторы
             sectorAngles.forEachIndexed { index, (startAngle, sweepAngle, _) ->
                 val isSelected = selectedIndices.contains(index)
                 val animatedSweepAngle = sweepAngle * progressValue
                 
-                // Выбранный сектор делаем чуть больше
+                // Выбранный сектор немного увеличиваем и добавляем обводку
                 val sectorRadius = if (isSelected) radius * 1.05f else radius
                 
-                // Используем функцию для рисования сектора пончика
                 drawDonutSection(
                     center = center,
                     innerRadius = innerRadius,
@@ -541,11 +663,18 @@ private fun DrawPieChart(
                     color = data[index].color,
                     holeColor = surfaceColor,
                     addOutline = isSelected,
-                    alpha = if (selectedIndices.isNotEmpty() && !isSelected) 0.5f else 1f
+                    alpha = 1f  // Всегда полная непрозрачность для всех секторов
                 )
             }
             
-            // Рисуем информацию в центре
+            // Дополнительно рисуем полный круг в центре для чистого фона
+            drawCircle(
+                color = surfaceColor,
+                radius = innerRadius,
+                center = center
+            )
+            
+            // Рисуем текст в центре
             drawInnerText(center, size, selectedItem, totalMoney, isIncome, centerTextColor)
         }
     }
@@ -560,7 +689,7 @@ private fun DrawCategoryLegend(
     selectedIndices: Set<Int>,
     onItemClick: (Int) -> Unit
 ) {
-    // Сохраняем стабильный список, сортируем элементы по сумме (от большей к меньшей)
+    // Сортируем элементы по сумме (от большей к меньшей)
     val sortedItems = remember(items) {
         items.sortedByDescending { it.amount }
     }
@@ -583,7 +712,7 @@ private fun DrawCategoryLegend(
             // Create a Money object from the amount
             val money = Money(BigDecimal.valueOf(item.amount.toDouble()))
             
-            // Строка категории - делаем элементы крупнее для удобства нажатия
+            // Строка категории
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -592,47 +721,47 @@ private fun DrawCategoryLegend(
                         if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
                         else Color.Transparent
                     )
-                    .padding(vertical = 10.dp, horizontal = 8.dp), // Увеличенный вертикальный отступ
+                    .padding(vertical = 12.dp, horizontal = 8.dp), // Увеличиваем padding для удобства нажатия
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Цветной индикатор категории - делаем крупнее
+                // Цветной индикатор категории
                 Box(
                     modifier = Modifier
-                        .size(16.dp) // Увеличенный размер индикатора
+                        .size(16.dp)
                         .background(
                             color = item.color,
                             shape = if (isSelected) RoundedCornerShape(3.dp) else CircleShape
                         )
                 )
                 
-                // Название категории - увеличиваем размер текста
+                // Название категории
                 Text(
                     text = item.name,
-                    style = MaterialTheme.typography.bodyMedium.copy( // изменяем с bodySmall на bodyMedium
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                     ),
                     modifier = Modifier
-                        .padding(start = 8.dp)
+                        .padding(start = 12.dp)
                         .weight(1f),
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
             
-                // Сумма - увеличиваем размер текста
+                // Сумма
                 Text(
                     text = money.formatForDisplay(),
-                    style = MaterialTheme.typography.bodyMedium.copy( // изменяем с bodySmall на bodyMedium
+                    style = MaterialTheme.typography.bodyMedium.copy(
                         fontWeight = FontWeight.SemiBold
                     ),
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(horizontal = 8.dp)
                 )
                 
-                // Процент - увеличиваем размер и ширину
+                // Процент
                 Text(
                     text = String.format("%.1f%%", item.percentage),
-                    style = MaterialTheme.typography.bodyMedium, // изменяем с bodySmall на bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                     color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.width(55.dp), // Увеличиваем ширину для процентов
+                    modifier = Modifier.width(55.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.End
                 )
             }
