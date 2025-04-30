@@ -153,6 +153,74 @@
     <string name="grid_color">Цвет сетки</string>
     <string name="background_color">Цвет фона</string>
     <string name="dynamics_by_month">Динамика по месяцам</string>
+    <string name="chart_title_dynamics">Динамика доходов и расходов</string>
+    <string name="chart_subtitle_income">Доходы за период</string>
+    <string name="chart_subtitle_expense">Расходы за период</string>
+    <string name="chart_subtitle_both">Доходы и расходы за период</string>
+    <string name="chart_empty_line_data">Нет данных для отображения на графике</string>
+    <string name="chart_empty_pie_data">Нет данных для отображения</string>
+    <string name="chart_expenses">Расходы</string>
+    <string name="chart_legend_income">Доходы</string>
+    <string name="chart_legend_expense">Расходы</string>
+    <string name="chart_pie_title_income">Доходы по категориям</string>
+    <string name="chart_pie_title_expense">Расходы по категориям</string>
+    <string name="chart_type_selector_income">Доходы</string>
+    <string name="chart_type_selector_expense">Расходы</string>
+    <string name="chart_type_selector_both">Оба</string>
+    <string name="chart_no_data">Нет данных для отображения</string>
+    <string name="chart_income">Доходы</string>
+    <string name="chart_expense">Расходы</string>
+    <string name="chart_both">Оба</string>
+    <string name="chart_category_distribution">Распределение по категориям</string>
+    <string name="chart_income_expense_dynamics">Динамика доходов и расходов</string>
+    <string name="chart_daily_average">Среднее в день: %1$s</string>
+    <string name="chart_monthly_average">Среднее в месяц: %1$s</string>
+    <string name="chart_savings_months">Месяцев сбережений: %1$s</string>
+    <string name="chart_income_title">Доходы</string>
+    <string name="chart_expense_title">Расходы</string>
+    <string name="chart_both_title">Доходы и расходы</string>
+    <string name="chart_income_legend">Доходы</string>
+    <string name="chart_expense_legend">Расходы</string>
+    <string name="chart_pie_income_title">Доходы по категориям</string>
+    <string name="chart_pie_expense_title">Расходы по категориям</string>
+    <string name="chart_line_title">Динамика по времени</string>
+    <string name="chart_category_other">Другое</string>
+    <string name="chart_category_percent">%1$d%%</string>
+    <string name="chart_selected_point_value">%1$.2f ₽</string>
+    <string name="chart_selected_point_date">%1$s</string>
+    <string name="chart_select_point_prompt">Нажмите на точку для получения информации</string>
+    <string name="chart_total_value">Всего: %1$s</string>
+    <string name="chart_date_format">%1$s: %2$s</string>
+    <string name="chart_categories_title">Категории</string>
+    <string name="chart_other_category">Другое</string>
+    <string name="chart_category_percentage">%1$s: %2$s (%3$s%%)</string>
+    <string name="chart_income_label">Income</string>
+    <string name="chart_expense_label">Expenses</string>
+    <string name="chart_both_label">Both</string>
+    <string name="chart_loading">Loading chart data…</string>
+    <string name="chart_error">Failed to load chart data</string>
+    <string name="chart_total_amount">Total: %s</string>
+    <string name="chart_tap_to_select">Tap to select a point</string>
+    <string name="chart_select_type">Выберите тип графика</string>
+    <string name="chart_select_display_mode">Выберите режим отображения</string>
+    <string name="chart_select_period">Выберите период</string>
+    <string name="chart_pie_empty">Нет данных для отображения диаграммы</string>
+    <string name="chart_line_empty">Нет данных для отображения графика</string>
+    <string name="chart_enhanced_title">Расширенная аналитика</string>
+    <string name="chart_debug_info">Отладочная информация: %1$s</string>
+    <string name="chart_legend_title">Легенда</string>
+    
+    <!-- Enhanced Line Chart strings -->
+    <string name="enhanced_line_chart_title">Улучшенная линейная диаграмма</string>
+    <string name="enhanced_line_chart_income">Доходы</string>
+    <string name="enhanced_line_chart_expense">Расходы</string>
+    <string name="enhanced_line_chart_both">Доходы и расходы</string>
+    <string name="enhanced_line_chart_no_data">Нет данных для отображения</string>
+    <string name="enhanced_line_chart_tap_point">Выберите точку для просмотра деталей</string>
+    <string name="enhanced_line_chart_selected_value">Значение: %1$s</string>
+    <string name="enhanced_line_chart_selected_date">Дата: %1$s</string>
+    <string name="enhanced_line_chart_total">Итого: %1$s</string>
+    <string name="enhanced_line_chart_grid_label">%1$s</string>
 
     <!-- FinanceChartScreen strings -->
     <string name="error_loading_transactions">Ошибка при загрузке транзакций: %s</string>
@@ -165,8 +233,6 @@
     <string name="insufficient_data">Недостаточно данных для отображения</string>
     <string name="expenses_last_7_days">Расходы за последние 7 дней</string>
     <string name="no_expenses_recent_days">Нет данных о расходах за последние дни</string>
-    <string name="chart_income">Доходы</string>
-    <string name="chart_expenses">Расходы</string>
     <string name="currency_format_with_percent" formatted="false">%.2f ₽ (%.1f%%)</string>
 
     <!-- Analytics strings -->
@@ -505,4 +571,29 @@
 
     <!-- Sources strings -->
     <string name="delete_source">Удалить источник</string>
+
+    <!-- Общие тексты для графиков -->
+    <string name="chart_title_income">Доходы</string>
+    <string name="chart_title_expense">Расходы</string>
+    <string name="chart_title_both">Оба</string>
+    <string name="chart_title_dynamics_short">Динамика</string>
+    <string name="chart_title_categories">Категории</string>
+    
+    <!-- Тексты для линейного графика -->
+    <string name="chart_title_income_dynamics">Динамика доходов</string>
+    <string name="chart_title_expense_dynamics">Динамика расходов</string>
+    <string name="chart_title_income_expense_dynamics">Динамика доходов и расходов</string>
+    <string name="chart_period_format">%1$s - %2$s</string>
+    <string name="chart_empty_line_data_short">Нет данных для графика</string>
+    
+    <!-- Тексты для пирографа -->
+    <string name="chart_title_income_categories">Категории доходов</string>
+    <string name="chart_title_expense_categories">Категории расходов</string>
+    <string name="chart_percentage_format">%.1f%%</string>
+    <string name="chart_category_others">Другое</string>
+    <string name="chart_tap_hint">Нажмите на сектор для подробностей</string>
+    
+    <!-- Тексты ошибок -->
+    <string name="error_title">Ошибка</string>
+    <string name="error_dismiss">ОК</string>
 </resources>

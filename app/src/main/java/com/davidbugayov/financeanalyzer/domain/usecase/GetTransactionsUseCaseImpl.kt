@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
 import java.util.Date
 import java.util.Calendar
 
@@ -19,15 +20,16 @@ class GetTransactionsUseCaseImpl(
 ) : GetTransactionsUseCase {
 
     /**
-     * Получает поток транзакций за указанный период времени через репозиторий.
-     * Делегирует фактическую работу репозиторию, следуя принципу разделения обязанностей.
-     *
-     * @param startDate Начальная дата периода для получения транзакций
-     * @param endDate Конечная дата периода для получения транзакций
+     * Возвращает Flow с транзакциями за указанный период
+     * @param startDate Начальная дата периода
+     * @param endDate Конечная дата периода
      * @return Flow с списком транзакций за указанный период
      */
     override suspend fun invoke(startDate: Date, endDate: Date): Flow<List<Transaction>> {
-        return repository.getTransactionsByDateRange(startDate, endDate)
+        return flow {
+            val transactions = repository.getTransactionsByDateRange(startDate, endDate)
+            emit(transactions)
+        }
     }
 
     /**

@@ -13,6 +13,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
@@ -62,175 +63,81 @@ class ChartViewModel : ViewModel(), KoinComponent {
     fun handleIntent(intent: ChartIntent) {
         when (intent) {
             is ChartIntent.LoadTransactions -> loadTransactions()
-            is ChartIntent.UpdateStartDate -> {
-                _state.value = _state.value.copy(
-                    startDate = intent.date,
-                    periodType = PeriodType.CUSTOM
-                )
-                updateTransactionsWithPeriod(allTransactions)
-            }
-
-            is ChartIntent.UpdateEndDate -> {
-                _state.value = _state.value.copy(
-                    endDate = intent.date,
-                    periodType = PeriodType.CUSTOM
-                )
-                updateTransactionsWithPeriod(allTransactions)
-            }
-            is ChartIntent.UpdateDateRange -> updateDateRange(intent.startDate, intent.endDate)
             is ChartIntent.ToggleExpenseView -> toggleExpenseView(intent.showExpenses)
-            is ChartIntent.SetPeriodType -> {
-                _state.value = _state.value.copy(periodType = intent.periodType)
-                updatePeriodDates(intent.periodType)
-            }
-            is ChartIntent.ShowPeriodDialog -> _state.update { it.copy(showPeriodDialog = true) }
-            is ChartIntent.HidePeriodDialog -> _state.update { it.copy(showPeriodDialog = false) }
-            is ChartIntent.ShowStartDatePicker -> _state.update { it.copy(showStartDatePicker = true) }
-            is ChartIntent.HideStartDatePicker -> _state.update { it.copy(showStartDatePicker = false) }
-            is ChartIntent.ShowEndDatePicker -> _state.update { it.copy(showEndDatePicker = true) }
-            is ChartIntent.HideEndDatePicker -> _state.update { it.copy(showEndDatePicker = false) }
-            is ChartIntent.ResetDateFilter -> {
-                Timber.d("Explicitly resetting date filter")
-                resetDateFilter()
-                loadTransactions()
-            }
+            is ChartIntent.SetDateRange -> setDateRange(intent.startDate, intent.endDate)
+            is ChartIntent.SetPeriodType -> setPeriodType(intent.periodType)
+            is ChartIntent.TogglePeriodDialog -> togglePeriodDialog(intent.show)
+            is ChartIntent.ToggleStartDatePicker -> toggleStartDatePicker(intent.show)
+            is ChartIntent.ToggleEndDatePicker -> toggleEndDatePicker(intent.show)
+            is ChartIntent.ToggleSavingsRateInfo -> toggleSavingsRateInfo(intent.show)
         }
     }
-
-    private fun setPeriodType(periodType: PeriodType) {
-        val calendar = Calendar.getInstance()
-        val endDate = calendar.apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }.time
-
-        val startDate = calendar.apply {
-            when (periodType) {
-                PeriodType.ALL -> add(Calendar.YEAR, -10)
-                PeriodType.DAY -> add(Calendar.DAY_OF_MONTH, -1)
-                PeriodType.WEEK -> add(Calendar.WEEK_OF_YEAR, -1)
-                PeriodType.MONTH -> add(Calendar.MONTH, -1)
-                PeriodType.QUARTER -> add(Calendar.MONTH, -3)
-                PeriodType.YEAR -> add(Calendar.YEAR, -1)
-                PeriodType.CUSTOM -> Unit // Не меняем даты для пользовательского периода
-            }
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.time
-
-        _state.update {
-            it.copy(
-                startDate = startDate,
-                endDate = endDate,
-                periodType = periodType
-            )
-        }
-
-        loadTransactions()
-    }
-
+    
+    // Публичный метод для загрузки транзакций, используемый в MainScreen
     fun loadTransactions() {
         viewModelScope.launch {
-            _state.update { it.copy(isLoading = true) }
             try {
-                allTransactions = repository.getAllTransactions()
-
-                // Устанавливаем период по умолчанию (текущий месяц)
-                val calendar = Calendar.getInstance()
-                // Первый день месяца
-                calendar.set(Calendar.DAY_OF_MONTH, 1)
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                val firstDayOfMonth = calendar.time
-
-                // Последний день месяца
-                calendar.add(Calendar.MONTH, 1)
-                calendar.add(Calendar.DAY_OF_MONTH, -1)
-                calendar.set(Calendar.HOUR_OF_DAY, 23)
-                calendar.set(Calendar.MINUTE, 59)
-                calendar.set(Calendar.SECOND, 59)
-                val lastDayOfMonth = calendar.time
-
-                _state.update { currentState ->
-                    currentState.copy(
-                        startDate = firstDayOfMonth,
-                        endDate = lastDayOfMonth
-                    )
+                _state.update { it.copy(isLoading = true, error = null) }
+                
+                val transactions = getTransactionsUseCase.getAllTransactions()
+                allTransactions = transactions
+                
+                // Фильтруем транзакции по датам
+                val filteredTransactions = allTransactions.filter { transaction ->
+                    transaction.date >= _state.value.startDate && transaction.date <= _state.value.endDate
                 }
-
-                updateTransactionsWithPeriod(allTransactions)
-            } catch (e: Exception) {
-                Timber.e(e, "Error loading transactions")
+                
+                // Рассчитываем ежедневные расходы
+                val dailyExpenses = calculateDailyExpenses(filteredTransactions)
+                
+                // Рассчитываем суммы доходов и расходов
+                val (income, expense) = calculateIncomeAndExpense(filteredTransactions)
+                
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = e.message ?: "Неизвестная ошибка при загрузке данных"
+                        transactions = filteredTransactions,
+                        dailyExpenses = dailyExpenses,
+                        income = income,
+                        expense = expense
                     )
                 }
+            } catch (e: Exception) {
+                Timber.e(e, "Error loading transactions")
+                _state.update { it.copy(isLoading = false, error = e.message) }
             }
         }
     }
-
-    private fun updateStartDate(date: Date) {
-        Timber.d("Updating start date to: ${formatDate(date)}")
-        _state.update { currentState ->
-            val calendar = Calendar.getInstance().apply {
-                time = date
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
-            currentState.copy(
-                startDate = calendar.time,
-                dailyExpenses = calculateDailyExpenses(currentState.transactions)
-            )
-        }
+    
+    private fun calculateIncomeAndExpense(transactions: List<Transaction>): Pair<Money, Money> {
+        val income = transactions
+            .filter { transaction -> transaction.amount.amount.toFloat() > 0 }
+            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+            
+        val expense = transactions
+            .filter { transaction -> transaction.amount.amount.toFloat() < 0 }
+            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount.abs() }
+            
+        return income to expense
     }
-
-    private fun updateEndDate(date: Date) {
-        Timber.d("Updating end date to: ${formatDate(date)}")
-        _state.update { currentState ->
-            val calendar = Calendar.getInstance().apply {
-                time = date
-                set(Calendar.HOUR_OF_DAY, 23)
-                set(Calendar.MINUTE, 59)
-                set(Calendar.SECOND, 59)
-                set(Calendar.MILLISECOND, 999)
-            }
-            currentState.copy(
-                endDate = calendar.time,
-                dailyExpenses = calculateDailyExpenses(currentState.transactions)
-            )
-        }
-    }
-
-    private fun updateDateRange(startDate: Date, endDate: Date) {
-        Timber.d("Updating date range to: ${formatDate(startDate)} - ${formatDate(endDate)}")
-        _state.update { currentState ->
-            val startCalendar = Calendar.getInstance().apply {
-                time = startDate
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }
-            val endCalendar = Calendar.getInstance().apply {
-                time = endDate
-                set(Calendar.HOUR_OF_DAY, 23)
-                set(Calendar.MINUTE, 59)
-                set(Calendar.SECOND, 59)
-                set(Calendar.MILLISECOND, 999)
-            }
-            currentState.copy(
-                startDate = startCalendar.time,
-                endDate = endCalendar.time,
-                dailyExpenses = calculateDailyExpenses(currentState.transactions)
+    
+    private fun calculateDailyExpenses(transactions: List<Transaction>): List<DailyExpense> {
+        // Группируем по дате
+        val expensesByDay = transactions
+            .filter { transaction -> transaction.amount.amount.toFloat() < 0 }
+            .groupBy { DateUtils.truncateToDay(it.date, _state.value.startDate, _state.value.endDate) }
+        
+        // Преобразуем в список DailyExpense
+        return expensesByDay.entries
+            .sortedBy { it.key }
+            .map { (date, transactions) ->
+                val total = transactions.fold(Money.zero()) { acc, transaction ->
+                    acc + transaction.amount.abs()
+                }
+                
+                DailyExpense(
+                    date = date,
+                    amount = total
             )
         }
     }
@@ -239,75 +146,22 @@ class ChartViewModel : ViewModel(), KoinComponent {
         _state.update { it.copy(showExpenses = showExpenses) }
     }
 
-    fun getExpensesByCategory(transactions: List<Transaction>): Map<String, Money> {
-        val expensesByCategory = transactions
-            .filter { it.isExpense }
-            .groupBy { it.category }
-            .mapValues { (_, transactions) ->
-                transactions
-                    .map { it.amount }
-                    .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
-            }
-            
-        return expensesByCategory
+    private fun setDateRange(startDate: Date, endDate: Date) {
+        _state.update { it.copy(startDate = startDate, endDate = endDate) }
+        loadTransactions()
     }
-
-    fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
-        val incomeByCategory = transactions
-            .filter { !it.isExpense }
-            .groupBy { it.category }
-            .mapValues { (_, transactions) ->
-                transactions
-                    .map { it.amount }
-                    .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
-            }
-            
-        return incomeByCategory
+    
+    private fun setPeriodType(periodType: PeriodType) {
+        _state.update { it.copy(periodType = periodType) }
+        
+        // Обновляем даты в зависимости от типа периода
+        val (start, end) = calculateDatesForPeriod(periodType)
+        _state.update { it.copy(startDate = start, endDate = end) }
+        
+        loadTransactions()
     }
-
-    private fun calculateDailyExpenses(transactions: List<Transaction>): List<DailyExpense> {
-        // Используем IO диспатчер для тяжелых вычислений
-        return try {
-            val filteredTransactions = transactions.filter { transaction ->
-                transaction.date.time >= _state.value.startDate.time &&
-                        transaction.date.time <= _state.value.endDate.time
-            }
-
-            Timber.d("Отфильтровано ${filteredTransactions.size} транзакций для графиков")
-
-            filteredTransactions
-                .groupBy { transaction ->
-                    Calendar.getInstance().apply {
-                        time = transaction.date
-                        set(Calendar.HOUR_OF_DAY, 0)
-                        set(Calendar.MINUTE, 0)
-                        set(Calendar.SECOND, 0)
-                        set(Calendar.MILLISECOND, 0)
-                    }.time
-                }
-                .map { (date, transactionsForDate) ->
-                    val expenseAmount = transactionsForDate
-                        .filter { it.isExpense }
-                        .map { it.amount }
-                        .reduceOrNull { acc, amount -> acc + amount } ?: Money.zero()
-
-                    DailyExpense(
-                        date = date,
-                        amount = expenseAmount
-                    )
-                }
-                .filter { !it.amount.isZero() }
-                .sortedBy { it.date }
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при расчете ежедневных расходов")
-            emptyList()
-        }
-    }
-
-    /**
-     * Сбрасывает фильтр дат на значение по умолчанию (месяц)
-     */
-    private fun resetDateFilter() {
+    
+    private fun calculateDatesForPeriod(periodType: PeriodType): Pair<Date, Date> {
         val calendar = Calendar.getInstance()
         val endDate = calendar.apply {
             set(Calendar.HOUR_OF_DAY, 23)
@@ -316,7 +170,23 @@ class ChartViewModel : ViewModel(), KoinComponent {
             set(Calendar.MILLISECOND, 999)
         }.time
 
-        val startDate = calendar.apply {
+        val startDate = when (periodType) {
+            PeriodType.DAY -> calendar.apply {
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
+            
+            PeriodType.WEEK -> calendar.apply {
+                add(Calendar.DAY_OF_YEAR, -7)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
+            
+            PeriodType.MONTH -> calendar.apply {
             add(Calendar.MONTH, -1)
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
@@ -324,78 +194,75 @@ class ChartViewModel : ViewModel(), KoinComponent {
             set(Calendar.MILLISECOND, 0)
         }.time
 
-        _state.update {
-            it.copy(
-                startDate = startDate,
-                endDate = endDate,
-                periodType = PeriodType.MONTH
-            )
+            PeriodType.QUARTER -> calendar.apply {
+                add(Calendar.MONTH, -3)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
+            
+            PeriodType.YEAR -> calendar.apply {
+                add(Calendar.YEAR, -1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
+            
+            PeriodType.ALL, PeriodType.CUSTOM -> calendar.apply {
+                set(Calendar.YEAR, 2000)
+                set(Calendar.MONTH, Calendar.JANUARY)
+                set(Calendar.DAY_OF_MONTH, 1)
+                set(Calendar.HOUR_OF_DAY, 0)
+                set(Calendar.MINUTE, 0)
+                set(Calendar.SECOND, 0)
+                set(Calendar.MILLISECOND, 0)
+            }.time
         }
+        
+        return startDate to endDate
     }
-
-    /**
-     * Вызывается при уничтожении ViewModel (когда пользователь выходит с экрана)
-     * Сбрасывает выбор даты к значениям по умолчанию
-     */
-    override fun onCleared() {
-        super.onCleared()
-        Timber.d("onCleared: Resetting date filter")
-        resetDateFilter()
+    
+    private fun togglePeriodDialog(show: Boolean) {
+        _state.update { it.copy(showPeriodDialog = show) }
     }
-
-    private fun updateTransactionsWithPeriod(transactions: List<Transaction>) {
-        val filteredTransactions = filterTransactionsByPeriod(transactions, _state.value.startDate, _state.value.endDate)
-
-        // Вычисляем сумму доходов и расходов
-        val income = calculateTotalIncome(filteredTransactions)
-        val expense = calculateTotalExpense(filteredTransactions)
-
-        _state.value = _state.value.copy(
-            transactions = filteredTransactions,
-            isLoading = false,
-            income = income,
-            expense = expense
-        )
+    
+    private fun toggleStartDatePicker(show: Boolean) {
+        _state.update { it.copy(showStartDatePicker = show) }
     }
-
-    /**
-     * Вычисляет общую сумму доходов
-     */
-    private fun calculateTotalIncome(transactions: List<Transaction>): Money {
+    
+    private fun toggleEndDatePicker(show: Boolean) {
+        _state.update { it.copy(showEndDatePicker = show) }
+    }
+    
+    private fun toggleSavingsRateInfo(show: Boolean) {
+        _state.update { it.copy(showSavingsRateInfo = show) }
+    }
+    
+    private fun resetDateFilter() {
+        setPeriodType(PeriodType.MONTH)
+    }
+    
+    // Для совместимости со старым кодом
+    fun getExpensesByCategory(transactions: List<Transaction>): Map<String, Money> {
         return transactions
-            .filter { !it.isExpense }
-            .map { it.amount }
-            .fold(Money.zero()) { acc, money -> acc + money }
+            .filter { transaction -> transaction.amount.amount.toFloat() < 0 }
+            .groupBy { it.category }
+            .mapValues { (_, transactions) ->
+                transactions.fold(Money.zero()) { acc, transaction -> 
+                    acc + transaction.amount.abs() 
+                }
+            }
     }
-
-    /**
-     * Вычисляет общую сумму расходов
-     */
-    private fun calculateTotalExpense(transactions: List<Transaction>): Money {
+    
+    // Для совместимости со старым кодом
+    fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
         return transactions
-            .filter { it.isExpense }
-            .map { it.amount }
-            .fold(Money.zero()) { acc, money -> acc + money }
-    }
-
-    private fun filterTransactionsByPeriod(
-        transactions: List<Transaction>,
-        startDate: Date,
-        endDate: Date
-    ): List<Transaction> {
-        return transactions.filter { it.date in startDate..endDate }
-    }
-
-    private fun updatePeriodDates(periodType: PeriodType) {
-        val (start, end) = DateUtils.getPeriodDates(periodType)
-        _state.value = _state.value.copy(
-            startDate = start,
-            endDate = end
-        )
-        updateTransactionsWithPeriod(allTransactions)
-    }
-
-    companion object {
-        private const val PAGE_SIZE = 100 // Размер страницы для начальной загрузки
+            .filter { transaction -> transaction.amount.amount.toFloat() > 0 }
+            .groupBy { it.category }
+            .mapValues { (_, transactions) ->
+                transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+            }
     }
 } 

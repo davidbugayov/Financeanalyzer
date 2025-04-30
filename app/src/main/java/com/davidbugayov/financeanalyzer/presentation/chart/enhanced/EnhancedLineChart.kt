@@ -20,6 +20,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -33,26 +34,29 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Path
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.presentation.chart.ChartDataPoint
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.ChartLegendItem
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawGridLines
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawLineChart
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.LineChartUtils.findNearestPoint
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-
-/**
- * Модель данных для точки на линейном графике
- */
-data class LineChartPoint(
-    val date: Date,
-    val value: Money,
-    val label: String = ""
-)
 
 /**
  * Улучшенный линейный график для отображения динамики доходов/расходов
@@ -73,7 +77,7 @@ fun EnhancedLineChart(
     expenseData: List<LineChartPoint>,
     showIncome: Boolean = true,
     showExpense: Boolean = true,
-    title: String = "Динамика",
+    title: String = stringResource(id = R.string.chart_title_dynamics),
     subtitle: String = "",
     period: String = "",
     onPointSelected: (LineChartPoint) -> Unit = {},
@@ -86,7 +90,7 @@ fun EnhancedLineChart(
     // Если нет данных для отображения, показываем сообщение
     if (!hasIncomeData && !hasExpenseData) {
         Box(modifier = modifier.fillMaxWidth()) {
-            EmptyContent()
+            EmptyContent(message = stringResource(id = R.string.chart_empty_line_data))
         }
         return
     }
@@ -94,11 +98,18 @@ fun EnhancedLineChart(
     // Состояния для анимации и выбранной точки
     var selectedIncomePoint by remember { mutableStateOf<LineChartPoint?>(null) }
     var selectedExpensePoint by remember { mutableStateOf<LineChartPoint?>(null) }
+
+    // Константа для порогового значения выбора точки
+    val selectionThreshold = 20.dp
+
     val animatedProgress by animateFloatAsState(
         targetValue = 1f,
         animationSpec = tween(1500, easing = FastOutSlowInEasing),
         label = "ChartAnimation"
     )
+
+    // Преобразуем selectionThreshold в пиксели заранее
+    val thresholdPx = with(LocalDensity.current) { selectionThreshold.toPx() }
 
     // Найдем минимальные и максимальные значения для масштабирования
     val allPoints = mutableListOf<LineChartPoint>().apply {
@@ -109,14 +120,14 @@ fun EnhancedLineChart(
     // Если список пуст, возвращаемся
     if (allPoints.isEmpty()) {
         Box(modifier = modifier.fillMaxWidth()) {
-            EmptyContent()
+            EmptyContent(message = stringResource(id = R.string.chart_empty_line_data))
         }
         return
     }
 
-    // Convert to float for consistent use in drawing functions
-    val maxValueFloat = allPoints.maxOf { it.value.amount.toDouble() }.toFloat()
-    val minValueFloat = allPoints.minOf { it.value.amount.toDouble() }.toFloat()
+    // Максимальное и минимальное значение для оси Y
+    val maxValue = allPoints.maxOf { it.value.amount.toDouble() }.toFloat()
+    val minValue = allPoints.minOf { it.value.amount.toDouble() }.toFloat()
 
     // Получаем крайние даты для оси X
     val startDate = allPoints.minOf { it.date.time }
@@ -125,32 +136,41 @@ fun EnhancedLineChart(
     // Сохраняем цвета поверхности для использования в функциях рисования
     val surfaceColor = MaterialTheme.colorScheme.surface
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-    val errorColor = MaterialTheme.colorScheme.error
+    val expenseColor = MaterialTheme.colorScheme.error
+    val incomeColor = colorResource(id = R.color.income_primary)
+
+    // Получаем размеры из ресурсов
+    val cardCornerRadius = dimensionResource(id = R.dimen.chart_card_corner_radius)
+    val cardElevation = dimensionResource(id = R.dimen.chart_card_elevation)
+    val chartCornerRadius = dimensionResource(id = R.dimen.chart_corner_radius)
+    val chartHeight = dimensionResource(id = R.dimen.chart_height)
+    val spacingNormal = dimensionResource(id = R.dimen.chart_spacing_normal)
+    val spacingMedium = dimensionResource(id = R.dimen.chart_spacing_medium)
 
     // Создаем карточку с графиком
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clip(RoundedCornerShape(16.dp))
+            .clip(RoundedCornerShape(cardCornerRadius))
             .clickable {
                 // При клике на пустую область сбрасываем выбор
                 selectedIncomePoint = null
                 selectedExpensePoint = null
                 // Вызываем колбэк для сброса выбора
                 // Создаем временную точку с пустыми данными для сброса выбора
-                onPointSelected(LineChartPoint(Date(), Money.zero(), ""))
+                onPointSelected(LineChartPoint(java.util.Date(), Money.zero(), ""))
             },
         colors = CardDefaults.cardColors(
             containerColor = surfaceColor
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 4.dp
+            defaultElevation = cardElevation
         )
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(spacingNormal)
         ) {
             // Заголовок графика
             Text(
@@ -182,7 +202,7 @@ fun EnhancedLineChart(
                 }
             }
 
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(spacingNormal))
 
             // Отображение выбранной точки
             val selectedPoint = selectedIncomePoint ?: selectedExpensePoint
@@ -191,7 +211,7 @@ fun EnhancedLineChart(
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(bottom = 8.dp),
+                        .padding(bottom = spacingMedium),
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
@@ -203,7 +223,7 @@ fun EnhancedLineChart(
                         text = selectedPoint.value.format(true),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (selectedPoint == selectedIncomePoint) Color(0xFF66BB6A) else MaterialTheme.colorScheme.error
+                        color = if (selectedPoint == selectedIncomePoint) incomeColor else expenseColor
                     )
                 }
             }
@@ -212,80 +232,47 @@ fun EnhancedLineChart(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(200.dp)
-                    .clip(RoundedCornerShape(8.dp))
+                    .height(chartHeight)
+                    .clip(RoundedCornerShape(chartCornerRadius))
                     .background(surfaceVariantColor.copy(alpha = 0.2f))
-                    .padding(horizontal = 8.dp, vertical = 16.dp)
+                    .padding(horizontal = spacingMedium, vertical = spacingNormal)
             ) {
                 // Отрисовка графика на холсте
                 Canvas(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(200.dp)
-                        .pointerInput(incomeData, expenseData) {
+                        .height(chartHeight)
+                        .pointerInput(Unit) {
                             detectTapGestures { offset ->
                                 // Обработка нажатия на точки графика
                                 val chartWidth = size.width
                                 val chartHeight = size.height
-
-                                // Функция для поиска ближайшей точки
-                                fun findNearestPoint(
-                                    points: List<LineChartPoint>,
-                                    startDate: Long,
-                                    endDate: Long,
-                                    minValue: Float,
-                                    maxValue: Float,
-                                    tapPosition: Offset,
-                                    chartWidth: Float,
-                                    chartHeight: Float,
-                                    threshold: Float = 20f
-                                ): LineChartPoint? {
-                                    if (points.isEmpty()) return null
-
-                                    var nearestPoint: LineChartPoint? = null
-                                    var nearestDistance = Float.MAX_VALUE
-
-                                    points.forEach { point ->
-                                        val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-                                        val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
-
-                                        val pointX = normalizedX * chartWidth
-                                        val pointY = normalizedY * chartHeight
-
-                                        val distance = kotlin.math.hypot(pointX - tapPosition.x, pointY - tapPosition.y)
-
-                                        if (distance < nearestDistance && distance < threshold) {
-                                            nearestDistance = distance
-                                            nearestPoint = point
-                                        }
-                                    }
-
-                                    return nearestPoint
-                                }
+                                // Используем уже преобразованное значение
+                                // val thresholdPx = with(LocalDensity.current) { selectionThreshold.toPx() }
 
                                 // Ищем ближайшие точки на обеих линиях
                                 val incomePoint = if (hasIncomeData) findNearestPoint(
                                     points = incomeData,
                                     startDate = startDate,
                                     endDate = endDate,
-                                    minValue = minValueFloat,
-                                    maxValue = maxValueFloat,
+                                    minValue = minValue,
+                                    maxValue = maxValue,
                                     tapPosition = offset,
                                     chartWidth = chartWidth.toFloat(),
                                     chartHeight = chartHeight.toFloat(),
-                                    threshold = 30.dp.toPx() // Увеличиваем порог для более удобного выбора
+                                    threshold = thresholdPx
                                 ) else null
 
                                 val expensePoint = if (hasExpenseData) findNearestPoint(
                                     points = expenseData,
                                     startDate = startDate,
                                     endDate = endDate,
-                                    minValue = minValueFloat,
-                                    maxValue = maxValueFloat,
+                                    minValue = minValue,
+                                    maxValue = maxValue,
                                     tapPosition = offset,
                                     chartWidth = chartWidth.toFloat(),
                                     chartHeight = chartHeight.toFloat(),
-                                    threshold = 30.dp.toPx() // Увеличиваем порог для более удобного выбора
+                                    threshold = thresholdPx
                                 ) else null
 
                                 // Выбираем ближайшую из всех найденных
@@ -293,11 +280,11 @@ fun EnhancedLineChart(
                                     // Если найдены точки на обеих линиях, выбираем ближайшую
                                     val incomeX = (incomePoint.date.time - startDate).toFloat() / (endDate - startDate).toFloat() * chartWidth
                                     val incomeY =
-                                        (1f - (incomePoint.value.amount.toFloat() - minValueFloat) / (maxValueFloat - minValueFloat)) * chartHeight
+                                        (1f - (incomePoint.value.amount.toFloat() - minValue) / (maxValue - minValue).toFloat()) * chartHeight.toFloat()
 
                                     val expenseX = (expensePoint.date.time - startDate).toFloat() / (endDate - startDate).toFloat() * chartWidth
                                     val expenseY =
-                                        (1f - (expensePoint.value.amount.toFloat() - minValueFloat) / (maxValueFloat - minValueFloat)) * chartHeight
+                                        (1f - (expensePoint.value.amount.toFloat() - minValue) / (maxValue - minValue).toFloat()) * chartHeight.toFloat()
 
                                     val incomeDistance = kotlin.math.hypot(incomeX - offset.x, incomeY - offset.y)
                                     val expenseDistance = kotlin.math.hypot(expenseX - offset.x, expenseY - offset.y)
@@ -335,10 +322,10 @@ fun EnhancedLineChart(
                             points = incomeData,
                             startDate = startDate,
                             endDate = endDate,
-                            minValue = minValueFloat,
-                            maxValue = maxValueFloat,
-                            lineColor = Color(0xFF66BB6A),
-                            fillColor = Color(0xFF66BB6A).copy(alpha = 0.2f),
+                            minValue = minValue,
+                            maxValue = maxValue,
+                            lineColor = incomeColor,
+                            fillColor = incomeColor.copy(alpha = 0.2f),
                             animatedProgress = animatedProgress,
                             selectedPoint = selectedIncomePoint
                         )
@@ -350,10 +337,10 @@ fun EnhancedLineChart(
                             points = expenseData,
                             startDate = startDate,
                             endDate = endDate,
-                            minValue = minValueFloat,
-                            maxValue = maxValueFloat,
-                            lineColor = errorColor,
-                            fillColor = errorColor.copy(alpha = 0.2f),
+                            minValue = minValue,
+                            maxValue = maxValue,
+                            lineColor = expenseColor,
+                            fillColor = expenseColor.copy(alpha = 0.2f),
                             animatedProgress = animatedProgress,
                             selectedPoint = selectedExpensePoint
                         )
@@ -361,205 +348,34 @@ fun EnhancedLineChart(
                 }
             }
 
-            Spacer(modifier = Modifier.height(8.dp))
+            Spacer(modifier = Modifier.height(spacingMedium))
 
             // Легенда для графика
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 8.dp),
+                    .padding(top = spacingMedium),
                 horizontalArrangement = Arrangement.Center,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 if (showIncome) {
                     ChartLegendItem(
-                        color = Color(0xFF66BB6A),
-                        text = "Доходы"
+                        color = incomeColor,
+                        text = stringResource(id = R.string.chart_title_income)
                     )
 
                     if (showExpense) {
-                        Spacer(modifier = Modifier.width(16.dp))
+                        Spacer(modifier = Modifier.width(spacingNormal))
                     }
                 }
 
                 if (showExpense) {
                     ChartLegendItem(
-                        color = MaterialTheme.colorScheme.error,
-                        text = "Расходы"
+                        color = expenseColor,
+                        text = stringResource(id = R.string.chart_title_expense)
                     )
                 }
             }
-        }
-    }
-}
-
-/**
- * Легенда для графика
- */
-@Composable
-private fun ChartLegendItem(
-    color: Color,
-    text: String
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Box(
-            modifier = Modifier
-                .width(12.dp)
-                .height(4.dp)
-                .background(color, RoundedCornerShape(4.dp))
-        )
-
-        Spacer(modifier = Modifier.width(4.dp))
-
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
-        )
-    }
-}
-
-/**
- * Функция расширения для рисования сетки графика
- */
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawGridLines(
-    width: Float,
-    height: Float
-) {
-    // Рисуем горизонтальные линии сетки
-    val horizontalLineCount = 4
-    val dashPattern = floatArrayOf(10f, 10f)
-
-    repeat(horizontalLineCount) { i ->
-        val y = height * i / (horizontalLineCount - 1)
-
-        drawLine(
-            color = Color.Gray.copy(alpha = 0.2f),
-            start = Offset(0f, y),
-            end = Offset(width, y),
-            strokeWidth = 1f,
-            pathEffect = PathEffect.dashPathEffect(dashPattern)
-        )
-    }
-
-    // Рисуем вертикальные линии сетки
-    val verticalLineCount = 5
-
-    repeat(verticalLineCount) { i ->
-        val x = width * i / (verticalLineCount - 1)
-
-        drawLine(
-            color = Color.Gray.copy(alpha = 0.2f),
-            start = Offset(x, 0f),
-            end = Offset(x, height),
-            strokeWidth = 1f,
-            pathEffect = PathEffect.dashPathEffect(dashPattern)
-        )
-    }
-}
-
-/**
- * Функция расширения для рисования линейного графика
- */
-private fun androidx.compose.ui.graphics.drawscope.DrawScope.drawLineChart(
-    points: List<LineChartPoint>,
-    startDate: Long,
-    endDate: Long,
-    minValue: Float,
-    maxValue: Float,
-    lineColor: Color,
-    fillColor: Color,
-    animatedProgress: Float,
-    selectedPoint: LineChartPoint?
-) {
-    if (points.isEmpty()) return
-
-    val width = size.width
-    val height = size.height
-
-    // Создаем путь для линии
-    val linePath = Path()
-    val fillPath = Path()
-
-    // Нормализуем данные и создаем путь
-    var isFirst = true
-
-    points.forEachIndexed { index, point ->
-        // Нормализуем координаты точки
-        val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-        val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
-
-        // Масштабируем согласно анимации и размеру холста
-        val scaledX = normalizedX * width * animatedProgress
-        val scaledY = normalizedY * height
-
-        // Добавляем точку к пути
-        if (isFirst) {
-            linePath.moveTo(0f, scaledY)
-            fillPath.moveTo(0f, height)
-            fillPath.lineTo(0f, scaledY)
-            isFirst = false
-        }
-
-        linePath.lineTo(scaledX, scaledY)
-        fillPath.lineTo(scaledX, scaledY)
-
-        // Если это последняя точка
-        if (index == points.size - 1 && animatedProgress >= 1f) {
-            fillPath.lineTo(scaledX, height)
-            fillPath.lineTo(0f, height)
-            fillPath.close()
-        }
-    }
-
-    // Рисуем заполнение под линией
-    drawPath(
-        path = fillPath,
-        brush = Brush.verticalGradient(
-            colors = listOf(
-                fillColor,
-                fillColor.copy(alpha = 0.1f)
-            ),
-            startY = 0f,
-            endY = height
-        )
-    )
-
-    // Рисуем саму линию
-    drawPath(
-        path = linePath,
-        color = lineColor,
-        style = Stroke(
-            width = 2.dp.toPx(),
-            cap = StrokeCap.Round
-        )
-    )
-
-    // Рисуем точки на линии, если нужно показать все точки
-    points.forEach { point ->
-        val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
-        val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
-
-        val scaledX = normalizedX * width * animatedProgress
-        val scaledY = normalizedY * height
-
-        // Если это выбранная точка, рисуем ее крупнее
-        if (point == selectedPoint) {
-            // Рисуем внешний круг
-            drawCircle(
-                color = Color.White,
-                radius = 12f,
-                center = Offset(scaledX, scaledY)
-            )
-
-            // Рисуем внутренний круг
-            drawCircle(
-                color = lineColor,
-                radius = 8f,
-                center = Offset(scaledX, scaledY)
-            )
         }
     }
 } 

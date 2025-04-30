@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer
 import android.app.Application
 import com.davidbugayov.financeanalyzer.di.appModule
 import com.davidbugayov.financeanalyzer.di.budgetModule
+import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.historyModule
 import com.davidbugayov.financeanalyzer.di.importModule
 import com.davidbugayov.financeanalyzer.di.onboardingModule
@@ -68,9 +69,10 @@ class FinanceApp : Application() {
                 modules(
                     appModule,
                     historyModule,
-                    importModule,
+                    budgetModule,
                     onboardingModule,
-                    budgetModule
+                    importModule,
+                    chartModule
                 )
             }
             

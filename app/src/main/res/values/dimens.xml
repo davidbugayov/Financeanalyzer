@@ -1,35 +1,56 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Отступы -->
+    <!-- Spacing dimensions -->
     <dimen name="spacing_tiny">3dp</dimen>
-    <dimen name="spacing_small">6dp</dimen>
-    <dimen name="spacing_medium">12dp</dimen>
-    <dimen name="spacing_normal">20dp</dimen>
+    <dimen name="spacing_small">4dp</dimen>
+    <dimen name="spacing_medium">8dp</dimen>
+    <dimen name="spacing_normal">16dp</dimen>
     <dimen name="spacing_large">24dp</dimen>
-    <dimen name="spacing_xlarge">28dp</dimen>
+    <dimen name="spacing_xlarge">32dp</dimen>
     <dimen name="spacing_xxlarge">36dp</dimen>
     <dimen name="spacing_xxsmall">4dp</dimen>
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="space_small">8dp</dimen>
+    <dimen name="space_medium">16dp</dimen>
+    <dimen name="space_large">24dp</dimen>
 
-    <!-- Размеры компонентов -->
+    <!-- Icon sizes -->
     <dimen name="icon_size_small">20dp</dimen>
     <dimen name="icon_size_medium">32dp</dimen>
     <dimen name="icon_size_large">48dp</dimen>
     <dimen name="icon_size_xlarge">56dp</dimen>
     <dimen name="icon_size_xxlarge">64dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="nav_icon_size">18dp</dimen>
+    <dimen name="main_nav_icon_size">22dp</dimen>
 
-    <!-- Высоты -->
+    <!-- Heights -->
     <dimen name="height_toolbar">56dp</dimen>
     <dimen name="height_button">36dp</dimen>
     <dimen name="height_nav_bar">80dp</dimen>
-    <dimen name="height_chart">300dp</dimen>
     <dimen name="height_empty_state">150dp</dimen>
     <dimen name="height_list_item">72dp</dimen>
     <dimen name="height_bottom_sheet">350dp</dimen>
     <dimen name="height_dialog">450dp</dimen>
     <dimen name="height_progress_indicator">4dp</dimen>
     <dimen name="height_divider">1dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="input_height">56dp</dimen>
+    <dimen name="list_item_height">84dp</dimen>
+    <dimen name="list_divider_height">1dp</dimen>
+    <dimen name="list_section_height">56dp</dimen>
+    <dimen name="profile_item_height">56dp</dimen>
+    <dimen name="empty_state_height">120dp</dimen>
+    <dimen name="nav_header_height">176dp</dimen>
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="status_bar_height">24dp</dimen>
+    <dimen name="navigation_bar_height">48dp</dimen>
+    <dimen name="nav_bar_height">62dp</dimen>
 
-    <!-- Размеры текста -->
+    <!-- Text sizes -->
     <dimen name="text_size_micro">11sp</dimen>
     <dimen name="text_size_small">12sp</dimen>
     <dimen name="text_size_medium">16sp</dimen>
@@ -38,8 +59,13 @@
     <dimen name="text_size_xlarge">24sp</dimen>
     <dimen name="text_size_xxlarge">28sp</dimen>
     <dimen name="text_size_xxxlarge">36sp</dimen>
+    <dimen name="text_small">11sp</dimen>
+    <dimen name="input_text_size">16sp</dimen>
+    <dimen name="input_helper_text_size">12sp</dimen>
+    <dimen name="input_error_text_size">12sp</dimen>
+    <dimen name="profile_header_text_size">18sp</dimen>
 
-    <!-- Радиусы -->
+    <!-- Radius and Elevation -->
     <dimen name="radius_small">4dp</dimen>
     <dimen name="radius_medium">8dp</dimen>
     <dimen name="radius_large">16dp</dimen>
@@ -48,8 +74,15 @@
     <dimen name="radius_button">20dp</dimen>
     <dimen name="radius_fab">28dp</dimen>
     <dimen name="corner_radius">12dp</dimen>
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="dialog_corner_radius">28dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="button_elevation">2dp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
+    <dimen name="dialog_elevation">24dp</dimen>
+    <dimen name="elevation_small">2dp</dimen>
 
-    <!-- Толщина линий -->
+    <!-- Stroke and Border -->
     <dimen name="stroke_thin">1dp</dimen>
     <dimen name="stroke_medium">2dp</dimen>
     <dimen name="stroke_thick">3dp</dimen>
@@ -58,101 +91,136 @@
     <dimen name="border_width_medium">2dp</dimen>
     <dimen name="border_width_large">3dp</dimen>
 
-    <!-- Размеры для графиков -->
-    <dimen name="chart_height">220dp</dimen>
-    <dimen name="chart_height_large">300dp</dimen>
-    <dimen name="chart_bar_width">24dp</dimen>
-    <dimen name="chart_line_width">2dp</dimen>
-    <dimen name="chart_dot_radius">4dp</dimen>
-    <dimen name="chart_legend_height">48dp</dimen>
-    <dimen name="chart_axis_text_size">12sp</dimen>
-    <dimen name="chart_label_text_size">14sp</dimen>
-    <dimen name="chart_axis_width">50dp</dimen>
-    <dimen name="space_between_bars">24dp</dimen>
-    <dimen name="bar_width">24dp</dimen>
-    <dimen name="legend_icon_size">10dp</dimen>
+    <!-- Button dimensions -->
+    <dimen name="button_min_width">88dp</dimen>
+    <dimen name="button_padding">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="nav_button_size">42dp</dimen>
+    <dimen name="main_nav_button_size">48dp</dimen>
 
-    <!-- Размеры для анимаций -->
+    <!-- Layout dimensions -->
+    <dimen name="card_content_padding">16dp</dimen>
+    <dimen name="card_spacing">8dp</dimen>
+    <dimen name="card_image_height">200dp</dimen>
+    <dimen name="input_padding">16dp</dimen>
+    <dimen name="list_item_padding">20dp</dimen>
+    <dimen name="list_icon_size">48dp</dimen>
+    <dimen name="dialog_padding">24dp</dimen>
+    <dimen name="dialog_min_width">280dp</dimen>
+    <dimen name="dialog_max_width">560dp</dimen>
+    <dimen name="nav_drawer_width">280dp</dimen>
+    <dimen name="profile_section_spacing">16dp</dimen>
+    <dimen name="profile_section_padding">16dp</dimen>
+    <dimen name="profile_item_icon_size">24dp</dimen>
+    <dimen name="category_item_width">80dp</dimen>
+    <dimen name="category_icon_size">60dp</dimen>
+    <dimen name="color_picker_item_size">40dp</dimen>
+    <dimen name="bar_shape">16dp</dimen>
+
+    <!-- Animation dimensions -->
     <dimen name="anim_offset_small">20dp</dimen>
     <dimen name="anim_offset_medium">40dp</dimen>
     <dimen name="anim_offset_large">60dp</dimen>
 
-    <!-- Размеры для навигации -->
-    <dimen name="nav_header_height">176dp</dimen>
-    <dimen name="nav_drawer_width">280dp</dimen>
-    <dimen name="bottom_nav_height">56dp</dimen>
-    <dimen name="status_bar_height">24dp</dimen>
-    <dimen name="navigation_bar_height">48dp</dimen>
-    <dimen name="nav_bar_height">62dp</dimen>
-    <dimen name="nav_button_size">42dp</dimen>
-    <dimen name="main_nav_button_size">48dp</dimen>
-    <dimen name="nav_icon_size">18dp</dimen>
-    <dimen name="main_nav_icon_size">22dp</dimen>
-    <dimen name="text_small">11sp</dimen>
+    <!-- Chart common dimensions -->
+    <dimen name="chart_height">300dp</dimen>
+    <dimen name="chart_height_large">300dp</dimen>
+    <dimen name="chart_card_padding">16dp</dimen>
+    <dimen name="chart_title_padding">8dp</dimen>
+    <dimen name="chart_corner_radius">8dp</dimen>
+    <dimen name="chart_card_corner_radius">12dp</dimen>
+    <dimen name="chart_card_elevation">4dp</dimen>
+    <dimen name="chart_empty_state_elevation">2dp</dimen>
+    <dimen name="chart_padding">16dp</dimen>
+    <dimen name="chart_empty_message_padding">24dp</dimen>
+    <dimen name="chart_title_padding_bottom">8dp</dimen>
+    <dimen name="chart_subtitle_padding_bottom">16dp</dimen>
 
-    <!-- Размеры для карточек -->
-    <dimen name="card_elevation">4dp</dimen>
-    <dimen name="card_corner_radius">12dp</dimen>
-    <dimen name="card_content_padding">16dp</dimen>
-    <dimen name="card_spacing">8dp</dimen>
-    <dimen name="card_image_height">200dp</dimen>
+    <!-- Chart element dimensions -->
+    <dimen name="chart_bar_width">24dp</dimen>
+    <dimen name="space_between_bars">24dp</dimen>
+    <dimen name="bar_width">24dp</dimen>
+    <dimen name="chart_axis_width">50dp</dimen>
+    <dimen name="chart_grid_stroke_width">1dp</dimen>
+    <dimen name="chart_grid_line_width">1dp</dimen>
+    <dimen name="chart_line_stroke_width">2dp</dimen>
+    <dimen name="chart_point_stroke_width">1dp</dimen>
+    <dimen name="chart_point_radius">4dp</dimen>
+    <dimen name="chart_selected_point_stroke_width">4dp</dimen>
+    <dimen name="chart_selected_point_radius">6dp</dimen>
+    <dimen name="chart_selected_point_outer_radius">12dp</dimen>
+    <dimen name="chart_selected_point_inner_radius">8dp</dimen>
+    <dimen name="chart_text_size">14sp</dimen>
+    <dimen name="chart_label_text_size">12sp</dimen>
+    <dimen name="chart_axis_text_size">10sp</dimen>
 
-    <!-- Размеры для кнопок -->
-    <dimen name="button_height">56dp</dimen>
-    <dimen name="button_min_width">88dp</dimen>
-    <dimen name="button_padding">16dp</dimen>
-    <dimen name="button_elevation">2dp</dimen>
-    <dimen name="fab_margin">16dp</dimen>
-    <dimen name="fab_elevation">6dp</dimen>
+    <!-- Chart legend dimensions -->
+    <dimen name="chart_legend_height">48dp</dimen>
+    <dimen name="chart_legend_item_width">12dp</dimen>
+    <dimen name="chart_legend_item_height">4dp</dimen>
+    <dimen name="chart_legend_item_size">12dp</dimen>
+    <dimen name="chart_legend_item_spacing">8dp</dimen>
+    <dimen name="chart_legend_padding">4dp</dimen>
+    <dimen name="chart_legend_spacing">8dp</dimen>
+    <dimen name="chart_legend_icon_size">12dp</dimen>
+    <dimen name="legend_icon_size">10dp</dimen>
 
-    <!-- Размеры для диалогов -->
-    <dimen name="dialog_padding">24dp</dimen>
-    <dimen name="dialog_corner_radius">28dp</dimen>
-    <dimen name="dialog_elevation">24dp</dimen>
-    <dimen name="dialog_min_width">280dp</dimen>
-    <dimen name="dialog_max_width">560dp</dimen>
+    <!-- Pie chart specific dimensions -->
+    <dimen name="pie_chart_size">220dp</dimen>
+    <dimen name="pie_chart_hole_radius">60dp</dimen>
+    <dimen name="pie_chart_stroke_width">40dp</dimen>
+    <dimen name="pie_chart_spacing">2dp</dimen>
+    <dimen name="chart_pie_stroke_width">24dp</dimen>
+    <dimen name="chart_pie_inner_radius_factor">0.65</dimen>
+    <dimen name="chart_pie_selected_offset">8dp</dimen>
+    <dimen name="pie_chart_inner_padding">20dp</dimen>
+    <dimen name="pie_chart_legend_item_height">48dp</dimen>
+    <dimen name="pie_chart_legend_icon_size">12dp</dimen>
+    <dimen name="pie_chart_legend_spacing">4dp</dimen>
+    <dimen name="pie_chart_legend_text_start_padding">8dp</dimen>
+    <dimen name="pie_chart_sector_spacing">2dp</dimen>
+    <dimen name="pie_chart_selected_stroke_width">3dp</dimen>
+    <dimen name="pie_chart_tap_threshold">30dp</dimen>
+    <dimen name="pie_chart_min_sector_angle">15</dimen>
 
-    <!-- Размеры для полей ввода -->
-    <dimen name="input_height">56dp</dimen>
-    <dimen name="input_padding">16dp</dimen>
-    <dimen name="input_text_size">16sp</dimen>
-    <dimen name="input_helper_text_size">12sp</dimen>
-    <dimen name="input_error_text_size">12sp</dimen>
+    <!-- Line chart dimensions -->
+    <dimen name="line_chart_height">220dp</dimen>
+    <dimen name="line_chart_padding">16dp</dimen>
+    <dimen name="line_chart_stroke_width">2dp</dimen>
+    <dimen name="line_chart_point_radius">4dp</dimen>
+    <dimen name="line_chart_selected_point_radius">6dp</dimen>
+    <dimen name="line_chart_selected_point_stroke_width">4dp</dimen>
+    <dimen name="line_chart_grid_stroke_width">1dp</dimen>
+    <dimen name="line_chart_tap_threshold">20dp</dimen>
+    <dimen name="line_chart_label_padding">4dp</dimen>
+    <dimen name="line_chart_label_corner_radius">4dp</dimen>
+    <dimen name="line_chart_grid_label_size">12sp</dimen>
+    <dimen name="line_chart_grid_lines">4</dimen>
 
-    <!-- Размеры для списков -->
-    <dimen name="list_item_height">84dp</dimen>
-    <dimen name="list_item_padding">20dp</dimen>
-    <dimen name="list_icon_size">48dp</dimen>
-    <dimen name="list_divider_height">1dp</dimen>
-    <dimen name="list_section_height">56dp</dimen>
+    <!-- Enhanced line chart dimensions -->
+    <dimen name="enhanced_line_chart_height">240dp</dimen>
+    <dimen name="enhanced_line_chart_padding">20dp</dimen>
+    <dimen name="enhanced_line_chart_stroke_width">2.5dp</dimen>
+    <dimen name="enhanced_line_chart_point_radius">5dp</dimen>
+    <dimen name="enhanced_line_chart_selected_point_radius">7dp</dimen>
+    <dimen name="enhanced_line_chart_selected_point_stroke_width">3dp</dimen>
+    <dimen name="enhanced_line_chart_grid_stroke_width">0.8dp</dimen>
+    <dimen name="enhanced_line_chart_tap_threshold">24dp</dimen>
+    <dimen name="enhanced_line_chart_text_size">14sp</dimen>
+    <dimen name="enhanced_line_chart_label_text_size">12sp</dimen>
+    <dimen name="enhanced_line_chart_legend_height">48dp</dimen>
+    <dimen name="enhanced_line_chart_legend_indicator_size">16dp</dimen>
+    <dimen name="enhanced_line_chart_legend_spacing">12dp</dimen>
 
-    <!-- Размеры для профиля -->
-    <dimen name="profile_section_spacing">16dp</dimen>
-    <dimen name="profile_section_padding">16dp</dimen>
-    <dimen name="profile_header_text_size">18sp</dimen>
-    <dimen name="profile_item_height">56dp</dimen>
-    <dimen name="profile_item_icon_size">24dp</dimen>
+    <!-- Spacing dimensions -->
+    <dimen name="chart_spacing_normal">8dp</dimen>
+    <dimen name="chart_spacing_medium">12dp</dimen>
+    <dimen name="chart_spacing_large">16dp</dimen>
+    <dimen name="chart_selection_threshold">24dp</dimen>
     
-    <!-- Размеры для выбора категорий -->
-    <dimen name="category_item_width">80dp</dimen>
-    <dimen name="category_icon_size">60dp</dimen>
-    
-    <!-- Размеры для выбора цвета -->
-    <dimen name="color_picker_item_size">40dp</dimen>
-
-    <dimen name="divider_height">1dp</dimen>
-
-    <dimen name="elevation_small">2dp</dimen>
-
-    <dimen name="bar_shape">16dp</dimen>
-
-    <!-- Import Transactions Screen -->
-    <dimen name="padding_small">4dp</dimen>
-    <dimen name="padding_medium">8dp</dimen>
-    <dimen name="padding_large">16dp</dimen>
-    <dimen name="space_small">8dp</dimen>
-    <dimen name="space_medium">16dp</dimen>
-    <dimen name="space_large">24dp</dimen>
-    <dimen name="icon_size">24dp</dimen>
-    <dimen name="empty_state_height">120dp</dimen>
+    <!-- Type selector dimensions -->
+    <dimen name="chart_type_selector_padding">8dp</dimen>
+    <dimen name="chart_type_selector_spacing">8dp</dimen>
+    <dimen name="chart_selector_button_padding">12dp</dimen>
+    <dimen name="chart_selector_button_corner_radius">8dp</dimen>
 </resources> 

@@ -274,4 +274,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+
+    // Add kotlinx-datetime
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
 }

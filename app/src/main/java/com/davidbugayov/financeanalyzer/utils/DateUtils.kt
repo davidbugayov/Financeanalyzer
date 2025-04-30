@@ -5,6 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import java.time.LocalDate
 
 /**
  * Утилитарный класс для работы с датами
@@ -164,5 +165,63 @@ object DateUtils {
                 return Pair(now, now)
             }
         }
+    }
+
+    /**
+     * Возвращает текущую дату
+     */
+    fun getTodayDate(): LocalDate {
+        return LocalDate.now()
+    }
+    
+    /**
+     * Возвращает дату начала текущего года
+     */
+    fun getYearStartDate(): LocalDate {
+        return LocalDate.now().withDayOfYear(1)
+    }
+    
+    /**
+     * Возвращает дату начала текущего месяца
+     */
+    fun getMonthStartDate(): LocalDate {
+        return LocalDate.now().withDayOfMonth(1)
+    }
+    
+    /**
+     * Возвращает дату начала предыдущего месяца
+     */
+    fun getPreviousMonthStartDate(): LocalDate {
+        return LocalDate.now().minusMonths(1).withDayOfMonth(1)
+    }
+    
+    /**
+     * Возвращает дату начала текущей недели (понедельник)
+     */
+    fun getWeekStartDate(): LocalDate {
+        val today = LocalDate.now()
+        val dayOfWeek = today.dayOfWeek.value
+        return today.minusDays((dayOfWeek - 1).toLong())
+    }
+
+    /**
+     * Обрезает дату до дня и возвращает объект Date, содержащий только день
+     */
+    fun truncateToDay(date: Date): Date {
+        val calendar = Calendar.getInstance()
+        calendar.time = date
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
+        return calendar.time
+    }
+
+    /**
+     * Обрезает дату до дня и возвращает объект Date, содержащий только день
+     * с учетом интервала дат
+     */
+    fun truncateToDay(date: Date, startDate: Date, endDate: Date): Date {
+        return truncateToDay(date)
     }
 } 

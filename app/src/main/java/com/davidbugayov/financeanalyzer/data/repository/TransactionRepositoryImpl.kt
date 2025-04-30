@@ -21,6 +21,9 @@ import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.locks.ReentrantReadWriteLock
+import java.time.ZoneId
+import kotlinx.datetime.toJavaLocalDate
+import java.time.Instant
 
 /**
  * Абстрактная политика кэширования для различных типов данных.
@@ -621,30 +624,35 @@ class TransactionRepositoryImpl(
     }
 
     /**
-     * Получает транзакции за указанный период.
-     * @param startDate Начальная дата периода.
-     * @param endDate Конечная дата периода.
-     * @return Flow со списком транзакций.
+     * Реализация метода getTransactionsByDateRange для java.util.Date
      */
     override suspend fun getTransactionsByDateRange(
         startDate: Date,
         endDate: Date
-    ): Flow<List<Transaction>> = flow {
-        // Получаем все транзакции и фильтруем по дате
-        val transactions = getAllTransactions()
-            .filter { it.date >= startDate && it.date <= endDate }
-        emit(transactions)
+    ): List<Transaction> = withContext(Dispatchers.IO) {
+        try {
+            Timber.d("Получение транзакций по диапазону дат java.util.Date")
+            val transactions = dao.getTransactionsByDateRange(startDate, endDate)
+                .map { mapEntityToDomain(it) }
+            
+            Timber.d("Загружено ${transactions.size} транзакций за период")
+            return@withContext transactions
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при получении транзакций по диапазону дат: ${e.message}")
+            emptyList()
+        }
     }
-
+    
     /**
      * Получает транзакции за указанный период (метод из ITransactionRepository).
      * @param startDate Начальная дата периода.
      * @param endDate Конечная дата периода.
      * @return Flow со списком транзакций.
      */
-    override suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>> {
-        // Делегируем вызов методу getTransactionsByDateRange
-        return getTransactionsByDateRange(startDate, endDate)
+    override suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>> = flow {
+        // Используем реализованный метод getTransactionsByDateRange
+        val transactions = getTransactionsByDateRange(startDate, endDate)
+        emit(transactions)
     }
     
     /**
@@ -771,6 +779,35 @@ class TransactionRepositoryImpl(
         } catch (e: Exception) {
             Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при загрузке списка транзакций по диапазону дат: ${e.message}")
             throw e // Перебрасываем исключение для обработки выше
+        }
+    }
+
+    /**
+     * Реализация метода getTransactionsByDateRange для kotlinx.datetime.LocalDate
+     */
+    override suspend fun getTransactionsByDateRange(
+        startDate: kotlinx.datetime.LocalDate,
+        endDate: kotlinx.datetime.LocalDate
+    ): List<Transaction> = withContext(Dispatchers.IO) {
+        try {
+            Timber.d("Получение транзакций по диапазону дат с использованием kotlinx.datetime.LocalDate")
+            
+            // Преобразуем kotlinx.datetime.LocalDate в java.util.Date для работы с DAO
+            val startJavaLocalDate = startDate.toJavaLocalDate()
+            val endJavaLocalDate = endDate.toJavaLocalDate().plusDays(1)
+            
+            val startDateUtilDate = Date.from(startJavaLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
+            val endDateUtilDate = Date.from(endJavaLocalDate.atStartOfDay(ZoneId.systemDefault()).minusNanos(1).toInstant())
+            
+            // Используем существующий метод с java.util.Date
+            val transactions = dao.getTransactionsByDateRange(startDateUtilDate, endDateUtilDate)
+                .map { mapEntityToDomain(it) }
+            
+            Timber.d("Загружено ${transactions.size} транзакций за период с $startDate по $endDate")
+            return@withContext transactions
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при получении транзакций по диапазону дат с kotlinx.datetime.LocalDate: ${e.message}")
+            emptyList()
         }
     }
 } 

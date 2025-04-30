@@ -47,7 +47,10 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.LineChartTypeSelector
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartScreenState
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -65,6 +68,10 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartContract
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
+import androidx.compose.ui.graphics.toArgb
+import java.math.BigDecimal
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -87,6 +94,9 @@ fun EnhancedFinanceChartScreen(
     val state by viewModel.state.collectAsState()
     val scrollState = rememberScrollState()
     val coroutineScope = rememberCoroutineScope()
+
+    // Add the missing variable
+    var shouldScrollToSummaryCard by remember { mutableStateOf(false) }
 
     // Состояния для улучшенной интерактивности
     var selectedCategory by remember { mutableStateOf<String?>(null) }
@@ -125,7 +135,7 @@ fun EnhancedFinanceChartScreen(
                 showBackButton = true,
                 onBackClick = {
                     // Сбрасываем даты перед выходом с экрана
-                    viewModel.handleIntent(ChartIntent.ResetDateFilter)
+                    viewModel.handleIntent(ChartIntent.SetPeriodType(PeriodType.MONTH))
                     onNavigateBack()
                 },
                 actions = {
@@ -148,7 +158,7 @@ fun EnhancedFinanceChartScreen(
                     }
 
                     // Выбор периода
-                    IconButton(onClick = { viewModel.handleIntent(ChartIntent.ShowPeriodDialog) }) {
+                    IconButton(onClick = { viewModel.handleIntent(ChartIntent.TogglePeriodDialog(true)) }) {
                         Icon(
                             imageVector = Icons.Filled.DateRange,
                             contentDescription = stringResource(R.string.select_period)
@@ -249,6 +259,7 @@ fun EnhancedFinanceChartScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
+                            .height(420.dp)
                     ) { page ->
                         when (page) {
                             0 -> {
@@ -265,24 +276,21 @@ fun EnhancedFinanceChartScreen(
                                         getIncomeByCategory(state.transactions, state.startDate, state.endDate)
                                     }
 
-                                    // Выбор типа данных (доходы/расходы)
-                                    PieChartTypeSelector(
-                                        showExpenses = state.showExpenses,
-                                        onShowExpensesChange = { showExpenses ->
-                                            viewModel.handleIntent(ChartIntent.ToggleExpenseView(showExpenses))
-                                        },
-                                        modifier = Modifier.fillMaxWidth()
-                                    )
-
                                     // Улучшенный пирограф категорий
-                                    EnhancedCategoryPieChart(
+                                    CategoryPieChartAdapter(
                                         data = categoryData,
                                         isIncome = !state.showExpenses,
                                         onCategorySelected = { category ->
-                                            selectedCategory = category
-                                            onNavigateToTransactions?.invoke(category, state.startDate, state.endDate)
+                                            selectedCategory = category?.name
+                                            category?.name?.let { categoryName ->
+                                                onNavigateToTransactions?.invoke(categoryName, state.startDate, state.endDate)
+                                            }
                                         },
-                                        modifier = Modifier.padding(top = 16.dp)
+                                        modifier = Modifier.padding(top = 16.dp),
+                                        showExpenses = state.showExpenses,
+                                        onShowExpensesChange = { showExpenses ->
+                                            viewModel.handleIntent(ChartIntent.ToggleExpenseView(showExpenses))
+                                        }
                                     )
                                 }
                             }
@@ -403,69 +411,43 @@ fun EnhancedFinanceChartScreen(
                             .fillMaxWidth()
                             .padding(16.dp)
                     )
+                    
+                    // Scroll to appropriate card based on time series chart tab
+                    if (shouldScrollToSummaryCard) {
+                        // After composition, scroll to the summary card
+                        LaunchedEffect(true) {
+                            // Scroll only once
+                            coroutineScope.launch {
+                                scrollState.animateScrollTo(0)
+                                shouldScrollToSummaryCard = false
+                            }
+                        }
+                    }
+
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Budget planning card with blue gradient background
+                    BudgetPlanningCard(
+                        averageMonthlyExpense = getAverageDailyExpense(state).times(30.toBigDecimal()),
+                        recommendedSavings = if (state.income != null && !state.income!!.isZero()) 
+                            (state.income!!.minus(state.expense ?: Money.zero())) else Money.zero(),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
+                    )
+                    
+                    Spacer(modifier = Modifier.height(16.dp))
+                    
+                    // Budget recommendations
+                    BudgetRecommendationsCard(
+                        averageMonthlyExpense = getAverageDailyExpense(state).times(30.toBigDecimal()),
+                        savingsRate = getSavingsRate(state),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(16.dp)
+                    )
                 }
             }
-        }
-    }
-}
-
-/**
- * Селектор типа данных для пирографика (доходы/расходы)
- */
-@Composable
-fun PieChartTypeSelector(
-    showExpenses: Boolean,
-    onShowExpensesChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.Center
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    if (showExpenses) MaterialTheme.colorScheme.error.copy(alpha = 0.2f)
-                    else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                )
-                .clickable { onShowExpensesChange(true) }
-                .padding(vertical = 12.dp, horizontal = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Расходы",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal
-                ),
-                color = if (showExpenses) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
-
-        Box(
-            modifier = Modifier
-                .weight(1f)
-                .padding(horizontal = 8.dp)
-                .clip(RoundedCornerShape(16.dp))
-                .background(
-                    if (!showExpenses) Color(0xFF4CAF50).copy(alpha = 0.2f)
-                    else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                )
-                .clickable { onShowExpensesChange(false) }
-                .padding(vertical = 12.dp, horizontal = 16.dp),
-            contentAlignment = Alignment.Center
-        ) {
-            Text(
-                text = "Доходы",
-                style = MaterialTheme.typography.bodyLarge.copy(
-                    fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal
-                ),
-                color = if (!showExpenses) Color(0xFF4CAF50) else MaterialTheme.colorScheme.onSurfaceVariant
-            )
         }
     }
 }
@@ -622,4 +604,125 @@ private fun createLineChartData(
                 value = value
             )
         }
+}
+
+/**
+ * Адаптер для вызова EnhancedCategoryPieChart с правильными параметрами
+ */
+@Composable
+private fun CategoryPieChartAdapter(
+    data: Map<String, Money>,
+    isIncome: Boolean,
+    onCategorySelected: (Category?) -> Unit,
+    modifier: Modifier = Modifier,
+    showExpenses: Boolean = !isIncome,
+    onShowExpensesChange: (Boolean) -> Unit = {}
+) {
+    // Получаем нужное количество цветов для диаграммы
+    val colors = com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.PieChartUtils
+        .getCategoryColors(data.size, isIncome)
+    
+    // Convert Map<String, Money> to List<PieChartData>
+    val pieChartDataList = data.entries.mapIndexed { index, entry ->
+        val categoryName = entry.key
+        val amount = entry.value.amount.toFloat()
+        // Create a simple Category object with ID based on index
+        val category = if (isIncome) {
+            Category.income(name = categoryName)
+        } else {
+            Category.expense(name = categoryName)
+        }
+        
+        // Используем цвет из полученной палитры вместо одного цвета для всех категорий
+        val color = colors.getOrElse(index) { 
+            // Если вдруг индекс вышел за пределы, генерируем новый цвет
+            if (isIncome) {
+                Color(0xFF66BB6A + (index * 1000)) // Разные оттенки зеленого для доходов
+            } else {
+                Color(0xFFEF5350 + (index * 1000)) // Разные оттенки красного для расходов
+            }
+        }
+        
+        PieChartItemData(
+            id = index.toString(),
+            name = categoryName,
+            amount = amount,
+            percentage = 0f, // Will be calculated later
+            color = color,
+            category = category,
+            transactions = emptyList() // Add empty transactions list
+        )
+    }
+    
+    // Calculate total and percentages
+    if (pieChartDataList.isNotEmpty()) {
+        val total = pieChartDataList.sumOf { it.amount.toDouble() }.toFloat()
+        
+        // Create the final list with percentages
+        val finalDataList = pieChartDataList.map { item ->
+            val percentage = if (total > 0) (item.amount / total) * 100 else 0f
+            item.copy(percentage = percentage) 
+        }
+        
+        // Create the enhanced pie chart with the data
+        EnhancedCategoryPieChart(
+            items = finalDataList,
+            selectedIndex = null,
+            onSectorClick = { item ->
+                if (item != null) {
+                    onCategorySelected(item.category)
+                } else {
+                    onCategorySelected(null)
+                }
+            },
+            modifier = modifier,
+            showExpenses = showExpenses,
+            onShowExpensesChange = onShowExpensesChange
+        )
+    }
+}
+
+@Composable
+private fun AnalyticsChartsSection(
+    incomeByCategory: List<Pair<String, Money>> = emptyList(),
+    expensesByCategory: List<Pair<String, Money>> = emptyList(),
+    averageDailyExpense: Money = Money.zero(),
+    savingsRate: Double = 0.0,
+    modifier: Modifier = Modifier,
+) {
+    val totalIncome = incomeByCategory.sumOf { it.second.amount.toLong() }
+    val totalExpenses = expensesByCategory.sumOf { it.second.amount.toLong() }
+    
+    // Рассчитываем среднемесячные расходы (умножая на 30 дней)
+    val averageMonthlyExpense = averageDailyExpense.times(30.toBigDecimal())
+    
+    // Рассчитываем рекомендуемую сумму сбережений (20% от дохода - стандартная рекомендация)
+    val recommendedSavings = if (totalIncome > 0) {
+        Money(BigDecimal.valueOf(totalIncome * 0.2))
+    } else {
+        Money.zero()
+    }
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        // Отображаем карточку с финансовой статистикой
+        FinancialHealthMetricsCard(
+            savingsRate = savingsRate,
+            averageDailyExpense = averageDailyExpense,
+            monthsOfSavings = 0.0
+        )
+        
+        // Отображаем карточку с рекомендациями по бюджету
+        BudgetRecommendationsCard(
+            averageMonthlyExpense = averageMonthlyExpense,
+            savingsRate = savingsRate
+        )
+        
+        // Здесь будут дополнительные метрики и анализ
+        // TODO: добавить дополнительные блоки аналитики
+    }
 }
