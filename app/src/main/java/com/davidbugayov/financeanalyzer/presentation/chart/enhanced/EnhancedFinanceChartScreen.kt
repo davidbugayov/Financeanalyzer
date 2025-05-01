@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -259,7 +260,6 @@ fun EnhancedFinanceChartScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(horizontal = 16.dp)
-                            .height(420.dp)
                     ) { page ->
                         when (page) {
                             0 -> {
@@ -267,6 +267,7 @@ fun EnhancedFinanceChartScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
+                                        .fillMaxSize()
                                         .padding(vertical = 16.dp)
                                 ) {
                                     // Получаем данные категорий в зависимости от выбранного режима
@@ -409,43 +410,18 @@ fun EnhancedFinanceChartScreen(
                         monthsOfSavings = getMonthsOfSavings(state),
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(horizontal = 16.dp, vertical = 8.dp)
                     )
                     
-                    // Scroll to appropriate card based on time series chart tab
+                    // Если нужно прокручивать к карточке
                     if (shouldScrollToSummaryCard) {
-                        // After composition, scroll to the summary card
                         LaunchedEffect(true) {
-                            // Scroll only once
                             coroutineScope.launch {
                                 scrollState.animateScrollTo(0)
                                 shouldScrollToSummaryCard = false
                             }
                         }
                     }
-
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Budget planning card with blue gradient background
-                    BudgetPlanningCard(
-                        averageMonthlyExpense = getAverageDailyExpense(state).times(30.toBigDecimal()),
-                        recommendedSavings = if (state.income != null && !state.income!!.isZero()) 
-                            (state.income!!.minus(state.expense ?: Money.zero())) else Money.zero(),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = 16.dp, vertical = 8.dp)
-                    )
-                    
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    // Budget recommendations
-                    BudgetRecommendationsCard(
-                        averageMonthlyExpense = getAverageDailyExpense(state).times(30.toBigDecimal()),
-                        savingsRate = getSavingsRate(state),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp)
-                    )
                 }
             }
         }

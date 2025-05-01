@@ -61,6 +61,9 @@ import java.math.BigDecimal
 import kotlin.math.atan2
 import kotlin.math.min
 import kotlin.math.roundToInt
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
+import timber.log.Timber
 /**
  * Enhanced category pie chart that shows categories distribution with an interactive legend
  * and compact size for better visibility
@@ -84,10 +87,12 @@ fun EnhancedCategoryPieChart(
         items.filter { it.percentage > 0f }
     }
     
+    Timber.d("FinanceAnalyzer: EnhancedCategoryPieChart: инициализация с ${items.size} элементами, отфильтровано до ${filteredData.size}")
     Log.d("[D]", "EnhancedCategoryPieChart: инициализация с ${items.size} элементами, отфильтровано до ${filteredData.size}")
     
     if (filteredData.isEmpty()) {
         // Show empty state if no valid data
+        Timber.d("FinanceAnalyzer: EnhancedCategoryPieChart: нет данных для отображения")
         Log.d("[D]", "EnhancedCategoryPieChart: нет данных для отображения")
         Box(
             modifier = modifier.fillMaxWidth(),
@@ -105,6 +110,7 @@ fun EnhancedCategoryPieChart(
     val totalAmount = filteredData.sumOf { it.amount.toDouble() }.toFloat()
     val totalMoney = Money(BigDecimal.valueOf(totalAmount.toDouble()))
     
+    Timber.d("FinanceAnalyzer: EnhancedCategoryPieChart: общая сумма ${totalMoney.formatForDisplay()}")
     Log.d("[D]", "EnhancedCategoryPieChart: общая сумма ${totalMoney.formatForDisplay()}")
     
     // State for selected indices - сбрасываем при смене типа (доходы/расходы)
@@ -132,10 +138,14 @@ fun EnhancedCategoryPieChart(
     // Use this color for center text
     val centerTextColor = MaterialTheme.colorScheme.onBackground
     
+    // Используем белый цвет фона для карточки, как на скриншоте
+    val cardColor = Color.White
+    
+    // Увеличиваем карточку для отображения всех категорий
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.background
+            containerColor = cardColor
         ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = 4.dp
@@ -143,15 +153,15 @@ fun EnhancedCategoryPieChart(
         shape = RoundedCornerShape(16.dp)
     ) {
         Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
         ) {
             // Горизонтальный переключатель доходы/расходы
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
+                    .padding(bottom = 16.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -174,11 +184,11 @@ fun EnhancedCategoryPieChart(
                 )
             }
             
-            // Диаграмма сверху (по центру)
-                    Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    .height(240.dp),
+            // Диаграмма сверху (по центру) с меньшей высотой
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(220.dp),
                 contentAlignment = Alignment.Center
             ) {
                 DrawPieChart(
@@ -213,40 +223,137 @@ fun EnhancedCategoryPieChart(
                     totalMoney = totalMoney,
                     selectedItem = selectedItem,
                     isIncome = isIncome,
-                    centerTextColor = centerTextColor
+                    centerTextColor = centerTextColor,
+                    backgroundColor = cardColor
                 )
             }
             
-            // Список категорий снизу
-            DrawCategoryLegend(
-                items = filteredData,
-                selectedIndices = selectedIndices.value,
-                onItemClick = { index ->
-                    // Тот же подход, что и в onSectorClick
-                    selectedIndices.value = when {
-                        // Если уже выбран этот элемент - сбрасываем выбор
-                        selectedIndices.value.contains(index) -> emptySet()
-                        // Иначе выбираем новый элемент, если индекс валидный
-                        index >= 0 && index < filteredData.size -> setOf(index)
-                        // В случае невалидного индекса - сохраняем текущее состояние
-                        else -> selectedIndices.value
-                    }
-                    
-                    // Оповещаем о выбранной категории или null, если ничего не выбрано
-                    val newSelectedItem = if (selectedIndices.value.isEmpty()) {
-                        null
-                    } else {
-                        val selectedIdx = selectedIndices.value.first()
-                        if (selectedIdx >= 0 && selectedIdx < filteredData.size) {
-                            filteredData[selectedIdx]
-                        } else {
-                            null
-                        }
-                    }
-                    
-                    onSectorClick(newSelectedItem)
-                }
+            // Разделитель между диаграммой и списком категорий
+            Spacer(modifier = Modifier.height(16.dp))
+            
+            // Заголовок для списка категорий
+            Text(
+                text = "Список категорий",
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(start = 8.dp, bottom = 8.dp)
             )
+            
+            // Сортируем элементы по сумме (от большей к меньшей)
+            val sortedItems = filteredData.sortedByDescending { it.amount }
+            
+            // Выводим логи для отслеживания количества категорий
+            Timber.d("FinanceAnalyzer: EnhancedCategoryPieChart: список категорий содержит ${sortedItems.size} элементов")
+            Log.d("[D]", "EnhancedCategoryPieChart: список категорий содержит ${sortedItems.size} элементов")
+            
+            // Рассчитываем высоту для списка категорий (30dp на элемент, минимум 150dp)
+            val categoryHeight = (sortedItems.size * 30).coerceAtLeast(150).coerceAtMost(500)
+            
+            // Показываем все категории с ограниченной высотой и скроллингом
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp)
+                    .height(categoryHeight.dp) // Обязательно задаем высоту для компонента со скроллингом
+                    .verticalScroll(rememberScrollState())
+            ) {
+                // Выводим содержимое категорий для отладки
+                sortedItems.forEachIndexed { index, item ->
+                    Timber.d("FinanceAnalyzer: Категория #$index: ${item.name}, сумма: ${item.amount}, процент: ${item.percentage}%")
+                    Log.d("[D]", "Категория #$index: ${item.name}, сумма: ${item.amount}, процент: ${item.percentage}%")
+                    
+                    // Находим оригинальный индекс элемента в несортированном списке для правильной обработки выбора
+                    val originalIndex = filteredData.indexOfFirst { it.id == item.id }
+                    val isSelected = selectedIndices.value.contains(originalIndex)
+                    
+                    // Create a Money object from the amount
+                    val money = Money(BigDecimal.valueOf(item.amount.toDouble()))
+                    
+                    // Строка категории (максимально компактная)
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { 
+                                selectedIndices.value = when {
+                                    selectedIndices.value.contains(originalIndex) -> emptySet()
+                                    else -> setOf(originalIndex)
+                                }
+                                
+                                val newSelectedItem = if (selectedIndices.value.isEmpty()) {
+                                    null
+                                } else {
+                                    val selectedIdx = selectedIndices.value.first()
+                                    if (selectedIdx >= 0 && selectedIdx < filteredData.size) {
+                                        filteredData[selectedIdx]
+                                    } else {
+                                        null
+                                    }
+                                }
+                                
+                                onSectorClick(newSelectedItem)
+                            }
+                            .background(
+                                if (isSelected) item.color.copy(alpha = 0.15f)
+                                else Color.Transparent
+                            )
+                            .padding(vertical = 6.dp, horizontal = 4.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        // Цветной индикатор категории
+                        Box(
+                            modifier = Modifier
+                                .size(12.dp)
+                                .background(
+                                    color = item.color,
+                                    shape = if (isSelected) RoundedCornerShape(3.dp) else CircleShape
+                                )
+                        )
+                        
+                        // Название категории
+                        Text(
+                            text = item.name,
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                            ),
+                            color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier
+                                .padding(start = 8.dp)
+                                .weight(1f),
+                            maxLines = 1,
+                            overflow = TextOverflow.Ellipsis
+                        )
+                        
+                        // Сумма
+                        Text(
+                            text = money.formatForDisplay(),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontWeight = FontWeight.SemiBold
+                            ),
+                            color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.padding(horizontal = 4.dp)
+                        )
+                        
+                        // Процент с цветом категории для выделенного элемента
+                        Text(
+                            text = String.format("%.1f%%", item.percentage),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (isSelected) item.color else MaterialTheme.colorScheme.onSurfaceVariant,
+                            modifier = Modifier.width(45.dp),
+                            textAlign = androidx.compose.ui.text.style.TextAlign.End
+                        )
+                    }
+                    
+                    // Тонкий разделитель после каждого элемента, кроме последнего
+                    if (index < sortedItems.size - 1) {
+                        Spacer(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(1.dp)
+                                .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f))
+                        )
+                    }
+                }
+            }
         }
     }
 }
@@ -463,11 +570,11 @@ private fun DrawPieChart(
     totalMoney: Money,
     selectedItem: PieChartItemData?,
     isIncome: Boolean,
-    centerTextColor: Color
+    centerTextColor: Color,
+    backgroundColor: Color
 ) {
     val animatedProgress = remember { Animatable(0f) }
     val surfaceColor = MaterialTheme.colorScheme.surface
-    val backgroundColor = MaterialTheme.colorScheme.background
     
     Log.d("[D]", "DrawPieChart: инициализация с ${data.size} элементами, выбрано: ${selectedIndices.size}")
     
@@ -653,13 +760,13 @@ private fun DrawPieChart(
                     startAngle = startAngle,
                     sweepAngle = animatedSweepAngle,
                     color = data[index].color,
-                    holeColor = backgroundColor, // Используем цвет фона для отверстия пончика
+                    holeColor = backgroundColor, // Используем белый цвет для отверстия пончика
                     addOutline = isSelected,
                     alpha = 1f  // Всегда полная непрозрачность для всех секторов
                 )
             }
             
-            // Дополнительно рисуем полный круг в центре для чистого фона
+            // Дополнительно рисуем полный круг в центре для чистого белого фона
             drawCircle(
                 color = backgroundColor,
                 radius = innerRadius,
@@ -687,10 +794,11 @@ private fun DrawCategoryLegend(
     }
     
     // Используем LazyColumn для отображения списка категорий
+    // Увеличиваем высоту до 450dp (в 1.5 раза больше)
     LazyColumn(
         modifier = Modifier
             .fillMaxWidth()
-            .height(200.dp)
+            .height(450.dp)
             .padding(horizontal = 8.dp)
     ) {
         items(
@@ -704,56 +812,59 @@ private fun DrawCategoryLegend(
             // Create a Money object from the amount
             val money = Money(BigDecimal.valueOf(item.amount.toDouble()))
             
-            // Строка категории
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
+            // Строка категории (уменьшаем отступы для компактности)
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
                     .clickable { onItemClick(originalIndex) }
                     .background(
-                        if (isSelected) MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.3f)
+                        // Используем цвет категории с низкой прозрачностью при выделении
+                        if (isSelected) item.color.copy(alpha = 0.15f)
                         else Color.Transparent
                     )
-                    .padding(vertical = 12.dp, horizontal = 8.dp), // Увеличиваем padding для удобства нажатия
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+                    .padding(vertical = 10.dp, horizontal = 8.dp), // Уменьшаем вертикальный padding для более компактного отображения
+                verticalAlignment = Alignment.CenterVertically
+            ) {
                 // Цветной индикатор категории
-            Box(
-                modifier = Modifier
+                Box(
+                    modifier = Modifier
                         .size(16.dp)
                         .background(
                             color = item.color,
-                            shape = if (isSelected) RoundedCornerShape(3.dp) else CircleShape
+                            shape = if (isSelected) RoundedCornerShape(4.dp) else CircleShape
                         )
                 )
                 
                 // Название категории
-            Text(
+                Text(
                     text = item.name,
-                    style = MaterialTheme.typography.bodyMedium.copy(
+                    style = MaterialTheme.typography.bodySmall.copy(
                         fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
                     ),
+                    color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier
-                        .padding(start = 12.dp)
+                        .padding(start = 8.dp)
                         .weight(1f),
-                maxLines = 1,
+                    maxLines = 1,
                     overflow = TextOverflow.Ellipsis
-            )
-            
-                // Сумма
-            Text(
-                    text = money.formatForDisplay(),
-                    style = MaterialTheme.typography.bodyMedium.copy(
-                        fontWeight = FontWeight.SemiBold
-                    ),
-                    modifier = Modifier.padding(horizontal = 8.dp)
                 )
                 
-                // Процент
-            Text(
+                // Сумма
+                Text(
+                    text = money.formatForDisplay(),
+                    style = MaterialTheme.typography.bodySmall.copy(
+                        fontWeight = FontWeight.SemiBold
+                    ),
+                    color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(horizontal = 4.dp)
+                )
+                
+                // Процент с цветом категории для выделенного элемента
+                Text(
                     text = String.format("%.1f%%", item.percentage),
-                style = MaterialTheme.typography.bodyMedium,
-                    color = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.width(55.dp),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = if (isSelected) item.color else MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.width(45.dp),
                     textAlign = androidx.compose.ui.text.style.TextAlign.End
                 )
             }
@@ -790,7 +901,7 @@ private fun DrawScope.drawDonutSection(
         alpha = alpha
     )
     
-    // Cut out the inner circle to create the donut hole with specified color
+    // Cut out the inner circle to create the donut hole with white background
     drawArc(
         color = holeColor,
         startAngle = startAngle,
