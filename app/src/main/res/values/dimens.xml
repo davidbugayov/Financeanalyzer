@@ -223,4 +223,20 @@
     <dimen name="chart_type_selector_spacing">8dp</dimen>
     <dimen name="chart_selector_button_padding">12dp</dimen>
     <dimen name="chart_selector_button_corner_radius">8dp</dimen>
+
+    <!-- Enhanced category pie chart dimensions -->
+    <dimen name="enhanced_pie_chart_size">220dp</dimen>
+    <dimen name="enhanced_pie_chart_text_spacing_tiny">6dp</dimen>
+    <dimen name="enhanced_pie_chart_text_spacing_small">10dp</dimen>
+    <dimen name="enhanced_pie_chart_card_elevation">4dp</dimen>
+    <dimen name="enhanced_pie_chart_card_corner_radius">16dp</dimen>
+    <dimen name="enhanced_pie_chart_padding">16dp</dimen>
+    <dimen name="enhanced_pie_chart_padding_small">8dp</dimen>
+    <dimen name="enhanced_pie_chart_padding_tiny">4dp</dimen>
+    <dimen name="enhanced_pie_chart_category_icon_size">12dp</dimen>
+    <dimen name="enhanced_pie_chart_divider_height">1dp</dimen>
+    <dimen name="enhanced_pie_chart_category_spacing">6dp</dimen>
+    <dimen name="enhanced_pie_chart_sector_outer_stroke_width">1.5dp</dimen>
+    <dimen name="enhanced_pie_chart_sector_inner_stroke_width">1dp</dimen>
+    <dimen name="enhanced_pie_chart_animation_duration">800</dimen>
 </resources> 

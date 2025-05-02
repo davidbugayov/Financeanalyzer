@@ -126,4 +126,8 @@
     <color name="category_investment">#FFFFEB3B</color>
     <color name="category_other">#FF9E9E9E</color>
     <color name="category_color_other">#9E9E9E</color>
+
+    <!-- Enhanced pie chart colors -->
+    <color name="enhanced_pie_chart_sector_outline_outer">#66FFFFFF</color>
+    <color name="enhanced_pie_chart_sector_outline_inner">#4DFFFFFF</color>
 </resources>
