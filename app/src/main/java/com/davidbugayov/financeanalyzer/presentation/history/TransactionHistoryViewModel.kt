@@ -16,6 +16,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -31,7 +32,6 @@ import java.util.Date
 import javax.inject.Inject
 
 class TransactionHistoryViewModel @Inject constructor(
-    private val loadTransactionsUseCase: LoadTransactionsUseCase,
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
@@ -527,84 +527,12 @@ class TransactionHistoryViewModel @Inject constructor(
         // Получаем текущее состояние
         val currentState = _state.value
         
-        // Вычисляем новые даты начала и конца периода
-        val (startDate, endDate) = when (periodType) {
-            PeriodType.ALL -> {
-                val end = Calendar.getInstance().time
-                val start = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
-                Timber.d("Период ALL: $start - $end")
-                Pair(start, end)
-            }
-            PeriodType.DAY -> {
-                val start = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-                val end = Calendar.getInstance().apply {
-                    set(Calendar.HOUR_OF_DAY, 23)
-                    set(Calendar.MINUTE, 59)
-                    set(Calendar.SECOND, 59)
-                    set(Calendar.MILLISECOND, 999)
-                }.time
-                Timber.d("Период DAY: $start - $end")
-                Pair(start, end)
-            }
-            PeriodType.WEEK -> {
-                val start = Calendar.getInstance().apply {
-                    add(Calendar.DAY_OF_MONTH, -7)
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-                val end = Calendar.getInstance().time
-                Timber.d("Период WEEK: $start - $end")
-                Pair(start, end)
-            }
-            PeriodType.MONTH -> {
-                val start = Calendar.getInstance().apply {
-                    add(Calendar.MONTH, -1)
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-                val end = Calendar.getInstance().time
-                Timber.d("Период MONTH: $start - $end")
-                Pair(start, end)
-            }
-            PeriodType.QUARTER -> {
-                val start = Calendar.getInstance().apply {
-                    add(Calendar.MONTH, -3)
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-                val end = Calendar.getInstance().time
-                Timber.d("Период QUARTER: $start - $end")
-                Pair(start, end)
-            }
-            PeriodType.YEAR -> {
-                val start = Calendar.getInstance().apply {
-                    add(Calendar.YEAR, -1)
-                    set(Calendar.HOUR_OF_DAY, 0)
-                    set(Calendar.MINUTE, 0)
-                    set(Calendar.SECOND, 0)
-                    set(Calendar.MILLISECOND, 0)
-                }.time
-                val end = Calendar.getInstance().time
-                Timber.d("Период YEAR: $start - $end")
-                Pair(start, end)
-            }
-            PeriodType.CUSTOM -> {
-                // Для кастомного периода сохраняем текущие даты
-                Timber.d("Период CUSTOM: ${currentState.startDate} - ${currentState.endDate}")
-                Pair(currentState.startDate, currentState.endDate)
-            }
-        }
+        // Используем общую логику для вычисления дат начала и конца периода
+        val (startDate, endDate) = DateUtils.updatePeriodDates(
+            periodType = periodType,
+            currentStartDate = currentState.startDate,
+            currentEndDate = currentState.endDate
+        )
         
         // Обновляем состояние
         _state.update { 
@@ -708,9 +636,7 @@ class TransactionHistoryViewModel @Inject constructor(
             // Обновляем состояние
             _state.update { it.copy(sourceToDelete = null) }
 
-            // В данном приложении нет метода для удаления источников,
-            // но мы можем добавить его позже при необходимости.
-            // На данный момент просто обновляем список выбранных источников
+            // Удаляем источник из списка выбранных источников
             _state.update { currentState ->
                 val updatedSources = currentState.selectedSources.filter { it != source }
                 currentState.copy(selectedSources = updatedSources)

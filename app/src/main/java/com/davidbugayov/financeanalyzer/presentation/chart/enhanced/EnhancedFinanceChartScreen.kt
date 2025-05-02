@@ -73,6 +73,8 @@ import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieCha
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
 import androidx.compose.ui.graphics.toArgb
 import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.utils.DateUtils
+import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -84,6 +86,7 @@ import java.math.BigDecimal
  * @param onNavigateToStatistics Опциональный колбэк для навигации к экрану финансовой статистики
  */
 @OptIn(ExperimentalMaterial3Api::class, ExperimentalPagerApi::class)
+@Suppress("DEPRECATION") // Suppressing deprecation warnings for accompanist/pager components
 @Composable
 fun EnhancedFinanceChartScreen(
     viewModel: ChartViewModel,
@@ -114,10 +117,30 @@ fun EnhancedFinanceChartScreen(
             screenName = "enhanced_finance_chart",
             screenClass = "EnhancedFinanceChartScreen"
         )
-
+        
         // Загружаем данные, если они еще не загружены
         if (state.transactions.isEmpty()) {
             viewModel.handleIntent(ChartIntent.LoadTransactions)
+        } else {
+            Timber.d("Всего загружено транзакций: ${state.transactions.size}")
+            Timber.d("Даты транзакций: ${state.transactions.map { DateUtils.formatDate(it.date) }.distinct().joinToString()}")
+        }
+    }
+    
+    // Следим за изменениями периода
+    LaunchedEffect(state.periodType, state.startDate, state.endDate) {
+        val periodText = UiUtils.formatPeriod(state.periodType, state.startDate, state.endDate)
+        Timber.d("Период изменен на: $periodText")
+        Timber.d("Текущие даты: ${DateUtils.formatDate(state.startDate)} - ${DateUtils.formatDate(state.endDate)}")
+        Timber.d("Кол-во транзакций после изменения периода: ${state.transactions.size}")
+        
+        // Для целей отладки - показываем мин. и макс. даты транзакций
+        if (state.transactions.isNotEmpty()) {
+            val minDate = state.transactions.minByOrNull { it.date }?.date
+            val maxDate = state.transactions.maxByOrNull { it.date }?.date
+            if (minDate != null && maxDate != null) {
+                Timber.d("Диапазон дат транзакций: ${DateUtils.formatDate(minDate)} - ${DateUtils.formatDate(maxDate)}")
+            }
         }
     }
 
@@ -135,8 +158,6 @@ fun EnhancedFinanceChartScreen(
                 title = stringResource(R.string.charts_title),
                 showBackButton = true,
                 onBackClick = {
-                    // Сбрасываем даты перед выходом с экрана
-                    viewModel.handleIntent(ChartIntent.SetPeriodType(PeriodType.MONTH))
                     onNavigateBack()
                 },
                 actions = {
@@ -213,7 +234,9 @@ fun EnhancedFinanceChartScreen(
                     EnhancedSummaryCard(
                         income = state.income ?: Money.zero(),
                         expense = state.expense ?: Money.zero(),
-                        period = getPeriodText(state),
+                        startDate = state.startDate,
+                        endDate = state.endDate,
+                        viewModel = viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(16.dp)
@@ -272,27 +295,49 @@ fun EnhancedFinanceChartScreen(
                                 ) {
                                     // Получаем данные категорий в зависимости от выбранного режима
                                     val categoryData = if (state.showExpenses) {
-                                        getExpensesByCategory(state.transactions, state.startDate, state.endDate)
+                                        val data = getExpensesByCategory(state.transactions, state.startDate, state.endDate)
+                                        Timber.d("Данные по расходам за период ${DateUtils.formatDate(state.startDate)} - ${DateUtils.formatDate(state.endDate)}: ${data.size} категорий, сумма: ${data.values.sumOf { it.amount.toDouble() }}")
+                                        Timber.d("Список категорий расходов: ${data.keys.joinToString()}")
+                                        data
                                     } else {
-                                        getIncomeByCategory(state.transactions, state.startDate, state.endDate)
+                                        val data = getIncomeByCategory(state.transactions, state.startDate, state.endDate) 
+                                        Timber.d("Данные по доходам за период ${DateUtils.formatDate(state.startDate)} - ${DateUtils.formatDate(state.endDate)}: ${data.size} категорий, сумма: ${data.values.sumOf { it.amount.toDouble() }}")
+                                        Timber.d("Список категорий доходов: ${data.keys.joinToString()}")
+                                        data
                                     }
 
-                                    // Улучшенный пирограф категорий
-                                    CategoryPieChartAdapter(
-                                        data = categoryData,
-                                        isIncome = !state.showExpenses,
-                                        onCategorySelected = { category ->
-                                            selectedCategory = category?.name
-                                            category?.name?.let { categoryName ->
-                                                onNavigateToTransactions?.invoke(categoryName, state.startDate, state.endDate)
-                                            }
-                                        },
-                                        modifier = Modifier.padding(top = 16.dp),
-                                        showExpenses = state.showExpenses,
-                                        onShowExpensesChange = { showExpenses ->
-                                            viewModel.handleIntent(ChartIntent.ToggleExpenseView(showExpenses))
+                                    // Проверяем, нет ли данных для отображения
+                                    if (categoryData.isEmpty()) {
+                                        Box(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .height(250.dp)
+                                                .padding(top = 16.dp),
+                                            contentAlignment = Alignment.Center
+                                        ) {
+                                            Text(
+                                                text = stringResource(R.string.enhanced_chart_no_data),
+                                                style = MaterialTheme.typography.bodyLarge
+                                            )
                                         }
-                                    )
+                                    } else {
+                                        // Улучшенный пирограф категорий
+                                        CategoryPieChartAdapter(
+                                            data = categoryData,
+                                            isIncome = !state.showExpenses,
+                                            onCategorySelected = { category ->
+                                                selectedCategory = category?.name
+                                                category?.name?.let { categoryName ->
+                                                    onNavigateToTransactions?.invoke(categoryName, state.startDate, state.endDate)
+                                                }
+                                            },
+                                            modifier = Modifier.padding(top = 16.dp),
+                                            showExpenses = state.showExpenses,
+                                            onShowExpensesChange = { showExpenses ->
+                                                viewModel.handleIntent(ChartIntent.ToggleExpenseView(showExpenses))
+                                            }
+                                        )
+                                    }
                                 }
                             }
 
@@ -436,12 +481,36 @@ private fun getExpensesByCategory(
     startDate: Date,
     endDate: Date
 ): Map<String, Money> {
-    // Фильтруем транзакции
-    return transactions
-        .filter { it.isExpense && it.date >= startDate && it.date <= endDate }
+    // Логируем диапазон дат
+    Timber.d("getExpensesByCategory: фильтрация с ${DateUtils.formatDate(startDate)} по ${DateUtils.formatDate(endDate)}")
+    
+    // Показываем все существующие даты до фильтрации
+    val allDates = transactions.filter { it.isExpense }.map { DateUtils.formatDate(it.date) }.distinct()
+    Timber.d("getExpensesByCategory: имеющиеся даты расходных транзакций: ${allDates.joinToString()}")
+    
+    // Дополнительно логируем метки времени для сравнения
+    Timber.d("getExpensesByCategory: startDate=${startDate.time}, endDate=${endDate.time}")
+    
+    // Вместо прямого сравнения дат используем усеченные даты без времени
+    val filteredByDate = transactions.filter { 
+        it.isExpense && 
+        DateUtils.truncateToDay(it.date).time >= DateUtils.truncateToDay(startDate).time && 
+        DateUtils.truncateToDay(it.date).time <= DateUtils.truncateToDay(endDate).time 
+    }
+    
+    // Логируем результаты фильтрации
+    Timber.d("getExpensesByCategory: найдено ${filteredByDate.size} расходных транзакций в указанном периоде")
+    
+    // Если транзакции найдены, показываем их даты
+    if (filteredByDate.isNotEmpty()) {
+        val filteredDates = filteredByDate.map { DateUtils.formatDate(it.date) }.distinct()
+        Timber.d("getExpensesByCategory: даты найденных транзакций: ${filteredDates.joinToString()}")
+    }
+    
+    return filteredByDate
         .groupBy { it.category }
         .mapValues { (_, transactions) ->
-            transactions.map { it.amount }.reduceOrNull { acc, money ->
+            transactions.map { it.amount.abs() }.reduceOrNull { acc, money ->
                 acc + money
             } ?: Money.zero()
         }
@@ -455,9 +524,33 @@ private fun getIncomeByCategory(
     startDate: Date,
     endDate: Date
 ): Map<String, Money> {
-    // Фильтруем транзакции
-    return transactions
-        .filter { !it.isExpense && it.date >= startDate && it.date <= endDate }
+    // Логируем диапазон дат
+    Timber.d("getIncomeByCategory: фильтрация с ${DateUtils.formatDate(startDate)} по ${DateUtils.formatDate(endDate)}")
+    
+    // Показываем все существующие даты до фильтрации
+    val allDates = transactions.filter { !it.isExpense }.map { DateUtils.formatDate(it.date) }.distinct()
+    Timber.d("getIncomeByCategory: имеющиеся даты доходных транзакций: ${allDates.joinToString()}")
+    
+    // Дополнительно логируем метки времени для сравнения
+    Timber.d("getIncomeByCategory: startDate=${startDate.time}, endDate=${endDate.time}")
+    
+    // Вместо прямого сравнения дат используем усеченные даты без времени
+    val filteredByDate = transactions.filter { 
+        !it.isExpense && 
+        DateUtils.truncateToDay(it.date).time >= DateUtils.truncateToDay(startDate).time && 
+        DateUtils.truncateToDay(it.date).time <= DateUtils.truncateToDay(endDate).time 
+    }
+    
+    // Логируем результаты фильтрации
+    Timber.d("getIncomeByCategory: найдено ${filteredByDate.size} доходных транзакций в указанном периоде")
+    
+    // Если транзакции найдены, показываем их даты
+    if (filteredByDate.isNotEmpty()) {
+        val filteredDates = filteredByDate.map { DateUtils.formatDate(it.date) }.distinct()
+        Timber.d("getIncomeByCategory: даты найденных транзакций: ${filteredDates.joinToString()}")
+    }
+    
+    return filteredByDate
         .groupBy { it.category }
         .mapValues { (_, transactions) ->
             transactions.map { it.amount }.reduceOrNull { acc, money ->
@@ -470,14 +563,11 @@ private fun getIncomeByCategory(
  * Получение форматированного текста периода
  */
 private fun getPeriodText(state: ChartScreenState): String {
-    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-
-    return when (state.periodType) {
-        PeriodType.ALL -> "Все время"
-        PeriodType.DAY -> dateFormat.format(state.startDate)
-        PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
-            "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
-    }
+    return com.davidbugayov.financeanalyzer.presentation.util.UiUtils.formatPeriod(
+        state.periodType,
+        state.startDate,
+        state.endDate
+    )
 }
 
 /**
@@ -597,12 +687,23 @@ private fun CategoryPieChartAdapter(
     // Сохраняем текущее значение типа отображения
     var currentShowExpenses by remember(showExpenses) { mutableStateOf(showExpenses) }
     
+    // Логируем размер данных перед началом обработки
+    Timber.d("CategoryPieChartAdapter: получено ${data.size} категорий, общая сумма: ${data.values.sumOf { it.amount.toDouble() }}")
+    
+    // Проверяем, есть ли нулевые суммы
+    val hasZeroAmounts = data.any { it.value.isZero() }
+    Timber.d("CategoryPieChartAdapter: есть нулевые суммы: $hasZeroAmounts")
+    
     // Получаем нужное количество цветов для диаграммы
     val colors = com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.PieChartUtils
         .getCategoryColors(data.size, !currentShowExpenses)
     
+    // Отфильтровываем категории с нулевыми суммами
+    val filteredData = data.filter { !it.value.isZero() }
+    Timber.d("CategoryPieChartAdapter: после фильтрации нулевых сумм осталось ${filteredData.size} категорий")
+    
     // Convert Map<String, Money> to List<PieChartData>
-    val pieChartDataList = data.entries.mapIndexed { index, entry ->
+    val pieChartDataList = filteredData.entries.mapIndexed { index, entry ->
         val categoryName = entry.key
         val amount = entry.value.amount.toFloat()
         // Create a simple Category object with ID based on index
@@ -633,15 +734,21 @@ private fun CategoryPieChartAdapter(
         )
     }
     
+    // Логируем размер списка до подсчета процентов
+    Timber.d("CategoryPieChartAdapter: после конвертации получено ${pieChartDataList.size} элементов")
+    
     // Calculate total and percentages
     if (pieChartDataList.isNotEmpty()) {
         val total = pieChartDataList.sumOf { it.amount.toDouble() }.toFloat()
+        Timber.d("CategoryPieChartAdapter: общая сумма для расчета процентов: $total")
         
         // Create the final list with percentages
         val finalDataList = pieChartDataList.map { item ->
             val percentage = if (total > 0) (item.amount / total) * 100 else 0f
             item.copy(percentage = percentage) 
         }
+        
+        Timber.d("CategoryPieChartAdapter: финальный список содержит ${finalDataList.size} элементов с процентами")
         
         // Create the enhanced pie chart with the data
         EnhancedCategoryPieChart(
@@ -661,5 +768,18 @@ private fun CategoryPieChartAdapter(
                 onShowExpensesChange(newShowExpenses)
             }
         )
+    } else {
+        Timber.d("CategoryPieChartAdapter: список элементов пуст, график не отображается")
+        
+        // Показываем сообщение "Нет доступных данных" если список пуст
+        Box(
+            modifier = modifier.fillMaxWidth(),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = stringResource(R.string.enhanced_chart_no_data),
+                style = MaterialTheme.typography.bodyLarge
+            )
+        }
     }
 }

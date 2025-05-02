@@ -20,7 +20,6 @@ val historyModule = module {
     // ViewModel для экрана истории транзакций
     viewModel {
         TransactionHistoryViewModel(
-            loadTransactionsUseCase = get(),
             filterTransactionsUseCase = get(),
             groupTransactionsUseCase = get(),
             calculateCategoryStatsUseCase = get(),

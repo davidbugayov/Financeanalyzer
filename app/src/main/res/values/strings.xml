@@ -605,4 +605,16 @@
     <string name="enhanced_chart_income_single">Доход</string>
     <string name="enhanced_chart_expense_single">Расход</string>
     <string name="enhanced_chart_percent_format">%.1f%%</string>
+
+    <!-- Enhanced Summary Card strings -->
+    <string name="enhanced_summary_income">Доходы</string>
+    <string name="enhanced_summary_expense">Расходы</string>
+    <string name="enhanced_summary_select_period">Выбрать период</string>
+    <string name="enhanced_summary_all_time">Все время</string>
+    <string name="enhanced_summary_day">День: %s</string>
+    <string name="enhanced_summary_week" formatted="false">Неделя: %s - %s</string>
+    <string name="enhanced_summary_month" formatted="false">Месяц: %s - %s</string>
+    <string name="enhanced_summary_quarter" formatted="false">Квартал: %s - %s</string>
+    <string name="enhanced_summary_year" formatted="false">Год: %s - %s</string>
+    <string name="enhanced_summary_custom" formatted="false">%s - %s</string>
 </resources>

@@ -60,6 +60,7 @@ import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -370,22 +371,12 @@ fun TransactionHistoryScreen(
                         .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
-                    
                     Text(
-                        text = when (state.periodType) {
-                            PeriodType.ALL -> stringResource(R.string.all_time)
-                            PeriodType.DAY -> stringResource(R.string.day)
-                            PeriodType.WEEK -> stringResource(R.string.week)
-                            PeriodType.MONTH -> stringResource(R.string.month)
-                            PeriodType.QUARTER -> stringResource(R.string.period_quarter)
-                            PeriodType.YEAR -> stringResource(R.string.year)
-                            PeriodType.CUSTOM -> {
-                                val startDate = state.startDate
-                                val endDate = state.endDate
-                                "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
-                            }
-                        },
+                        text = UiUtils.formatPeriod(
+                            state.periodType,
+                            state.startDate,
+                            state.endDate
+                        ),
                         fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium

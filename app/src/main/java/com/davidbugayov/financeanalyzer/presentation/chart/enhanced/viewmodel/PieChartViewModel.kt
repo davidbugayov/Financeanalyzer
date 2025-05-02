@@ -31,22 +31,9 @@ class PieChartViewModel(
     
     private val _event = MutableSharedFlow<PieChartContract.Event>()
     val event: SharedFlow<PieChartContract.Event> = _event.asSharedFlow()
-    
-    private val TAG = "PieChartViewModel"
-    
+
     init {
         loadData(true)
-    }
-    
-    fun processIntent(intent: PieChartContract.Intent) {
-        when (intent) {
-            is PieChartContract.Intent.LoadData -> loadData(true)
-            is PieChartContract.Intent.LoadIncomeData -> loadData(true)
-            is PieChartContract.Intent.LoadExpenseData -> loadData(false)
-            is PieChartContract.Intent.SelectCategory -> selectCategory(intent.category, intent.isIncome)
-            PieChartContract.Intent.ClearSelection -> clearSelection()
-            PieChartContract.Intent.ClearError -> _state.update { it.copy(error = null) }
-        }
     }
     
     private fun loadData(isIncome: Boolean) {
@@ -90,25 +77,6 @@ class PieChartViewModel(
             }
         }
     }
-    
-    private fun selectCategory(category: Category?, isIncome: Boolean) {
-        viewModelScope.launch {
-            _state.update { it.copy(
-                selectedCategory = category,
-                isIncomeSelected = isIncome
-            ) }
-            
-            category?.let {
-                _event.emit(PieChartContract.Event.CategorySelected(it, isIncome))
-            }
-        }
-    }
-    
-    private fun clearSelection() {
-        _state.update { it.copy(selectedCategory = null) }
-    }
+
 }
 
-interface CategoryColorProvider {
-    fun getColorForCategory(categoryId: String, isIncome: Boolean): Color
-} 

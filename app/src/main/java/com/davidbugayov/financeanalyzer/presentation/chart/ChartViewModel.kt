@@ -27,7 +27,6 @@ import java.util.Locale
 class ChartViewModel : ViewModel(), KoinComponent {
 
     private val getTransactionsUseCase: GetTransactionsUseCase by inject()
-    private val repository: TransactionRepository by inject()
     private val _state = MutableStateFlow(
         ChartScreenState(
             startDate = Calendar.getInstance().apply {
@@ -125,7 +124,7 @@ class ChartViewModel : ViewModel(), KoinComponent {
         // Группируем по дате
         val expensesByDay = transactions
             .filter { transaction -> transaction.amount.amount.toFloat() < 0 }
-            .groupBy { DateUtils.truncateToDay(it.date, _state.value.startDate, _state.value.endDate) }
+            .groupBy { DateUtils.truncateToDay(it.date) }
         
         // Преобразуем в список DailyExpense
         return expensesByDay.entries
@@ -154,74 +153,16 @@ class ChartViewModel : ViewModel(), KoinComponent {
     private fun setPeriodType(periodType: PeriodType) {
         _state.update { it.copy(periodType = periodType) }
         
-        // Обновляем даты в зависимости от типа периода
-        val (start, end) = calculateDatesForPeriod(periodType)
+        // Обновляем даты в зависимости от типа периода, используя общую логику
+        val currentState = _state.value
+        val (start, end) = DateUtils.updatePeriodDates(
+            periodType = periodType,
+            currentStartDate = currentState.startDate,
+            currentEndDate = currentState.endDate
+        )
         _state.update { it.copy(startDate = start, endDate = end) }
         
         loadTransactions()
-    }
-    
-    private fun calculateDatesForPeriod(periodType: PeriodType): Pair<Date, Date> {
-        val calendar = Calendar.getInstance()
-        val endDate = calendar.apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }.time
-
-        val startDate = when (periodType) {
-            PeriodType.DAY -> calendar.apply {
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
-            
-            PeriodType.WEEK -> calendar.apply {
-                add(Calendar.DAY_OF_YEAR, -7)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
-            
-            PeriodType.MONTH -> calendar.apply {
-            add(Calendar.MONTH, -1)
-            set(Calendar.HOUR_OF_DAY, 0)
-            set(Calendar.MINUTE, 0)
-            set(Calendar.SECOND, 0)
-            set(Calendar.MILLISECOND, 0)
-        }.time
-
-            PeriodType.QUARTER -> calendar.apply {
-                add(Calendar.MONTH, -3)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
-            
-            PeriodType.YEAR -> calendar.apply {
-                add(Calendar.YEAR, -1)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
-            
-            PeriodType.ALL, PeriodType.CUSTOM -> calendar.apply {
-                set(Calendar.YEAR, 2000)
-                set(Calendar.MONTH, Calendar.JANUARY)
-                set(Calendar.DAY_OF_MONTH, 1)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
-        }
-        
-        return startDate to endDate
     }
     
     private fun togglePeriodDialog(show: Boolean) {
@@ -242,27 +183,5 @@ class ChartViewModel : ViewModel(), KoinComponent {
     
     private fun resetDateFilter() {
         setPeriodType(PeriodType.MONTH)
-    }
-    
-    // Для совместимости со старым кодом
-    fun getExpensesByCategory(transactions: List<Transaction>): Map<String, Money> {
-        return transactions
-            .filter { transaction -> transaction.amount.amount.toFloat() < 0 }
-            .groupBy { it.category }
-            .mapValues { (_, transactions) ->
-                transactions.fold(Money.zero()) { acc, transaction -> 
-                    acc + transaction.amount.abs() 
-                }
-            }
-    }
-    
-    // Для совместимости со старым кодом
-    fun getIncomeByCategory(transactions: List<Transaction>): Map<String, Money> {
-        return transactions
-            .filter { transaction -> transaction.amount.amount.toFloat() > 0 }
-            .groupBy { it.category }
-            .mapValues { (_, transactions) ->
-                transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-            }
     }
 } 

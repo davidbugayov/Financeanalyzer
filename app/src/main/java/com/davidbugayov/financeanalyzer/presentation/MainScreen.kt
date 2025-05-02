@@ -220,14 +220,11 @@ fun MainScreen(startDestination: String = "home") {
      * Получение форматированного текста периода
      */
     fun getPeriodText(state: ChartScreenState): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-
-        return when (state.periodType) {
-            PeriodType.ALL -> "Все время"
-            PeriodType.DAY -> dateFormat.format(state.startDate)
-            PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
-                "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
-        }
+        return com.davidbugayov.financeanalyzer.presentation.util.UiUtils.formatPeriodCompact(
+            state.periodType,
+            state.startDate,
+            state.endDate
+        )
     }
 
     // Применяем тему к всему приложению

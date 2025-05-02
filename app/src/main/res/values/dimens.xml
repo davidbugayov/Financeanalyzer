@@ -239,4 +239,16 @@
     <dimen name="enhanced_pie_chart_sector_outer_stroke_width">1.5dp</dimen>
     <dimen name="enhanced_pie_chart_sector_inner_stroke_width">1dp</dimen>
     <dimen name="enhanced_pie_chart_animation_duration">800</dimen>
+    
+    <!-- Enhanced Summary Card dimensions -->
+    <dimen name="enhanced_summary_card_corner_radius">20dp</dimen>
+    <dimen name="enhanced_summary_card_elevation">12dp</dimen>
+    <dimen name="enhanced_summary_card_padding_horizontal">20dp</dimen>
+    <dimen name="enhanced_summary_card_padding_vertical">16dp</dimen>
+    <dimen name="enhanced_summary_card_balance_font_size">42sp</dimen>
+    <dimen name="enhanced_summary_card_balance_letter_spacing">-1sp</dimen>
+    <dimen name="enhanced_summary_card_income_expense_font_size">18sp</dimen>
+    <dimen name="enhanced_summary_card_label_font_size">12sp</dimen>
+    <dimen name="enhanced_summary_card_icon_size">16dp</dimen>
+    <dimen name="enhanced_summary_card_spacing">6dp</dimen>
 </resources> 
