@@ -52,8 +52,8 @@ fun HomeGroupSummary(
     val expenseColor = LocalExpenseColor.current
 
     // Вычисляем баланс
-    val balance = totalIncome - totalExpense
-    val balanceColor = if (balance.amount >= BigDecimal.ZERO) incomeColor else expenseColor
+    val balance = totalIncome.minus(totalExpense)
+    val balanceColor = if (balance.amount.signum() >= 0) incomeColor else expenseColor
 
     // Состояние для отслеживания - показывать ли все группы
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
@@ -172,15 +172,10 @@ fun HomeGroupSummary(
                     fontSize = 14.sp,
                     fontWeight = FontWeight.Bold
                 )
-                val balanceText = if (balance.amount >= BigDecimal.ZERO) {
-                    "+" + balance.abs().formatted(false)
-                } else {
-                    "-" + balance.abs().formatted(false)
-                }
                 Text(
-                    text = balanceText,
+                    text = balance.format(false),
                     fontSize = 14.sp,
-                    color = balanceColor,
+                    color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
                     fontWeight = FontWeight.Bold
                 )
             }

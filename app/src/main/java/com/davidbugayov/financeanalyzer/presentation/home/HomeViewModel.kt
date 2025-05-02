@@ -617,13 +617,21 @@ class HomeViewModel(
             return cachedStats
         }
 
+        // Доходы - суммируем транзакции с isExpense = false
         val income = transactions
             .filter { !it.isExpense }
             .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-        val expense = transactions
+        
+        // Расходы - берем абсолютное значение суммы транзакций с isExpense = true
+        // Их значения уже хранятся с отрицательным знаком
+        val expenseWithSign = transactions
             .filter { it.isExpense }
             .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-        val balance = income - expense
+            
+        val expense = expenseWithSign.abs()
+        
+        // Для баланса - просто суммируем все транзакции (со знаками)
+        val balance = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
 
         Timber.d("[DIAG] calculateStats: income=${income.formatted()}, expense=${expense.formatted()}, balance=${balance.formatted()}")
 

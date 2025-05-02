@@ -42,13 +42,13 @@ fun BalanceCard(
     val cardColor = MaterialTheme.colorScheme.background
     
     // Получаем цвета из локального контекста для текста
-    val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) 
+    val balanceTextColor = if (balance.amount.signum() >= 0) 
         incomeColor // Зеленый текст для положительного баланса
     else 
         expenseColor // Красный текст для отрицательного баланса
     
     // Цвет заголовка (немного светлее основного цвета текста)
-    val titleColor = if (balance.amount >= BigDecimal.ZERO) 
+    val titleColor = if (balance.amount.signum() >= 0) 
         incomeColor.copy(alpha = 0.7f) // Зеленый для положительного баланса
     else 
         expenseColor.copy(alpha = 0.7f) // Красный для отрицательного баланса
@@ -82,11 +82,11 @@ fun BalanceCard(
             Spacer(modifier = Modifier.height(12.dp))
 
             Text(
-                text = balance.formatted(),
+                text = balance.format(true),
                 style = MaterialTheme.typography.headlineMedium,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold,
-                color = balanceTextColor
+                color = if (balance.amount.signum() >= 0) incomeColor else expenseColor
             )
         }
     }

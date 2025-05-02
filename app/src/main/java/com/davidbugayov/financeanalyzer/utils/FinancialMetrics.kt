@@ -52,16 +52,38 @@ class FinancialMetrics private constructor() : KoinComponent {
             try {
                 val visibleTransactions = repository.loadTransactions()
                 Timber.d("[DIAG] FinancialMetrics транзакций: ${visibleTransactions.size}")
-                visibleTransactions.forEach { Timber.d("[DIAG] FM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") }
-                val income = visibleTransactions.filter { !it.isExpense }
+                
+                // Анализируем транзакции для диагностики
+                visibleTransactions.forEach { 
+                    Timber.d("[DIAG] FM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") 
+                }
+                
+                // Для доходов собираем только положительные транзакции (isExpense = false)
+                val income = visibleTransactions
+                    .filter { !it.isExpense }
                     .fold(Money.zero()) { acc, t -> acc + t.amount }
-                val expense = visibleTransactions.filter { it.isExpense }
+                
+                // Для расходов берем абсолютные значения транзакций с isExpense = true
+                // Их значения уже хранятся с отрицательным знаком
+                val expenseNegative = visibleTransactions
+                    .filter { it.isExpense }
                     .fold(Money.zero()) { acc, t -> acc + t.amount }
-                val balance = income - expense
+                
+                // Для отображения берем абсолютное значение расходов (без знака)
+                val expenseAbsolute = expenseNegative.abs()
+                
+                // Баланс - просто сумма всех транзакций (включая отрицательные значения расходов)
+                val balance = visibleTransactions.fold(Money.zero()) { acc, t -> acc + t.amount }
+                
+                // Обновляем значения в состоянии
                 _totalIncome.value = income
-                _totalExpense.value = expense
+                _totalExpense.value = expenseAbsolute // Для отображения храним положительное значение
                 _balance.value = balance
-                Timber.d("Метрики обновлены: доход=${income.formatted()}, расход=${expense.formatted()}, баланс=${balance.formatted()}")
+                
+                // Логгируем результаты для диагностики
+                Timber.d("Метрики обновлены: доход=${income.formatted()}, расход=${expenseAbsolute.formatted()}, баланс=${balance.formatted()}")
+                
+                // Дополнительная диагностика
                 val expenseIds = visibleTransactions.filter { it.isExpense }.map { it.id }
                 Timber.d("[DIAG] FM EXPENSE IDS: ${expenseIds}")
             } catch (e: Exception) {
