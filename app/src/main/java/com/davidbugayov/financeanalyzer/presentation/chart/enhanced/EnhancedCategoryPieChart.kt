@@ -155,7 +155,7 @@ fun EnhancedCategoryPieChart(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 16.dp)
+                .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
         ) {
             // Горизонтальный переключатель доходы/расходы
             Row(
@@ -246,16 +246,19 @@ fun EnhancedCategoryPieChart(
             Timber.d("FinanceAnalyzer: EnhancedCategoryPieChart: список категорий содержит ${sortedItems.size} элементов")
             Log.d("[D]", "EnhancedCategoryPieChart: список категорий содержит ${sortedItems.size} элементов")
             
-            // Рассчитываем высоту для списка категорий (30dp на элемент, минимум 150dp)
-            val categoryHeight = (sortedItems.size * 30).coerceAtLeast(150).coerceAtMost(500)
+            // Рассчитываем высоту для списка категорий (25dp на элемент, минимум 20dp)
+            val categoryHeight = 20 + sortedItems.size * 25
             
-            // Показываем все категории с ограниченной высотой и скроллингом
+            Timber.d("FinanceAnalyzer: EnhancedCategoryPieChart: рассчитанная высота для списка категорий: ${categoryHeight}dp")
+            Log.d("[D]", "EnhancedCategoryPieChart: рассчитанная высота для списка категорий: ${categoryHeight}dp")
+            
+            // Показываем все категории с высотой, подходящей для количества элементов
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp)
-                    .height(categoryHeight.dp) // Обязательно задаем высоту для компонента со скроллингом
-                    .verticalScroll(rememberScrollState())
+                    .height(categoryHeight.dp) // Динамическая высота без верхнего ограничения
+                    .verticalScroll(rememberScrollState()) // Оставляем скроллинг на всякий случай
             ) {
                 // Выводим содержимое категорий для отладки
                 sortedItems.forEachIndexed { index, item ->
