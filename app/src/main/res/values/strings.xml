@@ -596,4 +596,13 @@
     <!-- Тексты ошибок -->
     <string name="error_title">Ошибка</string>
     <string name="error_dismiss">ОК</string>
+
+    <!-- EnhancedCategoryPieChart strings -->
+    <string name="enhanced_chart_no_data">Нет доступных данных</string>
+    <string name="enhanced_chart_expenses">Расходы</string>
+    <string name="enhanced_chart_income">Доходы</string>
+    <string name="enhanced_chart_category_list">Список категорий</string>
+    <string name="enhanced_chart_income_single">Доход</string>
+    <string name="enhanced_chart_expense_single">Расход</string>
+    <string name="enhanced_chart_percent_format">%.1f%%</string>
 </resources>
