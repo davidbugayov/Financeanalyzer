@@ -441,7 +441,7 @@
     <string name="transaction_history">История транзакций</string>
 
     <!-- Savings Rate Dialog -->
-    <string name="savings_rate_title">Норма сбережений</string>
+    <string name="savings_rate_dialog_title">Норма сбережений</string>
     <string name="income_header">Доходы</string>
     <string name="expenses_header">Расходы</string>
     <string name="savings_amount">Сумма сбережений</string>
@@ -617,4 +617,63 @@
     <string name="enhanced_summary_quarter" formatted="false">Квартал: %s - %s</string>
     <string name="enhanced_summary_year" formatted="false">Год: %s - %s</string>
     <string name="enhanced_summary_custom" formatted="false">%s - %s</string>
+
+    <!-- FinancialHealthMetricsCard strings -->
+    <string name="financial_health_analysis">Анализ финансового здоровья</string>
+    <string name="financial_health_subtitle">Ключевые показатели для планирования вашего бюджета</string>
+    <string name="financial_health_title">Финансовое здоровье</string>
+    <string name="financial_health_info_description">Информация о метриках</string>
+    <string name="financial_health_tooltip_description">Подсказка</string>
+    
+    <string name="average_expenses_title">Средние расходы</string>
+    <string name="average_expenses_explanation">Рассчитывается на основе ваших трат за выбранный период. Помогает планировать ежедневный бюджет.</string>
+    <string name="daily_expenses_title">В день</string>
+    <string name="monthly_expenses_title">В месяц</string>
+    <string name="yearly_expenses_title">В год</string>
+    
+    <string name="savings_rate_title">Норма сбережений</string>
+    <string name="savings_rate_explanation" formatted="false">Показывает процент дохода, который вы откладываете. Рекомендуемый показатель – от 15% до 30%. Чем выше, тем быстрее растут ваши накопления.</string>
+    <string name="savings_rate_percent">%d%%</string>
+    <string name="savings_rate_percent_0">0%%</string>
+    <string name="savings_rate_percent_15">15%%</string>
+    <string name="savings_rate_percent_30">30%%</string>
+    <string name="savings_rate_percent_50">50%%+</string>
+    
+    <string name="financial_cushion_title">Финансовая подушка</string>
+    <string name="financial_cushion_explanation">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум - 3-6 месяцев.</string>
+    <string name="financial_cushion_months">%d</string>
+    <string name="financial_cushion_months_short">мес.</string>
+    <string name="financial_cushion_expenses">При ежемесячных расходах %s</string>
+    
+    <string name="qualification_excellent">Отлично</string>
+    <string name="qualification_good">Хорошо</string>
+    <string name="qualification_satisfactory">Удовлетворительно</string>
+    <string name="qualification_needs_attention">Требует внимания</string>
+    <string name="qualification_insufficient">Недостаточно</string>
+    
+    <string name="trend_positive">Положительный тренд</string>
+    <string name="trend_negative">Отрицательный тренд</string>
+    <string name="trend_neutral">Нейтральный тренд</string>
+    
+    <string name="savings_rate_excellent">Вы отлично справляетесь с накоплениями! Продолжайте в том же духе.</string>
+    <string name="savings_rate_good">Хороший результат. Стремитесь увеличить до 30% для более быстрого роста накоплений.</string>
+    <string name="savings_rate_satisfactory">Неплохое начало. Попробуйте увеличить процент сбережений.</string>
+    <string name="savings_rate_needs_attention">Рекомендуется откладывать минимум 10-15% от дохода.</string>
+    
+    <string name="financial_cushion_excellent">Вы хорошо защищены от финансовых неожиданностей! Ваш запас превышает рекомендуемый минимум в 6 месяцев.</string>
+    <string name="financial_cushion_good">У вас есть базовая финансовая подушка. Старайтесь увеличить её до 6 месяцев расходов.</string>
+    <string name="financial_cushion_insufficient">Рекомендуется иметь запас на 3-6 месяцев расходов. Работайте над увеличением сбережений.</string>
+    
+    <string name="financial_health_explanation">Анализ финансового здоровья включает несколько ключевых метрик:</string>
+    <string name="financial_health_savings_rate_title">1. Норма сбережений</string>
+    <string name="financial_health_savings_rate_content">Показывает, какой процент дохода вы откладываете. Рассчитывается как отношение сбережений к общему доходу. Финансовые эксперты рекомендуют сохранять минимум 15-20% дохода.</string>
+    <string name="financial_health_average_expenses_title">2. Средние расходы</string>
+    <string name="financial_health_average_expenses_content">Ваши расходы в среднем за день, месяц и год, рассчитанные на основе истории трат. Помогают планировать бюджет и оценивать уровень потребления.</string>
+    <string name="financial_health_financial_cushion_title">3. Финансовая подушка</string>
+    <string name="financial_health_financial_cushion_content">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум - 3-6 месяцев для защиты от непредвиденных ситуаций.</string>
+    <string name="financial_health_tips_title">Советы по улучшению финансового здоровья:</string>
+    <string name="financial_health_tips_content">• Постарайтесь откладывать не менее 15-20% от дохода\n• Контролируйте ежедневные расходы\n• Создайте финансовую подушку на 3-6 месяцев\n• Инвестируйте регулярно\n• Избегайте кредитов с высокими процентами</string>
+    <string name="financial_health_recommended_values_title">Рекомендуемые значения показателей:</string>
+    <string name="financial_health_recommended_values_content" formatted="false">• Норма сбережений: выше 15% - хорошо, выше 30% - отлично\n• Финансовая подушка: 3-6 месяцев для наемных работников, 6-12 месяцев для предпринимателей\n• Соотношение долга к доходу: не более 30-40% ежемесячного дохода</string>
+    <string name="financial_health_ok_button">Понятно</string>
 </resources>

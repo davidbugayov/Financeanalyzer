@@ -159,41 +159,6 @@ fun EnhancedFinanceChartScreen(
                 showBackButton = true,
                 onBackClick = {
                     onNavigateBack()
-                },
-                actions = {
-                    // Добавляем кнопку перехода на экран финансовой статистики
-                    IconButton(
-                        onClick = {
-                            // Переход на экран финансовой статистики
-                            onNavigateToStatistics?.invoke(
-                                state.transactions,
-                                state.income ?: Money.zero(),
-                                state.expense ?: Money.zero(),
-                                getPeriodText(state)
-                            )
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Filled.Analytics,
-                            contentDescription = "Подробная статистика"
-                        )
-                    }
-
-                    // Выбор периода
-                    IconButton(onClick = { viewModel.handleIntent(ChartIntent.TogglePeriodDialog(true)) }) {
-                        Icon(
-                            imageVector = Icons.Filled.DateRange,
-                            contentDescription = stringResource(R.string.select_period)
-                        )
-                    }
-
-                    // Настройки
-                    IconButton(onClick = { /* Открыть настройки отображения */ }) {
-                        Icon(
-                            imageVector = Icons.Filled.Settings,
-                            contentDescription = "Настройки графиков"
-                        )
-                    }
                 }
             )
         }

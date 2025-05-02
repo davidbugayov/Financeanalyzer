@@ -251,4 +251,18 @@
     <dimen name="enhanced_summary_card_label_font_size">12sp</dimen>
     <dimen name="enhanced_summary_card_icon_size">16dp</dimen>
     <dimen name="enhanced_summary_card_spacing">6dp</dimen>
+
+    <!-- Financial Health Metrics dimensions -->
+    <dimen name="financial_health_card_corner_radius">16dp</dimen>
+    <dimen name="financial_health_card_elevation">4dp</dimen>
+    <dimen name="financial_health_card_padding">16dp</dimen>
+    <dimen name="financial_health_card_spacing">16dp</dimen>
+    <dimen name="financial_health_section_spacing">12dp</dimen>
+    <dimen name="financial_health_icon_size">20dp</dimen>
+    <dimen name="financial_health_help_icon_size">16dp</dimen>
+    <dimen name="financial_health_badge_padding_horizontal">12dp</dimen>
+    <dimen name="financial_health_badge_padding_vertical">4dp</dimen>
+    <dimen name="financial_health_badge_corner_radius">50dp</dimen>
+    <dimen name="financial_health_dialog_max_height">450dp</dimen>
+    <dimen name="financial_health_progress_height">8dp</dimen>
 </resources> 

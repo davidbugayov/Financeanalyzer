@@ -130,4 +130,20 @@
     <!-- Enhanced pie chart colors -->
     <color name="enhanced_pie_chart_sector_outline_outer">#66FFFFFF</color>
     <color name="enhanced_pie_chart_sector_outline_inner">#4DFFFFFF</color>
+
+    <!-- Financial Health Metrics Colors -->
+    <color name="savings_rate_excellent">#00C853</color>
+    <color name="savings_rate_good">#66BB6A</color>
+    <color name="savings_rate_satisfactory">#FFA726</color>
+    <color name="savings_rate_needs_attention">#EF5350</color>
+    
+    <color name="financial_cushion_excellent">#00C853</color>
+    <color name="financial_cushion_good">#66BB6A</color>
+    <color name="financial_cushion_insufficient">#FFA726</color>
+    
+    <color name="trend_positive">#00C853</color>
+    <color name="trend_negative">#EF5350</color>
+    <color name="trend_neutral">#FFA726</color>
+    
+    <color name="qualification_badge_background_alpha">#26FFFFFF</color>
 </resources>

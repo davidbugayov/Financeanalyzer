@@ -12,24 +12,23 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowForward
 import androidx.compose.material.icons.filled.ArrowUpward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Savings
-import androidx.compose.material.icons.outlined.Help
+import androidx.compose.material.icons.automirrored.outlined.Help
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Divider
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
@@ -45,37 +44,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * Карточка с метриками финансового здоровья.
- * Отображает ключевые показатели финансового состояния пользователя с подробными объяснениями.
- *
- * @param savingsRate Процент сохраненного дохода (Норма сбережений) - отношение сбережений к доходу, 
- *                    показывает, какую часть своего дохода вы откладываете. Чем выше показатель, тем лучше.
- * @param averageDailyExpense Средние ежедневные расходы - рассчитываются на основе данных за выбранный период, 
- *                            помогают планировать бюджет.
- * @param monthsOfSavings На сколько месяцев хватит средств при текущих расходах - рассчитывается путем деления 
- *                       общей суммы сбережений на средние месячные расходы.
- * @param modifier Модификатор для настройки внешнего вида
- * @param onInfoClick Коллбэк для отображения дополнительной информации
+ * Отображает ключевые показатели финансового состояния пользователя.
  */
 @Composable
 fun FinancialHealthMetricsCard(
     savingsRate: Double,
     averageDailyExpense: Money,
     monthsOfSavings: Double,
-    modifier: Modifier = Modifier,
-    onInfoClick: () -> Unit = {}
+    modifier: Modifier = Modifier
 ) {
     var showInfoDialog by remember { mutableStateOf(false) }
     
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(16.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.financial_health_card_corner_radius)),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.financial_health_card_elevation)),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -83,362 +77,445 @@ fun FinancialHealthMetricsCard(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(dimensionResource(R.dimen.financial_health_card_padding))
         ) {
-            // Заголовок секции
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Text(
-                    text = "Анализ финансового здоровья",
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-
-                IconButton(
-                    onClick = { showInfoDialog = true },
-                    modifier = Modifier.padding(0.dp)
-                ) {
-                    Icon(
-                        imageVector = Icons.Filled.Info,
-                        contentDescription = "Информация о метриках",
-                        tint = MaterialTheme.colorScheme.primary
-                    )
-                }
-            }
-            
-            Text(
-                text = "Ключевые показатели для планирования вашего бюджета",
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+            CardHeader(
+                onInfoClick = { showInfoDialog = true }
             )
-
-            Spacer(modifier = Modifier.height(16.dp))
             
-            // Блок с ежедневными расходами
-            MetricItemEnhanced(
-                title = "Средние расходы",
-                icon = Icons.Filled.MonetizationOn, 
-                explanation = "Рассчитывается на основе ваших трат за выбранный период. Помогает планировать ежедневный бюджет."
-            ) {
-                // Блок с метриками расходов
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
-                ) {
-                    // Средние расходы в день
-                    MetricItem(
-                        title = "В день",
-                        value = averageDailyExpense.format(true),
-                        modifier = Modifier.weight(1f)
-                    )
-
-                    // Средние расходы в месяц
-                    val monthlyExpense = averageDailyExpense.times(30.toBigDecimal())
-                    MetricItem(
-                        title = "В месяц",
-                        value = monthlyExpense.format(true),
-                        modifier = Modifier.weight(1f)
-                    )
-                    
-                    // Средние расходы в год
-                    val yearlyExpense = averageDailyExpense.times(365.toBigDecimal())
-                    MetricItem(
-                        title = "В год",
-                        value = yearlyExpense.format(true),
-                        modifier = Modifier.weight(1f)
-                    )
-                }
-            }
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_health_card_spacing)))
             
-            Spacer(modifier = Modifier.height(12.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(12.dp))
-
-            // Норма сбережений
-            MetricItemEnhanced(
-                title = "Норма сбережений",
-                icon = Icons.Filled.Savings,
-                explanation = "Показывает процент дохода, который вы откладываете. Рекомендуемый показатель – от 15% до 30%. Чем выше, тем быстрее растут ваши накопления."
-            ) {
-                Column {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "${savingsRate.toInt()}%",
-                            style = MaterialTheme.typography.headlineMedium,
-                            fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                        
-                        val qualification = when {
-                            savingsRate >= 30 -> "Отлично"
-                            savingsRate >= 15 -> "Хорошо"
-                            savingsRate >= 5 -> "Удовлетворительно"
-                            else -> "Требует внимания"
-                        }
-
-                        val qualificationColor = when {
-                            savingsRate >= 30 -> Color(0xFF00C853) // Ярко-зеленый
-                            savingsRate >= 15 -> Color(0xFF66BB6A) // Зеленый
-                            savingsRate >= 5 -> Color(0xFFFFA726)  // Оранжевый
-                            else -> Color(0xFFEF5350)              // Красный
-                        }
-                        
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .background(qualificationColor.copy(alpha = 0.15f))
-                                .padding(horizontal = 12.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = qualification,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = qualificationColor,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        // Индикатор
-                        SavingsRateProgressIndicator(
-                            savingsRate = savingsRate,
-                            modifier = Modifier.weight(1f)
-                        )
-                        
-                        Spacer(modifier = Modifier.width(8.dp))
-                        
-                        // Стрелочка тренда
-                        val trendDirection = if (savingsRate >= 30) TrendDirection.UP
-                            else if (savingsRate >= 15) TrendDirection.NEUTRAL
-                            else TrendDirection.DOWN
-                        
-                        Icon(
-                            imageVector = when(trendDirection) {
-                                TrendDirection.UP -> Icons.Filled.ArrowUpward
-                                TrendDirection.DOWN -> Icons.Filled.ArrowDownward
-                                TrendDirection.NEUTRAL -> Icons.Filled.ArrowForward
-                            },
-                            contentDescription = "Тренд сбережений",
-                            tint = when(trendDirection) {
-                                TrendDirection.UP -> Color(0xFF00C853)
-                                TrendDirection.DOWN -> Color(0xFFEF5350)
-                                TrendDirection.NEUTRAL -> Color(0xFFFFA726)
-                            },
-                            modifier = Modifier.size(20.dp)
-                        )
-                    }
-                    
-                    Spacer(modifier = Modifier.height(4.dp))
-                    
-                    Text(
-                        text = when {
-                            savingsRate >= 30 -> "Вы отлично справляетесь с накоплениями! Продолжайте в том же духе."
-                            savingsRate >= 15 -> "Хороший результат. Стремитесь увеличить до 30% для более быстрого роста накоплений."
-                            savingsRate >= 5 -> "Неплохое начало. Попробуйте увеличить процент сбережений."
-                            else -> "Рекомендуется откладывать минимум 10-15% от дохода."
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
+            // Секция средних расходов
+            ExpensesSection(averageDailyExpense)
             
-            Spacer(modifier = Modifier.height(12.dp))
-            Divider()
-            Spacer(modifier = Modifier.height(12.dp))
+            SectionDivider()
+            
+            // Секция нормы сбережений
+            SavingsRateSection(savingsRate)
+            
+            SectionDivider()
 
-            // Блок "Хватит на X месяцев"
+            // Секция финансовой подушки
             if (monthsOfSavings.isFinite() && monthsOfSavings > 0) {
-                MetricItemEnhanced(
-                    title = "Финансовая подушка",
-                    icon = Icons.Filled.CalendarMonth,
-                    explanation = "Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум - 3-6 месяцев."
-                ) {
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column {
-                            Row(
-                                verticalAlignment = Alignment.Bottom
-                            ) {
-                                Text(
-                                    text = "${monthsOfSavings.toInt()}",
-                                    style = MaterialTheme.typography.headlineMedium,
-                                    fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
-                                )
-                                
-                                Spacer(modifier = Modifier.width(4.dp))
-                                
-                                Text(
-                                    text = "мес.",
-                                    style = MaterialTheme.typography.bodyLarge,
-                                    color = MaterialTheme.colorScheme.onSurface,
-                                    modifier = Modifier.padding(bottom = 4.dp)
-                                )
-                            }
-
-                            Text(
-                                text = "При ежемесячных расходах ${averageDailyExpense.times(30.toBigDecimal()).format(true)}",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        }
-
-                        val qualification = when {
-                            monthsOfSavings >= 6 -> "Отлично"
-                            monthsOfSavings >= 3 -> "Хорошо"
-                            else -> "Недостаточно"
-                        }
-
-                        val qualificationColor = when {
-                            monthsOfSavings >= 6 -> Color(0xFF00C853) // Ярко-зеленый
-                            monthsOfSavings >= 3 -> Color(0xFF66BB6A) // Зеленый
-                            else -> Color(0xFFFFA726)  // Оранжевый
-                        }
-
-                        Box(
-                            modifier = Modifier
-                                .clip(RoundedCornerShape(50))
-                                .background(qualificationColor.copy(alpha = 0.15f))
-                                .padding(horizontal = 12.dp, vertical = 4.dp)
-                        ) {
-                            Text(
-                                text = qualification,
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = qualificationColor,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = when {
-                            monthsOfSavings >= 6 -> "Вы хорошо защищены от финансовых неожиданностей! Ваш запас превышает рекомендуемый минимум в 6 месяцев."
-                            monthsOfSavings >= 3 -> "У вас есть базовая финансовая подушка. Старайтесь увеличить её до 6 месяцев расходов."
-                            else -> "Рекомендуется иметь запас на 3-6 месяцев расходов. Работайте над увеличением сбережений."
-                        },
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
+                FinancialCushionSection(monthsOfSavings, averageDailyExpense)
             }
         }
     }
     
     // Диалог с подробным объяснением финансового здоровья
     if (showInfoDialog) {
-        androidx.compose.material3.AlertDialog(
-            onDismissRequest = { showInfoDialog = false },
-            title = {
-                Text(
-                    text = "Финансовое здоровье",
-                    style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
-                )
-            },
-            text = {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(max = 450.dp)
-                        .verticalScroll(rememberScrollState())
-                ) {
-                    Text(
-                        text = "Анализ финансового здоровья включает несколько ключевых метрик:",
-                        style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(bottom = 8.dp)
-                    )
-                    
-                    // Пояснение норма сбережений
-                    Text(
-                        text = "1. Норма сбережений",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Показывает, какой процент дохода вы откладываете. Рассчитывается как отношение сбережений к общему доходу. Финансовые эксперты рекомендуют сохранять минимум 15-20% дохода.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    
-                    // Пояснение средние расходы
-                    Text(
-                        text = "2. Средние расходы",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Ваши расходы в среднем за день, месяц и год, рассчитанные на основе истории трат. Помогают планировать бюджет и оценивать уровень потребления.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    
-                    // Пояснение финансовая подушка
-                    Text(
-                        text = "3. Финансовая подушка",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-                    )
-                    Text(
-                        text = "Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум - 3-6 месяцев для защиты от непредвиденных ситуаций.",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    
-                    Spacer(modifier = Modifier.height(8.dp))
-                    
-                    Text(
-                        text = "Советы по улучшению финансового здоровья:",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 8.dp, bottom = 4.dp)
-                    )
-                    Text(
-                        text = "• Постарайтесь откладывать не менее 15-20% от дохода\n• Контролируйте ежедневные расходы\n• Создайте финансовую подушку на 3-6 месяцев\n• Инвестируйте регулярно\n• Избегайте кредитов с высокими процентами",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                    
-                    // Дополнительная информация о значениях метрик
-                    Text(
-                        text = "Рекомендуемые значения показателей:",
-                        style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold,
-                        modifier = Modifier.padding(top = 12.dp, bottom = 4.dp)
-                    )
-                    
-                    Text(
-                        text = "• Норма сбережений: выше 15% - хорошо, выше 30% - отлично\n• Финансовая подушка: 3-6 месяцев для наемных работников, 6-12 месяцев для предпринимателей\n• Соотношение долга к доходу: не более 30-40% ежемесячного дохода",
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-            },
-            confirmButton = {
-                androidx.compose.material3.Button(
-                    onClick = { showInfoDialog = false }
-                ) {
-                    Text("Понятно")
-                }
-            }
+        FinancialHealthInfoDialog(
+            onDismiss = { showInfoDialog = false }
         )
     }
+}
+
+/**
+ * Заголовок карточки с метриками финансового здоровья
+ */
+@Composable
+private fun CardHeader(
+    onInfoClick: () -> Unit
+) {
+    Column {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = stringResource(R.string.financial_health_analysis),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface
+            )
+
+            IconButton(
+                onClick = onInfoClick,
+                modifier = Modifier.padding(0.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.Info,
+                    contentDescription = stringResource(R.string.financial_health_info_description),
+                    tint = MaterialTheme.colorScheme.primary
+                )
+            }
+        }
+        
+        Text(
+            text = stringResource(R.string.financial_health_subtitle),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+    }
+}
+
+/**
+ * Секция с информацией о средних расходах
+ */
+@Composable
+private fun ExpensesSection(averageDailyExpense: Money) {
+    val monthlyExpense = averageDailyExpense.times(30.toBigDecimal())
+    val yearlyExpense = averageDailyExpense.times(365.toBigDecimal())
+    
+    MetricItemEnhanced(
+        title = stringResource(R.string.average_expenses_title),
+        icon = Icons.Filled.MonetizationOn,
+        explanation = stringResource(R.string.average_expenses_explanation)
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween
+        ) {
+            MetricItem(
+                title = stringResource(R.string.daily_expenses_title),
+                value = averageDailyExpense.format(true),
+                modifier = Modifier.weight(1f)
+            )
+
+            MetricItem(
+                title = stringResource(R.string.monthly_expenses_title),
+                value = monthlyExpense.format(true),
+                modifier = Modifier.weight(1f)
+            )
+            
+            MetricItem(
+                title = stringResource(R.string.yearly_expenses_title),
+                value = yearlyExpense.format(true),
+                modifier = Modifier.weight(1f)
+            )
+        }
+    }
+}
+
+/**
+ * Секция с информацией о норме сбережений
+ */
+@Composable
+private fun SavingsRateSection(savingsRate: Double) {
+    val qualification = when {
+        savingsRate >= 30 -> stringResource(R.string.qualification_excellent)
+        savingsRate >= 15 -> stringResource(R.string.qualification_good)
+        savingsRate >= 5 -> stringResource(R.string.qualification_satisfactory)
+        else -> stringResource(R.string.qualification_needs_attention)
+    }
+    
+    val qualificationColor = when {
+        savingsRate >= 30 -> colorResource(R.color.savings_rate_excellent)
+        savingsRate >= 15 -> colorResource(R.color.savings_rate_good)
+        savingsRate >= 5 -> colorResource(R.color.savings_rate_satisfactory)
+        else -> colorResource(R.color.savings_rate_needs_attention)
+    }
+    
+    val trendDirection = when {
+        savingsRate >= 30 -> TrendDirection.UP
+        savingsRate >= 15 -> TrendDirection.NEUTRAL
+        else -> TrendDirection.DOWN
+    }
+    
+    val recommendationText = when {
+        savingsRate >= 30 -> stringResource(R.string.savings_rate_excellent)
+        savingsRate >= 15 -> stringResource(R.string.savings_rate_good)
+        savingsRate >= 5 -> stringResource(R.string.savings_rate_satisfactory)
+        else -> stringResource(R.string.savings_rate_needs_attention)
+    }
+    
+    MetricItemEnhanced(
+        title = stringResource(R.string.savings_rate_title),
+        icon = Icons.Filled.Savings,
+        explanation = stringResource(R.string.savings_rate_explanation)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.savings_rate_percent, savingsRate.toInt()),
+                    style = MaterialTheme.typography.headlineMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                
+                QualificationBadge(qualification, qualificationColor)
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                SavingsRateProgressIndicator(
+                    savingsRate = savingsRate,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                Spacer(modifier = Modifier.width(8.dp))
+                
+                TrendIcon(trendDirection)
+            }
+            
+            Spacer(modifier = Modifier.height(4.dp))
+            
+            Text(
+                text = recommendationText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * Секция с информацией о финансовой подушке
+ */
+@Composable
+private fun FinancialCushionSection(
+    monthsOfSavings: Double,
+    averageDailyExpense: Money
+) {
+    val qualification = when {
+        monthsOfSavings >= 6 -> stringResource(R.string.qualification_excellent)
+        monthsOfSavings >= 3 -> stringResource(R.string.qualification_good)
+        else -> stringResource(R.string.qualification_insufficient)
+    }
+    
+    val qualificationColor = when {
+        monthsOfSavings >= 6 -> colorResource(R.color.financial_cushion_excellent)
+        monthsOfSavings >= 3 -> colorResource(R.color.financial_cushion_good)
+        else -> colorResource(R.color.financial_cushion_insufficient)
+    }
+    
+    val recommendationText = when {
+        monthsOfSavings >= 6 -> stringResource(R.string.financial_cushion_excellent)
+        monthsOfSavings >= 3 -> stringResource(R.string.financial_cushion_good)
+        else -> stringResource(R.string.financial_cushion_insufficient)
+    }
+    
+    val monthlyExpense = averageDailyExpense.times(30.toBigDecimal())
+    
+    MetricItemEnhanced(
+        title = stringResource(R.string.financial_cushion_title),
+        icon = Icons.Filled.CalendarMonth,
+        explanation = stringResource(R.string.financial_cushion_explanation)
+    ) {
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Column {
+                    Row(
+                        verticalAlignment = Alignment.Bottom
+                    ) {
+                        Text(
+                            text = stringResource(R.string.financial_cushion_months, monthsOfSavings.toInt()),
+                            style = MaterialTheme.typography.headlineMedium,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.onSurface
+                        )
+                        
+                        Spacer(modifier = Modifier.width(4.dp))
+                        
+                        Text(
+                            text = stringResource(R.string.financial_cushion_months_short),
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.onSurface,
+                            modifier = Modifier.padding(bottom = 4.dp)
+                        )
+                    }
+
+                    Text(
+                        text = stringResource(R.string.financial_cushion_expenses, monthlyExpense.format(true)),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
+                }
+
+                QualificationBadge(qualification, qualificationColor)
+            }
+            
+            Spacer(modifier = Modifier.height(8.dp))
+            
+            Text(
+                text = recommendationText,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+    }
+}
+
+/**
+ * Разделитель между секциями
+ */
+@Composable
+private fun SectionDivider() {
+    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_health_section_spacing)))
+    HorizontalDivider()
+    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_health_section_spacing)))
+}
+
+/**
+ * Бейдж с квалификацией
+ */
+@Composable
+private fun QualificationBadge(
+    qualification: String,
+    qualificationColor: Color
+) {
+    Box(
+        modifier = Modifier
+            .clip(RoundedCornerShape(dimensionResource(R.dimen.financial_health_badge_corner_radius)))
+            .background(qualificationColor.copy(alpha = 0.15f))
+            .padding(
+                horizontal = dimensionResource(R.dimen.financial_health_badge_padding_horizontal), 
+                vertical = dimensionResource(R.dimen.financial_health_badge_padding_vertical)
+            )
+    ) {
+        Text(
+            text = qualification,
+            style = MaterialTheme.typography.bodyMedium,
+            color = qualificationColor,
+            fontWeight = FontWeight.Medium
+        )
+    }
+}
+
+/**
+ * Иконка тренда
+ */
+@Composable
+private fun TrendIcon(trendDirection: TrendDirection) {
+    val (imageVector, contentDescription, tint) = when(trendDirection) {
+        TrendDirection.UP -> Triple(
+            Icons.Filled.ArrowUpward,
+            stringResource(R.string.trend_positive),
+            colorResource(R.color.trend_positive)
+        )
+        TrendDirection.DOWN -> Triple(
+            Icons.Filled.ArrowDownward,
+            stringResource(R.string.trend_negative),
+            colorResource(R.color.trend_negative)
+        )
+        TrendDirection.NEUTRAL -> Triple(
+            Icons.AutoMirrored.Filled.ArrowForward,
+            stringResource(R.string.trend_neutral),
+            colorResource(R.color.trend_neutral)
+        )
+    }
+    
+    Icon(
+        imageVector = imageVector,
+        contentDescription = contentDescription,
+        tint = tint,
+        modifier = Modifier.size(dimensionResource(R.dimen.financial_health_icon_size))
+    )
+}
+
+/**
+ * Диалог с подробной информацией о финансовом здоровье
+ */
+@Composable
+private fun FinancialHealthInfoDialog(
+    onDismiss: () -> Unit
+) {
+    AlertDialog(
+        onDismissRequest = onDismiss,
+        title = {
+            Text(
+                text = stringResource(R.string.financial_health_title),
+                style = MaterialTheme.typography.headlineSmall,
+                fontWeight = FontWeight.Bold
+            )
+        },
+        text = {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(max = dimensionResource(R.dimen.financial_health_dialog_max_height))
+                    .verticalScroll(rememberScrollState())
+            ) {
+                Text(
+                    text = stringResource(R.string.financial_health_explanation),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier.padding(bottom = 8.dp)
+                )
+                
+                // Пояснение норма сбережений
+                InfoSectionTitle(text = stringResource(R.string.financial_health_savings_rate_title))
+                InfoSectionContent(
+                    text = stringResource(R.string.financial_health_savings_rate_content)
+                )
+                
+                // Пояснение средние расходы
+                InfoSectionTitle(text = stringResource(R.string.financial_health_average_expenses_title))
+                InfoSectionContent(
+                    text = stringResource(R.string.financial_health_average_expenses_content)
+                )
+                
+                // Пояснение финансовая подушка
+                InfoSectionTitle(text = stringResource(R.string.financial_health_financial_cushion_title))
+                InfoSectionContent(
+                    text = stringResource(R.string.financial_health_financial_cushion_content)
+                )
+                
+                Spacer(modifier = Modifier.height(8.dp))
+                
+                InfoSectionTitle(text = stringResource(R.string.financial_health_tips_title))
+                InfoSectionContent(
+                    text = stringResource(R.string.financial_health_tips_content)
+                )
+                
+                // Дополнительная информация о значениях метрик
+                InfoSectionTitle(
+                    text = stringResource(R.string.financial_health_recommended_values_title),
+                    topPadding = 12.dp
+                )
+                
+                InfoSectionContent(
+                    text = stringResource(R.string.financial_health_recommended_values_content)
+                )
+            }
+        },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text(stringResource(R.string.financial_health_ok_button))
+            }
+        }
+    )
+}
+
+/**
+ * Заголовок раздела в информационном диалоге
+ */
+@Composable
+private fun InfoSectionTitle(
+    text: String,
+    topPadding: Dp = 8.dp
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(top = topPadding, bottom = 4.dp)
+    )
+}
+
+/**
+ * Содержимое раздела в информационном диалоге
+ */
+@Composable
+private fun InfoSectionContent(
+    text: String
+) {
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodyMedium
+    )
 }
 
 /**
@@ -462,7 +539,7 @@ fun MetricItemEnhanced(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.financial_health_icon_size))
             )
             
             Spacer(modifier = Modifier.width(8.dp))
@@ -478,13 +555,13 @@ fun MetricItemEnhanced(
             
             IconButton(
                 onClick = { showExplanation = !showExplanation },
-                modifier = Modifier.size(20.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.financial_health_icon_size))
             ) {
                 Icon(
-                    imageVector = Icons.Outlined.Help,
-                    contentDescription = "Подсказка",
+                    imageVector = Icons.AutoMirrored.Outlined.Help,
+                    contentDescription = stringResource(R.string.financial_health_tooltip_description),
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(dimensionResource(R.dimen.financial_health_help_icon_size))
                 )
             }
         }
@@ -545,24 +622,7 @@ fun MetricItem(
 
             if (trend != null) {
                 Spacer(modifier = Modifier.width(4.dp))
-                Icon(
-                    imageVector = when(trend) {
-                        TrendDirection.UP -> Icons.Filled.ArrowUpward
-                        TrendDirection.DOWN -> Icons.Filled.ArrowDownward
-                        TrendDirection.NEUTRAL -> Icons.Filled.ArrowForward
-                    },
-                    contentDescription = when(trend) {
-                        TrendDirection.UP -> "Положительный тренд"
-                        TrendDirection.DOWN -> "Отрицательный тренд"
-                        TrendDirection.NEUTRAL -> "Нейтральный тренд"
-                    },
-                    tint = when(trend) {
-                        TrendDirection.UP -> Color(0xFF00C853)
-                        TrendDirection.DOWN -> Color(0xFFEF5350)
-                        TrendDirection.NEUTRAL -> MaterialTheme.colorScheme.onSurfaceVariant
-                    },
-                    modifier = Modifier.size(16.dp)
-                )
+                TrendIcon(trend)
             }
         }
     }
@@ -578,82 +638,94 @@ fun SavingsRateProgressIndicator(
 ) {
     val normalizedRate = (savingsRate / 100.0).coerceIn(0.0, 1.0)
     val progressColor = when {
-        savingsRate >= 30.0 -> Color(0xFF00C853) // Ярко-зеленый
-        savingsRate >= 15.0 -> Color(0xFF66BB6A) // Зеленый
-        savingsRate >= 5.0 -> Color(0xFFFFA726)  // Оранжевый
-        else -> Color(0xFFEF5350)              // Красный
+        savingsRate >= 30 -> colorResource(R.color.savings_rate_excellent)
+        savingsRate >= 15 -> colorResource(R.color.savings_rate_good)
+        savingsRate >= 5 -> colorResource(R.color.savings_rate_satisfactory)
+        else -> colorResource(R.color.savings_rate_needs_attention)
     }
     
     Box(modifier = modifier) {
-        // Фоновая шкала
+        // Фоновая шкала с цветовыми зонами
         Row(modifier = Modifier.fillMaxWidth()) {
+            // Красная зона (0-5%)
             Box(
                 modifier = Modifier
                     .weight(0.15f)
-                    .height(8.dp)
+                    .height(dimensionResource(R.dimen.financial_health_progress_height))
                     .clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp))
-                    .background(Color(0xFFEF5350).copy(alpha = 0.2f))
+                    .background(colorResource(R.color.savings_rate_needs_attention).copy(alpha = 0.2f))
             )
+            // Оранжевая зона (5-15%)
             Box(
                 modifier = Modifier
                     .weight(0.1f)
-                    .height(8.dp)
-                    .background(Color(0xFFFFA726).copy(alpha = 0.2f))
+                    .height(dimensionResource(R.dimen.financial_health_progress_height))
+                    .background(colorResource(R.color.savings_rate_satisfactory).copy(alpha = 0.2f))
             )
+            // Зеленая зона (15-30%)
             Box(
                 modifier = Modifier
                     .weight(0.15f)
-                    .height(8.dp)
-                    .background(Color(0xFF66BB6A).copy(alpha = 0.2f))
+                    .height(dimensionResource(R.dimen.financial_health_progress_height))
+                    .background(colorResource(R.color.savings_rate_good).copy(alpha = 0.2f))
             )
+            // Ярко-зеленая зона (30%+)
             Box(
                 modifier = Modifier
                     .weight(0.6f)
-                    .height(8.dp)
+                    .height(dimensionResource(R.dimen.financial_health_progress_height))
                     .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
-                    .background(Color(0xFF00C853).copy(alpha = 0.2f))
+                    .background(colorResource(R.color.savings_rate_excellent).copy(alpha = 0.2f))
             )
         }
         
-        // Прогресс
+        // Индикатор прогресса
         LinearProgressIndicator(
-            progress = normalizedRate.toFloat(),
+            progress = { normalizedRate.toFloat() },
             modifier = Modifier
                 .fillMaxWidth()
-                .height(8.dp)
+                .height(dimensionResource(R.dimen.financial_health_progress_height))
                 .clip(RoundedCornerShape(4.dp)),
             color = progressColor,
             trackColor = Color.Transparent
         )
         
         // Метки процентов
-        Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(top = 12.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
-        ) {
-            Text(
-                text = "0%",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "15%",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "30%",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-            Text(
-                text = "50%+",
-                style = MaterialTheme.typography.labelSmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
-            )
-        }
+        ProgressLabels()
+    }
+}
+
+/**
+ * Метки процентов для индикатора сбережений
+ */
+@Composable
+private fun ProgressLabels() {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 12.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = stringResource(R.string.savings_rate_percent_0),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = stringResource(R.string.savings_rate_percent_15),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = stringResource(R.string.savings_rate_percent_30),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = stringResource(R.string.savings_rate_percent_50),
+            style = MaterialTheme.typography.labelSmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
     }
 }
 
