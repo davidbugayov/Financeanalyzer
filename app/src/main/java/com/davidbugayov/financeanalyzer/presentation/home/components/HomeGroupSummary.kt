@@ -39,21 +39,23 @@ import java.math.BigDecimal
  * @param totalIncome Общий доход
  * @param totalExpense Общий расход
  * @param currentFilter Текущий фильтр периода (день/неделя/месяц)
+ * @param balance Новый опциональный параметр для прямой передачи баланса
  */
 @Composable
 fun HomeGroupSummary(
     filteredTransactions: List<Transaction> = emptyList(),
     totalIncome: Money,
     totalExpense: Money,
-    currentFilter: TransactionFilter = TransactionFilter.MONTH
+    currentFilter: TransactionFilter = TransactionFilter.MONTH,
+    balance: Money? = null  // Новый опциональный параметр для прямой передачи баланса
 ) {
     // Определяем цвета для доходов и расходов из темы
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
 
-    // Вычисляем баланс
-    val balance = totalIncome.minus(totalExpense)
-    val balanceColor = if (balance.amount.signum() >= 0) incomeColor else expenseColor
+    // Вычисляем баланс, если он не передан явно
+    val calculatedBalance = balance ?: totalIncome.minus(totalExpense)
+    val balanceColor = if (calculatedBalance.amount.signum() >= 0) incomeColor else expenseColor
 
     // Состояние для отслеживания - показывать ли все группы
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
@@ -173,9 +175,9 @@ fun HomeGroupSummary(
                     fontWeight = FontWeight.Bold
                 )
                 Text(
-                    text = balance.format(false),
+                    text = calculatedBalance.format(false),
                     fontSize = 14.sp,
-                    color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
+                    color = balanceColor,
                     fontWeight = FontWeight.Bold
                 )
             }

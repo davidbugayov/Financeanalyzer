@@ -106,7 +106,8 @@ fun CompactLayout(
                             filteredTransactions = state.filteredTransactions,
                             totalIncome = state.filteredIncome,
                             totalExpense = state.filteredExpense,
-                            currentFilter = state.currentFilter
+                            currentFilter = state.currentFilter,
+                            balance = state.filteredBalance
                         )
                     }
                 }

@@ -197,7 +197,7 @@ fun EnhancedFinanceChartScreen(
                     // Карточка с общим балансом и периодом
                     EnhancedSummaryCard(
                         income = state.income ?: Money.zero(),
-                        expense = state.expense ?: Money.zero(),
+                        expense = (state.expense ?: Money.zero()).abs(),
                         startDate = state.startDate,
                         endDate = state.endDate,
                         viewModel = viewModel,
@@ -543,7 +543,7 @@ private fun getSavingsRate(state: ChartScreenState): Double {
     if (income.isZero()) return 0.0
 
     // Расчет процента сбережений
-    val expense = state.expense ?: Money.zero()
+    val expense = (state.expense ?: Money.zero()).abs()
     val savings = income.minus(expense)
     return if (!income.isZero()) {
         savings.percentageOf(income)
@@ -557,7 +557,7 @@ private fun getSavingsRate(state: ChartScreenState): Double {
  */
 private fun getAverageDailyExpense(state: ChartScreenState): Money {
     // Получаем количество дней в периоде
-    val expense = state.expense ?: Money.zero()
+    val expense = (state.expense ?: Money.zero()).abs()
     val days = (state.endDate.time - state.startDate.time) / (24 * 60 * 60 * 1000)
     val daysInPeriod = if (days <= 0) 1 else days
 
@@ -571,7 +571,7 @@ private fun getAverageDailyExpense(state: ChartScreenState): Money {
 private fun getMonthsOfSavings(state: ChartScreenState): Double {
     val averageDailyExpense = getAverageDailyExpense(state)
     val income = state.income ?: Money.zero()
-    val expense = state.expense ?: Money.zero()
+    val expense = (state.expense ?: Money.zero()).abs()
 
     // Если нет расходов или средние расходы нулевые, возвращаем бесконечность
     if (averageDailyExpense.isZero()) return Double.POSITIVE_INFINITY
