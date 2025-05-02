@@ -156,6 +156,17 @@ fun EnhancedCategoryPieChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(start = 16.dp, end = 16.dp, top = 16.dp, bottom = 8.dp)
+                .clickable(
+                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    indication = null // Убираем визуальный эффект нажатия
+                ) { 
+                    // Сбрасываем выбор только если что-то выбрано
+                    if (selectedIndices.value.isNotEmpty()) {
+                        selectedIndices.value = emptySet()
+                        onSectorClick(null)
+                        Log.d("[D]", "PieChart: сброс выбора при нажатии на карточку")
+                    }
+                }
         ) {
             // Горизонтальный переключатель доходы/расходы
             Row(
