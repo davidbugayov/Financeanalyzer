@@ -61,14 +61,38 @@ class ChartViewModel : ViewModel(), KoinComponent {
 
     fun handleIntent(intent: ChartIntent) {
         when (intent) {
-            is ChartIntent.LoadTransactions -> loadTransactions()
-            is ChartIntent.ToggleExpenseView -> toggleExpenseView(intent.showExpenses)
-            is ChartIntent.SetDateRange -> setDateRange(intent.startDate, intent.endDate)
-            is ChartIntent.SetPeriodType -> setPeriodType(intent.periodType)
-            is ChartIntent.TogglePeriodDialog -> togglePeriodDialog(intent.show)
-            is ChartIntent.ToggleStartDatePicker -> toggleStartDatePicker(intent.show)
-            is ChartIntent.ToggleEndDatePicker -> toggleEndDatePicker(intent.show)
-            is ChartIntent.ToggleSavingsRateInfo -> toggleSavingsRateInfo(intent.show)
+            is ChartIntent.LoadTransactions -> {
+                Timber.d("ChartViewModel: Получен intent LoadTransactions")
+                loadTransactions()
+            }
+            is ChartIntent.ToggleExpenseView -> {
+                Timber.d("ChartViewModel: Получен intent ToggleExpenseView: ${intent.showExpenses}")
+                toggleExpenseView(intent.showExpenses)
+            }
+            is ChartIntent.SetDateRange -> {
+                Timber.d("ChartViewModel: Получен intent SetDateRange: ${formatDate(intent.startDate)} - ${formatDate(intent.endDate)}")
+                setDateRange(intent.startDate, intent.endDate)
+            }
+            is ChartIntent.SetPeriodType -> {
+                Timber.d("ChartViewModel: Получен intent SetPeriodType: ${intent.periodType}")
+                setPeriodType(intent.periodType)
+            }
+            is ChartIntent.TogglePeriodDialog -> {
+                Timber.d("ChartViewModel: Получен intent TogglePeriodDialog: ${intent.show}")
+                togglePeriodDialog(intent.show)
+            }
+            is ChartIntent.ToggleStartDatePicker -> {
+                Timber.d("ChartViewModel: Получен intent ToggleStartDatePicker: ${intent.show}")
+                toggleStartDatePicker(intent.show)
+            }
+            is ChartIntent.ToggleEndDatePicker -> {
+                Timber.d("ChartViewModel: Получен intent ToggleEndDatePicker: ${intent.show}")
+                toggleEndDatePicker(intent.show)
+            }
+            is ChartIntent.ToggleSavingsRateInfo -> {
+                Timber.d("ChartViewModel: Получен intent ToggleSavingsRateInfo: ${intent.show}")
+                toggleSavingsRateInfo(intent.show)
+            }
         }
     }
     
@@ -76,21 +100,28 @@ class ChartViewModel : ViewModel(), KoinComponent {
     fun loadTransactions() {
         viewModelScope.launch {
             try {
+                Timber.d("ChartViewModel: Начало загрузки транзакций для графиков")
                 _state.update { it.copy(isLoading = true, error = null) }
                 
                 val transactions = getTransactionsUseCase.getAllTransactions()
                 allTransactions = transactions
+                
+                Timber.d("ChartViewModel: Получено всего транзакций: ${transactions.size}")
                 
                 // Фильтруем транзакции по датам
                 val filteredTransactions = allTransactions.filter { transaction ->
                     transaction.date >= _state.value.startDate && transaction.date <= _state.value.endDate
                 }
                 
+                Timber.d("ChartViewModel: После фильтрации по дате (${formatDate(_state.value.startDate)} - ${formatDate(_state.value.endDate)}) осталось: ${filteredTransactions.size} транзакций")
+                
                 // Рассчитываем ежедневные расходы
                 val dailyExpenses = calculateDailyExpenses(filteredTransactions)
                 
                 // Рассчитываем суммы доходов и расходов
                 val (income, expense) = calculateIncomeAndExpense(filteredTransactions)
+                
+                Timber.d("ChartViewModel: Обновление состояния. Доход: ${income.amount}, Расход: ${expense.amount}, Кол-во транзакций: ${filteredTransactions.size}")
                 
                 _state.update {
                     it.copy(
@@ -101,8 +132,9 @@ class ChartViewModel : ViewModel(), KoinComponent {
                         expense = expense
                     )
                 }
+                Timber.d("ChartViewModel: Загрузка транзакций для графиков завершена успешно")
             } catch (e: Exception) {
-                Timber.e(e, "Error loading transactions")
+                Timber.e(e, "ChartViewModel: Ошибка загрузки транзакций для графиков")
                 _state.update { it.copy(isLoading = false, error = e.message) }
             }
         }

@@ -291,6 +291,7 @@ fun MainScreen(startDestination: String = "home") {
                         HomeScreen(
                             viewModel = homeViewModel,
                             editTransactionViewModel = editTransactionViewModel,
+                            chartViewModel = chartViewModel,
                             onNavigateToHistory = { navController.navigate(Screen.History.route) },
                             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
@@ -362,7 +363,11 @@ fun MainScreen(startDestination: String = "home") {
                         }
                     ) {
                         AddTransactionScreen(
-                            onNavigateBack = { navController.popBackStack() },
+                            onNavigateBack = { 
+                                // Обновляем данные для графиков при возврате с экрана добавления транзакции
+                                chartViewModel.loadTransactions()
+                                navController.popBackStack() 
+                            },
                             onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
                         )
                     }
@@ -409,6 +414,8 @@ fun MainScreen(startDestination: String = "home") {
                             viewModel = koinViewModel<EditTransactionViewModel>(),
                             onNavigateBack = { 
                                 homeViewModel.initiateBackgroundDataRefresh()
+                                // Обновляем данные для графиков при возврате с экрана редактирования транзакции
+                                chartViewModel.loadTransactions()
                                 navController.navigateUp()
                             },
                             transactionId = transactionId

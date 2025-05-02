@@ -371,20 +371,36 @@ class AddTransactionViewModel(
             viewModelScope.launch {
                 Timber.d("Launching coroutine to add transaction")
                 try {
+                    _state.update { it.copy(isLoading = true) }
+                    
+                    // Добавляем транзакцию
                     val result = addTransactionUseCase(transaction)
-                    Timber.d("Transaction add result: $result")
-
-                    if (result is DomainResult.Success) {
-                        Timber.d("Transaction added successfully")
-                        _state.update { it.copy(isSuccess = true, error = null) }
-                        
-                        // Обновляем балансы кошельков, если это доход и выбраны кошельки
-                        if (!transaction.isExpense && transaction.walletIds != null && transaction.walletIds.isNotEmpty()) {
-                            updateWalletsBalance(transaction.walletIds, transaction.amount)
+                    
+                    // Обрабатываем результат
+                    when (result) {
+                        is DomainResult.Success -> {
+                            Timber.d("Транзакция успешно добавлена: ${transaction.id}")
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    isSuccess = true,
+                                    successMessage = "Транзакция добавлена успешно"
+                                )
+                            }
+                            
+                            // Добавляем дополнительный лог для отслеживания момента завершения операции
+                            Timber.d("Транзакция сохранена и готова к обновлению графиков: ${transaction.id}")
                         }
-                    } else if (result is DomainResult.Error) {
-                        Timber.e("Error adding transaction: ${result.exception.message}")
-                        _state.update { it.copy(error = result.exception.message) }
+                        
+                        is DomainResult.Error -> {
+                            Timber.e("Ошибка при добавлении транзакции: ${result.exception.message}")
+                            _state.update {
+                                it.copy(
+                                    isLoading = false,
+                                    error = result.exception.message
+                                )
+                            }
+                        }
                     }
                 } catch (e: Exception) {
                     Timber.e(e, "Exception in coroutine while adding transaction")

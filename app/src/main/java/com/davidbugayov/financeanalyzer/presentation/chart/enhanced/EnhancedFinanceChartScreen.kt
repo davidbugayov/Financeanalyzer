@@ -118,13 +118,12 @@ fun EnhancedFinanceChartScreen(
             screenClass = "EnhancedFinanceChartScreen"
         )
         
-        // Загружаем данные, если они еще не загружены
-        if (state.transactions.isEmpty()) {
-            viewModel.handleIntent(ChartIntent.LoadTransactions)
-        } else {
-            Timber.d("Всего загружено транзакций: ${state.transactions.size}")
-            Timber.d("Даты транзакций: ${state.transactions.map { DateUtils.formatDate(it.date) }.distinct().joinToString()}")
-        }
+        // Загружаем данные при каждом открытии экрана
+        Timber.d("EnhancedFinanceChartScreen: Принудительно обновляем данные при открытии экрана")
+        viewModel.handleIntent(ChartIntent.LoadTransactions)
+        
+        Timber.d("EnhancedFinanceChartScreen: Всего загружено транзакций: ${state.transactions.size}")
+        Timber.d("EnhancedFinanceChartScreen: Даты транзакций: ${state.transactions.map { DateUtils.formatDate(it.date) }.distinct().joinToString()}")
     }
     
     // Следим за изменениями периода
