@@ -29,13 +29,24 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.drawBehind
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.PathEffect
+import androidx.compose.ui.graphics.drawscope.DrawScope
+import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.drawText
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.ChartLegendItem
@@ -46,6 +57,8 @@ import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.LineCh
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import java.text.SimpleDateFormat
 import java.util.Locale
+import kotlin.math.roundToInt
+import timber.log.Timber
 
 /**
  * Улучшенный линейный график для отображения динамики доходов/расходов
@@ -57,6 +70,7 @@ import java.util.Locale
  * @param title Заголовок графика
  * @param subtitle Подзаголовок графика
  * @param period Текстовое описание периода
+ * @param formatYValue Функция для форматирования значений на оси Y
  * @param onPointSelected Колбэк при выборе точки на графике
  * @param modifier Модификатор для настройки внешнего вида
  */
@@ -69,6 +83,13 @@ fun EnhancedLineChart(
     title: String = stringResource(id = R.string.chart_title_dynamics),
     subtitle: String = "",
     period: String = "",
+    formatYValue: (Float) -> String = { value ->
+        when {
+            value >= 1000000 -> String.format("%.1fM", value / 1000000)
+            value >= 1000 -> String.format("%.1fK", value / 1000)
+            else -> value.roundToInt().toString()
+        }
+    },
     onPointSelected: (LineChartPoint) -> Unit = {},
     modifier: Modifier = Modifier
 ) {
@@ -89,7 +110,7 @@ fun EnhancedLineChart(
     var selectedExpensePoint by remember { mutableStateOf<LineChartPoint?>(null) }
 
     // Константа для порогового значения выбора точки
-    val selectionThreshold = 20.dp
+    val selectionThreshold = 25.dp
 
     val animatedProgress by animateFloatAsState(
         targetValue = 1f,
@@ -114,9 +135,42 @@ fun EnhancedLineChart(
         return
     }
 
-    // Максимальное и минимальное значение для оси Y
-    val maxValue = allPoints.maxOf { it.value.amount.toDouble() }.toFloat()
-    val minValue = allPoints.minOf { it.value.amount.toDouble() }.toFloat()
+    // Вычисляем максимальные и минимальные значения для каждого типа данных
+    var maxIncomeValue = 0f
+    var maxExpenseValue = 0f
+    
+    if (hasIncomeData) {
+        maxIncomeValue = incomeData.maxOf { it.value.amount.toDouble() }.toFloat()
+    }
+    
+    if (hasExpenseData) {
+        maxExpenseValue = expenseData.maxOf { it.value.amount.toDouble() }.toFloat()
+    }
+    
+    // Берем максимальное из всех значений для оси Y с запасом 10%
+    val maxValue = Math.max(maxIncomeValue, maxExpenseValue) * 1.1f
+    
+    // Устанавливаем минимальное значение близко к нулю для лучшего восприятия
+    val minValue = 0f
+
+    // Логируем значения для отладки масштабирования
+    Timber.d("EnhancedLineChart: диапазон значений по Y: $minValue - $maxValue")
+    Timber.d("EnhancedLineChart: доходы - ${if (hasIncomeData) "${incomeData.size} точек" else "нет данных"}")
+    Timber.d("EnhancedLineChart: расходы - ${if (hasExpenseData) "${expenseData.size} точек" else "нет данных"}")
+    
+    if (hasIncomeData) {
+        val incomeMin = incomeData.minOf { it.value.amount.toDouble() }
+        val incomeMax = incomeData.maxOf { it.value.amount.toDouble() }
+        Timber.d("EnhancedLineChart: диапазон доходов: $incomeMin - $incomeMax")
+        Timber.d("EnhancedLineChart: максимальное значение для доходов: $maxIncomeValue")
+    }
+    
+    if (hasExpenseData) {
+        val expenseMin = expenseData.minOf { it.value.amount.toDouble() }
+        val expenseMax = expenseData.maxOf { it.value.amount.toDouble() }
+        Timber.d("EnhancedLineChart: диапазон расходов: $expenseMin - $expenseMax")
+        Timber.d("EnhancedLineChart: максимальное значение для расходов: $maxExpenseValue")
+    }
 
     // Получаем крайние даты для оси X
     val startDate = allPoints.minOf { it.date.time }
@@ -127,7 +181,16 @@ fun EnhancedLineChart(
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
     val expenseColor = MaterialTheme.colorScheme.error
     val incomeColor = colorResource(id = R.color.income_primary)
-
+    val axisColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+    val axisLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
+    val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
+    
+    // Текстовый измеритель для осей
+    val textMeasurer = rememberTextMeasurer()
+    
+    // Форматтер для дат
+    val dateFormatter = SimpleDateFormat("dd MMM", Locale("ru"))
+    
     // Получаем размеры из ресурсов
     val cardCornerRadius = dimensionResource(id = R.dimen.chart_card_corner_radius)
     val cardElevation = dimensionResource(id = R.dimen.chart_card_elevation)
@@ -146,7 +209,6 @@ fun EnhancedLineChart(
                 selectedIncomePoint = null
                 selectedExpensePoint = null
                 // Вызываем колбэк для сброса выбора
-                // Создаем временную точку с пустыми данными для сброса выбора
                 onPointSelected(LineChartPoint(java.util.Date(), Money.zero(), ""))
             },
         colors = CardDefaults.cardColors(
@@ -196,7 +258,7 @@ fun EnhancedLineChart(
             // Отображение выбранной точки
             val selectedPoint = selectedIncomePoint ?: selectedExpensePoint
             if (selectedPoint != null) {
-                val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
+                val dateFormatterFull = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -204,7 +266,7 @@ fun EnhancedLineChart(
                     horizontalArrangement = Arrangement.SpaceBetween
                 ) {
                     Text(
-                        text = dateFormatter.format(selectedPoint.date),
+                        text = dateFormatterFull.format(selectedPoint.date),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Medium
                     )
@@ -217,14 +279,14 @@ fun EnhancedLineChart(
                 }
             }
 
-            // Область с графиком
+            // Область с графиком и осями
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(chartHeight)
+                    .height(chartHeight + 40.dp) // Увеличиваем высоту для осей и меток
                     .clip(RoundedCornerShape(chartCornerRadius))
-                    .background(surfaceVariantColor.copy(alpha = 0.2f))
-                    .padding(horizontal = spacingMedium, vertical = spacingNormal)
+                    .background(surfaceVariantColor.copy(alpha = 0.1f))
+                    .padding(start = 40.dp, end = 10.dp, top = 20.dp, bottom = 25.dp) // Отступы для осей
             ) {
                 // Отрисовка графика на холсте
                 Canvas(
@@ -236,8 +298,6 @@ fun EnhancedLineChart(
                                 // Обработка нажатия на точки графика
                                 val chartWidth = size.width
                                 val chartHeight = size.height
-                                // Используем уже преобразованное значение
-                                // val thresholdPx = with(LocalDensity.current) { selectionThreshold.toPx() }
 
                                 // Ищем ближайшие точки на обеих линиях
                                 val incomePoint = if (hasIncomeData) findNearestPoint(
@@ -298,6 +358,118 @@ fun EnhancedLineChart(
                                 }
                             }
                         }
+                        .drawBehind {
+                            // Рисуем оси X и Y с большей толщиной линий
+                            drawLine(
+                                color = axisColor,
+                                start = Offset(0f, size.height),
+                                end = Offset(size.width, size.height),
+                                strokeWidth = 2.5f
+                            )
+                            
+                            drawLine(
+                                color = axisColor,
+                                start = Offset(0f, 0f),
+                                end = Offset(0f, size.height),
+                                strokeWidth = 2.5f
+                            )
+                            
+                            // Рисуем горизонтальные линии и метки на оси Y
+                            val ySteps = 5
+                            val valueRange = maxValue - minValue
+                            
+                            for (i in 0..ySteps) {
+                                val y = size.height - (size.height / ySteps.toFloat() * i)
+                                val value = minValue + (valueRange / ySteps.toFloat() * i)
+                                
+                                // Рисуем горизонтальную линию (более заметную)
+                                drawLine(
+                                    color = gridColor,
+                                    start = Offset(0f, y),
+                                    end = Offset(size.width, y),
+                                    strokeWidth = 1.0f,
+                                    pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 4f), 0f)
+                                )
+                                
+                                // Форматируем значение для отображения
+                                val formattedValue = formatYValue(value)
+                                
+                                // Рисуем метку значения (с лучшим контрастом)
+                                val labelStyle = TextStyle(
+                                    fontSize = 10.sp,
+                                    color = axisLabelColor.copy(alpha = 0.8f),
+                                    fontWeight = FontWeight.Medium
+                                )
+                                
+                                // Рисуем текст слева от оси Y
+                                val textLayoutResult = textMeasurer.measure(
+                                    text = formattedValue,
+                                    style = labelStyle
+                                )
+                                
+                                drawText(
+                                    textLayoutResult = textLayoutResult,
+                                    topLeft = Offset(-textLayoutResult.size.width - 5f, y - textLayoutResult.size.height / 2)
+                                )
+                                
+                                // Добавляем маленькие отметки на оси Y
+                                drawLine(
+                                    color = axisColor,
+                                    start = Offset(-4f, y),
+                                    end = Offset(0f, y),
+                                    strokeWidth = 1.5f
+                                )
+                            }
+                            
+                            // Рисуем метки на оси X (даты) с улучшенной презентацией
+                            val xSteps = 4
+                            
+                            for (i in 0..xSteps) {
+                                val ratio = i.toFloat() / xSteps.toFloat()
+                                val x = size.width * ratio
+                                val date = java.util.Date(startDate + ((endDate - startDate) * ratio).toLong())
+                                
+                                // Форматируем дату
+                                val formattedDate = dateFormatter.format(date)
+                                
+                                // Рисуем вертикальную линию (более заметную)
+                                if (i > 0 && i < xSteps) { // Не рисуем для крайних точек
+                                    drawLine(
+                                        color = gridColor,
+                                        start = Offset(x, 0f),
+                                        end = Offset(x, size.height),
+                                        strokeWidth = 1.0f,
+                                        pathEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 4f), 0f)
+                                    )
+                                }
+                                
+                                // Рисуем метку даты внизу с улучшенным стилем
+                                val labelStyle = TextStyle(
+                                    fontSize = 10.sp,
+                                    color = axisLabelColor.copy(alpha = 0.8f),
+                                    textAlign = TextAlign.Center,
+                                    fontWeight = FontWeight.Medium
+                                )
+                                
+                                val textLayoutResult = textMeasurer.measure(
+                                    text = formattedDate,
+                                    style = labelStyle
+                                )
+                                
+                                drawText(
+                                    textLayoutResult = textLayoutResult,
+                                    topLeft = Offset(x - textLayoutResult.size.width / 2, size.height + 5f)
+                                )
+                                
+                                // Добавляем маленькие отметки на оси X
+                                drawLine(
+                                    color = axisColor,
+                                    start = Offset(x, size.height),
+                                    end = Offset(x, size.height + 4f),
+                                    strokeWidth = 1.5f
+                                )
+                            }
+                        }
                 ) {
                     val width = size.width
                     val height = size.height
@@ -306,7 +478,7 @@ fun EnhancedLineChart(
                     drawGridLines(width, height)
 
                     // Отрисовка линии доходов
-                    if (hasIncomeData && incomeData.size > 1) {
+                    if (hasIncomeData) {
                         drawLineChart(
                             points = incomeData,
                             startDate = startDate,
@@ -321,7 +493,7 @@ fun EnhancedLineChart(
                     }
 
                     // Отрисовка линии расходов
-                    if (hasExpenseData && expenseData.size > 1) {
+                    if (hasExpenseData) {
                         drawLineChart(
                             points = expenseData,
                             startDate = startDate,

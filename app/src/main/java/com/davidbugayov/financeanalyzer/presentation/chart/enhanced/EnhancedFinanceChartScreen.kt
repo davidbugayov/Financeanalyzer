@@ -321,23 +321,45 @@ fun EnhancedFinanceChartScreen(
                                     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
                                     val periodText = "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
 
+                                    // Создаем данные для графика заранее для логирования
+                                    val incomeData = createLineChartData(
+                                        transactions = state.transactions,
+                                        isIncome = true,
+                                        startDate = state.startDate,
+                                        endDate = state.endDate
+                                    )
+                                    val expenseData = createLineChartData(
+                                        transactions = state.transactions,
+                                        isIncome = false,
+                                        startDate = state.startDate,
+                                        endDate = state.endDate
+                                    )
+                                    
+                                    // Логируем созданные данные
+                                    Timber.d("Линейный график - данные для доходов: ${incomeData.size} точек")
+                                    if (incomeData.isNotEmpty()) {
+                                        Timber.d("Доходы: от ${DateUtils.formatDate(incomeData.first().date)} до ${DateUtils.formatDate(incomeData.last().date)}")
+                                        Timber.d("Доходы: значения от ${incomeData.minOf { it.value.amount }} до ${incomeData.maxOf { it.value.amount }}")
+                                    }
+                                    
+                                    Timber.d("Линейный график - данные для расходов: ${expenseData.size} точек")
+                                    if (expenseData.isNotEmpty()) {
+                                        Timber.d("Расходы: от ${DateUtils.formatDate(expenseData.first().date)} до ${DateUtils.formatDate(expenseData.last().date)}")
+                                        Timber.d("Расходы: значения от ${expenseData.minOf { it.value.amount }} до ${expenseData.maxOf { it.value.amount }}")
+                                    }
+
+                                    val showIncome = lineChartDisplayMode == LineChartDisplayMode.INCOME || 
+                                                    lineChartDisplayMode == LineChartDisplayMode.BOTH
+                                    val showExpense = lineChartDisplayMode == LineChartDisplayMode.EXPENSE || 
+                                                    lineChartDisplayMode == LineChartDisplayMode.BOTH
+                                    
+                                    Timber.d("Линейный график - настройки отображения: showIncome=$showIncome, showExpense=$showExpense")
+                                                    
                                     EnhancedLineChart(
-                                        incomeData = createLineChartData(
-                                            transactions = state.transactions,
-                                            isIncome = true,
-                                            startDate = state.startDate,
-                                            endDate = state.endDate
-                                        ),
-                                        expenseData = createLineChartData(
-                                            transactions = state.transactions,
-                                            isIncome = false,
-                                            startDate = state.startDate,
-                                            endDate = state.endDate
-                                        ),
-                                        showIncome = lineChartDisplayMode == LineChartDisplayMode.INCOME ||
-                                                lineChartDisplayMode == LineChartDisplayMode.BOTH,
-                                        showExpense = lineChartDisplayMode == LineChartDisplayMode.EXPENSE ||
-                                                lineChartDisplayMode == LineChartDisplayMode.BOTH,
+                                        incomeData = incomeData,
+                                        expenseData = expenseData,
+                                        showIncome = showIncome,
+                                        showExpense = showExpense,
                                         title = "Динамика финансов",
                                         period = periodText,
                                         modifier = Modifier.fillMaxWidth()
@@ -596,16 +618,27 @@ private fun createLineChartData(
     startDate: Date,
     endDate: Date
 ): List<LineChartPoint> {
+    // Логируем начало процесса создания данных
+    Timber.d("createLineChartData: создаем данные для ${if(isIncome) "доходов" else "расходов"}, всего транзакций: ${transactions.size}")
+    
     // Фильтруем транзакции по типу (доход/расход)
     val filteredTransactions = transactions.filter {
         (isIncome && !it.isExpense) || (!isIncome && it.isExpense)
     }
 
+    // Логируем количество отфильтрованных транзакций
+    Timber.d("createLineChartData: после фильтрации типа осталось транзакций: ${filteredTransactions.size}")
+    
     // Если нет транзакций, возвращаем пустой список
     if (filteredTransactions.isEmpty()) {
+        Timber.d("createLineChartData: нет ${if(isIncome) "доходных" else "расходных"} транзакций, возвращаем пустой список")
         return emptyList()
     }
 
+    // Показываем все даты транзакций перед группировкой
+    val allDates = filteredTransactions.map { DateUtils.formatDate(it.date) }.distinct()
+    Timber.d("createLineChartData: даты ${if(isIncome) "доходных" else "расходных"} транзакций: ${allDates.joinToString()}")
+    
     // Группируем транзакции по дате
     val aggregatedData = filteredTransactions
         .groupBy {
@@ -618,12 +651,29 @@ private fun createLineChartData(
             calendar.set(Calendar.MILLISECOND, 0)
             calendar.time
         }
-        .mapValues { (_, transactions) ->
-            // Суммируем все транзакции за один день
+        .mapValues { (date, transactions) ->
+            // Суммируем все транзакции за один день - исправляем логику для доходов
+            Timber.d("Агрегирование на дату ${DateUtils.formatDate(date)}: ${transactions.size} транзакций")
+            
             transactions.fold(Money.zero()) { acc, transaction ->
-                acc + transaction.amount
+                val value = if (isIncome) {
+                    // Для доходов берем значение как есть
+                    transaction.amount
+                } else {
+                    // Для расходов берем абсолютное значение
+                    transaction.amount.abs()
+                }
+                Timber.d("  Транзакция: категория=${transaction.category}, источник=${transaction.source}, сумма=${value.formatted()}")
+                acc + value
             }
         }
+        
+    // Логируем количество дней после группировки
+    Timber.d("createLineChartData: после группировки по дням получено ${aggregatedData.size} точек данных")
+    
+    // Проверяем, что у агрегированных данных корректные значения
+    val aggrSums = aggregatedData.values.sumOf { it.amount.toDouble() }
+    Timber.d("createLineChartData: сумма значений в агрегированных данных: $aggrSums")
 
     // Сортируем точки по дате
     return aggregatedData.entries
