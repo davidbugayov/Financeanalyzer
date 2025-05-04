@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model
 
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 
 /**
@@ -10,7 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 data class PieChartItemData(
     val id: String,
     val name: String,
-    val amount: Float,
+    val money: Money,
     val percentage: Float,
     val color: Color,
     val category: Category? = null,
@@ -33,5 +34,5 @@ data class PieChartItemData(
      * Formatted amount string with 2 decimal places
      */
     val formattedAmount: String
-        get() = String.format("%.2f", amount)
+        get() = String.format("%.2f", money.amount)
 } 

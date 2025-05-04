@@ -724,7 +724,7 @@ private fun CategoryPieChartAdapter(
     // Convert Map<String, Money> to List<PieChartData>
     val pieChartDataList = filteredData.entries.mapIndexed { index, entry ->
         val categoryName = entry.key
-        val amount = entry.value.amount.toFloat()
+        val moneyValue = entry.value // Keep Money object
         // Create a simple Category object with ID based on index
         val category = if (!currentShowExpenses) {
             Category.income(name = categoryName)
@@ -745,7 +745,7 @@ private fun CategoryPieChartAdapter(
         PieChartItemData(
             id = index.toString(),
             name = categoryName,
-            amount = amount,
+            money = moneyValue, // Pass Money object
             percentage = 0f, // Will be calculated later
             color = color,
             category = category,
@@ -758,12 +758,15 @@ private fun CategoryPieChartAdapter(
     
     // Calculate total and percentages
     if (pieChartDataList.isNotEmpty()) {
-        val total = pieChartDataList.sumOf { it.amount.toDouble() }.toFloat()
-        Timber.d("CategoryPieChartAdapter: общая сумма для расчета процентов: $total")
+        val totalMoney = Money(pieChartDataList.sumOf { it.money.amount }) // Sum BigDecimal from Money
+        Timber.d("CategoryPieChartAdapter: общая сумма для расчета процентов: ${totalMoney.formatted()}")
         
         // Create the final list with percentages
         val finalDataList = pieChartDataList.map { item ->
-            val percentage = if (total > 0) (item.amount / total) * 100 else 0f
+            val percentage = if (!totalMoney.isZero()) {
+                 // Calculate percentage using BigDecimal for precision
+                 (item.money.amount.toDouble() / totalMoney.amount.toDouble() * 100.0).toFloat()
+             } else 0f
             item.copy(percentage = percentage) 
         }
         

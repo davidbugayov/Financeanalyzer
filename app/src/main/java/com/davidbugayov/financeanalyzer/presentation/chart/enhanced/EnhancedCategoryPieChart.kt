@@ -122,8 +122,9 @@ fun EnhancedCategoryPieChart(
     }
     
     // Calculate total amount from the filtered data
-    val totalAmount = filteredData.sumOf { it.amount.toDouble() }.toFloat()
-    val totalMoney = Money(BigDecimal.valueOf(totalAmount.toDouble()))
+    val totalMoney = remember(filteredData) {
+        Money(filteredData.sumOf { it.money.amount })
+    }
     
     // State for selected indices - сбрасываем при смене типа (доходы/расходы)
     val selectedIndices = remember(selectedIndex, filteredData, showExpenses) { 
@@ -263,7 +264,7 @@ fun EnhancedCategoryPieChart(
             )
             
             // Сортируем элементы по сумме (от большей к меньшей)
-            val sortedItems = filteredData.sortedByDescending { it.amount }
+            val sortedItems = filteredData.sortedByDescending { it.money.amount }
             
             // Use constants for legend height calculation
             val legendItemHeight = dimensionResource(id = R.dimen.legend_item_height_approx) // New dimen needed
@@ -286,9 +287,6 @@ fun EnhancedCategoryPieChart(
                     // Находим оригинальный индекс элемента в несортированном списке для правильной обработки выбора
                     val originalIndex = filteredData.indexOfFirst { it.id == item.id }
                     val isSelected = selectedIndices.value.contains(originalIndex)
-                    
-                    // Create a Money object from the amount
-                    val money = Money(BigDecimal.valueOf(item.amount.toDouble()))
                     
                     // Строка категории (максимально компактная)
                     Row(
@@ -348,6 +346,7 @@ fun EnhancedCategoryPieChart(
                         )
                         
                         // Сумма
+                        val money = item.money
                         Text(
                             text = money.formatForDisplay(),
                             style = MaterialTheme.typography.bodySmall.copy(
@@ -430,7 +429,7 @@ private fun DrawScope.drawSelectedItemText(
 ) {
     drawIntoCanvas { canvas ->
         // Создаем Money из значения
-        val itemMoney = Money(BigDecimal.valueOf(selectedItem.amount.toDouble()))
+        val itemMoney = selectedItem.money
             
         // Определяем цвет в зависимости от типа операции
         val amountColor = if (isIncome) {
