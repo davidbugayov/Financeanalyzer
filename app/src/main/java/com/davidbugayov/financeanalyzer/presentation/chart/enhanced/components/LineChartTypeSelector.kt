@@ -19,6 +19,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.LineChartDisplayMode
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import androidx.compose.ui.graphics.Color
 
 /**
  * Селектор типа данных для линейного графика (доходы/расходы/оба)
@@ -44,14 +46,14 @@ fun LineChartTypeSelector(
         SelectorButton(
             text = "Расходы",
             isSelected = selectedMode == LineChartDisplayMode.EXPENSE,
-            color = MaterialTheme.colorScheme.error,
+            color = Color(ColorUtils.EXPENSE_COLOR),
             onClick = { onModeSelected(LineChartDisplayMode.EXPENSE) }
         )
 
         SelectorButton(
             text = "Доходы",
             isSelected = selectedMode == LineChartDisplayMode.INCOME,
-            color = MaterialTheme.colorScheme.primary,
+            color = Color(ColorUtils.INCOME_COLOR),
             onClick = { onModeSelected(LineChartDisplayMode.INCOME) }
         )
 

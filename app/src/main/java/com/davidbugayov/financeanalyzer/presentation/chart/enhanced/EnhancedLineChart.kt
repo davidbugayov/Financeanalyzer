@@ -55,6 +55,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawGr
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawLineChart
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.LineChartUtils.findNearestPoint
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 import java.util.Calendar
@@ -198,8 +199,9 @@ fun EnhancedLineChart(
     // Сохраняем цвета поверхности для использования в функциях рисования
     val surfaceColor = MaterialTheme.colorScheme.surface
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-    val expenseColor = MaterialTheme.colorScheme.error
-    val incomeColor = colorResource(id = R.color.income_primary)
+    // Используем константы из ColorUtils
+    val currentIncomeColor = Color(ColorUtils.INCOME_COLOR)
+    val currentExpenseColor = Color(ColorUtils.EXPENSE_COLOR)
     val axisColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
     val axisLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
@@ -294,7 +296,7 @@ fun EnhancedLineChart(
                         text = selectedPoint.value.format(true),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (selectedPoint == selectedIncomePoint) incomeColor else expenseColor
+                        color = if (selectedPoint == selectedIncomePoint) currentIncomeColor else currentExpenseColor
                     )
                 }
             }
@@ -539,8 +541,8 @@ fun EnhancedLineChart(
                             endDate = chartEndDate,
                             minValue = minValue,
                             maxValue = maxValue,
-                            lineColor = incomeColor,
-                            fillColor = incomeColor.copy(alpha = 0.2f),
+                            lineColor = currentIncomeColor,
+                            fillColor = currentIncomeColor.copy(alpha = 0.2f),
                             animatedProgress = animatedProgress,
                             selectedPoint = selectedIncomePoint
                         )
@@ -559,8 +561,8 @@ fun EnhancedLineChart(
                             endDate = chartEndDate,
                             minValue = minValue,
                             maxValue = maxValue,
-                            lineColor = expenseColor,
-                            fillColor = expenseColor.copy(alpha = 0.2f),
+                            lineColor = currentExpenseColor,
+                            fillColor = currentExpenseColor.copy(alpha = 0.2f),
                             animatedProgress = animatedProgress,
                             selectedPoint = selectedExpensePoint
                         )
@@ -580,7 +582,7 @@ fun EnhancedLineChart(
             ) {
                 if (showIncome) {
                     ChartLegendItem(
-                        color = incomeColor,
+                        color = currentIncomeColor,
                         text = stringResource(id = R.string.chart_title_income)
                     )
 
@@ -591,7 +593,7 @@ fun EnhancedLineChart(
 
                 if (showExpense) {
                     ChartLegendItem(
-                        color = expenseColor,
+                        color = currentExpenseColor,
                         text = stringResource(id = R.string.chart_title_expense)
                     )
                 }
