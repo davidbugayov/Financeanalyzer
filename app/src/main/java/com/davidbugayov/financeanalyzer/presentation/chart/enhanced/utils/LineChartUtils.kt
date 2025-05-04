@@ -217,6 +217,9 @@ fun DrawScope.drawLineChart(
         val x = normalizedX * width * animatedProgress
         val y = normalizedY * height
         
+        // Логируем координаты отрисовки точки
+        Timber.d("drawLineChart [Point $index Draw]: Date=${point.date}, Drawing at Coords=($x, $y)")
+        
         // Проверяем, является ли текущая точка выбранной
         val isSelected = selectedPoint?.date?.time == point.date.time
         
@@ -283,6 +286,29 @@ fun DrawScope.drawLineChart(
                 center = Offset(x, y)
             )
         }
+        
+        // Рисуем пунктирные линии от точки к осям
+        val dashEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 4f), 0f)
+        val dashLineColor = lineColor.copy(alpha = 0.4f)
+        val dashStrokeWidth = 1.dp.toPx()
+
+        // Вертикальная линия до оси X
+        drawLine(
+            color = dashLineColor,
+            start = Offset(x, y),
+            end = Offset(x, height),
+            strokeWidth = dashStrokeWidth,
+            pathEffect = dashEffect
+        )
+
+        // Горизонтальная линия до оси Y
+        drawLine(
+            color = dashLineColor,
+            start = Offset(x, y),
+            end = Offset(0f, y),
+            strokeWidth = dashStrokeWidth,
+            pathEffect = dashEffect
+        )
     }
 }
 
@@ -303,6 +329,7 @@ object LineChartUtils {
      * @param chartWidth Ширина графика
      * @param chartHeight Высота графика
      * @param threshold Порог для определения близости (в пикселях)
+     * @param animatedProgress Текущий прогресс анимации (для корректного расчета X)
      * @return Ближайшая точка или null, если нет точек в пределах порога
      */
     fun <T : ChartDataPoint> findNearestPoint(
@@ -314,28 +341,39 @@ object LineChartUtils {
         tapPosition: Offset,
         chartWidth: Float,
         chartHeight: Float,
-        threshold: Float
+        threshold: Float,
+        animatedProgress: Float = 1f
     ): T? {
         if (points.isEmpty()) return null
         
         var closestPoint: T? = null
         var minDistance = Float.MAX_VALUE
+        Timber.d("findNearestPoint: Checking points against threshold: $threshold") // Лог порога
         
-        points.forEach { point ->
+        points.forEachIndexed { index, point -> // Добавляем index для лога
             val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
             val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
             
-            val x = normalizedX * chartWidth
+            val x = normalizedX * chartWidth * animatedProgress
             val y = normalizedY * chartHeight
             
             val distance = hypot(x - tapPosition.x, y - tapPosition.y)
             
+            // Логируем данные для каждой точки
+            Timber.d("findNearestPoint [Point $index]: Date=${point.date}, Value=${point.value.amount}, Coords=($x, $y), TapPos=(${tapPosition.x}, ${tapPosition.y}), Distance=$distance")
+            
             if (distance < threshold && distance < minDistance) {
+                Timber.d("findNearestPoint [Point $index]: Found closer point within threshold. Updating minDistance to $distance") // Лог обновления
                 minDistance = distance
                 closestPoint = point
+            } else if (distance < threshold) {
+                 Timber.d("findNearestPoint [Point $index]: Point within threshold ($distance < $threshold) but not closer than current min ($minDistance)")
+            } else {
+                 Timber.d("findNearestPoint [Point $index]: Point outside threshold ($distance >= $threshold)")
             }
         }
         
+        Timber.d("findNearestPoint: Finished checking. Closest point found: ${closestPoint?.value?.amount ?: "None"}") // Лог результата
         return closestPoint
     }
 } 

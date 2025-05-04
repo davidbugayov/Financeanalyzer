@@ -52,6 +52,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.LineChartTypeSelector
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartScreenState
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -75,6 +76,10 @@ import androidx.compose.ui.graphics.toArgb
 import java.math.BigDecimal
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedSummaryCard
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialHealthMetricsCard
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedCategoryPieChart
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedLineChart
 
 /**
  * Улучшенный экран с финансовыми графиками.
