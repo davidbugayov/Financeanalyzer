@@ -23,16 +23,4 @@ data class PieChartItemData(
      */
     val isIncome: Boolean
         get() = category?.let { !it.isExpense } ?: false
-        
-    /**
-     * Formatted percentage string with % symbol 
-     */
-    val formattedPercentage: String
-        get() = String.format("%.1f%%", percentage)
-    
-    /**
-     * Formatted amount string with 2 decimal places
-     */
-    val formattedAmount: String
-        get() = String.format("%.2f", money.amount)
 } 

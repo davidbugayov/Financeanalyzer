@@ -276,4 +276,13 @@
     <dimen name="padding_extra_small">4dp</dimen>
     <dimen name="padding_tiny">2dp</dimen>
 
+    <!-- New dimensions for EnhancedFinanceChartScreen -->
+    <dimen name="finance_chart_screen_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_tab_row_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_card_bottom_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_card_content_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_vertical_spacing">8dp</dimen>
+    <dimen name="finance_chart_screen_analytics_text_padding">32dp</dimen>
+    <dimen name="finance_chart_screen_piechart_height">250dp</dimen>
+
 </resources>

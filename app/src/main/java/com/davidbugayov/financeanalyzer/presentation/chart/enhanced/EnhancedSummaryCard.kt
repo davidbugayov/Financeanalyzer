@@ -42,8 +42,8 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
-import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartIntent
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel.EnhancedFinanceChartViewModel
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
@@ -75,7 +75,7 @@ fun EnhancedSummaryCard(
     modifier: Modifier = Modifier,
     startDate: Date = Date(),
     endDate: Date = Date(),
-    viewModel: ChartViewModel? = null
+    viewModel: EnhancedFinanceChartViewModel? = null
 ) {
     val balance = income.minus(expense)
     val incomeColor = LocalIncomeColor.current
@@ -86,23 +86,17 @@ fun EnhancedSummaryCard(
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
     
-    // Используем периоды из ChartViewModel
+    // Используем только входящие параметры для периода
     var selectedPeriodType by remember { mutableStateOf(PeriodType.MONTH) }
     var currentStartDate by remember { mutableStateOf(startDate) }
     var currentEndDate by remember { mutableStateOf(endDate) }
     
-    // Обновляем внутреннее состояние при изменении входных данных
-    LaunchedEffect(startDate, endDate) {
-        currentStartDate = startDate
-        currentEndDate = endDate
-    }
-    
-    // Создаем форматированный период на основе текущих дат
+    // Форматируем период
     val formattedPeriod by remember(selectedPeriodType, currentStartDate, currentEndDate) {
         derivedStateOf {
             com.davidbugayov.financeanalyzer.presentation.util.UiUtils.formatPeriod(
-                selectedPeriodType, 
-                currentStartDate, 
+                selectedPeriodType,
+                currentStartDate,
                 currentEndDate
             )
         }
@@ -140,25 +134,17 @@ fun EnhancedSummaryCard(
             onPeriodSelected = { periodType ->
                 selectedPeriodType = periodType
                 if (periodType != PeriodType.CUSTOM) {
-                    // Рассчитываем новые даты на основе выбранного периода, используя общую логику
                     val (newStartDate, newEndDate) = DateUtils.updatePeriodDates(
                         periodType = periodType,
-                        currentStartDate = currentStartDate, 
+                        currentStartDate = currentStartDate,
                         currentEndDate = currentEndDate
                     )
                     currentStartDate = newStartDate
                     currentEndDate = newEndDate
-                    
-                    // Обновляем данные в ChartViewModel
-                    viewModel?.let {
-                        // Используем ViewModel для обновления данных в приложении
-                        Timber.d("Updating period in ChartViewModel: $periodType, $newStartDate - $newEndDate")
-                        it.handleIntent(ChartIntent.SetPeriodType(periodType))
-                        it.handleIntent(ChartIntent.SetDateRange(newStartDate, newEndDate))
-                        it.handleIntent(ChartIntent.LoadTransactions)
-                    }
-                    
-                    // Закрываем диалог
+                    // Обновляем данные через EnhancedFinanceChartViewModel
+                    viewModel?.handleIntent(
+                        EnhancedFinanceChartIntent.ChangePeriod(periodType, newStartDate, newEndDate)
+                    )
                     showPeriodDialog = false
                 }
             },
@@ -169,16 +155,10 @@ fun EnhancedSummaryCard(
                 showEndDatePicker = true
             },
             onConfirm = {
-                // Подтверждаем выбор произвольного периода
                 showPeriodDialog = false
-                
-                // Обновляем данные в ChartViewModel для произвольного периода
-                viewModel?.let {
-                    Timber.d("Updating custom period in ChartViewModel: $currentStartDate - $currentEndDate")
-                    it.handleIntent(ChartIntent.SetPeriodType(PeriodType.CUSTOM))
-                    it.handleIntent(ChartIntent.SetDateRange(currentStartDate, currentEndDate))
-                    it.handleIntent(ChartIntent.LoadTransactions)
-                }
+                viewModel?.handleIntent(
+                    EnhancedFinanceChartIntent.ChangePeriod(PeriodType.CUSTOM, currentStartDate, currentEndDate)
+                )
             },
             onDismiss = {
                 showPeriodDialog = false

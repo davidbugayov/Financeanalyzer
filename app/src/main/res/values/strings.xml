@@ -676,4 +676,12 @@
     <string name="financial_health_recommended_values_title">Рекомендуемые значения показателей:</string>
     <string name="financial_health_recommended_values_content" formatted="false">• Норма сбережений: выше 15% - хорошо, выше 30% - отлично\n• Финансовая подушка: 3-6 месяцев для наемных работников, 6-12 месяцев для предпринимателей\n• Соотношение долга к доходу: не более 30-40% ежемесячного дохода</string>
     <string name="financial_health_ok_button">Понятно</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="tab_categories">Категории</string>
+    <string name="tab_dynamics">Динамика</string>
+    <string name="tab_analysis">Анализ</string>
+    <string name="detailed_financial_statistics">Подробная финансовая статистика</string>
+    <string name="explore_your_financial_metrics">Изучите ваши финансовые показатели</string>
+    <string name="analytics_coming_soon">Скоро здесь появится подробная аналитика и финансовые инсайты</string>
 </resources>

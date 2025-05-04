@@ -451,7 +451,6 @@ fun MainScreen(startDestination: String = "home") {
                     ) {
                         // Используем улучшенный экран графиков
                         EnhancedFinanceChartScreen(
-                            viewModel = chartViewModel,
                             onNavigateBack = { navController.popBackStack() },
                             onNavigateToStatistics = { _, _, _, _ ->
                                 // Переход на экран финансовой статистики
