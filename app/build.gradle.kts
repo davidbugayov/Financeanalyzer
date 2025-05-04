@@ -277,4 +277,7 @@ dependencies {
 
     // Add kotlinx-datetime
     implementation(libs.kotlinx.datetime)
+
+    // Add kotlinx-serialization for kotlinx-datetime
+    implementation(libs.kotlinx.serialization.core)
 }

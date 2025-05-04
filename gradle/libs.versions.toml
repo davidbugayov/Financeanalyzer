@@ -6,6 +6,7 @@ googleServices = "4.4.2"
 firebaseCrashlytics = "2.9.9"
 coroutines = "1.7.3"
 kotlinx-datetime = "0.4.1"
+kotlinx-serialization = "1.6.3"
 
 # AndroidX
 androidxCore = "1.12.0"
@@ -54,6 +55,7 @@ kotlin-stdlib = { group = "org.jetbrains.kotlin", name = "kotlin-stdlib", versio
 kotlin-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 kotlin-coroutines-android = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-android", version.ref = "coroutines" }
 kotlinx-datetime = { group = "org.jetbrains.kotlinx", name = "kotlinx-datetime", version.ref = "kotlinx-datetime" }
+kotlinx-serialization-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-core", version.ref = "kotlinx-serialization" }
 
 # AndroidX
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "androidxCore" }

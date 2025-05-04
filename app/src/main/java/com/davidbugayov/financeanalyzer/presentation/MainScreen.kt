@@ -453,7 +453,7 @@ fun MainScreen(startDestination: String = "home") {
                         EnhancedFinanceChartScreen(
                             viewModel = chartViewModel,
                             onNavigateBack = { navController.popBackStack() },
-                            onNavigateToStatistics = { transactions, income, expense, period ->
+                            onNavigateToStatistics = { _, _, _, _ ->
                                 // Переход на экран финансовой статистики
                                 navController.navigate(Screen.FinancialStatistics.route)
                             }
