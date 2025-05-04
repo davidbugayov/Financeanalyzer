@@ -17,12 +17,14 @@ sealed class EnhancedFinanceChartIntent {
     data class ChangeChartTab(val tabIndex: Int) : EnhancedFinanceChartIntent()
     data class ChangeLineChartMode(val mode: LineChartDisplayMode) : EnhancedFinanceChartIntent()
     data class ToggleExpenseView(val showExpenses: Boolean) : EnhancedFinanceChartIntent()
+    object AddTransactionClicked : EnhancedFinanceChartIntent()
     // Добавляй другие интенты по мере необходимости
 }
 
 sealed class EnhancedFinanceChartEffect {
     data class ShowError(val message: String) : EnhancedFinanceChartEffect()
     object ScrollToSummary : EnhancedFinanceChartEffect()
+    object NavigateToAddTransaction : EnhancedFinanceChartEffect()
     // Добавляй другие эффекты по необходимости
 }
 

@@ -67,6 +67,11 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
             is EnhancedFinanceChartIntent.ToggleExpenseView -> {
                 _state.update { it.copy(showExpenses = intent.showExpenses) }
             }
+            is EnhancedFinanceChartIntent.AddTransactionClicked -> {
+                viewModelScope.launch {
+                    _effect.emit(EnhancedFinanceChartEffect.NavigateToAddTransaction)
+                }
+            }
         }
     }
 

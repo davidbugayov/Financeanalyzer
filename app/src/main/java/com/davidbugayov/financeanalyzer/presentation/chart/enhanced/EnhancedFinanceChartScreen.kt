@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
@@ -19,6 +20,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.filled.AddCircleOutline
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -29,6 +32,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
+import androidx.compose.material3.Button
+import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -39,6 +44,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -68,6 +74,8 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.material3.SnackbarHostState
 import kotlinx.coroutines.flow.collectLatest
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.foundation.layout.width
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -119,6 +127,9 @@ fun EnhancedFinanceChartScreen(
                         scrollState.animateScrollTo(0)
                     }
                 }
+                is EnhancedFinanceChartEffect.NavigateToAddTransaction -> {
+                    onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
+                }
                 else -> {}
             }
         }
@@ -156,18 +167,52 @@ fun EnhancedFinanceChartScreen(
                     error = state.error ?: stringResource(R.string.unknown_error),
                     onRetry = { viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData) }
                 )
-            } else if (state.transactions.isEmpty()) {
-                EmptyContent(
-                    message = stringResource(R.string.enhanced_chart_no_data),
-                    onActionClick = { viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData) }
-                )
             } else {
-                // Основной контент с графиками
+                // Основной контент с графиками и фильтрами всегда отображается
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
                         .verticalScroll(scrollState)
                 ) {
+                    // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
+                    if (state.transactions.isEmpty()) {
+                        Surface(
+                            shape = MaterialTheme.shapes.large,
+                            color = MaterialTheme.colorScheme.surfaceVariant,
+                            tonalElevation = 2.dp,
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(horizontal = dimensionResource(R.dimen.finance_chart_screen_padding), vertical = 16.dp)
+                                .clickable { viewModel.handleIntent(EnhancedFinanceChartIntent.AddTransactionClicked) }
+                        ) {
+                            Row(
+                                verticalAlignment = Alignment.CenterVertically,
+                                modifier = Modifier.padding(16.dp)
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Filled.Add,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.size(28.dp)
+                                )
+                                Spacer(modifier = Modifier.width(12.dp))
+                                Column {
+                                    Text(
+                                        text = stringResource(R.string.add_first_transaction),
+                                        style = MaterialTheme.typography.bodyLarge,
+                                        color = MaterialTheme.colorScheme.primary
+                                    )
+                                    Text(
+                                        text = stringResource(R.string.analytics_magic_hint),
+                                        style = MaterialTheme.typography.bodySmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                        modifier = Modifier.alpha(0.8f)
+                                    )
+                                }
+                            }
+                        }
+                    }
+                    // Далее — все фильтры, табы, графики и т.д. (основной UI)
                     // Карточка с общим балансом и периодом
                     EnhancedSummaryCard(
                         income = state.income ?: Money.zero(),

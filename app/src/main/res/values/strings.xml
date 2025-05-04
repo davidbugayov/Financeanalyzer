@@ -684,4 +684,6 @@
     <string name="detailed_financial_statistics">Подробная финансовая статистика</string>
     <string name="explore_your_financial_metrics">Изучите ваши финансовые показатели</string>
     <string name="analytics_coming_soon">Скоро здесь появится подробная аналитика и финансовые инсайты</string>
+    <string name="add_first_transaction">Добавьте первую транзакцию</string>
+    <string name="analytics_magic_hint">И начнётся магия аналитики ✨</string>
 </resources>
