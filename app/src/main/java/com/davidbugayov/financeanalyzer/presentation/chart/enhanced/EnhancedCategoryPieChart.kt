@@ -7,6 +7,7 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -17,6 +18,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
@@ -25,10 +28,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -38,26 +43,44 @@ import androidx.compose.ui.graphics.drawscope.drawIntoCanvas
 import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.colorResource
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
 import androidx.compose.foundation.layout.Arrangement
-import java.math.BigDecimal
-import kotlin.math.atan2
-import kotlin.math.min
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.R
 import timber.log.Timber
 import android.graphics.Paint
 import android.graphics.Typeface
-import androidx.compose.ui.platform.LocalContext
+import java.math.BigDecimal
+import kotlin.math.PI
+import kotlin.math.atan2
+import kotlin.math.cos
+import kotlin.math.min
+import kotlin.math.sin
+import kotlin.math.roundToInt
+import kotlin.math.sqrt
+import androidx.compose.ui.platform.LocalDensity
+
+// --- Constants --- 
+private const val ANIMATION_DURATION_MS = 800
+private const val START_ANGLE_OFFSET = -90f // Start drawing from the top
+private const val MAX_CATEGORIES_VISIBLE = 10 // Limit visible categories in legend
+private const val LEGEND_ITEM_HEIGHT_DP = 28 // Approximate height for legend item
+private const val MIN_LEGEND_HEIGHT_DP = 50 // Minimum height for the scrollable legend area
+private const val MAX_LEGEND_HEIGHT_DP = LEGEND_ITEM_HEIGHT_DP * MAX_CATEGORIES_VISIBLE
+private const val CENTER_TEXT_SCALE_FACTOR = 0.18f // Factor to scale center text size relative to chart size
+private const val CENTER_SUBTEXT_SCALE_FACTOR = 0.09f
+private const val TOUCH_OFFSET_THRESHOLD_DP = 10f // Threshold to detect tap near center to deselect
+private const val SELECTED_SCALE_FACTOR = 1.08f
+private const val STROKE_WIDTH_DP = 6f // Stroke width for the gap between slices
 
 /**
  * Улучшенная круговая диаграмма категорий, которая показывает распределение категорий 
@@ -125,7 +148,7 @@ fun EnhancedCategoryPieChart(
     val isIncome = filteredData.firstOrNull()?.category?.isExpense == false
     
     // Используем белый цвет фона для карточки
-    val cardColor = colorResource(id = R.color.white)
+    val cardColor = MaterialTheme.colorScheme.surface // Use theme surface color instead of hardcoded white
     
     // Увеличиваем карточку для отображения всех категорий
     Card(
@@ -142,10 +165,7 @@ fun EnhancedCategoryPieChart(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    start = dimensionResource(id = R.dimen.enhanced_pie_chart_padding),
-                    end = dimensionResource(id = R.dimen.enhanced_pie_chart_padding),
-                    top = dimensionResource(id = R.dimen.enhanced_pie_chart_padding),
-                    bottom = dimensionResource(id = R.dimen.enhanced_pie_chart_padding_small)
+                    all = dimensionResource(id = R.dimen.padding_medium) // Use standard padding
                 )
                 .clickable(
                     interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
@@ -162,25 +182,25 @@ fun EnhancedCategoryPieChart(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = dimensionResource(id = R.dimen.enhanced_pie_chart_padding)),
+                    .padding(bottom = dimensionResource(id = R.dimen.padding_medium)), // Use standard padding
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.expense),
+                    text = stringResource(R.string.chart_type_selector_expense),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal
                     ),
-                    color = if (showExpenses) colorResource(id = R.color.expense) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (showExpenses) Color(ColorUtils.EXPENSE_COLOR) else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.clickable { onShowExpensesChange(true) }
                 )
                 
                 Text(
-                    text = stringResource(R.string.income),
+                    text = stringResource(R.string.chart_type_selector_income),
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal
                     ),
-                    color = if (!showExpenses) colorResource(id = R.color.income) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (!showExpenses) Color(ColorUtils.INCOME_COLOR) else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.clickable { onShowExpensesChange(false) }
                 )
             }
@@ -189,11 +209,11 @@ fun EnhancedCategoryPieChart(
             Box(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(dimensionResource(id = R.dimen.enhanced_pie_chart_size)),
+                    .height(dimensionResource(id = R.dimen.enhanced_pie_chart_size)), // Keep specific size
                 contentAlignment = Alignment.Center
             ) {
                 DrawPieChart(
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.enhanced_pie_chart_size)),
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.enhanced_pie_chart_size)), // Keep specific size
                     data = filteredData,
                     selectedIndices = selectedIndices.value,
                     onSectorClick = { index ->
@@ -229,7 +249,7 @@ fun EnhancedCategoryPieChart(
             }
             
             // Разделитель между диаграммой и списком категорий
-            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.enhanced_pie_chart_padding)))
+            Spacer(modifier = Modifier.height(dimensionResource(id = R.dimen.padding_medium))) // Use standard padding
             
             // Заголовок для списка категорий
             Text(
@@ -237,23 +257,28 @@ fun EnhancedCategoryPieChart(
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(
-                    start = dimensionResource(id = R.dimen.enhanced_pie_chart_padding_small),
-                    bottom = dimensionResource(id = R.dimen.enhanced_pie_chart_padding_small)
+                    start = dimensionResource(id = R.dimen.padding_small),
+                    bottom = dimensionResource(id = R.dimen.padding_small) // Use standard padding
                 )
             )
             
             // Сортируем элементы по сумме (от большей к меньшей)
             val sortedItems = filteredData.sortedByDescending { it.amount }
             
-            // Рассчитываем высоту для списка категорий (25dp на элемент, минимум 20dp)
-            val categoryHeight = 20 + sortedItems.size * 25
+            // Use constants for legend height calculation
+            val legendItemHeight = dimensionResource(id = R.dimen.legend_item_height_approx) // New dimen needed
+            val minLegendHeight = dimensionResource(id = R.dimen.min_legend_height) // New dimen needed
+            val maxLegendHeight = dimensionResource(id = R.dimen.max_legend_height) // New dimen needed
+
+            val calculatedHeight = minLegendHeight + (sortedItems.size * legendItemHeight.value).dp // Multiply Int by Dp's value, convert back to Dp
+            val legendHeight = calculatedHeight.coerceIn(minLegendHeight, maxLegendHeight)
             
             // Показываем все категории с высотой, подходящей для количества элементов
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.enhanced_pie_chart_padding_tiny))
-                    .height(categoryHeight.dp) // Динамическая высота без верхнего ограничения
+                    .padding(horizontal = dimensionResource(id = R.dimen.padding_extra_small)) // Use standard padding
+                    .height(legendHeight) // Calculated height with constraints
                     .verticalScroll(rememberScrollState()) // Оставляем скроллинг на всякий случай
             ) {
                 // Выводим содержимое категорий для отладки
@@ -293,15 +318,15 @@ fun EnhancedCategoryPieChart(
                                 else Color.Transparent
                             )
                             .padding(
-                                vertical = dimensionResource(id = R.dimen.enhanced_pie_chart_category_spacing),
-                                horizontal = dimensionResource(id = R.dimen.enhanced_pie_chart_padding_tiny)
+                                vertical = dimensionResource(id = R.dimen.padding_extra_small),
+                                horizontal = dimensionResource(id = R.dimen.padding_tiny)
                             ),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         // Цветной индикатор категории
                         Box(
                             modifier = Modifier
-                                .size(dimensionResource(id = R.dimen.enhanced_pie_chart_category_icon_size))
+                                .size(dimensionResource(id = R.dimen.legend_indicator_size)) // Use standard padding
                                 .background(
                                     color = item.color,
                                     shape = if (isSelected) RoundedCornerShape(dimensionResource(id = R.dimen.radius_small)) else CircleShape
@@ -316,7 +341,7 @@ fun EnhancedCategoryPieChart(
                             ),
                             color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
-                                .padding(start = dimensionResource(id = R.dimen.enhanced_pie_chart_padding_small))
+                                .padding(start = dimensionResource(id = R.dimen.padding_small))
                                 .weight(1f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -329,7 +354,7 @@ fun EnhancedCategoryPieChart(
                                 fontWeight = FontWeight.SemiBold
                             ),
                             color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.enhanced_pie_chart_padding_tiny))
+                            modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.padding_tiny))
                         )
                         
                         // Процент с цветом категории для выделенного элемента
@@ -347,7 +372,7 @@ fun EnhancedCategoryPieChart(
                         Spacer(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(dimensionResource(id = R.dimen.enhanced_pie_chart_divider_height))
+                                .height(dimensionResource(id = R.dimen.divider_height))
                                 .background(MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f))
                         )
                     }
@@ -611,8 +636,8 @@ private fun DrawPieChart(
     backgroundColor: Color
 ) {
     // Получаем строковые ресурсы внутри @Composable
-    val incomeText = stringResource(id = R.string.enhanced_chart_income_single)
-    val expenseText = stringResource(id = R.string.enhanced_chart_expense_single)
+    val incomeText = stringResource(id = R.string.chart_type_selector_income)
+    val expenseText = stringResource(id = R.string.chart_type_selector_expense)
     val context = LocalContext.current
     
     val animatedProgress = remember { Animatable(0f) }
@@ -667,7 +692,7 @@ private fun DrawPieChart(
         Canvas(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(dimensionResource(id = R.dimen.enhanced_pie_chart_padding_tiny))
+                .padding(dimensionResource(id = R.dimen.padding_tiny))
                 .pointerInput(pointerInputKey) {
                     detectTapGestures { offset ->
                         val size = this.size

@@ -14,13 +14,21 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import androidx.compose.ui.graphics.Color
+
+// --- Constants for Dimensions ---
+private val SelectorVerticalPadding = 8.dp
+private val SelectorButtonHorizontalPadding = 8.dp
+private val SelectorButtonCornerRadius = 16.dp
+private val SelectorButtonTextHorizontalPadding = 16.dp
+private val SelectorButtonTextVerticalPadding = 8.dp
 
 /**
  * Селектор типа данных для линейного графика (доходы/расходы/оба)
@@ -38,27 +46,27 @@ fun LineChartTypeSelector(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .padding(vertical = 8.dp),
+            .padding(vertical = SelectorVerticalPadding),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically
     ) {
         // Кнопка для отображения расходов
         SelectorButton(
-            text = "Расходы",
+            text = stringResource(id = R.string.chart_type_selector_expense),
             isSelected = selectedMode == LineChartDisplayMode.EXPENSE,
             color = Color(ColorUtils.EXPENSE_COLOR),
             onClick = { onModeSelected(LineChartDisplayMode.EXPENSE) }
         )
 
         SelectorButton(
-            text = "Доходы",
+            text = stringResource(id = R.string.chart_type_selector_income),
             isSelected = selectedMode == LineChartDisplayMode.INCOME,
             color = Color(ColorUtils.INCOME_COLOR),
             onClick = { onModeSelected(LineChartDisplayMode.INCOME) }
         )
 
         SelectorButton(
-            text = "Оба",
+            text = stringResource(id = R.string.chart_type_selector_both),
             isSelected = selectedMode == LineChartDisplayMode.BOTH,
             color = MaterialTheme.colorScheme.tertiary,
             onClick = { onModeSelected(LineChartDisplayMode.BOTH) }
@@ -73,19 +81,23 @@ fun LineChartTypeSelector(
 private fun SelectorButton(
     text: String,
     isSelected: Boolean,
-    color: androidx.compose.ui.graphics.Color,
+    color: Color,
     onClick: () -> Unit
 ) {
     Box(
         modifier = Modifier
-            .padding(horizontal = 8.dp)
-            .clip(RoundedCornerShape(16.dp))
+            .padding(horizontal = SelectorButtonHorizontalPadding)
+            .clip(RoundedCornerShape(SelectorButtonCornerRadius))
             .background(
-                if (isSelected) color.copy(alpha = 0.15f)
-                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                color = if (isSelected) color.copy(alpha = 0.15f)
+                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                shape = RoundedCornerShape(SelectorButtonCornerRadius)
             )
             .clickable(onClick = onClick)
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(
+                horizontal = SelectorButtonTextHorizontalPadding,
+                vertical = SelectorButtonTextVerticalPadding
+            ),
         contentAlignment = Alignment.Center
     ) {
         Text(

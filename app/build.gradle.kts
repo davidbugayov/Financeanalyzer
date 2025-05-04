@@ -26,8 +26,8 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 23
-        versionName = "2.8"
+        versionCode = 24
+        versionName = "2.9"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -276,5 +276,5 @@ dependencies {
     testImplementation(libs.junit)
 
     // Add kotlinx-datetime
-    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+    implementation(libs.kotlinx.datetime)
 }
