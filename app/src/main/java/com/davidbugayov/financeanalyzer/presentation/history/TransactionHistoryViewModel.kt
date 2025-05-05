@@ -10,6 +10,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
@@ -38,7 +39,8 @@ class TransactionHistoryViewModel @Inject constructor(
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val repository: TransactionRepository,
     private val analyticsUtils: AnalyticsUtils,
-    val categoriesViewModel: CategoriesViewModel
+    val categoriesViewModel: CategoriesViewModel,
+    private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
@@ -193,31 +195,22 @@ class TransactionHistoryViewModel @Inject constructor(
                         Timber.d("Загрузка транзакций с периодом: ${currentState.periodType}")
                         when (currentState.periodType) {
                             PeriodType.ALL -> {
-                                // Для периода ALL всегда загружаем все транзакции
                                 Timber.d("Загружаем ВСЕ транзакции напрямую из репозитория")
                                 repository.getAllTransactions()
                             }
-                            PeriodType.CUSTOM -> {
-                                // Для пользовательского периода используем фильтрацию по диапазону дат
-                                Timber.d("Загружаем транзакции по ПОЛЬЗОВАТЕЛЬСКОМУ периоду: ${currentState.startDate} - ${currentState.endDate}")
-                                repository.getTransactionsByDateRangePaginated(
-                                    currentState.startDate,
-                                    currentState.endDate,
-                                    pageSize,
-                                    0
-                                )
+                            PeriodType.CUSTOM, PeriodType.DAY, PeriodType.QUARTER, PeriodType.YEAR -> {
+                                Timber.d("Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}")
+                                getTransactionsForPeriodUseCase(currentState.startDate, currentState.endDate)
                             }
                             PeriodType.MONTH -> {
-                                // Используем оптимизированный метод для загрузки по месяцам
                                 val calendar = Calendar.getInstance()
                                 calendar.time = currentState.endDate
                                 val year = calendar.get(Calendar.YEAR)
-                                val month = calendar.get(Calendar.MONTH) + 1 // +1 т.к. Calendar.MONTH начинается с 0
+                                val month = calendar.get(Calendar.MONTH) + 1
                                 Timber.d("Загружаем транзакции за МЕСЯЦ: $year-$month")
                                 repository.getTransactionsByMonth(year, month)
                             }
                             PeriodType.WEEK -> {
-                                // Используем оптимизированный метод для загрузки по неделям
                                 val calendar = Calendar.getInstance()
                                 calendar.time = currentState.endDate
                                 val year = calendar.get(Calendar.YEAR)
@@ -226,7 +219,6 @@ class TransactionHistoryViewModel @Inject constructor(
                                 repository.getTransactionsByWeek(year, week)
                             }
                             else -> {
-                                // Для остальных периодов (DAY, QUARTER, YEAR) используем стандартный метод
                                 Timber.d("Загружаем транзакции за период ${currentState.periodType}: ${currentState.startDate} - ${currentState.endDate}")
                                 repository.getTransactionsByDateRangePaginated(
                                     currentState.startDate,

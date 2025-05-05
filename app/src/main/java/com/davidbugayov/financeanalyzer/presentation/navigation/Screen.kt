@@ -26,7 +26,9 @@ sealed class Screen(val route: String) {
     data object Chart : Screen("chart")
 
     /** Экран с подробной финансовой статистикой */
-    data object FinancialStatistics : Screen("financial_statistics")
+    data object FinancialStatistics : Screen("financial_statistics/{startDate}/{endDate}") {
+        fun createRoute(startDate: Long, endDate: Long) = "financial_statistics/$startDate/$endDate"
+    }
     
     /** Экран профиля пользователя */
     data object Profile : Screen("profile")

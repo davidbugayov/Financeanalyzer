@@ -21,8 +21,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
@@ -30,10 +30,12 @@ import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialStatisticsViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
+import org.koin.core.parameter.parametersOf
 
 /**
  * Основной модуль Koin для внедрения зависимостей.
@@ -80,10 +82,10 @@ val appModule = module {
     single { ImportTransactionsManager(get(), androidContext(), get(), get()) }
     single { ValidateTransactionUseCase() }
     single { GetTransactionByIdUseCase(get()) }
+    single { CalculateBalanceMetricsUseCase() }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
-    viewModel { ChartViewModel() }
     viewModel {
         AddTransactionViewModel(
             validateTransactionUseCase = get(),
@@ -106,7 +108,9 @@ val appModule = module {
         HomeViewModel(
             addTransactionUseCase = get(),
             deleteTransactionUseCase = get(),
-            repository = get()
+            repository = get(),
+            getTransactionsForPeriodUseCase = get(),
+            calculateBalanceMetricsUseCase = get()
         )
     }
 
@@ -124,3 +128,15 @@ val appModule = module {
     // Утилиты
     single { NotificationScheduler() }
 }
+
+val statisticsModule = module {
+    single { androidContext().resources }
+    viewModel { (startDate: Long, endDate: Long) ->
+        FinancialStatisticsViewModel(get(), get(), startDate, endDate, get())
+    }
+}
+
+val appModules = listOf(
+    appModule,
+    statisticsModule
+)

@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.chart.ChartDataPoint
 import java.util.Date
 
 /**
@@ -12,7 +11,7 @@ import java.util.Date
  * @param description Опциональное описание точки
  */
 data class LineChartPoint(
-    override val date: Date,
-    override val value: Money,
+    val date: Date,
+    val value: Money,
     val description: String = ""
-) : ChartDataPoint 
+) 

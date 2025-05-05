@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -18,21 +17,16 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Analytics
-import androidx.compose.material.icons.filled.DateRange
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.icons.filled.AddCircleOutline
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.Button
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,9 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,7 +49,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.LineChartTypeSelector
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
-import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -74,24 +65,30 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.material3.SnackbarHostState
 import kotlinx.coroutines.flow.collectLatest
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.foundation.layout.width
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedCategoryPieChart
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedLineChart
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedSummaryCard
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.FinancialHealthMetricsCard
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartDisplayMode
+import androidx.navigation.NavController
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 
 /**
  * Улучшенный экран с финансовыми графиками.
  * Поддерживает свайп между разными типами визуализации и обновленный дизайн.
  *
+ * @param navController NavController для навигации
  * @param viewModel ViewModel для управления состоянием экрана
  * @param onNavigateBack Колбэк для навигации назад
  * @param onNavigateToTransactions Опциональный колбэк для навигации к списку транзакций с фильтрами
- * @param onNavigateToStatistics Опциональный колбэк для навигации к экрану финансовой статистики
  */
 @OptIn(ExperimentalMaterial3Api::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 fun EnhancedFinanceChartScreen(
+    navController: NavController,
     onNavigateBack: () -> Unit,
-    onNavigateToTransactions: ((String, Date, Date) -> Unit)? = null,
-    onNavigateToStatistics: ((List<Transaction>, Money, Money, String) -> Unit)? = null
+    onNavigateToTransactions: ((String, Date, Date) -> Unit)? = null
 ) {
     // Используем новую ViewModel
     val viewModel: EnhancedFinanceChartViewModel = viewModel()
@@ -365,12 +362,12 @@ fun EnhancedFinanceChartScreen(
                                             .fillMaxWidth()
                                             .padding(bottom = dimensionResource(R.dimen.finance_chart_screen_card_bottom_padding))
                                             .clickable {
-                                                // Переход на экран подробной статистики
-                                                onNavigateToStatistics?.invoke(
-                                                    state.transactions,
-                                                    state.income ?: Money.zero(),
-                                                    state.expense ?: Money.zero(),
-                                                    state.periodText
+                                                // Переход на экран подробной статистики через navController
+                                                navController.navigate(
+                                                    Screen.FinancialStatistics.createRoute(
+                                                        state.startDate.time,
+                                                        state.endDate.time
+                                                    )
                                                 )
                                             },
                                         shape = RoundedCornerShape(16.dp),

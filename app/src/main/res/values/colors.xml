@@ -146,4 +146,10 @@
     <color name="trend_neutral">#FFA726</color>
     
     <color name="qualification_badge_background_alpha">#26FFFFFF</color>
+
+    <!-- Financial Statistics Screen custom progress colors -->
+    <color name="financial_statistics_progress_excellent">#00C853</color>
+    <color name="financial_statistics_progress_good">#66BB6A</color>
+    <color name="financial_statistics_progress_ok">#FFA726</color>
+    <color name="financial_statistics_progress_attention">#EF5350</color>
 </resources>

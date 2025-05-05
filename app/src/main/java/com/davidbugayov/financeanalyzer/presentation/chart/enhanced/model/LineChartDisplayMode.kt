@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
+package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model
 
 import androidx.annotation.StringRes
 import com.davidbugayov.financeanalyzer.R

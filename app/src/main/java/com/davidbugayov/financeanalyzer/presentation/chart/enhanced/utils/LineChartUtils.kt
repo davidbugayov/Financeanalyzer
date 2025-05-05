@@ -24,7 +24,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
-import com.davidbugayov.financeanalyzer.presentation.chart.ChartDataPoint
 import kotlin.math.hypot
 import kotlin.math.roundToInt
 import java.math.BigDecimal
@@ -332,7 +331,7 @@ object LineChartUtils {
      * @param animatedProgress Текущий прогресс анимации (для корректного расчета X)
      * @return Ближайшая точка или null, если нет точек в пределах порога
      */
-    fun <T : ChartDataPoint> findNearestPoint(
+    fun <T : LineChartPoint> findNearestPoint(
         points: List<T>,
         startDate: Long,
         endDate: Long,
@@ -360,8 +359,7 @@ object LineChartUtils {
             val distance = hypot(x - tapPosition.x, y - tapPosition.y)
             
             // Логируем данные для каждой точки
-            Timber.d("findNearestPoint [Point $index]: Date=${point.date}, Value=${point.value.amount}, Coords=($x, $y), TapPos=(${tapPosition.x}, ${tapPosition.y}), Distance=$distance")
-            
+
             if (distance < threshold && distance < minDistance) {
                 Timber.d("findNearestPoint [Point $index]: Found closer point within threshold. Updating minDistance to $distance") // Лог обновления
                 minDistance = distance
@@ -373,7 +371,6 @@ object LineChartUtils {
             }
         }
         
-        Timber.d("findNearestPoint: Finished checking. Closest point found: ${closestPoint?.value?.amount ?: "None"}") // Лог результата
         return closestPoint
     }
 } 

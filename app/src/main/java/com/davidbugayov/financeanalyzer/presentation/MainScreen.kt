@@ -38,10 +38,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedFinanceChartScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialStatisticsScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.state.ChartScreenState
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.FinancialStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
@@ -80,7 +78,6 @@ fun MainScreen(startDestination: String = "home") {
     val navController = rememberNavController()
     val layoutDirection = LocalLayoutDirection.current
     val homeViewModel: HomeViewModel = koinViewModel()
-    val chartViewModel: ChartViewModel = koinViewModel()
     val editTransactionViewModel: EditTransactionViewModel = koinViewModel()
     val profileViewModel: ProfileViewModel = koinViewModel()
     val onboardingViewModel: OnboardingViewModel = koinViewModel()
@@ -196,7 +193,6 @@ fun MainScreen(startDestination: String = "home") {
             // Загружаем данные для графиков с большей задержкой, чтобы не мешать основному экрану
             delay(2000) 
             Timber.d("MainScreen: Запускаем загрузку данных для графиков")
-            chartViewModel.loadTransactions()
         }
     }
 
@@ -214,17 +210,6 @@ fun MainScreen(startDestination: String = "home") {
             controller.isAppearanceLightStatusBars = !isDarkTheme
             controller.isAppearanceLightNavigationBars = !isDarkTheme
         }
-    }
-
-    /**
-     * Получение форматированного текста периода
-     */
-    fun getPeriodText(state: ChartScreenState): String {
-        return com.davidbugayov.financeanalyzer.presentation.util.UiUtils.formatPeriodCompact(
-            state.periodType,
-            state.startDate,
-            state.endDate
-        )
     }
 
     // Применяем тему к всему приложению
@@ -291,7 +276,6 @@ fun MainScreen(startDestination: String = "home") {
                         HomeScreen(
                             viewModel = homeViewModel,
                             editTransactionViewModel = editTransactionViewModel,
-                            chartViewModel = chartViewModel,
                             onNavigateToHistory = { navController.navigate(Screen.History.route) },
                             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
                             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
@@ -364,8 +348,6 @@ fun MainScreen(startDestination: String = "home") {
                     ) {
                         AddTransactionScreen(
                             onNavigateBack = { 
-                                // Обновляем данные для графиков при возврате с экрана добавления транзакции
-                                chartViewModel.loadTransactions()
                                 navController.popBackStack() 
                             },
                             onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
@@ -414,8 +396,6 @@ fun MainScreen(startDestination: String = "home") {
                             viewModel = koinViewModel<EditTransactionViewModel>(),
                             onNavigateBack = { 
                                 homeViewModel.initiateBackgroundDataRefresh()
-                                // Обновляем данные для графиков при возврате с экрана редактирования транзакции
-                                chartViewModel.loadTransactions()
                                 navController.navigateUp()
                             },
                             transactionId = transactionId
@@ -449,21 +429,19 @@ fun MainScreen(startDestination: String = "home") {
                             ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
                         }
                     ) {
-                        // Используем улучшенный экран графиков
                         EnhancedFinanceChartScreen(
-                            onNavigateBack = { navController.popBackStack() },
-                            onNavigateToTransactions = { _, _, _ ->
-                                navController.navigate(Screen.AddTransaction.route)
-                            },
-                            onNavigateToStatistics = { _, _, _, _ ->
-                                navController.navigate(Screen.FinancialStatistics.route)
-                            }
+                            navController = navController,
+                            onNavigateBack = { navController.popBackStack() }
                         )
                     }
 
                     // Экран финансовой статистики
                     composable(
                         route = Screen.FinancialStatistics.route,
+                        arguments = listOf(
+                            navArgument("startDate") { type = NavType.LongType },
+                            navArgument("endDate") { type = NavType.LongType }
+                        ),
                         enterTransition = {
                             slideIntoContainer(
                                 towards = AnimatedContentTransitionScope.SlideDirection.Left,
@@ -488,12 +466,12 @@ fun MainScreen(startDestination: String = "home") {
                                 animationSpec = tween(400, easing = EaseInOut)
                             ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
                         }
-                    ) {
+                    ) { backStackEntry ->
+                        val startDate = backStackEntry.arguments?.getLong("startDate") ?: 0L
+                        val endDate = backStackEntry.arguments?.getLong("endDate") ?: 0L
                         FinancialStatisticsScreen(
-                            transactions = chartViewModel.state.value.transactions,
-                            income = chartViewModel.state.value.income ?: Money.zero(),
-                            expense = chartViewModel.state.value.expense ?: Money.zero(),
-                            period = getPeriodText(chartViewModel.state.value),
+                            startDate = startDate,
+                            endDate = endDate,
                             onNavigateBack = { navController.popBackStack() }
                         )
                     }

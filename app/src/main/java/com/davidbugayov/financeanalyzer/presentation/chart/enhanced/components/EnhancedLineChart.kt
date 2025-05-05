@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
+package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -46,8 +46,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.ChartLegendItem
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawGridLines
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawLineChart
@@ -59,6 +57,8 @@ import java.util.Locale
 import java.util.Calendar
 import kotlin.math.roundToInt
 import timber.log.Timber
+import java.util.Date
+import kotlin.math.hypot
 
 // --- Constants for Dimensions ---
 private val DefaultSelectionThreshold: Dp = 30.dp
@@ -430,7 +430,7 @@ fun EnhancedLineChart(
                                 for (i in 0..X_AXIS_STEPS) {
                                     val ratio = i.toFloat() / X_AXIS_STEPS.toFloat()
                                     val x = width * ratio
-                                    val date = java.util.Date(chartStartDate + (timeRange * ratio).toLong())
+                                    val date = Date(chartStartDate + (timeRange * ratio).toLong())
                                     val formattedDate = shortDateFormatter.format(date)
 
                                     // Рисуем вертикальную линию сетки (не для крайних точек)
@@ -557,5 +557,5 @@ private fun calculateDistance(
 
     val x = normalizedX * chartWidth * animatedProgress
     val y = normalizedY * chartHeight
-    return kotlin.math.hypot(x - tapPosition.x, y - tapPosition.y)
+    return hypot(x - tapPosition.x, y - tapPosition.y)
 } 

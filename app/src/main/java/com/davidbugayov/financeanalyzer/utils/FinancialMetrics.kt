@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.utils
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import timber.log.Timber
  */
 class FinancialMetrics private constructor() : KoinComponent {
     private val repository: ITransactionRepository by inject()
+    private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
     private val _totalIncome = MutableStateFlow(Money.zero())
@@ -58,30 +60,18 @@ class FinancialMetrics private constructor() : KoinComponent {
                     Timber.d("[DIAG] FM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") 
                 }
                 
-                // Для доходов собираем только положительные транзакции (isExpense = false)
-                val income = visibleTransactions
-                    .filter { !it.isExpense }
-                    .fold(Money.zero()) { acc, t -> acc + t.amount }
-                
-                // Для расходов берем абсолютные значения транзакций с isExpense = true
-                // Их значения уже хранятся с отрицательным знаком
-                val expenseNegative = visibleTransactions
-                    .filter { it.isExpense }
-                    .fold(Money.zero()) { acc, t -> acc + t.amount }
-                
-                // Для отображения берем абсолютное значение расходов (без знака)
-                val expenseAbsolute = expenseNegative.abs()
-                
-                // Баланс - просто сумма всех транзакций (включая отрицательные значения расходов)
-                val balance = visibleTransactions.fold(Money.zero()) { acc, t -> acc + t.amount }
+                val metrics = calculateBalanceMetricsUseCase(visibleTransactions)
+                val income = metrics.income
+                val expense = metrics.expense
+                val balance = income - expense
                 
                 // Обновляем значения в состоянии
                 _totalIncome.value = income
-                _totalExpense.value = expenseAbsolute // Для отображения храним положительное значение
+                _totalExpense.value = expense
                 _balance.value = balance
                 
                 // Логгируем результаты для диагностики
-                Timber.d("Метрики обновлены: доход=${income.formatted()}, расход=${expenseAbsolute.formatted()}, баланс=${balance.formatted()}")
+                Timber.d("Метрики обновлены: доход=${income.formatted()}, расход=${expense.formatted()}, баланс=${balance.formatted()}")
                 
                 // Дополнительная диагностика
                 val expenseIds = visibleTransactions.filter { it.isExpense }.map { it.id }

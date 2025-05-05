@@ -6,11 +6,11 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartState
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
-import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.MutableSharedFlow
@@ -23,7 +23,6 @@ import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.Date
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.PieChartUtils
@@ -31,6 +30,8 @@ import androidx.compose.ui.graphics.Color
 
 class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private val getTransactionsUseCase: GetTransactionsUseCase by inject()
+    private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
+    private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
     private val _state = MutableStateFlow(EnhancedFinanceChartState())
     val state: StateFlow<EnhancedFinanceChartState> = _state.asStateFlow()
 
@@ -81,20 +82,17 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 Timber.d("EnhancedFinanceChartViewModel: Начало загрузки транзакций для графиков")
                 _state.update { it.copy(isLoading = true, error = null) }
 
-                val transactions = getTransactionsUseCase.getAllTransactions()
-                allTransactions = transactions
-
-                Timber.d("EnhancedFinanceChartViewModel: Получено всего транзакций: "+transactions.size)
-
-                // Фильтруем транзакции по датам
-                val filteredTransactions = allTransactions.filter { transaction ->
-                    val date = transaction.date
-                    date >= _state.value.startDate && date <= _state.value.endDate
-                }
+                val filteredTransactions = getTransactionsForPeriodUseCase(_state.value.startDate, _state.value.endDate)
+                allTransactions = filteredTransactions
 
                 Timber.d("EnhancedFinanceChartViewModel: После фильтрации по дате осталось: "+filteredTransactions.size+" транзакций")
 
-                val (income, expense) = calculateIncomeAndExpense(filteredTransactions)
+                val metrics = calculateBalanceMetricsUseCase(filteredTransactions, _state.value.startDate, _state.value.endDate)
+                val income = metrics.income
+                val expense = metrics.expense
+                val savingsRate = metrics.savingsRate
+                val averageDailyExpense = metrics.averageDailyExpense
+                val monthsOfSavings = metrics.monthsOfSavings
 
                 // Агрегируем по категориям
                 val expensesByCategory = filteredTransactions
@@ -124,11 +122,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                     endDate = _state.value.endDate
                 )
                 // --- конец нового ---
-
-                // --- Новое: расчёт savingsRate, averageDailyExpense, monthsOfSavings ---
-                val savingsRate = calculateSavingsRate(income, expense)
-                val averageDailyExpense = calculateAverageDailyExpense(expense, _state.value.startDate, _state.value.endDate)
-                val monthsOfSavings = calculateMonthsOfSavings(income, expense, averageDailyExpense)
 
                 // --- Новое: подготовка данных для PieChart ---
                 val showExpenses = _state.value.showExpenses
@@ -168,19 +161,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
         }
     }
 
-    private fun calculateIncomeAndExpense(transactions: List<Transaction>): Pair<Money, Money> {
-        val income = transactions
-            .filter { transaction -> transaction.amount.amount.toFloat() > 0 }
-            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-
-        val expense = transactions
-            .filter { transaction -> transaction.amount.amount.toFloat() < 0 }
-            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount.abs() }
-
-        return income to expense
-    }
-
-    // --- Новое: функция для подготовки данных для линейного графика ---
     private fun createLineChartData(
         transactions: List<Transaction>,
         isIncome: Boolean,
@@ -229,32 +209,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                     it.endDate
                 )
             )
-        }
-    }
-
-    private fun calculateSavingsRate(income: Money, expense: Money): Double {
-        if (income.isZero()) return 0.0
-        val savings = income.minus(expense.abs())
-        return if (!income.isZero()) {
-            savings.percentageOf(income)
-        } else {
-            0.0
-        }
-    }
-
-    private fun calculateAverageDailyExpense(expense: Money, startDate: java.util.Date, endDate: java.util.Date): Money {
-        val days = (endDate.time - startDate.time) / (24 * 60 * 60 * 1000)
-        val daysInPeriod = if (days <= 0) 1 else days
-        return expense.abs().div(daysInPeriod.toBigDecimal())
-    }
-
-    private fun calculateMonthsOfSavings(income: Money, expense: Money, averageDailyExpense: Money): Double {
-        if (averageDailyExpense.isZero()) return Double.POSITIVE_INFINITY
-        val monthlyExpense = averageDailyExpense.times(30.toBigDecimal())
-        return if (!monthlyExpense.isZero()) {
-            (income.minus(expense.abs()).amount.toDouble() / monthlyExpense.amount.toDouble())
-        } else {
-            Double.POSITIVE_INFINITY
         }
     }
 

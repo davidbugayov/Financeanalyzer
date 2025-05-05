@@ -6,7 +6,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Date
 import java.util.Calendar
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.LineChartDisplayMode
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
 

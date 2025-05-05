@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
+package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

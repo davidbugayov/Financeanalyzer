@@ -634,10 +634,10 @@
     <string name="savings_rate_title">Норма сбережений</string>
     <string name="savings_rate_explanation" formatted="false">Показывает процент дохода, который вы откладываете. Рекомендуемый показатель – от 15% до 30%. Чем выше, тем быстрее растут ваши накопления.</string>
     <string name="savings_rate_percent">%d%%</string>
-    <string name="savings_rate_percent_0">0%%</string>
-    <string name="savings_rate_percent_15">15%%</string>
-    <string name="savings_rate_percent_30">30%%</string>
-    <string name="savings_rate_percent_50">50%%+</string>
+    <string name="savings_rate_percent_0">0%</string>
+    <string name="savings_rate_percent_15">15%</string>
+    <string name="savings_rate_percent_30">30%</string>
+    <string name="savings_rate_percent_50">50%+</string>
     
     <string name="financial_cushion_title">Финансовая подушка</string>
     <string name="financial_cushion_explanation">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум - 3-6 месяцев.</string>
@@ -686,4 +686,60 @@
     <string name="analytics_coming_soon">Скоро здесь появится подробная аналитика и финансовые инсайты</string>
     <string name="add_first_transaction">Добавьте первую транзакцию</string>
     <string name="analytics_magic_hint">И начнётся магия аналитики ✨</string>
+
+    <!-- Financial Statistics Screen -->
+    <string name="financial_statistics_title">Финансовая статистика</string>
+    <string name="financial_statistics_period">Статистика за период</string>
+    <string name="key_metrics">Ключевые показатели</string>
+    <string name="savings_rate_fn">Норма сбережений: %1$d%%</string>
+    <string name="savings_status_excellent">Отлично</string>
+    <string name="savings_status_good">Хорошо</string>
+    <string name="savings_status_ok">Удовлетворительно</string>
+    <string name="savings_status_attention">Требует внимания</string>
+    <string name="transaction_statistics">Статистика транзакций</string>
+    <string name="income_transactions">Транзакций доходов</string>
+    <string name="expense_transactions">Транзакций расходов</string>
+    <string name="avg_income_per_transaction">Средний доход за транзакцию</string>
+    <string name="avg_expense_per_transaction">Средний расход за транзакцию</string>
+    <string name="max_income">Максимальный доход</string>
+    <string name="max_expense">Максимальный расход</string>
+    <string name="expense_analysis">Анализ расходов</string>
+    <string name="avg_daily_expense">Средний расход в день</string>
+    <string name="avg_monthly_expense">Средний расход в месяц</string>
+    <string name="main_expense_categories">Основные категории расходов</string>
+    <string name="recommendations">Рекомендации</string>
+    <string name="no_recommendations">Нет рекомендаций</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="recommendation_save_10_15">Старайтесь сохранять не менее 10-15% дохода. Рассмотрите возможность сокращения необязательных расходов.</string>
+    <string name="recommendation_increase_savings">Вы уже откладываете часть дохода — попробуйте увеличить норму сбережений до 20%.</string>
+    <string name="recommendation_savings_excellent">Отличная норма сбережений! Продолжайте в том же духе.</string>
+    <string name="recommendation_top_expense_category">Основная категория расходов: %1$s. Проанализируйте возможности для оптимизации.</string>
+    <string name="recommendation_months_of_savings_low">Ваших сбережений хватит менее чем на 3 месяца. Рекомендуется создать резерв на 3-6 месяцев расходов.</string>
+    <string name="recommendation_months_of_savings_medium">У вас есть базовая финансовая подушка. Старайтесь увеличить её до 6 месяцев расходов.</string>
+    <string name="recommendation_months_of_savings_high">Вы хорошо защищены от финансовых неожиданностей! Ваш запас превышает рекомендуемый минимум.</string>
+    <string name="recommendation_increase_income">Рассмотрите возможности для увеличения дохода: дополнительная подработка, фриланс, инвестиции или повышение квалификации.</string>
+    <string name="recommendation_track_expenses">Отслеживайте свои расходы регулярно и планируйте бюджет на месяц вперед.</string>
+    <string name="recommendation_auto_savings">Используйте автоматические переводы на сберегательный счет для дисциплины накоплений.</string>
+    <string name="recommendation_compare_prices">Сравнивайте цены и ищите скидки перед крупными покупками.</string>
+    <string name="recommendation_avoid_impulse">Старайтесь избегать импульсивных трат — давайте себе 24 часа на обдумывание.</string>
+    <string name="no_category">Без категории</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="savings_rate_label">Норма сбережений</string>
+    <string name="months_of_savings_label">Месяцев финансовой подушки</string>
+    <string name="main_income_category">Основная категория доходов: %1$s</string>
+    <string name="main_expense_category">Основная категория расходов: %1$s</string>
+    <string name="most_frequent_expense_day">Самый частый день расходов: %1$s</string>
+    <string name="savings_norm">Норма сбережений</string>
+    <string name="savings_status_done">Выполнено</string>
 </resources>

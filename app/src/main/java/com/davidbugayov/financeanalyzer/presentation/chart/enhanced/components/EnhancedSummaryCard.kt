@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
+package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components
 
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -47,11 +47,11 @@ import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.Enhanc
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.delay
-import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
@@ -94,7 +94,7 @@ fun EnhancedSummaryCard(
     // Форматируем период
     val formattedPeriod by remember(selectedPeriodType, currentStartDate, currentEndDate) {
         derivedStateOf {
-            com.davidbugayov.financeanalyzer.presentation.util.UiUtils.formatPeriod(
+            UiUtils.formatPeriod(
                 selectedPeriodType,
                 currentStartDate,
                 currentEndDate

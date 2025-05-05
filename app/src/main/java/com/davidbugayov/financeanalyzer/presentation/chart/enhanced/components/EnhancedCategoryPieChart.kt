@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
+package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -28,12 +28,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
@@ -44,12 +42,10 @@ import androidx.compose.ui.graphics.nativeCanvas
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
@@ -59,15 +55,11 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import timber.log.Timber
 import android.graphics.Paint
 import android.graphics.Typeface
-import java.math.BigDecimal
-import kotlin.math.PI
 import kotlin.math.atan2
-import kotlin.math.cos
 import kotlin.math.min
-import kotlin.math.sin
-import kotlin.math.roundToInt
-import kotlin.math.sqrt
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.text.style.TextAlign
+import kotlin.math.abs
+import kotlin.math.max
 
 // --- Constants --- 
 private const val ANIMATION_DURATION_MS = 800
@@ -169,7 +161,7 @@ fun EnhancedCategoryPieChart(
                     all = dimensionResource(id = R.dimen.padding_medium) // Use standard padding
                 )
                 .clickable(
-                    interactionSource = remember { androidx.compose.foundation.interaction.MutableInteractionSource() },
+                    interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убираем визуальный эффект нажатия
                 ) { 
                     // Сбрасываем выбор только если что-то выбрано
@@ -362,7 +354,7 @@ fun EnhancedCategoryPieChart(
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isSelected) item.color else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.width(45.dp),
-                            textAlign = androidx.compose.ui.text.style.TextAlign.End
+                            textAlign = TextAlign.End
                         )
                     }
                     
@@ -602,16 +594,16 @@ private fun getClickedSectorIndex(
             }
             
             // Увеличиваем область до максимум 30°, но не менее размера сектора
-            val effectiveAngle = kotlin.math.min(
+            val effectiveAngle = min(
                 sweep * DonutTextConstants.SMALL_SECTOR_DETECTION_MULTIPLIER, 
                 DonutTextConstants.SMALL_SECTOR_MAX_DETECTION_ANGLE
             )
             val halfEffective = effectiveAngle / 2f
             
             // Проверка расстояния от центра сектора до места клика
-            val distanceToMid = kotlin.math.min(
-                kotlin.math.abs((angle - midAngle + 360f) % 360f),
-                kotlin.math.abs((midAngle - angle + 360f) % 360f)
+            val distanceToMid = min(
+                abs((angle - midAngle + 360f) % 360f),
+                abs((midAngle - angle + 360f) % 360f)
             )
             
             if (distanceToMid <= halfEffective) {
@@ -672,7 +664,7 @@ private fun DrawPieChart(
             val sweepAngle = normalizedPercentage * 3.6f // 360 / 100 = 3.6
             
             // Гарантируем минимальный угол для маленьких секторов при отрисовке - не менее 1°
-            val effectiveSweepAngle = kotlin.math.max(sweepAngle, 1f)
+            val effectiveSweepAngle = max(sweepAngle, 1f)
             
             angles.add(Triple(currentAngle, effectiveSweepAngle, normalizedPercentage))
             currentAngle += effectiveSweepAngle

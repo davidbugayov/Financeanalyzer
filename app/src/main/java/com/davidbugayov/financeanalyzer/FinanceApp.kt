@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.di.chartModule
 import com.davidbugayov.financeanalyzer.di.historyModule
 import com.davidbugayov.financeanalyzer.di.importModule
 import com.davidbugayov.financeanalyzer.di.onboardingModule
+import com.davidbugayov.financeanalyzer.di.statisticsModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TimberInitializer
@@ -72,7 +73,8 @@ class FinanceApp : Application() {
                     budgetModule,
                     onboardingModule,
                     importModule,
-                    chartModule
+                    chartModule,
+                    statisticsModule
                 )
             }
             

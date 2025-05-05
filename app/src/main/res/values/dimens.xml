@@ -285,4 +285,13 @@
     <dimen name="finance_chart_screen_analytics_text_padding">32dp</dimen>
     <dimen name="finance_chart_screen_piechart_height">250dp</dimen>
 
+    <!-- Financial Statistics Screen dimens -->
+    <dimen name="financial_statistics_card_padding">16dp</dimen>
+    <dimen name="financial_statistics_card_corner_radius">16dp</dimen>
+    <dimen name="financial_statistics_card_elevation">4dp</dimen>
+    <dimen name="financial_statistics_spacer_large">16dp</dimen>
+    <dimen name="financial_statistics_spacer_medium">8dp</dimen>
+    <dimen name="financial_statistics_spacer_small">4dp</dimen>
+    <dimen name="financial_statistics_metric_row_vertical">4dp</dimen>
+
 </resources>

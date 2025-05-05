@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
@@ -16,6 +17,7 @@ val historyModule = module {
     factory { FilterTransactionsUseCase() }
     factory { GroupTransactionsUseCase() }
     factory { CalculateCategoryStatsUseCase(get()) }
+    factory { GetTransactionsForPeriodUseCase(get()) }
 
     // ViewModel для экрана истории транзакций
     viewModel {
@@ -26,7 +28,8 @@ val historyModule = module {
             deleteTransactionUseCase = get(),
             repository = get(),
             analyticsUtils = get(),
-            categoriesViewModel = get()
+            categoriesViewModel = get(),
+            getTransactionsForPeriodUseCase = get()
         )
     }
 } 

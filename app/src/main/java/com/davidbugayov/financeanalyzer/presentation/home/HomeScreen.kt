@@ -33,7 +33,6 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.chart.ChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
@@ -60,7 +59,6 @@ import timber.log.Timber
 fun HomeScreen(
     viewModel: HomeViewModel,
     editTransactionViewModel: EditTransactionViewModel,
-    chartViewModel: ChartViewModel,
     onNavigateToHistory: () -> Unit,
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit,
@@ -209,7 +207,6 @@ fun HomeScreen(
             AnimatedBottomNavigationBar(
                 visible = true,
                 onChartClick = {
-                    chartViewModel.loadTransactions()
                     onNavigateToChart()
                     // feedbackMessage = "Переход к графикам"
                     // feedbackType = FeedbackType.INFO

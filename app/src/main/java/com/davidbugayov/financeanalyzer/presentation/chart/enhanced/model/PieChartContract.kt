@@ -3,8 +3,6 @@ package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model
 import androidx.compose.ui.graphics.Color
 import com.davidbugayov.financeanalyzer.domain.model.Category
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import kotlinx.datetime.LocalDate
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.PieChartData
 
 /**
  * Контракт для взаимодействия между View и ViewModel круговой диаграммы
