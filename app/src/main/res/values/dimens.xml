@@ -294,4 +294,12 @@
     <dimen name="financial_statistics_spacer_small">4dp</dimen>
     <dimen name="financial_statistics_metric_row_vertical">4dp</dimen>
 
+    <!-- New dimensions for BudgetTip -->
+    <dimen name="budget_tip_vertical_margin">4dp</dimen>
+    <dimen name="budget_tip_corner_radius">8dp</dimen>
+    <dimen name="budget_tip_elevation">1dp</dimen>
+    <dimen name="budget_tip_content_padding">10dp</dimen>
+    <dimen name="budget_tip_icon_end_padding">8dp</dimen>
+    <dimen name="budget_tip_spacer">1dp</dimen>
+
 </resources>

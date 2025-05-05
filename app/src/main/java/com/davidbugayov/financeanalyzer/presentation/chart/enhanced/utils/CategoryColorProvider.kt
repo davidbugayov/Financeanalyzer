@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
+package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils
 
 import androidx.compose.ui.graphics.Color
 

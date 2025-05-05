@@ -45,7 +45,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.LineChartTypeSelector
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
@@ -73,6 +72,11 @@ import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.F
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartDisplayMode
 import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.BudgetTip
+import androidx.compose.material.icons.filled.AccountBalanceWallet
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.filled.Check
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -354,7 +358,9 @@ fun EnhancedFinanceChartScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(vertical = dimensionResource(R.dimen.finance_chart_screen_padding))
+                                        .padding(top = 24.dp, bottom = 4.dp)
+                                        ,
+                                    horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     // Карточка "Полная статистика"
                                     Card(
@@ -405,12 +411,40 @@ fun EnhancedFinanceChartScreen(
                                     // Оставляем остальной контент этой вкладки
                                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.finance_chart_screen_vertical_spacing)))
 
-                                    Text(
-                                        text = stringResource(R.string.analytics_coming_soon),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.finance_chart_screen_analytics_text_padding)),
-                                        textAlign = androidx.compose.ui.text.style.TextAlign.Center
-                                    )
+                                    // Блок рекомендаций по бюджету
+                                    Column(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp),
+                                        horizontalAlignment = Alignment.CenterHorizontally
+                                    ) {
+                                        Text(
+                                            text = stringResource(R.string.budget_tips_title),
+                                            style = MaterialTheme.typography.titleMedium,
+                                            color = MaterialTheme.colorScheme.primary,
+                                            modifier = Modifier.padding(bottom = 8.dp)
+                                        )
+                                        BudgetTip(
+                                            icon = Icons.Filled.AccountBalanceWallet,
+                                            title = stringResource(R.string.budget_tip_save_10_title),
+                                            description = stringResource(R.string.budget_tip_save_10_desc)
+                                        )
+                                        BudgetTip(
+                                            icon = Icons.Filled.BarChart,
+                                            title = stringResource(R.string.budget_tip_control_categories_title),
+                                            description = stringResource(R.string.budget_tip_control_categories_desc)
+                                        )
+                                        BudgetTip(
+                                            icon = Icons.Filled.TrendingUp,
+                                            title = stringResource(R.string.budget_tip_set_goals_title),
+                                            description = stringResource(R.string.budget_tip_set_goals_desc)
+                                        )
+                                        BudgetTip(
+                                            icon = Icons.Filled.Check,
+                                            title = stringResource(R.string.budget_tip_check_weekly_title),
+                                            description = stringResource(R.string.budget_tip_check_weekly_desc)
+                                        )
+                                    }
                                 }
                             }
                         }

@@ -742,4 +742,15 @@
     <string name="most_frequent_expense_day">Самый частый день расходов: %1$s</string>
     <string name="savings_norm">Норма сбережений</string>
     <string name="savings_status_done">Выполнено</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="budget_tips_title">Рекомендации по бюджету</string>
+    <string name="budget_tip_save_10_title">Откладывайте минимум 10% дохода</string>
+    <string name="budget_tip_save_10_desc">Регулярно переводите часть дохода на сбережения — это создаст финансовую подушку безопасности.</string>
+    <string name="budget_tip_control_categories_title">Контролируйте расходы по категориям</string>
+    <string name="budget_tip_control_categories_desc">Анализируйте, на что уходит больше всего денег, и ищите возможности для оптимизации.</string>
+    <string name="budget_tip_set_goals_title">Ставьте финансовые цели</string>
+    <string name="budget_tip_set_goals_desc">Планируйте крупные траты заранее и разбивайте их на небольшие накопления каждый месяц.</string>
+    <string name="budget_tip_check_weekly_title">Проверяйте бюджет раз в неделю</string>
+    <string name="budget_tip_check_weekly_desc">Регулярный анализ поможет вовремя скорректировать траты и не выйти за рамки бюджета.</string>
 </resources>

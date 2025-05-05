@@ -4,9 +4,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.GetCategoriesWithAmountUs
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.CategoryColorProvider
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.CategoryColorProviderImpl
-import org.koin.androidx.viewmodel.dsl.viewModel
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.CategoryColorProvider
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.CategoryColorProviderImpl
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
