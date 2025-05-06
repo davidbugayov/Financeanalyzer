@@ -7,26 +7,23 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider
+import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Date
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: CategoriesViewModel,
     protected val sourcePreferences: SourcePreferences,
-    protected val walletRepository: WalletRepository,
-    private val validateTransactionUseCase: ValidateTransactionUseCase
+    protected val walletRepository: WalletRepository
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
 
     protected abstract val _state: MutableStateFlow<S>
@@ -46,30 +43,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * Реализуется в наследниках.
      */
     abstract override fun submitTransaction(context: android.content.Context)
-
-    open fun updateWidget(context: android.content.Context) {
-        val widgetManager = android.appwidget.AppWidgetManager.getInstance(context)
-        val widgetComponent = android.content.ComponentName(context, "com.davidbugayov.financeanalyzer.widget.BalanceWidget")
-        val widgetIds = widgetManager.getAppWidgetIds(widgetComponent)
-
-        if (widgetIds.isNotEmpty()) {
-            val intent = android.content.Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.BalanceWidget"))
-            intent.action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, widgetIds)
-            context.sendBroadcast(intent)
-        }
-
-        // Обновляем малый виджет баланса
-        val smallWidgetComponent = android.content.ComponentName(context, "com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget")
-        val smallWidgetIds = widgetManager.getAppWidgetIds(smallWidgetComponent)
-
-        if (smallWidgetIds.isNotEmpty()) {
-            val intent = android.content.Intent(context, Class.forName("com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget"))
-            intent.action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
-            intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, smallWidgetIds)
-            context.sendBroadcast(intent)
-        }
-    }
 
     /**
      * Обновляет балансы кошельков после редактирования доходной транзакции
@@ -600,18 +573,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         }
     }
 
-    // --- Общая валидация ---
-    protected fun validateInput(
-        amount: String,
-        category: String,
-        source: String,
-        updateState: (ValidateTransactionUseCase.Result) -> Unit
-    ): Boolean {
-        val result = validateTransactionUseCase(amount, category, source)
-        updateState(result)
-        return result.isValid
-    }
-
     // --- Общая инициализация данных (кошельки, категории, источники) ---
     open fun loadInitialData() {
         // Реализация загрузки категорий и источников
@@ -813,15 +774,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     // Utility methods
     
     /**
-     * Очищает сообщение об ошибке
-     */
-    protected fun clearError() {
-        _state.update { state ->
-            copyState(state, error = null)
-        }
-    }
-    
-    /**
      * Загружает список источников средств
      */
     protected fun loadSources() {
@@ -838,42 +790,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     // --- Универсальные методы для настройки и сброса состояния ---
-    open fun setTargetWalletId(walletId: String) {
-        _state.update { state ->
-            copyState(
-                state,
-                targetWalletId = walletId,
-                addToWallet = true,
-                selectedWallets = listOf(walletId)
-            )
-        }
-    }
-
-    open fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean) {
-        _state.update { state ->
-            copyState(
-                state,
-                isExpense = false,
-                forceExpense = false,
-                amount = amount,
-                targetWalletId = state.targetWalletId,
-                selectedWallets = state.selectedWallets,
-                addToWallet = state.addToWallet || shouldDistribute
-            )
-        }
-    }
-
-    open fun setupForIncomeAddition(amount: String, targetWalletId: String, context: android.content.Context) {
-        setTargetWalletId(targetWalletId)
-        if (!_state.value.addToWallet) {
-            handleBaseEvent(BaseTransactionEvent.ToggleAddToWallet, context)
-        }
-        handleBaseEvent(BaseTransactionEvent.ForceSetIncomeType, context)
-        _state.update { state ->
-            copyState(state, amount = amount)
-        }
-    }
-
     open fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
         _state.update { state ->
             copyState(
@@ -886,17 +802,5 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             )
         }
         handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
-    }
-
-    open fun resetToDefaultState() {
-        _state.update { state ->
-            copyState(
-                state,
-                isExpense = true,
-                targetWalletId = null,
-                addToWallet = false,
-                selectedWallets = emptyList()
-            )
-        }
     }
 } 

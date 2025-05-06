@@ -30,7 +30,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import java.math.BigDecimal
+import timber.log.Timber
 
 /**
  * Компонент для отображения сводки по группам транзакций и категориям.
@@ -103,6 +103,12 @@ fun HomeGroupSummary(
             )
         }.sortedByDescending { it.amount.amount }
     }
+
+    // DEBUG LOGGING: Выводим все транзакции, суммы доходов, расходов и баланс
+    Timber.d(
+        "[DEBUG][HomeGroupSummary] Все транзакции: %s",
+        filteredTransactions.map { "${it.date}: ${it.amount} (${if (it.isExpense) "расход" else "доход"}), категория: ${it.category}" })
+    Timber.d("[DEBUG][HomeGroupSummary] Сумма доходов: %s, сумма расходов: %s, баланс: %s", totalIncome, totalExpense, calculatedBalance)
 
     Card(
         modifier = Modifier

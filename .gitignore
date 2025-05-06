@@ -15,8 +15,8 @@ local.properties
 # Keystore files
 *.keystore
 *.jks
-keystore.properties
 keystore/
+keystore/keystore.properties
 
 # Log/OS Files
 *.log

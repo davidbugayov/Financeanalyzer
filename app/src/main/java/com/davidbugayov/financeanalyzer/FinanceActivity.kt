@@ -2,9 +2,6 @@ package com.davidbugayov.financeanalyzer
 
 import android.Manifest
 import android.app.AlarmManager
-import android.appwidget.AppWidgetManager
-import android.content.ComponentName
-import android.content.Context
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
@@ -28,8 +25,6 @@ import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.TransactionReminderReceiver
-import com.davidbugayov.financeanalyzer.widget.BalanceWidget
-import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
 import timber.log.Timber
 
 class FinanceActivity : ComponentActivity() {
@@ -52,9 +47,6 @@ class FinanceActivity : ComponentActivity() {
         // Проверяем разрешение на уведомления
         checkNotificationPermission()
         
-        // Обновляем виджеты при запуске приложения
-        updateWidgets()
-
         // Делаем контент приложения отображаться под системными панелями
         WindowCompat.setDecorFitsSystemWindows(window, false)
         
@@ -117,39 +109,6 @@ class FinanceActivity : ComponentActivity() {
         }
     }
     
-    /**
-     * Обновляет все виджеты приложения, но только если они добавлены на домашний экран
-     */
-    private fun updateWidgets() {
-        try {
-            val appWidgetManager = AppWidgetManager.getInstance(this)
-            
-            // Обновляем основной виджет баланса
-            val balanceWidgetComponent = ComponentName(this, BalanceWidget::class.java)
-            val balanceWidgetIds = appWidgetManager.getAppWidgetIds(balanceWidgetComponent)
-            if (balanceWidgetIds.isNotEmpty()) {
-                val intent = Intent(this, BalanceWidget::class.java).apply {
-                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, balanceWidgetIds)
-                }
-                sendBroadcast(intent)
-            }
-            
-            // Обновляем маленький виджет баланса
-            val smallBalanceWidgetComponent = ComponentName(this, SmallBalanceWidget::class.java)
-            val smallBalanceWidgetIds = appWidgetManager.getAppWidgetIds(smallBalanceWidgetComponent)
-            if (smallBalanceWidgetIds.isNotEmpty()) {
-                val intent = Intent(this, SmallBalanceWidget::class.java).apply {
-                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallBalanceWidgetIds)
-                }
-                sendBroadcast(intent)
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "Error updating widgets")
-        }
-    }
-
     /**
      * Проверяет, есть ли у приложения разрешение на отправку уведомлений.
      * Если нет, запрашивает разрешение через системный диалог.
@@ -243,7 +202,7 @@ class FinanceActivity : ComponentActivity() {
      */
     private fun checkExactAlarmPermission() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-            val alarmManager = getSystemService(Context.ALARM_SERVICE) as AlarmManager
+            val alarmManager = getSystemService(ALARM_SERVICE) as AlarmManager
             if (!alarmManager.canScheduleExactAlarms()) {
                 Timber.d("Requesting SCHEDULE_EXACT_ALARM permission")
                 try {

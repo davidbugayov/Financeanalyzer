@@ -2,9 +2,9 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import kotlinx.coroutines.flow.StateFlow
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
 interface TransactionScreenViewModel<S, E> {
 
@@ -75,4 +75,4 @@ fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTr
         is BaseTransactionEvent -> eventData
         else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
     }
-} 
+}

@@ -33,6 +33,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
@@ -48,6 +49,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransa
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 /**
@@ -68,6 +70,7 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
+    val updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject()
 
     // Состояние для обратной связи
     var showFeedback by remember { mutableStateOf(false) }
@@ -87,6 +90,9 @@ fun HomeScreen(
             screenName = "home",
             screenClass = "HomeScreen"
         )
+
+        // Обновляем виджеты при первом входе на главный экран
+        updateWidgetsUseCase(context)
     }
     
     // Инициализируем состояние из SharedPreferences при первом запуске
@@ -242,7 +248,8 @@ fun HomeScreen(
                     onShowGroupSummaryChange = onShowGroupSummaryChange,
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick
+                    onTransactionLongClick = onTransactionLongClick,
+                    onAddClick = onNavigateToAdd
                 )
             } else {
                 // Расширенный макет для планшетов
@@ -252,7 +259,8 @@ fun HomeScreen(
                     onShowGroupSummaryChange = onShowGroupSummaryChange,
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick
+                    onTransactionLongClick = onTransactionLongClick,
+                    onAddClick = onNavigateToAdd
                 )
             }
             

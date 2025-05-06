@@ -8,9 +8,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
@@ -40,7 +39,7 @@ class TransactionHistoryViewModel @Inject constructor(
     private val repository: TransactionRepository,
     private val analyticsUtils: AnalyticsUtils,
     val categoriesViewModel: CategoriesViewModel,
-    private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase
+    private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
@@ -173,7 +172,6 @@ class TransactionHistoryViewModel @Inject constructor(
             try {
                 // Получаем текущие параметры
                 val currentState = _state.value
-                val pageSize = currentState.pageSize
                 
                 Timber.d("Начинаем загрузку транзакций с периодом: ${currentState.periodType}")
                 
@@ -200,7 +198,7 @@ class TransactionHistoryViewModel @Inject constructor(
                             }
                             PeriodType.CUSTOM, PeriodType.DAY, PeriodType.QUARTER, PeriodType.YEAR -> {
                                 Timber.d("Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}")
-                                getTransactionsForPeriodUseCase(currentState.startDate, currentState.endDate)
+                                getTransactionsForPeriodWithCacheUseCase(currentState.startDate, currentState.endDate)
                             }
                             PeriodType.MONTH -> {
                                 val calendar = Calendar.getInstance()
@@ -217,15 +215,6 @@ class TransactionHistoryViewModel @Inject constructor(
                                 val week = calendar.get(Calendar.WEEK_OF_YEAR)
                                 Timber.d("Загружаем транзакции за НЕДЕЛЮ: $year-$week")
                                 repository.getTransactionsByWeek(year, week)
-                            }
-                            else -> {
-                                Timber.d("Загружаем транзакции за период ${currentState.periodType}: ${currentState.startDate} - ${currentState.endDate}")
-                                repository.getTransactionsByDateRangePaginated(
-                                    currentState.startDate,
-                                    currentState.endDate,
-                                    pageSize,
-                                    0
-                                )
                             }
                         }
                     } catch (e: Exception) {

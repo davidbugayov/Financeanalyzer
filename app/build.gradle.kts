@@ -11,7 +11,7 @@ plugins {
 
 fun getKeystoreProperties(): Properties {
     val properties = Properties()
-    val propertiesFile = rootProject.file("keystore.properties")
+    val propertiesFile = rootProject.file("keystore/keystore.properties")
     if (propertiesFile.exists()) {
         properties.load(FileInputStream(propertiesFile))
     }
@@ -26,8 +26,8 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 24
-        versionName = "2.9"
+        versionCode = 25
+        versionName = "2.10"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

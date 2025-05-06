@@ -1,33 +1,30 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel
 
+import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.Category
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartState
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import java.util.Date
-import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.PieChartUtils
-import androidx.compose.ui.graphics.Color
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import java.math.BigDecimal
 
 class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
@@ -87,7 +84,10 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val filteredTransactions = getTransactionsForPeriodUseCase(_state.value.startDate, _state.value.endDate)
                 allTransactions = filteredTransactions
 
-                Timber.d("EnhancedFinanceChartViewModel: После фильтрации по дате осталось: "+filteredTransactions.size+" транзакций")
+                Timber.d("%s транзакций", "EnhancedFinanceChartViewModel: После фильтрации по дате осталось: " + filteredTransactions.size)
+                Timber.d(
+                    "[DEBUG] Все транзакции за период: %s",
+                    filteredTransactions.map { "${'$'}{it.date}: ${'$'}{it.amount} (${if (it.isExpense) "расход" else "доход"}), категория: ${'$'}{it.category}" })
 
                 val metrics = calculateBalanceMetricsUseCase(filteredTransactions, _state.value.startDate, _state.value.endDate)
                 val income = metrics.income
@@ -95,6 +95,8 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val savingsRate = metrics.savingsRate
                 val averageDailyExpense = metrics.averageDailyExpense
                 val monthsOfSavings = metrics.monthsOfSavings
+
+                Timber.d("[DEBUG] Сумма доходов: $income, сумма расходов: $expense, баланс: ${income - expense}")
 
                 // Агрегируем по категориям
                 val expensesByCategory = filteredTransactions
@@ -113,15 +115,11 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 // --- Новое: подготовка данных для линейного графика ---
                 val incomeLineChartData = createLineChartData(
                     transactions = filteredTransactions,
-                    isIncome = true,
-                    startDate = _state.value.startDate,
-                    endDate = _state.value.endDate
+                    isIncome = true
                 )
                 val expenseLineChartData = createLineChartData(
                     transactions = filteredTransactions,
-                    isIncome = false,
-                    startDate = _state.value.startDate,
-                    endDate = _state.value.endDate
+                    isIncome = false
                 )
                 // --- конец нового ---
 
@@ -130,10 +128,14 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val categoryData = if (showExpenses) expensesByCategory else incomeByCategory
                 val pieChartData = preparePieChartData(categoryData, showExpenses)
 
-                Timber.d("EnhancedFinanceChartViewModel: Категорий расходов: "+expensesByCategory.size+", доходов: "+incomeByCategory.size)
+                Timber.d(
+                    "%s%s",
+                    "EnhancedFinanceChartViewModel: Категорий расходов: " + expensesByCategory.size + ", доходов: ",
+                    incomeByCategory.size
+                )
                 if (!showExpenses) {
-                    Timber.d("[DEBUG] incomeByCategory: " + incomeByCategory.map { it.key + ": " + it.value.amount })
-                    Timber.d("[DEBUG] pieChartData (income): " + pieChartData.map { it.name + ": " + it.money.amount + ", %: " + it.percentage })
+                    Timber.d("[DEBUG] incomeByCategory: %s", incomeByCategory.map { it.key + ": " + it.value.amount })
+                    Timber.d("[DEBUG] pieChartData (income): %s", pieChartData.map { it.name + ": " + it.money.amount + ", %: " + it.percentage })
                 }
 
                 _state.update {
@@ -170,8 +172,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private fun createLineChartData(
         transactions: List<Transaction>,
         isIncome: Boolean,
-        startDate: Date,
-        endDate: Date
     ): List<com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint> {
         // Фильтруем транзакции по типу (доход/расход)
         val filteredTransactions = transactions.filter {
@@ -222,7 +222,12 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
         data: Map<String, Money>,
         showExpenses: Boolean
     ): List<UiCategory> {
-        val filteredData = data.filter { !it.value.isZero() }
+        val filteredData = if (showExpenses) {
+            data.filter { !it.value.isZero() }
+        } else {
+            // Для доходов фильтруем только положительные суммы
+            data.filter { it.value.amount > BigDecimal.ZERO }
+        }
         val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
         val pieChartDataList = filteredData.entries.mapIndexed { index, entry ->
             val categoryName = entry.key
@@ -233,7 +238,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 id = index.toLong(),
                 name = categoryName,
                 isExpense = showExpenses,
-                isCustom = category?.isCustom ?: false,
+                isCustom = category?.isCustom == true,
                 count = 0,
                 money = moneyValue,
                 percentage = 0f,
@@ -243,11 +248,20 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 icon = category?.icon
             )
         }
-        val totalMoney = pieChartDataList.sumOf { it.money.amount.toDouble() }
+        val totalMoney = if (showExpenses) {
+            pieChartDataList.sumOf { it.money.amount.toDouble() }
+        } else {
+            // Для доходов считаем сумму только по положительным значениям
+            pieChartDataList.sumOf { it.money.amount.toDouble().coerceAtLeast(0.0) }
+        }
         return if (pieChartDataList.isNotEmpty() && totalMoney != 0.0) {
             pieChartDataList.map { item ->
-                val percentage = (item.money.amount.toDouble() / totalMoney * 100.0).toFloat()
-                item.copy(percentage = percentage)
+                val percent = if (showExpenses) {
+                    (item.money.amount.toDouble() / totalMoney * 100.0).toFloat()
+                } else {
+                    (item.money.amount.toDouble().coerceAtLeast(0.0) / totalMoney * 100.0).toFloat()
+                }
+                item.copy(percentage = percent)
             }
         } else emptyList()
     }

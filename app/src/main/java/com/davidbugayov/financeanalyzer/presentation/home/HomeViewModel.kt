@@ -9,17 +9,15 @@ import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.BalanceMetrics
+import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -36,7 +34,7 @@ import java.util.Calendar
  *
  * @property addTransactionUseCase UseCase для добавления новых транзакций
  * @property deleteTransactionUseCase UseCase для удаления транзакций
- * @property getTransactionsForPeriodUseCase UseCase для получения транзакций за период
+ * @property getTransactionsForPeriodWithCacheUseCase UseCase для получения транзакций за период с кэшированием
  * @property calculateBalanceMetricsUseCase UseCase для расчета финансовых метрик
  * @property repository Репозиторий для прямого доступа к транзакциям с поддержкой пагинации и подпиской на изменения
  * @property _state Внутренний MutableStateFlow для хранения состояния экрана
@@ -45,7 +43,7 @@ import java.util.Calendar
 class HomeViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
-    private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase,
+    private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
     private val repository: TransactionRepository
 ) : ViewModel(), KoinComponent {
@@ -167,10 +165,8 @@ class HomeViewModel(
             try {
                 deleteTransactionUseCase(transaction).fold(
                     onSuccess = {
-                        // Очищаем кэши при удалении транзакции
                         clearCaches()
-                        // Уведомление об удалении теперь происходит через SharedFlow репозитория
-                        // Скрываем диалог подтверждения
+                        getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                         _state.update { it.copy(transactionToDelete = null) }
                     },
                     onFailure = { exception ->
@@ -289,19 +285,13 @@ class HomeViewModel(
         }
     }
 
-    /**
-     * Загружает транзакции за текущий месяц
-     */
-    private var lastLoadTime = 0L // Время последней загрузки
-    private var isLoadingInProgress = false // Флаг, указывающий на то, что загрузка уже идет
-    private var loadedPeriod = 30 // По умолчанию загружаем за 30 дней вместо 60
-    
+
     private fun loadTransactions() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
-                val transactions = getTransactionsForPeriodUseCase(startDate, endDate)
+                val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
                 val metrics = calculateBalanceMetricsUseCase(transactions, startDate, endDate)
                 Timber.d("[LOG_BALANCE] loadTransactions: startDate=$startDate, endDate=$endDate, income=${metrics.income.formatted()}, expense=${metrics.expense.formatted()}, balance=${(metrics.income - metrics.expense).formatted()}, txCount=${transactions.size}")
                 _state.update {
@@ -317,7 +307,6 @@ class HomeViewModel(
                         error = null
                     )
                 }
-                // Обновляем категории и группы транзакций
                 viewModelScope.launch(Dispatchers.Default) {
                     updateCategoryStats(transactions)
                 }
@@ -376,12 +365,8 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 Timber.d("Generating test data")
-                // Устанавливаем флаг загрузки
                 _state.update { it.copy(isLoading = true) }
-
-                // Генерируем 10 транзакций за последний месяц
                 val testTransactions = TestDataGenerator.generateTransactions(10)
-
                 var hasError = false
                 testTransactions.forEach { transaction ->
                     Timber.d("Saving test transaction: ${transaction.category}")
@@ -393,22 +378,18 @@ class HomeViewModel(
                         }
                     )
                 }
-
                 if (!hasError) {
-                    // Очищаем кэши при добавлении тестовых данных
                     clearCaches()
+                    getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                     Timber.d("Test data generation completed successfully")
                 } else {
                     _state.update { it.copy(error = "Ошибка при сохранении некоторых тестовых транзакций") }
                 }
-                
-                // Запускаем обновление транзакций для отображения новых данных
                 loadTransactions()
             } catch (e: Exception) {
                 Timber.e(e, "Error generating test data")
                 _state.update { it.copy(error = e.message ?: "Ошибка при генерации тестовых данных") }
             } finally {
-                // В любом случае (успех или ошибка) отключаем индикатор загрузки
                 _state.update { it.copy(isLoading = false) }
             }
         }
@@ -419,94 +400,36 @@ class HomeViewModel(
      * @param filter Выбранный фильтр транзакций
      */
     private fun updateFilteredTransactions(filter: TransactionFilter) {
-        val allTransactions = _state.value.transactions
-        if (allTransactions.isEmpty()) {
-            _state.update { it.copy(
-                filteredTransactions = emptyList(),
-                filteredIncome = Money.zero(),
-                filteredExpense = Money.zero(),
-                filteredBalance = Money.zero(),
-                isLoading = false
-            ) }
-            return
-        }
-
-        val calendar = Calendar.getInstance()
-
-        // Определяем filteredTransactions для каждого фильтра
-        val filteredTransactions = when (filter) {
-            TransactionFilter.TODAY -> {
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                val startOfDay = calendar.time
-
-                calendar.add(Calendar.DAY_OF_MONTH, 1)
-                val endOfDay = calendar.time
-
-                allTransactions.filter { transaction ->
-                    transaction.date in startOfDay..<endOfDay
-                }
+        viewModelScope.launch {
+            val (startDate, endDate) = getPeriodDates(filter)
+            val filteredTransactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
+            val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
+                val income = financialMetrics.getTotalIncomeAsMoney()
+                val expense = financialMetrics.getTotalExpenseAsMoney()
+                val balance = financialMetrics.getCurrentBalance()
+                Timber.d("[LOG_BALANCE] updateFilteredTransactions(ALL): income=${income.formatted()}, expense=${expense.formatted()}, balance=${balance.formatted()}, txCount=${filteredTransactions.size}")
+                Triple(income, expense, balance)
+            } else {
+                val stats = calculateStats(filteredTransactions)
+                Timber.d("[LOG_BALANCE] updateFilteredTransactions(${filter.name}): income=${stats.first.formatted()}, expense=${stats.second.formatted()}, balance=${stats.third.formatted()}, txCount=${filteredTransactions.size}")
+                stats
             }
-            TransactionFilter.WEEK -> {
-                calendar.add(Calendar.DAY_OF_MONTH, -6)
-                val weekAgo = calendar.time
-
-                allTransactions.filter { transaction ->
-                    transaction.date.after(weekAgo)
-                }
+            Timber.d("[DIAG] STATS: income=${filteredIncome.formatted()}, expense=${filteredExpense.formatted()}, balance=${filteredBalance.formatted()}")
+            val transactionGroups = groupTransactionsByDate(filteredTransactions)
+            _state.update {
+                it.copy(
+                    filteredTransactions = filteredTransactions,
+                    transactionGroups = transactionGroups,
+                    filteredIncome = filteredIncome,
+                    filteredExpense = filteredExpense,
+                    filteredBalance = filteredBalance,
+                    isLoading = false
+                )
             }
-            TransactionFilter.MONTH -> {
-                calendar.add(Calendar.DAY_OF_MONTH, -29)
-                val monthAgo = calendar.time
-
-                allTransactions.filter { transaction ->
-                    transaction.date.after(monthAgo)
-                }
+            if (filter == TransactionFilter.ALL) {
+                Timber.d("[DIAG] HomeViewModel транзакций: ${filteredTransactions.size}")
+                filteredTransactions.forEach { Timber.d("[DIAG] HVM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") }
             }
-            TransactionFilter.ALL -> {
-                allTransactions
-            }
-        }
-
-        val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
-            val income = financialMetrics.getTotalIncomeAsMoney()
-            val expense = financialMetrics.getTotalExpenseAsMoney()
-            val balance = financialMetrics.getCurrentBalance()
-            Timber.d("[LOG_BALANCE] updateFilteredTransactions(ALL): income=${income.formatted()}, expense=${expense.formatted()}, balance=${balance.formatted()}, txCount=${allTransactions.size}")
-            Triple(income, expense, balance)
-        } else {
-            val stats = calculateStats(filteredTransactions)
-            Timber.d("[LOG_BALANCE] updateFilteredTransactions(${filter.name}): income=${stats.first.formatted()}, expense=${stats.second.formatted()}, balance=${stats.third.formatted()}, txCount=${filteredTransactions.size}")
-            stats
-        }
-        
-        Timber.d("[DIAG] STATS: income=${filteredIncome.formatted()}, expense=${filteredExpense.formatted()}, balance=${filteredBalance.formatted()}")
-
-        // Если фильтр установлен в "Все", синхронизируем метрики с фильтрацией
-        if (filter == TransactionFilter.ALL && filteredTransactions.isNotEmpty()) {
-            val currentMetricsBalance = financialMetrics.getCurrentBalance()
-            if (filteredBalance != currentMetricsBalance) {
-                Timber.d("Обнаружено расхождение общего баланса: в метриках ${currentMetricsBalance.formatted()}, в фильтре ${filteredBalance.formatted()}")
-                // Принудительно пересчитываем метрики, если есть расхождение
-                financialMetrics.recalculateStats()
-            }
-        }
-
-        val transactionGroups = groupTransactionsByDate(filteredTransactions)
-        _state.update { it.copy(
-            filteredTransactions = filteredTransactions, 
-            transactionGroups = transactionGroups,
-            filteredIncome = filteredIncome,
-            filteredExpense = filteredExpense,
-            filteredBalance = filteredBalance,
-            isLoading = false  // Отключаем индикатор загрузки после обновления данных
-        ) }
-
-        if (filter == TransactionFilter.ALL) {
-            Timber.d("[DIAG] HomeViewModel транзакций: ${filteredTransactions.size}")
-            filteredTransactions.forEach { Timber.d("[DIAG] HVM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") }
         }
     }
 
@@ -542,21 +465,11 @@ class HomeViewModel(
             return cachedStats
         }
 
-        // Доходы - суммируем транзакции с isExpense = false
-        val income = transactions
-            .filter { !it.isExpense }
-            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-        
-        // Расходы - берем абсолютное значение суммы транзакций с isExpense = true
-        // Их значения уже хранятся с отрицательным знаком
-        val expenseWithSign = transactions
-            .filter { it.isExpense }
-            .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-            
-        val expense = expenseWithSign.abs()
-        
-        // Для баланса - просто суммируем все транзакции (со знаками)
-        val balance = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+        // Используем CalculateBalanceMetricsUseCase для расчёта
+        val metrics = calculateBalanceMetricsUseCase(transactions)
+        val income = metrics.income
+        val expense = metrics.expense
+        val balance = income - expense
 
         Timber.d("[DIAG] calculateStats: income=${income.formatted()}, expense=${expense.formatted()}, balance=${balance.formatted()}")
 
@@ -638,28 +551,40 @@ class HomeViewModel(
 
     private fun getPeriodDates(filter: TransactionFilter): Pair<java.util.Date, java.util.Date> {
         val calendar = Calendar.getInstance()
+        // Устанавливаем endDate на конец дня
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
         val endDate = calendar.time
-        val startDate = when (filter) {
+        val startCalendar = Calendar.getInstance()
+        when (filter) {
             TransactionFilter.TODAY -> {
-                calendar.set(Calendar.HOUR_OF_DAY, 0)
-                calendar.set(Calendar.MINUTE, 0)
-                calendar.set(Calendar.SECOND, 0)
-                calendar.set(Calendar.MILLISECOND, 0)
-                calendar.time
+                startCalendar.set(Calendar.HOUR_OF_DAY, 0)
+                startCalendar.set(Calendar.MINUTE, 0)
+                startCalendar.set(Calendar.SECOND, 0)
+                startCalendar.set(Calendar.MILLISECOND, 0)
             }
             TransactionFilter.WEEK -> {
-                calendar.add(Calendar.DAY_OF_MONTH, -6)
-                calendar.time
+                startCalendar.add(Calendar.DAY_OF_MONTH, -6)
+                startCalendar.set(Calendar.HOUR_OF_DAY, 0)
+                startCalendar.set(Calendar.MINUTE, 0)
+                startCalendar.set(Calendar.SECOND, 0)
+                startCalendar.set(Calendar.MILLISECOND, 0)
             }
             TransactionFilter.MONTH -> {
-                calendar.add(Calendar.DAY_OF_MONTH, -29)
-                calendar.time
+                startCalendar.add(Calendar.DAY_OF_MONTH, -29)
+                startCalendar.set(Calendar.HOUR_OF_DAY, 0)
+                startCalendar.set(Calendar.MINUTE, 0)
+                startCalendar.set(Calendar.SECOND, 0)
+                startCalendar.set(Calendar.MILLISECOND, 0)
             }
             TransactionFilter.ALL -> {
-                calendar.set(2000, 0, 1, 0, 0, 0)
-                calendar.time
+                startCalendar.set(2000, 0, 1, 0, 0, 0)
+                startCalendar.set(Calendar.MILLISECOND, 0)
             }
         }
+        val startDate = startCalendar.time
         return Pair(startDate, endDate)
     }
 } 

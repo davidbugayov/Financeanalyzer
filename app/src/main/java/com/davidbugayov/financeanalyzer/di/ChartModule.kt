@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.domain.usecase.GetCategoriesWithAmountUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCaseImpl
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import org.koin.core.module.Module
 import org.koin.dsl.module
 
@@ -15,6 +15,6 @@ val chartModule: Module = module {
     // UseCases
     factory { GetCategoriesWithAmountUseCase(get()) }
     single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
-    factory { GetTransactionsForPeriodUseCase(get()) }
+    factory { GetTransactionsForPeriodWithCacheUseCase(get()) }
     
 }
