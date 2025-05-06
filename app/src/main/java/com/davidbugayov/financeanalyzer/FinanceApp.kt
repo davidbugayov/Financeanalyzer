@@ -2,11 +2,6 @@ package com.davidbugayov.financeanalyzer
 
 import android.app.Application
 import com.davidbugayov.financeanalyzer.di.appModule
-import com.davidbugayov.financeanalyzer.di.budgetModule
-import com.davidbugayov.financeanalyzer.di.chartModule
-import com.davidbugayov.financeanalyzer.di.historyModule
-import com.davidbugayov.financeanalyzer.di.importModule
-import com.davidbugayov.financeanalyzer.di.onboardingModule
 import com.davidbugayov.financeanalyzer.di.statisticsModule
 import com.davidbugayov.financeanalyzer.utils.CrashlyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
@@ -69,11 +64,6 @@ class FinanceApp : Application() {
                 androidContext(this@FinanceApp)
                 modules(
                     appModule,
-                    historyModule,
-                    budgetModule,
-                    onboardingModule,
-                    importModule,
-                    chartModule,
                     statisticsModule
                 )
             }

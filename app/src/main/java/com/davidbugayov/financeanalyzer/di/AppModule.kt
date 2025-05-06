@@ -16,23 +16,33 @@ import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUse
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetCategoriesWithAmountUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodWithCacheUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
+import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialStatisticsViewModel
+import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
+import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
+import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
+import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
@@ -40,8 +50,7 @@ import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 
 /**
- * Основной модуль Koin для внедрения зависимостей.
- * Следует принципу инверсии зависимостей (Dependency Inversion Principle).
+ * Единый DI-модуль приложения. Все зависимости, ViewModel, use-case, менеджеры и утилиты.
  */
 val appModule = module {
     // Database
@@ -55,22 +64,17 @@ val appModule = module {
     single { WalletPreferences.getInstance(androidContext()) }
     single { PreferencesManager(androidContext()) }
 
-    // Utils
+    // Utils & Managers
     single { AnalyticsUtils }
     single { FinancialMetrics.getInstance() }
-    
+    single { NotificationScheduler() }
+    single { OnboardingManager(androidContext()) }
+
     // Repositories
     single<TransactionRepositoryImpl> { TransactionRepositoryImpl(get()) }
     single<TransactionRepository> { get<TransactionRepositoryImpl>() }
     single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
-    
-    // Создаем WalletRepositoryImpl с доступом к TransactionRepository
-    single<WalletRepository> {
-        WalletRepositoryImpl(
-            walletPreferences = get(),
-            transactionRepository = get()
-        )
-    }
+    single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
 
     // Use cases
     single { LoadTransactionsUseCase(get()) }
@@ -88,50 +92,23 @@ val appModule = module {
     single { GetTransactionsForPeriodWithCacheUseCase(get()) }
     single { GetTransactionsForPeriodUseCase(get()) }
     single { UpdateWidgetsUseCase() }
+    single { GetCategoriesWithAmountUseCase(get()) }
+    single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
-    viewModel {
-        AddTransactionViewModel(
-            addTransactionUseCase = get(),
-            categoriesViewModel = get(),
-            sourcePreferences = get(),
-            walletRepository = get()
-        )
-    }
-    viewModel {
-        ProfileViewModel(
-            exportTransactionsToCSVUseCase = get(),
-            loadTransactionsUseCase = get(),
-            notificationScheduler = get(),
-            preferencesManager = get()
-        )
-    }
-    
-    viewModel {
-        HomeViewModel(
-            addTransactionUseCase = get(),
-            deleteTransactionUseCase = get(),
-            repository = get(),
-            getTransactionsForPeriodWithCacheUseCase = get(),
-            calculateBalanceMetricsUseCase = get()
-        )
-    }
-
-    viewModel {
-        com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel(
-            updateTransactionUseCase = get(),
-            getTransactionByIdUseCase = get(),
-            categoriesViewModel = get(),
-            sourcePreferences = get(),
-            walletRepository = get()
-        )
-    }
-
-    // Утилиты
-    single { NotificationScheduler() }
+    viewModel { AddTransactionViewModel(get(), get(), get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
+    viewModel { EditTransactionViewModel(get(), get(), get(), get(), get()) }
+    viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { BudgetViewModel(get(), get()) }
+    viewModel { WalletTransactionsViewModel(get(), get()) }
+    viewModel { ImportTransactionsViewModel(get()) }
+    viewModel { OnboardingViewModel(get()) }
 }
 
+// Для параметризованных ViewModel (пример: статистика за период)
 val statisticsModule = module {
     single { androidContext().resources }
     viewModel { (startDate: Long, endDate: Long) ->
