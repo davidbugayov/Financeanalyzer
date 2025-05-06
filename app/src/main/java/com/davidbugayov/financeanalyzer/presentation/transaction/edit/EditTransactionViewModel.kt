@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.edit
 
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
@@ -8,26 +9,22 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
-import kotlinx.coroutines.Dispatchers
-import androidx.compose.ui.graphics.vector.ImageVector
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
-    validateTransactionUseCase: ValidateTransactionUseCase,
     categoriesViewModel: CategoriesViewModel,
     sourcePreferences: SourcePreferences,
     walletRepository: WalletRepository
@@ -35,7 +32,6 @@ class EditTransactionViewModel(
     categoriesViewModel,
     sourcePreferences,
     walletRepository,
-    validateTransactionUseCase
 ) {
 
     override val _state = MutableStateFlow(
@@ -259,7 +255,7 @@ class EditTransactionViewModel(
 
         // Форматируем сумму как строку без знака минус
         val formattedAmount = transaction.amount.abs().amount.toString()
-        Timber.d("ТРАНЗАКЦИЯ: Форматированная сумма: $formattedAmount (исходная: ${transaction.amount})")
+        Timber.d("ТРАНЗАКЦИЯ: Форматированная сумма: %s (исходная: %s)", formattedAmount, transaction.amount)
 
         // Определяем какую категорию установить в зависимости от типа транзакции
         val selectedExpenseCategory = if (transaction.isExpense) transaction.category else ""
@@ -267,8 +263,8 @@ class EditTransactionViewModel(
         
         // Если это доход (не расход), устанавливаем настройки кошелька
         val addToWallet = !transaction.isExpense // For income transactions, enable wallets
-        
-        Timber.d("ТРАНЗАКЦИЯ: selectedExpenseCategory=$selectedExpenseCategory, selectedIncomeCategory=$selectedIncomeCategory")
+
+        Timber.d("ТРАНЗАКЦИЯ: selectedExpenseCategory=%s, selectedIncomeCategory=%s", selectedExpenseCategory, selectedIncomeCategory)
         Timber.d("ТРАНЗАКЦИЯ: установка кошельков: addToWallet=$addToWallet")
 
         // Загружаем связанные с транзакцией кошельки
@@ -563,7 +559,7 @@ class EditTransactionViewModel(
         showDeleteCategoryConfirmDialog: Boolean,
         showDeleteSourceConfirmDialog: Boolean,
         editMode: Boolean,
-        transactionToEdit: com.davidbugayov.financeanalyzer.domain.model.Transaction?,
+        transactionToEdit: Transaction?,
         addToWallet: Boolean,
         selectedWallets: List<String>,
         showWalletSelector: Boolean,

@@ -11,10 +11,9 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources
@@ -26,7 +25,6 @@ import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -34,7 +32,6 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIc
  */
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
-    validateTransactionUseCase: ValidateTransactionUseCase,
     categoriesViewModel: CategoriesViewModel,
     sourcePreferences: SourcePreferences,
     walletRepository: WalletRepository
@@ -42,7 +39,6 @@ class AddTransactionViewModel(
     categoriesViewModel,
     sourcePreferences,
     walletRepository,
-    validateTransactionUseCase
 ) {
 
     override val _state = MutableStateFlow(
@@ -176,7 +172,7 @@ class AddTransactionViewModel(
 
         // Генерируем UUID для новой транзакции, если id не задан
         val transactionId = currentState.transactionToEdit?.id ?: java.util.UUID.randomUUID().toString()
-        Timber.d("Используем ID транзакции: $transactionId (новый: ${currentState.transactionToEdit == null})")
+        Timber.d("Используем ID транзакции: %s (новый: %s)", transactionId, (currentState.transactionToEdit == null))
 
         // Получаем список ID кошельков для сохранения в транзакции
         val selectedWalletIds = getWalletIdsForTransaction(
@@ -251,7 +247,7 @@ class AddTransactionViewModel(
                     validationBuilder.addAmountError()
                 }
             } catch (e: Exception) {
-                Timber.d("Ошибка: невозможно преобразовать сумму в число")
+                Timber.d("Ошибка: невозможно преобразовать сумму в число $e")
                 validationBuilder.addAmountError()
             }
         }
@@ -336,7 +332,7 @@ class AddTransactionViewModel(
             // создания и сохранения транзакции
             Timber.d("Validation passed, creating transaction")
             val transaction = createTransactionFromState(_state.value)
-            Timber.d("Transaction created: id=${transaction.id}, amount=${transaction.amount}, category=${transaction.category}")
+            Timber.d("Transaction created: id=%s, amount=%s, category=%s", transaction.id, transaction.amount, transaction.category)
 
             viewModelScope.launch {
                 Timber.d("Launching coroutine to add transaction")
@@ -349,7 +345,7 @@ class AddTransactionViewModel(
                     // Обрабатываем результат
                     when (result) {
                         is DomainResult.Success -> {
-                            Timber.d("Транзакция успешно добавлена: ${transaction.id}")
+                            Timber.d("Транзакция успешно добавлена: %s", transaction.id)
                             _state.update {
                                 it.copy(
                                     isLoading = false,
@@ -359,7 +355,7 @@ class AddTransactionViewModel(
                             }
                             
                             // Добавляем дополнительный лог для отслеживания момента завершения операции
-                            Timber.d("Транзакция сохранена и готова к обновлению графиков: ${transaction.id}")
+                            Timber.d("Транзакция сохранена и готова к обновлению графиков: %s", transaction.id)
                         }
                         
                         is DomainResult.Error -> {
