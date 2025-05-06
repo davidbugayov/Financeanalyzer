@@ -21,8 +21,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
@@ -36,7 +38,7 @@ import timber.log.Timber
 fun ExpandedLayout(
     state: HomeState,
     showGroupSummary: Boolean,
-    onShowGroupSummaryChange: (Boolean) -> Unit,
+    onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
@@ -47,132 +49,174 @@ fun ExpandedLayout(
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        // Левая панель с балансом и фильтрами
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(end = 8.dp)
-                .verticalScroll(rememberScrollState())
-        ) {
-            BalanceCard(
-                balance = state.balance
-            )
+        ExpandedLeftPanel(
+            state = state,
+            showGroupSummary = showGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary,
+            onFilterSelected = onFilterSelected
+        )
+        ExpandedRightPanel(
+            state = state,
+            showGroupSummary = showGroupSummary,
+            onTransactionClick = onTransactionClick,
+            onTransactionLongClick = onTransactionLongClick,
+            onAddClick = onAddClick
+        )
+    }
+}
 
+@Composable
+private fun ExpandedLeftPanel(
+    state: HomeState,
+    showGroupSummary: Boolean,
+    onToggleGroupSummary: (Boolean) -> Unit,
+    onFilterSelected: (TransactionFilter) -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(end = 8.dp)
+            .verticalScroll(rememberScrollState())
+    ) {
+        BalanceCard(balance = state.balance)
+        Spacer(modifier = Modifier.height(16.dp))
+        HomeFilterChips(
+            currentFilter = state.currentFilter,
+            onFilterSelected = onFilterSelected
+        )
+        HomeTransactionsHeader(
+            currentFilter = state.currentFilter,
+            showGroupSummary = showGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary,
+        )
+        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
-
-            HomeFilterChips(
+            HomeGroupSummary(
+                filteredTransactions = state.filteredTransactions,
+                totalIncome = state.filteredIncome,
+                totalExpense = state.filteredExpense,
                 currentFilter = state.currentFilter,
-                onFilterSelected = onFilterSelected
+                balance = state.filteredBalance
             )
+        }
+    }
+}
 
-            // Кнопка показать/скрыть сводку
-            HomeTransactionsHeader(
-                currentFilter = state.currentFilter,
-                showGroupSummary = showGroupSummary,
-                onShowGroupSummaryChange = onShowGroupSummaryChange,
-            )
+@Composable
+private fun ExpandedRightPanel(
+    state: HomeState,
+    showGroupSummary: Boolean,
+    onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit,
+    onAddClick: () -> Unit
+) {
+    Column(
+        modifier = Modifier
+            .padding(start = 8.dp)
+    ) {
+        when {
+            !state.isLoading && state.transactions.isEmpty() -> {
+                ExpandedEmptyState(onAddClick)
+            }
 
-            // Сводка по группам под кнопкой
-            if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(16.dp))
-                HomeGroupSummary(
-                    filteredTransactions = state.filteredTransactions,
-                    totalIncome = state.filteredIncome,
-                    totalExpense = state.filteredExpense,
-                    currentFilter = state.currentFilter,
-                    balance = state.filteredBalance
+            !state.isLoading && state.filteredTransactions.isEmpty() -> {
+                ExpandedNoFilteredState(state.currentFilter)
+            }
+
+            else -> {
+                ExpandedTransactionList(
+                    state = state,
+                    showGroupSummary = showGroupSummary,
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick
                 )
             }
         }
+    }
+}
 
-        // Правая панель со списком транзакций
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp)
-        ) {
-            // Только список транзакций без заголовка и сводки
-            when {
-                !state.isLoading && state.transactions.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-                            androidx.compose.material3.Icon(
-                                imageVector = androidx.compose.material.icons.Icons.Filled.Add,
-                                contentDescription = "Пусто",
-                                tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier
-                                    .padding(bottom = 16.dp)
-                                    .size(48.dp)
-                            )
-                            Text(
-                                text = "Здесь пока пусто",
-                                style = MaterialTheme.typography.headlineSmall,
-                                color = MaterialTheme.colorScheme.onSurface,
-                                modifier = Modifier.padding(bottom = 8.dp)
-                            )
-                            Text(
-                                text = "Добавьте свою первую транзакцию, чтобы начать анализировать финансы!",
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                modifier = Modifier.padding(bottom = 24.dp)
-                            )
-                            androidx.compose.material3.Button(onClick = onAddClick) {
-                                Text("Добавить первую транзакцию")
-                            }
-                        }
-                    }
-                }
-
-                !state.isLoading && state.filteredTransactions.isEmpty() -> {
-                    Box(
-                        modifier = Modifier.fillMaxSize(),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Text(
-                            text = when (state.currentFilter) {
-                                TransactionFilter.TODAY -> "Нет транзакций за сегодня"
-                                TransactionFilter.WEEK -> "Нет транзакций за эту неделю"
-                                TransactionFilter.MONTH -> "Нет транзакций за этот месяц"
-                                TransactionFilter.ALL -> "Нет транзакций"
-                            },
-                            color = Color.Gray,
-                            style = MaterialTheme.typography.bodyLarge,
-                            textAlign = TextAlign.Center
-                        )
-                    }
-                }
-
-                else -> {
-                    // Только список транзакций
-                    val lazyListState = rememberLazyListState()
-                    LaunchedEffect(showGroupSummary) {
-                        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-                            lazyListState.animateScrollToItem(0)
-                            Timber.d("ExpandedLayout: Скроллим к началу списка при показе сводки")
-                        }
-                    }
-                    LazyColumn(
-                        state = lazyListState,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        items(
-                            items = state.filteredTransactions,
-                            key = { it.id },
-                            contentType = { "transaction" }
-                        ) { transaction ->
-                            TransactionItem(
-                                transaction = transaction,
-                                onClick = onTransactionClick,
-                                onLongClick = onTransactionLongClick,
-                                showDivider = true
-                            )
-                        }
-                    }
-                }
+@Composable
+private fun ExpandedEmptyState(onAddClick: () -> Unit) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            androidx.compose.material3.Icon(
+                imageVector = androidx.compose.material.icons.Icons.Filled.Add,
+                contentDescription = stringResource(R.string.empty_state_icon_desc),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(bottom = 16.dp)
+                    .size(48.dp)
+            )
+            Text(
+                text = stringResource(R.string.empty_state_title),
+                style = MaterialTheme.typography.headlineSmall,
+                color = MaterialTheme.colorScheme.onSurface,
+                modifier = Modifier.padding(bottom = 8.dp)
+            )
+            Text(
+                text = stringResource(R.string.empty_state_subtitle),
+                style = MaterialTheme.typography.bodyMedium,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                modifier = Modifier.padding(bottom = 24.dp)
+            )
+            androidx.compose.material3.Button(onClick = onAddClick) {
+                Text(stringResource(R.string.empty_state_add_first_transaction))
             }
+        }
+    }
+}
+
+@Composable
+private fun ExpandedNoFilteredState(currentFilter: TransactionFilter) {
+    Box(
+        modifier = Modifier.fillMaxSize(),
+        contentAlignment = Alignment.Center
+    ) {
+        Text(
+            text = when (currentFilter) {
+                TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
+                TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
+                TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
+                TransactionFilter.ALL -> stringResource(R.string.no_transactions_all)
+            },
+            color = Color.Gray,
+            style = MaterialTheme.typography.bodyLarge,
+            textAlign = TextAlign.Center
+        )
+    }
+}
+
+@Composable
+private fun ExpandedTransactionList(
+    state: HomeState,
+    showGroupSummary: Boolean,
+    onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit
+) {
+    val lazyListState = rememberLazyListState()
+    LaunchedEffect(showGroupSummary) {
+        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+            lazyListState.animateScrollToItem(0)
+            Timber.d("ExpandedLayout: Скроллим к началу списка при показе сводки")
+        }
+    }
+    LazyColumn(
+        state = lazyListState,
+        modifier = Modifier.fillMaxSize()
+    ) {
+        items(
+            items = state.filteredTransactions,
+            key = { it.id },
+            contentType = { "transaction" }
+        ) { transaction ->
+            TransactionItem(
+                transaction = transaction,
+                onClick = onTransactionClick,
+                onLongClick = onTransactionLongClick,
+                showDivider = true
+            )
         }
     }
 } 

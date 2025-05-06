@@ -1,36 +1,18 @@
 package com.davidbugayov.financeanalyzer.presentation.categories
 
 import android.app.Application
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Checkroom
-import androidx.compose.material.icons.filled.Computer
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.DirectionsCar
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalHospital
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.Movie
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Phone
-import androidx.compose.material.icons.filled.Restaurant
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Work
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.core.graphics.toColorInt
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
-import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Category
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryColorProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -38,7 +20,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.R
 
 /**
  * ViewModel для управления категориями транзакций.
@@ -91,7 +72,7 @@ class CategoriesViewModel(
 
             // Добавляем пользовательские категории
             val customExpenseCategories = savedExpenseCategories.map { data ->
-                val color = data.colorHex?.let { Color(android.graphics.Color.parseColor(it)) } ?: run {
+                val color = data.colorHex?.let { Color(it.toColorInt()) } ?: run {
                     val generated = CategoryProvider.generateRandomCategoryColor()
                     // Сохраняем сгенерированный цвет обратно в preferences
                     val colorHex = String.format("#%02X%02X%02X", (generated.red * 255).toInt(), (generated.green * 255).toInt(), (generated.blue * 255).toInt())
@@ -113,7 +94,7 @@ class CategoriesViewModel(
                 )
             }
             val customIncomeCategories = savedIncomeCategories.map { data ->
-                val color = data.colorHex?.let { Color(android.graphics.Color.parseColor(it)) } ?: run {
+                val color = data.colorHex?.let { Color(it.toColorInt()) } ?: run {
                     val generated = CategoryProvider.generateRandomCategoryColor()
                     val colorHex = String.format("#%02X%02X%02X", (generated.red * 255).toInt(), (generated.green * 255).toInt(), (generated.blue * 255).toInt())
                     val updated = data.copy(colorHex = colorHex)
@@ -153,8 +134,8 @@ class CategoriesViewModel(
             _expenseCategories.value = sortedExpenseCategories + listOf(otherExpenseCategory)
             _incomeCategories.value = sortedIncomeCategories + listOf(otherIncomeCategory)
 
-            Timber.d("[CategoriesVM] Итоговые категории расходов: " + _expenseCategories.value.joinToString { "${'$'}{it.name}: ${'$'}{it.color}" })
-            Timber.d("[CategoriesVM] Итоговые категории доходов: " + _incomeCategories.value.joinToString { "${'$'}{it.name}: ${'$'}{it.color}" })
+            Timber.d("[CategoriesVM] Итоговые категории расходов: %s", _expenseCategories.value.joinToString { "${'$'}{it.name}: ${'$'}{it.color}" })
+            Timber.d("[CategoriesVM] Итоговые категории доходов: %s", _incomeCategories.value.joinToString { "${'$'}{it.name}: ${'$'}{it.color}" })
         }
     }
 

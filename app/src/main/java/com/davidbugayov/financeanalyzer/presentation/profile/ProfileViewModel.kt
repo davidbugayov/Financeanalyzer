@@ -5,6 +5,7 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase.ExportAction
@@ -13,18 +14,17 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
-import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
-import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * ViewModel для экрана профиля.
@@ -302,13 +302,6 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Загрузка финансовой статистики на основе реальных данных из базы данных.
-     * Публичный метод, чтобы можно было обновить статистику после добавления новой транзакции.
-     */
-    fun updateFinancialStatistics() {
-        loadFinancialAnalytics()
-    }
 
     /**
      * Загружает финансовую аналитику из базы данных.

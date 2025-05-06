@@ -4,6 +4,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -25,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -45,6 +45,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayo
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
@@ -57,6 +58,130 @@ import timber.log.Timber
  * Отображает текущий баланс и последние транзакции.
  * Следует принципам MVI и Clean Architecture.
  */
+@Composable
+private fun HomeTopBar(
+    onGenerateTestData: () -> Unit,
+    onNavigateToProfile: () -> Unit
+) {
+    AppTopBar(
+        title = stringResource(R.string.app_title),
+        navigationIcon = {
+            if (BuildConfig.DEBUG) {
+                IconButton(
+                    onClick = onGenerateTestData
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.Add,
+                        contentDescription = stringResource(R.string.generate_test_data)
+                    )
+                }
+            }
+        },
+        actions = {
+            IconButton(onClick = onNavigateToProfile) {
+                Icon(
+                    imageVector = Icons.Default.Person,
+                    contentDescription = stringResource(R.string.profile)
+                )
+            }
+        },
+        titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+    )
+}
+
+@Composable
+private fun HomeBottomBar(
+    onNavigateToChart: () -> Unit,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToAdd: () -> Unit
+) {
+    AnimatedBottomNavigationBar(
+        visible = true,
+        onChartClick = onNavigateToChart,
+        onHistoryClick = onNavigateToHistory,
+        onAddClick = onNavigateToAdd
+    )
+}
+
+@Composable
+private fun HomeMainContent(
+    windowSizeIsCompact: Boolean,
+    state: HomeState,
+    showGroupSummary: Boolean,
+    onToggleGroupSummary: (Boolean) -> Unit,
+    onFilterSelected: (TransactionFilter) -> Unit,
+    onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit,
+    onAddClick: () -> Unit
+) {
+    if (windowSizeIsCompact) {
+        CompactLayout(
+            state = state,
+            showGroupSummary = showGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary,
+            onFilterSelected = onFilterSelected,
+            onTransactionClick = onTransactionClick,
+            onTransactionLongClick = onTransactionLongClick,
+            onAddClick = onAddClick
+        )
+    } else {
+        ExpandedLayout(
+            state = state,
+            showGroupSummary = showGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary,
+            onFilterSelected = onFilterSelected,
+            onTransactionClick = onTransactionClick,
+            onTransactionLongClick = onTransactionLongClick,
+            onAddClick = onAddClick
+        )
+    }
+}
+
+@Composable
+private fun HomeDialogs(
+    showActionsDialog: Boolean,
+    selectedTransaction: Transaction?,
+    onDismissActionsDialog: () -> Unit,
+    onDeleteTransaction: (Transaction) -> Unit,
+    onEditTransaction: (Transaction) -> Unit,
+    transactionToDelete: Transaction?,
+    onConfirmDelete: () -> Unit,
+    onDismissDelete: () -> Unit
+) {
+    if (showActionsDialog && selectedTransaction != null) {
+        TransactionActionsDialog(
+            transaction = selectedTransaction,
+            onDismiss = onDismissActionsDialog,
+            onDelete = onDeleteTransaction,
+            onEdit = onEditTransaction
+        )
+    }
+    transactionToDelete?.let { transaction ->
+        DeleteTransactionDialog(
+            transaction = transaction,
+            onConfirm = onConfirmDelete,
+            onDismiss = onDismissDelete
+        )
+    }
+}
+
+@Composable
+private fun HomeFeedback(
+    feedbackMessage: String,
+    feedbackType: FeedbackType,
+    showFeedback: Boolean,
+    onDismiss: () -> Unit
+) {
+    FeedbackMessage(
+        message = feedbackMessage,
+        type = feedbackType,
+        visible = showFeedback,
+        onDismiss = onDismiss,
+        modifier = Modifier
+            .padding(top = dimensionResource(R.dimen.padding_small))
+    )
+}
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -72,259 +197,197 @@ fun HomeScreen(
     val windowSize = rememberWindowSize()
     val updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject()
 
-    // Состояние для обратной связи
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
     var feedbackType by remember { mutableStateOf(FeedbackType.INFO) }
-
-    // Состояние для диалога действий с транзакцией
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
-
-    // Загружаем сохраненное состояние видимости GroupSummary
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
 
-    // Логируем открытие главного экрана и загружаем данные только при первом входе
+    val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
+    val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
+    val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
+
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "home",
             screenClass = "HomeScreen"
         )
-
-        // Обновляем виджеты при первом входе на главный экран
         updateWidgetsUseCase(context)
     }
-    
-    // Инициализируем состояние из SharedPreferences при первом запуске
     LaunchedEffect(Unit) {
         val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(savedShowSummary))
     }
-
-    // Обновляем транзакции при возвращении на экран, но с управлением частоты
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        Timber.d("HomeScreen: регистрируем обновление при навигации")
-        
-        // Время последнего обновления
         var lastRefreshTime = 0L
-        
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                // Проверяем, прошло ли достаточно времени с последнего обновления
                 val currentTime = System.currentTimeMillis()
-                if (currentTime - lastRefreshTime > 2000) { // Не обновляем чаще чем раз в 2 секунды
-                    Timber.d("HomeScreen: Запрашиваем обновление данных после навигации (ON_RESUME)")
-                    
-                    // Запускаем стандартную загрузку данных. Дебаунсинг внутри ViewModel предотвратит лишние вызовы.
+                if (currentTime - lastRefreshTime > 2000) {
                     viewModel.onEvent(HomeEvent.LoadTransactions)
-                    
                     lastRefreshTime = currentTime
-                } else {
-                    Timber.d("HomeScreen: пропускаем обновление - прошло менее 2 секунд с последнего")
                 }
             }
         }
-        
         lifecycleOwner.lifecycle.addObserver(observer)
-        
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
-        }
+        onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-
-    // Оптимизируем обработчики событий TransactionClick и TransactionLongClick, чтобы они не пересоздавались при каждой рекомпозиции
     val onTransactionClick = remember<(Transaction) -> Unit> {
         { transaction ->
             selectedTransaction = transaction
             showActionsDialog = true
         }
     }
-
     val onTransactionLongClick = remember<(Transaction) -> Unit> {
         { transaction ->
             selectedTransaction = transaction
             showActionsDialog = true
         }
     }
-
-    // Оптимизируем обработчик изменения showGroupSummary
-    val onShowGroupSummaryChange = remember<(Boolean) -> Unit> {
+    val onToggleGroupSummary = remember<(Boolean) -> Unit> {
         { newValue ->
-            // Обновляем состояние только в ViewModel
             viewModel.onEvent(HomeEvent.SetShowGroupSummary(newValue))
-            // Обновляем SharedPreferences
-            sharedPreferences.edit {
-                putBoolean("show_group_summary", newValue)
-            }
+            sharedPreferences.edit { putBoolean("show_group_summary", newValue) }
         }
     }
-
-    // Оптимизируем обработчик выбора фильтра
     val onFilterSelected = remember<(TransactionFilter) -> Unit> {
-        { filter ->
-            viewModel.onEvent(HomeEvent.SetFilter(filter))
-        }
+        { filter -> viewModel.onEvent(HomeEvent.SetFilter(filter)) }
     }
-
     Scaffold(
         topBar = {
-            AppTopBar(
-                title = stringResource(R.string.app_title),
-                navigationIcon = {
-                    // Кнопка для генерации тестовых данных
-                    if (BuildConfig.DEBUG) {
-                        IconButton(
-                            onClick = {
-                                viewModel.onEvent(HomeEvent.GenerateTestData)
-                                feedbackMessage = "Тестовые данные сгенерированы"
-                                feedbackType = FeedbackType.SUCCESS
-                                showFeedback = true
-                            }
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.Add,
-                                contentDescription = "Сгенерировать тестовые данные"
-                            )
-                        }
-                    }
+            HomeTopBar(
+                onGenerateTestData = {
+                    viewModel.onEvent(HomeEvent.GenerateTestData)
+                    feedbackMessage = testDataGeneratedMsg
+                    feedbackType = FeedbackType.SUCCESS
+                    showFeedback = true
                 },
-                actions = {
-                    // Кнопка профиля
-                    IconButton(
-                        onClick = {
-                            onNavigateToProfile()
-                            // feedbackMessage = "Переход к профилю"
-                            // feedbackType = FeedbackType.INFO
-                            // showFeedback = true
-                        }
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Person,
-                            contentDescription = stringResource(R.string.profile)
-                        )
-                    }
-                },
-                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+                onNavigateToProfile = onNavigateToProfile
             )
         },
         bottomBar = {
-            // Используем анимированную нижнюю навигацию 
-            AnimatedBottomNavigationBar(
-                visible = true,
-                onChartClick = {
-                    onNavigateToChart()
-                    // feedbackMessage = "Переход к графикам"
-                    // feedbackType = FeedbackType.INFO
-                    // showFeedback = true
-                },
-                onHistoryClick = {
-                    onNavigateToHistory()
-                    // feedbackMessage = "Переход к истории транзакций"
-                    // feedbackType = FeedbackType.INFO
-                    // showFeedback = true
-                },
-                onAddClick = {
-                    onNavigateToAdd()
-                    // feedbackMessage = "Добавить транзакцию"
-                    // feedbackType = FeedbackType.INFO
-                    // showFeedback = true
-                },
+            HomeBottomBar(
+                onNavigateToChart = onNavigateToChart,
+                onNavigateToHistory = onNavigateToHistory,
+                onNavigateToAdd = onNavigateToAdd
             )
         }
     ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                // Применяем явно только внутренние отступы, полученные от Scaffold
-                .padding(paddingValues)
+        HomeScreenContent(
+            paddingValues = paddingValues,
+            windowSizeIsCompact = windowSize.isCompact(),
+            state = state,
+            showGroupSummary = state.showGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary,
+            onFilterSelected = onFilterSelected,
+            onTransactionClick = onTransactionClick,
+            onTransactionLongClick = onTransactionLongClick,
+            onAddClick = onNavigateToAdd,
+            showActionsDialog = showActionsDialog,
+            selectedTransaction = selectedTransaction,
+            onDismissActionsDialog = { showActionsDialog = false },
+            onDeleteTransaction = { transaction ->
+                showActionsDialog = false
+                viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
+            },
+            onEditTransaction = { transaction ->
+                showActionsDialog = false
+                editTransactionViewModel.loadTransactionForEdit(transaction)
+                if (transaction.id.isNotBlank()) {
+                    onNavigateToEdit(transaction.id)
+                } else {
+                    Timber.e(emptyTransactionIdErrorMsg)
+                }
+            },
+            transactionToDelete = state.transactionToDelete,
+            onConfirmDelete = {
+                state.transactionToDelete?.let { transaction ->
+                    viewModel.onEvent(HomeEvent.DeleteTransaction(transaction))
+                    feedbackMessage = transactionDeletedMsg
+                    feedbackType = FeedbackType.SUCCESS
+                    showFeedback = true
+                }
+            },
+            onDismissDelete = {
+                viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
+            },
+            feedbackMessage = feedbackMessage,
+            feedbackType = feedbackType,
+            showFeedback = showFeedback,
+            onDismissFeedback = { showFeedback = false },
+            isLoading = state.isLoading
+        )
+    }
+}
+
+@Composable
+private fun HomeScreenContent(
+    paddingValues: PaddingValues,
+    windowSizeIsCompact: Boolean,
+    state: HomeState,
+    showGroupSummary: Boolean,
+    onToggleGroupSummary: (Boolean) -> Unit,
+    onFilterSelected: (TransactionFilter) -> Unit,
+    onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit,
+    onAddClick: () -> Unit,
+    showActionsDialog: Boolean,
+    selectedTransaction: Transaction?,
+    onDismissActionsDialog: () -> Unit,
+    onDeleteTransaction: (Transaction) -> Unit,
+    onEditTransaction: (Transaction) -> Unit,
+    transactionToDelete: Transaction?,
+    onConfirmDelete: () -> Unit,
+    onDismissDelete: () -> Unit,
+    feedbackMessage: String,
+    feedbackType: FeedbackType,
+    showFeedback: Boolean,
+    onDismissFeedback: () -> Unit,
+    isLoading: Boolean
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(paddingValues)
+    ) {
+        HomeMainContent(
+            windowSizeIsCompact = windowSizeIsCompact,
+            state = state,
+            showGroupSummary = showGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary,
+            onFilterSelected = onFilterSelected,
+            onTransactionClick = onTransactionClick,
+            onTransactionLongClick = onTransactionLongClick,
+            onAddClick = onAddClick
+        )
+        AnimatedVisibility(
+            visible = isLoading,
+            enter = fadeIn(),
+            exit = fadeOut(),
+            modifier = Modifier.align(Alignment.Center)
         ) {
-            // Адаптивный макет в зависимости от размера экрана
-            if (windowSize.isCompact()) {
-                // Компактный макет для телефонов
-                CompactLayout(
-                    state = state,
-                    showGroupSummary = state.showGroupSummary,
-                    onShowGroupSummaryChange = onShowGroupSummaryChange,
-                    onFilterSelected = onFilterSelected,
-                    onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = onNavigateToAdd
-                )
-            } else {
-                // Расширенный макет для планшетов
-                ExpandedLayout(
-                    state = state,
-                    showGroupSummary = state.showGroupSummary,
-                    onShowGroupSummaryChange = onShowGroupSummaryChange,
-                    onFilterSelected = onFilterSelected,
-                    onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = onNavigateToAdd
-                )
-            }
-            
-            // Индикатор загрузки с анимацией
-            AnimatedVisibility(
-                visible = state.isLoading,
-                enter = fadeIn(),
-                exit = fadeOut(),
-                modifier = Modifier.align(Alignment.Center)
-            ) {
-                CenteredLoadingIndicator(
-                    message = stringResource(R.string.loading_data),
-                    modifier = Modifier
-                )
-            }
-
-            // Диалог действий с транзакцией (удаление/редактирование)
-            if (showActionsDialog && selectedTransaction != null) {
-                TransactionActionsDialog(
-                    transaction = selectedTransaction!!,
-                    onDismiss = { showActionsDialog = false },
-                    onDelete = { transaction ->
-                        showActionsDialog = false
-                        viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
-                    },
-                    onEdit = { transaction ->
-                        showActionsDialog = false
-                        editTransactionViewModel.loadTransactionForEdit(transaction)
-                        if (transaction.id.isNotBlank()) {
-                            onNavigateToEdit(transaction.id)
-                        } else {
-                            Timber.e("Попытка навигации на экран редактирования с пустым transactionId!")
-                            // Можно показать Snackbar или Toast
-                        }
-                    }
-                )
-            }
-
-            // Диалог подтверждения удаления транзакции
-            state.transactionToDelete?.let { transaction ->
-                DeleteTransactionDialog(
-                    transaction = transaction,
-                    onConfirm = {
-                        viewModel.onEvent(HomeEvent.DeleteTransaction(transaction))
-                        feedbackMessage = "Транзакция удалена"
-                        feedbackType = FeedbackType.SUCCESS
-                        showFeedback = true
-                    },
-                    onDismiss = {
-                        viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
-                    }
-                )
-            }
-
-            // Отображение уведомлений обратной связи
-            FeedbackMessage(
-                message = feedbackMessage,
-                type = feedbackType,
-                visible = showFeedback,
-                onDismiss = { showFeedback = false },
+            CenteredLoadingIndicator(
+                message = stringResource(R.string.loading_data),
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(top = 8.dp) // Оставляем небольшой отступ сверху
             )
         }
+        HomeDialogs(
+            showActionsDialog = showActionsDialog,
+            selectedTransaction = selectedTransaction,
+            onDismissActionsDialog = onDismissActionsDialog,
+            onDeleteTransaction = onDeleteTransaction,
+            onEditTransaction = onEditTransaction,
+            transactionToDelete = transactionToDelete,
+            onConfirmDelete = onConfirmDelete,
+            onDismissDelete = onDismissDelete
+        )
+        HomeFeedback(
+            feedbackMessage = feedbackMessage,
+            feedbackType = feedbackType,
+            showFeedback = showFeedback,
+            onDismiss = onDismissFeedback
+        )
     }
 }

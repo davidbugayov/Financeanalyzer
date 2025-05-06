@@ -432,7 +432,7 @@ class AddTransactionViewModel(
                         sources = updatedSources,
                         showCustomSourceDialog = false,
                         customSource = "",
-                        sourceColor = com.davidbugayov.financeanalyzer.utils.ColorUtils.CASH_COLOR,
+                        sourceColor = newSource.color,
                         source = newSource.name
                     )
                 }

@@ -42,9 +42,6 @@ sealed class Screen(val route: String) {
     /** Экран бюджета */
     data object Budget : Screen("budget")
 
-    
-    /** Экран кошельков */
-    data object Wallets : Screen("wallets")
 
     /** Экран транзакций кошелька */
     data object WalletTransactions : Screen("wallet/{walletId}") {

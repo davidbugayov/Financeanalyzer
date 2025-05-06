@@ -30,7 +30,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import timber.log.Timber
 
 /**
  * Компонент для отображения сводки по группам транзакций и категориям.
@@ -47,68 +46,28 @@ fun HomeGroupSummary(
     totalIncome: Money,
     totalExpense: Money,
     currentFilter: TransactionFilter = TransactionFilter.MONTH,
-    balance: Money? = null  // Новый опциональный параметр для прямой передачи баланса
+    balance: Money? = null
 ) {
-    // Определяем цвета для доходов и расходов из темы
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-
-    // Вычисляем баланс, если он не передан явно
     val calculatedBalance = balance ?: totalIncome.minus(totalExpense)
     val balanceColor = if (calculatedBalance.amount.signum() >= 0) incomeColor else expenseColor
-
-    // Состояние для отслеживания - показывать ли все группы
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
-
-    // Состояние для выбора типа - расходы или доходы
     var showExpenses by rememberSaveable { mutableStateOf(true) }
 
-    // Получаем строки для заголовков за пределами remember
-    val titleToday = "Сводка за сегодня"
-    val titleWeek = "Сводка за неделю"
-    val titleMonth = "Сводка за месяц"
-    val titleAll = "Сводка за все время"
+    val periodTitle = periodTitleForFilter(currentFilter)
 
-    // Определяем заголовок периода в зависимости от фильтра
-    val periodTitle = remember(currentFilter) {
-        when (currentFilter) {
-            TransactionFilter.TODAY -> titleToday
-            TransactionFilter.WEEK -> titleWeek
-            TransactionFilter.MONTH -> titleMonth
-            TransactionFilter.ALL -> titleAll
-        }
-    }
-
-    // Группируем транзакции по категориям
     val categoryGroups = remember(filteredTransactions, showExpenses) {
-        // Фильтруем по типу (расходы/доходы)
-        val filteredByType = filteredTransactions.filter {
-            it.isExpense == showExpenses
-        }
-
-        // Группируем по категориям и суммируем
+        val filteredByType = filteredTransactions.filter { it.isExpense == showExpenses }
         val groupedByCategory = filteredByType.groupBy { it.category }
-
         groupedByCategory.map { (category, transactions) ->
-            // Суммируем все транзакции в этой категории с использованием Money
-            val amount = transactions.fold(Money.zero()) { acc, transaction -> 
-                acc + transaction.amount 
-            }
-
-            // Создаем объект с информацией о категории
             CategorySummary(
                 category = category,
-                amount = amount,
+                amount = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount },
                 isExpense = showExpenses
             )
         }.sortedByDescending { it.amount.amount }
     }
-
-    // DEBUG LOGGING: Выводим все транзакции, суммы доходов, расходов и баланс
-    Timber.d(
-        "[DEBUG][HomeGroupSummary] Все транзакции: %s",
-        filteredTransactions.map { "${it.date}: ${it.amount} (${if (it.isExpense) "расход" else "доход"}), категория: ${it.category}" })
-    Timber.d("[DEBUG][HomeGroupSummary] Сумма доходов: %s, сумма расходов: %s, баланс: %s", totalIncome, totalExpense, calculatedBalance)
 
     Card(
         modifier = Modifier
@@ -119,179 +78,219 @@ fun HomeGroupSummary(
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            // Отображение заголовка в зависимости от периода
-            Text(
-                text = periodTitle,
-                style = MaterialTheme.typography.titleMedium,
-                fontSize = 16.sp,
-                fontWeight = FontWeight.Bold,
-                modifier = Modifier.padding(bottom = 4.dp),
-                color = MaterialTheme.colorScheme.primary
-            )
-
-            // Отображение общего дохода и расхода в более компактном виде
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.total_income),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "+" + totalIncome.abs().formatted(false),
-                    fontSize = 14.sp,
-                    color = incomeColor,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.total_expense),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Medium
-                )
-                Text(
-                    text = "-" + totalExpense.abs().formatted(false),
-                    fontSize = 14.sp,
-                    color = expenseColor,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
-            // Отображение баланса
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 4.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
-            ) {
-                Text(
-                    text = stringResource(R.string.balance),
-                    fontSize = 14.sp,
-                    fontWeight = FontWeight.Bold
-                )
-                Text(
-                    text = calculatedBalance.format(false),
-                    fontSize = 14.sp,
-                    color = balanceColor,
-                    fontWeight = FontWeight.Bold
-                )
-            }
-
+            SummaryHeader(periodTitle)
+            SummaryTotals(totalIncome, totalExpense, calculatedBalance, incomeColor, expenseColor, balanceColor)
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
+            SummaryCategorySwitcher(showExpenses, onSwitch = { showExpenses = !showExpenses })
+            val visibleCount = if (showAllGroups) categoryGroups.size else minOf(5, categoryGroups.size)
+            val visibleCategories = categoryGroups.take(visibleCount)
+            SummaryCategoryList(
+                visibleCategories = visibleCategories,
+                incomeColor = incomeColor,
+                expenseColor = expenseColor
+            )
+            if (visibleCategories.isEmpty()) {
+                SummaryEmptyState(showExpenses)
+            }
+            if (categoryGroups.size > 5 && !showAllGroups) {
+                SummaryShowMoreButton(categoryGroups.size - 5) { showAllGroups = true }
+            } else if (showAllGroups && categoryGroups.size > 5) {
+                SummaryHideButton { showAllGroups = false }
+            }
+        }
+    }
+}
 
-            // Переключатель между расходами и доходами
+@Composable
+private fun SummaryHeader(periodTitle: String) {
+    Text(
+        text = periodTitle,
+        style = MaterialTheme.typography.titleMedium,
+        fontSize = 16.sp,
+        fontWeight = FontWeight.Bold,
+        modifier = Modifier.padding(bottom = 4.dp),
+        color = MaterialTheme.colorScheme.primary
+    )
+}
+
+@Composable
+private fun SummaryTotals(
+    totalIncome: Money,
+    totalExpense: Money,
+    balance: Money,
+    incomeColor: androidx.compose.ui.graphics.Color,
+    expenseColor: androidx.compose.ui.graphics.Color,
+    balanceColor: androidx.compose.ui.graphics.Color
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = stringResource(R.string.total_income),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = "+" + totalIncome.abs().formatted(false),
+            fontSize = 14.sp,
+            color = incomeColor,
+            fontWeight = FontWeight.Bold
+        )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = stringResource(R.string.total_expense),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium
+        )
+        Text(
+            text = "-" + totalExpense.abs().formatted(false),
+            fontSize = 14.sp,
+            color = expenseColor,
+            fontWeight = FontWeight.Bold
+        )
+    }
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(vertical = 4.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = stringResource(R.string.balance),
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Bold
+        )
+        Text(
+            text = balance.format(false),
+            fontSize = 14.sp,
+            color = balanceColor,
+            fontWeight = FontWeight.Bold
+        )
+    }
+}
+
+@Composable
+private fun SummaryCategorySwitcher(
+    showExpenses: Boolean,
+    onSwitch: () -> Unit
+) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(bottom = 8.dp),
+        horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = stringResource(if (showExpenses) R.string.expense_categories else R.string.income_categories),
+            style = MaterialTheme.typography.titleSmall,
+            fontSize = 14.sp,
+            fontWeight = FontWeight.Medium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Text(
+            text = stringResource(if (showExpenses) R.string.show_income else R.string.show_expenses),
+            fontSize = 12.sp,
+            color = MaterialTheme.colorScheme.primary,
+            fontWeight = FontWeight.Medium,
+            modifier = Modifier.clickable { onSwitch() }
+        )
+    }
+}
+
+@Composable
+private fun SummaryCategoryList(
+    visibleCategories: List<CategorySummary>,
+    incomeColor: androidx.compose.ui.graphics.Color,
+    expenseColor: androidx.compose.ui.graphics.Color
+) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        visibleCategories.forEach { categorySummary ->
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(bottom = 8.dp),
-                horizontalArrangement = Arrangement.SpaceBetween
+                    .padding(vertical = 2.dp),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = if (showExpenses) "Категории расходов" else "Категории доходов",
-                    style = MaterialTheme.typography.titleSmall,
-                    fontSize = 14.sp,
+                    text = categorySummary.category,
+                    fontSize = 13.sp,
+                    color = if (categorySummary.isExpense) expenseColor else incomeColor,
                     fontWeight = FontWeight.Medium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    modifier = Modifier.weight(1f)
                 )
-
                 Text(
-                    text = "Показать ${if (showExpenses) "доходы" else "расходы"}",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium,
-                    modifier = Modifier.clickable { showExpenses = !showExpenses }
-                )
-            }
-
-            // Определяем, сколько категорий показывать
-            val visibleCount =
-                if (showAllGroups) categoryGroups.size else minOf(5, categoryGroups.size)
-            val visibleCategories = categoryGroups.take(visibleCount)
-
-            Column(
-                verticalArrangement = Arrangement.spacedBy(2.dp)
-            ) {
-                if (visibleCategories.isEmpty()) {
-                    Text(
-                        text = if (showExpenses)
-                            "Нет расходов за выбранный период"
-                        else
-                            "Нет доходов за выбранный период",
-                        fontSize = 13.sp,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(vertical = 8.dp)
-                    )
-                } else {
-                    visibleCategories.forEach { categorySummary ->
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 2.dp),
-                            horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = categorySummary.category,
-                                fontSize = 13.sp,
-                                color = if (categorySummary.isExpense) expenseColor else incomeColor,
-                                fontWeight = FontWeight.Medium,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis,
-                                modifier = Modifier.weight(1f)
-                            )
-
-                            Text(
-                                text = if (categorySummary.isExpense)
-                                    "-" + categorySummary.amount.abs().formatted(false)
-                                else
-                                    "+" + categorySummary.amount.abs().formatted(false),
-                                fontSize = 13.sp,
-                                color = if (categorySummary.isExpense) expenseColor else incomeColor,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
-                    }
-                }
-            }
-
-            // Если есть еще категории и не показываем все, отображаем текст "И ещё X элементов"
-            if (categoryGroups.size > 5 && !showAllGroups) {
-                Text(
-                    text = "И ещё ${categoryGroups.size - 5} категорий",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .clickable { showAllGroups = true },
-                    fontWeight = FontWeight.Medium
-                )
-            }
-            // Если показываем все категории, добавляем кнопку "Скрыть"
-            else if (showAllGroups && categoryGroups.size > 5) {
-                Text(
-                    text = "Скрыть",
-                    fontSize = 12.sp,
-                    color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 4.dp)
-                        .clickable { showAllGroups = false },
+                    text = if (categorySummary.isExpense)
+                        "-" + categorySummary.amount.abs().formatted(false)
+                    else
+                        "+" + categorySummary.amount.abs().formatted(false),
+                    fontSize = 13.sp,
+                    color = if (categorySummary.isExpense) expenseColor else incomeColor,
                     fontWeight = FontWeight.Medium
                 )
             }
         }
+    }
+}
+
+@Composable
+private fun SummaryEmptyState(showExpenses: Boolean) {
+    Text(
+        text = stringResource(if (showExpenses) R.string.no_expenses_period else R.string.no_income_period),
+        fontSize = 13.sp,
+        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        modifier = Modifier.padding(vertical = 8.dp)
+    )
+}
+
+@Composable
+private fun SummaryShowMoreButton(moreCount: Int, onClick: () -> Unit) {
+    Text(
+        text = stringResource(R.string.and_more_categories, moreCount),
+        fontSize = 12.sp,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)
+            .clickable { onClick() },
+        fontWeight = FontWeight.Medium
+    )
+}
+
+@Composable
+private fun SummaryHideButton(onClick: () -> Unit) {
+    Text(
+        text = stringResource(R.string.hide),
+        fontSize = 12.sp,
+        color = MaterialTheme.colorScheme.primary,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 4.dp)
+            .clickable { onClick() },
+        fontWeight = FontWeight.Medium
+    )
+}
+
+@Composable
+private fun periodTitleForFilter(filter: TransactionFilter): String {
+    return when (filter) {
+        TransactionFilter.TODAY -> stringResource(R.string.summary_today)
+        TransactionFilter.WEEK -> stringResource(R.string.summary_week)
+        TransactionFilter.MONTH -> stringResource(R.string.summary_month)
+        TransactionFilter.ALL -> stringResource(R.string.summary_all_time)
     }
 }
 

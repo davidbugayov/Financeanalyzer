@@ -1,16 +1,11 @@
 package com.davidbugayov.financeanalyzer.presentation
 
 import android.Manifest
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
-import androidx.compose.animation.AnimatedContentTransitionScope
-import androidx.compose.animation.core.EaseInOut
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -26,36 +21,17 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
+import androidx.compose.ui.res.stringResource
 import androidx.core.view.WindowCompat
-import androidx.navigation.NavType
-import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import androidx.navigation.navArgument
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
-import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
-import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedFinanceChartScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.FinancialStatisticsScreen
-import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
-import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
-import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
-import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
-import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.navigation.AppNavGraph
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingScreen
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
-import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
@@ -66,691 +42,178 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 /**
  * Главный экран приложения, содержащий навигацию между различными разделами.
  */
+@SuppressLint("UnusedMaterial3ScaffoldPaddingParameter")
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MainScreen(startDestination: String = "home") {
-    val navController = rememberNavController()
-    val layoutDirection = LocalLayoutDirection.current
-    val homeViewModel: HomeViewModel = koinViewModel()
-    val editTransactionViewModel: EditTransactionViewModel = koinViewModel()
-    val profileViewModel: ProfileViewModel = koinViewModel()
-    val onboardingViewModel: OnboardingViewModel = koinViewModel()
+fun MainScreen(
+    startDestination: String = "home",
+    homeViewModel: HomeViewModel = koinViewModel(),
+    editTransactionViewModel: EditTransactionViewModel = koinViewModel(),
+    profileViewModel: ProfileViewModel = koinViewModel(),
+    onboardingViewModel: OnboardingViewModel = koinViewModel()
+) {
     val context = LocalContext.current
-
-    // Функция для настройки уведомлений, определена локально
-    fun setupNotifications() {
-        try {
-            val notificationScheduler = NotificationScheduler()
-            notificationScheduler.scheduleTransactionReminder(
-                context,
-                20,
-                0
-            ) // По умолчанию в 20:00
-            Timber.d("Transaction reminders scheduled after permission granted")
-        } catch (e: Exception) {
-            Timber.e(e, "Failed to schedule transaction reminders")
-        }
-    }
-    
-    // Проверяем, нужно ли показывать онбординг
-    var shouldShowOnboarding by remember { mutableStateOf(!onboardingViewModel.isOnboardingCompleted()) }
-
-    // Состояние для диалогов разрешений
-    var showPermissionDialog by remember { mutableStateOf(false) }
-    var showSettingsDialog by remember { mutableStateOf(false) }
-
-    // Лаунчер для запроса разрешений на уведомления
-    val permissionLauncher = PermissionUtils.rememberNotificationPermissionLauncher { isGranted ->
-        if (isGranted) {
-            // Разрешение предоставлено, настраиваем уведомления
-            setupNotifications()
-            Timber.d("Notification permission granted after onboarding")
-        } else {
-            // Пользователь отказал, показываем диалог с предложением перейти в настройки
-            showSettingsDialog = true
-            Timber.d("Notification permission denied after onboarding")
-        }
-    }
-
-    // Диалог с предложением перейти в настройки (когда пользователь отказал в разрешении)
-    if (showSettingsDialog) {
-        AlertDialog(
-            onDismissRequest = { showSettingsDialog = false },
-            title = { Text("Разрешение отклонено") },
-            text = { Text("Для получения уведомлений о транзакциях необходимо разрешение. Вы можете включить его в настройках приложения.") },
-            confirmButton = {
-                Button(onClick = {
-                    PermissionUtils.openNotificationSettings(context)
-                    showSettingsDialog = false
-                }) {
-                    Text("Открыть настройки")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showSettingsDialog = false }) {
-                    Text("Отмена")
-                }
-            }
-        )
-    }
-
-    // Диалог запроса разрешений
-    if (showPermissionDialog) {
-        AlertDialog(
-            onDismissRequest = { showPermissionDialog = false },
-            title = { Text("Нужно разрешение") },
-            text = { Text("Для получения уведомлений о транзакциях требуется ваше разрешение.") },
-            confirmButton = {
-                Button(onClick = {
-                    showPermissionDialog = false
-                    // Запрашиваем разрешение напрямую
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    } else {
-                        // Для более старых версий разрешение не требуется
-                        setupNotifications()
-                    }
-                }) {
-                    Text("Запросить разрешение")
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPermissionDialog = false }) {
-                    Text("Отмена")
-                }
-            }
-        )
-    }
-    
-    val themeState = profileViewModel.themeMode.collectAsState()
-    val themeMode = themeState.value
-    
+    val navController = rememberNavController()
+    val themeMode by profileViewModel.themeMode.collectAsState()
     val view = LocalView.current
-
-    // Определяем isDarkTheme здесь, за пределами LaunchedEffect
     val isDarkTheme = when (themeMode) {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
+    var shouldShowOnboarding by remember { mutableStateOf(!onboardingViewModel.isOnboardingCompleted()) }
 
-    // Для загрузки данных в фоновом режиме
-    LaunchedEffect(Unit) {
-        Timber.d("MainScreen: Планируем фоновую инициализацию данных")
-        
-        // Запускаем единую фоновую задачу для инициализации данных после небольшой задержки
-        MainScope().launch(Dispatchers.Default) {
-            delay(500) // Даем время UI на отрисовку
-            Timber.d("MainScreen: Запускаем initiateBackgroundDataRefresh")
-            homeViewModel.initiateBackgroundDataRefresh()
-            
-            // Загружаем данные для графиков с большей задержкой, чтобы не мешать основному экрану
-            delay(2000) 
-            Timber.d("MainScreen: Запускаем загрузку данных для графиков")
+    PermissionDialogs(
+        onboardingViewModel = onboardingViewModel,
+        onPermissionGranted = { /* setupNotifications() */ },
+        onPermissionDenied = { /* showSettingsDialog = true */ },
+        context = context
+    )
+
+    ApplyThemeAndSystemBars(themeMode, isDarkTheme, view)
+    BackgroundInit(homeViewModel)
+
+    FinanceAnalyzerTheme(themeMode = themeMode) {
+        if (shouldShowOnboarding) {
+            OnboardingScreen(onFinish = {
+                onboardingViewModel.completeOnboarding()
+                shouldShowOnboarding = false
+                // PermissionDialogs будет сам обрабатывать разрешения
+            })
+        } else {
+            Scaffold(modifier = Modifier.fillMaxSize()) {
+                AppNavGraph(
+                    navController = navController,
+                    startDestination = startDestination,
+                    homeViewModel = homeViewModel,
+                    editTransactionViewModel = editTransactionViewModel,
+                    profileViewModel = profileViewModel
+                )
+            }
+        }
+    }
+}
+
+private fun setupNotifications(context: android.content.Context) {
+    try {
+        val notificationScheduler = NotificationScheduler()
+        notificationScheduler.scheduleTransactionReminder(
+            context,
+            20,
+            0
+        ) // По умолчанию в 20:00
+        Timber.d("Transaction reminders scheduled after permission granted")
+    } catch (e: Exception) {
+        Timber.e(e, "Failed to schedule transaction reminders")
+    }
+}
+
+@Composable
+private fun PermissionDialogs(
+    onboardingViewModel: OnboardingViewModel,
+    onPermissionGranted: () -> Unit,
+    onPermissionDenied: () -> Unit,
+    context: android.content.Context
+) {
+    var showPermissionDialog by remember { mutableStateOf(false) }
+    var showSettingsDialog by remember { mutableStateOf(false) }
+    val permissionLauncher = PermissionUtils.rememberNotificationPermissionLauncher { isGranted ->
+        if (isGranted) {
+            setupNotifications(context)
+            onPermissionGranted()
+            Timber.d("Notification permission granted after onboarding")
+        } else {
+            showSettingsDialog = true
+            onPermissionDenied()
+            Timber.d("Notification permission denied after onboarding")
         }
     }
 
-    // Отслеживаем изменения темы
+    // Показываем диалог после онбординга, если нужно
+    LaunchedEffect(onboardingViewModel.isOnboardingCompleted()) {
+        if (onboardingViewModel.isOnboardingCompleted() &&
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+            !PermissionUtils.hasNotificationPermission(context)
+        ) {
+            showPermissionDialog = true
+        }
+    }
+
+    if (showSettingsDialog) {
+        AlertDialog(
+            onDismissRequest = { showSettingsDialog = false },
+            title = { Text(stringResource(R.string.permission_denied_title)) },
+            text = { Text(stringResource(R.string.permission_denied_text)) },
+            confirmButton = {
+                Button(onClick = {
+                    PermissionUtils.openNotificationSettings(context)
+                    showSettingsDialog = false
+                }) {
+                    Text(stringResource(R.string.open_settings))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showSettingsDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+
+    if (showPermissionDialog) {
+        AlertDialog(
+            onDismissRequest = { showPermissionDialog = false },
+            title = { Text(stringResource(R.string.permission_required_title)) },
+            text = { Text(stringResource(R.string.permission_required_text)) },
+            confirmButton = {
+                Button(onClick = {
+                    showPermissionDialog = false
+                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                    } else {
+                        setupNotifications(context)
+                        onPermissionGranted()
+                    }
+                }) {
+                    Text(stringResource(R.string.request_permission))
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showPermissionDialog = false }) {
+                    Text(stringResource(R.string.cancel))
+                }
+            }
+        )
+    }
+}
+
+@Composable
+private fun ApplyThemeAndSystemBars(themeMode: ThemeMode, isDarkTheme: Boolean, view: android.view.View) {
     LaunchedEffect(themeMode) {
-        // Обновляем UI при изменении темы
         val window = (view.context as? Activity)?.window
         if (window != null) {
-            // Устанавливаем прозрачность через WindowInsetsController вместо устаревших свойств
             WindowCompat.setDecorFitsSystemWindows(window, false)
             val controller = WindowCompat.getInsetsController(window, window.decorView)
-
-            // Настраиваем иконки статус-бара и навигационной панели в зависимости от темы
-            // Светлые иконки для темной темы, темные иконки для светлой темы
             controller.isAppearanceLightStatusBars = !isDarkTheme
             controller.isAppearanceLightNavigationBars = !isDarkTheme
         }
     }
+}
 
-    // Применяем тему к всему приложению
-    FinanceAnalyzerTheme(themeMode = themeMode) {
-        if (shouldShowOnboarding) {
-            // Показываем экран онбординга
-            OnboardingScreen(
-                onFinish = {
-                    // Отмечаем онбординг как завершенный
-                    onboardingViewModel.completeOnboarding()
-                    shouldShowOnboarding = false
-
-                    // После завершения онбординга запрашиваем разрешение на уведомления
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-                        !PermissionUtils.hasNotificationPermission(context)
-                    ) {
-                        showPermissionDialog = true
-                    } else {
-                        // Для старых версий просто настраиваем уведомления
-                        setupNotifications()
-                    }
-                }
-            )
-        } else {
-            Scaffold(
-                modifier = Modifier
-                    .fillMaxSize() // Растягиваем фон на весь экран
-            ) { paddingValues ->
-                NavHost(
-                    navController = navController, 
-                    startDestination = startDestination,
-                    modifier = Modifier.padding(
-                        start = paddingValues.calculateLeftPadding(layoutDirection),
-                        end = paddingValues.calculateRightPadding(layoutDirection)
-                    )
-                ) {
-                    composable(
-                        route = Screen.Home.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left, 
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) {
-                        HomeScreen(
-                            viewModel = homeViewModel,
-                            editTransactionViewModel = editTransactionViewModel,
-                            onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                            onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
-                            onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                            onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-                            onNavigateToEdit = { transactionId -> navController.navigate(Screen.EditTransaction.createRoute(transactionId)) }
-                        )
-                    }
-                    
-                    composable(
-                        route = Screen.History.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) {
-                        TransactionHistoryScreen(
-                            viewModel = koinViewModel<TransactionHistoryViewModel>(),
-                            editTransactionViewModel = editTransactionViewModel,
-                            onNavigateBack = { navController.navigateUp() },
-                            navController = navController
-                        )
-                    }
-                    
-                    composable(
-                        route = Screen.AddTransaction.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                                animationSpec = tween(300, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                                animationSpec = tween(350, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(300))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                                animationSpec = tween(300, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                                animationSpec = tween(350, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(300))
-                        }
-                    ) {
-                        AddTransactionScreen(
-                            onNavigateBack = { 
-                                navController.popBackStack() 
-                            },
-                            onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
-                        )
-                    }
-
-                    // Экран редактирования транзакции
-                    composable(
-                        route = Screen.EditTransaction.route,
-                        arguments = listOf(
-                            navArgument("transactionId") { type = NavType.StringType }
-                        ),
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                                animationSpec = tween(300, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                                animationSpec = tween(350, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(300))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Up,
-                                animationSpec = tween(300, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Down,
-                                animationSpec = tween(350, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(300))
-                        }
-                    ) { backStackEntry ->
-                        val transactionId = backStackEntry.arguments?.getString("transactionId")
-                        if (transactionId.isNullOrBlank()) {
-                            Timber.e("transactionId is null or blank, не открываем экран редактирования")
-                            return@composable
-                        }
-                        // Логируем переход на экран редактирования
-                        Timber.d("Переход на экран редактирования транзакции: $transactionId")
-                        EditTransactionScreen(
-                            viewModel = koinViewModel<EditTransactionViewModel>(),
-                            onNavigateBack = { 
-                                homeViewModel.initiateBackgroundDataRefresh()
-                                navController.navigateUp()
-                            },
-                            transactionId = transactionId
-                        )
-                    }
-                    
-                    composable(
-                        route = Screen.Chart.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) {
-                        EnhancedFinanceChartScreen(
-                            navController = navController,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-
-                    // Экран финансовой статистики
-                    composable(
-                        route = Screen.FinancialStatistics.route,
-                        arguments = listOf(
-                            navArgument("startDate") { type = NavType.LongType },
-                            navArgument("endDate") { type = NavType.LongType }
-                        ),
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) { backStackEntry ->
-                        val startDate = backStackEntry.arguments?.getLong("startDate") ?: 0L
-                        val endDate = backStackEntry.arguments?.getLong("endDate") ?: 0L
-                        FinancialStatisticsScreen(
-                            startDate = startDate,
-                            endDate = endDate,
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    
-                    composable(
-                        route = Screen.Profile.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(300, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(350, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(300))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(300, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(300))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(350, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(300))
-                        }
-                    ) {
-                        ProfileScreen(
-                            onNavigateBack = { navController.popBackStack() },
-                            onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
-                            onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                            onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
-                            onNavigateToExportImport = { navController.navigate(Screen.ExportImport.route) }
-                        )
-                    }
-
-                    // Экран экспорт и импорт
-                    composable("export_import") {
-                        ExportImportScreen(
-                            onNavigateBack = { navController.popBackStack() },
-                            onImportClick = {
-                                navController.navigate(Screen.ImportTransactions.route)
-                            },
-                            viewModel = profileViewModel
-                        )
-                    }
-
-                    composable(
-                        route = Screen.ImportTransactions.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) {
-                        ImportTransactionsScreen(
-                            onNavigateBack = { navController.popBackStack() }
-                        )
-                    }
-                    
-                    composable(
-                        route = Screen.Libraries.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) {
-                        LibrariesScreen(
-                            onNavigateBack = { navController.navigateUp() }
-                        )
-                    }
-
-                    // Экран бюджета
-                    composable(
-                        route = Screen.Budget.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) {
-                        BudgetScreen(
-                            navController = navController,
-                            onNavigateBack = { navController.navigateUp() },
-                            onNavigateToTransactions = { categoryId ->
-                                navController.navigate(
-                                    Screen.WalletTransactions.createRoute(
-                                        categoryId
-                                    )
-                                )
-                            }
-                        )
-                    }
-
-                    // Экран транзакций бюджетной категории
-                    composable(
-                        route = Screen.WalletTransactions.route,
-                        arguments = listOf(
-                            navArgument("walletId") { type = NavType.StringType }
-                        ),
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) { backStackEntry ->
-                        val walletId =
-                            backStackEntry.arguments?.getString("walletId") ?: return@composable
-                        WalletTransactionsScreen(
-                            walletId = walletId,
-                            onNavigateBack = { navController.navigateUp() },
-                            navController = navController
-                        )
-                    }
-                    
-                    // Экран кошельков (новый)
-                    composable(
-                        route = Screen.Wallets.route,
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) {
-                        BudgetScreen( // Временно используем старый экран с новым ViewModel
-                            navController = navController,
-                            onNavigateBack = { navController.navigateUp() },
-                            onNavigateToTransactions = { walletId ->
-                                navController.navigate(
-                                    Screen.WalletTransactions.createRoute(
-                                        walletId
-                                    )
-                                )
-                            },
-                            viewModel = koinViewModel<BudgetViewModel>()
-                        )
-                    }
-
-                    // Экран транзакций кошелька (новый)
-                    composable(
-                        route = Screen.WalletTransactions.route,
-                        arguments = listOf(
-                            navArgument("walletId") { type = NavType.StringType }
-                        ),
-                        enterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        exitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popEnterTransition = {
-                            slideIntoContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Left,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-                        },
-                        popExitTransition = {
-                            slideOutOfContainer(
-                                towards = AnimatedContentTransitionScope.SlideDirection.Right,
-                                animationSpec = tween(400, easing = EaseInOut)
-                            ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-                        }
-                    ) { backStackEntry ->
-                        val walletId =
-                            backStackEntry.arguments?.getString("walletId") ?: return@composable
-                        WalletTransactionsScreen(
-                            walletId = walletId,
-                            onNavigateBack = { navController.navigateUp() },
-                            navController = navController
-                        )
-                    }
-                }
-            }
+@Composable
+private fun BackgroundInit(homeViewModel: HomeViewModel) {
+    LaunchedEffect(Unit) {
+        Timber.d("MainScreen: Планируем фоновую инициализацию данных")
+        MainScope().launch(Dispatchers.Default) {
+            delay(500)
+            Timber.d("MainScreen: Запускаем initiateBackgroundDataRefresh")
+            homeViewModel.initiateBackgroundDataRefresh()
+            delay(2000)
+            Timber.d("MainScreen: Запускаем загрузку данных для графиков")
         }
     }
 }

@@ -238,45 +238,9 @@ class HomeViewModel(
                 lastBackgroundRefreshTime = currentTime
                 
                 Timber.d("Инициирована фоновая загрузка метрик (без перезагрузки транзакций)")
-                // Просим FinancialMetrics запланировать проверку в фоне
-                // Это обновит глобальные метрики, которые HomeViewModel слушает через StateFlow
+
                 financialMetrics.recalculateStats()
-                
-                // УДАЛЯЕМ ЛОГИКУ ПРОВЕРКИ И ПЕРЕЗАГРУЗКИ ТРАНЗАКЦИЙ ЗДЕСЬ
-                // // Проверяем, нужно ли загружать транзакции полностью
-                // val currentTransactions = _state.value.transactions
-                // if (currentTransactions.isEmpty() || currentTransactions.size < 20) {
-                //     Timber.d("Запрашиваем полную загрузку транзакций в фоне")
-                //     
-                //     // Небольшая задержка, чтобы не перегружать UI
-                //     delay(100)
-                //     
-                //     // Используем loadTransactions, который уже имеет защиту от множественных вызовов
-                //     loadTransactions()
-                // } else {
-                //     Timber.d("Предварительная загрузка уже выполнена, обновляем только метрики")
-                //     
-                //     // Только обновляем метрики, но не перезагружаем транзакции
-                //     val metrics = withContext(Dispatchers.IO) {
-                //         try {
-                //             val fm = FinancialMetrics.getInstance()
-                //             fm.initializeMetricsFromCache() 
-                //             Triple(fm.getTotalIncome(), fm.getTotalExpense(), fm.getBalance())
-                //         } catch (e: Exception) {
-                //             Timber.e(e, "Ошибка при получении финансовых метрик: ${e.message}")
-                //             Triple(0.0, 0.0, 0.0) 
-                //         }
-                //     }
-                //     
-                //     // Обновляем только метрики
-                //     _state.update { 
-                //         it.copy(
-                //             income = Money(metrics.first),
-                //             expense = Money(metrics.second),
-                //             balance = Money(metrics.third)
-                //         )
-                //     }
-                // }
+
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при фоновом обновлении метрик")
             } finally {
@@ -587,4 +551,4 @@ class HomeViewModel(
         val startDate = startCalendar.time
         return Pair(startDate, endDate)
     }
-} 
+}

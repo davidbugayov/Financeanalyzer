@@ -12,22 +12,30 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Analytics
+import androidx.compose.material.icons.filled.BarChart
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Tab
 import androidx.compose.material3.TabRow
 import androidx.compose.material3.Text
-import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -40,43 +48,35 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.BudgetTip
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedCategoryPieChart
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedLineChart
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedSummaryCard
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.FinancialHealthMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.LineChartTypeSelector
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartDisplayMode
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel.EnhancedFinanceChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.utils.DateUtils
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import com.davidbugayov.financeanalyzer.utils.DateUtils
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel.EnhancedFinanceChartViewModel
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.material3.SnackbarHostState
-import kotlinx.coroutines.flow.collectLatest
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
-import androidx.compose.foundation.layout.width
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedCategoryPieChart
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedLineChart
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedSummaryCard
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.FinancialHealthMetricsCard
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartDisplayMode
-import androidx.navigation.NavController
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.BudgetTip
-import androidx.compose.material.icons.filled.AccountBalanceWallet
-import androidx.compose.material.icons.filled.BarChart
-import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.Check
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -131,7 +131,6 @@ fun EnhancedFinanceChartScreen(
                 is EnhancedFinanceChartEffect.NavigateToAddTransaction -> {
                     onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
                 }
-                else -> {}
             }
         }
     }
@@ -278,11 +277,11 @@ fun EnhancedFinanceChartScreen(
                                 ) {
                                     // Получаем данные категорий в зависимости от выбранного режима
                                     val categoryData = if (state.showExpenses) {
-                                        Timber.d("Данные по расходам за период ${DateUtils.formatDate(state.startDate)} - ${DateUtils.formatDate(state.endDate)}: ${state.expensesByCategory.size} категорий, сумма: ${state.expensesByCategory.values.sumOf { it.amount.toDouble() }}")
+                                        Timber.d("Данные по расходам за период ${DateUtils.formatDate(state.startDate)} – ${DateUtils.formatDate(state.endDate)}: ${state.expensesByCategory.size} категорий, сумма: ${state.expensesByCategory.values.sumOf { it.amount.toDouble() }}")
                                         Timber.d("Список категорий расходов: ${state.expensesByCategory.keys.joinToString()}")
                                         state.expensesByCategory
                                     } else {
-                                        Timber.d("Данные по доходам за период ${DateUtils.formatDate(state.startDate)} - ${DateUtils.formatDate(state.endDate)}: ${state.incomeByCategory.size} категорий, сумма: ${state.incomeByCategory.values.sumOf { it.amount.toDouble() }}")
+                                        Timber.d("Данные по доходам за период ${DateUtils.formatDate(state.startDate)} – ${DateUtils.formatDate(state.endDate)}: ${state.incomeByCategory.size} категорий, сумма: ${state.incomeByCategory.values.sumOf { it.amount.toDouble() }}")
                                         Timber.d("Список категорий доходов: ${state.incomeByCategory.keys.joinToString()}")
                                         state.incomeByCategory
                                     }
@@ -340,7 +339,7 @@ fun EnhancedFinanceChartScreen(
                                     )
 
                                     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-                                    val periodText = "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
+                                    val periodText = "${dateFormat.format(state.startDate)} – ${dateFormat.format(state.endDate)}"
                                                     
                                     EnhancedLineChart(
                                         incomeData = state.incomeLineChartData,
@@ -435,7 +434,7 @@ fun EnhancedFinanceChartScreen(
                                             description = stringResource(R.string.budget_tip_control_categories_desc)
                                         )
                                         BudgetTip(
-                                            icon = Icons.Filled.TrendingUp,
+                                            icon = Icons.AutoMirrored.Filled.TrendingUp,
                                             title = stringResource(R.string.budget_tip_set_goals_title),
                                             description = stringResource(R.string.budget_tip_set_goals_desc)
                                         )

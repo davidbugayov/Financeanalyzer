@@ -21,13 +21,13 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
  *
  * @param currentFilter Текущий фильтр транзакций
  * @param showGroupSummary Флаг отображения сводки
- * @param onShowGroupSummaryChange Callback, вызываемый при изменении флага отображения сводки
+ * @param onToggleGroupSummary Callback, вызываемый при переключении отображения сводки
  */
 @Composable
 fun HomeTransactionsHeader(
     currentFilter: TransactionFilter,
     showGroupSummary: Boolean,
-    onShowGroupSummaryChange: (Boolean) -> Unit,
+    onToggleGroupSummary: (Boolean) -> Unit,
 ) {
     Row(
         modifier = Modifier
@@ -36,30 +36,32 @@ fun HomeTransactionsHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        // Прямой вызов stringResource для получения текста заголовка
         Text(
-            text = when (currentFilter) {
-                TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
-                TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
-                TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
-                TransactionFilter.ALL -> stringResource(R.string.all_transactions)
-            },
+            text = headerTitleForFilter(currentFilter),
             fontSize = 15.sp,
             fontWeight = FontWeight.Medium
         )
-
-        // Текстовая кнопка вместо иконки глаза
         TextButton(
-            onClick = { onShowGroupSummaryChange(!showGroupSummary) }
+            onClick = { onToggleGroupSummary(!showGroupSummary) }
         ) {
             Text(
-                text = if (showGroupSummary) 
-                    stringResource(R.string.hide_summary) 
-                else 
+                text = if (showGroupSummary)
+                    stringResource(R.string.hide_summary)
+                else
                     stringResource(R.string.show_summary),
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
             )
         }
+    }
+}
+
+@Composable
+private fun headerTitleForFilter(filter: TransactionFilter): String {
+    return when (filter) {
+        TransactionFilter.TODAY -> stringResource(R.string.transactions_today)
+        TransactionFilter.WEEK -> stringResource(R.string.transactions_week)
+        TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
+        TransactionFilter.ALL -> stringResource(R.string.all_transactions)
     }
 } 

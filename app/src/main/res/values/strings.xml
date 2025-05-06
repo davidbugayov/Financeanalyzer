@@ -82,7 +82,7 @@
     <string name="period_half_year">Полгода</string>
     <string name="period_year">Год</string>
     <string name="period_custom">Произвольный</string>
-    <string name="period_custom_range">%1$s - %2$s</string>
+    <string name="period_custom_range">%1$s – %2$s</string>
     <string name="from_date">С: %s</string>
     <string name="to_date">По: %s</string>
     <string name="select_start_date">Выберите начальную дату</string>
@@ -428,8 +428,6 @@
     <string name="notification_permission_required">Для отправки напоминаний необходимо разрешение на уведомления.</string>
     <string name="permission_message_android15">Для импорта файлов необходим доступ к выбранным вами файлам. Пожалуйста, предоставьте разрешение.</string>
     <string name="permission_message">Для импорта файлов необходим доступ к хранилищу. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
-    <string name="open_settings">Открыть настройки</string>
-    <string name="request_permission">Запросить разрешение</string>
     <string name="save">Сохранить</string>
     <string name="selected_time">Выбранное время: %1$d:%2$s</string>
 
@@ -612,11 +610,11 @@
     <string name="enhanced_summary_select_period">Выбрать период</string>
     <string name="enhanced_summary_all_time">Все время</string>
     <string name="enhanced_summary_day">День: %s</string>
-    <string name="enhanced_summary_week" formatted="false">Неделя: %s - %s</string>
-    <string name="enhanced_summary_month" formatted="false">Месяц: %s - %s</string>
-    <string name="enhanced_summary_quarter" formatted="false">Квартал: %s - %s</string>
-    <string name="enhanced_summary_year" formatted="false">Год: %s - %s</string>
-    <string name="enhanced_summary_custom" formatted="false">%s - %s</string>
+    <string name="enhanced_summary_week" formatted="false">Неделя: %s – %s</string>
+    <string name="enhanced_summary_month" formatted="false">Месяц: %s – %s</string>
+    <string name="enhanced_summary_quarter" formatted="false">Квартал: %s – %s</string>
+    <string name="enhanced_summary_year" formatted="false">Год: %s – %s</string>
+    <string name="enhanced_summary_custom" formatted="false">%s – %s</string>
 
     <!-- FinancialHealthMetricsCard strings -->
     <string name="financial_health_analysis">Анализ финансового здоровья</string>
@@ -640,7 +638,7 @@
     <string name="savings_rate_percent_50">50%+</string>
     
     <string name="financial_cushion_title">Финансовая подушка</string>
-    <string name="financial_cushion_explanation">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум - 3-6 месяцев.</string>
+    <string name="financial_cushion_explanation">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум – 3–6 месяцев.</string>
     <string name="financial_cushion_months">%d</string>
     <string name="financial_cushion_months_short">мес.</string>
     <string name="financial_cushion_expenses">При ежемесячных расходах %s</string>
@@ -658,23 +656,23 @@
     <string name="savings_rate_excellent">Вы отлично справляетесь с накоплениями! Продолжайте в том же духе.</string>
     <string name="savings_rate_good">Хороший результат. Стремитесь увеличить до 30% для более быстрого роста накоплений.</string>
     <string name="savings_rate_satisfactory">Неплохое начало. Попробуйте увеличить процент сбережений.</string>
-    <string name="savings_rate_needs_attention">Рекомендуется откладывать минимум 10-15% от дохода.</string>
+    <string name="savings_rate_needs_attention">Рекомендуется откладывать минимум 10–15% от дохода.</string>
     
     <string name="financial_cushion_excellent">Вы хорошо защищены от финансовых неожиданностей! Ваш запас превышает рекомендуемый минимум в 6 месяцев.</string>
     <string name="financial_cushion_good">У вас есть базовая финансовая подушка. Старайтесь увеличить её до 6 месяцев расходов.</string>
-    <string name="financial_cushion_insufficient">Рекомендуется иметь запас на 3-6 месяцев расходов. Работайте над увеличением сбережений.</string>
+    <string name="financial_cushion_insufficient">Рекомендуется иметь запас на 3–6 месяцев расходов. Работайте над увеличением сбережений.</string>
     
     <string name="financial_health_explanation">Анализ финансового здоровья включает несколько ключевых метрик:</string>
     <string name="financial_health_savings_rate_title">1. Норма сбережений</string>
-    <string name="financial_health_savings_rate_content">Показывает, какой процент дохода вы откладываете. Рассчитывается как отношение сбережений к общему доходу. Финансовые эксперты рекомендуют сохранять минимум 15-20% дохода.</string>
+    <string name="financial_health_savings_rate_content">Показывает, какой процент дохода вы откладываете. Рассчитывается как отношение сбережений к общему доходу. Финансовые эксперты рекомендуют сохранять минимум 15–20% дохода.</string>
     <string name="financial_health_average_expenses_title">2. Средние расходы</string>
     <string name="financial_health_average_expenses_content">Ваши расходы в среднем за день, месяц и год, рассчитанные на основе истории трат. Помогают планировать бюджет и оценивать уровень потребления.</string>
     <string name="financial_health_financial_cushion_title">3. Финансовая подушка</string>
-    <string name="financial_health_financial_cushion_content">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум - 3-6 месяцев для защиты от непредвиденных ситуаций.</string>
+    <string name="financial_health_financial_cushion_content">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум – 3–6 месяцев для защиты от непредвиденных ситуаций.</string>
     <string name="financial_health_tips_title">Советы по улучшению финансового здоровья:</string>
-    <string name="financial_health_tips_content">• Постарайтесь откладывать не менее 15-20% от дохода\n• Контролируйте ежедневные расходы\n• Создайте финансовую подушку на 3-6 месяцев\n• Инвестируйте регулярно\n• Избегайте кредитов с высокими процентами</string>
+    <string name="financial_health_tips_content">• Постарайтесь откладывать не менее 15–20% от дохода\n• Контролируйте ежедневные расходы\n• Создайте финансовую подушку на 3–6 месяцев\n• Инвестируйте регулярно\n• Избегайте кредитов с высокими процентами</string>
     <string name="financial_health_recommended_values_title">Рекомендуемые значения показателей:</string>
-    <string name="financial_health_recommended_values_content" formatted="false">• Норма сбережений: выше 15% - хорошо, выше 30% - отлично\n• Финансовая подушка: 3-6 месяцев для наемных работников, 6-12 месяцев для предпринимателей\n• Соотношение долга к доходу: не более 30-40% ежемесячного дохода</string>
+    <string name="financial_health_recommended_values_content" formatted="false">• Норма сбережений: выше 15% – хорошо, выше 30% – отлично\n• Финансовая подушка: 3–6 месяцев для наемных работников, 6–12 месяцев для предпринимателей\n• Соотношение долга к доходу: не более 30–40% ежемесячного дохода</string>
     <string name="financial_health_ok_button">Понятно</string>
 
     <!-- New strings for FinanceChartScreen -->
@@ -711,11 +709,11 @@
     <string name="no_recommendations">Нет рекомендаций</string>
 
     <!-- New strings for FinanceChartScreen -->
-    <string name="recommendation_save_10_15">Старайтесь сохранять не менее 10-15% дохода. Рассмотрите возможность сокращения необязательных расходов.</string>
+    <string name="recommendation_save_10_15">Старайтесь сохранять не менее 10–15% дохода. Рассмотрите возможность сокращения необязательных расходов.</string>
     <string name="recommendation_increase_savings">Вы уже откладываете часть дохода — попробуйте увеличить норму сбережений до 20%.</string>
     <string name="recommendation_savings_excellent">Отличная норма сбережений! Продолжайте в том же духе.</string>
     <string name="recommendation_top_expense_category">Основная категория расходов: %1$s. Проанализируйте возможности для оптимизации.</string>
-    <string name="recommendation_months_of_savings_low">Ваших сбережений хватит менее чем на 3 месяца. Рекомендуется создать резерв на 3-6 месяцев расходов.</string>
+    <string name="recommendation_months_of_savings_low">Ваших сбережений хватит менее чем на 3 месяца. Рекомендуется создать резерв на 3–6 месяцев расходов.</string>
     <string name="recommendation_months_of_savings_medium">У вас есть базовая финансовая подушка. Старайтесь увеличить её до 6 месяцев расходов.</string>
     <string name="recommendation_months_of_savings_high">Вы хорошо защищены от финансовых неожиданностей! Ваш запас превышает рекомендуемый минимум.</string>
     <string name="recommendation_increase_income">Рассмотрите возможности для увеличения дохода: дополнительная подработка, фриланс, инвестиции или повышение квалификации.</string>
@@ -776,4 +774,30 @@
     <string name="category_other">Другое</string>
     <string name="category_shopping">Покупки</string>
     <string name="category_utilities">Коммунальные услуги</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="permission_denied_title">Разрешение отклонено</string>
+    <string name="permission_denied_text">Для получения уведомлений о транзакциях необходимо разрешение. Вы можете включить его в настройках приложения.</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="permission_required_title">Нужно разрешение</string>
+    <string name="permission_required_text">Для получения уведомлений о транзакциях требуется ваше разрешение.</string>
+    <string name="request_permission">Запросить разрешение</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="test_data_generated">Тестовые данные сгенерированы</string>
+    <string name="generate_test_data">Сгенерировать тестовые данные</string>
+    <string name="transaction_deleted">Транзакция удалена</string>
+    <string name="empty_transaction_id_error">Попытка навигации на экран редактирования с пустым transactionId!</string>
+    <string name="empty_state_icon_desc">Пусто</string>
+    <string name="empty_state_title">Здесь пока пусто</string>
+    <string name="empty_state_subtitle">Добавьте свою первую транзакцию, чтобы начать анализировать финансы!</string>
+    <string name="empty_state_add_first_transaction">Добавить первую транзакцию</string>
+    <string name="summary_today">Сводка за сегодня</string>
+    <string name="summary_week">Сводка за неделю</string>
+    <string name="summary_month">Сводка за месяц</string>
+    <string name="summary_all_time">Сводка за все время</string>
+    <string name="no_expenses_period">Нет расходов за выбранный период</string>
+    <string name="no_income_period">Нет доходов за выбранный период</string>
+    <string name="and_more_categories">И ещё %1$d категорий</string>
+    <string name="hide">Скрыть</string>
 </resources>
