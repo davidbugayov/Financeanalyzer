@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
 
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -22,7 +23,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
 
 /**
  * Диалог для выбора категорий (импорта или связывания)
@@ -39,7 +39,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.Categ
 fun ImportCategoriesDialog(
     onDismiss: () -> Unit,
     onImport: (List<String>) -> Unit,
-    availableCategories: List<CategoryItem>,
+    availableCategories: List<UiCategory>,
     title: String = "Импорт категорий",
     subtitle: String = "Выберите категории расходов для добавления в бюджет:",
     confirmButtonText: String = "Импортировать",

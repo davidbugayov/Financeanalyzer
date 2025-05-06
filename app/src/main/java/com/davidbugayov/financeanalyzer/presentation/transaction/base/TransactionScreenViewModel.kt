@@ -4,6 +4,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import kotlinx.coroutines.flow.StateFlow
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
 interface TransactionScreenViewModel<S, E> {
 
@@ -42,8 +43,8 @@ interface BaseTransactionState {
     val error: String?
     val isSuccess: Boolean
     val successMessage: String
-    val expenseCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem>
-    val incomeCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem>
+    val expenseCategories: List<UiCategory>
+    val incomeCategories: List<UiCategory>
     val sources: List<com.davidbugayov.financeanalyzer.domain.model.Source>
     val categoryToDelete: String?
     val sourceToDelete: String?
@@ -60,14 +61,16 @@ interface BaseTransactionState {
     val preventAutoSubmit: Boolean
     val selectedExpenseCategory: String
     val selectedIncomeCategory: String
-    val customCategoryIcon: ImageVector
+    val selectedCategory: UiCategory?
+    val categories: List<UiCategory>
     val availableCategoryIcons: List<ImageVector>
+    val customCategoryIcon: ImageVector?
 }
 
 fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent = { eventData ->
     when (eventData) {
         is com.davidbugayov.financeanalyzer.domain.model.Source -> BaseTransactionEvent.SetSource(eventData.name)
-        is com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem -> BaseTransactionEvent.SetCategory(eventData.name)
+        is UiCategory -> BaseTransactionEvent.SetCategory(eventData.name)
         is java.util.Date -> BaseTransactionEvent.SetDate(eventData)
         is BaseTransactionEvent -> eventData
         else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit

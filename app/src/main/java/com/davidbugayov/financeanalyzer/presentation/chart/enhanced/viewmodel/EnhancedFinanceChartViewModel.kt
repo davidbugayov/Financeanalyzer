@@ -24,14 +24,15 @@ import org.koin.core.component.inject
 import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.PieChartUtils
 import androidx.compose.ui.graphics.Color
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 
 class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
-    private val getTransactionsUseCase: GetTransactionsUseCase by inject()
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
+    private val categoriesViewModel: CategoriesViewModel by inject()
     private val _state = MutableStateFlow(EnhancedFinanceChartState())
     val state: StateFlow<EnhancedFinanceChartState> = _state.asStateFlow()
 
@@ -67,6 +68,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
             }
             is EnhancedFinanceChartIntent.ToggleExpenseView -> {
                 _state.update { it.copy(showExpenses = intent.showExpenses) }
+                loadData()
             }
             is EnhancedFinanceChartIntent.AddTransactionClicked -> {
                 viewModelScope.launch {
@@ -129,6 +131,10 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val pieChartData = preparePieChartData(categoryData, showExpenses)
 
                 Timber.d("EnhancedFinanceChartViewModel: Категорий расходов: "+expensesByCategory.size+", доходов: "+incomeByCategory.size)
+                if (!showExpenses) {
+                    Timber.d("[DEBUG] incomeByCategory: " + incomeByCategory.map { it.key + ": " + it.value.amount })
+                    Timber.d("[DEBUG] pieChartData (income): " + pieChartData.map { it.name + ": " + it.money.amount + ", %: " + it.percentage })
+                }
 
                 _state.update {
                     it.copy(
@@ -215,29 +221,26 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private fun preparePieChartData(
         data: Map<String, Money>,
         showExpenses: Boolean
-    ): List<PieChartItemData> {
+    ): List<UiCategory> {
         val filteredData = data.filter { !it.value.isZero() }
-        val colors = PieChartUtils.getCategoryColors(filteredData.size, !showExpenses)
+        val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
         val pieChartDataList = filteredData.entries.mapIndexed { index, entry ->
             val categoryName = entry.key
             val moneyValue = entry.value
-            val category = if (!showExpenses) {
-                Category.income(name = categoryName)
-            } else {
-                Category.expense(name = categoryName)
-            }
-            val color = colors.getOrElse(index) {
-                if (!showExpenses) Color(0xFF66BB6A + (index * 1000))
-                else Color(0xFFEF5350 + (index * 1000))
-            }
-            PieChartItemData(
-                id = index.toString(),
+            val category = categories.find { it.name == categoryName }
+            val color = category?.color ?: Color.Gray
+            UiCategory(
+                id = index.toLong(),
                 name = categoryName,
+                isExpense = showExpenses,
+                isCustom = category?.isCustom ?: false,
+                count = 0,
                 money = moneyValue,
-                percentage = 0f, // будет рассчитано ниже
+                percentage = 0f,
+                transactions = emptyList(),
+                original = category?.original,
                 color = color,
-                category = category,
-                transactions = emptyList()
+                icon = category?.icon
             )
         }
         val totalMoney = pieChartDataList.sumOf { it.money.amount.toDouble() }

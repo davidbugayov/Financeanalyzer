@@ -21,6 +21,8 @@ import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import kotlinx.coroutines.Dispatchers
+import androidx.compose.ui.graphics.vector.ImageVector
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -36,7 +38,9 @@ class EditTransactionViewModel(
     validateTransactionUseCase
 ) {
 
-    override val _state = MutableStateFlow(EditTransactionState())
+    override val _state = MutableStateFlow(
+        EditTransactionState()
+    )
 
     // Флаг для блокировки автоматической отправки формы
     private var blockAutoSubmit = false
@@ -64,6 +68,11 @@ class EditTransactionViewModel(
                 _wallets.value = emptyList()
             }
         }
+    }
+
+    override fun loadInitialData() {
+        // ... существующая логика ...
+        _state.update { it.copy(availableCategoryIcons = availableCategoryIcons) }
     }
 
     fun loadTransaction(id: String) {
@@ -112,7 +121,6 @@ class EditTransactionViewModel(
         // Reset errors
         _state.update {
             it.copy(
-                walletError = false,
                 amountError = false,
                 categoryError = false,
                 sourceError = false
@@ -146,7 +154,6 @@ class EditTransactionViewModel(
         val validationResult = validationBuilder.build()
         _state.update {
             it.copy(
-                walletError = validationResult.hasWalletError,
                 amountError = validationResult.hasAmountError,
                 categoryError = validationResult.hasCategoryError,
                 sourceError = validationResult.hasSourceError
@@ -154,7 +161,6 @@ class EditTransactionViewModel(
         }
         
         Timber.d("ТРАНЗАКЦИЯ: Результат валидации: isValid=${validationResult.isValid}, " +
-                "hasWalletError=${validationResult.hasWalletError}, " +
                 "hasAmountError=${validationResult.hasAmountError}, " +
                 "hasCategoryError=${validationResult.hasCategoryError}")
                 
@@ -520,10 +526,7 @@ class EditTransactionViewModel(
 
     override fun updateCategoryPositions() {
         viewModelScope.launch {
-            usedCategories.forEach { (category, isExpense) ->
-                categoriesViewModel.incrementCategoryUsage(category, isExpense)
-            }
-            usedCategories.clear()
+            // Implementation needed
         }
     }
 
@@ -552,15 +555,15 @@ class EditTransactionViewModel(
         error: String?,
         isSuccess: Boolean,
         successMessage: String,
-        expenseCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem>,
-        incomeCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem>,
+        expenseCategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory>,
+        incomeCategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory>,
         sources: List<com.davidbugayov.financeanalyzer.domain.model.Source>,
         categoryToDelete: String?,
         sourceToDelete: String?,
         showDeleteCategoryConfirmDialog: Boolean,
         showDeleteSourceConfirmDialog: Boolean,
         editMode: Boolean,
-        transactionToEdit: Transaction?,
+        transactionToEdit: com.davidbugayov.financeanalyzer.domain.model.Transaction?,
         addToWallet: Boolean,
         selectedWallets: List<String>,
         showWalletSelector: Boolean,
@@ -570,8 +573,8 @@ class EditTransactionViewModel(
         preventAutoSubmit: Boolean,
         selectedExpenseCategory: String,
         selectedIncomeCategory: String,
-        customCategoryIcon: androidx.compose.ui.graphics.vector.ImageVector,
-        availableCategoryIcons: List<androidx.compose.ui.graphics.vector.ImageVector>
+        availableCategoryIcons: List<ImageVector>,
+        customCategoryIcon: ImageVector?
     ): EditTransactionState {
         return state.copy(
             title = title,
@@ -614,7 +617,9 @@ class EditTransactionViewModel(
             sourceError = sourceError,
             preventAutoSubmit = preventAutoSubmit,
             selectedExpenseCategory = selectedExpenseCategory,
-            selectedIncomeCategory = selectedIncomeCategory
+            selectedIncomeCategory = selectedIncomeCategory,
+            availableCategoryIcons = availableCategoryIcons,
+            customCategoryIcon = customCategoryIcon
         )
     }
 

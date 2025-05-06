@@ -126,6 +126,18 @@
     <color name="category_investment">#FFFFEB3B</color>
     <color name="category_other">#FF9E9E9E</color>
     <color name="category_color_other">#9E9E9E</color>
+    <color name="category_restaurant">#FF8A65</color>
+    <color name="category_clothing">#BA68C8</color>
+    <color name="category_communication">#4FC3F7</color>
+    <color name="category_pet">#FFD54F</color>
+    <color name="category_services">#A1887F</color>
+    <color name="category_charity">#81C784</color>
+    <color name="category_credit">#90A4AE</color>
+    <color name="category_transfer">#B0BEC5</color>
+    <color name="category_freelance">#7986CB</color>
+    <color name="category_gift">#F06292</color>
+    <color name="category_interest">#FFD600</color>
+    <color name="category_rent">#8D6E63</color>
 
     <!-- Enhanced pie chart colors -->
     <color name="enhanced_pie_chart_sector_outline_outer">#66FFFFFF</color>

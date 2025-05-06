@@ -27,6 +27,7 @@ import timber.log.Timber
 import android.graphics.Color
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
 
 /**
  * Реализация импорта транзакций из PDF-выписки Озон Банка.
@@ -505,10 +506,11 @@ class OzonPdfImportUseCase(
      * @param isExpense Флаг, является ли категория расходной
      */
     private fun addCategoryIfNotExists(category: String, isExpense: Boolean) {
+        val customCategory = CustomCategoryData(category, "Add")
         if (isExpense) {
-            categoryPreferences.addExpenseCategory(category)
+            categoryPreferences.addExpenseCategory(customCategory)
         } else {
-            categoryPreferences.addIncomeCategory(category)
+            categoryPreferences.addIncomeCategory(customCategory)
         }
     }
     

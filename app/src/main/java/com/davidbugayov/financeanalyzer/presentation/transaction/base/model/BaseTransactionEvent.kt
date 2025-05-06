@@ -28,7 +28,6 @@ sealed class BaseTransactionEvent {
     data object HideCategoryPicker : BaseTransactionEvent()
     data object ShowCustomCategoryDialog : BaseTransactionEvent()
     data object HideCustomCategoryDialog : BaseTransactionEvent()
-    data class SetCustomCategoryIcon(val icon: ImageVector) : BaseTransactionEvent()
     data object ShowCancelConfirmation : BaseTransactionEvent()
     data object HideCancelConfirmation : BaseTransactionEvent()
     data object ShowSourcePicker : BaseTransactionEvent()
@@ -56,4 +55,5 @@ sealed class BaseTransactionEvent {
     data object PreventAutoSubmit : BaseTransactionEvent()
     data class SetExpenseCategory(val category: String) : BaseTransactionEvent()
     data class SetIncomeCategory(val category: String) : BaseTransactionEvent()
+    data class SetCustomCategoryIcon(val icon: ImageVector) : BaseTransactionEvent()
 } 

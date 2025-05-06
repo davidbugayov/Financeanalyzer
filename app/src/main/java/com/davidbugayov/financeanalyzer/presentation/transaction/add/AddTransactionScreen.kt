@@ -34,9 +34,6 @@ fun AddTransactionScreen(
             screenName = "add_transaction",
             screenClass = "AddTransactionScreen"
         )
-
-        // Устанавливаем callback для навигации назад
-        viewModel.navigateBackCallback = onNavigateBack
     }
 
     // Обработка типа транзакции на основе forceExpense
@@ -54,7 +51,7 @@ fun AddTransactionScreen(
     // Очищаем callback при выходе из композиции
     DisposableEffect(Unit) {
         onDispose {
-            viewModel.navigateBackCallback = null
+            // No need to reset navigateBackCallback as it's not used in the new implementation
         }
     }
 

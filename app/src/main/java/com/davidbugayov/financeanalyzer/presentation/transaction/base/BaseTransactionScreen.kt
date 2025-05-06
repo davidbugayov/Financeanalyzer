@@ -261,22 +261,13 @@ fun <E> BaseTransactionScreen(
                     )
                 }
 
-                // Секция категорий - теперь вторая
-                Column {
+                // Секция выбора категории
+                if (state.isExpense) {
                     CategorySection(
-                        categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
-                        selectedCategory = if (state.isExpense) state.selectedExpenseCategory else state.selectedIncomeCategory,
-                        onCategorySelected = { selectedCategory ->
-                            Timber.d("Category selected directly: " + selectedCategory.name)
-                            if (state.isExpense) {
-                                viewModel.onEvent(eventFactory(BaseTransactionEvent.SetExpenseCategory(selectedCategory.name)), context)
-                                // Обновление счетчика использования категории расходов
-                                categoriesViewModel.incrementCategoryUsage(selectedCategory.name, true)
-                            } else {
-                                viewModel.onEvent(eventFactory(BaseTransactionEvent.SetIncomeCategory(selectedCategory.name)), context)
-                                // Обновление счетчика использования категории доходов
-                                categoriesViewModel.incrementCategoryUsage(selectedCategory.name, false)
-                            }
+                        categories = state.expenseCategories,
+                        selectedCategory = state.category,
+                        onCategorySelected = { category ->
+                            viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCategory(category.name)), context)
                         },
                         onAddCategoryClick = {
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog), context)
@@ -284,6 +275,26 @@ fun <E> BaseTransactionScreen(
                         onCategoryLongClick = { selectedCategory ->
                             Timber.d("Category long click in BaseTransactionScreen: " + selectedCategory.name)
                             // Don't allow long press on "Другое" and "Переводы"
+                            if (selectedCategory.name != "Другое" && selectedCategory.name != "Переводы") {
+                                viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(selectedCategory.name)), context)
+                            } else {
+                                Timber.d("Ignoring long press on protected category: " + selectedCategory.name)
+                            }
+                        },
+                        isError = state.categoryError
+                    )
+                } else {
+                    CategorySection(
+                        categories = state.incomeCategories,
+                        selectedCategory = state.category,
+                        onCategorySelected = { category ->
+                            viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCategory(category.name)), context)
+                        },
+                        onAddCategoryClick = {
+                            viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog), context)
+                        },
+                        onCategoryLongClick = { selectedCategory ->
+                            Timber.d("Category long click in BaseTransactionScreen: " + selectedCategory.name)
                             if (selectedCategory.name != "Другое" && selectedCategory.name != "Переводы") {
                                 viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(selectedCategory.name)), context)
                             } else {
@@ -464,16 +475,16 @@ fun <E> BaseTransactionScreen(
                     onCategoryTextChange = { name ->
                         viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCustomCategory(name)), context)
                     },
-                    selectedIcon = addState?.customCategoryIcon ?: Icons.Default.MoreHoriz,
-                    onIconSelected = { icon ->
-                        viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCustomCategoryIcon(icon)), context)
-                    },
-                    availableIcons = addState?.availableCategoryIcons ?: emptyList(),
                     onConfirm = {
                         viewModel.onEvent(eventFactory(BaseTransactionEvent.AddCustomCategory(state.customCategory)), context)
                     },
                     onDismiss = {
                         viewModel.onEvent(eventFactory(BaseTransactionEvent.HideCustomCategoryDialog), context)
+                    },
+                    availableIcons = addState?.availableCategoryIcons ?: emptyList(),
+                    selectedIcon = addState?.customCategoryIcon,
+                    onIconSelected = { icon ->
+                        viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCustomCategoryIcon(icon)), context)
                     }
                 )
             }

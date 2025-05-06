@@ -14,7 +14,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources
@@ -26,6 +26,7 @@ import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -44,7 +45,12 @@ class AddTransactionViewModel(
     validateTransactionUseCase
 ) {
 
-    override val _state = MutableStateFlow(AddTransactionState())
+    override val _state = MutableStateFlow(
+        AddTransactionState(
+            expenseCategories = categoriesViewModel.expenseCategories.value,
+            incomeCategories = categoriesViewModel.incomeCategories.value
+        )
+    )
 
     // Расширение для преобразования строки в Double
     private fun String.toDouble(): Double {
@@ -58,8 +64,6 @@ class AddTransactionViewModel(
 
     init {
         Timber.d("[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel")
-        // Сбросить категорию перед загрузкой
-        _state.update { it.copy(category = "") }
         // Загружаем категории
         loadInitialData()
         // Принудительно выставить дефолтную категорию после инициализации (после collect)
@@ -84,6 +88,7 @@ class AddTransactionViewModel(
     override fun loadInitialData() {
         loadCategories()
         initSources()
+        _state.update { it.copy(availableCategoryIcons = availableCategoryIcons) }
     }
 
     /**
@@ -99,70 +104,39 @@ class AddTransactionViewModel(
      */
     private fun loadCategories() {
         viewModelScope.launch {
-            try {
-                categoriesViewModel.expenseCategories.collect { categories ->
-                    Timber.d("[VM] collect: expenseCategories обновились, size=${categories.size}, isExpense=${_state.value.isExpense}, category='${_state.value.category}'")
-                    _state.update { it.copy(expenseCategories = categories) }
-                    if (_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
-                        Timber.d("[VM] collect: Выставляю первую категорию расходов: ${categories.first().name}")
-                        _state.update {
-                            it.copy(
-                                category = categories.first().name,
-                                selectedExpenseCategory = categories.first().name
-                            )
-                        }
+            if (_state.value.isExpense) {
+                categoriesViewModel.expenseCategories.collect { expenseCategories ->
+                    _state.update { state ->
+                        state.copy(
+                            expenseCategories = expenseCategories,
+                            selectedCategory = expenseCategories.firstOrNull()
+                        )
                     }
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке категорий расходов")
-            }
-        }
-        viewModelScope.launch {
-            try {
-                categoriesViewModel.incomeCategories.collect { categories ->
-                    Timber.d("[VM] collect: incomeCategories обновились, size=${categories.size}, isExpense=${_state.value.isExpense}, category='${_state.value.category}'")
-                    _state.update { it.copy(incomeCategories = categories) }
-                    if (!_state.value.isExpense && categories.isNotEmpty() && _state.value.category.isBlank()) {
-                        Timber.d("[VM] collect: Выставляю первую категорию доходов: ${categories.first().name}")
-                        _state.update {
-                            it.copy(
-                                category = categories.first().name,
-                                selectedIncomeCategory = categories.first().name
-                            )
-                        }
+            } else {
+                categoriesViewModel.incomeCategories.collect { incomeCategories ->
+                    _state.update { state ->
+                        state.copy(
+                            incomeCategories = incomeCategories,
+                            selectedCategory = incomeCategories.firstOrNull()
+                        )
                     }
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке категорий доходов")
             }
         }
     }
 
     override fun setDefaultCategoryIfNeeded(force: Boolean) {
         _state.update { current ->
-            if (current.isExpense && current.expenseCategories.isNotEmpty()) {
-                // Если категория уже выбрана и есть в списке — не менять
-                if (!force && current.selectedExpenseCategory.isNotBlank() && current.expenseCategories.any { it.name == current.selectedExpenseCategory }) {
-                    current.copy(category = current.selectedExpenseCategory)
+            val filtered = if (current.isExpense) current.expenseCategories else current.incomeCategories
+            if (filtered.isNotEmpty()) {
+                if (!force && current.selectedCategory != null && filtered.any { it.name == current.selectedCategory.name }) {
+                    current
                 } else {
-                    Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию расходов: ${current.expenseCategories.first().name}")
-                    current.copy(
-                        category = current.expenseCategories.first().name,
-                        selectedExpenseCategory = current.expenseCategories.first().name
-                    )
-                }
-            } else if (!current.isExpense && current.incomeCategories.isNotEmpty()) {
-                if (!force && current.selectedIncomeCategory.isNotBlank() && current.incomeCategories.any { it.name == current.selectedIncomeCategory }) {
-                    current.copy(category = current.selectedIncomeCategory)
-                } else {
-                    Timber.d("[VM] setDefaultCategoryIfNeeded: Выставляю первую категорию доходов: ${current.incomeCategories.first().name}")
-                    current.copy(
-                        category = current.incomeCategories.first().name,
-                        selectedIncomeCategory = current.incomeCategories.first().name
-                    )
+                    current.copy(selectedCategory = filtered.first())
                 }
             } else {
-                current
+                current.copy(selectedCategory = null)
             }
         }
     }
@@ -253,11 +227,9 @@ class AddTransactionViewModel(
         // Reset errors
         _state.update {
             it.copy(
-                walletError = false,
                 amountError = false,
                 categoryError = false,
-                sourceError = false,
-                dateError = false
+                sourceError = false
             )
         }
 
@@ -308,11 +280,9 @@ class AddTransactionViewModel(
         val validationResult = validationBuilder.build()
         _state.update {
             it.copy(
-                walletError = validationResult.hasWalletError,
                 amountError = validationResult.hasAmountError,
                 categoryError = validationResult.hasCategoryError,
-                sourceError = validationResult.hasSourceError,
-                dateError = dateError
+                sourceError = validationResult.hasSourceError
             )
         }
 
@@ -530,8 +500,8 @@ class AddTransactionViewModel(
         error: String?,
         isSuccess: Boolean,
         successMessage: String,
-        expenseCategories: List<CategoryItem>,
-        incomeCategories: List<CategoryItem>,
+        expenseCategories: List<UiCategory>,
+        incomeCategories: List<UiCategory>,
         sources: List<Source>,
         categoryToDelete: String?,
         sourceToDelete: String?,
@@ -548,8 +518,8 @@ class AddTransactionViewModel(
         preventAutoSubmit: Boolean,
         selectedExpenseCategory: String,
         selectedIncomeCategory: String,
-        customCategoryIcon: ImageVector,
-        availableCategoryIcons: List<ImageVector>
+        availableCategoryIcons: List<ImageVector>,
+        customCategoryIcon: ImageVector?
     ): AddTransactionState {
         return state.copy(
             title = title,
@@ -593,8 +563,8 @@ class AddTransactionViewModel(
             preventAutoSubmit = preventAutoSubmit,
             selectedExpenseCategory = selectedExpenseCategory,
             selectedIncomeCategory = selectedIncomeCategory,
-            customCategoryIcon = customCategoryIcon,
-            availableCategoryIcons = availableCategoryIcons
+            availableCategoryIcons = availableCategoryIcons,
+            customCategoryIcon = customCategoryIcon
         )
     }
 } 

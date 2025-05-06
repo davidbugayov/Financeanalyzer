@@ -27,6 +27,7 @@ import kotlin.math.absoluteValue
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
 
 /**
  * Реализация импорта транзакций из PDF-выписки Т-Банка.
@@ -780,10 +781,11 @@ class TBankPdfImportUseCase(
      * Добавляет категорию в предпочтения, если её еще нет
      */
     private fun addCategoryIfNotExists(category: String, isExpense: Boolean) {
+        val customCategory = CustomCategoryData(category, "Add")
         if (isExpense) {
-            categoryPreferences.addExpenseCategory(category)
+            categoryPreferences.addExpenseCategory(customCategory)
         } else {
-            categoryPreferences.addIncomeCategory(category)
+            categoryPreferences.addIncomeCategory(customCategory)
         }
         Timber.d("Проверка и добавление категории: $category, расход: $isExpense")
     }

@@ -267,7 +267,7 @@
     <dimen name="financial_health_progress_height">8dp</dimen>
 
     <!-- Dimensions for EnhancedCategoryPieChart Legend -->
-    <dimen name="legend_item_height_approx">28dp</dimen>
+    <dimen name="legend_item_height_approx">14dp</dimen>
     <dimen name="min_legend_height">50dp</dimen>
     <dimen name="max_legend_height">280dp</dimen> <!-- Adjust based on MAX_CATEGORIES_VISIBLE * legend_item_height_approx -->
     <dimen name="legend_indicator_size">12dp</dimen>

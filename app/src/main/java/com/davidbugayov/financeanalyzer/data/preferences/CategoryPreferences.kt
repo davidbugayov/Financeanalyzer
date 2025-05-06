@@ -15,6 +15,7 @@ class CategoryPreferences private constructor(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
     private val gson = Gson()
+    private val typeCustomCategoryList = object : com.google.gson.reflect.TypeToken<List<CustomCategoryData>>() {}.type
 
     companion object {
 
@@ -34,12 +35,14 @@ class CategoryPreferences private constructor(context: Context) {
         }
     }
 
+    data class CustomCategoryData(val name: String, val iconName: String, val colorHex: String? = null)
+
     /**
      * Сохраняет пользовательские категории расходов
      */
-    fun saveExpenseCategories(categories: List<String>) {
+    fun saveExpenseCategories(categories: List<CustomCategoryData>) {
         try {
-            val json = GsonUtils.toJsonFromStringList(gson, categories)
+            val json = gson.toJson(categories)
             prefs.edit {
                 putString(KEY_EXPENSE_CATEGORIES, json)
             }
@@ -51,11 +54,11 @@ class CategoryPreferences private constructor(context: Context) {
     /**
      * Загружает пользовательские категории расходов
      */
-    fun loadExpenseCategories(): List<String> {
+    fun loadExpenseCategories(): List<CustomCategoryData> {
         val json = prefs.getString(KEY_EXPENSE_CATEGORIES, null)
         return if (json != null) {
             try {
-                GsonUtils.fromJsonToStringList(gson, json)
+                gson.fromJson<List<CustomCategoryData>>(json, typeCustomCategoryList) ?: emptyList()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing expense categories")
                 emptyList()
@@ -68,9 +71,9 @@ class CategoryPreferences private constructor(context: Context) {
     /**
      * Сохраняет пользовательские категории доходов
      */
-    fun saveIncomeCategories(categories: List<String>) {
+    fun saveIncomeCategories(categories: List<CustomCategoryData>) {
         try {
-            val json = GsonUtils.toJsonFromStringList(gson, categories)
+            val json = gson.toJson(categories)
             prefs.edit {
                 putString(KEY_INCOME_CATEGORIES, json)
             }
@@ -82,11 +85,11 @@ class CategoryPreferences private constructor(context: Context) {
     /**
      * Загружает пользовательские категории доходов
      */
-    fun loadIncomeCategories(): List<String> {
+    fun loadIncomeCategories(): List<CustomCategoryData> {
         val json = prefs.getString(KEY_INCOME_CATEGORIES, null)
         return if (json != null) {
             try {
-                GsonUtils.fromJsonToStringList(gson, json)
+                gson.fromJson<List<CustomCategoryData>>(json, typeCustomCategoryList) ?: emptyList()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing income categories")
                 emptyList()
@@ -99,9 +102,9 @@ class CategoryPreferences private constructor(context: Context) {
     /**
      * Добавляет новую категорию расходов
      */
-    fun addExpenseCategory(category: String) {
+    fun addExpenseCategory(category: CustomCategoryData) {
         val categories = loadExpenseCategories().toMutableList()
-        if (!categories.contains(category)) {
+        if (categories.none { it.name == category.name }) {
             categories.add(category)
             saveExpenseCategories(categories)
         }
@@ -110,9 +113,9 @@ class CategoryPreferences private constructor(context: Context) {
     /**
      * Добавляет новую категорию доходов
      */
-    fun addIncomeCategory(category: String) {
+    fun addIncomeCategory(category: CustomCategoryData) {
         val categories = loadIncomeCategories().toMutableList()
-        if (!categories.contains(category)) {
+        if (categories.none { it.name == category.name }) {
             categories.add(category)
             saveIncomeCategories(categories)
         }
@@ -123,7 +126,7 @@ class CategoryPreferences private constructor(context: Context) {
      */
     fun removeExpenseCategory(category: String) {
         val categories = loadExpenseCategories().toMutableList()
-        if (categories.remove(category)) {
+        if (categories.removeIf { it.name == category }) {
             saveExpenseCategories(categories)
         }
     }
@@ -133,7 +136,7 @@ class CategoryPreferences private constructor(context: Context) {
      */
     fun removeIncomeCategory(category: String) {
         val categories = loadIncomeCategories().toMutableList()
-        if (categories.remove(category)) {
+        if (categories.removeIf { it.name == category }) {
             saveIncomeCategories(categories)
         }
     }

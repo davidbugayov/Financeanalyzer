@@ -28,14 +28,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Category
 
 /**
  * Диалог выбора категории
  */
 @Composable
 fun CategoryPickerDialog(
-    categories: List<CategoryItem>,
+    categories: List<UiCategory>,
     onCategorySelected: (String) -> Unit,
     onCustomCategoryClick: () -> Unit,
     onDismiss: () -> Unit
@@ -77,7 +79,7 @@ fun CategoryPickerDialog(
  */
 @Composable
 fun CategoryItemButton(
-    category: CategoryItem,
+    category: UiCategory,
     onClick: () -> Unit
 ) {
     Surface(
@@ -93,7 +95,7 @@ fun CategoryItemButton(
             modifier = Modifier.padding(4.dp)
         ) {
             Icon(
-                imageVector = category.icon,
+                imageVector = category.icon ?: Icons.Default.Category,
                 contentDescription = category.name,
                 tint = MaterialTheme.colorScheme.primary
             )
@@ -113,11 +115,11 @@ fun CategoryItemButton(
 fun CustomCategoryDialog(
     categoryText: String,
     onCategoryTextChange: (String) -> Unit,
-    selectedIcon: ImageVector,
-    onIconSelected: (ImageVector) -> Unit,
-    availableIcons: List<ImageVector>,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    availableIcons: List<ImageVector> = emptyList(),
+    selectedIcon: ImageVector? = null,
+    onIconSelected: (ImageVector) -> Unit = {},
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -132,31 +134,31 @@ fun CustomCategoryDialog(
                     modifier = Modifier.fillMaxWidth()
                 )
                 Spacer(modifier = Modifier.height(16.dp))
-                Text(text = stringResource(R.string.select_icon), style = MaterialTheme.typography.bodyMedium)
-                Spacer(modifier = Modifier.height(8.dp))
-                LazyVerticalGrid(
-                    columns = GridCells.Fixed(5),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp),
-                    modifier = Modifier.height(180.dp)
-                ) {
-                    items(availableIcons) { icon ->
-                        Surface(
-                            shape = MaterialTheme.shapes.medium,
-                            color = if (icon == selectedIcon) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent,
-                            border = if (icon == selectedIcon) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
-                            modifier = Modifier
-                                .aspectRatio(1f)
-                                .clickable { onIconSelected(icon) }
-                        ) {
-                            Icon(
-                                imageVector = icon,
-                                contentDescription = null,
-                                tint = if (icon == selectedIcon) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface,
+                if (availableIcons.isNotEmpty()) {
+                    Text(text = stringResource(R.string.select_icon), style = MaterialTheme.typography.bodyMedium)
+                    Spacer(modifier = Modifier.height(8.dp))
+                    LazyVerticalGrid(
+                        columns = GridCells.Fixed(5),
+                        horizontalArrangement = Arrangement.spacedBy(8.dp),
+                        verticalArrangement = Arrangement.spacedBy(8.dp),
+                        modifier = Modifier.height(120.dp)
+                    ) {
+                        items(availableIcons) { icon ->
+                            Surface(
+                                shape = MaterialTheme.shapes.medium,
+                                color = if (icon == selectedIcon) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent,
+                                border = if (icon == selectedIcon) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
                                 modifier = Modifier
-                                    .padding(12.dp)
-                                    .size(28.dp)
-                            )
+                                    .size(48.dp)
+                                    .clickable { onIconSelected(icon) }
+                            ) {
+                                Icon(
+                                    imageVector = icon,
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary,
+                                    modifier = Modifier.padding(8.dp)
+                                )
+                            }
                         }
                     }
                 }
@@ -165,7 +167,7 @@ fun CustomCategoryDialog(
         confirmButton = {
             TextButton(
                 onClick = onConfirm,
-                enabled = categoryText.isNotBlank()
+                enabled = categoryText.isNotBlank() && selectedIcon != null
             ) {
                 Text(stringResource(R.string.add_button))
             }

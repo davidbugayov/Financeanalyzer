@@ -753,4 +753,27 @@
     <string name="budget_tip_set_goals_desc">Планируйте крупные траты заранее и разбивайте их на небольшие накопления каждый месяц.</string>
     <string name="budget_tip_check_weekly_title">Проверяйте бюджет раз в неделю</string>
     <string name="budget_tip_check_weekly_desc">Регулярный анализ поможет вовремя скорректировать траты и не выйти за рамки бюджета.</string>
+
+    <!-- Категории (для CategoryMappers) -->
+    <string name="category_food">Продукты</string>
+    <string name="category_transport">Транспорт</string>
+    <string name="category_entertainment">Развлечения</string>
+    <string name="category_restaurant">Рестораны</string>
+    <string name="category_health">Здоровье</string>
+    <string name="category_clothing">Одежда</string>
+    <string name="category_housing">Жилье</string>
+    <string name="category_communication">Связь</string>
+    <string name="category_pet">Питомец</string>
+    <string name="category_services">Услуги</string>
+    <string name="category_charity">Благотворительность</string>
+    <string name="category_credit">Кредит</string>
+    <string name="category_transfer">Переводы</string>
+    <string name="category_salary">Зарплата</string>
+    <string name="category_freelance">Фриланс</string>
+    <string name="category_gift">Подарки</string>
+    <string name="category_interest">Проценты</string>
+    <string name="category_rent">Аренда</string>
+    <string name="category_other">Другое</string>
+    <string name="category_shopping">Покупки</string>
+    <string name="category_utilities">Коммунальные услуги</string>
 </resources>

@@ -4,7 +4,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import java.util.Calendar
 import java.util.Date
 
@@ -66,7 +66,7 @@ data class TransactionHistoryState(
     val transactionToDelete: Transaction? = null,
     val categoryToDelete: Pair<String, Boolean>? = null,
     val sourceToDelete: String? = null,
-    val expenseCategories: List<CategoryItem> = emptyList(),
-    val incomeCategories: List<CategoryItem> = emptyList(),
+    val expenseCategories: List<UiCategory> = emptyList(),
+    val incomeCategories: List<UiCategory> = emptyList(),
     val protectedCategories: List<String> = listOf("Другое") // Категории, которые нельзя удалить
 ) 

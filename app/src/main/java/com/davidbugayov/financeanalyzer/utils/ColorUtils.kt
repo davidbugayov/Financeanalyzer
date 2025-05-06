@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.utils
 
+import android.content.Context
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import com.davidbugayov.financeanalyzer.domain.model.Source
 
@@ -85,6 +87,13 @@ object ColorUtils {
         return sourceColor.takeIf { it != 0 }
             ?: getSourceColor(sourceName) 
             ?: if (isExpense) EXPENSE_COLOR else INCOME_COLOR
+    }
+
+    /**
+     * Получает цвет из ресурсов по resId
+     */
+    fun getColor(context: Context, resId: Int): Int {
+        return ContextCompat.getColor(context, resId)
     }
 
 } 

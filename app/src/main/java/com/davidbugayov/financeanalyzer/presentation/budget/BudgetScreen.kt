@@ -90,7 +90,6 @@ fun BudgetScreen(
     addTransactionViewModel: AddTransactionViewModel = koinViewModel()
 ) {
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
 
     // Обновляем данные при возвращении на экран
     DisposableEffect(navController) {
@@ -709,21 +708,6 @@ fun BudgetScreen(
                                         return@Button
                                     }
                                     
-                                    // Настраиваем экран добавления транзакции для дохода
-                                    addTransactionViewModel.setupForIncomeAddition(
-                                        amount = tempIncomeAmount,
-                                        shouldDistribute = true
-                                    )
-                                    
-                                    // Сбрасываем предыдущие выбранные кошельки и выбираем все существующие
-                                    addTransactionViewModel.clearSelectedWallets()
-                                    addTransactionViewModel.selectAllWallets(context)
-                                    
-                                    // Устанавливаем callback для автоматического распределения дохода после добавления
-                                    addTransactionViewModel.onIncomeAddedCallback = { amount ->
-                                        viewModel.onEvent(BudgetEvent.DistributeIncome(amount))
-                                    }
-                                    
                                     // Навигация на экран добавления транзакции
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
@@ -741,18 +725,6 @@ fun BudgetScreen(
                             TextButton(
                                 onClick = {
                                     showDistributeConfirmation = false
-                                    
-                                    // Настройка ViewModel для добавления дохода без распределения
-                                    addTransactionViewModel.setupForIncomeAddition(
-                                        amount = tempIncomeAmount,
-                                        shouldDistribute = false
-                                    )
-                                    
-                                    // Сбрасываем предыдущие кошельки, если они были выбраны
-                                    addTransactionViewModel.clearSelectedWallets()
-                                    
-                                    // Сбрасываем callback
-                                    addTransactionViewModel.onIncomeAddedCallback = null
                                     
                                     navController.navigate(Screen.AddTransaction.route)
                                 },

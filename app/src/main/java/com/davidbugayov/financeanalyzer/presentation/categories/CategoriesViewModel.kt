@@ -19,12 +19,18 @@ import androidx.compose.material.icons.filled.Restaurant
 import androidx.compose.material.icons.filled.ShoppingCart
 import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material.icons.filled.Work
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
+import com.davidbugayov.financeanalyzer.domain.model.Category
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryColorProvider
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -32,6 +38,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.R
 
 /**
  * ViewModel для управления категориями транзакций.
@@ -44,38 +51,11 @@ class CategoriesViewModel(
     private val categoryPreferences: CategoryPreferences by inject()
     private val categoryUsagePreferences: CategoryUsagePreferences by inject()
 
-    private val defaultExpenseCategories = listOf(
-        CategoryItem("Продукты", Icons.Default.ShoppingCart),
-        CategoryItem("Транспорт", Icons.Default.DirectionsCar),
-        CategoryItem("Развлечения", Icons.Default.Movie),
-        CategoryItem("Рестораны", Icons.Default.Restaurant),
-        CategoryItem("Здоровье", Icons.Default.LocalHospital),
-        CategoryItem("Одежда", Icons.Default.Checkroom),
-        CategoryItem("Жилье", Icons.Default.Home),
-        CategoryItem("Связь", Icons.Default.Phone),
-        CategoryItem("Питомец", Icons.Default.Pets),
-        CategoryItem("Услуги", Icons.Default.Work),
-        CategoryItem("Благотворительность", Icons.Default.Payments),
-        CategoryItem("Кредит", Icons.Default.CreditCard),
-        CategoryItem("Переводы", Icons.Default.SwapHoriz),
-        CategoryItem("Другое", Icons.Default.Add)
-    )
+    private val _expenseCategories = MutableStateFlow(emptyList<UiCategory>())
+    val expenseCategories: StateFlow<List<UiCategory>> = _expenseCategories.asStateFlow()
 
-    private val defaultIncomeCategories = listOf(
-        CategoryItem("Зарплата", Icons.Default.Payments),
-        CategoryItem("Фриланс", Icons.Default.Computer),
-        CategoryItem("Подарки", Icons.Default.Payments),
-        CategoryItem("Проценты", Icons.AutoMirrored.Filled.TrendingUp),
-        CategoryItem("Аренда", Icons.Default.Work),
-        CategoryItem("Прочее", Icons.Default.MoreHoriz),
-        CategoryItem("Другое", Icons.Default.Add)
-    )
-
-    private val _expenseCategories = MutableStateFlow(defaultExpenseCategories)
-    val expenseCategories: StateFlow<List<CategoryItem>> = _expenseCategories.asStateFlow()
-
-    private val _incomeCategories = MutableStateFlow(defaultIncomeCategories)
-    val incomeCategories: StateFlow<List<CategoryItem>> = _incomeCategories.asStateFlow()
+    private val _incomeCategories = MutableStateFlow(emptyList<UiCategory>())
+    val incomeCategories: StateFlow<List<UiCategory>> = _incomeCategories.asStateFlow()
 
     init {
         Timber.d("[CategoriesVM] CategoriesViewModel создан: $this")
@@ -87,6 +67,7 @@ class CategoriesViewModel(
      */
     private fun loadCategories() {
         viewModelScope.launch {
+            val context = getApplication<Application>().applicationContext
             val savedExpenseCategories = categoryPreferences.loadExpenseCategories()
             val savedIncomeCategories = categoryPreferences.loadIncomeCategories()
             val deletedDefaultExpenseCategories = categoryPreferences.loadDeletedDefaultExpenseCategories()
@@ -96,64 +77,107 @@ class CategoriesViewModel(
             val expenseCategoriesUsage = categoryUsagePreferences.loadExpenseCategoriesUsage()
             val incomeCategoriesUsage = categoryUsagePreferences.loadIncomeCategoriesUsage()
 
+            // Получаем дефолтные категории через провайдер
+            val allDefaultExpenseCategories = CategoryProvider.getDefaultExpenseCategories(context)
+            val allDefaultIncomeCategories = CategoryProvider.getDefaultIncomeCategories(context)
+
             // Фильтруем дефолтные категории, исключая удаленные
-            val filteredDefaultExpenseCategories = defaultExpenseCategories.filter {
+            val filteredDefaultExpenseCategories = allDefaultExpenseCategories.filter {
                 !deletedDefaultExpenseCategories.contains(it.name) && it.name != "Другое"
             }
-
-            val filteredDefaultIncomeCategories = defaultIncomeCategories.filter {
+            val filteredDefaultIncomeCategories = allDefaultIncomeCategories.filter {
                 !deletedDefaultIncomeCategories.contains(it.name) && it.name != "Другое"
             }
 
             // Добавляем пользовательские категории
-            val customExpenseCategories = savedExpenseCategories.map {
-                CategoryItem(it, Icons.Default.MoreHoriz)
+            val customExpenseCategories = savedExpenseCategories.map { data ->
+                val color = data.colorHex?.let { Color(android.graphics.Color.parseColor(it)) } ?: run {
+                    val generated = CategoryProvider.generateRandomCategoryColor()
+                    // Сохраняем сгенерированный цвет обратно в preferences
+                    val colorHex = String.format("#%02X%02X%02X", (generated.red * 255).toInt(), (generated.green * 255).toInt(), (generated.blue * 255).toInt())
+                    // Обновляем preferences только если colorHex был null
+                    val updated = data.copy(colorHex = colorHex)
+                    val updatedList = savedExpenseCategories.map { if (it.name == data.name) updated else it }
+                    categoryPreferences.saveExpenseCategories(updatedList)
+                    generated
+                }
+                UiCategory(
+                    id = 0,
+                    name = data.name,
+                    isExpense = true,
+                    isCustom = true,
+                    count = 0,
+                    color = color,
+                    icon = CategoryIconProvider.getIconByName(data.iconName),
+                    original = Category.expense(data.name)
+                )
             }
-            val customIncomeCategories = savedIncomeCategories.map {
-                CategoryItem(it, Icons.Default.MoreHoriz)
+            val customIncomeCategories = savedIncomeCategories.map { data ->
+                val color = data.colorHex?.let { Color(android.graphics.Color.parseColor(it)) } ?: run {
+                    val generated = CategoryProvider.generateRandomCategoryColor()
+                    val colorHex = String.format("#%02X%02X%02X", (generated.red * 255).toInt(), (generated.green * 255).toInt(), (generated.blue * 255).toInt())
+                    val updated = data.copy(colorHex = colorHex)
+                    val updatedList = savedIncomeCategories.map { if (it.name == data.name) updated else it }
+                    categoryPreferences.saveIncomeCategories(updatedList)
+                    generated
+                }
+                UiCategory(
+                    id = 0,
+                    name = data.name,
+                    isExpense = false,
+                    isCustom = true,
+                    count = 0,
+                    color = color,
+                    icon = CategoryIconProvider.getIconByName(data.iconName),
+                    original = Category.income(data.name)
+                )
             }
 
             // Всегда оставляем категорию "Другое" в конце списка
-            val otherExpenseCategory = defaultExpenseCategories.last()
-            val otherIncomeCategory = defaultIncomeCategories.last()
+            val otherExpenseCategory = allDefaultExpenseCategories.last()
+            val otherIncomeCategory = allDefaultIncomeCategories.last()
 
             // Объединяем все категории (кроме "Другое")
             val allExpenseCategories = (filteredDefaultExpenseCategories + customExpenseCategories)
             val allIncomeCategories = (filteredDefaultIncomeCategories + customIncomeCategories)
 
             // Сортируем категории по частоте использования (по убыванию)
-            val sortedExpenseCategories = allExpenseCategories.sortedByDescending { 
-                expenseCategoriesUsage[it.name] ?: 0 
+            val sortedExpenseCategories = allExpenseCategories.sortedByDescending {
+                expenseCategoriesUsage[it.name] ?: 0
             }
-            val sortedIncomeCategories = allIncomeCategories.sortedByDescending { 
-                incomeCategoriesUsage[it.name] ?: 0 
+            val sortedIncomeCategories = allIncomeCategories.sortedByDescending {
+                incomeCategoriesUsage[it.name] ?: 0
             }
 
             // Добавляем "Другое" в конец списка
             _expenseCategories.value = sortedExpenseCategories + listOf(otherExpenseCategory)
             _incomeCategories.value = sortedIncomeCategories + listOf(otherIncomeCategory)
+
+            Timber.d("[CategoriesVM] Итоговые категории расходов: " + _expenseCategories.value.joinToString { "${'$'}{it.name}: ${'$'}{it.color}" })
+            Timber.d("[CategoriesVM] Итоговые категории доходов: " + _incomeCategories.value.joinToString { "${'$'}{it.name}: ${'$'}{it.color}" })
         }
     }
 
     /**
      * Добавляет новую пользовательскую категорию
      */
-    fun addCustomCategory(category: String, isExpense: Boolean, icon: ImageVector = Icons.Default.MoreHoriz) {
+    fun addCustomCategory(category: String, isExpense: Boolean, icon: ImageVector?) {
         if (category.isBlank()) return
-
+        val iconName = CategoryIconProvider.getIconName(icon)
+        val color = CategoryProvider.generateRandomCategoryColor()
+        val colorHex = String.format("#%02X%02X%02X", (color.red * 255).toInt(), (color.green * 255).toInt(), (color.blue * 255).toInt())
+        val customCategoryData = CustomCategoryData(category, iconName, colorHex)
         viewModelScope.launch {
             if (isExpense) {
-                categoryPreferences.addExpenseCategory(category)
-                val customCategory = CategoryItem(category, icon)
+                categoryPreferences.addExpenseCategory(customCategoryData)
+                val customCategory = UiCategory(0, category, true, true, 0, color = color, icon = icon)
                 val currentCategories = _expenseCategories.value.toMutableList()
-                // Добавляем перед "Другое"
                 currentCategories.add(currentCategories.size - 1, customCategory)
                 _expenseCategories.value = currentCategories
             } else {
-                categoryPreferences.addIncomeCategory(category)
-                val customCategory = CategoryItem(category, icon)
+                categoryPreferences.addIncomeCategory(customCategoryData)
+                val customCategory = UiCategory(0, category, false, true, 0, color = color, icon = icon)
                 val currentCategories = _incomeCategories.value.toMutableList()
-                // Добавляем перед "Другое"
                 currentCategories.add(currentCategories.size - 1, customCategory)
                 _incomeCategories.value = currentCategories
             }
@@ -167,7 +191,7 @@ class CategoriesViewModel(
         viewModelScope.launch {
             if (isExpense) {
                 // Проверяем, является ли категория дефолтной
-                val isDefaultCategory = defaultExpenseCategories.any { it.name == category && it.name != "Другое" }
+                val isDefaultCategory = CategoryProvider.getDefaultExpenseCategories(getApplication<Application>().applicationContext).any { it.name == category && it.name != "Другое" }
 
                 if (isDefaultCategory) {
                     // Если это дефолтная категория, добавляем ее в список удаленных дефолтных категорий
@@ -181,7 +205,7 @@ class CategoriesViewModel(
                 _expenseCategories.value = _expenseCategories.value.filterNot { it.name == category }
             } else {
                 // Проверяем, является ли категория дефолтной
-                val isDefaultCategory = defaultIncomeCategories.any { it.name == category && it.name != "Другое" }
+                val isDefaultCategory = CategoryProvider.getDefaultIncomeCategories(getApplication<Application>().applicationContext).any { it.name == category && it.name != "Другое" }
 
                 if (isDefaultCategory) {
                     // Если это дефолтная категория, добавляем ее в список удаленных дефолтных категорий
@@ -216,14 +240,14 @@ class CategoriesViewModel(
      * Проверяет, является ли категория расходов стандартной
      */
     fun isDefaultExpenseCategory(category: String): Boolean {
-        return defaultExpenseCategories.any { it.name == category }
+        return CategoryProvider.getDefaultExpenseCategories(getApplication<Application>().applicationContext).any { it.name == category }
     }
 
     /**
      * Проверяет, является ли категория доходов стандартной
      */
     fun isDefaultIncomeCategory(category: String): Boolean {
-        return defaultIncomeCategories.any { it.name == category }
+        return CategoryProvider.getDefaultIncomeCategories(getApplication<Application>().applicationContext).any { it.name == category }
     }
 
     /**

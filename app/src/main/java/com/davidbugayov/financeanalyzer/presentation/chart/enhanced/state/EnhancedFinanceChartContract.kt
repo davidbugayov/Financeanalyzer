@@ -8,7 +8,7 @@ import java.util.Date
 import java.util.Calendar
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
 sealed class EnhancedFinanceChartIntent {
     object LoadData : EnhancedFinanceChartIntent()
@@ -60,6 +60,6 @@ data class EnhancedFinanceChartState(
     val savingsRate: Double = 0.0,
     val averageDailyExpense: Money = Money.zero(),
     val monthsOfSavings: Double = 0.0,
-    val pieChartData: List<PieChartItemData> = emptyList()
+    val pieChartData: List<UiCategory> = emptyList()
     // Добавляй другие поля по необходимости
 ) 

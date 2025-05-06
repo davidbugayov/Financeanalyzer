@@ -49,7 +49,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.PieChartItemData
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import androidx.compose.foundation.layout.Arrangement
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import timber.log.Timber
@@ -78,7 +78,7 @@ private const val STROKE_WIDTH_DP = 6f // Stroke width for the gap between slice
  * Улучшенная круговая диаграмма категорий, которая показывает распределение категорий 
  * с интерактивной легендой и компактным размером для лучшей наглядности
  * 
- * @param items Список данных PieChartItemData для отображения
+ * @param items Список данных UiCategory для отображения
  * @param selectedIndex Индекс изначально выбранного сектора
  * @param onSectorClick Обратный вызов при клике на сектор с данными элемента
  * @param modifier Модификатор для диаграммы
@@ -87,9 +87,9 @@ private const val STROKE_WIDTH_DP = 6f // Stroke width for the gap between slice
  */
 @Composable
 fun EnhancedCategoryPieChart(
-    items: List<PieChartItemData>,
+    items: List<UiCategory>,
     selectedIndex: Int? = null,
-    onSectorClick: (PieChartItemData?) -> Unit = {},
+    onSectorClick: (UiCategory?) -> Unit = {},
     modifier: Modifier = Modifier,
     showExpenses: Boolean = true,
     onShowExpensesChange: (Boolean) -> Unit = {}
@@ -138,7 +138,7 @@ fun EnhancedCategoryPieChart(
     }
     
     // Determine if the first category is income
-    val isIncome = filteredData.firstOrNull()?.category?.isExpense == false
+    val isIncome = filteredData.firstOrNull()?.original?.isExpense == false
     
     // Используем белый цвет фона для карточки
     val cardColor = MaterialTheme.colorScheme.surface // Use theme surface color instead of hardcoded white
@@ -400,7 +400,7 @@ private object DonutTextConstants {
 private fun DrawScope.drawInnerText(
     center: Offset,
     size: Size,
-    selectedItem: PieChartItemData?,
+    selectedItem: UiCategory?,
     totalMoney: Money,
     isIncome: Boolean,
     incomeText: String,
@@ -416,7 +416,7 @@ private fun DrawScope.drawInnerText(
 private fun DrawScope.drawSelectedItemText(
     center: Offset,
     size: Size,
-    selectedItem: PieChartItemData,
+    selectedItem: UiCategory,
     isIncome: Boolean
 ) {
     drawIntoCanvas { canvas ->
@@ -436,7 +436,7 @@ private fun DrawScope.drawSelectedItemText(
             textSize = min(size.width, size.height) * DonutTextConstants.AMOUNT_TEXT_SIZE_FACTOR
             color = amountColor
             textAlign = Paint.Align.CENTER
-            typeface = Typeface.create(Typeface.DEFAULT, Typeface.BOLD)
+            isFakeBoldText = true
         }
             
         // Рисуем сумму выше центра
@@ -618,11 +618,11 @@ private fun getClickedSectorIndex(
 @Composable
 private fun DrawPieChart(
     modifier: Modifier,
-    data: List<PieChartItemData>,
+    data: List<UiCategory>,
     selectedIndices: Set<Int>,
     onSectorClick: (Int) -> Unit,
     totalMoney: Money,
-    selectedItem: PieChartItemData?,
+    selectedItem: UiCategory?,
     isIncome: Boolean,
     backgroundColor: Color
 ) {

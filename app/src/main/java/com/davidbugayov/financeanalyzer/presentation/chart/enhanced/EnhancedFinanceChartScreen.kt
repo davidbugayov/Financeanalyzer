@@ -308,8 +308,8 @@ fun EnhancedFinanceChartScreen(
                                             selectedIndex = null,
                                             onSectorClick = { item ->
                                                 if (item != null) {
-                                                    selectedCategory = item.category?.name
-                                                    item.category?.name?.let { categoryName ->
+                                                    selectedCategory = item.original?.name
+                                                    item.original?.name?.let { categoryName ->
                                                         onNavigateToTransactions?.invoke(categoryName, state.startDate, state.endDate)
                                                     }
                                                 } else {
@@ -341,7 +341,7 @@ fun EnhancedFinanceChartScreen(
 
                                     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
                                     val periodText = "${dateFormat.format(state.startDate)} - ${dateFormat.format(state.endDate)}"
-
+                                                    
                                     EnhancedLineChart(
                                         incomeData = state.incomeLineChartData,
                                         expenseData = state.expenseLineChartData,
@@ -418,7 +418,7 @@ fun EnhancedFinanceChartScreen(
                                             .padding(vertical = 4.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                        Text(
+                                    Text(
                                             text = stringResource(R.string.budget_tips_title),
                                             style = MaterialTheme.typography.titleMedium,
                                             color = MaterialTheme.colorScheme.primary,
@@ -462,7 +462,7 @@ fun EnhancedFinanceChartScreen(
                                 vertical = dimensionResource(R.dimen.finance_chart_screen_vertical_spacing)
                             )
                     )
-
+                    
                     // Если нужно прокручивать к карточке
                     if (shouldScrollToSummaryCard) {
                         LaunchedEffect(true) {

@@ -3,11 +3,15 @@ package com.davidbugayov.financeanalyzer.presentation.transaction.base
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
+import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,8 +23,8 @@ import timber.log.Timber
 import java.util.Date
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
-    protected val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel,
-    protected val sourcePreferences: com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences,
+    protected val categoriesViewModel: CategoriesViewModel,
+    protected val sourcePreferences: SourcePreferences,
     protected val walletRepository: WalletRepository,
     private val validateTransactionUseCase: ValidateTransactionUseCase
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
@@ -28,6 +32,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected abstract val _state: MutableStateFlow<S>
     override val state: StateFlow<S> get() = _state.asStateFlow()
     override val wallets: List<Wallet> = emptyList()
+
+    /**
+     * Список доступных иконок для пользовательских категорий (глобально для всех транзакций)
+     */
+    protected val availableCategoryIcons: List<ImageVector> =
+        CategoryProvider.defaultCategories.map { meta -> CategoryIconProvider.getIconByName(meta.iconName) }
 
     // Вся обработка событий теперь только в наследниках
     abstract override fun onEvent(event: E, context: android.content.Context)
@@ -58,71 +68,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             intent.action = android.appwidget.AppWidgetManager.ACTION_APPWIDGET_UPDATE
             intent.putExtra(android.appwidget.AppWidgetManager.EXTRA_APPWIDGET_IDS, smallWidgetIds)
             context.sendBroadcast(intent)
-        }
-    }
-
-    /**
-     * Универсальный метод для обновления баланса кошельков после транзакции (доход/расход)
-     */
-    protected suspend fun updateWalletsAfterTransaction(
-        walletIds: List<String>,
-        totalAmount: Money,
-        isExpense: Boolean
-    ) {
-        if (walletIds.isEmpty()) return
-        withContext(Dispatchers.IO) {
-            try {
-                val walletsList = walletRepository.getWalletsByIds(walletIds)
-                if (walletsList.isEmpty()) return@withContext
-                val amountPerWallet = totalAmount / walletsList.size
-                for (wallet in walletsList) {
-                    val updatedWallet = wallet.copy(
-                        balance = if (isExpense) wallet.balance.minus(amountPerWallet)
-                        else wallet.balance.plus(amountPerWallet)
-                    )
-                    walletRepository.updateWallet(updatedWallet)
-                }
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при обновлении кошельков после транзакции")
-            }
-        }
-    }
-    
-    /**
-     * Обновляет балансы кошельков после добавления доходной транзакции
-     * @param walletIds Список ID кошельков для обновления
-     * @param amount Сумма дохода
-     */
-    protected fun updateWalletsBalance(walletIds: List<String>, amount: Money) {
-        if (walletIds.isEmpty()) return
-        
-        viewModelScope.launch {
-            try {
-                // Если кошельков несколько, делим сумму равномерно между ними
-                val amountPerWallet = if (walletIds.size > 1) {
-                    amount.div(walletIds.size)
-                } else {
-                    amount
-                }
-                
-                Timber.d("Обновление баланса кошельков: ${walletIds.size} кошельков, сумма на кошелек: $amountPerWallet")
-                
-                // Получаем кошельки по ID
-                val walletsList = walletRepository.getWalletsByIds(walletIds)
-                
-                // Обновляем баланс каждого кошелька
-                walletsList.forEach { wallet ->
-                    val updatedWallet = wallet.copy(
-                        balance = wallet.balance.plus(amountPerWallet)
-                    )
-                    Timber.d("Обновляем кошелек ${wallet.name}: старый баланс=${wallet.balance}, новый баланс=${updatedWallet.balance}")
-                    walletRepository.updateWallet(updatedWallet)
-                }
-                
-                Timber.d("Балансы кошельков успешно обновлены")
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при обновлении баланса кошельков")
-            }
         }
     }
 
@@ -315,7 +260,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 customCategory = "",
                 sourceColor = 0,
                 customSource = "",
-                customCategoryIcon = state.customCategoryIcon,
                 availableCategoryIcons = state.availableCategoryIcons
             )
         }
@@ -459,27 +403,41 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 copyState(state, selectedWallets = event.walletIds)
             }
 
-            is BaseTransactionEvent.SetCustomCategoryIcon -> {
-                // Более безопасная реализация без использования приведения типов
-                _state.update { state ->
-                    copyState(state, customCategoryIcon = event.icon)
-                }
-            }
-
             is BaseTransactionEvent.SetCustomCategory -> _state.update { state ->
                 copyState(state, customCategory = event.category)
             }
 
             is BaseTransactionEvent.AddCustomCategory -> {
-                val icon = _state.value.customCategoryIcon
-                val category = event.category
-                
-                if (category.isNotBlank()) {
-                    categoriesViewModel.addCustomCategory(category, _state.value.isExpense, icon)
+                val isExpense = _state.value.isExpense
+                val customCategoryIcon = _state.value.customCategoryIcon
+                categoriesViewModel.addCustomCategory(event.category, isExpense, customCategoryIcon)
+                val updatedCategories = if (isExpense) {
+                    categoriesViewModel.expenseCategories.value
+                } else {
+                    categoriesViewModel.incomeCategories.value
                 }
-                
-                _state.update { state ->
-                    copyState(state, showCustomCategoryDialog = false, customCategory = "")
+                _state.update {
+                    if (isExpense) {
+                        copyState(
+                            it,
+                            showCustomCategoryDialog = false,
+                            customCategory = "",
+                            customCategoryIcon = null,
+                            expenseCategories = updatedCategories,
+                            category = event.category,
+                            selectedExpenseCategory = event.category
+                        )
+                    } else {
+                        copyState(
+                            it,
+                            showCustomCategoryDialog = false,
+                            customCategory = "",
+                            customCategoryIcon = null,
+                            incomeCategories = updatedCategories,
+                            category = event.category,
+                            selectedIncomeCategory = event.category
+                        )
+                    }
                 }
             }
 
@@ -593,6 +551,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 copyState(state, isExpense = true)
             }
 
+            is BaseTransactionEvent.SetCustomCategoryIcon -> {
+                _state.update { state ->
+                    copyState(state, customCategoryIcon = event.icon)
+                }
+            }
+
             else -> {}
         }
     }
@@ -664,7 +628,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     val updatedCategories = if (categories.isNotEmpty()) {
                         categories.mapIndexed { index, categoryItem ->
                             if (index == 0 || categoryItem.name == firstCategory) {
-                                categoryItem.copy(wasSelected = true)
+                                categoryItem.copy()
                             } else {
                                 categoryItem
                             }
@@ -711,7 +675,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         categoryError = false,
                         note = state.note,
                         selectedDate = state.selectedDate,
-                        customCategoryIcon = state.customCategoryIcon,
                         availableCategoryIcons = state.availableCategoryIcons
                     )
                 }
@@ -762,7 +725,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     categoryError = false,
                     note = state.note,
                     selectedDate = state.selectedDate,
-                    customCategoryIcon = state.customCategoryIcon,
                     availableCategoryIcons = state.availableCategoryIcons
                 )
             }
@@ -770,22 +732,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     // --- Универсальные поля и коллбэки для работы с транзакциями ---
-    protected val usedCategories = mutableSetOf<Pair<String, Boolean>>()
-    open var autoDistributeIncome: Boolean = false
-        protected set
-    open var onIncomeAddedCallback: ((Money) -> Unit)? = null
-    open var onExpenseAddedCallback: ((Money) -> Unit)? = null
-    open var storedTargetWalletId: String? = null
-        protected set
-    open var budgetViewModel: com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel? = null
-    open var navigateBackCallback: (() -> Unit)? = null
-
     override fun updateCategoryPositions() {
         viewModelScope.launch {
-            usedCategories.forEach { (category, isExpense) ->
-                categoriesViewModel.incrementCategoryUsage(category, isExpense)
-            }
-            usedCategories.clear()
+            // Implementation needed
         }
     }
 
@@ -839,8 +788,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         error: String? = state.error,
         isSuccess: Boolean = state.isSuccess,
         successMessage: String = state.successMessage,
-        expenseCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem> = state.expenseCategories,
-        incomeCategories: List<com.davidbugayov.financeanalyzer.presentation.transaction.add.model.CategoryItem> = state.incomeCategories,
+        expenseCategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory> = state.expenseCategories,
+        incomeCategories: List<com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory> = state.incomeCategories,
         sources: List<com.davidbugayov.financeanalyzer.domain.model.Source> = state.sources,
         categoryToDelete: String? = state.categoryToDelete,
         sourceToDelete: String? = state.sourceToDelete,
@@ -857,8 +806,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         preventAutoSubmit: Boolean = state.preventAutoSubmit,
         selectedExpenseCategory: String = state.selectedExpenseCategory,
         selectedIncomeCategory: String = state.selectedIncomeCategory,
-        customCategoryIcon: ImageVector = state.customCategoryIcon,
-        availableCategoryIcons: List<ImageVector> = state.availableCategoryIcons
+        availableCategoryIcons: List<ImageVector> = state.availableCategoryIcons,
+        customCategoryIcon: ImageVector? = state.customCategoryIcon
     ): S
 
     // Utility methods
@@ -890,7 +839,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
     // --- Универсальные методы для настройки и сброса состояния ---
     open fun setTargetWalletId(walletId: String) {
-        storedTargetWalletId = walletId
         _state.update { state ->
             copyState(
                 state,
@@ -902,19 +850,15 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     open fun setupForIncomeAddition(amount: String, shouldDistribute: Boolean) {
-        autoDistributeIncome = shouldDistribute
-        val currentTargetWalletId = _state.value.targetWalletId
-        val currentSelectedWallets = _state.value.selectedWallets
-        val currentAddToWallet = _state.value.addToWallet || shouldDistribute
         _state.update { state ->
             copyState(
                 state,
                 isExpense = false,
                 forceExpense = false,
                 amount = amount,
-                targetWalletId = currentTargetWalletId,
-                selectedWallets = currentSelectedWallets,
-                addToWallet = currentAddToWallet
+                targetWalletId = state.targetWalletId,
+                selectedWallets = state.selectedWallets,
+                addToWallet = state.addToWallet || shouldDistribute
             )
         }
     }
@@ -931,26 +875,20 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     open fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
-        autoDistributeIncome = false
-        val currentTargetWalletId = _state.value.targetWalletId
-        val currentSelectedWallets = _state.value.selectedWallets
-        val currentAddToWallet = _state.value.addToWallet
-        handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
         _state.update { state ->
             copyState(
                 state,
                 amount = amount,
                 category = walletCategory,
-                targetWalletId = currentTargetWalletId,
-                selectedWallets = currentSelectedWallets,
-                addToWallet = currentAddToWallet
+                targetWalletId = state.targetWalletId,
+                selectedWallets = state.selectedWallets,
+                addToWallet = state.addToWallet
             )
         }
+        handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
     }
 
     open fun resetToDefaultState() {
-        autoDistributeIncome = false
-        storedTargetWalletId = null
         _state.update { state ->
             copyState(
                 state,
@@ -960,6 +898,5 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 selectedWallets = emptyList()
             )
         }
-        onIncomeAddedCallback = null
     }
 } 
