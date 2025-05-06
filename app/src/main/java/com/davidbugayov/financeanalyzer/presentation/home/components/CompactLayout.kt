@@ -168,9 +168,6 @@ fun CompactLayout(
                             showDivider = true
                         )
                     }
-                    item {
-                        Spacer(modifier = Modifier.height(140.dp))
-                    }
                 }
             }
         }

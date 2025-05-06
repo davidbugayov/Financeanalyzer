@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components
 
+import android.graphics.Paint
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.tween
@@ -8,6 +9,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.detectTapGestures
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -19,9 +21,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
@@ -45,21 +47,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
-import androidx.compose.foundation.layout.Arrangement
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import timber.log.Timber
-import android.graphics.Paint
-import android.graphics.Typeface
-import kotlin.math.atan2
-import kotlin.math.min
-import androidx.compose.ui.text.style.TextAlign
 import kotlin.math.abs
+import kotlin.math.atan2
 import kotlin.math.max
+import kotlin.math.min
 
 // --- Constants --- 
 private const val ANIMATION_DURATION_MS = 800
@@ -115,7 +114,9 @@ fun EnhancedCategoryPieChart(
     
     // Calculate total amount from the filtered data
     val totalMoney = remember(filteredData) {
-        Money(filteredData.sumOf { it.money.amount })
+        val currency = filteredData.firstOrNull()?.money?.currency ?: com.davidbugayov.financeanalyzer.domain.model.Currency.RUB
+        val sum = filteredData.sumOf { it.money.amount }
+        Money(sum.setScale(currency.decimalPlaces, java.math.RoundingMode.HALF_EVEN), currency)
     }
     
     // State for selected indices - сбрасываем при смене типа (доходы/расходы)
@@ -163,7 +164,7 @@ fun EnhancedCategoryPieChart(
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
                     indication = null // Убираем визуальный эффект нажатия
-                ) { 
+                ) {
                     // Сбрасываем выбор только если что-то выбрано
                     if (selectedIndices.value.isNotEmpty()) {
                         selectedIndices.value = emptySet()
@@ -284,12 +285,12 @@ fun EnhancedCategoryPieChart(
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .clickable { 
+                            .clickable {
                                 selectedIndices.value = when {
                                     selectedIndices.value.contains(originalIndex) -> emptySet()
                                     else -> setOf(originalIndex)
                                 }
-                                
+
                                 val newSelectedItem = if (selectedIndices.value.isEmpty()) {
                                     null
                                 } else {
@@ -300,7 +301,7 @@ fun EnhancedCategoryPieChart(
                                         null
                                     }
                                 }
-                                
+
                                 onSectorClick(newSelectedItem)
                             }
                             .background(
@@ -690,21 +691,21 @@ private fun DrawPieChart(
                         val radius = min(size.width, size.height) / 2f * DonutTextConstants.OUTER_RADIUS_FACTOR
                         val innerRadius = radius * DonutTextConstants.INNER_RADIUS_FACTOR
                         val center = Offset(size.width / 2f, size.height / 2f)
-                        
+
                         // Проверяем расстояние от центра
                         val distanceFromCenter = (offset - center).getDistance()
-                        
+
                         // Вычисляем угол клика
                         val dx = offset.x - center.x
                         val dy = offset.y - center.y
-                        
+
                         // Вычисляем угол в радианах и конвертируем в градусы
                         val angleRad = atan2(dy, dx)
                         var angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
-                        
+
                         // Нормализуем в диапазон [0, 360)
                         if (angleDeg < 0) angleDeg += 360f
-                        
+
                         // Получаем выбранный сектор
                         val selectedSector = getClickedSectorIndex(
                             angle = angleDeg,
@@ -713,7 +714,7 @@ private fun DrawPieChart(
                             innerRadius = innerRadius,
                             outerRadius = radius
                         )
-                        
+
                         // Если сектор найден, логируем информацию
                         if (selectedSector >= 0) {
                             Timber.tag("[D]").d("PieChart: выбран сектор №$selectedSector '${data[selectedSector].name}'")
@@ -722,7 +723,7 @@ private fun DrawPieChart(
                             // Если сектор не найден и есть выбранный элемент - сбрасываем выбор
                             if (selectedIndices.isNotEmpty()) onSectorClick(-1)
                         }
-                        
+
                         onSectorClick(selectedSector)
                     }
                 }

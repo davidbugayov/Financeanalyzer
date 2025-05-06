@@ -65,7 +65,24 @@ fun ExpandedLayout(
                 onFilterSelected = onFilterSelected
             )
 
-            // Удаляем сводку из левой колонки, теперь она будет в LazyColumn
+            // Кнопка показать/скрыть сводку
+            HomeTransactionsHeader(
+                currentFilter = state.currentFilter,
+                showGroupSummary = showGroupSummary,
+                onShowGroupSummaryChange = onShowGroupSummaryChange,
+            )
+
+            // Сводка по группам под кнопкой
+            if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                Spacer(modifier = Modifier.height(16.dp))
+                HomeGroupSummary(
+                    filteredTransactions = state.filteredTransactions,
+                    totalIncome = state.filteredIncome,
+                    totalExpense = state.filteredExpense,
+                    currentFilter = state.currentFilter,
+                    balance = state.filteredBalance
+                )
+            }
         }
 
         // Правая панель со списком транзакций
@@ -74,14 +91,7 @@ fun ExpandedLayout(
                 .weight(1f)
                 .padding(start = 8.dp)
         ) {
-            // Заголовок для транзакций с кнопкой для отображения/скрытия сводки
-            HomeTransactionsHeader(
-                currentFilter = state.currentFilter,
-                showGroupSummary = showGroupSummary,
-                onShowGroupSummaryChange = onShowGroupSummaryChange,
-            )
-
-            // Пустое состояние и список транзакций
+            // Только список транзакций без заголовка и сводки
             when {
                 !state.isLoading && state.transactions.isEmpty() -> {
                     Box(
@@ -136,7 +146,7 @@ fun ExpandedLayout(
                 }
 
                 else -> {
-                    // LazyColumn всегда показывается, если не пусто и не loading
+                    // Только список транзакций
                     val lazyListState = rememberLazyListState()
                     LaunchedEffect(showGroupSummary) {
                         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
@@ -148,17 +158,6 @@ fun ExpandedLayout(
                         state = lazyListState,
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
-                            item {
-                                HomeGroupSummary(
-                                    filteredTransactions = state.filteredTransactions,
-                                    totalIncome = state.filteredIncome,
-                                    totalExpense = state.filteredExpense,
-                                    currentFilter = state.currentFilter,
-                                    balance = state.filteredBalance
-                                )
-                            }
-                        }
                         items(
                             items = state.filteredTransactions,
                             key = { it.id },
@@ -170,9 +169,6 @@ fun ExpandedLayout(
                                 onLongClick = onTransactionLongClick,
                                 showDivider = true
                             )
-                        }
-                        item {
-                            Spacer(modifier = Modifier.height(140.dp))
                         }
                     }
                 }
