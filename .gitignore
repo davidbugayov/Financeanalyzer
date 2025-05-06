@@ -75,3 +75,4 @@ lint/tmp/
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
+keystore/keystore.properties
