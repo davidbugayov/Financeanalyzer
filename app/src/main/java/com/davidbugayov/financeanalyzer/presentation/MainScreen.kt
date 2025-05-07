@@ -111,7 +111,7 @@ private fun setupNotifications(context: android.content.Context) {
         Timber.e(e, "Failed to schedule transaction reminders")
     }
 }
-
+    
 @Composable
 private fun PermissionDialogs(
     onboardingViewModel: OnboardingViewModel,

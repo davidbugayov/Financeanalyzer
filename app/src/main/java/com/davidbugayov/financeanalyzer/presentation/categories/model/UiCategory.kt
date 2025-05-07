@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.categories.model
 
-import android.content.Context
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Category

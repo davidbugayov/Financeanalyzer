@@ -114,14 +114,12 @@ private fun ExpandedRightPanel(
             .padding(start = 8.dp)
     ) {
         when {
-            !state.isLoading && state.transactions.isEmpty() -> {
+            !state.isLoading && state.filteredTransactions.isEmpty() && state.currentFilter == TransactionFilter.ALL -> {
                 ExpandedEmptyState(onAddClick)
             }
-
             !state.isLoading && state.filteredTransactions.isEmpty() -> {
                 ExpandedNoFilteredState(state.currentFilter)
             }
-
             else -> {
                 ExpandedTransactionList(
                     state = state,

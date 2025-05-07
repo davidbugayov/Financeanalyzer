@@ -178,14 +178,12 @@ fun CompactLayout(
             showGroupSummary = showGroupSummary
         )
         when {
-            !state.isLoading && state.transactions.isEmpty() -> {
+            !state.isLoading && state.filteredTransactions.isEmpty() && state.currentFilter == TransactionFilter.ALL -> {
                 CompactEmptyState(onAddClick)
             }
-
             !state.isLoading && state.filteredTransactions.isEmpty() -> {
                 CompactNoFilteredState(state.currentFilter)
             }
-
             else -> {
                 CompactTransactionList(
                     state = state,
