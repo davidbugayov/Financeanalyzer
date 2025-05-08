@@ -8,8 +8,6 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.NotificationPreferences
-import com.davidbugayov.financeanalyzer.domain.UserPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
@@ -18,6 +16,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
@@ -25,7 +24,6 @@ import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -39,10 +37,7 @@ import java.util.Locale
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
-    private val notificationScheduler: NotificationScheduler,
-    private val preferencesManager: PreferencesManager,
-    private val userPreferences: UserPreferences,
-    private val notificationPreferences: NotificationPreferences
+    private val preferencesManager: PreferencesManager
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -62,16 +57,12 @@ class ProfileViewModel(
     var reminderTime by mutableStateOf(Time(20, 0))
         private set
 
-    // Данные профиля пользователя
-    var userName by mutableStateOf("")
-        private set
-
-    var currency by mutableStateOf("")
-        private set
-
     init {
-        // Загружаем настройки уведомлений
-        loadNotificationSettings()
+        Timber.d("[ProfileViewModel] INIT: isTransactionReminderEnabled=${preferencesManager.isTransactionReminderEnabled()}")
+        notificationEnabled = preferencesManager.isTransactionReminderEnabled()
+        val (hour, minute) = preferencesManager.getReminderTime()
+        reminderTime = Time(hour, minute)
+        syncNotificationState()
         
         // Загружаем финансовую статистику
         loadFinancialAnalytics()
@@ -97,32 +88,6 @@ class ProfileViewModel(
         viewModelScope.launch {
             financialMetrics.totalExpense.collect { expense ->
                 _state.update { it.copy(totalExpense = expense) }
-            }
-        }
-
-        loadPreferences()
-    }
-
-    /**
-     * Загружает настройки пользователя
-     */
-    private fun loadPreferences() {
-        viewModelScope.launch {
-            try {
-                // Загрузка данных профиля
-                val preferences = userPreferences.getUserPreferences().first()
-                userName = preferences.userName
-                currency = preferences.currency
-
-                // Загрузка настроек уведомлений
-                val notificationSettings = notificationPreferences.getNotificationPreferences().first()
-                notificationEnabled = notificationSettings.enabled
-                reminderTime = Time(
-                    hours = notificationSettings.reminderHour,
-                    minutes = notificationSettings.reminderMinute
-                )
-            } catch (e: Exception) {
-                // Обработка ошибок загрузки настроек
             }
         }
     }
@@ -180,7 +145,7 @@ class ProfileViewModel(
                 _state.update { it.copy(isEditingNotifications = false) }
             }
             is ProfileEvent.UpdateTransactionReminder -> {
-                updateTransactionReminder(event.isEnabled, event.reminderTime, context)
+                context?.let { NotificationScheduler.updateTransactionReminder(it, event.isEnabled, event.reminderTime) }
             }
             is ProfileEvent.NavigateToLibraries -> {
                 // Это событие будет обрабатываться в ProfileScreen
@@ -198,8 +163,23 @@ class ProfileViewModel(
                 // Здесь можно добавить сохранение настройки в DataStore
             }
             is ProfileEvent.ChangeNotifications -> {
+                Timber.d("[ProfileViewModel] ChangeNotifications: enabled=${event.enabled}")
+                preferencesManager.setTransactionReminderEnabled(event.enabled)
+                Timber.d(
+                    "[ProfileViewModel] setTransactionReminderEnabled called with enabled=%b, actual value in prefs=%b",
+                    event.enabled,
+                    preferencesManager.isTransactionReminderEnabled()
+                )
                 _state.update { it.copy(isNotificationsEnabled = event.enabled) }
-                // Здесь можно добавить сохранение настройки в DataStore
+                if (event.enabled && context != null) {
+                    Timber.d("[ProfileViewModel] Scheduling transaction reminder after enabling notifications")
+                    NotificationScheduler.updateTransactionReminder(context, true)
+                } else if (context != null) {
+                    Timber.d("[ProfileViewModel] Cancelling transaction reminder after disabling notifications")
+                    NotificationScheduler.updateTransactionReminder(context, false)
+                }
+                Timber.d("[ProfileViewModel] Calling syncNotificationState after ChangeNotifications")
+                syncNotificationState()
             }
             
             // События безопасности
@@ -315,43 +295,6 @@ class ProfileViewModel(
     }
 
     /**
-     * Загрузка настроек уведомлений.
-     */
-    private fun loadNotificationSettings() {
-        // В реальном приложении здесь будет загрузка из хранилища настроек
-        // Для примера используем заглушку
-        _state.update { it.copy(
-            isTransactionReminderEnabled = true,
-            transactionReminderTime = Pair(20, 0) // 20:00
-        ) }
-    }
-
-    /**
-     * Обновление настроек уведомлений о транзакциях.
-     */
-    private fun updateTransactionReminder(isEnabled: Boolean, reminderTime: Pair<Int, Int>?, context: Context?) {
-        _state.update { it.copy(
-            isTransactionReminderEnabled = isEnabled,
-            transactionReminderTime = reminderTime,
-            isEditingNotifications = false
-        ) }
-        
-        // Сохраняем настройки в хранилище
-        // В реальном приложении здесь будет сохранение в хранилище настроек
-        
-        // Обновляем расписание уведомлений
-        if (context != null) {
-            if (isEnabled && reminderTime != null) {
-                val (hour, minute) = reminderTime
-                notificationScheduler.scheduleTransactionReminder(context, hour, minute)
-            } else {
-                notificationScheduler.cancelTransactionReminder(context)
-            }
-        }
-    }
-
-
-    /**
      * Загружает финансовую аналитику из базы данных.
      * Рассчитывает общий доход, расходы, баланс и норму сбережений.
      */
@@ -449,7 +392,7 @@ class ProfileViewModel(
                     }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке финансовой аналитики: ${e.message}")
+                Timber.e(e, String.format(Locale.getDefault(), "Ошибка при загрузке финансовой аналитики: %s", e.message))
                 _state.update { it.copy(
                     isLoading = false,
                     error = e.message
@@ -459,25 +402,27 @@ class ProfileViewModel(
     }
 
     /**
-     * Обновляет настройку включения/отключения уведомлений
-     */
-    fun updateNotificationEnabled(enabled: Boolean) {
-        viewModelScope.launch {
-            notificationEnabled = enabled
-            notificationPreferences.updateNotificationEnabled(enabled)
-            // Автоматически обновлять напоминания при изменении статуса
-            val reminderPair = if (enabled) Pair(reminderTime.hours, reminderTime.minutes) else null
-            updateTransactionReminder(enabled, reminderPair, null)
-        }
-    }
-
-    /**
      * Обновляет время напоминаний
      */
     fun updateReminderTime(hour: Int, minute: Int) {
         viewModelScope.launch {
             reminderTime = Time(hour, minute)
-            notificationPreferences.updateReminderTime(hour, minute)
+            preferencesManager.setReminderTime(hour, minute)
+        }
+    }
+
+    fun syncNotificationState() {
+        viewModelScope.launch {
+            val remindersEnabled = preferencesManager.isTransactionReminderEnabled()
+            val reminderTime = preferencesManager.getReminderTime()
+            Timber.d("[ProfileViewModel] syncNotificationState: remindersEnabled=%b, reminderTime=%s", remindersEnabled, reminderTime)
+            _state.update {
+                it.copy(
+                    isNotificationsEnabled = remindersEnabled,
+                    isTransactionReminderEnabled = remindersEnabled,
+                    transactionReminderTime = reminderTime
+                )
+            }
         }
     }
 } 

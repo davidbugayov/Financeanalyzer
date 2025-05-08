@@ -2,14 +2,14 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
 import android.content.SharedPreferences
-import android.os.Build
+import androidx.core.content.edit
 import timber.log.Timber
 
 /**
  * Менеджер состояний разрешения для уведомлений.
  * Реализует конечный автомат для управления жизненным циклом разрешения.
  */
-class PermissionManager(private val context: Context) {
+class PermissionManager(context: Context) {
 
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("finance_analyzer_prefs", 0)
@@ -48,7 +48,7 @@ class PermissionManager(private val context: Context) {
             "notification_permission_state",
             NotificationPermissionState.INITIAL.ordinal
         )
-        return NotificationPermissionState.values()[stateOrdinal]
+        return NotificationPermissionState.entries[stateOrdinal]
     }
 
     /**
@@ -107,65 +107,14 @@ class PermissionManager(private val context: Context) {
      * Сохранение состояния в SharedPreferences
      */
     private fun saveState(state: NotificationPermissionState) {
-        sharedPreferences.edit()
-            .putInt("notification_permission_state", state.ordinal)
-            .apply()
-    }
-
-    /**
-     * Проверка, нужно ли показывать диалог запроса разрешения на главном экране
-     */
-    fun shouldShowPermissionDialogOnMain(): Boolean {
-        // Проверяем, есть ли уже разрешение
-        if (PermissionUtils.hasNotificationPermission(context)) {
-            return false
+        sharedPreferences.edit {
+            putInt("notification_permission_state", state.ordinal)
         }
-
-        // Проверяем поддержку Android 13+
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            return false
-        }
-
-        // Проверяем текущее состояние
-        val currentState = getCurrentState()
-        Timber.d("Проверка показа диалога на главном экране. Текущее состояние: $currentState")
-
-        return when (currentState) {
-            NotificationPermissionState.ONBOARDING_COMPLETED -> true
-            else -> false // Во всех остальных случаях не показываем
-        }
-    }
-
-    /**
-     * Проверка, нужно ли показывать диалог перехода в настройки после отказа
-     */
-    fun shouldShowSettingsDialog(): Boolean {
-        // Только для Android 13+
-        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.TIRAMISU) {
-            return false
-        }
-
-        // Проверяем, показывали ли уже диалог о переходе в настройки
-        val hasShownPermissionDeniedDialog = sharedPreferences.getBoolean("has_shown_permission_denied_dialog", false)
-        if (hasShownPermissionDeniedDialog) {
-            return false
-        }
-
-        // Показываем диалог только если разрешение отклонено и не постоянно
-        val currentState = getCurrentState()
-        return currentState == NotificationPermissionState.PERMISSION_DENIED
-    }
-
-    /**
-     * Отмечаем, что диалог запроса разрешения был закрыт на главном экране
-     */
-    fun markMainDialogDismissed() {
-        processEvent(PermissionEvent.DISMISS_DIALOG)
     }
 
     // --- Новый функционал для однократного показа диалога разрешения ---
     fun markPermissionDialogShown() {
-        sharedPreferences.edit().putBoolean("was_permission_dialog_shown", true).apply()
+        sharedPreferences.edit { putBoolean("was_permission_dialog_shown", true) }
     }
 
     fun wasPermissionDialogShown(): Boolean {

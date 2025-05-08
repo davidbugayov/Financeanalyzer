@@ -24,6 +24,7 @@ import com.davidbugayov.financeanalyzer.presentation.navigation.AppNavGraph
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingScreen
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -78,14 +79,15 @@ fun MainScreen(
         },
         onPermissionGranted = {
             showPermissionDialog = false
+            wasPermissionDialogDismissed = true
             permissionManager.markPermissionDialogShown()
+            profileViewModel.onEvent(ProfileEvent.ChangeNotifications(true), context)
         },
         onPermissionDenied = {
             showPermissionDialog = false
             wasPermissionDialogDismissed = true
             permissionManager.markPermissionDialogShown()
-        },
-        openSettingsOnDeny = false
+        }
     )
 
     ApplyThemeAndSystemBars(themeMode, isDarkTheme, view)

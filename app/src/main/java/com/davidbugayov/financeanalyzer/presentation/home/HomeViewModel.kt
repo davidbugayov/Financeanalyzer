@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 
+import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
@@ -16,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
+import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -113,7 +115,7 @@ class HomeViewModel(
      * Обрабатывает события экрана Home
      * @param event Событие для обработки
      */
-    fun onEvent(event: HomeEvent) {
+    fun onEvent(event: HomeEvent, context: Context? = null) {
         when (event) {
             is HomeEvent.SetFilter -> {
                 _state.update { 
@@ -152,6 +154,11 @@ class HomeViewModel(
 
             is HomeEvent.DeleteTransaction -> {
                 deleteTransaction(event.transaction)
+            }
+            is HomeEvent.ChangeNotifications -> {
+                if (event.enabled && context != null) {
+                    NotificationScheduler.updateTransactionReminder(context, true)
+                }
             }
         }
     }

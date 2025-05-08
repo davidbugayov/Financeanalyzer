@@ -21,6 +21,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -35,9 +36,10 @@ import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
-import com.davidbugayov.financeanalyzer.presentation.profile.Time
+import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
+import timber.log.Timber
 
 /**
  * Диалог настройки уведомлений о транзакциях.
@@ -50,37 +52,35 @@ fun NotificationSettingsDialog(
     onDismiss: () -> Unit,
     viewModel: ProfileViewModel
 ) {
+    val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val permissionManager = remember { PermissionManager(context) }
-    var notificationsEnabled by remember { mutableStateOf(viewModel.notificationEnabled) }
     var pendingEnableNotifications by remember { mutableStateOf(false) }
-    var reminderTime by remember { mutableStateOf(viewModel.reminderTime) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
-
     var hasNotificationPermission by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
 
     // Если разрешение только что появилось и был запрос на включение — включаем напоминания
     LaunchedEffect(hasNotificationPermission) {
         if (hasNotificationPermission && pendingEnableNotifications) {
-            notificationsEnabled = true
-            viewModel.updateNotificationEnabled(true)
+            viewModel.onEvent(ProfileEvent.ChangeNotifications(true), context)
             pendingEnableNotifications = false
         }
     }
 
-    // Автоматически обновлять состояние разрешения при возвращении на экран
     LaunchedEffect(Unit) {
         hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
     }
 
-    // Диалог выбора времени
+    LaunchedEffect(state.isTransactionReminderEnabled) {
+        Timber.d("[UI] NotificationSettingsDialog: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}")
+    }
+
     if (showTimePicker) {
         TimePickerDialog(
-            initialHour = reminderTime.hours,
-            initialMinute = reminderTime.minutes,
+            initialHour = state.transactionReminderTime?.first ?: 20,
+            initialMinute = state.transactionReminderTime?.second ?: 0,
             onTimeSelected = { hour, minute ->
-                reminderTime = Time(hour, minute)
                 viewModel.updateReminderTime(hour, minute)
                 showTimePicker = false
             },
@@ -94,8 +94,7 @@ fun NotificationSettingsDialog(
         onPermissionGranted = {
             showPermissionDialog = false
             hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
-            notificationsEnabled = true
-            viewModel.updateNotificationEnabled(true)
+            viewModel.onEvent(ProfileEvent.ChangeNotifications(true), context)
         },
         onPermissionDenied = { showPermissionDialog = false }
     )
@@ -123,7 +122,6 @@ fun NotificationSettingsDialog(
 
                 Spacer(modifier = Modifier.height(16.dp))
 
-                // Информация о необходимости разрешения и кнопка запроса
                 if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     Text(
                         text = stringResource(R.string.notification_permission_required),
@@ -158,24 +156,21 @@ fun NotificationSettingsDialog(
                         )
                     }
                     Switch(
-                        checked = notificationsEnabled,
+                        checked = state.isTransactionReminderEnabled,
                         onCheckedChange = { checked ->
-                            if (checked && !hasNotificationPermission &&
-                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
-                            ) {
+                            if (checked && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 permissionManager.processEvent(PermissionManager.PermissionEvent.REQUEST_PERMISSION)
                                 showPermissionDialog = true
                                 pendingEnableNotifications = true
                             } else {
-                                notificationsEnabled = checked
-                                viewModel.updateNotificationEnabled(checked)
+                                viewModel.onEvent(ProfileEvent.ChangeNotifications(checked), context)
                                 pendingEnableNotifications = false
                             }
                         }
                     )
                 }
 
-                if (notificationsEnabled) {
+                if (state.isTransactionReminderEnabled) {
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -189,7 +184,7 @@ fun NotificationSettingsDialog(
                             Text(
                                 text = stringResource(
                                     R.string.reminder_time_description,
-                                    reminderTime.formattedString
+                                    String.format("%02d:%02d", state.transactionReminderTime?.first ?: 20, state.transactionReminderTime?.second ?: 0)
                                 ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant

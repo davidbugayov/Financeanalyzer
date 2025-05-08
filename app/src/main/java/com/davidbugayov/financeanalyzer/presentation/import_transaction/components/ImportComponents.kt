@@ -13,7 +13,6 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Lightbulb
-import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -36,7 +35,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsState
-import com.davidbugayov.financeanalyzer.ui.animation.DialogTransitions
 
 /**
  * Компонент с инструкциями по импорту
@@ -336,9 +334,7 @@ fun BankInstructionDialog(
         )
     ) {
         androidx.compose.animation.AnimatedVisibility(
-            visible = true,
-            enter = DialogTransitions.fadeInWithScale(),
-            exit = DialogTransitions.fadeOutWithScale()
+            visible = true
         ) {
             Card(
                 modifier = Modifier
@@ -410,9 +406,7 @@ fun PermissionDialog(
         )
     ) {
         androidx.compose.animation.AnimatedVisibility(
-            visible = true,
-            enter = DialogTransitions.fadeInWithScale(),
-            exit = DialogTransitions.fadeOutWithScale()
+            visible = true
         ) {
             Card(
                 modifier = Modifier

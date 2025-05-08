@@ -12,12 +12,18 @@ import androidx.activity.result.ActivityResultLauncher
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
+import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import timber.log.Timber
 
 /**
  * Утилитарный класс для работы с разрешениями.
  */
 object PermissionUtils {
+
+    private const val PREFS_NAME = "permission_prefs"
+    private const val KEY_NOTIFICATION_REQUESTED = "notification_permission_requested"
 
     /**
      * Проверяет, есть ли у приложения разрешение на отправку уведомлений.
@@ -66,7 +72,7 @@ object PermissionUtils {
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             }
             context.startActivity(intent)
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             // Fallback: открыть настройки приложения
             val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
                 data = Uri.fromParts("package", context.packageName, null)
@@ -94,7 +100,7 @@ object PermissionUtils {
                         context,
                         permission
                     ) == PackageManager.PERMISSION_GRANTED
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Fallback к разрешениям Android 13+
                     ContextCompat.checkSelfPermission(
                         context,
@@ -139,5 +145,77 @@ object PermissionUtils {
                 Manifest.permission.READ_EXTERNAL_STORAGE
             }
         }
+    }
+
+    /**
+     * Проверяет, запрашивалось ли уже разрешение на уведомления
+     */
+    fun hasRequestedNotificationPermission(context: Context): Boolean {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        return prefs.getBoolean(KEY_NOTIFICATION_REQUESTED, false)
+    }
+
+    /**
+     * Сохраняет факт запроса разрешения на уведомления
+     */
+    fun setRequestedNotificationPermission(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        prefs.edit { putBoolean(KEY_NOTIFICATION_REQUESTED, true) }
+    }
+
+    /**
+     * Проверяет и запрашивает разрешение на уведомления, если нужно открывает настройки.
+     * @param context Контекст
+     * @param launcher Лаунчер для запроса разрешения
+     * @param openSettingsOnDeny Открывать ли настройки при отказе
+     * @param onGranted Callback при успехе
+     * @param onDenied Callback при отказе
+     */
+    @Suppress("InlinedApi")
+    fun handleNotificationPermission(
+        context: Context,
+        launcher: ActivityResultLauncher<String>,
+        openSettingsOnDeny: Boolean,
+        onGranted: () -> Unit,
+        onDenied: () -> Unit
+    ) {
+        if (hasNotificationPermission(context)) {
+            onGranted()
+        } else {
+            val hasRequestedBefore = hasRequestedNotificationPermission(context)
+            if (shouldShowSettingsDialog(context) && hasRequestedBefore) {
+                if (openSettingsOnDeny) {
+                    openNotificationSettings(context)
+                }
+                onDenied()
+            } else {
+                setRequestedNotificationPermission(context)
+                launcher.launch(Manifest.permission.POST_NOTIFICATIONS)
+            }
+        }
+    }
+
+    /**
+     * Определяет, нужно ли показывать диалог перехода в настройки (например, если пользователь навсегда запретил разрешение).
+     * @param context Контекст
+     * @return true, если нужно открыть настройки
+     */
+    fun shouldShowSettingsDialog(context: Context): Boolean {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val activity = context as? android.app.Activity ?: return false
+            val hasPermission = hasNotificationPermission(context)
+            val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
+                activity,
+                Manifest.permission.POST_NOTIFICATIONS
+            )
+            Timber.d(
+                "[PermissionUtils] shouldShowSettingsDialog: hasPermission=%b, shouldShowRationale=%b, context=%s",
+                hasPermission,
+                shouldShowRationale,
+                context::class.java.simpleName
+            )
+            return !hasPermission && !shouldShowRationale
+        }
+        return false
     }
 } 

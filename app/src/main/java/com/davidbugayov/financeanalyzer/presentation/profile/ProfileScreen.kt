@@ -34,6 +34,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.BuildConfig
@@ -51,6 +52,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 /**
  * Экран профиля пользователя.
@@ -99,6 +101,10 @@ fun ProfileScreen(
         // Показываем сообщения о результате экспорта
         HandleExportMessages(state, snackbarHostState, viewModel)
 
+        LaunchedEffect(state.isTransactionReminderEnabled) {
+            Timber.d("[UI] ProfileScreen: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}")
+        }
+
         Scaffold(
             topBar = {
                 ProfileTopBar(onNavigateBack = onNavigateBack)
@@ -129,74 +135,13 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
                 // Секция бюджета
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.profile_section_padding)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = onNavigateToBudget)
-                            .padding(
-                                start = dimensionResource(R.dimen.profile_section_padding),
-                                end = dimensionResource(R.dimen.profile_section_padding),
-                                top = dimensionResource(R.dimen.profile_section_padding),
-                                bottom = dimensionResource(R.dimen.profile_section_padding)
-                            ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountBalanceWallet,
-                            contentDescription = "Бюджет",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
-                        )
-                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-                        Text(
-                            text = "Бюджет",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
+                BudgetSection(onNavigateToBudget, modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding)))
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
                 // Секция экспорт и импорт
-                Card(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.profile_section_padding)),
-                    elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
-                    shape = MaterialTheme.shapes.medium
-                ) {
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable(onClick = { onNavigateToExportImport(Screen.ExportImport.route) })
-                            .padding(
-                                start = dimensionResource(R.dimen.profile_section_padding),
-                                end = dimensionResource(R.dimen.profile_section_padding),
-                                top = dimensionResource(R.dimen.profile_section_padding),
-                                bottom = dimensionResource(R.dimen.profile_section_padding)
-                            ),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FileUpload,
-                            contentDescription = "Экспорт и импорт",
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
-                        )
-                        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-                        Text(
-                            text = "Экспорт и импорт",
-                            style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                            color = MaterialTheme.colorScheme.onSurface
-                        )
-                    }
-                }
+                ExportImportSection(
+                    onNavigateToExportImport,
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
+                )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
 
                 // Секция настроек
@@ -224,7 +169,7 @@ fun ProfileScreen(
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
 
                 // Диалоги
-                ShowDialogs(state, viewModel, context)
+                ShowDialogs(state, viewModel)
                 
                 // Отступ внизу экрана для улучшения UX
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing) * 2))
@@ -298,4 +243,76 @@ private fun ShowDialogs(
             viewModel = viewModel
         )
     }
-} 
+}
+
+/**
+ * Секция бюджета на экране профиля.
+ * @param onNavigateToBudget Обработчик перехода к бюджету.
+ * @param modifier Модификатор для внешнего вида.
+ */
+@Composable
+private fun BudgetSection(onNavigateToBudget: () -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = onNavigateToBudget),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.profile_section_padding)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.AccountBalanceWallet,
+                contentDescription = stringResource(R.string.budget),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+            Text(
+                text = stringResource(R.string.budget),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}
+
+/**
+ * Секция экспорта и импорта на экране профиля.
+ * @param onNavigateToExportImport Обработчик перехода к экспорту/импорту.
+ * @param modifier Модификатор для внешнего вида.
+ */
+@Composable
+private fun ExportImportSection(onNavigateToExportImport: (String) -> Unit, modifier: Modifier = Modifier) {
+    Card(
+        modifier = modifier
+            .fillMaxWidth()
+            .clickable(onClick = { onNavigateToExportImport(Screen.ExportImport.route) }),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+        shape = MaterialTheme.shapes.medium
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.profile_section_padding)),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Icon(
+                imageVector = Icons.Default.FileUpload,
+                contentDescription = stringResource(R.string.export_import),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
+            )
+            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
+            Text(
+                text = stringResource(R.string.export_import),
+                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                color = MaterialTheme.colorScheme.onSurface
+            )
+        }
+    }
+}

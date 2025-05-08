@@ -45,7 +45,6 @@
     <string name="month">Месяц</string>
     <string name="recent_transactions">Последние транзакции</string>
     <string name="unknown_error">Неизвестная ошибка</string>
-    <string name="profile">Профиль</string>
     <string name="profile_title">Профиль пользователя</string>
     
     <!-- Фильтры -->
@@ -411,8 +410,6 @@
     
     <!-- Информация о приложении -->
     <string name="app_info">О приложении</string>
-    <string name="app_version">Версия приложения</string>
-    <string name="build_version">Версия кода</string>
     <string name="libraries">Используемые библиотеки</string>
     <string name="libraries_title">Используемые библиотеки</string>
     <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
@@ -526,7 +523,6 @@
     <string name="csv_note">Положительные суммы будут импортированы как доходы, отрицательные - как расходы.</string>
 
     <!-- Budget screen strings -->
-    <string name="budget">Бюджет</string>
     <string name="budget_transactions">Транзакции</string>
     <string name="budget_category_transactions">Транзакции категории %s</string>
     <string name="add_budget_category">Добавить категорию бюджета</string>
@@ -807,4 +803,17 @@
     <string name="reminder_time">Время напоминания</string>
     <string name="reminder_time_description">Напоминание будет в %1$s</string>
     <string name="edit_time">Изменить время</string>
+
+    <!-- New strings for Profile -->
+    <string name="budget">Бюджет</string>
+    <string name="export_import">Экспорт и импорт</string>
+    <string name="unknown">Неизвестно</string>
+    <string name="settings_section">Секция настроек</string>
+    <string name="analytics_section">Секция аналитики</string>
+    <string name="app_info_section">Секция информации о приложении</string>
+    <string name="budget_section">Секция бюджета</string>
+    <string name="export_import_section">Секция экспорт и импорт</string>
+    <string name="profile">Профиль</string>
+    <string name="app_version">Версия приложения</string>
+    <string name="build_version">Версия сборки</string>
 </resources>

@@ -13,12 +13,10 @@ import java.util.Calendar
 /**
  * Класс для планирования и управления уведомлениями.
  */
-class NotificationScheduler {
+object NotificationScheduler {
 
-    companion object {
-        private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
-        private const val TRANSACTION_REMINDER_REQUEST_CODE = 1001
-    }
+    private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
+    private const val TRANSACTION_REMINDER_REQUEST_CODE = 1001
 
     /**
      * Создает канал уведомлений для Android 8.0 (API 26) и выше.
@@ -110,5 +108,24 @@ class NotificationScheduler {
         
         val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(pendingIntent)
+    }
+
+    /**
+     * Универсальная функция для включения/отключения напоминаний о транзакциях и их перепланирования.
+     * @param context Контекст приложения.
+     * @param isEnabled Включить или выключить напоминания.
+     * @param reminderTime Время напоминания (час, минута). Если null — используется сохранённое в PreferencesManager.
+     */
+    fun updateTransactionReminder(context: Context, isEnabled: Boolean, reminderTime: Pair<Int, Int>? = null) {
+        val preferencesManager = PreferencesManager(context)
+        if (isEnabled) {
+            val (hour, minute) = reminderTime ?: preferencesManager.getReminderTime()
+            preferencesManager.setTransactionReminderEnabled(true)
+            preferencesManager.setReminderTime(hour, minute)
+            scheduleTransactionReminder(context, hour, minute)
+        } else {
+            preferencesManager.setTransactionReminderEnabled(false)
+            cancelTransactionReminder(context)
+        }
     }
 } 

@@ -6,7 +6,6 @@ import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -15,10 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material.icons.filled.MoreHoriz
-import androidx.compose.material.icons.filled.FileUpload
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -26,7 +21,6 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -35,19 +29,15 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
-import com.davidbugayov.financeanalyzer.presentation.components.ErrorDialog
 import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AddButton
@@ -67,11 +57,8 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import com.davidbugayov.financeanalyzer.utils.PreferencesManager
-import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.presentation.components.FeatureAnnouncement
 
 /**
  * Базовый экран для работы с транзакциями
@@ -94,23 +81,47 @@ fun <E> BaseTransactionScreen(
 
     // Логируем режим экрана
     LaunchedEffect(isEditMode) {
-        Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Инициализирован в режиме ${if (isEditMode) "редактирования" else "добавления"}. editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}")
+        Timber.d(
+            "ТРАНЗАКЦИЯ-ЭКРАН: Инициализирован в режиме %s. editMode=%b, transactionToEdit=%s",
+            if (isEditMode) "редактирования" else "добавления",
+            state.editMode,
+            state.transactionToEdit?.id
+        )
         
         if (isEditMode && state.transactionToEdit != null) {
             val transaction = state.transactionToEdit!!
-            Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Данные загруженной транзакции: ID=${transaction.id}, amount=${transaction.amount}, category=${transaction.category}, source=${transaction.source}, date=${transaction.date}")
-            Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Текущее состояние полей: amount=${state.amount}, category=${state.category}, source=${state.source}, isExpense=${state.isExpense}")
+            Timber.d(
+                "ТРАНЗАКЦИЯ-ЭКРАН: Данные загруженной транзакции: ID=%s, amount=%s, category=%s, source=%s, date=%s",
+                transaction.id,
+                transaction.amount,
+                transaction.category,
+                transaction.source,
+                transaction.date
+            )
+            Timber.d(
+                "ТРАНЗАКЦИЯ-ЭКРАН: Текущее состояние полей: amount=%s, category=%s, source=%s, isExpense=%b",
+                state.amount,
+                state.category,
+                state.source,
+                state.isExpense
+            )
         }
     }
     // Логируем состояние ошибок
     LaunchedEffect(state.categoryError, state.sourceError, state.amountError) {
-        Timber.d("Состояние ошибок: categoryError=${state.categoryError}, sourceError=${state.sourceError}, amountError=${state.amountError}")
+        Timber.d("Состояние ошибок: categoryError=%b, sourceError=%b, amountError=%b", state.categoryError, state.sourceError, state.amountError)
     }
 
     // Отслеживаем изменения в загруженной транзакции
     LaunchedEffect(state.transactionToEdit, state.amount, state.category, state.source) {
         if (isEditMode && state.transactionToEdit != null) {
-            Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Изменение состояния: amount=${state.amount}, category=${state.category}, source=${state.source}, isExpense=${state.isExpense}")
+            Timber.d(
+                "ТРАНЗАКЦИЯ-ЭКРАН: Изменение состояния: amount=%s, category=%s, source=%s, isExpense=%b",
+                state.amount,
+                state.category,
+                state.source,
+                state.isExpense
+            )
         }
     }
 
@@ -145,7 +156,7 @@ fun <E> BaseTransactionScreen(
 
     // Специальная обработка для типа транзакции на основе forceExpense
     LaunchedEffect(state.forceExpense) {
-        Timber.d("forceExpense изменен: ${state.forceExpense}")
+        Timber.d("forceExpense изменен: %b", state.forceExpense)
         // Если forceExpense=true и isExpense=false, переключаем на расход
         if (state.forceExpense && !state.isExpense) {
             viewModel.onEvent(eventFactory(BaseTransactionEvent.ToggleTransactionType), context)
@@ -241,12 +252,17 @@ fun <E> BaseTransactionScreen(
 
                 // Секция "Откуда/Куда" (Source) - теперь первая
                 Column {
-                    Timber.d("Rendering SourceSection with isExpense=" + state.isExpense + ", selectedSource=" + state.source + ", sources count=" + state.sources.size)
+                    Timber.d(
+                        "Rendering SourceSection with isExpense=%b, selectedSource=%s, sources count=%d",
+                        state.isExpense,
+                        state.source,
+                        state.sources.size
+                    )
                     SourceSection(
                         sources = state.sources,
                         selectedSource = state.source,
                         onSourceSelected = { selectedSource ->
-                            Timber.d("Source selected directly: " + selectedSource.name + " with color " + selectedSource.color)
+                            Timber.d("Source selected directly: %s with color %s", selectedSource.name, selectedSource.color)
                             viewModel.onEvent(eventFactory(selectedSource), context)
                         },
                         onAddSourceClick = {
@@ -254,7 +270,7 @@ fun <E> BaseTransactionScreen(
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowCustomSourceDialog), context)
                         },
                         onSourceLongClick = { selectedSource ->
-                            Timber.d("Source long clicked: " + selectedSource.name)
+                            Timber.d("Source long clicked: %s", selectedSource.name)
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowDeleteSourceConfirmDialog(selectedSource.name)), context)
                         },
                         isError = state.sourceError
@@ -273,12 +289,12 @@ fun <E> BaseTransactionScreen(
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog), context)
                         },
                         onCategoryLongClick = { selectedCategory ->
-                            Timber.d("Category long click in BaseTransactionScreen: " + selectedCategory.name)
+                            Timber.d("Category long click in BaseTransactionScreen: %s", selectedCategory.name)
                             // Don't allow long press on "Другое" and "Переводы"
                             if (selectedCategory.name != "Другое" && selectedCategory.name != "Переводы") {
                                 viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(selectedCategory.name)), context)
                             } else {
-                                Timber.d("Ignoring long press on protected category: " + selectedCategory.name)
+                                Timber.d("Ignoring long press on protected category: %s", selectedCategory.name)
                             }
                         },
                         isError = state.categoryError
@@ -294,11 +310,11 @@ fun <E> BaseTransactionScreen(
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog), context)
                         },
                         onCategoryLongClick = { selectedCategory ->
-                            Timber.d("Category long click in BaseTransactionScreen: " + selectedCategory.name)
+                            Timber.d("Category long click in BaseTransactionScreen: %s", selectedCategory.name)
                             if (selectedCategory.name != "Другое" && selectedCategory.name != "Переводы") {
                                 viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(selectedCategory.name)), context)
                             } else {
-                                Timber.d("Ignoring long press on protected category: " + selectedCategory.name)
+                                Timber.d("Ignoring long press on protected category: %s", selectedCategory.name)
                             }
                         },
                         isError = state.categoryError
@@ -599,16 +615,3 @@ fun <E> BaseTransactionScreen(
         }
     }
 }
-
-@Composable
-fun ImportInfoBanner(modifier: Modifier = Modifier, onNavigateToImport: () -> Unit) {
-    Timber.d("ImportInfoBanner: Attempting to show import info banner")
-    FeatureAnnouncement(
-        title = "Новая функция!",
-        description = "Вы можете импортировать транзакции из других банков автоматически! Это упростит учет ваших финансов.",
-        actionText = "Нажмите, чтобы перейти к импорту транзакций",
-        preferencesKey = "import_info_add_transaction_dismissed",
-        onActionClick = onNavigateToImport,
-        modifier = modifier
-    )
-} 
