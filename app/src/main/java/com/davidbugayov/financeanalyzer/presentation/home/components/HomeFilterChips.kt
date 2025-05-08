@@ -25,7 +25,7 @@ import timber.log.Timber
  * @param onFilterSelected Callback, вызываемый при выборе фильтра
  */
 @Composable
-fun HomeFilterChips(
+fun PermissionUtilsHomeFilterChips(
     currentFilter: TransactionFilter,
     onFilterSelected: (TransactionFilter) -> Unit
 ) {
@@ -77,5 +77,16 @@ private fun FilterChipItem(
             selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
             selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
         )
+    )
+}
+
+@Composable
+fun HomeFilterChips(
+    currentFilter: TransactionFilter,
+    onFilterSelected: (TransactionFilter) -> Unit
+) {
+    PermissionUtilsHomeFilterChips(
+        currentFilter = currentFilter,
+        onFilterSelected = onFilterSelected
     )
 } 

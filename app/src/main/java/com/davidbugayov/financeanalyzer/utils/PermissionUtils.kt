@@ -4,6 +4,7 @@ import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
 import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -12,7 +13,6 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.core.content.ContextCompat
-import androidx.core.net.toUri
 
 /**
  * Утилитарный класс для работы с разрешениями.
@@ -59,37 +59,20 @@ object PermissionUtils {
      * @param context Контекст приложения
      */
     fun openNotificationSettings(context: Context) {
-        val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
-            putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        }
-
-        if (intent.resolveActivity(context.packageManager) == null) {
-            // Fallback для старых версий или если настройки уведомлений недоступны
-            Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-                addCategory(Intent.CATEGORY_DEFAULT)
-                data = "package:${context.packageName}".toUri()
+        try {
+            // Попытка открыть настройки уведомлений (Android 8+)
+            val intent = Intent(Settings.ACTION_APP_NOTIFICATION_SETTINGS).apply {
+                putExtra(Settings.EXTRA_APP_PACKAGE, context.packageName)
                 addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                context.startActivity(this)
             }
-        } else {
             context.startActivity(intent)
-        }
-    }
-
-    /**
-     * Открывает системные настройки приложения для управления разрешениями.
-     * Используется, когда пользователь отказал в предоставлении разрешения и нужно направить его
-     * в настройки для ручного включения разрешения.
-     * 
-     * @param context Контекст приложения
-     */
-    fun openApplicationSettings(context: Context) {
-        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-            addCategory(Intent.CATEGORY_DEFAULT)
-            data = "package:${context.packageName}".toUri()
-            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            context.startActivity(this)
+        } catch (e: Exception) {
+            // Fallback: открыть настройки приложения
+            val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+                data = Uri.fromParts("package", context.packageName, null)
+                addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+            }
+            context.startActivity(intent)
         }
     }
 

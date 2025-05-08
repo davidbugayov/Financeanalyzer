@@ -1,28 +1,24 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.components
 
-import android.Manifest
 import android.os.Build
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.MutableTransitionState
-import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.AlertDialog
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material3.Button
-import androidx.compose.material3.Card
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
-import androidx.compose.material3.TimeInput
-import androidx.compose.material3.rememberTimePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -31,292 +27,191 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.ui.animation.DialogTransitions
+import com.davidbugayov.financeanalyzer.presentation.components.PermissionDialogs
+import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.presentation.profile.Time
+import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
-import java.util.*
 
 /**
  * Диалог настройки уведомлений о транзакциях.
- * @param isEnabled Включены ли уведомления.
- * @param reminderTime Время напоминания (часы и минуты).
- * @param onSave Обработчик сохранения настроек.
  * @param onDismiss Обработчик закрытия диалога.
+ * @param viewModel ViewModel для управления состоянием настроек.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun NotificationSettingsDialog(
-    isEnabled: Boolean,
-    reminderTime: Pair<Int, Int>?, // Часы и минуты
-    onSave: (isEnabled: Boolean, reminderTime: Pair<Int, Int>?) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    viewModel: ProfileViewModel
 ) {
-    var notificationsEnabled by remember { mutableStateOf(isEnabled) }
-    val selectedTime by remember { 
-        mutableStateOf(reminderTime ?: Pair(20, 0)) // По умолчанию 20:00
-    }
     val context = LocalContext.current
+    val permissionManager = remember { PermissionManager(context) }
+    var notificationsEnabled by remember { mutableStateOf(viewModel.notificationEnabled) }
+    var pendingEnableNotifications by remember { mutableStateOf(false) }
+    var reminderTime by remember { mutableStateOf(viewModel.reminderTime) }
+    var showTimePicker by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
-    var showSettingsDialog by remember { mutableStateOf(false) }
-    var hasNotificationPermission by remember {
-        mutableStateOf(PermissionUtils.hasNotificationPermission(context))
-    }
-    
-    // Состояние для анимации
-    val animatedVisibilityState = remember { MutableTransitionState(false) }
-    LaunchedEffect(Unit) {
-        animatedVisibilityState.targetState = true
-    }
-    
-    // Анимация масштабирования
-    val scale by animateFloatAsState(
-        targetValue = if (animatedVisibilityState.targetState) 1f else 0.8f,
-        label = "scale"
-    )
-    
-    val timePickerState = rememberTimePickerState(
-        initialHour = selectedTime.first,
-        initialMinute = selectedTime.second,
-        is24Hour = true
-    )
 
-    // Launcher для запроса разрешений
-    val permissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { isGranted ->
-        if (isGranted) {
-            hasNotificationPermission = true
+    var hasNotificationPermission by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
+
+    // Если разрешение только что появилось и был запрос на включение — включаем напоминания
+    LaunchedEffect(hasNotificationPermission) {
+        if (hasNotificationPermission && pendingEnableNotifications) {
             notificationsEnabled = true
-        } else {
-            // Если пользователь отказал, предлагаем перейти в настройки
-            showSettingsDialog = true
+            viewModel.updateNotificationEnabled(true)
+            pendingEnableNotifications = false
         }
     }
 
-    // Диалог с предложением перейти в настройки (когда пользователь отказал в разрешении)
-    if (showSettingsDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showSettingsDialog = false
-                notificationsEnabled = false
+    // Автоматически обновлять состояние разрешения при возвращении на экран
+    LaunchedEffect(Unit) {
+        hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
+    }
+
+    // Диалог выбора времени
+    if (showTimePicker) {
+        TimePickerDialog(
+            initialHour = reminderTime.hours,
+            initialMinute = reminderTime.minutes,
+            onTimeSelected = { hour, minute ->
+                reminderTime = Time(hour, minute)
+                viewModel.updateReminderTime(hour, minute)
+                showTimePicker = false
             },
-            title = { Text(stringResource(R.string.permission_denied)) },
-            text = { Text(stringResource(R.string.notification_permission_settings_message)) },
-            confirmButton = {
-                Button(onClick = {
-                    PermissionUtils.openNotificationSettings(context)
-                    showSettingsDialog = false
-                }) {
-                    Text(stringResource(R.string.open_settings))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showSettingsDialog = false
-                    notificationsEnabled = false
-                }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
+            onDismiss = { showTimePicker = false }
         )
     }
 
-    // Диалог запроса разрешений
-    if (showPermissionDialog) {
-        AlertDialog(
-            onDismissRequest = {
-                showPermissionDialog = false
-                notificationsEnabled = false
-            },
-            title = { Text(stringResource(R.string.permission_required)) },
-            text = { Text(stringResource(R.string.notification_permission_message)) },
-            confirmButton = {
-                Button(onClick = {
-                    showPermissionDialog = false
-                    // Запрашиваем разрешение напрямую
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                    }
-                }) {
-                    Text(stringResource(R.string.request_permission))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = {
-                    showPermissionDialog = false
-                    notificationsEnabled = false
-                }) {
-                    Text(stringResource(R.string.cancel))
-                }
-            }
-        )
-    }
-    
+    PermissionDialogs(
+        show = showPermissionDialog,
+        onDismiss = { showPermissionDialog = false },
+        onPermissionGranted = {
+            showPermissionDialog = false
+            hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
+            notificationsEnabled = true
+            viewModel.updateNotificationEnabled(true)
+        },
+        onPermissionDenied = { showPermissionDialog = false }
+    )
+
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
             dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-            usePlatformDefaultWidth = false
+            dismissOnClickOutside = true
         )
     ) {
-        androidx.compose.animation.AnimatedVisibility(
-            visibleState = animatedVisibilityState,
-            enter = DialogTransitions.fadeInWithScale(),
-            exit = DialogTransitions.fadeOutWithScale()
+        Surface(
+            shape = MaterialTheme.shapes.medium,
+            color = MaterialTheme.colorScheme.surface
         ) {
-            Card(
+            Column(
                 modifier = Modifier
-                    .fillMaxWidth(0.9f)
-                    .padding(dimensionResource(R.dimen.spacing_normal))
-                    .graphicsLayer {
-                        scaleX = scale
-                        scaleY = scale
-                    }
+                    .padding(16.dp)
+                    .fillMaxWidth()
             ) {
-                Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(dimensionResource(R.dimen.spacing_normal))
-                ) {
+                Text(
+                    text = stringResource(R.string.notification_settings),
+                    style = MaterialTheme.typography.titleLarge
+                )
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                // Информация о необходимости разрешения и кнопка запроса
+                if (!hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                     Text(
-                        text = stringResource(R.string.transaction_reminder_settings),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold
+                        text = stringResource(R.string.notification_permission_required),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.error
                     )
-
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxlarge)))
-                    
-                    // Переключатель включения/выключения уведомлений
-                    Row(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                    Button(
+                        onClick = {
+                            permissionManager.processEvent(PermissionManager.PermissionEvent.REQUEST_PERMISSION)
+                            showPermissionDialog = true
+                        },
+                        modifier = Modifier.align(Alignment.CenterHorizontally)
                     ) {
-                        Text(
-                            text = stringResource(R.string.transaction_reminders),
-                            style = MaterialTheme.typography.bodyLarge,
-                            modifier = Modifier.weight(1f)
-                        )
-                        
-                        Switch(
-                            checked = notificationsEnabled,
-                            onCheckedChange = { isChecked ->
-                                if (isChecked && !hasNotificationPermission) {
-                                    // Если пользователь включает уведомления, но нет разрешения
-                                    showPermissionDialog = true
-                                } else {
-                                    notificationsEnabled = isChecked
-                                }
-                            }
-                        )
+                        Text(stringResource(R.string.request_permission))
                     }
+                    Spacer(modifier = Modifier.height(16.dp))
+                }
 
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
-                    
-                    if (notificationsEnabled) {
-                        if (hasNotificationPermission) {
-                            // Если разрешения есть, показываем настройки времени
-                            Text(
-                                text = stringResource(R.string.select_reminder_time),
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-                            // Выбор времени
-                            TimeInput(
-                                state = timePickerState,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-                            // Отображение выбранного времени
-                            Text(
-                                text = stringResource(
-                                    R.string.selected_time,
-                                    timePickerState.hour,
-                                    String.format(Locale.US, "%02d", timePickerState.minute)
-                                ),
-                                style = MaterialTheme.typography.bodyMedium,
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            )
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-
-                            Text(
-                                text = stringResource(R.string.reminder_description),
-                                style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                        } else {
-                            // Если разрешений нет, показываем сообщение и кнопку для запроса разрешений
-                            Text(
-                                text = stringResource(R.string.notification_permission_required),
-                                style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.error
-                            )
-
-                            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
-
-                            Button(
-                                onClick = {
-                                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                        permissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
-                                    }
-                                },
-                                modifier = Modifier.align(Alignment.CenterHorizontally)
-                            ) {
-                                Text(stringResource(R.string.request_permission))
-                            }
-
-                            // Проверяем состояние разрешения при активации экрана и при возвращении фокуса
-                            LaunchedEffect(Unit) {
-                                hasNotificationPermission =
-                                    PermissionUtils.hasNotificationPermission(context)
-                            }
-                        }
-                    } else {
-                        // Текст-подсказка, если уведомления отключены
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.notifications_disabled_message),
+                            text = stringResource(R.string.enable_reminders),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                        Text(
+                            text = stringResource(R.string.reminder_description),
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
+                    Switch(
+                        checked = notificationsEnabled,
+                        onCheckedChange = { checked ->
+                            if (checked && !hasNotificationPermission &&
+                                Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU
+                            ) {
+                                permissionManager.processEvent(PermissionManager.PermissionEvent.REQUEST_PERMISSION)
+                                showPermissionDialog = true
+                                pendingEnableNotifications = true
+                            } else {
+                                notificationsEnabled = checked
+                                viewModel.updateNotificationEnabled(checked)
+                                pendingEnableNotifications = false
+                            }
+                        }
+                    )
+                }
 
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
-                    
-                    // Кнопки действий
+                if (notificationsEnabled) {
+                    Spacer(modifier = Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.End
+                        verticalAlignment = Alignment.CenterVertically
                     ) {
-                        TextButton(
-                            onClick = onDismiss
-                        ) {
-                            Text(stringResource(R.string.cancel))
+                        Column(modifier = Modifier.weight(1f)) {
+                            Text(
+                                text = stringResource(R.string.reminder_time),
+                                style = MaterialTheme.typography.bodyLarge
+                            )
+                            Text(
+                                text = stringResource(
+                                    R.string.reminder_time_description,
+                                    reminderTime.formattedString
+                                ),
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                            )
                         }
+                        IconButton(onClick = { showTimePicker = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Edit,
+                                contentDescription = stringResource(R.string.edit_time)
+                            )
+                        }
+                    }
+                }
 
-                        Button(
-                            onClick = {
-                                val time = if (notificationsEnabled) {
-                                    Pair(timePickerState.hour, timePickerState.minute)
-                                } else {
-                                    null
-                                }
-                                onSave(notificationsEnabled, time)
-                            }
-                        ) {
-                            Text(stringResource(R.string.save))
-                        }
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Row(
+                    modifier = Modifier.fillMaxWidth(),
+                    horizontalArrangement = Arrangement.End
+                ) {
+                    TextButton(onClick = onDismiss) {
+                        Text(stringResource(R.string.close))
                     }
                 }
             }

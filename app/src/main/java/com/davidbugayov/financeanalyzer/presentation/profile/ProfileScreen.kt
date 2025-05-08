@@ -278,8 +278,7 @@ private fun HandleExportMessages(
 @Composable
 private fun ShowDialogs(
     state: ProfileState,
-    viewModel: ProfileViewModel,
-    context: Context
+    viewModel: ProfileViewModel
 ) {
     // Диалог выбора темы
     if (state.isEditingTheme) {
@@ -295,17 +294,8 @@ private fun ShowDialogs(
     // Диалог настроек уведомлений
     if (state.isEditingNotifications) {
         NotificationSettingsDialog(
-            isEnabled = state.isTransactionReminderEnabled,
-            reminderTime = state.transactionReminderTime,
-            onSave = { isEnabled, time ->
-                viewModel.onEvent(
-                    ProfileEvent.UpdateTransactionReminder(
-                        isEnabled,
-                        time
-                    ), context
-                )
-            },
-            onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) }
+            onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) },
+            viewModel = viewModel
         )
     }
 } 

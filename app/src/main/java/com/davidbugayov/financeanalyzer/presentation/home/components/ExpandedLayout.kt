@@ -20,9 +20,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -114,11 +112,8 @@ private fun ExpandedRightPanel(
             .padding(start = 8.dp)
     ) {
         when {
-            !state.isLoading && state.filteredTransactions.isEmpty() && state.currentFilter == TransactionFilter.ALL -> {
-                ExpandedEmptyState(onAddClick)
-            }
             !state.isLoading && state.filteredTransactions.isEmpty() -> {
-                ExpandedNoFilteredState(state.currentFilter)
+                ExpandedEmptyState(onAddClick)
             }
             else -> {
                 ExpandedTransactionList(
@@ -163,26 +158,6 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
                 Text(stringResource(R.string.empty_state_add_first_transaction))
             }
         }
-    }
-}
-
-@Composable
-private fun ExpandedNoFilteredState(currentFilter: TransactionFilter) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = when (currentFilter) {
-                TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
-                TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
-                TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
-                TransactionFilter.ALL -> stringResource(R.string.no_transactions_all)
-            },
-            color = Color.Gray,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
     }
 }
 

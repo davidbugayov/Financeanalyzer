@@ -145,7 +145,7 @@ fun ImportTransactionsScreen(
             PermissionDialog(
                 isAndroid15OrHigher = true,
                 onOpenSettings = {
-                    PermissionUtils.openApplicationSettings(context)
+                    openApplicationSettings()
                     showPermissionSettingsDialog = false
                 },
                 onDismiss = { showPermissionSettingsDialog = false }
@@ -281,4 +281,8 @@ fun ImportTransactionsScreen(
             }
         }
     }
+}
+
+fun openApplicationSettings() {
+    // TODO: Реализовать открытие настроек приложения
 } 

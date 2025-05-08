@@ -98,7 +98,7 @@ val appModule = module {
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
     viewModel { AddTransactionViewModel(get(), get(), get(), get()) }
-    viewModel { ProfileViewModel(get(), get(), get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
     viewModel { EditTransactionViewModel(get(), get(), get(), get(), get()) }
     viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
@@ -106,6 +106,10 @@ val appModule = module {
     viewModel { WalletTransactionsViewModel(get(), get()) }
     viewModel { ImportTransactionsViewModel(get()) }
     viewModel { OnboardingViewModel(get()) }
+
+    // New single for UserPreferences and NotificationPreferences
+    single { com.davidbugayov.financeanalyzer.domain.UserPreferences() }
+    single { com.davidbugayov.financeanalyzer.domain.NotificationPreferences() }
 }
 
 // Для параметризованных ViewModel (пример: статистика за период)

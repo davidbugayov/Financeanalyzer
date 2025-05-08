@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -170,14 +171,15 @@ private fun HomeFeedback(
     feedbackMessage: String,
     feedbackType: FeedbackType,
     showFeedback: Boolean,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     FeedbackMessage(
         message = feedbackMessage,
         type = feedbackType,
         visible = showFeedback,
         onDismiss = onDismiss,
-        modifier = Modifier
+        modifier = modifier
             .padding(top = dimensionResource(R.dimen.padding_small))
     )
 }
@@ -387,7 +389,10 @@ private fun HomeScreenContent(
             feedbackMessage = feedbackMessage,
             feedbackType = feedbackType,
             showFeedback = showFeedback,
-            onDismiss = onDismissFeedback
+            onDismiss = onDismissFeedback,
+            modifier = Modifier
+                .align(Alignment.TopCenter)
+                .padding(top = 16.dp)
         )
     }
 }

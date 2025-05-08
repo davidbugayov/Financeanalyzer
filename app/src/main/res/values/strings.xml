@@ -404,7 +404,7 @@
     <string name="transaction_reminders">Напоминания о транзакциях</string>
     <string name="transaction_reminder_settings">Настройки напоминаний</string>
     <string name="select_reminder_time">Выберите время напоминания:</string>
-    <string name="reminder_description">Вы будете получать ежедневные напоминания о необходимости внести транзакции в указанное время.</string>
+    <string name="reminder_description">Включите напоминания, чтобы не забывать о важных транзакциях</string>
     <string name="notifications_disabled_message">Напоминания отключены. Включите их, чтобы не забывать вносить транзакции.</string>
     <string name="notification_disabled_title">Уведомления отключены</string>
     <string name="notification_disabled_description">Для полноценной работы напоминаний включите разрешение на уведомления в настройках приложения</string>
@@ -800,4 +800,11 @@
     <string name="no_income_period">Нет доходов за выбранный период</string>
     <string name="and_more_categories">И ещё %1$d категорий</string>
     <string name="hide">Скрыть</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="notification_settings">Настройки уведомлений</string>
+    <string name="enable_reminders">Включить напоминания</string>
+    <string name="reminder_time">Время напоминания</string>
+    <string name="reminder_time_description">Напоминание будет в %1$s</string>
+    <string name="edit_time">Изменить время</string>
 </resources>

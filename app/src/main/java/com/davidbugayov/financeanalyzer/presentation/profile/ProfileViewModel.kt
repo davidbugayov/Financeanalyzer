@@ -2,9 +2,14 @@ package com.davidbugayov.financeanalyzer.presentation.profile
 
 import android.content.Context
 import android.content.Intent
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.NotificationPreferences
+import com.davidbugayov.financeanalyzer.domain.UserPreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
@@ -20,6 +25,7 @@ import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
@@ -34,7 +40,9 @@ class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
     private val loadTransactionsUseCase: LoadTransactionsUseCase,
     private val notificationScheduler: NotificationScheduler,
-    private val preferencesManager: PreferencesManager
+    private val preferencesManager: PreferencesManager,
+    private val userPreferences: UserPreferences,
+    private val notificationPreferences: NotificationPreferences
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -46,6 +54,20 @@ class ProfileViewModel(
     
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
+
+    // Настройки уведомлений
+    var notificationEnabled by mutableStateOf(false)
+        private set
+
+    var reminderTime by mutableStateOf(Time(20, 0))
+        private set
+
+    // Данные профиля пользователя
+    var userName by mutableStateOf("")
+        private set
+
+    var currency by mutableStateOf("")
+        private set
 
     init {
         // Загружаем настройки уведомлений
@@ -75,6 +97,32 @@ class ProfileViewModel(
         viewModelScope.launch {
             financialMetrics.totalExpense.collect { expense ->
                 _state.update { it.copy(totalExpense = expense) }
+            }
+        }
+
+        loadPreferences()
+    }
+
+    /**
+     * Загружает настройки пользователя
+     */
+    private fun loadPreferences() {
+        viewModelScope.launch {
+            try {
+                // Загрузка данных профиля
+                val preferences = userPreferences.getUserPreferences().first()
+                userName = preferences.userName
+                currency = preferences.currency
+
+                // Загрузка настроек уведомлений
+                val notificationSettings = notificationPreferences.getNotificationPreferences().first()
+                notificationEnabled = notificationSettings.enabled
+                reminderTime = Time(
+                    hours = notificationSettings.reminderHour,
+                    minutes = notificationSettings.reminderMinute
+                )
+            } catch (e: Exception) {
+                // Обработка ошибок загрузки настроек
             }
         }
     }
@@ -407,6 +455,29 @@ class ProfileViewModel(
                     error = e.message
                 ) }
             }
+        }
+    }
+
+    /**
+     * Обновляет настройку включения/отключения уведомлений
+     */
+    fun updateNotificationEnabled(enabled: Boolean) {
+        viewModelScope.launch {
+            notificationEnabled = enabled
+            notificationPreferences.updateNotificationEnabled(enabled)
+            // Автоматически обновлять напоминания при изменении статуса
+            val reminderPair = if (enabled) Pair(reminderTime.hours, reminderTime.minutes) else null
+            updateTransactionReminder(enabled, reminderPair, null)
+        }
+    }
+
+    /**
+     * Обновляет время напоминаний
+     */
+    fun updateReminderTime(hour: Int, minute: Int) {
+        viewModelScope.launch {
+            reminderTime = Time(hour, minute)
+            notificationPreferences.updateReminderTime(hour, minute)
         }
     }
 } 

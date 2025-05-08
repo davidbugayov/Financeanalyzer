@@ -17,9 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -92,26 +90,6 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
 }
 
 @Composable
-private fun CompactNoFilteredState(currentFilter: TransactionFilter) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
-    ) {
-        Text(
-            text = when (currentFilter) {
-                TransactionFilter.TODAY -> stringResource(R.string.no_transactions_today)
-                TransactionFilter.WEEK -> stringResource(R.string.no_transactions_week)
-                TransactionFilter.MONTH -> stringResource(R.string.no_transactions_month)
-                TransactionFilter.ALL -> stringResource(R.string.no_transactions_all)
-            },
-            color = Color.Gray,
-            style = MaterialTheme.typography.bodyLarge,
-            textAlign = TextAlign.Center
-        )
-    }
-}
-
-@Composable
 private fun CompactTransactionList(
     state: HomeState,
     showGroupSummary: Boolean,
@@ -178,11 +156,8 @@ fun CompactLayout(
             showGroupSummary = showGroupSummary
         )
         when {
-            !state.isLoading && state.filteredTransactions.isEmpty() && state.currentFilter == TransactionFilter.ALL -> {
-                CompactEmptyState(onAddClick)
-            }
             !state.isLoading && state.filteredTransactions.isEmpty() -> {
-                CompactNoFilteredState(state.currentFilter)
+                CompactEmptyState(onAddClick)
             }
             else -> {
                 CompactTransactionList(
