@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.compose.compiler)
 }
 
 fun getKeystoreProperties(): Properties {
@@ -131,15 +132,8 @@ android {
         // Enable compiler optimizations
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all", 
-            "-Xcontext-receivers",
-            // Compose optimizations
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.asFile.get()}/compose_metrics",
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.asFile.get()}/compose_reports",
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=${layout.buildDirectory.asFile.get()}/compose_stability.conf"
+            "-Xjvm-default=all",
+            "-Xcontext-receivers"
         )
     }
 
@@ -151,10 +145,6 @@ android {
         renderScript = false
         shaders = false
         resValues = true
-    }
-
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 
     // Enable KSP optimizations
@@ -175,15 +165,7 @@ android {
             useLegacyPackaging = true
         }
     }
-}
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        // Additional Kotlin optimizations
-        allWarningsAsErrors = false
-        // Speed up incremental compilation
-        incremental = true
-    }
 }
 
 // Optimize build tasks with caching
@@ -280,4 +262,12 @@ dependencies {
 
     // Add kotlinx-serialization for kotlinx-datetime
     implementation(libs.kotlinx.serialization.core)
+}
+
+composeCompiler {
+    reportsDestination = layout.buildDirectory.dir("compose_compiler_reports")
+    // Если у вас есть файл конфигурации стабильности, раскомментируйте следующую строку:
+    // stabilityConfigurationFile = rootProject.layout.projectDirectory.file("stability_config.conf")
+    // Включить метрики, если необходимо:
+    // metricsDestination = layout.buildDirectory.dir("compose_compiler_metrics")
 }

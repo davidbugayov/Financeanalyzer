@@ -122,10 +122,10 @@ class TransactionReminderReceiver : BroadcastReceiver() {
      */
     private fun rescheduleReminder(context: Context) {
         try {
-            // Используем NotificationScheduler для планирования следующего уведомления
-            val scheduler = NotificationScheduler()
-            scheduler.scheduleTransactionReminder(context, 20, 0) // Планируем на 20:00
-            Timber.d("Rescheduled reminder for tomorrow at 20:00")
+            val preferencesManager = PreferencesManager(context)
+            val (hour, minute) = preferencesManager.getReminderTime()
+            NotificationScheduler.scheduleTransactionReminder(context, hour, minute)
+            Timber.d("Rescheduled reminder for tomorrow at %02d:%02d", hour, minute)
         } catch (e: SecurityException) {
             Timber.e(e, "Failed to reschedule reminder due to missing permission")
         } catch (e: Exception) {
