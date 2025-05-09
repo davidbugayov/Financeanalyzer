@@ -20,7 +20,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartDisplayMode
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
 // --- Constants for Dimensions ---
 private val SelectorVerticalPadding = 8.dp
@@ -53,14 +54,14 @@ fun LineChartTypeSelector(
         SelectorButton(
             text = stringResource(id = R.string.chart_type_selector_expense),
             isSelected = selectedMode == LineChartDisplayMode.EXPENSE,
-            color = Color(ColorUtils.EXPENSE_COLOR),
+            color = LocalExpenseColor.current,
             onClick = { onModeSelected(LineChartDisplayMode.EXPENSE) }
         )
 
         SelectorButton(
             text = stringResource(id = R.string.chart_type_selector_income),
             isSelected = selectedMode == LineChartDisplayMode.INCOME,
-            color = Color(ColorUtils.INCOME_COLOR),
+            color = LocalIncomeColor.current,
             onClick = { onModeSelected(LineChartDisplayMode.INCOME) }
         )
 

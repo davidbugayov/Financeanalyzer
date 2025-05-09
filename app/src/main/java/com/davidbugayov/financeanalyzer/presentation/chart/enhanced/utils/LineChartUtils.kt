@@ -1,10 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils
 
-import android.util.Log
-import androidx.compose.foundation.gestures.detectDragGestures
-import androidx.compose.foundation.gestures.detectTapGestures
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -14,44 +9,32 @@ import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.DrawScope
 import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.colorResource
-import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
-import kotlin.math.hypot
-import kotlin.math.roundToInt
-import java.math.BigDecimal
 import timber.log.Timber
-
-private const val TAG = "LineChartUtils"
+import kotlin.math.hypot
 
 /**
  * Функция для рисования сетки графика
  *
  * @param width Ширина холста
  * @param height Высота холста
+ * @param color Цвет линий сетки
+ * @param pathEffect Эффект для линий сетки (например, пунктир)
  */
-fun DrawScope.drawGridLines(width: Float, height: Float) {
-    val gridColor = Color(0x14000000) // Серый цвет с прозрачностью
+fun DrawScope.drawGridLines(width: Float, height: Float, color: Color, pathEffect: PathEffect?) {
     val gridStrokeWidth = 0.5.dp.toPx()
-    val dashEffect = PathEffect.dashPathEffect(floatArrayOf(3f, 3f), 0f)
 
     // Горизонтальные линии (5 линий)
     val horizontalLines = 4
     for (i in 0..horizontalLines) {
         val y = height * i / horizontalLines
         drawLine(
-            color = gridColor,
+            color = color,
             start = Offset(0f, y),
             end = Offset(width, y),
             strokeWidth = gridStrokeWidth,
-            pathEffect = dashEffect
+            pathEffect = pathEffect
         )
     }
 
@@ -60,11 +43,11 @@ fun DrawScope.drawGridLines(width: Float, height: Float) {
     for (i in 0..verticalLines) {
         val x = width * i / verticalLines
         drawLine(
-            color = gridColor,
+            color = color,
             start = Offset(x, 0f),
             end = Offset(x, height),
             strokeWidth = gridStrokeWidth,
-            pathEffect = dashEffect
+            pathEffect = pathEffect
         )
     }
 }
@@ -331,8 +314,8 @@ object LineChartUtils {
      * @param animatedProgress Текущий прогресс анимации (для корректного расчета X)
      * @return Ближайшая точка или null, если нет точек в пределах порога
      */
-    fun <T : LineChartPoint> findNearestPoint(
-        points: List<T>,
+    fun findNearestPoint(
+        points: List<LineChartPoint>,
         startDate: Long,
         endDate: Long,
         minValue: Float,
@@ -342,10 +325,10 @@ object LineChartUtils {
         chartHeight: Float,
         threshold: Float,
         animatedProgress: Float = 1f
-    ): T? {
+    ): LineChartPoint? {
         if (points.isEmpty()) return null
-        
-        var closestPoint: T? = null
+
+        var closestPoint: LineChartPoint? = null
         var minDistance = Float.MAX_VALUE
         Timber.d("findNearestPoint: Checking points against threshold: $threshold") // Лог порога
         

@@ -2,10 +2,10 @@ package com.davidbugayov.financeanalyzer.presentation.budget
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,6 +42,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
@@ -53,8 +54,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
@@ -65,20 +66,16 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
-import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletAction
-import com.davidbugayov.financeanalyzer.presentation.budget.wallet.components.WalletCard
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.math.BigDecimal
-import androidx.compose.ui.draw.clip
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -222,13 +219,13 @@ fun BudgetScreen(
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .background(Color(0xFF4F6BED).copy(alpha = 0.15f), CircleShape),
+                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), CircleShape),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Schedule,
                                     contentDescription = null,
-                                    tint = Color(0xFF4F6BED),
+                                    tint = MaterialTheme.colorScheme.primary,
                                     modifier = Modifier.size(16.dp)
                                 )
                             }
@@ -247,8 +244,8 @@ fun BudgetScreen(
                             BudgetInfoCard(
                                 title = "Общий лимит",
                                 value = "${state.totalLimit.amount.toInt()} ₽",
-                                containerColor = Color(0xFF4F6BED).copy(alpha = 0.9f),
-                                contentColor = Color.White,
+                                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                                contentColor = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.weight(1f)
                             )
                             
@@ -257,8 +254,8 @@ fun BudgetScreen(
                             BudgetInfoCard(
                                 title = "Потрачено",
                                 value = "${state.totalSpent.amount.toInt()} ₽",
-                                containerColor = Color(0xFF66B1FF).copy(alpha = 0.9f),
-                                contentColor = Color.White,
+                                containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
+                                contentColor = MaterialTheme.colorScheme.onSecondary,
                                 modifier = Modifier.weight(1f)
                             )
                             
@@ -267,8 +264,8 @@ fun BudgetScreen(
                             BudgetInfoCard(
                                 title = "Баланс",
                                 value = "${state.totalWalletBalance.amount.toInt()} ₽",
-                                containerColor = Color(0xFF4ECDC4).copy(alpha = 0.9f),
-                                contentColor = Color.White,
+                                containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.9f),
+                                contentColor = MaterialTheme.colorScheme.onTertiary,
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -281,19 +278,19 @@ fun BudgetScreen(
                                 .padding(top = 16.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = Color(0xFF4F6BED).copy(alpha = 0.1f)
+                                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
                             )
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = null,
-                                tint = Color(0xFF4F6BED),
+                                tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(18.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Добавить кошелек",
-                                color = Color(0xFF4F6BED),
+                                color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium.copy(
                                     fontWeight = FontWeight.SemiBold
                                 )
@@ -365,7 +362,7 @@ fun BudgetScreen(
                                         categoryName = ""
                                         categoryLimit = ""
                                         showAddCategoryDialog = false
-                                    } catch (e: Exception) {
+                                    } catch (_: Exception) {
                                         // Обработка ошибки
                                     }
                                 }
@@ -846,16 +843,26 @@ fun WalletCard(
     wallet: Wallet,
     onClick: () -> Unit
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
+    val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
+    val backgroundColor = remember(wallet.color, wallet.name, isDarkTheme) {
+        wallet.color?.takeIf { it != 0 }?.let { Color(it) }
+            ?: com.davidbugayov.financeanalyzer.utils.ColorUtils.getSourceColorByName(wallet.name)
+            ?: surfaceVariantColor
+    }
+    val contentColor = contentColorFor(backgroundColor)
+
     val percentUsed = if (wallet.limit.amount > BigDecimal.ZERO) {
         ((wallet.spent.amount / wallet.limit.amount) * BigDecimal("100")).toInt().coerceIn(0, 100)
     } else 0
 
-    val progressColor = when {
+    val progressIndicatorColor = when {
         percentUsed > 90 -> MaterialTheme.colorScheme.error
         percentUsed > 70 -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
         percentUsed > 50 -> MaterialTheme.colorScheme.tertiary
         else -> MaterialTheme.colorScheme.primary
     }
+    val progressTrackColor = progressIndicatorColor.copy(alpha = 0.3f)
 
     Card(
         modifier = Modifier
@@ -865,7 +872,7 @@ fun WalletCard(
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = backgroundColor
         )
     ) {
         Column(
@@ -883,15 +890,15 @@ fun WalletCard(
                         modifier = Modifier
                             .size(44.dp)
                             .background(
-                                color = Color(0xFF4F6BED), // Можно заменить на wallet.color
+                                color = contentColor.copy(alpha = 0.2f),
                                 shape = CircleShape
                             ),
                         contentAlignment = Alignment.Center
                     ) {
                         Icon(
-                            imageVector = Icons.Default.AccountBalanceWallet, // Можно заменить на другую иконку
+                            imageVector = Icons.Default.AccountBalanceWallet,
                             contentDescription = null,
-                            tint = Color.White,
+                            tint = contentColor,
                             modifier = Modifier.size(24.dp)
                         )
                     }
@@ -899,13 +906,15 @@ fun WalletCard(
                     Text(
                         text = wallet.name,
                         style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
+                        color = contentColor
                     )
                 }
                 IconButton(onClick = { /* TODO: show menu */ }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
-                        contentDescription = "Опции"
+                        contentDescription = "Опции",
+                        tint = contentColor
                     )
                 }
             }
@@ -916,11 +925,13 @@ fun WalletCard(
             ) {
                 Text(
                     text = "Потрачено: ${wallet.spent.amount.toInt()} ₽",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = contentColor
                 )
                 Text(
                     text = "Лимит: ${wallet.limit.amount.toInt()} ₽",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = contentColor
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -930,14 +941,14 @@ fun WalletCard(
                     .fillMaxWidth()
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
-                color = progressColor,
-                trackColor = MaterialTheme.colorScheme.surfaceVariant
+                color = progressIndicatorColor,
+                trackColor = progressTrackColor
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "$percentUsed% использовано",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = contentColor.copy(alpha = 0.7f)
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
@@ -949,17 +960,17 @@ fun WalletCard(
                 Icon(
                     imageVector = Icons.Default.AccountBalanceWallet,
                     contentDescription = null,
-                    tint = Color(0xFF4F6BED),
+                    tint = contentColor,
                     modifier = Modifier.size(16.dp)
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Кошелёк: ${wallet.balance.amount.toInt()} ₽",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        color = Color(0xFF4F6BED),
                         textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
                     ),
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
+                    color = contentColor
                 )
             }
         }

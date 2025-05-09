@@ -2,7 +2,8 @@ package com.davidbugayov.financeanalyzer.utils
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
@@ -59,9 +60,10 @@ fun getWindowHeightType(height: Dp): WindowType = when {
  */
 @Composable
 fun rememberWindowSize(): WindowSize {
-    val configuration = LocalConfiguration.current
-    val screenWidth = configuration.screenWidthDp.dp
-    val screenHeight = configuration.screenHeightDp.dp
+    val windowInfo = LocalWindowInfo.current
+    val density = LocalDensity.current
+    val screenWidth = with(density) { windowInfo.containerSize.width.toDp() }
+    val screenHeight = with(density) { windowInfo.containerSize.height.toDp() }
 
     return remember(screenWidth, screenHeight) {
         WindowSize(
@@ -75,18 +77,3 @@ fun rememberWindowSize(): WindowSize {
  * Расширение для определения, является ли экран компактным (телефон)
  */
 fun WindowSize.isCompact(): Boolean = width == WindowType.COMPACT
-
-/**
- * Расширение для определения, является ли экран средним (большой телефон или планшет в портретной ориентации)
- */
-fun WindowSize.isMedium(): Boolean = width == WindowType.MEDIUM
-
-/**
- * Расширение для определения, является ли экран расширенным (планшет в ландшафтной ориентации)
- */
-fun WindowSize.isExpanded(): Boolean = width == WindowType.EXPANDED
-
-/**
- * Расширение для определения, является ли экран достаточно широким для двухпанельного интерфейса
- */
-fun WindowSize.isTwoPanelLayout(): Boolean = width != WindowType.COMPACT 

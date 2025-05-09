@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -14,12 +15,15 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
@@ -39,6 +43,8 @@ fun TransactionActionsDialog(
     onDelete: (Transaction) -> Unit,
     onEdit: (Transaction) -> Unit
 ) {
+    val isDarkTheme = isSystemInDarkTheme()
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Действия с транзакцией") },
@@ -55,10 +61,10 @@ fun TransactionActionsDialog(
                 Text(
                     text = transaction.amount.formatted(showSign = true),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (transaction.isExpense) 
-                        Color(ColorUtils.EXPENSE_COLOR)
-                    else 
-                        Color(ColorUtils.INCOME_COLOR)
+                    color = if (transaction.isExpense)
+                        LocalExpenseColor.current
+                    else
+                        LocalIncomeColor.current
                 )
                 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -69,15 +75,17 @@ fun TransactionActionsDialog(
                 )
                 
                 Spacer(modifier = Modifier.height(12.dp))
+
+                // Определяем цвет источника один раз
+                val effectiveSourceColor = rememberSourceColor(transaction, isDarkTheme)
                 
                 // Отображаем источник
                 Row(verticalAlignment = Alignment.CenterVertically) {
-                    // Добавляем цветной индикатор источника
                     Box(
                         modifier = Modifier
                             .size(12.dp)
                             .background(
-                                Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense)),
+                                effectiveSourceColor,
                                 CircleShape
                             )
                     )
@@ -86,7 +94,7 @@ fun TransactionActionsDialog(
                     Text(
                         text = "Источник: ${transaction.source}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
+                        color = effectiveSourceColor
                     )
                 }
                 
@@ -125,4 +133,27 @@ fun TransactionActionsDialog(
             }
         }
     )
+}
+
+@Composable
+private fun rememberSourceColor(transaction: Transaction, isDarkTheme: Boolean): Color {
+    return remember(transaction.source, transaction.sourceColor, transaction.isExpense, isDarkTheme) {
+        val sourceColorInt = transaction.sourceColor
+        var colorFromInt: Color? = null
+        if (sourceColorInt != 0) { // 0 может быть маркером отсутствия цвета
+            colorFromInt = try {
+                Color(sourceColorInt)
+            } catch (_: Exception) {
+                null
+            }
+        }
+        // Если цвет из sourceColorInt не подошел, или его не было, пробуем по имени источника.
+        // sourceColorHex передаем null, так как мы уже обработали sourceColorInt.
+        colorFromInt ?: ColorUtils.getEffectiveSourceColor(
+            sourceName = transaction.source,
+            sourceColorHex = null,
+            isExpense = transaction.isExpense,
+            isDarkTheme = isDarkTheme
+        )
+    }
 } 

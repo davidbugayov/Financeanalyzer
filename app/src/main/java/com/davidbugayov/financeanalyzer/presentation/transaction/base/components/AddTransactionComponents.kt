@@ -23,6 +23,7 @@ import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -83,12 +84,16 @@ fun CategoryItemButton(
     category: UiCategory,
     onClick: () -> Unit
 ) {
+    val backgroundColor = category.color
+    val contentColor = contentColorFor(backgroundColor = backgroundColor)
+
     Surface(
         modifier = Modifier
             .aspectRatio(1f)
             .clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(1.dp, MaterialTheme.colorScheme.outline.copy(alpha = 0.5f))
+        border = BorderStroke(1.dp, backgroundColor.copy(alpha = 0.7f)),
+        color = backgroundColor
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
@@ -98,12 +103,13 @@ fun CategoryItemButton(
             Icon(
                 imageVector = category.icon ?: Icons.Default.Category,
                 contentDescription = category.name,
-                tint = MaterialTheme.colorScheme.primary
+                tint = contentColor
             )
             Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = category.name,
-                style = MaterialTheme.typography.bodySmall
+                style = MaterialTheme.typography.bodySmall,
+                color = contentColor
             )
         }
     }

@@ -10,7 +10,6 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
@@ -18,7 +17,7 @@ import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 
-// Цвета для светлой темы
+// Цвета для светлой темы (используются стандартные Material Design слоты)
 private val LightColors = lightColorScheme(
     primary = md_theme_light_primary,
     onPrimary = md_theme_light_onPrimary,
@@ -45,7 +44,7 @@ private val LightColors = lightColorScheme(
     outline = md_theme_light_outline
 )
 
-// Цвета для темной темы
+// Цвета для темной темы (используются стандартные Material Design слоты)
 private val DarkColors = darkColorScheme(
     primary = md_theme_dark_primary,
     onPrimary = md_theme_dark_onPrimary,
@@ -72,20 +71,37 @@ private val DarkColors = darkColorScheme(
     outline = md_theme_dark_outline
 )
 
-// Цвета для доходов и расходов, и цвета баланса
-val LocalIncomeColor = staticCompositionLocalOf { md_theme_light_income }
-val LocalExpenseColor = staticCompositionLocalOf { md_theme_light_expense }
-val LocalBalanceCardColor = staticCompositionLocalOf { md_theme_light_primaryContainer }
-val LocalBalanceTextColor = staticCompositionLocalOf { md_theme_light_balance_text }
-val LocalFabColor = staticCompositionLocalOf { md_theme_light_fab }
-val LocalWarningColor = staticCompositionLocalOf { WarningColor }
-val LocalInfoColor = staticCompositionLocalOf { InfoColor }
+// Local providers для кастомных семантических цветов
+val LocalIncomeColor = staticCompositionLocalOf { IncomeColorLight }
+val LocalExpenseColor = staticCompositionLocalOf { ExpenseColorLight }
+val LocalFabColor = staticCompositionLocalOf { FabColorLight }
+val LocalBalanceTextColor = staticCompositionLocalOf { BalanceTextColorLight }
+// LocalBalanceCardColor больше не нужен, т.к. md_theme_light_primaryContainer используется напрямую в colorScheme
+// и может быть получен через MaterialTheme.colorScheme.primaryContainer
+
+val LocalSuccessColor = staticCompositionLocalOf { SuccessColorLight }
+val LocalWarningColor = staticCompositionLocalOf { WarningColorLight }
+val LocalInfoColor = staticCompositionLocalOf { InfoColorLight }
+val LocalTransferColor = staticCompositionLocalOf { TransferColorLight }
+
+// Local providers для цветов элементов графиков
+val LocalChartGridColor = staticCompositionLocalOf { ChartGridColorLight }
+val LocalChartAxisTextColor = staticCompositionLocalOf { ChartAxisTextColorLight }
+val LocalChartBackgroundColor = staticCompositionLocalOf { ChartBackgroundColorLight }
+val LocalChartEmptyStateTextColor = staticCompositionLocalOf { ChartEmptyStateTextColorLight }
+
+// Local providers для специфичных UI элементов
+val LocalPositiveBackgroundColor = staticCompositionLocalOf { PositiveBackgroundLight }
+val LocalPositiveTextColor = staticCompositionLocalOf { PositiveTextLight }
+val LocalNegativeBackgroundColor = staticCompositionLocalOf { NegativeBackgroundLight }
+val LocalNegativeTextColor = staticCompositionLocalOf { NegativeTextLight }
+val LocalErrorStateBackgroundColor = staticCompositionLocalOf { ErrorStateBackgroundLight }
+val LocalErrorStateContentColor = staticCompositionLocalOf { ErrorStateContentLight }
 
 @Composable
 fun FinanceAnalyzerTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
-    // Dynamic color is available on Android 12+
-    dynamicColor: Boolean = false, // Выключаем динамические цвета по умолчанию
+    dynamicColor: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val darkTheme = when (themeMode) {
@@ -93,7 +109,7 @@ fun FinanceAnalyzerTheme(
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
-    
+
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
@@ -102,30 +118,63 @@ fun FinanceAnalyzerTheme(
         darkTheme -> DarkColors
         else -> LightColors
     }
-    
-    // Определяем цвета для доходов и расходов в зависимости от темы
-    val incomeColor = if (darkTheme) md_theme_dark_income else md_theme_light_income
-    val expenseColor = if (darkTheme) md_theme_dark_expense else md_theme_light_expense
-    
-    // Цвета для баланса
-    val balanceCardColor = if (darkTheme) md_theme_dark_primaryContainer else md_theme_light_primaryContainer
-    val balanceTextColor = if (darkTheme) md_theme_dark_balance_text else md_theme_light_balance_text
-    
-    // Цвет кнопки добавления
-    val fabColor = if (darkTheme) md_theme_dark_fab else md_theme_light_fab
+
+    val view = LocalView.current
+    if (!view.isInEditMode) {
+        SideEffect {
+            val window = (view.context as Activity).window
+            // window.statusBarColor = colorScheme.background.toArgb() // Removed deprecated call
+            // window.navigationBarColor = colorScheme.background.toArgb() // Removed deprecated call
+            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
+            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+        }
+    }
+
+    val incomeColor = if (darkTheme) IncomeColorDark else IncomeColorLight
+    val expenseColor = if (darkTheme) ExpenseColorDark else ExpenseColorLight
+    val fabColor = if (darkTheme) FabColorDark else FabColorLight
+    val balanceTextColor = if (darkTheme) BalanceTextColorDark else BalanceTextColorLight
+    val successColor = if (darkTheme) SuccessColorDark else SuccessColorLight
+    val warningColor = if (darkTheme) WarningColorDark else WarningColorLight
+    val infoColor = if (darkTheme) InfoColorDark else InfoColorLight
+    val transferColor = if (darkTheme) TransferColorDark else TransferColorLight
+
+    val chartGridColor = if (darkTheme) ChartGridColorDark else ChartGridColorLight
+    val chartAxisTextColor = if (darkTheme) ChartAxisTextColorDark else ChartAxisTextColorLight
+    val chartBackgroundColor = if (darkTheme) ChartBackgroundColorDark else ChartBackgroundColorLight
+    val chartEmptyStateTextColor = if (darkTheme) ChartEmptyStateTextColorDark else ChartEmptyStateTextColorLight
+
+    val positiveBackgroundColor = if (darkTheme) PositiveBackgroundDark else PositiveBackgroundLight
+    val positiveTextColor = if (darkTheme) PositiveTextDark else PositiveTextLight
+    val negativeBackgroundColor = if (darkTheme) NegativeBackgroundDark else NegativeBackgroundLight
+    val negativeTextColor = if (darkTheme) NegativeTextDark else NegativeTextLight
+    val errorStateBackgroundColor = if (darkTheme) ErrorStateBackgroundDark else ErrorStateBackgroundLight
+    val errorStateContentColor = if (darkTheme) ErrorStateContentDark else ErrorStateContentLight
 
     CompositionLocalProvider(
         LocalIncomeColor provides incomeColor,
         LocalExpenseColor provides expenseColor,
-        LocalBalanceCardColor provides balanceCardColor,
-        LocalBalanceTextColor provides balanceTextColor,
         LocalFabColor provides fabColor,
-        LocalWarningColor provides WarningColor,
-        LocalInfoColor provides InfoColor
+        LocalBalanceTextColor provides balanceTextColor,
+        LocalSuccessColor provides successColor,
+        LocalWarningColor provides warningColor,
+        LocalInfoColor provides infoColor,
+        LocalTransferColor provides transferColor,
+        LocalChartGridColor provides chartGridColor,
+        LocalChartAxisTextColor provides chartAxisTextColor,
+        LocalChartBackgroundColor provides chartBackgroundColor,
+        LocalChartEmptyStateTextColor provides chartEmptyStateTextColor,
+        LocalPositiveBackgroundColor provides positiveBackgroundColor,
+        LocalPositiveTextColor provides positiveTextColor,
+        LocalNegativeBackgroundColor provides negativeBackgroundColor,
+        LocalNegativeTextColor provides negativeTextColor,
+        LocalErrorStateBackgroundColor provides errorStateBackgroundColor,
+        LocalErrorStateContentColor provides errorStateContentColor
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
+            shapes = Shapes,
             content = content
         )
     }

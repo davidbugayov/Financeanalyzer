@@ -1,8 +1,10 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -23,21 +25,20 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
-import timber.log.Timber
-import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.combinedClickable
+import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateBackgroundColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalErrorStateContentColor
 
 /**
  * Секция выбора категории
@@ -58,6 +59,9 @@ fun CategorySection(
     val showExpand = categories.size > maxVisibleCategories
     val (expanded, setExpanded) = remember { mutableStateOf(false) }
     val visibleCategories = if (expanded || !showExpand) categories else categories.take(maxVisibleCategories)
+
+    val errorBackgroundColor = LocalErrorStateBackgroundColor.current
+    val errorContentColor = LocalErrorStateContentColor.current
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
@@ -82,6 +86,9 @@ fun CategorySection(
             userScrollEnabled = expanded || !showExpand
         ) {
             items(visibleCategories) { category ->
+                val contentColor = contentColorFor(backgroundColor = category.color)
+                val selectedContentColor = MaterialTheme.colorScheme.onPrimaryContainer
+
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
                     modifier = Modifier
@@ -98,21 +105,21 @@ fun CategorySection(
                             .clip(CircleShape)
                             .background(
                                 when {
-                                    isError && selectedCategory.isBlank() -> Color(0xFFFFCDD2)
+                                    isError && selectedCategory.isBlank() -> errorBackgroundColor
                                     category.name == selectedCategory -> MaterialTheme.colorScheme.primaryContainer
-                                    else -> MaterialTheme.colorScheme.primaryContainer
+                                    else -> category.color
                                 }
                             )
                             .border(
                                 width = when {
                                     category.name == selectedCategory -> 2.dp
                                     isError && selectedCategory.isBlank() -> 2.dp
-                                    else -> 0.dp
+                                    else -> 1.dp
                                 },
                                 color = when {
                                     category.name == selectedCategory -> MaterialTheme.colorScheme.primary
-                                    isError && selectedCategory.isBlank() -> Color(0xFFE57373)
-                                    else -> Color.Transparent
+                                    isError && selectedCategory.isBlank() -> MaterialTheme.colorScheme.error
+                                    else -> category.color.copy(alpha = 0.5f)
                                 },
                                 shape = CircleShape
                             ),
@@ -121,7 +128,11 @@ fun CategorySection(
                         Icon(
                             imageVector = category.icon ?: Icons.Default.Category,
                             contentDescription = category.name,
-                            tint = if (isError && selectedCategory.isBlank()) Color.Red else MaterialTheme.colorScheme.onPrimaryContainer,
+                            tint = when {
+                                isError && selectedCategory.isBlank() -> errorContentColor
+                                category.name == selectedCategory -> selectedContentColor
+                                else -> contentColor
+                            },
                             modifier = Modifier.size(20.dp)
                         )
                     }
@@ -131,7 +142,11 @@ fun CategorySection(
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
-                        color = if (isError && selectedCategory.isBlank()) Color.Red else MaterialTheme.colorScheme.onSurface
+                        color = when {
+                            isError && selectedCategory.isBlank() -> errorContentColor
+                            category.name == selectedCategory -> selectedContentColor
+                            else -> contentColor
+                        }
                     )
                 }
             }

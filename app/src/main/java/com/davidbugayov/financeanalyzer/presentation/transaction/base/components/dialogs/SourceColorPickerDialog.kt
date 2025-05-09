@@ -18,10 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 
 /**
  * Диалог выбора цвета источника
@@ -32,8 +33,6 @@ fun SourceColorPickerDialog(
     onColorSelected: (Int) -> Unit,
     onDismiss: () -> Unit
 ) {
-    val colors = ColorUtils.predefinedColors
-
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.select_color)) },
@@ -46,11 +45,12 @@ fun SourceColorPickerDialog(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(12.dp)
                 ) {
-                    items(colors) { color ->
+                    items(ExpenseChartPalette) { composeColor ->
+                        val argbColor = composeColor.toArgb()
                         ColorItem(
-                            color = color,
-                            isSelected = color == initialColor,
-                            onClick = { onColorSelected(color) }
+                            color = argbColor,
+                            isSelected = argbColor == initialColor,
+                            onClick = { onColorSelected(argbColor) }
                         )
                     }
                 }

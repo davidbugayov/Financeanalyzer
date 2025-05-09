@@ -2,10 +2,19 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.graphics.toArgb
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.DefaultSourceColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.TransferColorInt
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
@@ -18,16 +27,8 @@ import kotlinx.coroutines.withTimeoutOrNull
 import timber.log.Timber
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
-import java.time.LocalDate
-import java.time.format.DateTimeFormatter
 import java.util.Date
 import java.util.Locale
-import java.util.regex.Pattern
-import kotlin.math.absoluteValue
-import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
-import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import com.davidbugayov.financeanalyzer.domain.model.Source
-import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
 
 /**
  * Реализация импорта транзакций из PDF-выписки Т-Банка.
@@ -57,14 +58,11 @@ class TBankPdfImportUseCase(
     private val dateRegex = "\\d{2}\\.\\d{2}\\.\\d{4}".toRegex()
     private val amountRegex = "([+-]?\\d+[\\s]?\\d+[,.]\\d{2})".toRegex()
     private val amountRegexWithSymbol = "[+-]?\\d+[\\s]?\\d+[,.]\\d{2}\\s?₽".toRegex()
-    private val cardNumberPattern = Pattern.compile("Карта\\s+([*•\\d]+)\\s+", Pattern.MULTILINE)
-    
+
     // Дополнительные паттерны для справки о движении средств
     private val statementHeaderRegex = "Справка о движении средств".toRegex(RegexOption.IGNORE_CASE)
-    private val statementTableStartRegex = "(?:Дата и время\\s+операции)|(?:Дата\\s+операции)|(?:Дата\\s+и\\s+время)|(?:Дата списания)|(?:Описание\\s+операции)".toRegex(RegexOption.IGNORE_CASE)
     private val periodRegex = "Движение средств за период с (\\d{2}\\.\\d{2}\\.\\d{4}) по (\\d{2}\\.\\d{2}\\.\\d{4})".toRegex()
     private val tableEndRegex = "Остаток на|Поступления:|Списания:|Итого|Номер верх|Конец выписки".toRegex(RegexOption.IGNORE_CASE)
-    private val cardNumberExtractor = "[*•\\d]{16,19}|\\d{4}\\s+\\d{4}\\s+\\d{4}\\s+\\d{4}|\\d{4}\\s+XXXX\\s+XXXX\\s+\\d{4}".toRegex()
     // Паттерн для сумм, более точный
     private val bigAmountRegex = "-?\\d{1,3}(?:[\\s]?\\d{3})*[,.](\\d{2})\\s?₽?".toRegex()
     
@@ -72,8 +70,8 @@ class TBankPdfImportUseCase(
     private val tbankHeaderRegex = "АКЦИОНЕРНОЕ ОБЩЕСТВО «ТБАНК»".toRegex(RegexOption.IGNORE_CASE)
     private val tbankAddressRegex = "РОССИЯ, \\d+, МОСКВА".toRegex(RegexOption.IGNORE_CASE)
     private val tbankWebsiteRegex = "TBANK.RU".toRegex(RegexOption.IGNORE_CASE)
-    private val transferTypeRegex = "(?:Внутрибанковский перевод)|(?:Внешний перевод)".toRegex(RegexOption.IGNORE_CASE)
-    private val contractRegex = "(?:с договора \\d+)|(?:по номеру телефона)".toRegex(RegexOption.IGNORE_CASE)
+    private val transferTypeRegex = "Внутрибанковский перевод|Внешний перевод".toRegex(RegexOption.IGNORE_CASE)
+    private val contractRegex = "с договора \\d+|по номеру телефона".toRegex(RegexOption.IGNORE_CASE)
     
     // Инициализация PDFBox при создании экземпляра
     init {
@@ -106,19 +104,16 @@ class TBankPdfImportUseCase(
                 emit(ImportResult.Error("Файл не является выпиской Т-Банка или имеет неподдерживаемый формат"))
                 return@flow
             }
-            
-            // Всегда используем "Т-Банк" как источник
-            val source = "Т-Банк"
-            
+
             // Добавляем источник "Т-Банк", если его еще нет в предпочтениях
-            addSourceIfNotExists(source)
+            addSourceIfNotExists()
             
             // Парсим данные из PDF и преобразуем их в транзакции
             emit(ImportResult.Progress(20, 100, "Анализ выписки Т-Банка"))
             
             // Используем таймаут для парсинга транзакций
             val transactions = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
-                parsePdfTransactions(pdfLines, source)
+                parsePdfTransactions(pdfLines)
             } ?: run {
                 emit(ImportResult.Error("Превышено время ожидания при анализе PDF-файла. Файл может содержать слишком много транзакций или иметь сложную структуру."))
                 return@flow
@@ -203,19 +198,17 @@ class TBankPdfImportUseCase(
     /**
      * Парсит транзакции из текста PDF выписки Т-Банка
      */
-    private fun parsePdfTransactions(pdfLines: List<String>, source: String): List<Transaction> {
+    private fun parsePdfTransactions(pdfLines: List<String>): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         
-        // Проверяем, является ли выписка "Справкой о движении средств"
         val isStatementOfFunds = pdfLines.any { 
             it.contains("Справка о движении средств", ignoreCase = true) ||
             it.contains("Движение средств за период", ignoreCase = true)
         }
         
         if (isStatementOfFunds) {
-            // Обрабатываем формат "Справка о движении средств"
             Timber.d("Обнаружен формат 'Справка о движении средств', используем специальную обработку")
-            return parseStatementOfFunds(pdfLines, source)
+            return parseStatementOfFunds(pdfLines)
         }
         
         // Стандартная обработка для обычной выписки
@@ -263,10 +256,10 @@ class TBankPdfImportUseCase(
                         date = date,
                         isExpense = isExpense,
                         note = note,
-                        source = source,
-                        sourceColor = ColorUtils.getSourceColor(source) ?: 
-                                     (if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                                      if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                        source = bankName,
+                        sourceColor = if (isTransfer) TransferColorInt
+                        else ColorUtils.getSourceColorByName(bankName)?.toArgb()
+                            ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
                         isTransfer = isTransfer
                     )
                     
@@ -281,7 +274,7 @@ class TBankPdfImportUseCase(
     /**
      * Парсит выписку в формате "Справка о движении средств"
      */
-    private fun parseStatementOfFunds(pdfLines: List<String>, source: String): List<Transaction> {
+    private fun parseStatementOfFunds(pdfLines: List<String>): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         
         try {
@@ -312,7 +305,7 @@ class TBankPdfImportUseCase(
             
             if (tableHeaderIndex == -1) {
                 Timber.d("Заголовок таблицы не найден, используем альтернативный метод парсинга")
-                return parseStatementWithoutHeaders(pdfLines, source, 0)
+                return parseStatementWithoutHeaders(pdfLines, 0)
             }
             
             Timber.d("Найден заголовок таблицы на строке $tableHeaderIndex: ${pdfLines[tableHeaderIndex]}")
@@ -379,7 +372,7 @@ class TBankPdfImportUseCase(
                         
                         // Если нашли сумму, создаем транзакцию
                         if (amount != null) {
-                            saveTransaction(transactions, date, amount, description, source)
+                            saveTransaction(transactions, date, amount, description)
                         }
                     }
                 } else {
@@ -394,7 +387,7 @@ class TBankPdfImportUseCase(
                             val amount = findAmountInString(line)
                             if (amount != null) {
                                 val description = line
-                                saveTransaction(transactions, date, amount, description, source)
+                                saveTransaction(transactions, date, amount, description)
                             }
                         }
                     }
@@ -408,7 +401,7 @@ class TBankPdfImportUseCase(
             // Если не нашли ни одной транзакции, попробуем другой метод
             if (transactions.isEmpty()) {
                 Timber.d("Транзакции не найдены, используем альтернативный метод парсинга")
-                return parseStatementWithoutHeaders(pdfLines, source, tableHeaderIndex + 1)
+                return parseStatementWithoutHeaders(pdfLines, tableHeaderIndex + 1)
             }
             
             // Если нашли транзакции, проверяем их даты с учетом периода выписки
@@ -434,7 +427,7 @@ class TBankPdfImportUseCase(
     /**
      * Парсит выписку без чётких заголовков таблицы
      */
-    private fun parseStatementWithoutHeaders(pdfLines: List<String>, source: String, startFromIndex: Int): List<Transaction> {
+    private fun parseStatementWithoutHeaders(pdfLines: List<String>, startFromIndex: Int): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         val fullText = pdfLines.joinToString(" ")
         
@@ -468,7 +461,7 @@ class TBankPdfImportUseCase(
                     var description = line
                     
                     if (amount != null) {
-                        saveTransaction(transactions, date, amount, description, source)
+                        saveTransaction(transactions, date, amount, description)
                     }
                 }
             }
@@ -512,8 +505,8 @@ class TBankPdfImportUseCase(
                     val descStart = minOf(dateIndex, amountIndex)
                     val descEnd = maxOf(dateIndex, amountIndex) + 1
                     val description = pdfLines.subList(descStart, minOf(descEnd, pdfLines.size)).joinToString(" ")
-                    
-                    saveTransaction(transactions, date, amount, description, source)
+
+                    saveTransaction(transactions, date, amount, description)
                 }
             }
         }
@@ -535,22 +528,13 @@ class TBankPdfImportUseCase(
     }
     
     /**
-     * Извлекает номер карты из строки
-     */
-    private fun extractCardNumber(text: String): String? {
-        val cardNumberMatch = cardNumberExtractor.find(text)
-        return cardNumberMatch?.value?.replace("\\s+".toRegex(), "")
-    }
-    
-    /**
      * Вспомогательный метод для создания и сохранения транзакции
      */
     private fun saveTransaction(
         transactions: MutableList<Transaction>,
         date: Date,
         amountInfo: Pair<Money, Boolean>,
-        description: String,
-        source: String
+        description: String
     ) {
         val (amount, isExpense) = amountInfo
         
@@ -568,10 +552,10 @@ class TBankPdfImportUseCase(
                 date = date,
                 isExpense = isExpense,
                 note = note,
-                source = source,
-                sourceColor = ColorUtils.getSourceColor(source) ?: 
-                            (if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                             if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                source = bankName,
+                sourceColor = if (isTransfer) TransferColorInt
+                else ColorUtils.getSourceColorByName(bankName)?.toArgb()
+                    ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
                 isTransfer = isTransfer
             )
             
@@ -621,22 +605,6 @@ class TBankPdfImportUseCase(
             Timber.e(e, "Ошибка парсинга даты: $dateString")
             null
         }
-    }
-    
-    /**
-     * Извлекает дату из строки текста
-     */
-    private fun extractDateFromString(text: String): LocalDate? {
-        val matches = dateRegex.findAll(text)
-        for (match in matches) {
-            try {
-                val dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy")
-                return LocalDate.parse(match.value, dateFormatter)
-            } catch (e: Exception) {
-                Timber.w(e, "Не удалось распарсить дату из: ${match.value}")
-            }
-        }
-        return null
     }
 
     /**
@@ -779,6 +747,8 @@ class TBankPdfImportUseCase(
     
     /**
      * Добавляет категорию в предпочтения, если её еще нет
+     * @param category Название категории
+     * @param isExpense Флаг, является ли категория расходной
      */
     private fun addCategoryIfNotExists(category: String, isExpense: Boolean) {
         val customCategory = CustomCategoryData(category, "Add")
@@ -791,23 +761,21 @@ class TBankPdfImportUseCase(
     }
     
     /**
-     * Добавляет источник в предпочтения, если его еще нет
+     * Добавляет источник "Т-Банк" в настройки, если его там еще нет
      */
-    private fun addSourceIfNotExists(sourceName: String) {
-        // Проверяем, есть ли уже такой источник в списке пользовательских
-        val customSources = sourcePreferences.getCustomSources()
-        if (customSources.none { it.name == sourceName }) {
-            // Определяем цвет для источника
-            val sourceColor = ColorUtils.getSourceColor(sourceName) ?: ColorUtils.predefinedColors.random()
-            
-            // Создаем и добавляем новый источник
+    private fun addSourceIfNotExists() {
+        val currentSources: List<Source> = sourcePreferences.getCustomSources().toList()
+        if (currentSources.none { it.name.equals(bankName, ignoreCase = true) }) {
+            Timber.d("Добавляем новый источник: $bankName")
+            val sourceColorInt = ColorUtils.getSourceColorByName(bankName)?.toArgb()
+                ?: DefaultSourceColorInt
+
             val newSource = Source(
-                name = sourceName,
-                color = sourceColor,
-                isCustom = true
+                name = bankName,
+                color = sourceColorInt
             )
-            sourcePreferences.addCustomSource(newSource)
-            Timber.d("Добавлен новый источник: $sourceName с цветом ${sourceColor.toString(16)}")
+            val updatedSources = (currentSources + newSource).distinctBy { it.name }
+            sourcePreferences.saveCustomSources(updatedSources)
         }
     }
     

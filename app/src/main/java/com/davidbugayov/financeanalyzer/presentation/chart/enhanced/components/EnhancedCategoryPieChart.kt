@@ -53,25 +53,14 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import timber.log.Timber
+import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
-
-// --- Constants --- 
-private const val ANIMATION_DURATION_MS = 800
-private const val START_ANGLE_OFFSET = -90f // Start drawing from the top
-private const val MAX_CATEGORIES_VISIBLE = 10 // Limit visible categories in legend
-private const val LEGEND_ITEM_HEIGHT_DP = 28 // Approximate height for legend item
-private const val MIN_LEGEND_HEIGHT_DP = 50 // Minimum height for the scrollable legend area
-private const val MAX_LEGEND_HEIGHT_DP = LEGEND_ITEM_HEIGHT_DP * MAX_CATEGORIES_VISIBLE
-private const val CENTER_TEXT_SCALE_FACTOR = 0.18f // Factor to scale center text size relative to chart size
-private const val CENTER_SUBTEXT_SCALE_FACTOR = 0.09f
-private const val TOUCH_OFFSET_THRESHOLD_DP = 10f // Threshold to detect tap near center to deselect
-private const val SELECTED_SCALE_FACTOR = 1.08f
-private const val STROKE_WIDTH_DP = 6f // Stroke width for the gap between slices
 
 /**
  * Улучшенная круговая диаграмма категорий, которая показывает распределение категорий 
@@ -86,10 +75,10 @@ private const val STROKE_WIDTH_DP = 6f // Stroke width for the gap between slice
  */
 @Composable
 fun EnhancedCategoryPieChart(
+    modifier: Modifier = Modifier,
     items: List<UiCategory>,
     selectedIndex: Int? = null,
     onSectorClick: (UiCategory?) -> Unit = {},
-    modifier: Modifier = Modifier,
     showExpenses: Boolean = true,
     onShowExpensesChange: (Boolean) -> Unit = {}
 ) {
@@ -185,7 +174,7 @@ fun EnhancedCategoryPieChart(
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal
                     ),
-                    color = if (showExpenses) Color(ColorUtils.EXPENSE_COLOR) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.clickable { onShowExpensesChange(true) }
                 )
                 
@@ -194,7 +183,7 @@ fun EnhancedCategoryPieChart(
                     style = MaterialTheme.typography.titleMedium.copy(
                         fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal
                     ),
-                    color = if (!showExpenses) Color(ColorUtils.INCOME_COLOR) else MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.clickable { onShowExpensesChange(false) }
                 )
             }
@@ -405,37 +394,31 @@ private fun DrawScope.drawInnerText(
     totalMoney: Money,
     isIncome: Boolean,
     incomeText: String,
-    expenseText: String
+    expenseText: String,
+    incomeColor: Color,
+    expenseColor: Color
 ) {
     if (selectedItem != null) {
-        drawSelectedItemText(center, size, selectedItem, isIncome)
+        drawSelectedItemText(center, size, selectedItem)
     } else {
-        drawTotalAmountText(center, size, totalMoney, isIncome, incomeText, expenseText)
+        drawTotalAmountText(center, size, totalMoney, isIncome, incomeText, expenseText, incomeColor, expenseColor)
     }
 }
 
 private fun DrawScope.drawSelectedItemText(
     center: Offset,
     size: Size,
-    selectedItem: UiCategory,
-    isIncome: Boolean
+    selectedItem: UiCategory
 ) {
     drawIntoCanvas { canvas ->
-        // Создаем Money из значения
         val itemMoney = selectedItem.money
+
+        val amountColor = selectedItem.color 
             
-        // Определяем цвет в зависимости от типа операции
-        val amountColor = if (isIncome) {
-            ColorUtils.INCOME_COLOR
-        } else {
-            ColorUtils.EXPENSE_COLOR
-        }
-            
-        // Рисуем сумму крупно во всю центральную область
         val amountPaint = Paint().apply {
             isAntiAlias = true
             textSize = min(size.width, size.height) * DonutTextConstants.AMOUNT_TEXT_SIZE_FACTOR
-            color = amountColor
+            color = amountColor.toArgb()
             textAlign = Paint.Align.CENTER
             isFakeBoldText = true
         }
@@ -487,7 +470,7 @@ private fun DrawScope.drawSelectedItemText(
         val percentY = categoryY + percentPaint.descent() * DonutTextConstants.PERCENT_Y_OFFSET
             
         canvas.nativeCanvas.drawText(
-            String.format("%.1f%%", selectedItem.percentage),
+            String.format(Locale.getDefault(), "%.1f%%", selectedItem.percentage),
             center.x,
             percentY,
             percentPaint
@@ -501,19 +484,15 @@ private fun DrawScope.drawTotalAmountText(
     totalMoney: Money,
     isIncome: Boolean,
     incomeText: String,
-    expenseText: String
+    expenseText: String,
+    incomeColor: Color,
+    expenseColor: Color
 ) {
     drawIntoCanvas { canvas ->
-        // Определяем цвет в зависимости от типа операции
-        val amountColor = if (isIncome) {
-            ColorUtils.INCOME_COLOR
-        } else {
-            ColorUtils.EXPENSE_COLOR
-        }
+        val amountColor = if (isIncome) incomeColor else expenseColor
             
-        // Рисуем общую сумму
         val amountPaint = Paint().apply {
-            color = amountColor
+            color = amountColor.toArgb()
             textAlign = Paint.Align.CENTER
             textSize = min(size.width, size.height) * 0.11f
             isFakeBoldText = true
@@ -532,11 +511,7 @@ private fun DrawScope.drawTotalAmountText(
             
         // Рисуем тип (доход/расход) - с цветом соответствующим типу
         val typePaint = Paint().apply {
-            color = if (isIncome) {
-                ColorUtils.INCOME_COLOR
-            } else {
-                ColorUtils.EXPENSE_COLOR
-            }
+            color = if (isIncome) incomeColor.toArgb() else expenseColor.toArgb()
             textAlign = Paint.Align.CENTER
             textSize = min(size.width, size.height) * DonutTextConstants.CATEGORY_TEXT_SIZE_FACTOR
             isFakeBoldText = true
@@ -627,10 +602,12 @@ private fun DrawPieChart(
     isIncome: Boolean,
     backgroundColor: Color
 ) {
-    // Получаем строковые ресурсы внутри @Composable
     val incomeText = stringResource(id = R.string.chart_type_selector_income)
     val expenseText = stringResource(id = R.string.chart_type_selector_expense)
+    val currentIncomeColor = LocalIncomeColor.current
+    val currentExpenseColor = LocalExpenseColor.current
     val context = LocalContext.current
+    val outlineColorForDonut = MaterialTheme.colorScheme.onSurface // Получаем цвет здесь
     
     val animatedProgress = remember { Animatable(0f) }
     
@@ -749,9 +726,10 @@ private fun DrawPieChart(
                     startAngle = startAngle,
                     sweepAngle = animatedSweepAngle,
                     color = data[index].color,
-                    holeColor = backgroundColor, // Используем белый цвет для отверстия пончика
+                    holeColor = backgroundColor, 
                     addOutline = isSelected,
-                    alpha = 1f  // Всегда полная непрозрачность для всех секторов
+                    alpha = 1f,
+                    outlineBaseColor = outlineColorForDonut
                 )
             }
             
@@ -770,7 +748,9 @@ private fun DrawPieChart(
                 totalMoney = totalMoney,
                 isIncome = isIncome,
                 incomeText = incomeText,
-                expenseText = expenseText
+                expenseText = expenseText,
+                incomeColor = currentIncomeColor,
+                expenseColor = currentExpenseColor
             )
         }
     }
@@ -798,12 +778,16 @@ private fun DrawScope.drawDonutSection(
     color: Color,
     holeColor: Color,
     addOutline: Boolean = false,
-    alpha: Float = 1f
+    alpha: Float = 1f,
+    outlineBaseColor: Color
 ) {
-    // Константы для обводки - используем статичные цвета вместо ресурсов, так как не в @Composable
+    // Используем цвет, контрастный фону (holeColor) для обводки
+    // Предполагаем, что onSurface обеспечит хороший контраст с surface (который является holeColor)
+    // val outlineBaseColor = MaterialTheme.colorScheme.onSurface // Убираем это
+
     val outlineColors = object {
-        val outer = Color.White.copy(alpha = 0.4f) // Соответствует #66FFFFFF
-        val inner = Color.White.copy(alpha = 0.3f) // Соответствует #4DFFFFFF
+        val outer = outlineBaseColor.copy(alpha = 0.4f)
+        val inner = outlineBaseColor.copy(alpha = 0.3f)
     }
     
     // Константы для ширины линий

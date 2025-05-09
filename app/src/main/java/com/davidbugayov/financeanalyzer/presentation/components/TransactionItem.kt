@@ -1,39 +1,23 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.combinedClickable
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CreditCard
-import androidx.compose.material.icons.filled.Fastfood
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.LocalGroceryStore
-import androidx.compose.material.icons.filled.LocalTaxi
-import androidx.compose.material.icons.filled.MonetizationOn
-import androidx.compose.material.icons.filled.Payments
-import androidx.compose.material.icons.filled.Pets
-import androidx.compose.material.icons.filled.Receipt
-import androidx.compose.material.icons.filled.ShoppingBag
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.SportsEsports
-import androidx.compose.material.icons.filled.SwapHoriz
-import androidx.compose.material.icons.filled.Wifi
-import androidx.compose.material.icons.filled.WorkOutline
+import androidx.compose.material.icons.filled.Category
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -54,17 +38,14 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalTransferColor
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Locale
-import kotlinx.coroutines.delay
-
-// Определяем цвета как константы на верхнем уровне
-private val IncomeColorVal = Color(ColorUtils.INCOME_COLOR)
-private val ExpenseColorVal = Color(ColorUtils.EXPENSE_COLOR)
-private val TransferColorVal = Color(ColorUtils.TRANSFER_COLOR)
 
 // Функция для создания форматтера с текущей локалью
 private fun getDateFormatter(): SimpleDateFormat {
@@ -72,84 +53,141 @@ private fun getDateFormatter(): SimpleDateFormat {
 }
 
 // Кэш для категорий и их иконок для более быстрого поиска
-private val CATEGORY_ICON_CACHE = mutableMapOf<Pair<String, Boolean>, ImageVector>()
+private data class CategoryDisplayInfo(val icon: ImageVector, val color: Color)
+
+private fun getCategoryDisplayInfo(
+    categoryName: String,
+    isExpense: Boolean,
+    defaultIncomeColor: Color,
+    defaultExpenseColor: Color,
+    transferColor: Color,
+    defaultOtherColor: Color,
+    incomeCategoryColors: Map<String, Color>,
+    expenseCategoryColors: Map<String, Color>
+): CategoryDisplayInfo {
+    // TODO: Заменить эту логику на использование CategoryIconProvider
+    // Цвет теперь берется из карт или дефолтных значений
+    val icon = Icons.Default.Category // Placeholder, используйте CategoryIconProvider
+
+    val specificColor = if (isExpense) {
+        expenseCategoryColors[categoryName]
+    } else {
+        incomeCategoryColors[categoryName]
+    }
+
+    val color = when {
+        specificColor != null -> specificColor
+        categoryName.equals("Перевод", ignoreCase = true) -> transferColor
+        categoryName.equals("Другое", ignoreCase = true) || categoryName.equals("Прочие операции", ignoreCase = true) -> defaultOtherColor
+        isExpense -> defaultExpenseColor
+        else -> defaultIncomeColor
+    }
+    return CategoryDisplayInfo(icon, color)
+}
 
 /**
  * Элемент списка транзакций с оптимизацией производительности
  * 
  * @param transaction Транзакция для отображения
  * @param onClick Обработчик клика по элементу
- * @param onLongClick Обработчик долгого нажатия по элементу
- * @param showDivider Показывать разделитель после элемента
- * @param animationDelay Задержка анимации при появлении (для создания эффекта каскада)
- * @param isAnimated Включить анимацию
  */
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun TransactionItem(
     transaction: Transaction,
-    onClick: (Transaction) -> Unit = {},
-    onLongClick: (Transaction) -> Unit = {},
+    showDate: Boolean = true,
+    animated: Boolean = true,
+    animationDelay: Long = 0L,
     showDivider: Boolean = true,
-    animationDelay: Long = 0,
-    isAnimated: Boolean = true
+    onClick: (Transaction) -> Unit = {},
+    onTransactionLongClick: (Transaction) -> Unit
 ) {
-    // Используем константы для цветов
-    val incomeColor = IncomeColorVal
-    val expenseColor = ExpenseColorVal
-    
-    // Форматируем дату только один раз и запоминаем результат
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    val otherColor = MaterialTheme.colorScheme.onSurfaceVariant // для категории "Прочее" или если цвет не найден
+    val isDarkTheme = isSystemInDarkTheme()
+    val transferColor = LocalTransferColor.current // Получаем transferColor здесь
+
+    // Получаем карты цветов категорий
+    val incomeColorsMap = com.davidbugayov.financeanalyzer.ui.theme.incomeCategoryColorsMap
+    val expenseColorsMap = com.davidbugayov.financeanalyzer.ui.theme.expenseCategoryColorsMap
+
     val formattedDate = remember(transaction.date) {
         getDateFormatter().format(transaction.date) 
     }
-    
-    // Получаем иконку и цвет для категории, используя кэширование
-    val categoryInfo = remember(transaction.category, transaction.isExpense) {
-        getCategoryInfo(transaction.category, transaction.isExpense, incomeColor, expenseColor)
+
+    val categoryDisplayInfo = remember(
+        transaction.category,
+        transaction.isExpense,
+        incomeColor,
+        expenseColor,
+        transferColor,
+        otherColor,
+        incomeColorsMap,
+        expenseColorsMap
+    ) {
+        getCategoryDisplayInfo(
+            categoryName = transaction.category,
+            isExpense = transaction.isExpense,
+            defaultIncomeColor = incomeColor,
+            defaultExpenseColor = expenseColor,
+            transferColor = transferColor,
+            defaultOtherColor = otherColor,
+            incomeCategoryColors = incomeColorsMap,
+            expenseCategoryColors = expenseColorsMap
+        )
+    }
+
+    // Определяем цвет источника
+    val sourceColor = remember(transaction.source, transaction.sourceColor, transaction.isExpense, isDarkTheme) {
+        val sourceColorInt = transaction.sourceColor
+        var colorFromInt: Color? = null
+        if (sourceColorInt != 0) { // 0 может быть маркером отсутствия цвета
+            colorFromInt = try {
+                Color(sourceColorInt)
+            } catch (_: Exception) {
+                null
+            }
+        }
+        colorFromInt ?: ColorUtils.getEffectiveSourceColor(
+            sourceName = transaction.source,
+            sourceColorHex = null, // Если sourceColorInt не подошел, пробуем по имени, без HEX
+            isExpense = transaction.isExpense,
+            isDarkTheme = isDarkTheme
+        )
     }
     
-    // Определяем цвет источника, используя remember для кэширования
-    val sourceColor = remember(transaction.source, transaction.sourceColor, transaction.isExpense) {
-        Color(ColorUtils.getEffectiveSourceColor(transaction.source, transaction.sourceColor, transaction.isExpense))
-    }
-    
-    // Кэшируем производный цвет для Surface
     val surfaceColor = remember(sourceColor) { sourceColor.copy(alpha = 0.3f) }
     
-    // Предварительно вычисляем и кэшируем форматированную сумму
     val formattedAmount = remember(transaction.amount, transaction.isExpense) {
         val amount = transaction.amount
-        if (transaction.isExpense) {
-            "-${amount.abs().format(showCurrency = true)}"
-        } else {
-            "+${amount.abs().format(showCurrency = true)}"
-        }
+        val prefix = if (transaction.isExpense) "-" else "+"
+        // Если это перевод, не показываем +/- ??? - нужно уточнить бизнес-логику
+        // if (transaction.category.equals("Перевод", ignoreCase = true)) "${amount.abs().format(showCurrency = true)}"
+        // else 
+        "$prefix${amount.abs().format(showCurrency = true)}"
     }
+
+    val onClickStable = remember { onClick }
+    val onLongClickStable = remember { onTransactionLongClick }
     
-    // Стабилизируем лямбды обработчиков кликов, чтобы избежать пересоздания при рекомпозиции
-    val onClickStable = remember(onClick) { onClick }
-    val onLongClickStable = remember(onLongClick) { onLongClick }
-    
-    // Состояние для анимации
     var visible by remember { mutableStateOf(false) }
     
-    // Запускаем анимацию с задержкой
     LaunchedEffect(Unit) {
-        if (animationDelay > 0) {
+        if (animated && animationDelay > 0) {
             delay(animationDelay)
         }
         visible = true
     }
     
-    // Анимация перехода для каждого элемента
     val animatedAlpha by animateFloatAsState(
-        targetValue = if (visible || !isAnimated) 1f else 0f,
+        targetValue = if (visible || !animated) 1f else 0f,
         animationSpec = tween(durationMillis = 300),
         label = "alpha"
     )
     
     val animatedOffset by animateFloatAsState(
-        targetValue = if (visible || !isAnimated) 0f else 20f, 
+        targetValue = if (visible || !animated) 0f else 20f, 
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
             stiffness = Spring.StiffnessMedium
@@ -160,8 +198,8 @@ fun TransactionItem(
     Column(
         modifier = Modifier
             .graphicsLayer {
-                alpha = if (isAnimated) animatedAlpha else 1f
-                translationY = if (isAnimated) animatedOffset else 0f
+                alpha = if (animated) animatedAlpha else 1f
+                translationY = if (animated) animatedOffset else 0f
             }
     ) {
         Row(
@@ -177,16 +215,17 @@ fun TransactionItem(
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Иконка категории с цветом источника
             Surface(
                 modifier = Modifier.size(40.dp),
                 shape = CircleShape,
-                color = surfaceColor
+                color = surfaceColor // Фон иконки категории
             ) {
                 Icon(
-                    imageVector = categoryInfo.icon,
+                    imageVector = categoryDisplayInfo.icon, // Иконка категории
                     contentDescription = if (transaction.isExpense) "Расход" else "Доход",
-                    tint = sourceColor,
+                    tint = sourceColor, // Цвет иконки категории = цвету источника (или категории?)
+                    // Логичнее чтобы tint был categoryDisplayInfo.color, а sourceColor был у текста источника.
+                    // Пока оставлю sourceColor для консистентности с предыдущей версией.
                     modifier = Modifier
                         .padding(8.dp)
                         .size(24.dp)
@@ -195,141 +234,67 @@ fun TransactionItem(
             
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_normal)))
             
-            // Информация о транзакции
             Column(
                 modifier = Modifier.weight(1f)
             ) {
                 Text(
-                    text = transaction.category,
+                    text = transaction.category.take(20) + if (transaction.category.length > 20) "..." else "",
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Medium,
+                    fontWeight = FontWeight.SemiBold,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                
-                // Источник и дата на одном уровне
-                Row(
-                    modifier = Modifier.padding(top = 4.dp),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Источник
+                Spacer(modifier = Modifier.height(2.dp))
+                Row {
                     Text(
-                        text = transaction.source,
+                        text = transaction.source.take(15) + if (transaction.source.length > 15) "..." else "",
                         style = MaterialTheme.typography.bodySmall,
-                        color = sourceColor,
+                        color = sourceColor, // Цвет текста источника
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.weight(1f, fill = false)
+                        modifier = Modifier.weight(1f, fill = false) 
                     )
-                    
-                    // Разделитель между источником и датой - очень маленький отступ
-                    Spacer(modifier = Modifier.width(4.dp))
-                    
-                    // Дата транзакции - используем предварительно отформатированную дату
-                    Text(
-                        text = formattedDate,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                
-                // Комментарий (если есть)
-                transaction.note?.let { note ->
-                    if (note.isNotBlank()) {
+                    transaction.note?.takeIf { it.isNotBlank() }?.let { noteContent ->
                         Text(
-                            text = note,
+                            text = " • ${noteContent.take(20)}${if (noteContent.length > 20) "..." else ""}",
                             style = MaterialTheme.typography.bodySmall,
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            maxLines = 2,
+                            maxLines = 1,
                             overflow = TextOverflow.Ellipsis
                         )
                     }
                 }
             }
-            
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_normal)))
-            
-            // Сумма транзакции - используем предварительно отформатированное значение
-            Text(
-                text = formattedAmount,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = when {
-                    transaction.isTransfer -> TransferColorVal
-                    transaction.isExpense -> expenseColor
-                    else -> incomeColor
+
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_small)))
+
+            Column(horizontalAlignment = Alignment.End) {
+                Text(
+                    text = formattedAmount,
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontWeight = FontWeight.SemiBold,
+                    color = if (transaction.category.equals("Перевод", ignoreCase = true)) MaterialTheme.colorScheme.onSurface
+                    else if (transaction.isExpense) expenseColor else incomeColor,
+                    maxLines = 1
+                )
+                Spacer(modifier = Modifier.height(2.dp))
+                if (showDate) {
+                    Text(
+                        text = formattedDate,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
                 }
-            )
-        }
-        
-        // Разделитель
-        if (showDivider) {
-            androidx.compose.material3.HorizontalDivider(
-                modifier = Modifier.padding(start = 72.dp, end = 16.dp),
-                color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
-                thickness = 0.5.dp
-            )
-        }
-    }
-}
-
-/**
- * Информация о категории транзакции
- */
-data class CategoryInfo(
-    val icon: ImageVector,
-    val backgroundColor: Color
-)
-
-/**
- * Возвращает иконку и цвет для категории транзакции
- * Оптимизировано с использованием кэша для часто используемых категорий
- */
-fun getCategoryInfo(
-    category: String, 
-    isExpense: Boolean,
-    incomeColor: Color,
-    expenseColor: Color
-): CategoryInfo {
-    // Попытка получения иконки из кэша
-    val cacheKey = category.lowercase() to isExpense
-    val cachedIcon = CATEGORY_ICON_CACHE[cacheKey]
-    
-    if (cachedIcon != null) {
-        // Если иконка найдена в кэше, возвращаем ее с соответствующим цветом
-        return CategoryInfo(cachedIcon, if (isExpense) expenseColor else incomeColor)
-    }
-    
-    // Если иконки нет в кэше, определяем ее и добавляем в кэш
-    val (icon, bgColor) = when {
-        !isExpense -> {
-            when (category.lowercase()) {
-                "зарплата" -> Icons.Default.Payments to incomeColor
-                "перевод", "переводы" -> Icons.Default.SwapHoriz to TransferColorVal
-                else -> Icons.Default.MonetizationOn to incomeColor
             }
         }
-        else -> when (category.lowercase()) {
-            "продукты" -> Icons.Default.LocalGroceryStore to expenseColor
-            "еда", "рестораны" -> Icons.Default.Fastfood to expenseColor
-            "транспорт" -> Icons.Default.LocalTaxi to expenseColor
-            "связь", "интернет" -> Icons.Default.Wifi to expenseColor
-            "развлечения" -> Icons.Default.SportsEsports to expenseColor
-            "покупки" -> Icons.Default.ShoppingBag to expenseColor
-            "животные" -> Icons.Default.Pets to expenseColor
-            "комиссия", "счета" -> Icons.Default.Receipt to expenseColor
-            "жилье" -> Icons.Default.Home to expenseColor
-            "кредит", "карта" -> Icons.Default.CreditCard to expenseColor
-            "работа" -> Icons.Default.WorkOutline to expenseColor
-            "переводы" -> Icons.Default.SwapHoriz to TransferColorVal
-            else -> Icons.Default.ShoppingCart to expenseColor
+        if (showDivider) {
+            // Используем HorizontalDivider вместо Divider для Material3
+            androidx.compose.material3.HorizontalDivider(
+                modifier = Modifier.padding(start = dimensionResource(id = R.dimen.spacing_normal) + 40.dp + dimensionResource(id = R.dimen.spacing_normal)),
+                thickness = 0.5.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.5f)
+            )
         }
     }
-    
-    // Обновляем кэш только для часто используемых категорий
-    if (category.length < 15) { // Ограничение на длину для экономии памяти
-        CATEGORY_ICON_CACHE[cacheKey] = icon
-    }
-    
-    return CategoryInfo(icon, bgColor)
 } 

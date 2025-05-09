@@ -2,16 +2,19 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.graphics.toArgb
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.TransferColorInt
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
-import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -534,15 +537,11 @@ class ImportFromCSVUseCase(
                             }
 
                             // Проверяем, не является ли это переводом
-                            val isTransfer = if (category.contains("перевод", ignoreCase = true) || 
-                                                 category.contains("transfer", ignoreCase = true)) {
-                                true
-                            } else {
-                                false
-                            }
+                            val isTransfer = category.contains("перевод", ignoreCase = true) ||
+                                    category.contains("transfer", ignoreCase = true)
 
                             // Создаем транзакцию с уникальным ID на основе времени и случайности
-                            val transaction = Transaction(
+                            var transaction = Transaction(
                                 id = "csv_${date.time}_${System.nanoTime()}",
                                 amount = Money(amountValue.absoluteValue),
                                 category = category,
@@ -550,12 +549,34 @@ class ImportFromCSVUseCase(
                                 isExpense = isExpense,
                                 note = note,
                                 source = source,
-                                sourceColor = if (isTransfer) ColorUtils.TRANSFER_COLOR else 
-                                             if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+                                sourceColor = ColorUtils.getSourceColorByName(source)?.toArgb()
+                                    ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
                                 isTransfer = isTransfer
                             )
 
                             Timber.d("ИМПОРТ: Создана транзакция: id=${transaction.id}, дата=${transaction.date}, сумма=${transaction.amount}, категория=${transaction.category}, расход=${transaction.isExpense}")
+
+                            // Обновляем цвет источника на основе типа транзакции
+                            val finalSourceColor = when {
+                                isTransfer -> TransferColorInt // Для переводов всегда цвет перевода
+                                sourceColorIndex != -1 && values.size > sourceColorIndex -> {
+                                    // Если цвет указан в CSV и он валидный (не 0, не true/false)
+                                    // Эта логика парсинга цвета из CSV может быть сложной и зависит от формата
+                                    // Пока оставим простой вариант: если есть значение, пытаемся его использовать как Int
+                                    // В идеале, CSV должен содержать ARGB Int или HEX
+                                    val rawSourceColor = cleanField(values[sourceColorIndex])
+                                    rawSourceColor.toIntOrNull()?.takeIf { it != 0 }
+                                        ?: ColorUtils.getSourceColorByName(source)?.toArgb()
+                                        ?: if (isExpense) ExpenseColorInt else IncomeColorInt
+                                }
+                                else -> {
+                                    // Если имя источника пустое, но есть цвет, используем его
+                                    val defaultSourceColor = if (isExpense) ExpenseColorInt else IncomeColorInt
+                                    ColorUtils.getSourceColorByName(source)?.toArgb() ?: defaultSourceColor
+                                }
+                            }
+
+                            transaction = transaction.copy(sourceColor = finalSourceColor)
 
                             // Сохраняем транзакцию
                             Timber.d("ИМПОРТ: Сохраняем транзакцию в базу данных")

@@ -18,10 +18,11 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
@@ -39,22 +40,23 @@ fun ColorPickerDialog(
                     horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
                     verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
                 ) {
-                    ColorUtils.predefinedColors.forEach { color ->
+                    ExpenseChartPalette.forEach { composeColor ->
+                        val argbColor = composeColor.toArgb()
                         Box(
                             modifier = Modifier
                                 .size(dimensionResource(R.dimen.color_picker_item_size))
                                 .clip(CircleShape)
-                                .background(Color(color))
+                                .background(composeColor)
                                 .border(
                                     width = dimensionResource(R.dimen.border_width_medium),
-                                    color = if (color == initialColor) {
+                                    color = if (argbColor == initialColor) {
                                         MaterialTheme.colorScheme.primary
                                     } else {
                                         Color.Transparent
                                     },
                                     shape = CircleShape
                                 )
-                                .clickable { onColorSelected(color) }
+                                .clickable { onColorSelected(argbColor) }
                         )
                     }
                 }

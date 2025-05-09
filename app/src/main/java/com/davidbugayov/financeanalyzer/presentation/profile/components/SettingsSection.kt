@@ -33,6 +33,7 @@ import androidx.compose.ui.text.TextStyle
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
+import java.util.Locale
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
@@ -121,7 +122,7 @@ fun SettingsSection(
                     stringResource(R.string.notification_disabled_description)
                 } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
                     val (hour, minute) = transactionReminderTime
-                    "Ежедневно в ${hour}:${String.format("%02d", minute)}"
+                    "Ежедневно в ${hour}:${String.format(Locale.getDefault(), "%02d", minute)} H"
                 } else {
                     stringResource(R.string.off)
                 },

@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.dialogs
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -27,6 +28,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
  * Диалог выбора источников для фильтрации транзакций.
@@ -97,10 +99,21 @@ fun SourceSelectionDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 // Список источников
+                val isDarkTheme = isSystemInDarkTheme()
                 sources.forEach { source ->
+                    val effectiveColor = if (source.color != 0) { // Предполагаем, что 0 означает отсутствие цвета
+                        Color(source.color)
+                    } else {
+                        ColorUtils.getEffectiveSourceColor(
+                            sourceName = source.name,
+                            sourceColorHex = null, // Так как source.color (Int) не был валидным HEX
+                            isExpense = false,    // Для диалога выбора источника не применимо
+                            isDarkTheme = isDarkTheme
+                        )
+                    }
                     SourceCheckboxItem(
                         sourceName = source.name,
-                        color = Color(source.color),
+                        color = effectiveColor, // Передаем уже готовый Color
                         isSelected = localSelectedSources.contains(source.name),
                         onToggle = { isChecked ->
                             localSelectedSources = if (isChecked) {

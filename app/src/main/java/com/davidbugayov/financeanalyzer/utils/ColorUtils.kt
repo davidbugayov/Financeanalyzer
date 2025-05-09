@@ -1,99 +1,92 @@
 package com.davidbugayov.financeanalyzer.utils
 
-import android.content.Context
-import androidx.core.content.ContextCompat
+import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
-import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.ui.theme.BankAlfa
+import com.davidbugayov.financeanalyzer.ui.theme.BankGazprom
+import com.davidbugayov.financeanalyzer.ui.theme.BankOzon
+import com.davidbugayov.financeanalyzer.ui.theme.BankPochta
+import com.davidbugayov.financeanalyzer.ui.theme.BankRaiffeisen
+import com.davidbugayov.financeanalyzer.ui.theme.BankSber
+import com.davidbugayov.financeanalyzer.ui.theme.BankTinkoff
+import com.davidbugayov.financeanalyzer.ui.theme.BankVTB
+import com.davidbugayov.financeanalyzer.ui.theme.BankYoomoney
+import com.davidbugayov.financeanalyzer.ui.theme.CashColor
 
 object ColorUtils {
 
-    // Цвета для банков
-    val SBER_COLOR = "#21A038".toColorInt()
-    val TINKOFF_COLOR = "#FFDD2D".toColorInt()
-    val ALFA_COLOR = "#EF3124".toColorInt()
-    
-    // Другие цвета для источников
-    val CASH_COLOR = "#9E9E9E".toColorInt() // Серый цвет для наличных
-
-    // Цвета для доходов и расходов
-    val INCOME_COLOR = "#4CAF50".toColorInt() // Зеленый
-    val EXPENSE_COLOR = "#F44336".toColorInt() // Красный
-    val TRANSFER_COLOR = "#9E9E9E".toColorInt() // Серый для переводов
-
-    // Предустановленные источники
-    val defaultSources = listOf(
-        Source(name = "Сбер", color = SBER_COLOR),
-        Source(name = "Т-Банк", color = TINKOFF_COLOR),
-        Source(name = "Альфа", color = ALFA_COLOR),
-        Source(name = "Наличные", color = CASH_COLOR)
-    )
-
-    val predefinedColors = listOf(
-        "#F44336".toColorInt(), // Red
-        "#E91E63".toColorInt(), // Pink
-        "#9C27B0".toColorInt(), // Purple
-        "#673AB7".toColorInt(), // Deep Purple
-        "#3F51B5".toColorInt(), // Indigo
-        "#2196F3".toColorInt(), // Blue
-        "#03A9F4".toColorInt(), // Light Blue
-        "#00BCD4".toColorInt(), // Cyan
-        "#009688".toColorInt(), // Teal
-        "#4CAF50".toColorInt(), // Green
-        "#8BC34A".toColorInt(), // Light Green
-        "#CDDC39".toColorInt(), // Lime
-        "#FFEB3B".toColorInt(), // Yellow
-        "#FFC107".toColorInt(), // Amber
-        "#FF9800".toColorInt(), // Orange
-        "#FF5722".toColorInt(), // Deep Orange
-        "#795548".toColorInt(), // Brown
-        "#9E9E9E".toColorInt(), // Grey
-        "#607D8B".toColorInt()  // Blue Grey
-    )
-    
     /**
-     * Возвращает цвет для источника по его названию.
+     * Возвращает цвет для источника по его названию из ui.theme.Color.
      * Если цвет для источника не найден, возвращает null.
-     * 
+     *
      * @param sourceName Название источника
-     * @return Цвет источника или null, если цвет не найден
+     * @return Цвет источника (androidx.compose.ui.graphics.Color) или null
      */
-    fun getSourceColor(sourceName: String): Int? {
+    fun getSourceColorByName(sourceName: String): Color? {
         val name = sourceName.lowercase()
         return when {
-            name.contains("сбер") -> SBER_COLOR
-            name.contains("тинькофф") || name.contains("т-банк") -> TINKOFF_COLOR
-            name.contains("альфа") -> ALFA_COLOR
-            name.contains("озон") -> "#0066FF".toColorInt() // Синий цвет для Озона
-            name.contains("втб") -> "#00AEEF".toColorInt() 
-            name.contains("газпромбанк") -> "#0079C2".toColorInt()
-            name.contains("райффайзен") -> "#FFED00".toColorInt()
-            name.contains("почта банк") -> "#74397E".toColorInt()
-            name.contains("юмани") || name.contains("yoomoney") -> "#8F2FE2".toColorInt()
-            name.contains("наличные") || name.contains("кэш") || name.contains("cash") -> CASH_COLOR
-            name.contains("перевод") -> TRANSFER_COLOR
+            name.contains("сбер") -> BankSber
+            name.contains("тинькофф") || name.contains("т-банк") -> BankTinkoff
+            name.contains("альфа") -> BankAlfa
+            name.contains("озон") -> BankOzon
+            name.contains("втб") -> BankVTB
+            name.contains("газпромбанк") -> BankGazprom
+            name.contains("райффайзен") -> BankRaiffeisen
+            name.contains("почта банк") -> BankPochta
+            name.contains("юмани") || name.contains("yoomoney") -> BankYoomoney
+            name.contains("наличные") || name.contains("кэш") || name.contains("cash") -> CashColor
+            // "перевод" теперь обрабатывается через TransferColorLight/Dark в теме
+            // Если нужен специфичный цвет для источника "Перевод", его надо добавить в BankColors
             else -> null
         }
     }
 
     /**
      * Получает эффективный цвет источника для транзакции.
-     * 
-     * @param source Название источника
-     * @param sourceColor Заданный цвет источника (0 если не задан)
+     * ВАЖНО: Эта функция возвращает Color, а не Int.
+     * Для получения цвета в зависимости от темы (доход/расход), используйте LocalIncomeColor/LocalExpenseColor.current в Composable.
+     * Эта утилита может быть полезна для не-Composable контекстов или если нужна логика по умолчанию.
+     *
+     * @param sourceName Название источника
+     * @param sourceColorHex HEX-строка цвета источника из БД (например, "#RRGGBB") или null
      * @param isExpense Флаг расхода
-     * @return Цвет источника или цвет по умолчанию (для расхода/дохода)
+     * @param isDarkTheme Текущая тема (для выбора цвета по умолчанию)
+     * @return androidx.compose.ui.graphics.Color
      */
-    fun getEffectiveSourceColor(sourceName: String, sourceColor: Int, isExpense: Boolean): Int {
-        return sourceColor.takeIf { it != 0 }
-            ?: getSourceColor(sourceName) 
-            ?: if (isExpense) EXPENSE_COLOR else INCOME_COLOR
+    fun getEffectiveSourceColor(
+        sourceName: String,
+        sourceColorHex: String?, // Ожидаем HEX-строку или null
+        isExpense: Boolean,
+        isDarkTheme: Boolean // Нужно передавать состояние темы
+    ): Color {
+        // Пытаемся получить цвет из sourceColorHex, если он есть
+        sourceColorHex?.let { hex ->
+            try {
+                if (hex.isNotBlank()) return Color(hex.toColorInt())
+            } catch (_: IllegalArgumentException) {
+                // Log error or handle invalid hex
+            }
+        }
+        // Затем пытаемся получить по имени источника
+        getSourceColorByName(sourceName)?.let { return it }
+
+        // В крайнем случае, цвет по умолчанию в зависимости от типа транзакции и темы
+        // Эту логику лучше вынести в Composable, используя LocalIncomeColor/LocalExpenseColor
+        return when {
+            isExpense && isDarkTheme -> com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorDark
+            isExpense && !isDarkTheme -> com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorLight
+            !isExpense && isDarkTheme -> com.davidbugayov.financeanalyzer.ui.theme.IncomeColorDark
+            else -> com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
+        }
     }
 
     /**
-     * Получает цвет из ресурсов по resId
+     * Эта функция больше не нужна для получения Compose Color из XML.
+     * Цвета должны быть определены в ui.theme.Color.kt
+     * Оставлена для возможного редкого использования, если нужно получить Int цвет из XML.
      */
-    fun getColor(context: Context, resId: Int): Int {
-        return ContextCompat.getColor(context, resId)
+    @Deprecated("Prefer defining colors in ui.theme.Color.kt for Compose.")
+    fun getIntColorFromXml(context: android.content.Context, resId: Int): Int {
+        return androidx.core.content.ContextCompat.getColor(context, resId)
     }
-
 } 

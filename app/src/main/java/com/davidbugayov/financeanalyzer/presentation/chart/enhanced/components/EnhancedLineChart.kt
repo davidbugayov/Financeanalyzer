@@ -31,7 +31,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalDensity
@@ -47,17 +46,17 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.LineChartUtils.findNearestPoint
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawGridLines
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.drawLineChart
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.utils.LineChartUtils.findNearestPoint
 import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.util.Calendar
-import kotlin.math.roundToInt
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import timber.log.Timber
+import java.text.SimpleDateFormat
+import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import kotlin.math.hypot
 
 // --- Constants for Dimensions ---
@@ -106,9 +105,10 @@ fun EnhancedLineChart(
     period: String = "",
     formatYValue: (Float) -> String = { value ->
         when {
-            value >= 1_000_000 -> String.format("%.1fM", value / 1_000_000)
-            value >= 1_000 -> String.format("%.1fK", value / 1_000)
-            else -> value.roundToInt().toString()
+            value >= 1_000_000_000 -> String.format(Locale.getDefault(), "%.1fB", value / 1_000_000_000)
+            value >= 1_000_000 -> String.format(Locale.getDefault(), "%.1fM", value / 1_000_000)
+            value >= 1_000 -> String.format(Locale.getDefault(), "%.1fK", value / 1_000)
+            else -> String.format(Locale.getDefault(), "%.0f", value)
         }
     },
     onPointSelected: (LineChartPoint?) -> Unit = {},
@@ -140,7 +140,7 @@ fun EnhancedLineChart(
 
     // Преобразуем selectionThreshold в пиксели заранее
     val thresholdPx = with(LocalDensity.current) { selectionThresholdDp.toPx() }
-    val chartHeightPx = with(LocalDensity.current) { chartHeight.toPx() }
+    with(LocalDensity.current) { chartHeight.toPx() }
     val axisTickLengthPx = with(LocalDensity.current) { AxisTickLength.toPx() }
     val yLabelOffsetPx = with(LocalDensity.current) { YLabelOffset.toPx() }
     val xLabelOffsetPx = with(LocalDensity.current) { XLabelOffset.toPx() }
@@ -202,8 +202,8 @@ fun EnhancedLineChart(
     // Сохраняем цвета для использования в функциях рисования
     val surfaceColor = MaterialTheme.colorScheme.surface
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-    val currentIncomeColor = Color(ColorUtils.INCOME_COLOR)
-    val currentExpenseColor = Color(ColorUtils.EXPENSE_COLOR)
+    val currentIncomeColor = LocalIncomeColor.current
+    val currentExpenseColor = LocalExpenseColor.current
     val axisColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
     val axisLabelColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f)
     val gridColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.15f)
@@ -309,7 +309,16 @@ fun EnhancedLineChart(
                 Canvas(
                     modifier = Modifier
                         .matchParentSize() // Canvas занимает все доступное место в Box после padding
-                        .pointerInput(hasIncomeData, hasExpenseData, chartStartDate, chartEndDate, minValue, maxValue, thresholdPx, animatedProgress) {
+                        .pointerInput(
+                            hasIncomeData,
+                            hasExpenseData,
+                            chartStartDate,
+                            chartEndDate,
+                            minValue,
+                            maxValue,
+                            thresholdPx,
+                            animatedProgress
+                        ) {
                             detectTapGestures { offset ->
                                 Timber.d("Tap detected in Canvas at $offset")
                                 val canvasWidth = size.width.toFloat()
@@ -351,8 +360,30 @@ fun EnhancedLineChart(
                                 // Логика выбора ближайшей точки
                                 val newSelection = when {
                                     incomePoint != null && expensePoint != null -> {
-                                        val incomeDist = calculateDistance(incomePoint, offset, chartStartDate, chartEndDate, minValue, maxValue, canvasWidth, canvasHeight, animatedProgress)
-                                        val expenseDist = calculateDistance(expensePoint, offset, chartStartDate, chartEndDate, minValue, maxValue, canvasWidth, canvasHeight, animatedProgress)
+                                        val incomeDist =
+                                            calculateDistance(
+                                                incomePoint,
+                                                offset,
+                                                chartStartDate,
+                                                chartEndDate,
+                                                minValue,
+                                                maxValue,
+                                                canvasWidth,
+                                                canvasHeight,
+                                                animatedProgress
+                                            )
+                                        val expenseDist =
+                                            calculateDistance(
+                                                expensePoint,
+                                                offset,
+                                                chartStartDate,
+                                                chartEndDate,
+                                                minValue,
+                                                maxValue,
+                                                canvasWidth,
+                                                canvasHeight,
+                                                animatedProgress
+                                            )
                                         Timber.d("Tap Handler: Both points. IncomeDist=$incomeDist, ExpenseDist=$expenseDist")
                                         if (incomeDist <= expenseDist) incomePoint else expensePoint
                                     }
@@ -364,34 +395,35 @@ fun EnhancedLineChart(
                                 // Обновляем состояние, если выбор изменился или сбросился
                                 if (newSelection != currentlySelected) {
                                     if (newSelection == null) {
-                                         Timber.d("Tap Handler: No point found nearby or tapped empty space, clearing selection.")
-                                         selectedIncomePoint = null
-                                         selectedExpensePoint = null
-                                         onPointSelected(null)
+                                        Timber.d("Tap Handler: No point found nearby or tapped empty space, clearing selection.")
+                                        selectedIncomePoint = null
+                                        selectedExpensePoint = null
+                                        onPointSelected(null)
                                     } else {
                                         if (newSelection in incomeData) {
-                                             Timber.d("Tap Handler: Selecting income point.")
-                                             selectedIncomePoint = newSelection
-                                             selectedExpensePoint = null
-                                             onPointSelected(newSelection)
+                                            Timber.d("Tap Handler: Selecting income point.")
+                                            selectedIncomePoint = newSelection
+                                            selectedExpensePoint = null
+                                            onPointSelected(newSelection)
                                         } else if (newSelection in expenseData) {
-                                             Timber.d("Tap Handler: Selecting expense point.")
-                                             selectedIncomePoint = null
-                                             selectedExpensePoint = newSelection
-                                             onPointSelected(newSelection)
+                                            Timber.d("Tap Handler: Selecting expense point.")
+                                            selectedIncomePoint = null
+                                            selectedExpensePoint = newSelection
+                                            onPointSelected(newSelection)
                                         }
                                     }
                                 }
                                 // Если тапнули на уже выбранную точку - ничего не делаем
                                 else {
-                                     Timber.d("Tap Handler: Tapped on the already selected point or no change.")
+                                    Timber.d("Tap Handler: Tapped on the already selected point or no change.")
                                 }
                             }
                         }
                         .drawBehind {
                             val width = size.width
                             val height = size.height
-                            val yLabelStyle = TextStyle(fontSize = AxisLabelFontSize, color = axisLabelColor.copy(alpha = 0.8f), fontWeight = FontWeight.Medium)
+                            val yLabelStyle =
+                                TextStyle(fontSize = AxisLabelFontSize, color = axisLabelColor.copy(alpha = 0.8f), fontWeight = FontWeight.Medium)
                             val xLabelStyle = yLabelStyle.copy(textAlign = TextAlign.Center)
                             val gridDashEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 4f), 0f)
 
@@ -420,7 +452,12 @@ fun EnhancedLineChart(
                                         textLayoutResult = textLayoutResult,
                                         topLeft = Offset(-textLayoutResult.size.width - yLabelOffsetPx, y - textLayoutResult.size.height / 2)
                                     )
-                                    drawLine(color = axisColor, start = Offset(-axisTickLengthPx, y), end = Offset(0f, y), strokeWidth = SelectedPointLineStrokeWidth)
+                                    drawLine(
+                                        color = axisColor,
+                                        start = Offset(-axisTickLengthPx, y),
+                                        end = Offset(0f, y),
+                                        strokeWidth = SelectedPointLineStrokeWidth
+                                    )
                                 }
                             }
 
@@ -449,11 +486,15 @@ fun EnhancedLineChart(
                                         textLayoutResult = textLayoutResult,
                                         topLeft = Offset(x - textLayoutResult.size.width / 2, height + xLabelOffsetPx)
                                     )
-                                    drawLine(color = axisColor, start = Offset(x, height), end = Offset(x, height + axisTickLengthPx), strokeWidth = SelectedPointLineStrokeWidth)
+                                    drawLine(
+                                        color = axisColor,
+                                        start = Offset(x, height),
+                                        end = Offset(x, height + axisTickLengthPx),
+                                        strokeWidth = SelectedPointLineStrokeWidth
+                                    )
                                 }
                             }
-                            // Отрисовка сетки
-                            drawGridLines(width, height)
+                            drawGridLines(width, height, color = gridColor, pathEffect = gridDashEffect)
                         }
                 ) {
                     // Отрисовка графиков

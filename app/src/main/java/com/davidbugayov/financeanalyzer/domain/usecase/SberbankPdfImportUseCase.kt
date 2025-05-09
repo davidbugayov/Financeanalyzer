@@ -2,9 +2,19 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.graphics.toArgb
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.DefaultSourceColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.TransferColorInt
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
@@ -14,21 +24,13 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
-import java.util.Date
-import java.util.Locale
-import java.util.regex.Pattern
-import kotlin.math.absoluteValue
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import timber.log.Timber
-import android.graphics.Color
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
-import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import com.davidbugayov.financeanalyzer.domain.model.Source
-import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
+import java.util.Date
+import java.util.Locale
 
 /**
  * Реализация импорта транзакций из PDF-выписки Сбербанка.
@@ -86,25 +88,10 @@ class SberbankPdfImportUseCase(
     
     // Паттерны для парсинга PDF-выписки
     private val datePattern = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
-    
-    // Паттерны для обработки выписок Сбербанка
-    private val dateRegex = "\\d{2}\\.\\d{2}\\.\\d{4}".toRegex()
-    private val amountRegex = "([+-]?\\d+[\\s]?\\d+[,.]\\d{2})".toRegex()
-    private val amountRegexImproved = "(([+-]?\\d+[\\s]?\\d+[,.]\\d{2})|(\\d+[,.]\\d{2}))".toRegex()
-    private val cardNumberPattern = Pattern.compile("Карта\\s+([*•\\d]+)\\s+", Pattern.MULTILINE)
-    
-    // Усовершенствованный паттерн для сумм в выписке, включая пробелы между группами цифр
+
     // Поддерживает форматы из скриншота: "2 800,00", "+2 000,00", "+800,00", "4 800,00" и т.д.
     private val tableAmountRegex = "([+-]?\\d{1,3}(\\s\\d{3})*[,.]\\d{2})(?:\\s*$|\\s+(?:[А-Яа-я₽]+)?)".toRegex()
-    
-    // Паттерны для новой формы выписки с таблицей "Расшифровка операций"
-    private val tableHeaderRegex = "Расшифровка\\s+операций".toRegex(RegexOption.IGNORE_CASE)
-    private val tableColumnDateRegex = "ДАТА\\s+ОПЕРАЦИИ".toRegex(RegexOption.IGNORE_CASE)
-    private val tableColumnDescriptionRegex = "Описание\\s+операции".toRegex(RegexOption.IGNORE_CASE)
-    private val tableColumnAmountRegex = "СУММА\\s+В\\s+ВАЛЮТЕ\\s+СЧЁТА".toRegex(RegexOption.IGNORE_CASE)
-    private val dateProcessingRegex = "Дата\\s+обработки".toRegex(RegexOption.IGNORE_CASE)
-    private val authCodeRegex = "код\\s+авторизации".toRegex(RegexOption.IGNORE_CASE)
-    private val tableEndRegex = "Итого:|Общая сумма:|остаток|Конец выписки".toRegex(RegexOption.IGNORE_CASE)
+
     
     // Перечень стандартных категорий Сбербанка
     private val standardCategories = listOf(
@@ -138,19 +125,16 @@ class SberbankPdfImportUseCase(
                 emit(ImportResult.Error("Не удалось прочитать PDF-файл или файл пуст"))
                 return@flow
             }
-            
-            // Всегда используем "Сбер" как источник
-            val source = "Сбер"
-            
+
             // Добавляем источник "Сбер", если его еще нет в предпочтениях
-            addSourceIfNotExists(source)
+            addSourceIfNotExists()
             
             // Парсим данные из PDF и преобразуем их в транзакции
             emit(ImportResult.Progress(20, 100, "Анализ выписки"))
             
             // Используем таймаут для парсинга транзакций
             val transactions = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
-                parsePdfTransactions(pdfLines, source)
+                parsePdfTransactions(pdfLines)
             } ?: run {
                 emit(ImportResult.Error("Превышено время ожидания при анализе PDF-файла. Файл может содержать слишком много транзакций или иметь сложную структуру."))
                 return@flow
@@ -233,38 +217,20 @@ class SberbankPdfImportUseCase(
     }
 
     /**
-     * Извлекает номер карты из текста выписки
-     */
-    private fun extractCardNumber(text: String): String? {
-        val cardNumberMatcher = cardNumberPattern.matcher(text)
-        return if (cardNumberMatcher.find()) {
-            "Карта ${cardNumberMatcher.group(1)}"
-        } else {
-            val cardMatch = "••••\\s*\\d+".toRegex().find(text)
-            if (cardMatch != null) {
-                "Карта ${cardMatch.value}"
-            } else {
-                null
-            }
-        }
-    }
-
-    /**
      * Парсит транзакции из текста PDF выписки
      */
-    private fun parsePdfTransactions(pdfLines: List<String>, source: String): List<Transaction> {
+    private fun parsePdfTransactions(pdfLines: List<String>): List<Transaction> {
+        val fixedSource = "Сбер"
         val transactions = mutableListOf<Transaction>()
         
-        // Проверяем, является ли выписка форматом с таблицей "Расшифровка операций"
         val isTableFormat = pdfLines.any { 
             it.contains("Расшифровка операций", ignoreCase = true) &&
             (it.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true) || pdfLines.any { line -> line.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true) })
         }
         
         if (isTableFormat) {
-            // Обрабатываем формат таблицы "Расшифровка операций"
             Timber.d("Обнаружен формат таблицы 'Расшифровка операций', используем специальную обработку")
-            return parseTableFormat(pdfLines, source)
+            return parseTableFormat(pdfLines)
         }
         
         // Продолжаем стандартную обработку для обычной выписки
@@ -315,16 +281,16 @@ class SberbankPdfImportUseCase(
                     
                     // Создаем объект транзакции
                     val transaction = Transaction(
-                        id = "sber_pdf_${date.time}_${System.nanoTime()}",
+                        id = "sber_pdf_${date.time}_${amount}_${System.nanoTime()}",
                         amount = amount,
                         category = category,
                         date = date,
                         isExpense = isExpense,
                         note = note,
-                        source = source,
-                        sourceColor = ColorUtils.getSourceColor(source) ?: 
-                                    (if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                                     if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                        source = fixedSource,
+                        sourceColor = if (isTransfer) TransferColorInt
+                        else ColorUtils.getSourceColorByName(fixedSource)?.toArgb()
+                            ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
                         isTransfer = isTransfer
                     )
                     
@@ -340,7 +306,8 @@ class SberbankPdfImportUseCase(
     /**
      * Парсит выписку в формате таблицы "Расшифровка операций"
      */
-    private fun parseTableFormat(pdfLines: List<String>, source: String): List<Transaction> {
+    private fun parseTableFormat(pdfLines: List<String>): List<Transaction> {
+        val fixedSource = "Сбер"
         val transactions = mutableListOf<Transaction>()
         
         Timber.d("Начинаю парсинг таблицы, строк: ${pdfLines.size}")
@@ -376,7 +343,7 @@ class SberbankPdfImportUseCase(
         
         if (!hasFoundHeader) {
             Timber.d("Не найден заголовок таблицы, пробуем анализировать данные напрямую")
-            return parseIndividualStatement(pdfLines, source)
+            return parseIndividualStatement(pdfLines)
         }
         
         // Пропускаем строки заголовка и подзаголовка
@@ -389,10 +356,8 @@ class SberbankPdfImportUseCase(
         Timber.d("Начало данных таблицы: строка $dataIndex")
         
         // Отладочный вывод первых строк после заголовка
-        if (tableStartIndex >= 0) {
-            for (i in tableStartIndex until minOf(tableStartIndex + 10, pdfLines.size)) {
-                Timber.d("Строка ${i}: ${pdfLines[i]}")
-            }
+        for (i in tableStartIndex until minOf(tableStartIndex + 10, pdfLines.size)) {
+            Timber.d("Строка ${i}: ${pdfLines[i]}")
         }
         
         // Теперь анализируем строки данных, предполагая структуру из трех столбцов
@@ -463,8 +428,8 @@ class SberbankPdfImportUseCase(
                             // Парсим сумму
                             val amountStr = amountMatch.value
                             val parsedAmount = safeParseAmount(amountStr)
-                            
-                            if (parsedAmount != null && parsedAmount > Money.zero()) {
+
+                            if (parsedAmount != null) {
                                 // Определяем тип операции (расход/доход)
                                 var isExpense = !amountStr.startsWith("+")
                                 
@@ -611,8 +576,8 @@ class SberbankPdfImportUseCase(
                                     date = currentDate,
                                     isExpense = finalIsExpense,
                                     note = noteText,
-                                    source = source,
-                                    sourceColor = if (finalIsExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR,
+                                    source = fixedSource,
+                                    sourceColor = if (finalIsExpense) ExpenseColorInt else IncomeColorInt,
                                     isTransfer = false
                                 )
                                 
@@ -671,7 +636,8 @@ class SberbankPdfImportUseCase(
     /**
      * Специализированный метод для парсинга индивидуальной выписки с тремя столбцами
      */
-    private fun parseIndividualStatement(pdfLines: List<String>, source: String): List<Transaction> {
+    private fun parseIndividualStatement(pdfLines: List<String>): List<Transaction> {
+        val fixedSource = "Сбер"
         val transactions = mutableListOf<Transaction>()
         
         Timber.d("Анализирую выписку напрямую, строк: ${pdfLines.size}")
@@ -732,8 +698,8 @@ class SberbankPdfImportUseCase(
                             // Парсим сумму
                             val amountStr = amountMatch.value
                             val parsedAmount = safeParseAmount(amountStr)
-                            
-                            if (parsedAmount != null && parsedAmount > Money.zero()) {
+
+                            if (parsedAmount != null) {
                                 // Определяем тип операции (расход/доход)
                                 var isExpense = !amountStr.startsWith("+")
                                 
@@ -870,8 +836,8 @@ class SberbankPdfImportUseCase(
                                     date = date,
                                     isExpense = isExpense,
                                     note = noteText,
-                                    source = source,
-                                    sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                                    source = fixedSource,
+                                    sourceColor = if (isExpense) ExpenseColorInt else IncomeColorInt,
                                     isTransfer = category == "Переводы" || category == "Перевод на карту" || 
                                                 noteText.lowercase().contains("перевод") || 
                                                 description.lowercase().contains("перевод")
@@ -898,37 +864,6 @@ class SberbankPdfImportUseCase(
         
         // Возвращаем обработанные транзакции, удаляя дубликаты
         return removeDuplicateTransactions(transactions)
-    }
-    
-    /**
-     * Преобразует категорию Сбербанка в категорию приложения
-     */
-    private fun mapSberbankCategory(category: String): String {
-        return when (category.trim().lowercase(Locale.getDefault())) {
-            "супермаркеты" -> "Продукты"
-            "рестораны" -> "Рестораны"
-            "транспорт" -> "Транспорт"
-            "одежда и обувь" -> "Одежда"
-            "здоровье и красота" -> "Здоровье"
-            "связь, интернет" -> "Связь"
-            "коммунальные услуги" -> "Коммунальные платежи"
-            "дом, ремонт" -> "Дом"
-            "развлечения" -> "Развлечения"
-            "прочие операции" -> "Другое"
-            "переводы" -> "Переводы"
-            else -> category // Возвращаем оригинальную категорию, если не найдено соответствие
-        }
-    }
-    
-    /**
-     * Проверяет наличие положительных индикаторов в строке
-     */
-    private fun containsPositiveSign(line: String): Boolean {
-        val lowerLine = line.lowercase(Locale.getDefault())
-        return lowerLine.contains("возврат") || 
-               lowerLine.contains("пополнение") || 
-               lowerLine.contains("зачисление") ||
-               lowerLine.contains("поступление")
     }
     
     /**
@@ -1076,7 +1011,7 @@ class SberbankPdfImportUseCase(
                         val year = parts[2].toInt()
                         return LocalDate.of(year, month, day)
                     }
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Если не удалось преобразовать дату, продолжаем поиск
                     continue
                 }
@@ -1112,7 +1047,7 @@ class SberbankPdfImportUseCase(
             if (day in 1..31) {
                 try {
                     return LocalDate.of(year, month, day)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Игнорируем невалидные даты (например, 31 февраля)
                 }
             }
@@ -1268,7 +1203,7 @@ class SberbankPdfImportUseCase(
                         continue
                     }
                     return Pair(amount, isExpense)
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                     // Если не удалось преобразовать в число, продолжаем поиск
                     continue
                 }
@@ -1299,7 +1234,7 @@ class SberbankPdfImportUseCase(
                 }
                 
                 return Pair(amount, isExpense)
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Игнорируем ошибки преобразования
             }
         }
@@ -1410,25 +1345,22 @@ class SberbankPdfImportUseCase(
     }
     
     /**
-     * Добавляет источник в настройки, если его там еще нет
-     * 
-     * @param sourceName Название источника
+     * Добавляет источник "Сбер" в настройки, если его там еще нет
      */
-    private fun addSourceIfNotExists(sourceName: String) {
-        // Проверяем, есть ли уже такой источник в списке пользовательских
-        val customSources = sourcePreferences.getCustomSources()
-        if (customSources.none { it.name == sourceName }) {
-            // Определяем цвет для источника
-            val sourceColor = ColorUtils.getSourceColor(sourceName) ?: ColorUtils.predefinedColors.random()
-            
-            // Создаем и добавляем новый источник
+    private fun addSourceIfNotExists() {
+        val fixedSourceName = "Сбер" // Using the constant value directly
+        val currentSources: List<Source> = sourcePreferences.getCustomSources().toList()
+        if (currentSources.none { it.name.equals(fixedSourceName, ignoreCase = true) }) {
+            Timber.d("Добавляем новый источник: $fixedSourceName")
+            val sourceColorInt = ColorUtils.getSourceColorByName(fixedSourceName)?.toArgb()
+                ?: DefaultSourceColorInt 
+
             val newSource = Source(
-                name = sourceName,
-                color = sourceColor,
-                isCustom = true
+                name = fixedSourceName,
+                color = sourceColorInt
             )
-            sourcePreferences.addCustomSource(newSource)
-            Timber.d("Добавлен новый источник: $sourceName с цветом ${sourceColor.toString(16)}")
+            val updatedSources = (currentSources + newSource).distinctBy { it.name }
+            sourcePreferences.saveCustomSources(updatedSources)
         }
     }
 } 

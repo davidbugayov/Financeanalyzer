@@ -1,22 +1,14 @@
 package com.davidbugayov.financeanalyzer.presentation.history.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandVertically
-import androidx.compose.animation.shrinkVertically
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
@@ -24,7 +16,6 @@ import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Divider
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -38,10 +29,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
@@ -49,11 +37,9 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import kotlinx.coroutines.launch
-import java.text.SimpleDateFormat
-import java.util.Locale
-import java.time.LocalDate
 
 /**
  * Компонент для отображения сгруппированных транзакций с поддержкой пагинации.
@@ -110,7 +96,7 @@ fun TransactionGroupList(
         modifier = Modifier.fillMaxWidth()
     ) {
         transactionGroups.forEach { group ->
-            val isExpanded = expandedGroups[group.date] ?: false
+            val isExpanded = expandedGroups[group.date] == true
             
             // Заголовок группы
             item(key = "header_${group.date}") {
@@ -143,10 +129,10 @@ fun TransactionGroupList(
                     TransactionItem(
                         transaction = transaction,
                         onClick = { onTransactionClick(transaction) },
-                        onLongClick = { onTransactionLongClick(transaction) },
+                        onTransactionLongClick = { onTransactionLongClick(transaction) },
                         showDivider = false,
                         animationDelay = 0L,
-                        isAnimated = false
+                        animated = false
                     )
                     
                     HorizontalDivider(
@@ -229,8 +215,8 @@ private fun ExpandableGroupHeader(
             
             val balanceText = balance.formatted(showSign = true)
             val balanceColor = when {
-                balance.isPositive() -> Color(ColorUtils.INCOME_COLOR)
-                balance.isNegative() -> Color(ColorUtils.EXPENSE_COLOR)
+                balance.isPositive() -> LocalIncomeColor.current
+                balance.isNegative() -> LocalExpenseColor.current
                 else -> MaterialTheme.colorScheme.onSurface
             }
             

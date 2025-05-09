@@ -11,6 +11,7 @@ package com.davidbugayov.financeanalyzer.domain.model
  * @property periodDuration Продолжительность расчетного периода в днях (по умолчанию 14 дней)
  * @property periodStartDate Дата начала текущего расчетного периода (в миллисекундах)
  * @property linkedCategories Список категорий, транзакции которых учитываются в этом кошельке
+ * @property color Цвет кошелька
  */
 data class Wallet(
     val name: String,
@@ -20,5 +21,6 @@ data class Wallet(
     val balance: Money = Money.zero(),
     val periodDuration: Int = 14,
     val periodStartDate: Long = System.currentTimeMillis(),
-    val linkedCategories: List<String> = emptyList()
+    val linkedCategories: List<String> = emptyList(),
+    val color: Int? = null
 )

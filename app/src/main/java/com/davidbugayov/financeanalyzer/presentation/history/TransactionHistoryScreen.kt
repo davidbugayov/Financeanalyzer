@@ -58,12 +58,9 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import timber.log.Timber
-import java.text.SimpleDateFormat
-import java.util.Locale
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -254,14 +251,16 @@ fun TransactionHistoryScreen(
     // Диалог выбора источника
     if (state.showSourceDialog) {
         // Получаем список всех источников из utils
-        val sources = remember {
-            val defaultSources = ColorUtils.defaultSources
-            defaultSources + listOf(Source(name = "Наличные", color = 0xFF9E9E9E.toInt()))
-        }
+        // TODO: Источники должны приходить из ViewModel/state (например, state.availableSources)
+        // val sources = remember {
+        //     val defaultSources = ColorUtils.defaultSources // ОШИБКА: defaultSources удален
+        //     defaultSources + listOf(Source(name = "Наличные", color = 0xFF9E9E9E.toInt()))
+        // }
+        val sourcesPlaceholder: List<Source> = emptyList() // Временная заглушка
 
         SourceSelectionDialog(
             selectedSources = state.selectedSources,
-            sources = sources,
+            sources = sourcesPlaceholder, // Используем заглушку
             onSourcesSelected = { selectedSources ->
                 viewModel.onEvent(TransactionHistoryEvent.SetSources(selectedSources))
                 viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)

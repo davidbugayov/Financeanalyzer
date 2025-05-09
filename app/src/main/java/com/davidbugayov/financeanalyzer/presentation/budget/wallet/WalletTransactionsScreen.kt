@@ -346,6 +346,7 @@ fun WalletTransactionsScreen(
                             TransactionItem(
                                 transaction = transaction,
                                 onClick = {},
+                                onTransactionLongClick = { /* TODO: Handle long click */ },
                                 showDivider = true
                             )
                         }

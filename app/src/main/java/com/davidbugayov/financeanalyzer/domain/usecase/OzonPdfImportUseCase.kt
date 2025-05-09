@@ -2,12 +2,20 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.graphics.toArgb
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.DefaultSourceColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.TransferColorInt
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
@@ -16,18 +24,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import kotlinx.coroutines.withTimeoutOrNull
+import timber.log.Timber
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import java.util.regex.Matcher
 import java.util.regex.Pattern
-import kotlin.math.absoluteValue
-import timber.log.Timber
-import android.graphics.Color
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences.CustomCategoryData
 
 /**
  * Реализация импорта транзакций из PDF-выписки Озон Банка.
@@ -50,9 +52,7 @@ class OzonPdfImportUseCase(
         
         // Регулярные выражения для парсинга данных
         private val DATE_PATTERN = Pattern.compile("(\\d{2}\\.\\d{2}\\.\\d{4})(\\s+\\d{2}:\\d{2}:\\d{2})?")
-        private val AMOUNT_PATTERN = Pattern.compile("([-+]?\\s*\\d+[\\s\\d]*[.,]\\d{2})") // Общий шаблон для сумм
         private val OPERATION_NUMBER_PATTERN = Pattern.compile("(\\d{7,})")
-        private val CARD_NUMBER_PATTERN = Pattern.compile("карт[аеыу]\\s+(\\d{4})")
     }
 
     override val bankName: String = "Озон Банк"
@@ -118,18 +118,15 @@ class OzonPdfImportUseCase(
                 // Продолжаем обработку, но выводим предупреждение
             }
             
-            // Всегда используем "Озон" как источник
-            val source = "Озон Банк"
-            
             // Добавляем источник "Озон Банк", если его еще нет в предпочтениях
-            addSourceIfNotExists(source)
+            addSourceIfNotExists()
             
             // Парсим данные из PDF и преобразуем их в транзакции
             emit(ImportResult.Progress(20, 100, "Анализ выписки"))
             
             // Используем таймаут для парсинга транзакций
             val transactions = withTimeoutOrNull(PDF_PARSING_TIMEOUT) {
-                parsePdfTransactions(pdfLines, source)
+                parsePdfTransactions(pdfLines)
             } ?: run {
                 emit(ImportResult.Error("Превышено время ожидания при обработке данных PDF-файла"))
                 return@flow
@@ -214,7 +211,7 @@ class OzonPdfImportUseCase(
     /**
      * Парсит транзакции из текста PDF-файла Озон Банка
      */
-    private suspend fun parsePdfTransactions(lines: List<String>, source: String): List<Transaction> {
+    private fun parsePdfTransactions(lines: List<String>): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         
         // Выводим первые 30 строк для отладки
@@ -338,8 +335,8 @@ class OzonPdfImportUseCase(
                     
                     // Финальное описание транзакции
                     val descriptionText = fullDescriptionBuilder.toString().trim()
-                    
-                    if (amountFound && amount > 0) {
+
+                    if (amountFound) {
                         // Дополнительная проверка типа транзакции
                         isExpense = if (descriptionText.contains("перевод", ignoreCase = true) && 
                                        descriptionText.contains("отправитель", ignoreCase = true)) {
@@ -364,10 +361,10 @@ class OzonPdfImportUseCase(
                             date = date,
                             isExpense = isExpense,
                             note = descriptionText.takeIf { it.isNotBlank() },
-                            source = source,
-                            sourceColor = ColorUtils.getSourceColor(source) ?: 
-                                       (if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                                        if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+                            source = bankName,
+                            sourceColor = if (isTransfer) TransferColorInt
+                            else ColorUtils.getSourceColorByName(bankName)?.toArgb()
+                                ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
                             isTransfer = isTransfer
                         )
                         
@@ -387,26 +384,6 @@ class OzonPdfImportUseCase(
         return transactions
     }
 
-    /**
-     * Извлекает ID документа из строки
-     */
-    private fun extractDocumentId(line: String): String {
-        val matcher = OPERATION_NUMBER_PATTERN.matcher(line)
-        return if (matcher.find()) {
-            matcher.group(1) ?: "unknown_${System.currentTimeMillis()}"
-        } else {
-            "unknown_${System.currentTimeMillis()}"
-        }
-    }
-
-    /**
-     * Нормализует строку с суммой для корректного парсинга
-     */
-    private fun normalizeAmount(amount: String): String {
-        return amount.replace(" ", "")
-            .replace(",", ".")
-            .trim()
-    }
     
     /**
      * Парсит дату из строки
@@ -516,24 +493,17 @@ class OzonPdfImportUseCase(
     
     /**
      * Добавляет источник в настройки, если его там еще нет
-     * 
-     * @param sourceName Название источника
-     */
-    private fun addSourceIfNotExists(sourceName: String) {
-        // Проверяем, есть ли уже такой источник в списке пользовательских
-        val customSources = sourcePreferences.getCustomSources()
-        if (customSources.none { it.name == sourceName }) {
-            // Определяем цвет для источника
-            val sourceColor = ColorUtils.getSourceColor(sourceName) ?: ColorUtils.predefinedColors.random()
-            
-            // Создаем и добавляем новый источник
+     * */
+    private fun addSourceIfNotExists() {
+        val currentSources = sourcePreferences.getCustomSources()
+        if (currentSources.none { it.name.equals(bankName, ignoreCase = true) }) {
             val newSource = Source(
-                name = sourceName,
-                color = sourceColor,
-                isCustom = true
+                name = bankName,
+                // Используем DefaultSourceColorInt, т.к. у Озона обычно свой цвет
+                color = ColorUtils.getSourceColorByName(bankName)?.toArgb() ?: DefaultSourceColorInt 
             )
-            sourcePreferences.addCustomSource(newSource)
-            Timber.d("Добавлен новый источник: $sourceName с цветом ${sourceColor.toString(16)}")
+            val updatedSources = (currentSources + newSource).distinctBy { it.name }
+            sourcePreferences.saveCustomSources(updatedSources)
         }
     }
 } 

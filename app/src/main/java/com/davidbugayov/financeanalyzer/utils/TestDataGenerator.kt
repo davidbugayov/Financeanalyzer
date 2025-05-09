@@ -1,7 +1,10 @@
 package com.davidbugayov.financeanalyzer.utils
 
+import androidx.compose.ui.graphics.toArgb
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
 import java.util.Calendar
 import java.util.Date
 import kotlin.random.Random
@@ -85,7 +88,8 @@ object TestDataGenerator {
                     date = date,
                     note = if (Random.nextBoolean()) "Примечание к транзакции" else null,
                     source = source,
-                    sourceColor = ColorUtils.getSourceColor(source) ?: (if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR)
+                    sourceColor = ColorUtils.getSourceColorByName(source)?.toArgb()
+                        ?: if (isExpense) ExpenseColorInt else IncomeColorInt
                 )
             )
         }

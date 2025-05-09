@@ -32,10 +32,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
 /**
  * Диалог выбора категорий для фильтрации транзакций.
@@ -69,8 +70,8 @@ fun CategorySelectionDialog(
     }
 
     // Цвета для категорий
-    val expenseColor = MaterialTheme.colorScheme.error
-    val incomeColor = Color(0xFF4CAF50) // Зеленый цвет для доходов
+    val expenseColor = LocalExpenseColor.current
+    val incomeColor = LocalIncomeColor.current
 
     AlertDialog(
         onDismissRequest = onDismiss,

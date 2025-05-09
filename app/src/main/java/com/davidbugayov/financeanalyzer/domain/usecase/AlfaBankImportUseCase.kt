@@ -2,20 +2,21 @@ package com.davidbugayov.financeanalyzer.domain.usecase
 
 import android.content.Context
 import android.net.Uri
+import androidx.compose.ui.graphics.toArgb
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
+import com.davidbugayov.financeanalyzer.ui.theme.TransferColorInt
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import org.apache.poi.hssf.usermodel.HSSFWorkbook
-import org.apache.poi.ss.usermodel.Cell
 import org.apache.poi.ss.usermodel.CellType
 import org.apache.poi.ss.usermodel.DateUtil
 import org.apache.poi.ss.usermodel.Row
 import org.apache.poi.ss.usermodel.Sheet
-import org.apache.poi.ss.usermodel.Workbook
 import org.apache.poi.xssf.usermodel.XSSFWorkbook
 import timber.log.Timber
 import java.io.BufferedReader
@@ -192,7 +193,7 @@ class AlfaBankImportUseCase(
                         }
                     } catch (fallbackError: Exception) {
                         Timber.e(fallbackError, "АЛЬФА-ИМПОРТ: Альтернативный метод тоже не сработал")
-                        emit(ImportResult.Error("Не удалось обработать XLSX файл: ${e.message}\nАльтернативный метод не сработал: ${fallbackError.message}"))
+                        emit(ImportResult.Error("Не удалось обработать XLSX файл: ${fallbackError.message}\nАльтернативный метод не сработал: ${fallbackError.message}"))
                     }
                 }
             }
@@ -448,7 +449,7 @@ class AlfaBankImportUseCase(
             // Закрываем поток входных данных в блоке finally
             try {
                 inputStream.close()
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Игнорируем ошибки при закрытии
             }
         }
@@ -489,11 +490,11 @@ class AlfaBankImportUseCase(
                 rowText.contains("дата проводки") ||
                 containsCategory ||
                 containsDescription) {
-                
-                Timber.d("АЛЬФА-ИМПОРТ: Найден заголовок в строке ${i + 1}, содержит: " +
-                       "дата=${containsDate}, сумма=${containsAmount}, " + 
-                       "категория=${containsCategory}, описание=${containsDescription}, " +
-                       "код=${containsCode}, статус=${containsStatus}")
+
+                Timber.d(
+                    "АЛЬФА-ИМПОРТ: Найден заголовок в строке %d, содержит: дата=%s, сумма=%s, категория=%s, описание=%s, код=%s, статус=%s",
+                    i + 1, containsDate, containsAmount, containsCategory, containsDescription, containsCode, containsStatus
+                )
                 return row
             }
         }
@@ -511,12 +512,10 @@ class AlfaBankImportUseCase(
                 
                 // Используем предыдущую строку как заголовок, если она существует
                 val headerIdx = i - 1
-                if (headerIdx >= 0) {
-                    val headerRow = sheet.getRow(headerIdx)
-                    if (headerRow != null) {
-                        Timber.d("АЛЬФА-ИМПОРТ: Используем строку ${headerIdx + 1} как заголовок")
-                        return headerRow
-                    }
+                val headerRow = sheet.getRow(headerIdx)
+                if (headerRow != null) {
+                    Timber.d("АЛЬФА-ИМПОРТ: Используем строку ${headerIdx + 1} как заголовок")
+                    return headerRow
                 }
                 
                 // Если предыдущей строки нет, создаем виртуальный заголовок
@@ -719,7 +718,7 @@ class AlfaBankImportUseCase(
                         else -> parseDate(dateCell.toString())
                     }
                 } catch (e: Exception) {
-                    Timber.w(e, "АЛЬФА-ИМПОРТ: Ошибка парсинга даты: ${dateCell.toString()}")
+                    Timber.w(e, "АЛЬФА-ИМПОРТ: Ошибка парсинга даты: $dateCell")
                     Date() // Если не удалось распарсить, используем текущую дату
                 }
             }
@@ -764,9 +763,8 @@ class AlfaBankImportUseCase(
             isExpense = isExpense,
             note = description,
             source = "Альфа-Банк",
-            sourceColor = ColorUtils.getSourceColor("альфа") ?:
-                        (if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                         if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+            sourceColor = ColorUtils.getSourceColorByName(bankName)?.toArgb() ?: (if (isTransfer) TransferColorInt else
+                if (isExpense) ExpenseColorInt else IncomeColorInt),
             isTransfer = isTransfer
         )
         
@@ -860,9 +858,8 @@ class AlfaBankImportUseCase(
             isExpense = isExpense,
             note = description,
             source = "Альфа-Банк",
-            sourceColor = ColorUtils.getSourceColor("альфа") ?:
-                        (if (isTransfer) ColorUtils.TRANSFER_COLOR else
-                         if (isExpense) ColorUtils.EXPENSE_COLOR else ColorUtils.INCOME_COLOR),
+            sourceColor = ColorUtils.getSourceColorByName(bankName)?.toArgb() ?: (if (isTransfer) TransferColorInt else
+                if (isExpense) ExpenseColorInt else IncomeColorInt),
             isTransfer = isTransfer
         )
 
@@ -876,7 +873,7 @@ class AlfaBankImportUseCase(
         for (format in dateFormats) {
             try {
                 return format.parse(dateString) ?: continue
-            } catch (e: Exception) {
+            } catch (_: Exception) {
                 // Пробуем следующий формат
             }
         }

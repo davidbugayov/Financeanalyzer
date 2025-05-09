@@ -40,6 +40,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import timber.log.Timber
+import java.util.Locale
 
 /**
  * Диалог настройки уведомлений о транзакциях.
@@ -184,7 +185,12 @@ fun NotificationSettingsDialog(
                             Text(
                                 text = stringResource(
                                     R.string.reminder_time_description,
-                                    String.format("%02d:%02d", state.transactionReminderTime?.first ?: 20, state.transactionReminderTime?.second ?: 0)
+                                    String.format(
+                                        Locale.getDefault(),
+                                        "%02d:%02d",
+                                        state.transactionReminderTime?.first ?: 20,
+                                        state.transactionReminderTime?.second ?: 0
+                                    )
                                 ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant

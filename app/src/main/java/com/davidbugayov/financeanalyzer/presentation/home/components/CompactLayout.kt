@@ -126,7 +126,7 @@ private fun CompactTransactionList(
             TransactionItem(
                 transaction = transaction,
                 onClick = onTransactionClick,
-                onLongClick = onTransactionLongClick,
+                onTransactionLongClick = onTransactionLongClick,
                 showDivider = true
             )
         }
