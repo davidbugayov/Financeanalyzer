@@ -7,6 +7,7 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.google.services)
     alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.compose.compiler)
 }
 
 fun getKeystoreProperties(): Properties {
@@ -80,7 +81,7 @@ android {
 
             // Additional optimizations
             ndk {
-                debugSymbolLevel = "FULL"
+                debugSymbolLevel = "NONE"
             }
         }
         debug {
@@ -131,15 +132,8 @@ android {
         // Enable compiler optimizations
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all", 
-            "-Xcontext-receivers",
-            // Compose optimizations
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:metricsDestination=${layout.buildDirectory.asFile.get()}/compose_metrics",
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:reportsDestination=${layout.buildDirectory.asFile.get()}/compose_reports",
-            "-P",
-            "plugin:androidx.compose.compiler.plugins.kotlin:stabilityConfigurationPath=${layout.buildDirectory.asFile.get()}/compose_stability.conf"
+            "-Xjvm-default=all",
+            "-Xcontext-receivers"
         )
     }
 
@@ -153,48 +147,29 @@ android {
         resValues = true
     }
 
-    composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
-    }
-
-    // Enable KSP optimizations
-    applicationVariants.all {
-        kotlin.sourceSets {
-            getByName(name) {
-                kotlin.srcDir("build/generated/ksp/$name/kotlin")
-            }
-        }
-    }
-    
     // Exclude POI and related libraries from minification
     packaging {
         resources {
             excludes += "META-INF/**"
         }
-        jniLibs {
-            useLegacyPackaging = true
-        }
     }
-}
 
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        // Additional Kotlin optimizations
-        allWarningsAsErrors = false
-        // Speed up incremental compilation
-        incremental = true
+    lint {
+        abortOnError = false
+        checkReleaseBuilds = true
+        // baseline = file("lint-baseline.xml") // Раскомментируйте и создайте файл для использования baseline
+        htmlReport = true
+        htmlOutput = layout.buildDirectory.file("reports/lint/lint-report.html").get().asFile
+        xmlReport = true
+        xmlOutput = layout.buildDirectory.file("reports/lint/lint-report.xml").get().asFile
+        
+        // Пример отключения конкретной проверки Lint (если необходимо)
+        // disable.add("TypographyFractions") // Замените "TypographyFractions" на ID нужной проверки
+        
+        // Пример установки уровня серьезности для проверки
+        // warning.add("ObsoleteLintCustomCheck")
     }
-}
 
-// Optimize build tasks with caching
-tasks.matching { it.name.contains("compile") }.configureEach {
-    outputs.cacheIf { true }
-}
-
-androidComponents {
-    onVariants(selector().withBuildType("release")) {
-        it.packaging.resources.excludes.add("META-INF/**")
-    }
 }
 
 dependencies {
@@ -227,14 +202,12 @@ dependencies {
     implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.compose.ui.test.manifest)
-    implementation(libs.androidx.lifecycle.runtime.compose)
 
     // Accompanist
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
     
     // Explicit dependency for Layout Inspector
-    debugImplementation(libs.compose.ui.tooling)
     debugImplementation(libs.androidx.customview)
     debugImplementation(libs.androidx.customview.poolingcontainer)
     
@@ -280,4 +253,27 @@ dependencies {
 
     // Add kotlinx-serialization for kotlinx-datetime
     implementation(libs.kotlinx.serialization.core)
+}
+
+composeCompiler {
+    // Включаем генерацию отчетов компилятора Compose (полезно для анализа рекомпозиций)
+    reportsDestination = layout.buildDirectory.dir("compose_compiler/reports")
+    
+    // Включаем генерацию метрик компилятора Compose (полезно для анализа производительности)
+    metricsDestination = layout.buildDirectory.dir("compose_compiler/metrics")
+    
+    // Позволяет указать файл конфигурации стабильности для классов, которые компилятор не может вывести автоматически.
+    // Это может помочь уменьшить количество ненужных рекомпозиций.
+    // Создайте файл stability_config.conf в корне проекта и перечислите стабильные классы,
+    // например:
+    // com.example.MyStableClass
+    // com.example.MyOtherStableClass
+    // stabilityConfigurationFile = rootProject.layout.projectDirectory.file("compose_stability.conf")
+
+    // Включение "strong skipping mode" может улучшить производительность, пропуская больше ненужных рекомпозиций,
+    // но требует, чтобы все Composable функции с нестабильными параметрами были помечены как @NonRestartableComposable или @Composable (с умом).
+    // strongSkipping = true // Используйте с осторожностью и после тщательного тестирования
+
+    // Если вы используете enableComposeCompilerMetrics или enableComposeCompilerReports в BuildConfig (старый способ),
+    // их можно удалить, так как эти настройки теперь здесь.
 }

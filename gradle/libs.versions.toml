@@ -1,49 +1,46 @@
 [versions]
 # Plugins
-androidGradlePlugin = "8.9.2"
-kotlin = "1.9.22"
+ androidGradlePlugin = "8.10.0"
+kotlin = "2.1.20"
 googleServices = "4.4.2"
-firebaseCrashlytics = "2.9.9"
+firebaseCrashlytics = "3.0.3"
 coroutines = "1.7.3"
 kotlinx-datetime = "0.4.1"
-kotlinx-serialization = "1.6.3"
+kotlinx-serialization = "1.7.3"
+composeBom = "2025.05.00"
 
 # AndroidX
-androidxCore = "1.12.0"
-androidxLifecycle = "2.8.7"
-androidxActivity = "1.8.2"
-androidxNavigation = "2.7.7"
+androidxCore = "1.16.0"
+androidxLifecycle = "2.9.0"
+androidxActivity = "1.10.1"
+androidxNavigation = "2.9.0"
 androidxSplashscreen = "1.0.1"
-material = "1.11.0"
-customView = "1.1.0"
-customViewPoolingContainer = "1.0.0"
+material = "1.12.0"
+customView = "1.2.0"
+customViewPoolingContainer = "1.1.0"
 
 # Compose
-composeBom = "2024.02.00"
-composeCompiler = "1.5.8"
-composeUiTooling = "1.7.8"
+composeUiTooling = "1.8.1"
 
 # Accompanist
 accompanist = "0.32.0"
 
 # Firebase
-firebaseBom = "32.7.4"
+firebaseBom = "33.13.0"
 
 # Koin
 koin = "3.5.3"
 
 # Testing
 junit = "4.13.2"
-androidxJunit = "1.2.1"
-espressoCore = "3.6.1"
 
 # Logging
 timber = "5.0.1"
 
 # Other
-room = "2.6.1"
-roomKsp = "1.9.22-1.0.17"
-gson = "2.10.1"
+room = "2.7.1"
+roomKsp = "2.1.20-2.0.1"
+gson = "2.11.0"
 pdfbox = "2.0.27.0"
 
 # Excel parsing libraries
@@ -76,7 +73,6 @@ compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
 compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "composeUiTooling" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-compose-ui-test-junit4 = { group = "androidx.compose.ui", name = "ui-test-junit4" }
 compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
@@ -115,8 +111,6 @@ pdfbox-android = { group = "com.tom-roush", name = "pdfbox-android", version.ref
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }
-androidx-test-junit = { group = "androidx.test.ext", name = "junit", version.ref = "androidxJunit" }
-androidx-test-espresso = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
 
 # Excel libraries
 poi-core = { group = "org.apache.poi", name = "poi", version.ref = "poi" }
@@ -128,6 +122,7 @@ kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
 google-services = { id = "com.google.gms.google-services", version.ref = "googleServices" }
 firebase-crashlytics = { id = "com.google.firebase.crashlytics", version.ref = "firebaseCrashlytics" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "roomKsp" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 
 [bundles]
 # ... existing bundles ...

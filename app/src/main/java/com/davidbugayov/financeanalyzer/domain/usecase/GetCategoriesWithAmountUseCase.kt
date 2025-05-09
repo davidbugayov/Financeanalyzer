@@ -18,8 +18,10 @@ class GetCategoriesWithAmountUseCase(
         val transactions = transactionRepository.getTransactionsByDateRange(startDate, endDate)
         
         // Filter by transaction type (income or expense)
-        val filteredTransactions = transactions.filter { transaction -> 
-            if (isIncome) transaction.amount.isPositive() else transaction.amount.isNegative()
+        val filteredTransactions = if (isIncome) {
+            transactions.filter { it.amount.isPositive() }
+        } else {
+            transactions.filter { it.amount.isNegative() }
         }
         
         // Group by category and sum amounts
