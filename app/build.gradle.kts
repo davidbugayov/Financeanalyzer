@@ -162,10 +162,10 @@ android {
         htmlOutput = layout.buildDirectory.file("reports/lint/lint-report.html").get().asFile
         xmlReport = true
         xmlOutput = layout.buildDirectory.file("reports/lint/lint-report.xml").get().asFile
-        
+
         // Пример отключения конкретной проверки Lint (если необходимо)
         // disable.add("TypographyFractions") // Замените "TypographyFractions" на ID нужной проверки
-        
+
         // Пример установки уровня серьезности для проверки
         // warning.add("ObsoleteLintCustomCheck")
     }
@@ -258,10 +258,10 @@ dependencies {
 composeCompiler {
     // Включаем генерацию отчетов компилятора Compose (полезно для анализа рекомпозиций)
     reportsDestination = layout.buildDirectory.dir("compose_compiler/reports")
-    
+
     // Включаем генерацию метрик компилятора Compose (полезно для анализа производительности)
     metricsDestination = layout.buildDirectory.dir("compose_compiler/metrics")
-    
+
     // Позволяет указать файл конфигурации стабильности для классов, которые компилятор не может вывести автоматически.
     // Это может помочь уменьшить количество ненужных рекомпозиций.
     // Создайте файл stability_config.conf в корне проекта и перечислите стабильные классы,
