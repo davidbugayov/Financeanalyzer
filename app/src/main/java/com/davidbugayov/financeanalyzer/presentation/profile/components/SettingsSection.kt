@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness6
 import androidx.compose.material.icons.filled.DarkMode
@@ -18,6 +19,7 @@ import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -30,8 +32,10 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import java.util.Locale
 
@@ -46,6 +50,7 @@ import java.util.Locale
  * @param transactionReminderTime Время напоминания о транзакциях (часы и минуты) или null, если отключено.
  * @param modifier Модификатор для настройки внешнего вида.
  */
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsSection(
     onThemeClick: () -> Unit,
@@ -61,8 +66,12 @@ fun SettingsSection(
     val hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
 
     Card(
-        modifier = modifier.fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(horizontal = dimensionResource(id = R.dimen.padding_medium)),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.radius_medium)),
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Column(
             modifier = Modifier

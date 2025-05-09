@@ -5,14 +5,16 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.FilterChip
+import androidx.compose.material3.FilterChipDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 /**
  * Компонент с чипами для выбора типа группировки транзакций.
@@ -36,19 +38,31 @@ fun GroupingChips(
         FilterChip(
             selected = currentGrouping == GroupingType.DAY,
             onClick = { onGroupingSelected(GroupingType.DAY) },
-            label = { Text(stringResource(R.string.group_by_day)) }
+            label = { Text(stringResource(R.string.group_by_day)) },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = LocalFriendlyCardBackgroundColor.current,
+                selectedLabelColor = MaterialTheme.colorScheme.primary
+            )
         )
 
         FilterChip(
             selected = currentGrouping == GroupingType.WEEK,
             onClick = { onGroupingSelected(GroupingType.WEEK) },
-            label = { Text(stringResource(R.string.group_by_week)) }
+            label = { Text(stringResource(R.string.group_by_week)) },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = LocalFriendlyCardBackgroundColor.current,
+                selectedLabelColor = MaterialTheme.colorScheme.primary
+            )
         )
 
         FilterChip(
             selected = currentGrouping == GroupingType.MONTH,
             onClick = { onGroupingSelected(GroupingType.MONTH) },
-            label = { Text(stringResource(R.string.group_by_month)) }
+            label = { Text(stringResource(R.string.group_by_month)) },
+            colors = FilterChipDefaults.filterChipColors(
+                selectedContainerColor = LocalFriendlyCardBackgroundColor.current,
+                selectedLabelColor = MaterialTheme.colorScheme.primary
+            )
         )
     }
 } 

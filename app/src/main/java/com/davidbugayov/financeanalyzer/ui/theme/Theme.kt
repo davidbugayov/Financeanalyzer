@@ -97,6 +97,7 @@ val LocalNegativeBackgroundColor = staticCompositionLocalOf { NegativeBackground
 val LocalNegativeTextColor = staticCompositionLocalOf { NegativeTextLight }
 val LocalErrorStateBackgroundColor = staticCompositionLocalOf { ErrorStateBackgroundLight }
 val LocalErrorStateContentColor = staticCompositionLocalOf { ErrorStateContentLight }
+val LocalFriendlyCardBackgroundColor = staticCompositionLocalOf { FriendlyCardBackgroundLight }
 
 @Composable
 fun FinanceAnalyzerTheme(
@@ -150,6 +151,7 @@ fun FinanceAnalyzerTheme(
     val negativeTextColor = if (darkTheme) NegativeTextDark else NegativeTextLight
     val errorStateBackgroundColor = if (darkTheme) ErrorStateBackgroundDark else ErrorStateBackgroundLight
     val errorStateContentColor = if (darkTheme) ErrorStateContentDark else ErrorStateContentLight
+    val friendlyCardBackgroundColor = if (darkTheme) FriendlyCardBackgroundDark else FriendlyCardBackgroundLight
 
     CompositionLocalProvider(
         LocalIncomeColor provides incomeColor,
@@ -169,7 +171,8 @@ fun FinanceAnalyzerTheme(
         LocalNegativeBackgroundColor provides negativeBackgroundColor,
         LocalNegativeTextColor provides negativeTextColor,
         LocalErrorStateBackgroundColor provides errorStateBackgroundColor,
-        LocalErrorStateContentColor provides errorStateContentColor
+        LocalErrorStateContentColor provides errorStateContentColor,
+        LocalFriendlyCardBackgroundColor provides friendlyCardBackgroundColor
     ) {
         MaterialTheme(
             colorScheme = colorScheme,

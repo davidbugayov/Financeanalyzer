@@ -29,6 +29,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
 /**
@@ -73,7 +74,8 @@ fun HomeGroupSummary(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)

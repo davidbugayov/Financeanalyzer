@@ -50,6 +50,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -251,13 +252,16 @@ private fun ShowDialogs(
  * @param modifier Модификатор для внешнего вида.
  */
 @Composable
-private fun BudgetSection(onNavigateToBudget: () -> Unit, modifier: Modifier = Modifier) {
+private fun BudgetSection(
+    onNavigateToBudget: () -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onNavigateToBudget),
+            .clickable { onNavigateToBudget() },
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
-        shape = MaterialTheme.shapes.medium
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Row(
             modifier = Modifier
@@ -287,19 +291,22 @@ private fun BudgetSection(onNavigateToBudget: () -> Unit, modifier: Modifier = M
  * @param modifier Модификатор для внешнего вида.
  */
 @Composable
-private fun ExportImportSection(onNavigateToExportImport: (String) -> Unit, modifier: Modifier = Modifier) {
+private fun ExportImportSection(
+    onNavigateToExportImport: (String) -> Unit,
+    modifier: Modifier = Modifier
+) {
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = { onNavigateToExportImport(Screen.ExportImport.route) }),
+            .fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
-        shape = MaterialTheme.shapes.medium
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
-        Row(
+        Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.profile_section_padding)),
-            verticalAlignment = Alignment.CenterVertically
+                .padding(dimensionResource(R.dimen.profile_section_padding))
+                .clickable { onNavigateToExportImport(Screen.ExportImport.route) },
+            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
         ) {
             Icon(
                 imageVector = Icons.Default.FileUpload,

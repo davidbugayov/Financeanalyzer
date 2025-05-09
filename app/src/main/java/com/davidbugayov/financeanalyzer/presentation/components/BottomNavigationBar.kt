@@ -25,12 +25,14 @@ import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material3.FilledIconButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.dimensionResource
@@ -145,12 +147,17 @@ private fun NavButton(
     ) {
             FilledIconButton(
                 onClick = onClick,
-                modifier = Modifier.size(dimensionResource(R.dimen.main_nav_button_size))
+                modifier = Modifier.size(dimensionResource(R.dimen.main_nav_button_size)),
+                colors = IconButtonDefaults.filledIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary, // Используем основной цвет темы для фона кнопки
+                    contentColor = Color.White // Явно задаем белый цвет для иконки
+                )
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = text,
                     modifier = Modifier.size(dimensionResource(R.dimen.main_nav_icon_size))
+                    // tint = Color.White - Уже управляется через contentColor в IconButtonDefaults
                 )
             }
 

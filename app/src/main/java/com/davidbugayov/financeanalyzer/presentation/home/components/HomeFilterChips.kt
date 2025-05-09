@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import timber.log.Timber
 
 /**
@@ -74,8 +75,19 @@ private fun FilterChipItem(
             )
         },
         colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = MaterialTheme.colorScheme.primaryContainer,
-            selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+            selectedContainerColor = LocalFriendlyCardBackgroundColor.current,
+            selectedLabelColor = MaterialTheme.colorScheme.primary,
+            // Оставляем цвета для невыбранного состояния по умолчанию или можно настроить их тоже, если нужно
+            // containerColor = ..., 
+            // labelColor = ..., 
+            // iconColor = ..., 
+            // selectedIconColor = ..., 
+            // disabledContainerColor = ..., 
+            // disabledLabelColor = ..., 
+            // disabledLeadingIconColor = ..., 
+            // disabledSelectedContainerColor = ..., 
+            // disabledSelectedLabelColor = ..., 
+            // disabledTrailingIconColor = ...
         )
     )
 }

@@ -70,6 +70,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -340,7 +341,7 @@ fun EnhancedFinanceChartScreen(
 
                                     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
                                     val periodText = "${dateFormat.format(state.startDate)} – ${dateFormat.format(state.endDate)}"
-                                                    
+
                                     EnhancedLineChart(
                                         incomeData = state.incomeLineChartData,
                                         expenseData = state.expenseLineChartData,
@@ -357,8 +358,7 @@ fun EnhancedFinanceChartScreen(
                                 Column(
                                     modifier = Modifier
                                         .fillMaxWidth()
-                                        .padding(top = 24.dp, bottom = 4.dp)
-                                        ,
+                                        .padding(top = 24.dp, bottom = 4.dp),
                                     horizontalAlignment = Alignment.CenterHorizontally
                                 ) {
                                     // Карточка "Полная статистика"
@@ -376,7 +376,10 @@ fun EnhancedFinanceChartScreen(
                                                 )
                                             },
                                         shape = RoundedCornerShape(16.dp),
-                                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                                        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                                        colors = CardDefaults.cardColors(
+                                            containerColor = LocalFriendlyCardBackgroundColor.current
+                                        )
                                     ) {
                                         Row(
                                             modifier = Modifier
@@ -417,7 +420,7 @@ fun EnhancedFinanceChartScreen(
                                             .padding(vertical = 4.dp),
                                         horizontalAlignment = Alignment.CenterHorizontally
                                     ) {
-                                    Text(
+                                        Text(
                                             text = stringResource(R.string.budget_tips_title),
                                             style = MaterialTheme.typography.titleMedium,
                                             color = MaterialTheme.colorScheme.primary,
@@ -461,7 +464,7 @@ fun EnhancedFinanceChartScreen(
                                 vertical = dimensionResource(R.dimen.finance_chart_screen_vertical_spacing)
                             )
                     )
-                    
+
                     // Если нужно прокручивать к карточке
                     if (shouldScrollToSummaryCard) {
                         LaunchedEffect(true) {

@@ -3,11 +3,32 @@ package com.davidbugayov.financeanalyzer.ui.theme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 
+// New Primary Palette based on #3DCFDC
+val NewPrimary = Color(0xFF3DCFDC)
+val OnNewPrimary = Color.Black // Adjusted for better contrast with a lighter primary
+val NewPrimaryLight = Color(0xFFE0F7FA) // Very light cyan/turquoise for light theme container
+val OnNewPrimaryContainer = Color(0xFF00373D) // Dark text for light container
+
+val NewPrimaryDark = Color(0xFF007C8C) // Darker cyan/turquoise for dark theme primary
+val DarkPrimaryContainer = Color(0xFF005662) // Dark container for dark theme
+val OnDarkPrimaryContainer = Color(0xFFB2EBF2) // Light text for dark container
+
+// New Teal Palette
+val TealPrimary = Color(0xFF009688) // Основной бирюзовый
+val TealPrimaryDark = Color(0xFF00796B) // Темный бирюзовый для контейнеров или акцентов в темной теме
+val TealPrimaryLight = Color(0xFFB2DFDB) // Светлый бирюзовый для контейнеров в светлой теме
+val OnTealPrimary = Color.White // Текст на основном бирюзовом
+val OnTealPrimaryContainer = Color(0xFF004D40) // Текст на светлых/темных бирюзовых контейнерах
+
+// Friendly Card Background Colors
+val FriendlyCardBackgroundLight = Color(0xFFE0F2F1) // Очень светлый бирюзовый (Soft Teal Light)
+val FriendlyCardBackgroundDark = Color(0xFF26A69A) //  Умеренно темный бирюзовый (Soft Teal Dark)
+
 // Material Theme Colors - Light
-val md_theme_light_primary = Color(0xFF2196F3) // Голубой для элементов управления
-val md_theme_light_onPrimary = Color.White
-val md_theme_light_primaryContainer = Color(0xFFE1F5FE) // Очень светлый голубой фон контейнера
-val md_theme_light_onPrimaryContainer = Color(0xFF1976D2)
+val md_theme_light_primary = NewPrimary
+val md_theme_light_onPrimary = OnNewPrimary
+val md_theme_light_primaryContainer = NewPrimaryLight
+val md_theme_light_onPrimaryContainer = OnNewPrimaryContainer
 val md_theme_light_secondary = Color(0xFF5677FC) // Более насыщенный синий для кнопки "Добавить"
 val md_theme_light_onSecondary = Color.White
 val md_theme_light_secondaryContainer = Color(0xFFB3E5FC)
@@ -29,10 +50,10 @@ val md_theme_light_onSurfaceVariant = Color(0xFF757575)
 val md_theme_light_outline = Color(0xFFBDBDBD)
 
 // Material Theme Colors - Dark
-val md_theme_dark_primary = Color(0xFF81CFEF) // Нежно-голубой
-val md_theme_dark_onPrimary = Color.Black
-val md_theme_dark_primaryContainer = Color(0xFF60A1C3) // Блекло-голубой фон контейнера
-val md_theme_dark_onPrimaryContainer = Color(0xFFD6F3FF)
+val md_theme_dark_primary = NewPrimaryDark
+val md_theme_dark_onPrimary = OnNewPrimary // Assuming black text works for NewPrimaryDark as well, or adjust if needed
+val md_theme_dark_primaryContainer = DarkPrimaryContainer
+val md_theme_dark_onPrimaryContainer = OnDarkPrimaryContainer
 val md_theme_dark_secondary = Color(0xFF64B5E8) // Блекло-голубой
 val md_theme_dark_onSecondary = Color.Black
 val md_theme_dark_secondaryContainer = Color(0xFF4D92BC) // Более темный голубой

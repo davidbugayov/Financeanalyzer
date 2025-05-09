@@ -3,9 +3,7 @@ package com.davidbugayov.financeanalyzer.data.local.entity
 import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.util.Date
 
 /**

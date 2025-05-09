@@ -15,6 +15,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
@@ -38,6 +39,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import kotlinx.coroutines.launch
 
@@ -181,6 +183,10 @@ private fun ExpandableGroupHeader(
     isExpanded: Boolean,
     onToggle: (Boolean) -> Unit
 ) {
+    val incomeColor = LocalIncomeColor.current
+    val expenseColor = LocalExpenseColor.current
+    val balanceTextColor = if (balance.amount.signum() >= 0) incomeColor else expenseColor
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -188,7 +194,8 @@ private fun ExpandableGroupHeader(
                 horizontal = dimensionResource(id = R.dimen.spacing_normal),
                 vertical = dimensionResource(id = R.dimen.spacing_small)
             )
-            .clickable { onToggle(!isExpanded) }
+            .clickable { onToggle(!isExpanded) },
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Row(
             modifier = Modifier
@@ -196,35 +203,32 @@ private fun ExpandableGroupHeader(
                 .padding(dimensionResource(id = R.dimen.spacing_normal)),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            // Иконка для сворачивания/разворачивания
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = if (isExpanded) "Свернуть" else "Развернуть",
-                tint = MaterialTheme.colorScheme.primary
+                tint = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
-            Spacer(modifier = Modifier.width(8.dp))
-            
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
             Text(
                 text = date,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold
+                modifier = Modifier.weight(1f),
+                fontWeight = FontWeight.Medium
             )
-            
-            Spacer(modifier = Modifier.weight(1f))
-            
-            val balanceText = balance.formatted(showSign = true)
-            val balanceColor = when {
-                balance.isPositive() -> LocalIncomeColor.current
-                balance.isNegative() -> LocalExpenseColor.current
-                else -> MaterialTheme.colorScheme.onSurface
+
+            val rawFormattedBalance = balance.format()
+            val displayText = when {
+                balance.amount.signum() > 0 && !rawFormattedBalance.startsWith("+") -> "+" + rawFormattedBalance
+                balance.amount.signum() < 0 && rawFormattedBalance.startsWith("+-") -> rawFormattedBalance.drop(1)
+                balance.amount.signum() < 0 && rawFormattedBalance.startsWith("+") -> "-" + rawFormattedBalance.drop(1)
+                else -> rawFormattedBalance
             }
-            
+
             Text(
-                text = balanceText,
+                text = displayText,
                 style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Bold,
-                color = balanceColor
+                color = balanceTextColor,
+                fontWeight = FontWeight.Bold
             )
         }
     }
