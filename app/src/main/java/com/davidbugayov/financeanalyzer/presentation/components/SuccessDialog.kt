@@ -56,6 +56,7 @@ fun SuccessDialog(
                 )
             }
         },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Text(
                 text = message,

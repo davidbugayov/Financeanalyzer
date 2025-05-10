@@ -460,18 +460,23 @@ fun BudgetScreen(
                         Button(
                             onClick = {
                                 val amount = walletAmount.toDoubleOrNull() ?: 0.0
-                                if (amount > 0 && amount <= selectedWallet!!.balance.amount) {
-                                    viewModel.onEvent(
-                                        BudgetEvent.SpendFromWallet(
-                                            selectedWallet!!,
-                                            Money(amount)
+                                // Ensure selectedWallet is not null again for safety, though checked in outer if
+                                selectedWallet?.let { sw ->
+                                    if (amount > 0 && walletAmount.toBigDecimalOrNull()?.let { it <= sw.balance.amount } == true) {
+                                        viewModel.onEvent(
+                                            BudgetEvent.SpendFromWallet(
+                                                sw.id, // Corrected: pass ID
+                                                Money(amount)
+                                            )
                                         )
-                                    )
-                                    walletAmount = ""
-                                    showSpendFromWalletDialog = false
+                                        walletAmount = ""
+                                        showSpendFromWalletDialog = false
+                                    }
                                 }
                             },
-                            enabled = walletAmount.toBigDecimalOrNull() != null && walletAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO && walletAmount.toBigDecimalOrNull()!! <= selectedWallet!!.balance.amount
+                            enabled = selectedWallet?.let { sw ->
+                                walletAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sw.balance.amount } ?: false
+                            } ?: false
                         ) {
                             Text("Потратить")
                         }
@@ -549,20 +554,25 @@ fun BudgetScreen(
                         Button(
                             onClick = {
                                 val amount = transferAmount.toDoubleOrNull() ?: 0.0
-                                if (amount > 0 && selectedFromWallet != null && selectedToWallet != null) {
-                                    viewModel.onEvent(
-                                        BudgetEvent.TransferBetweenWallets(
-                                            selectedFromWallet!!,
-                                            selectedToWallet!!,
-                                            Money(amount)
+                                // Ensure selectedFromWallet and selectedToWallet are not null again for safety
+                                if (selectedFromWallet != null && selectedToWallet != null) {
+                                    if (amount > 0 && transferAmount.toBigDecimalOrNull()?.let { it <= selectedFromWallet!!.balance.amount } == true) {
+                                        viewModel.onEvent(
+                                            BudgetEvent.TransferBetweenWallets(
+                                                selectedFromWallet!!.id, // Corrected: pass ID
+                                                selectedToWallet!!.id,   // Corrected: pass ID
+                                                Money(amount)
+                                            )
                                         )
-                                    )
-                                    transferAmount = ""
-                                    selectedToWallet = null
-                                    showTransferDialog = false
+                                        transferAmount = ""
+                                        selectedToWallet = null
+                                        showTransferDialog = false
+                                    }
                                 }
                             },
-                            enabled = selectedToWallet != null && transferAmount.toBigDecimalOrNull() != null && transferAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO && transferAmount.toBigDecimalOrNull()!! <= selectedFromWallet!!.balance.amount
+                            enabled = selectedFromWallet?.let { sfw ->
+                                selectedToWallet != null && transferAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } ?: false
+                            } ?: false
                         ) {
                             Text("Перевести")
                         }

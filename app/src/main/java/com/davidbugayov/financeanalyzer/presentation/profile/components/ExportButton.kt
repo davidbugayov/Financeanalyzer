@@ -92,6 +92,7 @@ private fun ActionChoiceDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.export_choose_action)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             if (filePath != null) {
                 Text(stringResource(R.string.exported_file_path, filePath))

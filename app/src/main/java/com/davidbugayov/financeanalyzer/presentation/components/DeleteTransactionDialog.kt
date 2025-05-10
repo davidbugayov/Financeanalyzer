@@ -61,6 +61,7 @@ fun DeleteTransactionDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.delete_transaction)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = { 
             Column {
                 Text(

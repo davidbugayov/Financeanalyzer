@@ -10,6 +10,7 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import timber.log.Timber
+import androidx.compose.material3.MaterialTheme
 
 @Composable
 fun PermissionDialogs(
@@ -29,6 +30,7 @@ fun PermissionDialogs(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.permission_required_title)) },
         text = { Text(stringResource(R.string.permission_required_text)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         confirmButton = {
             Button(onClick = {
                 PermissionUtils.handleNotificationPermission(
