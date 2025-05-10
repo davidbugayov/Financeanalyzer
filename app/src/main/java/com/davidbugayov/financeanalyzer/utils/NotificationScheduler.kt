@@ -7,24 +7,33 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
 import timber.log.Timber
 import java.util.Calendar
+
+// Интерфейс для NotificationScheduler
+interface INotificationScheduler {
+
+    fun updateTransactionReminder(isEnabled: Boolean, reminderTime: Time? = null)
+}
 
 /**
  * Класс для планирования и управления уведомлениями.
  */
-object NotificationScheduler {
+class NotificationScheduler(
+    private val applicationContext: Context,
+    private val preferencesManager: PreferencesManager // Добавляем PreferencesManager как зависимость
+) : INotificationScheduler {
 
-    private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
-    private const val TRANSACTION_REMINDER_REQUEST_CODE = 1001
+    private val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
+    private val TRANSACTION_REMINDER_REQUEST_CODE = 1001
 
     /**
      * Создает канал уведомлений для Android 8.0 (API 26) и выше.
-     * @param context Контекст приложения.
      */
-    private fun createNotificationChannel(context: Context) {
-        val name = context.getString(R.string.transaction_reminder_channel_name)
-        val description = context.getString(R.string.transaction_reminder_channel_description)
+    private fun createNotificationChannel() { // Убираем context из параметра
+        val name = applicationContext.getString(R.string.transaction_reminder_channel_name)
+        val description = applicationContext.getString(R.string.transaction_reminder_channel_description)
         val importance = NotificationManager.IMPORTANCE_DEFAULT
 
         val channel =
@@ -33,24 +42,23 @@ object NotificationScheduler {
             }
 
         val notificationManager =
-            context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
+            applicationContext.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.createNotificationChannel(channel)
     }
 
     /**
      * Планирует ежедневное уведомление о необходимости внести транзакции.
-     * @param context Контекст приложения.
      * @param hour Час для отправки уведомления (0-23).
      * @param minute Минута для отправки уведомления (0-59).
      */
-    fun scheduleTransactionReminder(context: Context, hour: Int, minute: Int) {
+    internal fun scheduleTransactionReminder(hour: Int, minute: Int) { // Убираем context из параметра
         // Создаем канал уведомлений
-        createNotificationChannel(context)
+        createNotificationChannel()
         
         // Создаем Intent для BroadcastReceiver, который будет показывать уведомление
-        val alarmIntent = Intent(context, TransactionReminderReceiver::class.java)
+        val alarmIntent = Intent(applicationContext, TransactionReminderReceiver::class.java)
         val alarmPendingIntent = PendingIntent.getBroadcast(
-            context,
+            applicationContext,
             TRANSACTION_REMINDER_REQUEST_CODE,
             alarmIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
@@ -70,10 +78,9 @@ object NotificationScheduler {
         }
         
         // Получаем AlarmManager и планируем повторяющееся уведомление
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+        val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         
         try {
-            // Для Android 6.0 (API 23) и выше используем setExactAndAllowWhileIdle
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
@@ -82,50 +89,48 @@ object NotificationScheduler {
             Timber.d("Scheduled exact alarm with setExactAndAllowWhileIdle")
         } catch (e: SecurityException) {
             Timber.e(e, "Failed to schedule alarm due to missing permission")
-            // Используем неточный будильник в случае ошибки
             alarmManager.set(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
                 alarmPendingIntent
             )
         }
-        
-        // Для повторяющихся уведомлений нужно будет перепланировать их в BroadcastReceiver
     }
 
     /**
      * Отменяет запланированные уведомления о транзакциях.
-     * @param context Контекст приложения.
      */
-    fun cancelTransactionReminder(context: Context) {
-        val intent = Intent(context, TransactionReminderReceiver::class.java)
+    private fun cancelTransactionReminder() { // Убираем context из параметра
+        val intent = Intent(applicationContext, TransactionReminderReceiver::class.java)
         val pendingIntent = PendingIntent.getBroadcast(
-            context,
+            applicationContext,
             TRANSACTION_REMINDER_REQUEST_CODE,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
-        val alarmManager = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
+
+        val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
         alarmManager.cancel(pendingIntent)
     }
 
     /**
      * Универсальная функция для включения/отключения напоминаний о транзакциях и их перепланирования.
-     * @param context Контекст приложения.
      * @param isEnabled Включить или выключить напоминания.
-     * @param reminderTime Время напоминания (час, минута). Если null — используется сохранённое в PreferencesManager.
+     * @param reminderTime Время напоминания (объект Time). Если null — используется сохранённое в PreferencesManager.
      */
-    fun updateTransactionReminder(context: Context, isEnabled: Boolean, reminderTime: Pair<Int, Int>? = null) {
-        val preferencesManager = PreferencesManager(context)
+    override fun updateTransactionReminder(isEnabled: Boolean, reminderTime: Time?) {
         if (isEnabled) {
-            val (hour, minute) = reminderTime ?: preferencesManager.getReminderTime()
+            val (h, m) = if (reminderTime != null) {
+                Pair(reminderTime.hours, reminderTime.minutes)
+            } else {
+                preferencesManager.getReminderTime()
+            }
             preferencesManager.setTransactionReminderEnabled(true)
-            preferencesManager.setReminderTime(hour, minute)
-            scheduleTransactionReminder(context, hour, minute)
+            preferencesManager.setReminderTime(h, m)
+            scheduleTransactionReminder(h, m)
         } else {
             preferencesManager.setTransactionReminderEnabled(false)
-            cancelTransactionReminder(context)
+            cancelTransactionReminder()
         }
     }
 } 

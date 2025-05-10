@@ -26,19 +26,19 @@ import java.util.Locale
  * Следует принципам Clean Architecture и Single Responsibility.
  */
 class ExportTransactionsToCSVUseCase(
+    private val applicationContext: Context,
     private val transactionRepository: TransactionRepository
 ) {
     /**
      * Экспортирует все транзакции в CSV файл в публичную директорию загрузок (Downloads).
-     * @param context Контекст приложения для доступа к директории
      * @return Flow с результатом операции (путь к файлу или ошибка)
      */
-    operator fun invoke(context: Context): Flow<Result<String>> = flow {
+    operator fun invoke(): Flow<Result<String>> = flow {
         try {
             // Проверка разрешений для Android 9 и ниже
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                 val hasWritePermission = ContextCompat.checkSelfPermission(
-                    context,
+                    applicationContext,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) == PackageManager.PERMISSION_GRANTED
                 
@@ -141,15 +141,14 @@ class ExportTransactionsToCSVUseCase(
     /**
      * Открывает диалог "Поделиться" для экспортированного CSV файла
      * 
-     * @param context Контекст приложения
      * @param filePath Путь к CSV файлу
      * @return Intent для показа диалога "Поделиться"
      */
-    fun shareCSVFile(context: Context, filePath: String): Intent {
+    fun shareCSVFile(filePath: String): Intent {
         val file = File(filePath)
         val fileUri: Uri = FileProvider.getUriForFile(
-            context,
-            context.packageName + ".fileprovider",
+            applicationContext,
+            applicationContext.packageName + ".fileprovider",
             file
         )
         
@@ -168,15 +167,14 @@ class ExportTransactionsToCSVUseCase(
     /**
      * Открывает CSV файл с использованием Intent.ACTION_VIEW
      * 
-     * @param context Контекст приложения
      * @param filePath Путь к CSV файлу
      * @return Intent для открытия файла
      */
-    fun openCSVFile(context: Context, filePath: String): Intent {
+    fun openCSVFile(filePath: String): Intent {
         val file = File(filePath)
         val fileUri: Uri = FileProvider.getUriForFile(
-            context,
-            context.packageName + ".fileprovider",
+            applicationContext,
+            applicationContext.packageName + ".fileprovider",
             file
         )
         

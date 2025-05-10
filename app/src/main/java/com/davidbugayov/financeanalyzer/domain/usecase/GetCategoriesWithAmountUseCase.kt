@@ -26,8 +26,8 @@ class GetCategoriesWithAmountUseCase(
         
         // Group by category and sum amounts
         return filteredTransactions
-            .filter { transaction -> transaction.category != null }
-            .groupBy { transaction -> transaction.category!! }
+            .filter { transaction -> true }
+            .groupBy { transaction -> transaction.category }
             .map { (category, categoryTransactions) ->
                 val totalAmount = categoryTransactions.fold(Money.zero()) { acc, transaction -> 
                     acc + transaction.amount.abs()

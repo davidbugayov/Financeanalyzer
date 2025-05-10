@@ -30,6 +30,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -52,6 +53,8 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
@@ -77,13 +80,14 @@ fun ProfileScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
 
     // Получаем информацию о версии приложения
     val packageInfo = remember {
         context.packageManager.getPackageInfo(context.packageName, 0)
     }
-    
-    val appVersion = remember { packageInfo?.versionName ?: "Unknown" }
+
+    val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
     val buildVersion = remember { BuildConfig.VERSION_CODE.toString() }
 
     // Логируем открытие экрана профиля
@@ -92,6 +96,20 @@ fun ProfileScreen(
             screenName = "profile",
             screenClass = "ProfileScreen"
         )
+    }
+
+    // Добавить этот LaunchedEffect для обработки intentCommands
+    LaunchedEffect(Unit) {
+        viewModel.intentCommands.collectLatest { intent ->
+            try {
+                context.startActivity(intent)
+            } catch (e: Exception) {
+                Timber.e(e, "Failed to start activity for intent: $intent")
+                scope.launch {
+                    snackbarHostState.showSnackbar("Не удалось выполнить действие: ${e.localizedMessage}")
+                }
+            }
+        }
     }
 
     // Устанавливаем темные иконки в статус-баре
@@ -266,7 +284,7 @@ private fun BudgetSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.profile_section_padding)),
+                .padding(dimensionResource(R.dimen.spacing_medium)),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
@@ -304,7 +322,7 @@ private fun ExportImportSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.profile_section_padding))
+                .padding(dimensionResource(R.dimen.spacing_medium))
                 .clickable { onNavigateToExportImport(Screen.ExportImport.route) },
             verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
         ) {

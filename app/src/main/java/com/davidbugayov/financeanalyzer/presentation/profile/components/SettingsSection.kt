@@ -32,12 +32,11 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
-import java.util.Locale
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
@@ -47,7 +46,7 @@ import java.util.Locale
  * @param onTransactionReminderClick Обработчик нажатия на настройку напоминаний о транзакциях.
  * @param themeMode Текущий режим темы приложения.
  * @param isTransactionReminderEnabled Включены ли напоминания о транзакциях.
- * @param transactionReminderTime Время напоминания о транзакциях (часы и минуты) или null, если отключено.
+ * @param transactionReminderTime Время напоминания о транзакциях (объект Time) или null, если отключено.
  * @param modifier Модификатор для настройки внешнего вида.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -59,7 +58,7 @@ fun SettingsSection(
     onTransactionReminderClick: () -> Unit,
     themeMode: ThemeMode,
     isTransactionReminderEnabled: Boolean,
-    transactionReminderTime: Pair<Int, Int>?,
+    transactionReminderTime: Time?,
     modifier: Modifier = Modifier
 ) {
     val context = LocalContext.current
@@ -67,16 +66,15 @@ fun SettingsSection(
 
     Card(
         modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = dimensionResource(id = R.dimen.padding_medium)),
-        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
+            .fillMaxWidth(),
+        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation_settings_section)),
         shape = RoundedCornerShape(dimensionResource(id = R.dimen.radius_medium)),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.profile_section_padding))
+                .padding(dimensionResource(R.dimen.spacing_medium))
         ) {
             Text(
                 text = stringResource(R.string.profile_settings_title),
@@ -92,11 +90,11 @@ fun SettingsSection(
                     ThemeMode.DARK -> Icons.Default.DarkMode
                     ThemeMode.SYSTEM -> Icons.Default.Brightness6
                 },
-                title = "Тема",
+                title = stringResource(R.string.settings_theme_title),
                 subtitle = when(themeMode) {
-                    ThemeMode.LIGHT -> "Светлая"
-                    ThemeMode.DARK -> "Темная"
-                    ThemeMode.SYSTEM -> "Системная"
+                    ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
+                    ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
+                    ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
                 },
                 onClick = onThemeClick
             )
@@ -106,8 +104,8 @@ fun SettingsSection(
             // Настройка языка
             SettingsItem(
                 icon = Icons.Default.Language,
-                title = "Язык",
-                subtitle = "Русский",
+                title = stringResource(R.string.settings_language_title),
+                subtitle = stringResource(R.string.settings_language_current_value),
                 onClick = onLanguageClick
             )
 
@@ -117,7 +115,7 @@ fun SettingsSection(
             SettingsItem(
                 icon = Icons.Default.Payments,
                 title = stringResource(R.string.profile_currency_title),
-                subtitle = "Рубль (₽)",
+                subtitle = stringResource(R.string.settings_currency_current_value),
                 onClick = onCurrencyClick
             )
 
@@ -130,8 +128,7 @@ fun SettingsSection(
                 subtitle = if (!hasNotificationPermission) {
                     stringResource(R.string.notification_disabled_description)
                 } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
-                    val (hour, minute) = transactionReminderTime
-                    "Ежедневно в ${hour}:${String.format(Locale.getDefault(), "%02d", minute)} H"
+                    stringResource(R.string.settings_reminder_time_format, transactionReminderTime.hours, transactionReminderTime.minutes)
                 } else {
                     stringResource(R.string.off)
                 },

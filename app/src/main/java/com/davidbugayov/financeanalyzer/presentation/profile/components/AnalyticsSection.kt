@@ -47,7 +47,6 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
@@ -86,7 +85,7 @@ fun AnalyticsSection(
     totalIncomeCategories: Int,
     averageExpense: String,
     totalSourcesUsed: Int,
-    dateRange: String = "Все время",
+    dateRange: String = stringResource(R.string.all_time),
     onSavingsRateClick: () -> Unit = {},
 ) {
     // Цвета для финансовых показателей
@@ -119,7 +118,7 @@ fun AnalyticsSection(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_normal))
+                .padding(dimensionResource(R.dimen.spacing_medium))
         ) {
             // Заголовок секции с иконкой аналитики
             Row(
@@ -134,9 +133,9 @@ fun AnalyticsSection(
                         imageVector = Icons.AutoMirrored.Filled.ShowChart,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_28dp))
                     )
-                    Spacer(modifier = Modifier.width(8.dp))
+                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_8dp)))
                     Text(
                         text = stringResource(R.string.analytics_title),
                         style = MaterialTheme.typography.titleMedium,
@@ -313,9 +312,9 @@ fun AnalyticsSection(
                                 imageVector = Icons.Default.Assessment,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_20dp))
                             )
-                            Spacer(modifier = Modifier.width(8.dp))
+                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_8dp)))
                             Text(
                                 text = stringResource(R.string.sources_used),
                                 style = MaterialTheme.typography.bodyMedium
@@ -324,13 +323,16 @@ fun AnalyticsSection(
                         
                         Surface(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                            shape = RoundedCornerShape(12.dp)
+                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_12dp))
                         ) {
                             Text(
                                 text = totalSourcesUsed.toString(),
                                 style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
                                 color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(horizontal = 12.dp, vertical = 6.dp)
+                                modifier = Modifier.padding(
+                                    horizontal = dimensionResource(R.dimen.padding_horizontal_12dp),
+                                    vertical = dimensionResource(R.dimen.padding_vertical_6dp)
+                                )
                             )
                         }
                     }
@@ -384,17 +386,17 @@ private fun AnimatedFinancialCard(
         ) {
             // Иконка в кружке
             Surface(
-                modifier = Modifier.size(40.dp),
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_container_size_40dp)),
                 color = color.copy(alpha = 0.15f),
-                shape = RoundedCornerShape(12.dp)
+                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_12dp))
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
                     tint = color,
                     modifier = Modifier
-                        .padding(8.dp)
-                        .size(24.dp)
+                        .padding(dimensionResource(R.dimen.padding_8dp))
+                        .size(dimensionResource(R.dimen.icon_size_24dp))
                 )
             }
             
@@ -423,11 +425,11 @@ private fun AnimatedFinancialCard(
  */
 @Composable
 private fun AnimatedAnalyticCard(
+    modifier: Modifier = Modifier,
     icon: androidx.compose.ui.graphics.vector.ImageVector,
     title: String,
     value: String,
-    animationDelay: Int = 0,
-    modifier: Modifier = Modifier
+    animationDelay: Int = 0
 ) {
     var visible by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
@@ -462,17 +464,17 @@ private fun AnimatedAnalyticCard(
         ) {
             // Иконка в кружке
             Surface(
-                modifier = Modifier.size(40.dp),
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(12.dp)
+                modifier = Modifier.size(dimensionResource(R.dimen.icon_container_size_40dp)),
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.08f),
+                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_12dp))
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = title,
                     tint = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
-                        .padding(8.dp)
-                        .size(24.dp)
+                        .padding(dimensionResource(R.dimen.padding_8dp))
+                        .size(dimensionResource(R.dimen.icon_size_24dp))
                 )
             }
             
@@ -494,44 +496,4 @@ private fun AnimatedAnalyticCard(
             )
         }
     }
-}
-
-/**
- * Карточка с финансовой информацией.
- * Оставляем для обратной совместимости
- */
-@Composable
-private fun FinancialCard(
-    title: String,
-    value: String,
-    color: Color,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    modifier: Modifier = Modifier
-) {
-    AnimatedFinancialCard(
-        title = title,
-        value = value, 
-        color = color,
-        icon = icon,
-        modifier = modifier
-    )
-}
-
-/**
- * Карточка с аналитической информацией.
- * Оставляем для обратной совместимости
- */
-@Composable
-private fun AnalyticCard(
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
-    AnimatedAnalyticCard(
-        icon = icon,
-        title = title,
-        value = value,
-        modifier = modifier
-    )
 }

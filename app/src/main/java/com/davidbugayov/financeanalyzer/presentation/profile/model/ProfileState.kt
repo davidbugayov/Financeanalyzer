@@ -22,11 +22,10 @@ data class ProfileState(
     val isEditingTheme: Boolean = false,
     val selectedLanguage: String = "Русский",
     val selectedCurrency: String = "Рубль (₽)",
-    val isNotificationsEnabled: Boolean = true,
     
     // Настройки уведомлений о транзакциях
     val isTransactionReminderEnabled: Boolean = false,
-    val transactionReminderTime: Pair<Int, Int>? = null, // Часы и минуты
+    val transactionReminderTime: Time? = null,
     val isEditingNotifications: Boolean = false,
     
     // Финансовая аналитика

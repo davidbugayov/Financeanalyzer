@@ -62,6 +62,14 @@ sealed class AppException(
         cause: Throwable? = null
     ) : AppException(message ?: "Неизвестная ошибка", cause)
 
+    /**
+     * Общая ошибка приложения
+     */
+    class GenericAppException(
+        message: String? = null,
+        cause: Throwable? = null
+    ) : AppException(message ?: "Ошибка приложения", cause)
+
     companion object {
 
         /**

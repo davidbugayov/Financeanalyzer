@@ -1,13 +1,12 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.components
 
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.FileDownload
-import androidx.compose.material.icons.filled.Share
-import androidx.compose.material.icons.filled.Save
 import androidx.compose.material.icons.automirrored.filled.OpenInNew
+import androidx.compose.material.icons.filled.FileDownload
+import androidx.compose.material.icons.filled.Save
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.CircularProgressIndicator
@@ -140,20 +139,3 @@ private fun ActionChoiceDialog(
         }
     )
 }
-
-/**
- * Описание функциональности экспорта данных.
- *
- * @param modifier Модификатор для настройки внешнего вида компонента
- */
-@Composable
-fun ExportDescription(
-    modifier: Modifier = Modifier
-) {
-    Text(
-        text = stringResource(R.string.export_description),
-        style = MaterialTheme.typography.bodySmall,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
-        modifier = modifier
-    )
-} 

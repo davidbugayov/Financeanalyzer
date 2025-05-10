@@ -9,12 +9,14 @@ import androidx.core.app.NotificationCompat
 import androidx.core.net.toUri
 import com.davidbugayov.financeanalyzer.FinanceActivity
 import com.davidbugayov.financeanalyzer.R
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import timber.log.Timber
 
 /**
  * BroadcastReceiver для показа уведомлений о необходимости внести транзакции.
  */
-class TransactionReminderReceiver : BroadcastReceiver() {
+class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
 
     companion object {
         private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
@@ -24,6 +26,10 @@ class TransactionReminderReceiver : BroadcastReceiver() {
         const val ACTION_SHOW_PERMISSION_NOTIFICATION =
             "com.davidbugayov.financeanalyzer.SHOW_PERMISSION_NOTIFICATION"
     }
+
+    // Inject dependencies using Koin
+    private val notificationScheduler: INotificationScheduler by inject()
+    private val preferencesManager: PreferencesManager by inject()
 
     override fun onReceive(context: Context, intent: Intent) {
         Timber.d("TransactionReminderReceiver: onReceive, action: ${intent.action}")
@@ -39,7 +45,7 @@ class TransactionReminderReceiver : BroadcastReceiver() {
                     showNotification(context)
 
                     // Перепланируем уведомление на следующий день
-                    rescheduleReminder(context)
+                    rescheduleReminder() // Removed context
                 }
             }
         } catch (e: Exception) {
@@ -118,13 +124,18 @@ class TransactionReminderReceiver : BroadcastReceiver() {
 
     /**
      * Перепланирует уведомление на следующий день.
-     * @param context Контекст приложения.
      */
-    private fun rescheduleReminder(context: Context) {
+    private fun rescheduleReminder() {
         try {
-            val preferencesManager = PreferencesManager(context)
+            // val preferencesManager = PreferencesManager(context) // No longer needed, use injected
             val (hour, minute) = preferencesManager.getReminderTime()
-            NotificationScheduler.scheduleTransactionReminder(context, hour, minute)
+            // NotificationScheduler.scheduleTransactionReminder(context, hour, minute) // Old static-like call
+            // Need to cast to NotificationScheduler to access internal fun, or make scheduleTransactionReminder part of INotificationScheduler
+            if (notificationScheduler is NotificationScheduler) {
+                (notificationScheduler as NotificationScheduler).scheduleTransactionReminder(hour, minute)
+            } else {
+                Timber.e("Cannot reschedule reminder: notificationScheduler is not an instance of NotificationScheduler")
+            }
             Timber.d("Rescheduled reminder for tomorrow at %02d:%02d", hour, minute)
         } catch (e: SecurityException) {
             Timber.e(e, "Failed to reschedule reminder due to missing permission")

@@ -816,4 +816,17 @@
     <string name="profile">Профиль</string>
     <string name="app_version">Версия приложения</string>
     <string name="build_version">Версия сборки</string>
+
+    <!-- Строки для настроек -->
+    <string name="settings_theme_title">Тема оформления</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_theme_system">Системная</string>
+    <string name="settings_language_title">Язык приложения</string>
+    <string name="settings_language_current_value">Русский</string>
+    <string name="settings_currency_current_value">Рубль (₽)</string>
+    <string name="settings_reminder_time_format" formatted="false">Ежедневно в %02d:%02d</string>
+    <string name="error_loading_analytics">Ошибка при загрузке аналитики</string>
+
+    <!-- Финансовые цели -->
 </resources>

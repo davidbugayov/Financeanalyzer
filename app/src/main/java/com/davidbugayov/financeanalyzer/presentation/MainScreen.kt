@@ -29,11 +29,13 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
 import timber.log.Timber
 
 /**
@@ -47,10 +49,11 @@ fun MainScreen(
     homeViewModel: HomeViewModel = koinViewModel(),
     editTransactionViewModel: EditTransactionViewModel = koinViewModel(),
     profileViewModel: ProfileViewModel = koinViewModel(),
-    onboardingViewModel: OnboardingViewModel = koinViewModel()
+    onboardingViewModel: OnboardingViewModel = koinViewModel(),
+    preferencesManager: PreferencesManager = koinInject()
 ) {
     val navController = rememberNavController()
-    val themeMode by profileViewModel.themeMode.collectAsState()
+    val themeMode by preferencesManager.themeModeFlow.collectAsState()
     val view = LocalView.current
     val context = LocalContext.current
     val permissionManager = remember { PermissionManager(context) }
@@ -81,7 +84,7 @@ fun MainScreen(
             showPermissionDialog = false
             wasPermissionDialogDismissed = true
             permissionManager.markPermissionDialogShown()
-            profileViewModel.onEvent(ProfileEvent.ChangeNotifications(true), context)
+            profileViewModel.onEvent(ProfileEvent.ChangeNotifications(true))
         },
         onPermissionDenied = {
             showPermissionDialog = false

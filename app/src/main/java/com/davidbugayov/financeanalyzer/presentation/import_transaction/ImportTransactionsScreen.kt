@@ -1,8 +1,11 @@
 package com.davidbugayov.financeanalyzer.presentation.import_transaction
 
 import android.app.Activity
+import android.content.Context
+import android.content.Intent
 import android.net.Uri
 import android.os.Build
+import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -49,11 +52,13 @@ import com.davidbugayov.financeanalyzer.presentation.import_transaction.componen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResultsSection
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.PermissionDialog
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
-import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
+import org.koin.compose.koinInject
+import timber.log.Timber
 
 /**
  * Экран импорта транзакций.
@@ -67,10 +72,10 @@ import org.koin.androidx.compose.koinViewModel
 fun ImportTransactionsScreen(
     onNavigateBack: () -> Unit,
     viewModel: ImportTransactionsViewModel = koinViewModel(),
-    profileViewModel: ProfileViewModel = koinViewModel()
+    preferencesManager: PreferencesManager = koinInject()
 ) {
     val context = LocalContext.current
-    val themeMode = profileViewModel.themeMode.collectAsState().value
+    val themeMode by preferencesManager.themeModeFlow.collectAsState()
 
     // Получаем состояние из ViewModel в соответствии с MVI
     val state by viewModel.state.collectAsState()
@@ -143,9 +148,8 @@ fun ImportTransactionsScreen(
         // Диалог для перехода в настройки приложения
         if (showPermissionSettingsDialog) {
             PermissionDialog(
-                isAndroid15OrHigher = true,
                 onOpenSettings = {
-                    openApplicationSettings()
+                    openApplicationSettings(context)
                     showPermissionSettingsDialog = false
                 },
                 onDismiss = { showPermissionSettingsDialog = false }
@@ -283,6 +287,15 @@ fun ImportTransactionsScreen(
     }
 }
 
-fun openApplicationSettings() {
-    // TODO: Реализовать открытие настроек приложения
+fun openApplicationSettings(context: Context) {
+    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+        data = Uri.fromParts("package", context.packageName, null)
+        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+    }
+    try {
+        context.startActivity(intent)
+    } catch (e: Exception) {
+        Timber.e(e, "Failed to open application settings")
+        // Опционально: показать Toast или Snackbar об ошибке
+    }
 } 

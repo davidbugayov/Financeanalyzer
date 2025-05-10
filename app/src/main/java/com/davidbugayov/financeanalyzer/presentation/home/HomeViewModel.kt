@@ -18,7 +18,6 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
-import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -157,10 +156,15 @@ class HomeViewModel(
             is HomeEvent.DeleteTransaction -> {
                 deleteTransaction(event.transaction, context)
             }
-            is HomeEvent.ChangeNotifications -> {
-                if (event.enabled && context != null) {
-                    NotificationScheduler.updateTransactionReminder(context, true)
-                }
+            // Commenting out this block as NotificationScheduler.updateTransactionReminder is not static
+            // and HomeViewModel should likely not be managing this directly.
+            // is HomeEvent.ChangeNotifications -> {
+            //     if (event.enabled && context != null) {
+            //         NotificationScheduler.updateTransactionReminder(context, true)
+            //     }
+            // }
+            else -> {
+                Timber.w("Unhandled HomeEvent: $event")
             }
         }
     }

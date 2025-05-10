@@ -4,6 +4,9 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 
 /**
  * Менеджер для работы с SharedPreferences.
@@ -15,12 +18,17 @@ class PreferencesManager(context: Context) {
         PREFERENCES_NAME, Context.MODE_PRIVATE
     )
 
+    // Flow для темы
+    private val _themeModeFlow = MutableStateFlow(getThemeModeInternal()) // Используем внутренний метод для инициализации
+    val themeModeFlow: StateFlow<ThemeMode> = _themeModeFlow.asStateFlow()
+
     /**
-     * Сохраняет тему приложения в SharedPreferences
+     * Сохраняет тему приложения в SharedPreferences и обновляет Flow
      * @param themeMode Режим темы для сохранения
      */
     fun saveThemeMode(themeMode: ThemeMode) {
         sharedPreferences.edit { putString(KEY_THEME_MODE, themeMode.name) }
+        _themeModeFlow.value = themeMode // Обновляем Flow
     }
 
     /**
@@ -28,6 +36,13 @@ class PreferencesManager(context: Context) {
      * @return Режим темы или SYSTEM, если ничего не сохранено
      */
     fun getThemeMode(): ThemeMode {
+        return _themeModeFlow.value // Возвращаем текущее значение из Flow для консистентности
+    }
+
+    /**
+     * Внутренний метод для первоначальной загрузки темы, чтобы избежать рекурсии при инициализации _themeModeFlow.
+     */
+    private fun getThemeModeInternal(): ThemeMode {
         val themeName = sharedPreferences.getString(KEY_THEME_MODE, ThemeMode.SYSTEM.name)
         return try {
             ThemeMode.valueOf(themeName ?: ThemeMode.SYSTEM.name)
@@ -37,12 +52,14 @@ class PreferencesManager(context: Context) {
     }
 
     companion object {
-
         private const val PREFERENCES_NAME = "finance_analyzer_prefs"
         private const val KEY_THEME_MODE = "theme_mode"
         private const val KEY_TRANSACTION_REMINDER_ENABLED = "transaction_reminder_enabled"
-    }
 
+        // Добавим ключи для времени напоминания, если они еще не в companion object
+        private const val KEY_REMINDER_HOUR = "reminder_hour"
+        private const val KEY_REMINDER_MINUTE = "reminder_minute"
+    }
 
     /**
      * Возвращает, включены ли уведомления о транзакциях.
@@ -77,14 +94,14 @@ class PreferencesManager(context: Context) {
 
     fun setReminderTime(hour: Int, minute: Int) {
         sharedPreferences.edit {
-            putInt("reminder_hour", hour)
-            putInt("reminder_minute", minute)
+            putInt(KEY_REMINDER_HOUR, hour)
+            putInt(KEY_REMINDER_MINUTE, minute)
         }
     }
 
     fun getReminderTime(): Pair<Int, Int> {
-        val hour = sharedPreferences.getInt("reminder_hour", 20)
-        val minute = sharedPreferences.getInt("reminder_minute", 0)
+        val hour = sharedPreferences.getInt(KEY_REMINDER_HOUR, 20) // Используем константу ключа
+        val minute = sharedPreferences.getInt(KEY_REMINDER_MINUTE, 0) // Используем константу ключа
         return Pair(hour, minute)
     }
 } 

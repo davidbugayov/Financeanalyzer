@@ -393,7 +393,6 @@ fun BankInstructionsContent(bankName: String) {
  */
 @Composable
 fun PermissionDialog(
-    isAndroid15OrHigher: Boolean,
     onOpenSettings: () -> Unit,
     onDismiss: () -> Unit
 ) {
@@ -426,11 +425,7 @@ fun PermissionDialog(
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                     
                     Text(
-                        text = if (isAndroid15OrHigher) {
-                            stringResource(R.string.permission_message_android15)
-                        } else {
-                            stringResource(R.string.permission_message)
-                        },
+                        text =  stringResource(R.string.permission_message_android15),
                         style = MaterialTheme.typography.bodyMedium
                     )
                     

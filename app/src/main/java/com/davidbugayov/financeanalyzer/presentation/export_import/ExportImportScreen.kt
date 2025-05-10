@@ -40,7 +40,7 @@ fun ExportImportScreen(
     viewModel: ProfileViewModel
 ) {
     val state by viewModel.state.collectAsState()
-    val context = LocalContext.current
+    LocalContext.current
     Scaffold(
         topBar = {
             AppTopBar(
@@ -86,7 +86,7 @@ fun ExportImportScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                     ExportButton(
                         onClick = { action ->
-                            viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV(action), context)
+                            viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV(action))
                         },
                         isExporting = state.isExporting,
                         showFilePath = state.exportedFilePath,

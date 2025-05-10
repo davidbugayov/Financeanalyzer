@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetCategoriesWithAmountUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodWithCacheUseCase
@@ -40,7 +41,8 @@ import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
+import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
+import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.koin.androidApplication
@@ -65,7 +67,6 @@ val appModule = module {
 
     // Utils & Managers
     single { AnalyticsUtils }
-    single { FinancialMetrics.getInstance() }
     single { OnboardingManager(androidContext()) }
 
     // Repositories
@@ -82,7 +83,7 @@ val appModule = module {
     single { FilterTransactionsUseCase() }
     single { GroupTransactionsUseCase() }
     single { CalculateCategoryStatsUseCase(get()) }
-    single { ExportTransactionsToCSVUseCase(get()) }
+    single { ExportTransactionsToCSVUseCase(get(), get()) }
     single { ImportTransactionsManager(get(), androidContext(), get(), get()) }
     single { ValidateTransactionUseCase() }
     single { GetTransactionByIdUseCase(get()) }
@@ -92,11 +93,17 @@ val appModule = module {
     single { UpdateWidgetsUseCase() }
     single { GetCategoriesWithAmountUseCase(get()) }
     single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
+    single<INotificationScheduler> { NotificationScheduler(androidApplication(), get()) }
+    factory {
+        val repo = get<TransactionRepositoryImpl>()
+        val metrics = get<CalculateBalanceMetricsUseCase>()
+        GetProfileAnalyticsUseCase(repo, metrics)
+    }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
     viewModel { AddTransactionViewModel(get(), get(), get(), get(), get(), androidApplication()) }
-    viewModel { ProfileViewModel(get(), get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel { EditTransactionViewModel(get(), get(), get(), get(), get(), get(), androidApplication()) }
     viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), androidApplication()) }

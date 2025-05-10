@@ -12,6 +12,10 @@
     <dimen name="padding_small">4dp</dimen>
     <dimen name="padding_medium">8dp</dimen>
     <dimen name="padding_large">16dp</dimen>
+    <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="padding_horizontal_12dp">12dp</dimen>
+    <dimen name="padding_vertical_6dp">6dp</dimen>
+    <dimen name="spacing_8dp">8dp</dimen>
     <dimen name="space_small">8dp</dimen>
     <dimen name="space_medium">16dp</dimen>
     <dimen name="space_large">24dp</dimen>
@@ -23,6 +27,10 @@
     <dimen name="icon_size_xlarge">56dp</dimen>
     <dimen name="icon_size_xxlarge">64dp</dimen>
     <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_size_20dp">20dp</dimen>
+    <dimen name="icon_size_24dp">24dp</dimen>
+    <dimen name="icon_size_28dp">28dp</dimen>
+    <dimen name="icon_container_size_40dp">40dp</dimen>
     <dimen name="nav_icon_size">18dp</dimen>
     <dimen name="main_nav_icon_size">22dp</dimen>
 
@@ -73,10 +81,13 @@
     <dimen name="radius_card">12dp</dimen>
     <dimen name="radius_button">20dp</dimen>
     <dimen name="radius_fab">28dp</dimen>
+    <dimen name="radius_12dp">12dp</dimen>
     <dimen name="corner_radius">12dp</dimen>
     <dimen name="card_corner_radius">12dp</dimen>
     <dimen name="dialog_corner_radius">28dp</dimen>
     <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_elevation_app_info_section">4dp</dimen>
+    <dimen name="card_elevation_settings_section">4dp</dimen>
     <dimen name="button_elevation">2dp</dimen>
     <dimen name="fab_elevation">6dp</dimen>
     <dimen name="dialog_elevation">24dp</dimen>

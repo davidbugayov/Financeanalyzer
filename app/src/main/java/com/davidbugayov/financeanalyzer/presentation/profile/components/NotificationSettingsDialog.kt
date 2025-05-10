@@ -61,10 +61,9 @@ fun NotificationSettingsDialog(
     var showPermissionDialog by remember { mutableStateOf(false) }
     var hasNotificationPermission by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
 
-    // Если разрешение только что появилось и был запрос на включение — включаем напоминания
     LaunchedEffect(hasNotificationPermission) {
         if (hasNotificationPermission && pendingEnableNotifications) {
-            viewModel.onEvent(ProfileEvent.ChangeNotifications(true), context)
+            viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
             pendingEnableNotifications = false
         }
     }
@@ -79,10 +78,10 @@ fun NotificationSettingsDialog(
 
     if (showTimePicker) {
         TimePickerDialog(
-            initialHour = state.transactionReminderTime?.first ?: 20,
-            initialMinute = state.transactionReminderTime?.second ?: 0,
+            initialHour = state.transactionReminderTime?.hours ?: 20,
+            initialMinute = state.transactionReminderTime?.minutes ?: 0,
             onTimeSelected = { hour, minute ->
-                viewModel.updateReminderTime(hour, minute)
+                viewModel.onEvent(ProfileEvent.UpdateTransactionReminder(state.isTransactionReminderEnabled, Pair(hour, minute)))
                 showTimePicker = false
             },
             onDismiss = { showTimePicker = false }
@@ -95,7 +94,7 @@ fun NotificationSettingsDialog(
         onPermissionGranted = {
             showPermissionDialog = false
             hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
-            viewModel.onEvent(ProfileEvent.ChangeNotifications(true), context)
+            viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
         },
         onPermissionDenied = { showPermissionDialog = false }
     )
@@ -164,7 +163,7 @@ fun NotificationSettingsDialog(
                                 showPermissionDialog = true
                                 pendingEnableNotifications = true
                             } else {
-                                viewModel.onEvent(ProfileEvent.ChangeNotifications(checked), context)
+                                viewModel.onEvent(ProfileEvent.ChangeNotifications(checked))
                                 pendingEnableNotifications = false
                             }
                         }
@@ -188,8 +187,8 @@ fun NotificationSettingsDialog(
                                     String.format(
                                         Locale.getDefault(),
                                         "%02d:%02d",
-                                        state.transactionReminderTime?.first ?: 20,
-                                        state.transactionReminderTime?.second ?: 0
+                                        state.transactionReminderTime?.hours ?: 20,
+                                        state.transactionReminderTime?.minutes ?: 0
                                     )
                                 ),
                                 style = MaterialTheme.typography.bodyMedium,
