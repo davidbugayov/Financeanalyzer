@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.history
 
+import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Result
@@ -10,6 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
@@ -39,7 +41,9 @@ class TransactionHistoryViewModel @Inject constructor(
     private val repository: TransactionRepository,
     private val analyticsUtils: AnalyticsUtils,
     val categoriesViewModel: CategoriesViewModel,
-    private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase
+    private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase,
+    private val application: Application
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
@@ -122,6 +126,8 @@ class TransactionHistoryViewModel @Inject constructor(
                 is Result.Success -> {
                     // Уведомление об удалении теперь происходит через SharedFlow репозитория
                     resetAndReloadTransactions()
+                    updateWidgetsUseCase(application.applicationContext)
+                    Timber.d("Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel.")
                 }
                 is Result.Error -> {
                     Timber.e(result.exception, "Failed to delete transaction")

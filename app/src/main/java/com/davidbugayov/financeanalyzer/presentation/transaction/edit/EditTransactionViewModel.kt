@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.edit
 
+import android.app.Application
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -9,6 +10,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
@@ -27,7 +29,9 @@ class EditTransactionViewModel(
     private val updateTransactionUseCase: UpdateTransactionUseCase,
     categoriesViewModel: CategoriesViewModel,
     sourcePreferences: SourcePreferences,
-    walletRepository: WalletRepository
+    walletRepository: WalletRepository,
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase,
+    private val application: Application
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
@@ -237,22 +241,30 @@ class EditTransactionViewModel(
                 val originalTransaction = currentState.transactionToEdit
                 
                 // Обновляем транзакцию через useCase
-                updateTransactionUseCase(transaction)
+                val result = updateTransactionUseCase(transaction)
                 
-                // Обновляем балансы кошельков, если это доход и выбраны кошельки
-                if (!transaction.isExpense && transaction.walletIds != null && transaction.walletIds.isNotEmpty()) {
-                    updateWalletsBalance(transaction.walletIds, transaction.amount, originalTransaction)
+                if (result is DomainResult.Success) {
+                    // Обновляем балансы кошельков, если это доход и выбраны кошельки
+                    if (!transaction.isExpense && transaction.walletIds != null && transaction.walletIds.isNotEmpty()) {
+                        updateWalletsBalance(transaction.walletIds, transaction.amount, originalTransaction)
+                    }
+                    
+                    // Показываем успешное обновление
+                    _state.update {
+                        it.copy(
+                            isLoading = false
+                        )
+                    }
+                    updateWidgetsUseCase(application.applicationContext)
+                    Timber.d("ТРАНЗАКЦИЯ: Успешно обновлена, ID=%s", transaction.id)
+                } else if (result is DomainResult.Error) {
+                    Timber.e(result.exception, "ТРАНЗАКЦИЯ: Ошибка при обновлении: %s", result.exception.message)
+                    _state.update {
+                        it.copy(
+                            isLoading = false,
+                        )
+                    }
                 }
-                
-                // Показываем успешное обновление
-                _state.update { 
-                    it.copy(
-                        isLoading = false,
-                        isSuccess = true,
-                        successMessage = "Транзакция успешно обновлена"
-                    ) 
-                }
-                Timber.d("ТРАНЗАКЦИЯ: Обновление транзакции успешно завершено")
             } catch (e: Exception) {
                 Timber.e(e, "ТРАНЗАКЦИЯ: Ошибка при обновлении транзакции: %s", e.message)
                 // Показываем ошибку и снимаем флаг загрузки

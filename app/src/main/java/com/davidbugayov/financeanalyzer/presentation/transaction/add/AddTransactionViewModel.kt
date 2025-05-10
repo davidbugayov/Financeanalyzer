@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.add
 
+import android.app.Application
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -11,6 +12,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
@@ -34,7 +36,9 @@ class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     categoriesViewModel: CategoriesViewModel,
     sourcePreferences: SourcePreferences,
-    walletRepository: WalletRepository
+    walletRepository: WalletRepository,
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase,
+    private val application: Application
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
@@ -356,6 +360,7 @@ class AddTransactionViewModel(
                             
                             // Добавляем дополнительный лог для отслеживания момента завершения операции
                             Timber.d("Транзакция сохранена и готова к обновлению графиков: %s", transaction.id)
+                            updateWidgetsUseCase(application.applicationContext)
                         }
                         
                         is DomainResult.Error -> {

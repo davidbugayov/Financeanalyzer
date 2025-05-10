@@ -209,26 +209,6 @@ fun Color.toHexString(): String {
     return String.format("#%02X%02X%02X", red, green, blue)
 }
 
-// Deprecated colors - to be removed after refactoring
-// val md_theme_light_income = Color(0xFF4CAF50) - replaced by IncomeColorLight
-// val md_theme_dark_income = Color(0xFF81C784) - replaced by IncomeColorDark
-// val md_theme_light_expense = Color(0xFFF44336) - replaced by ExpenseColorLight
-// val md_theme_dark_expense = Color(0xFFEF5350) - replaced by ExpenseColorDark
-// val md_theme_light_balance_text = Color(0xFF2196F3) - replaced by BalanceTextColorLight
-// val md_theme_dark_balance_text = Color(0xFF81CFEF) - replaced by BalanceTextColorDark
-// val md_theme_sber = Color(0xFF1A9F29) - replaced by BankSber
-// ... and so on for all duplicated or obsolete color definitions.
-
-// The original list of md_theme_chart_green_X and md_theme_chart_red_X are now GeneralChartPaletteGreen/Red
-
-// PrimaryLight, SecondaryLight, etc. are removed as they duplicate md_theme_light_primary etc.
-// IncomeColorLight (old) etc. are removed as they are now defined based on md_theme_light_income.
-
-// ErrorColor, SuccessColor (old global ones) are replaced by Light/Dark specific versions.
-// WarningColor, InfoColor (old global ones) are replaced by Light/Dark specific versions.
-
-// md_theme_light_fab, md_theme_dark_fab are replaced by FabColorLight/Dark which alias secondary colors.
-
 // Добавляем Int ARGB репрезентации для использования в не-Composable контекстах
 val IncomeColorInt = IncomeColorLight.toArgb()
 val ExpenseColorInt = ExpenseColorLight.toArgb()

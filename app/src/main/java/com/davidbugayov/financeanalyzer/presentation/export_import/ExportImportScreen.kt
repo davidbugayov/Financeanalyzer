@@ -30,6 +30,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.components.ExportButton
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
+import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +64,10 @@ fun ExportImportScreen(
                     .fillMaxWidth()
                     .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                     .heightIn(min = 200.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = LocalFriendlyCardBackgroundColor.current
+                )
             ) {
                 Column(
                     modifier = Modifier
@@ -96,7 +100,10 @@ fun ExportImportScreen(
                     .fillMaxWidth()
                     .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                     .heightIn(min = 200.dp),
-                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp)
+                elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+                colors = CardDefaults.cardColors(
+                    containerColor = LocalFriendlyCardBackgroundColor.current
+                )
             ) {
                 Column(
                     modifier = Modifier

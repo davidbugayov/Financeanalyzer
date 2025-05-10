@@ -13,6 +13,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodWithCacheUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -47,7 +48,8 @@ class HomeViewModel(
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
-    private val repository: TransactionRepository
+    private val repository: TransactionRepository,
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(HomeState())
@@ -153,7 +155,7 @@ class HomeViewModel(
             }
 
             is HomeEvent.DeleteTransaction -> {
-                deleteTransaction(event.transaction)
+                deleteTransaction(event.transaction, context)
             }
             is HomeEvent.ChangeNotifications -> {
                 if (event.enabled && context != null) {
@@ -166,8 +168,9 @@ class HomeViewModel(
     /**
      * Удаляет транзакцию
      * @param transaction Транзакция для удаления
+     * @param context Контекст для обновления виджетов (опционально)
      */
-    private fun deleteTransaction(transaction: Transaction) {
+    private fun deleteTransaction(transaction: Transaction, context: Context? = null) {
         viewModelScope.launch {
             try {
                 deleteTransactionUseCase(transaction).fold(
@@ -175,6 +178,10 @@ class HomeViewModel(
                         clearCaches()
                         getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                         _state.update { it.copy(transactionToDelete = null) }
+                        context?.let { ctx ->
+                            updateWidgetsUseCase(ctx)
+                            Timber.d("Виджеты обновлены после удаления транзакции из HomeViewModel.")
+                        } ?: Timber.w("Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.")
                     },
                     onFailure = { exception ->
                         Timber.e(exception, "Failed to delete transaction")

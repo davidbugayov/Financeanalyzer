@@ -61,6 +61,7 @@ fun ImportCategoriesDialog(
                 fontWeight = FontWeight.Bold
             )
         },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column {
                 Text(

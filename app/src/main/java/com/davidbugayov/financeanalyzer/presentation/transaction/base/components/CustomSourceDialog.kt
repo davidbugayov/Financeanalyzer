@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -63,6 +64,7 @@ fun CustomSourceDialog(
             onDismiss()
         },
         title = { Text(stringResource(R.string.add_custom_source)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(modifier = Modifier.padding(8.dp)) {
                 OutlinedTextField(

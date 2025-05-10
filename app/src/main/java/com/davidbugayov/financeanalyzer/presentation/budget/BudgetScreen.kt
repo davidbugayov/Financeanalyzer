@@ -366,7 +366,8 @@ fun BudgetScreen(
                                         // Обработка ошибки
                                     }
                                 }
-                            }
+                            },
+                            enabled = categoryName.isNotBlank() && categoryLimit.toBigDecimalOrNull() != null
                         ) {
                             Text("Добавить")
                         }
@@ -375,7 +376,8 @@ fun BudgetScreen(
                         TextButton(onClick = { showAddCategoryDialog = false }) {
                             Text("Отмена")
                         }
-                    }
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             }
 
@@ -411,7 +413,8 @@ fun BudgetScreen(
                                     incomeAmount = ""
                                     showDistributeIncomeDialog = false
                                 }
-                            }
+                            },
+                            enabled = incomeAmount.toBigDecimalOrNull() != null && incomeAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO
                         ) {
                             Text("Распределить")
                         }
@@ -420,7 +423,8 @@ fun BudgetScreen(
                         TextButton(onClick = { showDistributeIncomeDialog = false }) {
                             Text("Отмена")
                         }
-                    }
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             }
 
@@ -456,19 +460,18 @@ fun BudgetScreen(
                         Button(
                             onClick = {
                                 val amount = walletAmount.toDoubleOrNull() ?: 0.0
-                                if (amount > 0) {
-                                    selectedWallet?.let { category ->
-                                        viewModel.onEvent(
-                                            BudgetEvent.SpendFromWallet(
-                                                categoryId = category.id,
-                                                amount = Money(amount)
-                                            )
+                                if (amount > 0 && amount <= selectedWallet!!.balance.amount) {
+                                    viewModel.onEvent(
+                                        BudgetEvent.SpendFromWallet(
+                                            selectedWallet!!,
+                                            Money(amount)
                                         )
-                                    }
+                                    )
                                     walletAmount = ""
                                     showSpendFromWalletDialog = false
                                 }
-                            }
+                            },
+                            enabled = walletAmount.toBigDecimalOrNull() != null && walletAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO && walletAmount.toBigDecimalOrNull()!! <= selectedWallet!!.balance.amount
                         ) {
                             Text("Потратить")
                         }
@@ -477,7 +480,8 @@ fun BudgetScreen(
                         TextButton(onClick = { showSpendFromWalletDialog = false }) {
                             Text("Отмена")
                         }
-                    }
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             }
 
@@ -548,9 +552,9 @@ fun BudgetScreen(
                                 if (amount > 0 && selectedFromWallet != null && selectedToWallet != null) {
                                     viewModel.onEvent(
                                         BudgetEvent.TransferBetweenWallets(
-                                            fromCategoryId = selectedFromWallet!!.id,
-                                            toCategoryId = selectedToWallet!!.id,
-                                            amount = Money(amount)
+                                            selectedFromWallet!!,
+                                            selectedToWallet!!,
+                                            Money(amount)
                                         )
                                     )
                                     transferAmount = ""
@@ -558,7 +562,7 @@ fun BudgetScreen(
                                     showTransferDialog = false
                                 }
                             },
-                            enabled = selectedToWallet != null && transferAmount.isNotBlank()
+                            enabled = selectedToWallet != null && transferAmount.toBigDecimalOrNull() != null && transferAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO && transferAmount.toBigDecimalOrNull()!! <= selectedFromWallet!!.balance.amount
                         ) {
                             Text("Перевести")
                         }
@@ -572,7 +576,8 @@ fun BudgetScreen(
                         ) {
                             Text("Отмена")
                         }
-                    }
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             }
 
@@ -612,7 +617,8 @@ fun BudgetScreen(
                                     viewModel.onEvent(BudgetEvent.SetPeriodDuration(days))
                                     showPeriodSettingsDialog = false
                                 }
-                            }
+                            },
+                            enabled = periodDuration.toIntOrNull() != null && periodDuration.toInt() > 0
                         ) {
                             Text("Сохранить")
                         }
@@ -621,7 +627,8 @@ fun BudgetScreen(
                         TextButton(onClick = { showPeriodSettingsDialog = false }) {
                             Text("Отмена")
                         }
-                    }
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             }
 
@@ -635,7 +642,8 @@ fun BudgetScreen(
                         TextButton(onClick = { viewModel.onEvent(BudgetEvent.ClearError) }) {
                             Text("ОК")
                         }
-                    }
+                    },
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             }
 
@@ -1037,6 +1045,7 @@ fun EditWalletDialog(
         },
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Отмена") }
-        }
+        },
+        containerColor = MaterialTheme.colorScheme.surface
     )
 } 

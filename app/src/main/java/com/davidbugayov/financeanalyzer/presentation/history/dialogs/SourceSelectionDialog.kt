@@ -51,6 +51,7 @@ fun SourceSelectionDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.select_sources)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column {
                 // Кнопка "Выбрать все"

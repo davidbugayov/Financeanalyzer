@@ -48,6 +48,7 @@ fun TransactionActionsDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text("Действия с транзакцией") },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = { 
             Column {
                 Text(

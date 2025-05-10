@@ -95,11 +95,11 @@ val appModule = module {
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
-    viewModel { AddTransactionViewModel(get(), get(), get(), get()) }
+    viewModel { AddTransactionViewModel(get(), get(), get(), get(), get(), androidApplication()) }
     viewModel { ProfileViewModel(get(), get(), get()) }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get()) }
-    viewModel { EditTransactionViewModel(get(), get(), get(), get(), get()) }
-    viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
+    viewModel { EditTransactionViewModel(get(), get(), get(), get(), get(), get(), androidApplication()) }
+    viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), androidApplication()) }
     viewModel { BudgetViewModel(get(), get()) }
     viewModel { WalletTransactionsViewModel(get(), get()) }
     viewModel { ImportTransactionsViewModel(get()) }

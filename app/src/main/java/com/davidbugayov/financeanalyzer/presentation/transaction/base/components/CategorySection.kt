@@ -145,7 +145,7 @@ fun CategorySection(
                         color = when {
                             isError && selectedCategory.isBlank() -> errorContentColor
                             category.name == selectedCategory -> selectedContentColor
-                            else -> contentColor
+                            else -> MaterialTheme.colorScheme.onSurface
                         }
                     )
                 }
