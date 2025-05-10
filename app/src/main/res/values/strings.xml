@@ -829,4 +829,7 @@
     <string name="error_loading_analytics">Ошибка при загрузке аналитики</string>
 
     <!-- Финансовые цели -->
+    <string name="no_transactions_available">Нет транзакций</string>
+    <string name="all_time_label">Все время</string>
+    <string name="error_loading_profile_analytics_detail">Не удалось загрузить аналитику профиля: %1$s</string>
 </resources>

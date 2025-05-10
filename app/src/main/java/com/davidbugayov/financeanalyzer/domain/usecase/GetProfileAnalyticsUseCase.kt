@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase
 
+import android.content.Context
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.AppException.GenericAppException
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalyticsData
@@ -12,12 +14,13 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 class GetProfileAnalyticsUseCase(
+    private val context: Context,
     private val transactionRepository: ITransactionRepository,
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase
 ) {
-    // TODO: Рассмотреть возможность сделать SimpleDateFormat полем класса или передавать как зависимость,
-    // если он будет использоваться в нескольких местах и требует специфичной конфигурации.
-    // Для простоты пока оставим его локальным.
+
+    // SimpleDateFormat вынесен в поле класса
+    private val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
 
     suspend fun execute(): Result<ProfileAnalyticsData> = withContext(Dispatchers.Default) {
         try {
@@ -39,7 +42,7 @@ class GetProfileAnalyticsUseCase(
                         totalIncomeCategories = 0,
                         averageExpense = Money.zero().format(), // или "0" или соответствующая строка
                         totalSourcesUsed = 0,
-                        dateRange = "Нет транзакций" // или ресурс строки
+                        dateRange = context.getString(R.string.no_transactions_available) // <-- Использовать ресурс
                     )
                 )
             }
@@ -82,13 +85,13 @@ class GetProfileAnalyticsUseCase(
                 .distinct()
                 .size
 
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+            // Используем поле класса dateFormat
             val oldestDate = transactions.minByOrNull { it.date }?.date
             val newestDate = transactions.maxByOrNull { it.date }?.date
             val dateRangeString = if (oldestDate != null && newestDate != null) {
                 "${dateFormat.format(oldestDate)} - ${dateFormat.format(newestDate)}"
             } else {
-                "Все время" // Рассмотреть возможность использования строкового ресурса
+                context.getString(R.string.all_time_label)
             }
 
             Result.Success(
@@ -109,7 +112,12 @@ class GetProfileAnalyticsUseCase(
             Timber.e(e, "Error executing GetProfileAnalyticsUseCase") // Логируем ошибку
             // Оборачиваем общее исключение в кастомное AppException
             // Замените GenericAppException на ваш конкретный подтип AppException, если есть
-            Result.Error(GenericAppException("Failed to load profile analytics", e))
+            Result.Error(
+                GenericAppException(
+                    context.getString(R.string.error_loading_profile_analytics_detail, e.localizedMessage ?: e.toString()),
+                    e
+                )
+            )
         }
     }
 } 

@@ -97,7 +97,7 @@ val appModule = module {
     factory {
         val repo = get<TransactionRepositoryImpl>()
         val metrics = get<CalculateBalanceMetricsUseCase>()
-        GetProfileAnalyticsUseCase(repo, metrics)
+        GetProfileAnalyticsUseCase(androidContext(), repo, metrics)
     }
 
     // ViewModels
