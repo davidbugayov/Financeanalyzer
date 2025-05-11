@@ -21,10 +21,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowDownward
-import androidx.compose.material.icons.filled.ArrowUpward
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.SwapHoriz
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -252,74 +249,66 @@ fun TransactionItem(
                 )
             }
 
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_large))) // e.g., 16dp
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium))) // e.g., 12dp
 
-            // Title and Source
+            // Transaction Details: Category, Description, (New) Source, and Date
             Column(
                 modifier = Modifier.weight(1f), // Takes available space
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_xxsmall)) // e.g., 2dp or 4dp
+                verticalArrangement = Arrangement.Center // Vertically center content within this column
             ) {
+                // Category Name
                 Text(
-                    text = transaction.title.ifEmpty { transaction.category },
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.SemiBold, // Slightly bolder title
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    text = transaction.category.replaceFirstChar {
+                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                    }, // Capitalize first letter
+                    style = MaterialTheme.typography.titleMedium, // Slightly larger/bolder for category
                     maxLines = 1,
-                    overflow = TextOverflow.Ellipsis
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
                 )
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    Box(
-                        modifier = Modifier
-                            .size(dimensionResource(id = R.dimen.source_indicator_size)) // e.g., 8dp
-                            .clip(CircleShape)
-                            .background(sourceActualColor)
-                    )
-                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_xsmall))) // e.g., 4dp
+
+                // Source Name - NEW
+                if (transaction.source.isNotBlank()) {
                     Text(
-                        text = transaction.source.ifEmpty { stringResource(id = R.string.unknown_source) }, // Use specific string
-                        style = MaterialTheme.typography.bodyMedium, // Slightly larger body
-                        color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.8f), // Less prominent
+                        text = transaction.source,
+                        style = MaterialTheme.typography.bodySmall, // Smaller font for source
+                        color = sourceActualColor, // Apply source color
                         maxLines = 1,
-                        overflow = TextOverflow.Ellipsis
+                        overflow = TextOverflow.Ellipsis,
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.line_chart_stroke_width)) // Placeholder, will be updated or requires user to add to dimens.xml
+                    )
+                }
+
+                // Note (formerly Description)
+                if (!transaction.note.isNullOrBlank()) {
+                    Text(
+                        text = transaction.note, // Use !! as we've checked for isNullOrBlank
+                        style = MaterialTheme.typography.bodyMedium,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Slightly muted color
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.spacing_small)) // Placeholder, will be updated or requires user to add to dimens.xml
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium))) // Consistent spacing
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_small))) // e.g., 8dp
 
-            // Amount and Date
+            // Amount and Date Column
             Column(
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(id = R.dimen.spacing_xxsmall))
+                verticalArrangement = Arrangement.Center // Vertically center content within this column
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
-                    val typeIconImageVector = remember(transaction.category, transaction.isExpense, transferCategoryString) {
-                        when {
-                            transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                                    transaction.category.equals("Перевод", ignoreCase = true) -> Icons.Filled.SwapHoriz
-                            transaction.isExpense -> Icons.Filled.ArrowDownward
-                            else -> Icons.Filled.ArrowUpward
-                        }
-                    }
-                    Icon(
-                        imageVector = typeIconImageVector,
-                        contentDescription = if (transaction.isExpense) stringResource(R.string.expense_transaction) else stringResource(R.string.income_transaction), // For accessibility
-                        tint = transactionTypeColor,
-                        modifier = Modifier.size(dimensionResource(id = R.dimen.amount_type_icon_size)) // e.g., 16dp
-                    )
-                    Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_xsmall)))
-                    Text(
-                        text = formattedAmount,
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = transactionTypeColor,
-                        maxLines = 1
-                    )
-                }
+                Text(
+                    text = formattedAmount,
+                    style = MaterialTheme.typography.titleMedium, // Consistent with category title
+                    fontWeight = FontWeight.Bold,
+                    color = transactionTypeColor // Color indicates income/expense/transfer
+                )
                 Text(
                     text = formattedDate,
-                    style = MaterialTheme.typography.bodySmall, // Date can be smaller
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f) // Less prominent
+                    style = MaterialTheme.typography.bodySmall, // Smaller font for date
+                    color = MaterialTheme.colorScheme.onSurfaceVariant // Muted color
                 )
             }
         }
