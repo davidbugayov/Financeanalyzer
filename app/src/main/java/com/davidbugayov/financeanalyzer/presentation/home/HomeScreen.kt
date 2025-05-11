@@ -303,7 +303,7 @@ fun HomeScreen(
                 feedbackType = feedbackType,
                 showFeedback = showFeedback,
                 onDismiss = { showFeedback = false },
-                modifier = Modifier.align(Alignment.BottomCenter)
+                modifier = Modifier.align(Alignment.TopCenter)
             )
         }
     }

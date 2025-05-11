@@ -7,7 +7,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.domain.model.fold
-import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
@@ -217,18 +216,14 @@ class HomeViewModel(
             Timber.d("Subscribing to repository data changes")
             repository.dataChangeEvents.collect { event ->
                 Timber.d("Получено событие изменения данных из репозитория")
-
-                // Показываем индикатор загрузки, чтобы пользователь видел, что происходит обновление
+                // Очищаем кэши синхронно
+                filteredTransactionsCache.clear()
+                statsCache.clear()
+                transactionCache.clear()
+                getTransactionsForPeriodWithCacheUseCase.clearCache() // <--- ВАЖНО! Очищаем кэш use case
+                Timber.d("Все кэши очищены (sync)")
+                // Показываем индикатор загрузки
                 _state.update { it.copy(isLoading = true) }
-                
-                // Очищаем кэши при изменении данных
-                clearCaches()
-
-                // Получаем ID транзакции из события, если оно есть
-                val transactionId =
-                    if (event is DataChangeEvent.TransactionChanged) event.transactionId else null
-                Timber.d("Обновление по событию изменения данных: transactionId=$transactionId")
-                
                 // Перезагружаем данные
                 loadTransactions()
             }

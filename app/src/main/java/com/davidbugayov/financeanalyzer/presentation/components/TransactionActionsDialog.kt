@@ -60,7 +60,10 @@ fun TransactionActionsDialog(
                 Spacer(modifier = Modifier.height(16.dp))
                 
                 Text(
-                    text = transaction.amount.formatted(showSign = true),
+                    text = if (transaction.isExpense)
+                        "-${transaction.amount.abs().formatted(showCurrency = true, showSign = false)}"
+                    else
+                        "+${transaction.amount.formatted(showCurrency = true, showSign = false)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (transaction.isExpense)
                         LocalExpenseColor.current
