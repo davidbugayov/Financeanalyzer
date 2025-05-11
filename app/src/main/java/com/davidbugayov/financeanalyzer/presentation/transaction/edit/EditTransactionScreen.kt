@@ -4,6 +4,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
@@ -47,8 +49,8 @@ fun EditTransactionScreen(
     BaseTransactionScreen(
         viewModel = viewModel,
         onNavigateBack = onNavigateBack,
-        screenTitle = "Редактирование транзакции",
-        buttonText = "Сохранить",
+        screenTitle = stringResource(R.string.edit_transaction_title),
+        buttonText = stringResource(R.string.save_button_text),
         isEditMode = true,
         eventFactory = defaultTransactionEventFactory(true),
         submitEvent = BaseTransactionEvent.SubmitEdit

@@ -6,6 +6,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
@@ -59,8 +61,8 @@ fun AddTransactionScreen(
     BaseTransactionScreen(
         viewModel = viewModel,
         onNavigateBack = onNavigateBack,
-        screenTitle = "Новая транзакция",
-        buttonText = "Добавить",
+        screenTitle = stringResource(R.string.new_transaction_title),
+        buttonText = stringResource(R.string.add_button_text),
         isEditMode = false,
         eventFactory = defaultTransactionEventFactory(false),
         submitEvent = BaseTransactionEvent.Submit,

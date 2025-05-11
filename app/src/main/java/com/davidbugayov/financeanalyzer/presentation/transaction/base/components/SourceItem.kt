@@ -24,6 +24,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.ui.theme.SourceItemBorderWidth
+import com.davidbugayov.financeanalyzer.ui.theme.SourceItemErrorBackgroundColor
+import com.davidbugayov.financeanalyzer.ui.theme.SourceItemErrorContentColor
+import com.davidbugayov.financeanalyzer.ui.theme.SourceItemNoBorderWidth
 
 /**
  * Элемент источника средств
@@ -53,19 +57,19 @@ fun SourceItem(
                 .clip(CircleShape)
                 .background(
                     if (isError)
-                        Color(0xFFFFCDD2)
+                        SourceItemErrorBackgroundColor
                     else
                         Color(source.color)
                 )
                 .border(
                     width = when {
-                        isSelected -> 3.dp
-                        isError -> 3.dp
-                        else -> 0.dp
+                        isSelected -> SourceItemBorderWidth
+                        isError -> SourceItemBorderWidth
+                        else -> SourceItemNoBorderWidth
                     },
                     color = when {
                         isSelected -> MaterialTheme.colorScheme.primary
-                        isError -> Color(0xFFE57373)
+                        isError -> MaterialTheme.colorScheme.error
                         else -> Color.Transparent
                     },
                     shape = CircleShape
@@ -75,7 +79,7 @@ fun SourceItem(
             // Здесь можно добавить иконку для источника
             Text(
                 text = source.name.first().toString(),
-                color = if (isError) Color.Red else Color.White,
+                color = if (isError) SourceItemErrorContentColor else Color.White,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Bold
             )

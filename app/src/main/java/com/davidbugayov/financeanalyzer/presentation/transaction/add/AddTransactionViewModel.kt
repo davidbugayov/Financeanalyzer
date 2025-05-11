@@ -12,6 +12,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
@@ -38,11 +39,14 @@ class AddTransactionViewModel(
     sourcePreferences: SourcePreferences,
     walletRepository: WalletRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
-    private val application: Application
+    private val application: Application,
+    updateWalletBalancesUseCase: UpdateWalletBalancesUseCase
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
     walletRepository,
+    updateWalletBalancesUseCase,
+    application.resources
 ) {
 
     override val _state = MutableStateFlow(
@@ -95,7 +99,7 @@ class AddTransactionViewModel(
      * Инициализирует список источников
      */
     private fun initSources() {
-        val sources = getInitialSources(sourcePreferences)
+        val sources = getInitialSources(sourcePreferences, application.resources)
         _state.update { it.copy(sources = sources) }
     }
 

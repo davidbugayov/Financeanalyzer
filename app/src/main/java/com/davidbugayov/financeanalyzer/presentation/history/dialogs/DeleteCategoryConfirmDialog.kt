@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.history.dialogs
 
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
@@ -33,6 +34,7 @@ fun DeleteCategoryConfirmDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.delete)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = { Text(text = messageText) },
         confirmButton = {
             TextButton(onClick = onConfirm) {

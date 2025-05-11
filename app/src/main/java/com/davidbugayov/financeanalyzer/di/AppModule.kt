@@ -27,6 +27,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
@@ -94,6 +95,7 @@ val appModule = module {
     single { GetCategoriesWithAmountUseCase(get()) }
     single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
     single<INotificationScheduler> { NotificationScheduler(androidApplication(), get()) }
+    factory { UpdateWalletBalancesUseCase(get()) }
     factory {
         val repo = get<TransactionRepositoryImpl>()
         val metrics = get<CalculateBalanceMetricsUseCase>()
@@ -102,10 +104,31 @@ val appModule = module {
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
-    viewModel { AddTransactionViewModel(get(), get(), get(), get(), get(), androidApplication()) }
+    viewModel {
+        AddTransactionViewModel(
+            addTransactionUseCase = get(),
+            categoriesViewModel = get(),
+            sourcePreferences = get(),
+            walletRepository = get(),
+            updateWidgetsUseCase = get(),
+            application = androidApplication(),
+            updateWalletBalancesUseCase = get()
+        )
+    }
     viewModel { ProfileViewModel(get(), get(), get(), get()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
-    viewModel { EditTransactionViewModel(get(), get(), get(), get(), get(), get(), androidApplication()) }
+    viewModel {
+        EditTransactionViewModel(
+            getTransactionByIdUseCase = get(),
+            updateTransactionUseCase = get(),
+            categoriesViewModel = get(),
+            sourcePreferences = get(),
+            walletRepository = get(),
+            updateWidgetsUseCase = get(),
+            application = androidApplication(),
+            updateWalletBalancesUseCase = get()
+        )
+    }
     viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), androidApplication()) }
     viewModel { BudgetViewModel(get(), get()) }
     viewModel { WalletTransactionsViewModel(get(), get()) }

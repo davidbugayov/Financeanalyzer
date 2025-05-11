@@ -15,9 +15,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 
 /**
@@ -35,9 +35,12 @@ fun AddButton(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .height(56.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(
+                horizontal = dimensionResource(R.dimen.add_button_padding_horizontal), 
+                vertical = dimensionResource(R.dimen.add_button_padding_vertical)
+            )
+            .height(dimensionResource(R.dimen.add_button_height)),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.add_button_corner_radius)),
         colors = ButtonDefaults.buttonColors(
             containerColor = color
         ),
@@ -46,15 +49,16 @@ fun AddButton(
         Box(contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator(
-                    modifier = Modifier.size(24.dp),
+                    modifier = Modifier.size(dimensionResource(R.dimen.add_button_progress_size)),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = 2.dp
+                    strokeWidth = dimensionResource(R.dimen.add_button_progress_stroke_width)
                 )
             } else {
                 Text(
                     text = text ?: stringResource(R.string.add_button),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
+                    color = Color.White
                 )
             }
         }

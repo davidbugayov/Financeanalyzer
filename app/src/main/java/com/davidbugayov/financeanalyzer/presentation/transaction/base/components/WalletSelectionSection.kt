@@ -21,8 +21,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import timber.log.Timber
 
 /**
@@ -60,7 +62,7 @@ fun WalletSelectionSection(
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = "Добавить в кошельки",
+                    text = stringResource(R.string.add_to_wallets),
                     modifier = Modifier.weight(1f)
                 )
                 
@@ -84,9 +86,9 @@ fun WalletSelectionSection(
                     Spacer(modifier = Modifier.height(4.dp))
                     Text(
                         text = if (selectedWallets.size == 1) {
-                            "Выбран 1 кошелек"
+                            stringResource(R.string.wallet_selected_singular)
                         } else {
-                            "Выбрано ${selectedWallets.size} кошельков"
+                            stringResource(R.string.wallet_selected_plural, selectedWallets.size)
                         },
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.primary
@@ -109,11 +111,11 @@ private fun SelectWalletsButton(
     targetWalletName: String?
 ) {
     val text = if (selectedWallets.isEmpty()) {
-        "Выбрать кошельки"
+        stringResource(R.string.select_wallets)
     } else if (selectedWallets.size == 1 && targetWalletName != null) {
         targetWalletName
     } else {
-        "Выбрано кошельков: ${selectedWallets.size}"
+        stringResource(R.string.selected_wallets_count, selectedWallets.size)
     }
     
     WalletSelectorButton(
@@ -158,7 +160,7 @@ private fun WalletSelectorButton(
         
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
-            contentDescription = "Выбрать кошельки",
+            contentDescription = stringResource(R.string.select_wallets_content_description),
             tint = MaterialTheme.colorScheme.onSecondaryContainer
         )
     }

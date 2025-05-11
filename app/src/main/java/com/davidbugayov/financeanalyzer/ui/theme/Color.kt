@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.ui.theme
 
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.unit.dp
 
 // New Primary Palette based on #3DCFDC
 val NewPrimary = Color(0xFF3DCFDC)
@@ -117,6 +118,12 @@ val ChartGridColorDark = md_theme_dark_outline.copy(alpha = 0.5f)
 val ChartAxisTextColorDark = md_theme_dark_onSurfaceVariant
 val ChartBackgroundColorDark = md_theme_dark_background
 val ChartEmptyStateTextColorDark = md_theme_dark_onSurfaceVariant.copy(alpha = 0.7f)
+
+// SourceItem colors
+val SourceItemErrorBackgroundColor = Color(0xFFFFCDD2) // Красноватый фон для ошибки
+val SourceItemErrorContentColor = Color.Red // Цвет текста для ошибки
+val SourceItemBorderWidth = 3.dp // Толщина рамки выбранного элемента
+val SourceItemNoBorderWidth = 0.dp // Толщина рамки невыбранного элемента
 
 // Specific UI Element Colors - Light
 val PositiveBackgroundLight = IncomeColorLight.copy(alpha = 0.1f)

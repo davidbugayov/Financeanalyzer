@@ -16,14 +16,14 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material.icons.filled.ArrowDownward
 import androidx.compose.material.icons.filled.ArrowUpward
-import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Savings
-import androidx.compose.material.icons.automirrored.outlined.Help
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -372,7 +372,7 @@ private fun QualificationBadge(
             .clip(RoundedCornerShape(dimensionResource(R.dimen.financial_health_badge_corner_radius)))
             .background(qualificationColor.copy(alpha = 0.15f))
             .padding(
-                horizontal = dimensionResource(R.dimen.financial_health_badge_padding_horizontal), 
+                horizontal = dimensionResource(R.dimen.financial_health_badge_padding_horizontal),
                 vertical = dimensionResource(R.dimen.financial_health_badge_padding_vertical)
             )
     ) {
@@ -432,6 +432,7 @@ private fun FinancialHealthInfoDialog(
                 fontWeight = FontWeight.Bold
             )
         },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
                 modifier = Modifier
@@ -595,10 +596,10 @@ fun MetricItemEnhanced(
  */
 @Composable
 fun MetricItem(
+    modifier: Modifier = Modifier,
     title: String,
     value: String,
-    trend: TrendDirection? = null,
-    modifier: Modifier = Modifier
+    trend: TrendDirection? = null
 ) {
     Column(
         modifier = modifier,

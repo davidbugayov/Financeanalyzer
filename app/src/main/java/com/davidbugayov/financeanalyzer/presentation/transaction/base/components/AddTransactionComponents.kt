@@ -29,8 +29,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
@@ -47,11 +47,12 @@ fun CategoryPickerDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.select_category)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp)
+                horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_dialog_item_spacing)),
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_dialog_item_spacing))
             ) {
                 items(categories) { category ->
                     CategoryItemButton(
@@ -92,20 +93,20 @@ fun CategoryItemButton(
             .aspectRatio(1f)
             .clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(1.dp, backgroundColor.copy(alpha = 0.7f)),
+        border = BorderStroke(dimensionResource(R.dimen.category_dialog_item_border), backgroundColor.copy(alpha = 0.7f)),
         color = backgroundColor
     ) {
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(4.dp)
+            modifier = Modifier.padding(dimensionResource(R.dimen.category_dialog_item_padding))
         ) {
             Icon(
                 imageVector = category.icon ?: Icons.Default.Category,
                 contentDescription = category.name,
                 tint = contentColor
             )
-            Spacer(modifier = Modifier.height(4.dp))
+            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_dialog_item_spacing_vertical)))
             Text(
                 text = category.name,
                 style = MaterialTheme.typography.bodySmall,
@@ -131,6 +132,7 @@ fun CustomCategoryDialog(
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.add_category)) },
+        containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column {
                 OutlinedTextField(
@@ -140,35 +142,35 @@ fun CustomCategoryDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(8.dp))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_dialog_section_spacing)))
                 if (availableIcons.isNotEmpty()) {
                     Text(text = stringResource(R.string.select_icon), style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_dialog_item_spacing_vertical)))
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(5),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp),
-                        verticalArrangement = Arrangement.spacedBy(8.dp),
-                        modifier = Modifier.heightIn(max = 160.dp)
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_dialog_item_spacing)),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_dialog_item_spacing)),
+                        modifier = Modifier.heightIn(max = dimensionResource(R.dimen.category_dialog_icon_grid_max_height))
                     ) {
                         items(availableIcons) { icon ->
                             Surface(
                                 shape = MaterialTheme.shapes.medium,
                                 color = if (icon == selectedIcon) MaterialTheme.colorScheme.primary.copy(alpha = 0.2f) else Color.Transparent,
-                                border = if (icon == selectedIcon) BorderStroke(2.dp, MaterialTheme.colorScheme.primary) else null,
+                                border = if (icon == selectedIcon) BorderStroke(dimensionResource(R.dimen.category_dialog_icon_border), MaterialTheme.colorScheme.primary) else null,
                                 modifier = Modifier
-                                    .size(48.dp)
+                                    .size(dimensionResource(R.dimen.category_dialog_icon_size))
                                     .clickable { onIconSelected(icon) }
                             ) {
                                 Icon(
                                     imageVector = icon,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(8.dp)
+                                    modifier = Modifier.padding(dimensionResource(R.dimen.category_dialog_icon_padding))
                                 )
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(4.dp))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_dialog_item_spacing_vertical)))
                 }
             }
         },

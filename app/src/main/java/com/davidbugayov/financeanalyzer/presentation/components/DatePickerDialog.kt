@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.components
 
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +44,10 @@ fun DatePickerDialog(
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
+    val dateBeforeMinimumMessage = stringResource(R.string.date_before_minimum)
+    val dateAfterMaximumMessage = stringResource(R.string.date_after_maximum)
+    val invalidDateMessage = stringResource(R.string.invalid_date)
+
     // Показывать Snackbar сразу при выборе недопустимой даты
     LaunchedEffect(datePickerState.selectedDateMillis) {
         datePickerState.selectedDateMillis?.let { millis ->
@@ -53,11 +58,11 @@ fun DatePickerDialog(
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
                         if (minDate != null && selectedDate < minDate) {
-                            "Дата раньше минимально допустимой"
+                            dateBeforeMinimumMessage
                         } else if (maxDate != null && selectedDate > maxDate) {
-                            "Дата позже максимально допустимой"
+                            dateAfterMaximumMessage
                         } else {
-                            "Недопустимая дата"
+                            invalidDateMessage
                         }
                     )
                 }
@@ -82,11 +87,11 @@ fun DatePickerDialog(
                             coroutineScope.launch {
                                 snackbarHostState.showSnackbar(
                                     if (minDate != null && selectedDate < minDate) {
-                                        "Дата раньше минимально допустимой"
+                                        dateBeforeMinimumMessage
                                     } else if (maxDate != null && selectedDate > maxDate) {
-                                        "Дата позже максимально допустимой"
+                                        dateAfterMaximumMessage
                                     } else {
-                                        "Недопустимая дата"
+                                        invalidDateMessage
                                     }
                                 )
                             }
@@ -101,11 +106,15 @@ fun DatePickerDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.cancel))
             }
-        }
+        },
+        colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         androidx.compose.foundation.layout.Column {
             DatePicker(
-                state = datePickerState
+                state = datePickerState,
+                colors = DatePickerDefaults.colors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                )
             )
             SnackbarHost(
                 hostState = snackbarHostState,

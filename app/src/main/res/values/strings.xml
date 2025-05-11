@@ -27,6 +27,9 @@
     <string name="cash_deposit">пополнение</string>
     <string name="loading_data">Загрузка данных…</string>
     <string name="error">Ошибка</string>
+    <string name="date_before_minimum">Дата раньше минимально допустимой</string>
+    <string name="date_after_maximum">Дата позже максимально допустимой</string>
+    <string name="invalid_date">Недопустимая дата</string>
     
     <!-- Главный экран -->
     <string name="app_title">Деньги под Контролем</string>
@@ -832,4 +835,50 @@
     <string name="no_transactions_available">Нет транзакций</string>
     <string name="all_time_label">Все время</string>
     <string name="error_loading_profile_analytics_detail">Не удалось загрузить аналитику профиля: %1$s</string>
+
+    <!-- Строки для AddTransactionScreen -->
+    <string name="new_transaction_title">Новая транзакция</string>
+    <string name="add_button_text">Добавить</string>
+
+    <!-- Строки для BaseTransactionScreen (диалоги, кнопки и т.д.) -->
+    <string name="unknown_error_message">Произошла неизвестная ошибка</string>
+    <string name="dialog_ok">OK</string>
+    <string name="edit_transaction_title">Редактирование транзакции</string>
+    <string name="save_button_text">Сохранить</string>
+    <string name="import_transactions_content_description">Импорт транзакций</string>
+    <string name="attention_title">Внимание</string>
+    <string name="unsaved_data_warning">У вас есть несохраненные данные. Если вы перейдете к импорту, они будут потеряны.</string>
+    <string name="proceed_to_import">Перейти к импорту</string>
+    <string name="dialog_cancel">Отмена</string> <!-- Эта строка может использоваться многократно -->
+    <string name="transaction_saved_success">Транзакция успешно сохранена!</string>
+    <string name="delete_category_title">Удаление категории</string>
+    <string name="dialog_delete">Удалить</string>
+    <string name="delete_source_title">Удаление источника</string>
+    <string name="delete_source_confirmation">Вы уверены, что хотите удалить источник \'%1$s\'?</string> <!-- Используем %1$s для форматирования -->
+
+    <string-array name="default_source_names">
+        <item>Сбер</item>
+        <item>Тинькофф</item>
+        <item>Альфа</item>
+        <item>Озон</item>
+        <item>ВТБ</item>
+        <item>Газпромбанк</item>
+        <item>Райффайзен</item>
+        <item>Почта Банк</item>
+        <item>Юмани</item>
+        <item>Наличные</item>
+    </string-array>
+
+    <!-- Wallet Selection Section -->
+    <string name="add_to_wallets">Добавить в кошельки</string>
+    <string name="wallet_selected_singular">Выбран 1 кошелек</string>
+    <string name="wallet_selected_plural">Выбрано %d кошельков</string>
+    <string name="select_wallets">Выбрать кошельки</string>
+    <string name="selected_wallets_count">Выбрано кошельков: %d</string>
+    <string name="select_wallets_content_description">Выбрать кошельки</string>
+
+    <!-- CategorySection strings -->
+    <string name="show_more_categories">Показать ещё</string>
+    <string name="hide_categories">Скрыть</string>
+
 </resources>

@@ -313,4 +313,59 @@
     <dimen name="budget_tip_icon_end_padding">8dp</dimen>
     <dimen name="budget_tip_spacer">1dp</dimen>
 
+    <!-- CommentField dimensions -->
+    <dimen name="comment_field_padding_horizontal">16dp</dimen>
+    <dimen name="comment_field_padding_vertical">8dp</dimen>
+    <dimen name="comment_field_corner_radius">12dp</dimen>
+    <dimen name="comment_field_elevation">1dp</dimen>
+    <dimen name="comment_field_inner_padding_horizontal">16dp</dimen>
+    <dimen name="comment_field_inner_padding_vertical">8dp</dimen>
+
+    <!-- CategorySection dimensions -->
+    <dimen name="category_section_padding_horizontal">16dp</dimen>
+    <dimen name="category_section_padding_vertical">16dp</dimen>
+    <dimen name="category_section_spacing">8dp</dimen>
+    <dimen name="category_item_height">56dp</dimen>
+    <dimen name="category_item_padding_horizontal">16dp</dimen>
+    <dimen name="category_header_spacing">8dp</dimen>
+    <dimen name="category_header_padding_horizontal">8dp</dimen>
+    <dimen name="category_header_padding_vertical">4dp</dimen>
+    <dimen name="category_expand_text_padding_vertical">4dp</dimen>
+    <dimen name="category_expand_spacer_width">4dp</dimen>
+    <dimen name="category_grid_spacing">4dp</dimen>
+    <dimen name="category_item_circle_size">36dp</dimen>
+    <dimen name="category_item_icon_size">20dp</dimen>
+    <dimen name="category_item_vertical_padding">2dp</dimen>
+    <dimen name="category_item_spacer_height">2dp</dimen>
+    <dimen name="category_max_height">400dp</dimen>
+    <dimen name="category_collapsed_height">120dp</dimen>
+
+    <!-- AddButton dimensions -->
+    <dimen name="add_button_padding_horizontal">16dp</dimen>
+    <dimen name="add_button_padding_vertical">8dp</dimen>
+    <dimen name="add_button_height">56dp</dimen>
+    <dimen name="add_button_corner_radius">12dp</dimen>
+    <dimen name="add_button_progress_size">24dp</dimen>
+    <dimen name="add_button_progress_stroke_width">2dp</dimen>
+
+    <!-- DatePickerDialog dimensions -->
+    <dimen name="date_picker_snackbar_corner_radius">12dp</dimen>
+    
+    <!-- SourceColorPickerDialog dimensions -->
+    <dimen name="source_color_picker_padding">8dp</dimen>
+    <dimen name="source_color_picker_item_spacing">12dp</dimen>
+    <dimen name="source_color_picker_item_size">40dp</dimen>
+    <dimen name="source_color_picker_item_padding">4dp</dimen>
+
+    <!-- CategoryPickerDialog dimensions -->
+    <dimen name="category_dialog_item_spacing">8dp</dimen>
+    <dimen name="category_dialog_item_border">1dp</dimen>
+    <dimen name="category_dialog_item_padding">4dp</dimen>
+    <dimen name="category_dialog_item_spacing_vertical">4dp</dimen>
+    <dimen name="category_dialog_icon_size">48dp</dimen>
+    <dimen name="category_dialog_icon_padding">8dp</dimen>
+    <dimen name="category_dialog_icon_border">2dp</dimen>
+    <dimen name="category_dialog_section_spacing">8dp</dimen>
+    <dimen name="category_dialog_icon_grid_max_height">160dp</dimen>
+
 </resources>

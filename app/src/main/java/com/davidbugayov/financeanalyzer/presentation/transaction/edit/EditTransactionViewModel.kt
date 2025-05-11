@@ -10,6 +10,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
@@ -31,11 +32,14 @@ class EditTransactionViewModel(
     sourcePreferences: SourcePreferences,
     walletRepository: WalletRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
-    private val application: Application
+    private val application: Application,
+    updateWalletBalancesUseCase: UpdateWalletBalancesUseCase
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
     walletRepository,
+    updateWalletBalancesUseCase,
+    application.resources
 ) {
 
     override val _state = MutableStateFlow(
@@ -252,7 +256,8 @@ class EditTransactionViewModel(
                     // Показываем успешное обновление
                     _state.update {
                         it.copy(
-                            isLoading = false
+                            isLoading = false,
+                            isSuccess = true
                         )
                     }
                     updateWidgetsUseCase(application.applicationContext)

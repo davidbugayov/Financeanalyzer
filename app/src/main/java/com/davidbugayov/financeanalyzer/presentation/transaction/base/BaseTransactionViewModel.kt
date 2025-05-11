@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
+import android.content.res.Resources
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -7,6 +8,7 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider
@@ -23,7 +25,9 @@ import java.util.Date
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: CategoriesViewModel,
     protected val sourcePreferences: SourcePreferences,
-    protected val walletRepository: WalletRepository
+    protected val walletRepository: WalletRepository,
+    private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
+    protected val resources: Resources
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
 
     protected abstract val _state: MutableStateFlow<S>
@@ -52,56 +56,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      */
     protected fun updateWalletsBalance(walletIds: List<String>, amount: Money, originalTransaction: com.davidbugayov.financeanalyzer.domain.model.Transaction?) {
         viewModelScope.launch {
-            try {
-                // Если кошельков несколько, делим сумму равномерно между ними
-                val amountPerWallet = if (walletIds.size > 1) {
-                    amount.div(walletIds.size)
-                } else {
-                    amount
-                }
-                
-                Timber.d("Обновление баланса кошельков: ${walletIds.size} кошельков, сумма на кошелек: $amountPerWallet")
-                
-                // Получаем кошельки по ID
-                val walletsList = walletRepository.getWalletsByIds(walletIds)
-                
-                // Если есть исходная транзакция и у нее были кошельки, сначала откатываем изменения
-                if (originalTransaction != null && originalTransaction.walletIds != null && originalTransaction.walletIds.isNotEmpty()) {
-                    val originalAmount = originalTransaction.amount
-                    val originalWalletIds = originalTransaction.walletIds
-                    val originalAmountPerWallet = if (originalWalletIds.size > 1) {
-                        originalAmount.div(originalWalletIds.size)
-                    } else {
-                        originalAmount
-                    }
-                    
-                    Timber.d("Откат изменений для ${originalWalletIds.size} оригинальных кошельков, сумма: $originalAmountPerWallet")
-                    
-                    // Получаем исходные кошельки
-                    val originalWallets = walletRepository.getWalletsByIds(originalWalletIds)
-                    
-                    // Откатываем изменения в исходных кошельках
-                    originalWallets.forEach { wallet ->
-                        val updatedWallet = wallet.copy(
-                            balance = wallet.balance.minus(originalAmountPerWallet)
-                        )
-                        Timber.d("Откат для кошелька ${wallet.name}: баланс ${wallet.balance} -> ${updatedWallet.balance}")
-                        walletRepository.updateWallet(updatedWallet)
-                    }
-                }
-                
-                // Обновляем баланс каждого кошелька с новыми данными
-                walletsList.forEach { wallet ->
-                    val updatedWallet = wallet.copy(
-                        balance = wallet.balance.plus(amountPerWallet)
-                    )
-                    Timber.d("Обновляем кошелек ${wallet.name}: старый баланс=${wallet.balance}, новый баланс=${updatedWallet.balance}")
-                    walletRepository.updateWallet(updatedWallet)
-                }
-                
-                Timber.d("Балансы кошельков успешно обновлены")
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при обновлении баланса кошельков: ${e.message}")
+            val result = updateWalletBalancesUseCase(
+                walletIdsToUpdate = walletIds,
+                amountForWallets = amount,
+                originalTransaction = originalTransaction
+            )
+            if (result is com.davidbugayov.financeanalyzer.domain.model.Result.Error) {
+                Timber.e(result.exception, "Ошибка при обновлении баланса кошельков через UseCase")
             }
         }
     }
@@ -651,7 +612,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         }
         
         viewModelScope.launch {
-            val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences)
+            val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences, resources)
             _state.update { state ->
                 val firstSource = sources.firstOrNull()
                 copyState(
@@ -779,7 +740,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun loadSources() {
         viewModelScope.launch {
             try {
-                val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences)
+                val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences, resources)
                 _state.update { state ->
                     copyState(state, sources = sources)
                 }

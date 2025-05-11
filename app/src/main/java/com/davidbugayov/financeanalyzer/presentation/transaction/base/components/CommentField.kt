@@ -9,7 +9,8 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import com.davidbugayov.financeanalyzer.R
 
 /**
  * Поле для комментария без иконки прикрепления
@@ -23,15 +24,21 @@ fun CommentField(
     Surface(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
-        shape = RoundedCornerShape(12.dp),
+            .padding(
+                horizontal = dimensionResource(R.dimen.comment_field_padding_horizontal),
+                vertical = dimensionResource(R.dimen.comment_field_padding_vertical)
+            ),
+        shape = RoundedCornerShape(dimensionResource(R.dimen.comment_field_corner_radius)),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = 1.dp
+        tonalElevation = dimensionResource(R.dimen.comment_field_elevation)
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp, vertical = 8.dp),
+                .padding(
+                    horizontal = dimensionResource(R.dimen.comment_field_inner_padding_horizontal),
+                    vertical = dimensionResource(R.dimen.comment_field_inner_padding_vertical)
+                ),
             verticalAlignment = Alignment.CenterVertically
         ) {
             NoteField(

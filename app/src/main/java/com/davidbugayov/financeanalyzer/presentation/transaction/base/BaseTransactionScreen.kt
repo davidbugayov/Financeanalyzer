@@ -33,6 +33,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -132,15 +133,16 @@ fun <E> BaseTransactionScreen(
                 // Очищаем ошибку при закрытии диалога
                 viewModel.onEvent(eventFactory(BaseTransactionEvent.ClearError), context)
             },
+            containerColor = MaterialTheme.colorScheme.surface,
             title = { 
                 Text(
-                    text = "Ошибка", 
+                    text = stringResource(R.string.error_title), 
                     style = MaterialTheme.typography.titleLarge
                 ) 
             },
             text = { 
                 Text(
-                    text = state.error ?: "Произошла неизвестная ошибка",
+                    text = state.error ?: stringResource(R.string.unknown_error_message),
                     style = MaterialTheme.typography.bodyMedium
                 ) 
             },
@@ -148,7 +150,7 @@ fun <E> BaseTransactionScreen(
                 TextButton(onClick = {
                     viewModel.onEvent(eventFactory(BaseTransactionEvent.ClearError), context)
                 }) {
-                    Text("OK")
+                    Text(stringResource(R.string.dialog_ok))
                 }
             }
         )
@@ -168,8 +170,8 @@ fun <E> BaseTransactionScreen(
     }
 
     // В режиме редактирования устанавливаем заголовок и текст кнопки
-    val actualScreenTitle = if (isEditMode) "Редактирование транзакции" else screenTitle
-    val actualButtonText = if (isEditMode) "Сохранить" else buttonText
+    val actualScreenTitle = if (isEditMode) stringResource(R.string.edit_transaction_title) else screenTitle
+    val actualButtonText = if (isEditMode) stringResource(R.string.save_button_text) else buttonText
 
     var showCancelConfirmation by remember { mutableStateOf(false) }
     var showImportConfirmation by remember { mutableStateOf(false) }
@@ -216,7 +218,7 @@ fun <E> BaseTransactionScreen(
                         IconButton(onClick = { navigateToImport() }) {
                             Icon(
                                 imageVector = Icons.Default.Upload,
-                                contentDescription = "Импорт транзакций",
+                                contentDescription = stringResource(R.string.import_transactions_content_description),
                                 tint = MaterialTheme.colorScheme.primary
                             )
                         }
@@ -234,6 +236,7 @@ fun <E> BaseTransactionScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
             ) {
                 // Заголовок с датой и типом транзакции
                 TransactionHeader(
@@ -249,6 +252,8 @@ fun <E> BaseTransactionScreen(
                     },
                     forceExpense = state.forceExpense
                 )
+
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
 
                 // Секция "Откуда/Куда" (Source) - теперь первая
                 Column {
@@ -333,6 +338,8 @@ fun <E> BaseTransactionScreen(
                     )
                 }
 
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
+
                 // Поле выбора даты
                 DateField(
                     date = state.selectedDate,
@@ -344,6 +351,8 @@ fun <E> BaseTransactionScreen(
                         .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
                 )
 
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
+
                 // Поле для комментария без иконки прикрепления
                 CommentField(
                     note = state.note,
@@ -351,6 +360,8 @@ fun <E> BaseTransactionScreen(
                         viewModel.onEvent(eventFactory(BaseTransactionEvent.SetNote(note)), context)
                     }
                 )
+
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
 
                 // Секция выбора кошельков (показывается только для доходов)
                 Timber.d("BaseTransactionScreen: isExpense=${state.isExpense}, addToWallet=${state.addToWallet}, selectedWallets=${state.selectedWallets}, targetWalletId=${state.targetWalletId}")
@@ -367,7 +378,7 @@ fun <E> BaseTransactionScreen(
                     isVisible = !state.isExpense && viewModel.wallets.isNotEmpty() // Показываем только для доходов и если есть кошельки
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_medium)))
 
                 // Кнопка добавления/сохранения
                 AddButton(
@@ -380,7 +391,7 @@ fun <E> BaseTransactionScreen(
                     isLoading = state.isLoading
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xlarge)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.padding_medium)))
             }
 
             // Диалоги
@@ -399,8 +410,9 @@ fun <E> BaseTransactionScreen(
             if (showImportConfirmation) {
                 AlertDialog(
                     onDismissRequest = { showImportConfirmation = false },
-                    title = { Text("Внимание") },
-                    text = { Text("У вас есть несохраненные данные. Если вы перейдете к импорту, они будут потеряны.") },
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    title = { Text(stringResource(R.string.attention_title)) },
+                    text = { Text(stringResource(R.string.unsaved_data_warning)) },
                     confirmButton = {
                         Button(
                             onClick = {
@@ -412,14 +424,14 @@ fun <E> BaseTransactionScreen(
                                 }
                             }
                         ) {
-                            Text("Перейти к импорту")
+                            Text(stringResource(R.string.proceed_to_import))
                         }
                     },
                     dismissButton = {
                         TextButton(
                             onClick = { showImportConfirmation = false }
                         ) {
-                            Text("Отмена")
+                            Text(stringResource(R.string.dialog_cancel))
                         }
                     }
                 )
@@ -432,7 +444,7 @@ fun <E> BaseTransactionScreen(
                     exit = scaleOut(animationSpec = tween(400))
                 ) {
                     SuccessDialog(
-                        message = "Транзакция успешно сохранена!",
+                        message = stringResource(R.string.transaction_saved_success),
                         onDismiss = {
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.HideSuccessDialog), context)
                             handleExit()
@@ -509,20 +521,21 @@ fun <E> BaseTransactionScreen(
                 state.categoryToDelete?.let { category ->
                     AlertDialog(
                         onDismissRequest = { viewModel.onEvent(eventFactory(BaseTransactionEvent.HideDeleteCategoryConfirmDialog), context) },
-                        title = { Text("Удаление категории") },
-                        text = { Text("Вы уверены, что хотите удалить категорию '$category'?") },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        title = { Text(stringResource(R.string.delete_category_title)) },
+                        text = { Text(stringResource(R.string.delete_category_confirmation, category)) },
                         confirmButton = {
                             Button(
                                 onClick = { viewModel.onEvent(eventFactory(BaseTransactionEvent.DeleteCategory(category)), context) }
                             ) {
-                                Text("Удалить")
+                                Text(stringResource(R.string.dialog_delete))
                             }
                         },
                         dismissButton = {
                             TextButton(
                                 onClick = { viewModel.onEvent(eventFactory(BaseTransactionEvent.HideDeleteCategoryConfirmDialog), context) }
                             ) {
-                                Text("Отмена")
+                                Text(stringResource(R.string.dialog_cancel))
                             }
                         }
                     )
@@ -533,20 +546,21 @@ fun <E> BaseTransactionScreen(
                 state.sourceToDelete?.let { source ->
                     AlertDialog(
                         onDismissRequest = { viewModel.onEvent(eventFactory(BaseTransactionEvent.HideDeleteSourceConfirmDialog), context) },
-                        title = { Text("Удаление источника") },
-                        text = { Text("Вы уверены, что хотите удалить источник '$source'?") },
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        title = { Text(stringResource(R.string.delete_source_title)) },
+                        text = { Text(stringResource(R.string.delete_source_confirmation, source)) },
                         confirmButton = {
                             Button(
                                 onClick = { viewModel.onEvent(eventFactory(BaseTransactionEvent.DeleteSource(source)), context) }
                             ) {
-                                Text("Удалить")
+                                Text(stringResource(R.string.dialog_delete))
                             }
                         },
                         dismissButton = {
                             TextButton(
                                 onClick = { viewModel.onEvent(eventFactory(BaseTransactionEvent.HideDeleteSourceConfirmDialog), context) }
                             ) {
-                                Text("Отмена")
+                                Text(stringResource(R.string.dialog_cancel))
                             }
                         }
                     )

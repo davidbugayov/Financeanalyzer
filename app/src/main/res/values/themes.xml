@@ -13,6 +13,7 @@
         <item name="android:windowMinWidthMinor">@dimen/dialog_min_width</item>
         <item name="android:padding">@dimen/dialog_padding</item>
         <item name="cornerRadius">@dimen/dialog_corner_radius</item>
+        <item name="android:popupBackground">@color/surface</item>
     </style>
 
     <!-- Тема для всплывающих окон -->
