@@ -1,10 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
@@ -26,7 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
@@ -35,6 +30,7 @@ import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
@@ -51,6 +47,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransa
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
+import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
 
@@ -108,6 +105,7 @@ private fun HomeBottomBar(
 private fun HomeMainContent(
     windowSizeIsCompact: Boolean,
     state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -118,6 +116,7 @@ private fun HomeMainContent(
     if (windowSizeIsCompact) {
         CompactLayout(
             state = state,
+            categoriesViewModel = categoriesViewModel,
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
@@ -128,6 +127,7 @@ private fun HomeMainContent(
     } else {
         ExpandedLayout(
             state = state,
+            categoriesViewModel = categoriesViewModel,
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
@@ -194,6 +194,7 @@ fun HomeScreen(
     onNavigateToProfile: () -> Unit,
     onNavigateToEdit: (String) -> Unit
 ) {
+    val categoriesViewModel: CategoriesViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
@@ -202,7 +203,7 @@ fun HomeScreen(
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
     var feedbackType by remember { mutableStateOf(FeedbackType.INFO) }
-    var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
+    var selectedTransactionForActions by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
 
@@ -238,13 +239,13 @@ fun HomeScreen(
     }
     val onTransactionClick = remember<(Transaction) -> Unit> {
         { transaction ->
-            selectedTransaction = transaction
+            selectedTransactionForActions = transaction
             showActionsDialog = true
         }
     }
     val onTransactionLongClick = remember<(Transaction) -> Unit> {
         { transaction ->
-            selectedTransaction = transaction
+            selectedTransactionForActions = transaction
             showActionsDialog = true
         }
     }
@@ -277,122 +278,73 @@ fun HomeScreen(
             )
         }
     ) { paddingValues ->
-        HomeScreenContent(
-            paddingValues = paddingValues,
-            windowSizeIsCompact = windowSize.isCompact(),
-            state = state,
-            showGroupSummary = state.showGroupSummary,
-            onToggleGroupSummary = onToggleGroupSummary,
-            onFilterSelected = onFilterSelected,
-            onTransactionClick = onTransactionClick,
-            onTransactionLongClick = onTransactionLongClick,
-            onAddClick = onNavigateToAdd,
-            showActionsDialog = showActionsDialog,
-            selectedTransaction = selectedTransaction,
-            onDismissActionsDialog = { showActionsDialog = false },
-            onDeleteTransaction = { transaction ->
-                showActionsDialog = false
-                viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
-            },
-            onEditTransaction = { transaction ->
-                showActionsDialog = false
-                editTransactionViewModel.loadTransactionForEdit(transaction)
-                if (transaction.id.isNotBlank()) {
-                    onNavigateToEdit(transaction.id)
-                } else {
-                    Timber.e(emptyTransactionIdErrorMsg)
-                }
-            },
-            transactionToDelete = state.transactionToDelete,
-            onConfirmDelete = {
-                state.transactionToDelete?.let { transaction ->
-                    viewModel.onEvent(HomeEvent.DeleteTransaction(transaction))
-                    feedbackMessage = transactionDeletedMsg
-                    feedbackType = FeedbackType.SUCCESS
-                    showFeedback = true
-                }
-            },
-            onDismissDelete = {
-                viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
-            },
-            feedbackMessage = feedbackMessage,
-            feedbackType = feedbackType,
-            showFeedback = showFeedback,
-            onDismissFeedback = { showFeedback = false },
-            isLoading = state.isLoading
-        )
-    }
-}
-
-@Composable
-private fun HomeScreenContent(
-    paddingValues: PaddingValues,
-    windowSizeIsCompact: Boolean,
-    state: HomeState,
-    showGroupSummary: Boolean,
-    onToggleGroupSummary: (Boolean) -> Unit,
-    onFilterSelected: (TransactionFilter) -> Unit,
-    onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
-    onAddClick: () -> Unit,
-    showActionsDialog: Boolean,
-    selectedTransaction: Transaction?,
-    onDismissActionsDialog: () -> Unit,
-    onDeleteTransaction: (Transaction) -> Unit,
-    onEditTransaction: (Transaction) -> Unit,
-    transactionToDelete: Transaction?,
-    onConfirmDelete: () -> Unit,
-    onDismissDelete: () -> Unit,
-    feedbackMessage: String,
-    feedbackType: FeedbackType,
-    showFeedback: Boolean,
-    onDismissFeedback: () -> Unit,
-    isLoading: Boolean
-) {
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues)
-    ) {
-        HomeMainContent(
-            windowSizeIsCompact = windowSizeIsCompact,
-            state = state,
-            showGroupSummary = showGroupSummary,
-            onToggleGroupSummary = onToggleGroupSummary,
-            onFilterSelected = onFilterSelected,
-            onTransactionClick = onTransactionClick,
-            onTransactionLongClick = onTransactionLongClick,
-            onAddClick = onAddClick
-        )
-        AnimatedVisibility(
-            visible = isLoading,
-            enter = fadeIn(),
-            exit = fadeOut(),
-            modifier = Modifier.align(Alignment.Center)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(paddingValues)
         ) {
-            CenteredLoadingIndicator(
-                message = stringResource(R.string.loading_data),
-                modifier = Modifier
+            if (state.isLoading && state.transactions.isEmpty()) {
+                CenteredLoadingIndicator()
+            } else {
+                HomeMainContent(
+                    windowSizeIsCompact = windowSize.isCompact(),
+                    state = state,
+                    categoriesViewModel = categoriesViewModel,
+                    showGroupSummary = state.showGroupSummary,
+                    onToggleGroupSummary = onToggleGroupSummary,
+                    onFilterSelected = onFilterSelected,
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick,
+                    onAddClick = onNavigateToAdd
+                )
+            }
+            HomeFeedback(
+                feedbackMessage = feedbackMessage,
+                feedbackType = feedbackType,
+                showFeedback = showFeedback,
+                onDismiss = { showFeedback = false },
+                modifier = Modifier.align(Alignment.BottomCenter)
             )
         }
-        HomeDialogs(
-            showActionsDialog = showActionsDialog,
-            selectedTransaction = selectedTransaction,
-            onDismissActionsDialog = onDismissActionsDialog,
-            onDeleteTransaction = onDeleteTransaction,
-            onEditTransaction = onEditTransaction,
-            transactionToDelete = transactionToDelete,
-            onConfirmDelete = onConfirmDelete,
-            onDismissDelete = onDismissDelete
-        )
-        HomeFeedback(
-            feedbackMessage = feedbackMessage,
-            feedbackType = feedbackType,
-            showFeedback = showFeedback,
-            onDismiss = onDismissFeedback,
-            modifier = Modifier
-                .align(Alignment.TopCenter)
-                .padding(top = 16.dp)
-        )
     }
+
+    HomeDialogs(
+        showActionsDialog = showActionsDialog,
+        selectedTransaction = selectedTransactionForActions,
+        onDismissActionsDialog = {
+            showActionsDialog = false
+            selectedTransactionForActions = null
+        },
+        onDeleteTransaction = { transaction ->
+            viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
+            showActionsDialog = false
+            selectedTransactionForActions = null
+        },
+        onEditTransaction = { transaction ->
+            if (transaction.id.isBlank()) {
+                Timber.e(emptyTransactionIdErrorMsg)
+                feedbackMessage = emptyTransactionIdErrorMsg
+                feedbackType = FeedbackType.ERROR
+                showFeedback = true
+            } else {
+                editTransactionViewModel.loadTransactionForEditById(transaction.id)
+                onNavigateToEdit(transaction.id)
+            }
+            showActionsDialog = false
+            selectedTransactionForActions = null
+        },
+        transactionToDelete = state.transactionToDelete,
+        onConfirmDelete = {
+            state.transactionToDelete?.let { transactionToDelete ->
+                viewModel.onEvent(HomeEvent.DeleteTransaction(transactionToDelete))
+                feedbackMessage = transactionDeletedMsg
+                feedbackType = FeedbackType.SUCCESS
+                showFeedback = true
+            }
+            viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
+        },
+        onDismissDelete = {
+            viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
+        }
+    )
 }

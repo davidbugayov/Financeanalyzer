@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -99,6 +100,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
 @Composable
 private fun CompactTransactionList(
     state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit
@@ -132,9 +134,9 @@ private fun CompactTransactionList(
         ) { transaction ->
             TransactionItem(
                 transaction = transaction,
+                categoriesViewModel = categoriesViewModel,
                 onClick = onTransactionClick,
                 onTransactionLongClick = onTransactionLongClick,
-                showDivider = true
             )
         }
     }
@@ -143,6 +145,7 @@ private fun CompactTransactionList(
 @Composable
 fun CompactLayout(
     state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -169,6 +172,7 @@ fun CompactLayout(
             else -> {
                 CompactTransactionList(
                     state = state,
+                    categoriesViewModel = categoriesViewModel,
                     showGroupSummary = showGroupSummary,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick

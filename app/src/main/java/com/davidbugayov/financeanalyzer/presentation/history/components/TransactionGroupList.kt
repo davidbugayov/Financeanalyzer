@@ -32,11 +32,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
@@ -48,6 +48,7 @@ import kotlinx.coroutines.launch
  * Оптимизирован для улучшения производительности при большом количестве данных.
  *
  * @param transactionGroups Сгруппированные транзакции
+ * @param categoriesViewModel ViewModel для категорий
  * @param onTransactionClick Обработчик клика по транзакции
  * @param onTransactionLongClick Обработчик долгого нажатия на транзакцию
  * @param onLoadMore Функция загрузки следующей страницы транзакций
@@ -57,6 +58,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun TransactionGroupList(
     transactionGroups: List<TransactionGroup>,
+    categoriesViewModel: CategoriesViewModel,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onLoadMore: () -> Unit,
@@ -114,7 +116,17 @@ fun TransactionGroupList(
                                 // Находим индекс текущего заголовка и прокручиваем к нему
                                 val headerIndex = transactionGroups.indexOfFirst { it.date == group.date }
                                 if (headerIndex >= 0) {
-                                    listState.animateScrollToItem(headerIndex)
+                                    var currentItemIndex = 0
+                                    for (i in 0 until headerIndex) {
+                                        currentItemIndex++ // For the header
+                                        if (expandedGroups[transactionGroups[i].date] == true) {
+                                            currentItemIndex += transactionGroups[i].transactions.size // For transactions in this group
+                                        }
+                                        currentItemIndex++ // For the spacer
+                                    }
+                                    if (currentItemIndex >= 0) {
+                                        listState.animateScrollToItem(currentItemIndex)
+                                    }
                                 }
                             }
                         }
@@ -130,15 +142,15 @@ fun TransactionGroupList(
                 ) { transaction ->
                     TransactionItem(
                         transaction = transaction,
+                        categoriesViewModel = categoriesViewModel,
                         onClick = { onTransactionClick(transaction) },
                         onTransactionLongClick = { onTransactionLongClick(transaction) },
-                        showDivider = false,
                         animationDelay = 0L,
                         animated = false
                     )
                     
                     HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = 16.dp),
+                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.spacing_normal)),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                     )
                 }
@@ -160,11 +172,11 @@ fun TransactionGroupList(
                 Box(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(16.dp),
+                        .padding(dimensionResource(id = R.dimen.spacing_normal)),
                     contentAlignment = Alignment.Center
                 ) {
                     CircularProgressIndicator(
-                        modifier = Modifier.padding(8.dp),
+                        modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_small)),
                         color = MaterialTheme.colorScheme.primary
                     )
                 }

@@ -881,4 +881,9 @@
     <string name="show_more_categories">Показать ещё</string>
     <string name="hide_categories">Скрыть</string>
 
+    <!-- TransactionItem specific -->
+    <string name="unknown_source">Неизвестный источник</string>
+    <string name="expense_transaction">Расход</string>
+    <string name="income_transaction">Доход</string>
+
 </resources>

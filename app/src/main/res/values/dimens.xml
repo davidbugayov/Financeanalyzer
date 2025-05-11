@@ -368,4 +368,18 @@
     <dimen name="category_dialog_section_spacing">8dp</dimen>
     <dimen name="category_dialog_icon_grid_max_height">160dp</dimen>
 
+    <!-- TransactionItem specific -->
+    <dimen name="card_horizontal_padding">12dp</dimen>
+    <dimen name="card_vertical_padding">6dp</dimen>
+    <dimen name="card_elevation_default">2dp</dimen>
+    <dimen name="card_corner_radius_medium">12dp</dimen>
+    <dimen name="card_content_padding_medium">12dp</dimen>
+    <dimen name="transaction_type_indicator_width">4dp</dimen>
+    <dimen name="icon_container_size_large">48dp</dimen>
+    <dimen name="source_indicator_size">8dp</dimen>
+    <dimen name="amount_type_icon_size">16dp</dimen>
+
+    <!-- General Spacing -->
+    <dimen name="spacing_xsmall">4dp</dimen>
+
 </resources>

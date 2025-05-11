@@ -434,6 +434,7 @@ fun TransactionHistoryScreen(
 
                     TransactionGroupList(
                         transactionGroups = transactionGroups,
+                        categoriesViewModel = viewModel.categoriesViewModel,
                         onTransactionClick = { transaction ->
                             selectedTransaction = transaction
                             showActionsDialog = true

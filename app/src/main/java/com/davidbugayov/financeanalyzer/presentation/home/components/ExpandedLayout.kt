@@ -25,6 +25,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -36,6 +37,7 @@ import timber.log.Timber
 @Composable
 fun ExpandedLayout(
     state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -56,6 +58,7 @@ fun ExpandedLayout(
         )
         ExpandedRightPanel(
             state = state,
+            categoriesViewModel = categoriesViewModel,
             showGroupSummary = showGroupSummary,
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
@@ -103,6 +106,7 @@ private fun ExpandedLeftPanel(
 @Composable
 private fun ExpandedRightPanel(
     state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
@@ -119,6 +123,7 @@ private fun ExpandedRightPanel(
             else -> {
                 ExpandedTransactionList(
                     state = state,
+                    categoriesViewModel = categoriesViewModel,
                     showGroupSummary = showGroupSummary,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick
@@ -171,6 +176,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
 @Composable
 private fun ExpandedTransactionList(
     state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit
@@ -193,9 +199,9 @@ private fun ExpandedTransactionList(
         ) { transaction ->
             TransactionItem(
                 transaction = transaction,
+                categoriesViewModel = categoriesViewModel,
                 onClick = onTransactionClick,
                 onTransactionLongClick = onTransactionLongClick,
-                showDivider = true
             )
         }
     }

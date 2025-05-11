@@ -345,9 +345,9 @@ fun WalletTransactionsScreen(
                         items(state.transactions) { transaction ->
                             TransactionItem(
                                 transaction = transaction,
+                                categoriesViewModel = categoriesViewModel,
                                 onClick = {},
                                 onTransactionLongClick = { /* TODO: Handle long click */ },
-                                showDivider = true
                             )
                         }
                     }
@@ -358,13 +358,13 @@ fun WalletTransactionsScreen(
         // Диалог связывания категорий
         if (showImportCategoriesDialog) {
             ImportCategoriesDialog(
+                availableCategories = expenseCategories,
                 onDismiss = { showImportCategoriesDialog = false },
                 onImport = { selectedCategories ->
                     // Связываем выбранные категории с кошельком
                     viewModel.onEvent(WalletTransactionsEvent.LinkCategories(selectedCategories))
                     showImportCategoriesDialog = false
                 },
-                availableCategories = expenseCategories,
                 title = "Связать категории",
                 subtitle = "Выберите категории расходов, которые будут учитываться в этом кошельке:",
                 confirmButtonText = "Связать",
