@@ -27,17 +27,12 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 27
-        versionName = "2.10"
+        versionCode = 28
+        versionName = "2.11"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
             useSupportLibrary = true
-        }
-
-        // Room schema location
-        ksp {
-            arg("room.schemaLocation", "$projectDir/schemas")
         }
 
         // Enable R8 support
@@ -45,6 +40,11 @@ android {
             getDefaultProguardFile("proguard-android-optimize.txt"),
             "proguard-rules.pro"
         )
+    }
+
+    // Room schema location
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
     }
 
     signingConfigs {
