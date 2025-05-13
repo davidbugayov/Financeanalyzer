@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.profile
 
+import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -12,6 +13,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
+import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -33,7 +35,8 @@ class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
     private val getProfileAnalyticsUseCase: GetProfileAnalyticsUseCase,
     private val preferencesManager: PreferencesManager,
-    private val notificationScheduler: INotificationScheduler
+    private val notificationScheduler: INotificationScheduler,
+    private val appContext: Context
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -248,11 +251,18 @@ class ProfileViewModel(
         viewModelScope.launch {
             val remindersEnabled = preferencesManager.isTransactionReminderEnabled()
             val reminderTimePair = preferencesManager.getReminderTime()
-            Timber.d("[ProfileViewModel] syncNotificationState: remindersEnabled=%b, reminderTime=%s", remindersEnabled, reminderTimePair)
+            val permission = PermissionUtils.hasNotificationPermission(appContext)
+            Timber.d(
+                "[ProfileViewModel] syncNotificationState: remindersEnabled=%b, reminderTime=%s, hasPermission=%b",
+                remindersEnabled,
+                reminderTimePair,
+                permission
+            )
             _state.update {
                 it.copy(
                     isTransactionReminderEnabled = remindersEnabled,
-                    transactionReminderTime = Time(reminderTimePair.first, reminderTimePair.second)
+                    transactionReminderTime = Time(reminderTimePair.first, reminderTimePair.second),
+                    hasNotificationPermission = permission
                 )
             }
         }

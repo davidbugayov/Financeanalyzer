@@ -115,7 +115,7 @@ val appModule = module {
             updateWalletBalancesUseCase = get()
         )
     }
-    viewModel { ProfileViewModel(get(), get(), get(), get()) }
+    viewModel { ProfileViewModel(get(), get(), get(), get(), androidContext()) }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel {
         EditTransactionViewModel(

@@ -189,6 +189,7 @@ fun ProfileScreen(
                     themeMode = state.themeMode,
                     isTransactionReminderEnabled = state.isTransactionReminderEnabled,
                     transactionReminderTime = state.transactionReminderTime,
+                    hasNotificationPermission = state.hasNotificationPermission,
                     modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                 )
 

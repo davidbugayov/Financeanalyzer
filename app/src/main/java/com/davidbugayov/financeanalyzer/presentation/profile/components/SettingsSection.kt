@@ -32,14 +32,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
-import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
@@ -50,6 +48,7 @@ import com.davidbugayov.financeanalyzer.utils.PermissionUtils
  * @param themeMode Текущий режим темы приложения.
  * @param isTransactionReminderEnabled Включены ли напоминания о транзакциях.
  * @param transactionReminderTime Время напоминания о транзакциях (объект Time) или null, если отключено.
+ * @param hasNotificationPermission Флаг наличия разрешения на уведомления.
  * @param modifier Модификатор для настройки внешнего вида.
  */
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,11 +61,9 @@ fun SettingsSection(
     themeMode: ThemeMode,
     isTransactionReminderEnabled: Boolean,
     transactionReminderTime: Time?,
+    hasNotificationPermission: Boolean,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
-    val hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
-
     Column(
         modifier = modifier
             .fillMaxWidth()
