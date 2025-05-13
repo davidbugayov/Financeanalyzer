@@ -155,7 +155,9 @@ fun ProfileScreen(
                     totalSourcesUsed = state.totalSourcesUsed,
                     dateRange = state.dateRange,
                     onSavingsRateClick = onNavigateToChart,
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
+                    modifier = Modifier
+                        .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
+                        .clickable { onNavigateToChart() }
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
