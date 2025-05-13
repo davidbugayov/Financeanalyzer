@@ -76,7 +76,7 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
 
         // Создаем уведомление
         val builder = NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification)
+            .setSmallIcon(R.drawable.ic_rubble)
             .setContentTitle(context.getString(R.string.notification_disabled_title))
             .setContentText(context.getString(R.string.notification_disabled_description))
             .setPriority(NotificationCompat.PRIORITY_HIGH)
@@ -110,7 +110,7 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
         
         // Создаем уведомление
         val builder = NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_notification) // Убедитесь, что у вас есть такая иконка
+            .setSmallIcon(R.drawable.ic_rubble) // Убедитесь, что у вас есть такая иконка
             .setContentTitle(context.getString(R.string.transaction_reminder_title))
             .setContentText(context.getString(R.string.transaction_reminder_text))
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)

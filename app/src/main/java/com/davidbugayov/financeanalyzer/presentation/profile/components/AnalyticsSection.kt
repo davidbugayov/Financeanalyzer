@@ -7,8 +7,10 @@ import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -17,6 +19,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ShowChart
@@ -24,10 +27,8 @@ import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.Category
-import androidx.compose.material.icons.filled.ChevronRight
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
-import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -44,13 +45,16 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalWarningColor
@@ -113,7 +117,7 @@ fun AnalyticsSection(
             .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
         Column(
             modifier = Modifier
@@ -123,30 +127,28 @@ fun AnalyticsSection(
             // Заголовок секции с иконкой аналитики
             Row(
                 modifier = Modifier
-                    .fillMaxWidth()
-                    .clickable { onSavingsRateClick() },
-                horizontalArrangement = Arrangement.SpaceBetween,
+                    .fillMaxWidth(),
+                horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Row(verticalAlignment = Alignment.CenterVertically) {
+                Box(
+                    modifier = Modifier
+                        .size(40.dp)
+                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    contentAlignment = Alignment.Center
+                ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ShowChart,
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_28dp))
-                    )
-                    Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_8dp)))
-                    Text(
-                        text = stringResource(R.string.analytics_title),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold
+                        tint = Color.White,
+                        modifier = Modifier.size(24.dp)
                     )
                 }
-                
-                Icon(
-                    imageVector = Icons.Default.ChevronRight,
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary
+                Spacer(modifier = Modifier.width(12.dp))
+                Text(
+                    text = stringResource(R.string.analytics_title),
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
                 )
             }
             
@@ -179,7 +181,7 @@ fun AnalyticsSection(
                             title = stringResource(R.string.income),
                             value = totalIncome.format(),
                             color = incomeColor,
-                            icon = Icons.AutoMirrored.Filled.TrendingUp,
+                            icon = rememberVectorPainter(Icons.AutoMirrored.Filled.TrendingUp),
                             animationDelay = 0,
                             modifier = Modifier.weight(1f)
                         )
@@ -191,7 +193,7 @@ fun AnalyticsSection(
                             title = stringResource(R.string.expenses),
                             value = totalExpense.format(),
                             color = expenseColor,
-                            icon = Icons.AutoMirrored.Filled.TrendingDown,
+                            icon = rememberVectorPainter(Icons.AutoMirrored.Filled.TrendingDown),
                             animationDelay = 100,
                             modifier = Modifier.weight(1f)
                         )
@@ -209,7 +211,7 @@ fun AnalyticsSection(
                             title = stringResource(R.string.balance),
                             value = balance.format(),
                             color = balanceColor,
-                            icon = Icons.Default.MonetizationOn,
+                            icon = painterResource(R.drawable.ic_rubble),
                             animationDelay = 200,
                             modifier = Modifier.weight(1f)
                         )
@@ -228,7 +230,7 @@ fun AnalyticsSection(
                             title = stringResource(R.string.savings_rate),
                             value = String.format(Locale.US, "%.1f%%", calculatedSavingsRate),
                             color = savingsRateColor,
-                            icon = if (calculatedSavingsRate > 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                            icon = rememberVectorPainter(if (calculatedSavingsRate > 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown),
                             animationDelay = 300,
                             modifier = Modifier
                                 .weight(1f)
@@ -350,7 +352,7 @@ private fun AnimatedFinancialCard(
     title: String,
     value: String,
     color: Color,
-    icon: androidx.compose.ui.graphics.vector.ImageVector,
+    icon: Painter,
     animationDelay: Int = 0,
     modifier: Modifier = Modifier
 ) {
@@ -391,7 +393,7 @@ private fun AnimatedFinancialCard(
                 shape = RoundedCornerShape(dimensionResource(R.dimen.radius_12dp))
             ) {
                 Icon(
-                    imageVector = icon,
+                    painter = icon,
                     contentDescription = title,
                     tint = color,
                     modifier = Modifier

@@ -1,14 +1,18 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.components
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness6
@@ -20,22 +24,21 @@ import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 
 /**
@@ -64,32 +67,23 @@ fun SettingsSection(
     val context = LocalContext.current
     val hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
 
-    Card(
+    Column(
         modifier = modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation_settings_section)),
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.radius_medium)),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+            .fillMaxWidth()
     ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium))
-        ) {
-            Text(
-                text = stringResource(R.string.profile_settings_title),
-                style = MaterialTheme.typography.titleMedium
-            )
-
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
-            
-            // Настройка темы
-            SettingsItem(
+        Text(
+            text = stringResource(R.string.profile_settings_title),
+            style = MaterialTheme.typography.titleMedium,
+            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp)
+        )
+        AnimatedVisibility(visible = true, enter = fadeIn()) {
+            SettingsActionCard(
                 icon = when(themeMode) {
                     ThemeMode.LIGHT -> Icons.Default.LightMode
                     ThemeMode.DARK -> Icons.Default.DarkMode
                     ThemeMode.SYSTEM -> Icons.Default.Brightness6
                 },
+                iconBackground = MaterialTheme.colorScheme.primary,
                 title = stringResource(R.string.settings_theme_title),
                 subtitle = when(themeMode) {
                     ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
@@ -98,32 +92,29 @@ fun SettingsSection(
                 },
                 onClick = onThemeClick
             )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
-            
-            // Настройка языка
-            SettingsItem(
+        }
+        AnimatedVisibility(visible = true, enter = fadeIn()) {
+            SettingsActionCard(
                 icon = Icons.Default.Language,
+                iconBackground = MaterialTheme.colorScheme.secondary,
                 title = stringResource(R.string.settings_language_title),
                 subtitle = stringResource(R.string.settings_language_current_value),
                 onClick = onLanguageClick
             )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
-            
-            // Настройка валюты
-            SettingsItem(
+        }
+        AnimatedVisibility(visible = true, enter = fadeIn()) {
+            SettingsActionCard(
                 icon = Icons.Default.Payments,
+                iconBackground = MaterialTheme.colorScheme.tertiary,
                 title = stringResource(R.string.profile_currency_title),
                 subtitle = stringResource(R.string.settings_currency_current_value),
                 onClick = onCurrencyClick
             )
-
-            HorizontalDivider(modifier = Modifier.padding(vertical = dimensionResource(R.dimen.spacing_medium)))
-            
-            // Настройка напоминаний о транзакциях
-            SettingsItem(
+        }
+        AnimatedVisibility(visible = true, enter = fadeIn()) {
+            SettingsActionCard(
                 icon = Icons.Default.Timer,
+                iconBackground = MaterialTheme.colorScheme.primary,
                 title = stringResource(R.string.profile_transaction_reminders_title),
                 subtitle = if (!hasNotificationPermission) {
                     stringResource(R.string.notification_disabled_description)
@@ -132,70 +123,65 @@ fun SettingsSection(
                 } else {
                     stringResource(R.string.off)
                 },
-                subtitleStyle = if (!hasNotificationPermission) {
-                    MaterialTheme.typography.bodySmall.copy(color = MaterialTheme.colorScheme.error)
-                } else null,
+                subtitleColor = if (!hasNotificationPermission) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                 onClick = onTransactionReminderClick
             )
-            
         }
     }
 }
 
-/**
- * Элемент настройки.
- * @param icon Иконка настройки.
- * @param title Заголовок настройки.
- * @param subtitle Подзаголовок настройки (опционально).
- * @param onClick Обработчик нажатия на настройку.
- * @param trailingContent Содержимое в конце элемента (опционально).
- * @param subtitleStyle Стиль для подзаголовка (опционально).
- */
 @Composable
-fun SettingsItem(
-    title: String,
+fun SettingsActionCard(
     icon: ImageVector,
-    onClick: () -> Unit,
+    iconBackground: Color,
+    title: String,
     subtitle: String? = null,
-    subtitleStyle: TextStyle? = null,
-    trailingContent: @Composable (() -> Unit)? = null
+    subtitleColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
+    onClick: () -> Unit
 ) {
-    Row(
+    Card(
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
-            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
-        verticalAlignment = Alignment.CenterVertically
+            .padding(vertical = 4.dp, horizontal = 0.dp)
+            .background(Color.Transparent)
+            .clickable(onClick = onClick),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        shape = RoundedCornerShape(18.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
-        Icon(
-            imageVector = icon,
-            contentDescription = title,
-            modifier = Modifier.size(dimensionResource(R.dimen.icon_size_small)),
-            tint = MaterialTheme.colorScheme.primary
-        )
-
-        Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_small)))
-        
-        Column(
-            modifier = Modifier.weight(1f)
+        Row(
+            modifier = Modifier.padding(18.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            if (subtitle != null) {
-                Text(
-                    text = subtitle,
-                    style = subtitleStyle ?: MaterialTheme.typography.bodySmall,
-                    color = subtitleStyle?.color ?: MaterialTheme.colorScheme.onSurfaceVariant
+            Box(
+                modifier = Modifier
+                    .size(40.dp)
+                    .background(iconBackground, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(22.dp)
                 )
             }
-        }
-
-        if (trailingContent != null) {
-            trailingContent()
+            Spacer(modifier = Modifier.width(14.dp))
+            Column(modifier = Modifier.weight(1f)) {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                if (subtitle != null) {
+                    Text(
+                        text = subtitle,
+                        style = MaterialTheme.typography.bodySmall,
+                        color = subtitleColor,
+                        modifier = Modifier.padding(top = 2.dp)
+                    )
+                }
+            }
         }
     }
 } 
