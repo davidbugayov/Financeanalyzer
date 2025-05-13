@@ -9,6 +9,7 @@ import android.os.Build
 import android.os.Environment
 import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -177,14 +178,12 @@ class ExportTransactionsToCSVUseCase(
             applicationContext.packageName + ".fileprovider",
             file
         )
-        
         val openIntent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(fileUri, "text/csv")
-            flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
+            addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        
-        Timber.d("Открытие файла: $filePath")
-        return openIntent
+        val chooserTitle = applicationContext.getString(R.string.open_csv_with)
+        return Intent.createChooser(openIntent, chooserTitle)
     }
     
     /**

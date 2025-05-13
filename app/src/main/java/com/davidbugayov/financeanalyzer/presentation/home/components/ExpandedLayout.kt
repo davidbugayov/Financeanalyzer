@@ -12,6 +12,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material3.MaterialTheme
@@ -22,7 +23,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -162,12 +165,20 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
             )
             androidx.compose.material3.Button(
                 onClick = onAddClick,
+                shape = RoundedCornerShape(50),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.8f),
+                    containerColor = MaterialTheme.colorScheme.primary,
                     contentColor = Color.White
-                )
+                ),
+                modifier = Modifier
+                    .padding(horizontal = 16.dp)
+                    .height(48.dp)
             ) {
-                Text(stringResource(R.string.empty_state_add_first_transaction))
+                Text(
+                    text = stringResource(R.string.empty_state_add_first_transaction),
+                    fontWeight = FontWeight.Bold,
+                    fontSize = 18.sp
+                )
             }
         }
     }

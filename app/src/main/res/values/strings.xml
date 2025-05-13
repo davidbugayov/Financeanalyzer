@@ -886,4 +886,29 @@
     <string name="expense_transaction">Расход</string>
     <string name="income_transaction">Доход</string>
 
+    <string name="export_import_screen_title">Экспорт и импорт данных</string>
+    <string name="export_section_title">Экспорт данных</string>
+    <string name="export_section_description">Экспортируйте все транзакции в CSV файл для использования в Excel или других программах.</string>
+    <string name="import_section_title">Импорт транзакций</string>
+    <string name="import_section_description">Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Озон Банк.</string>
+    <string name="import_button">Импортировать транзакции</string>
+    <string name="export_action_error">Не удалось выполнить действие: %1$s</string>
+    <string name="error_no_csv_app">Нет приложения для открытия CSV-файлов. Вы можете открыть файл вручную через файловый менеджер или воспользоваться функцией "Поделиться".</string>
+    <string name="error_action_failed">Не удалось выполнить действие: %1$s</string>
+    <string name="export_success_title">Файл сохранён</string>
+    <string name="export_error_title">Ошибка экспорта</string>
+
+    <string name="export_section_title_emoji">📤 Экспорт данных</string>
+    <string name="export_section_description_friendly">Скачайте все свои транзакции в формате CSV — удобно для Excel и других программ. Ваши данные всегда под рукой!</string>
+    <string name="export_button_friendly">Экспортировать в CSV</string>
+
+    <string name="import_section_title_emoji">📥 Импорт транзакций</string>
+    <string name="import_section_description_friendly">Загрузите выписку из банка или CSV-файл, чтобы добавить транзакции в приложение. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
+    <string name="import_button_friendly">Импортировать из файла</string>
+
+    <string name="open_csv_with">Открыть CSV файл с помощью...</string>
+
+    <string name="profile_budget_subtitle">Планируйте бюджет и контролируйте расходы</string>
+    <string name="profile_export_import_subtitle">Экспортируйте или импортируйте ваши данные</string>
+
 </resources>

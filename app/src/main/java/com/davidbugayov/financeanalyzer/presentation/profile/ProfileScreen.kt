@@ -2,7 +2,9 @@ package com.davidbugayov.financeanalyzer.presentation.profile
 
 import android.app.Activity
 import android.content.Context
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,6 +15,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
@@ -33,10 +37,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
@@ -51,7 +58,6 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -154,12 +160,23 @@ fun ProfileScreen(
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
                 // Секция бюджета
-                BudgetSection(onNavigateToBudget, modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding)))
+                ProfileActionCard(
+                    icon = Icons.Default.AccountBalanceWallet,
+                    iconBackground = MaterialTheme.colorScheme.primary,
+                    title = stringResource(R.string.budget),
+                    subtitle = stringResource(R.string.profile_budget_subtitle),
+                    onClick = onNavigateToBudget,
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding), vertical = 4.dp)
+                )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
                 // Секция экспорт и импорт
-                ExportImportSection(
-                    onNavigateToExportImport,
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
+                ProfileActionCard(
+                    icon = Icons.Default.FileUpload,
+                    iconBackground = MaterialTheme.colorScheme.primary,
+                    title = stringResource(R.string.export_import),
+                    subtitle = stringResource(R.string.profile_export_import_subtitle),
+                    onClick = { onNavigateToExportImport(Screen.ExportImport.route) },
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding), vertical = 4.dp)
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
 
@@ -264,80 +281,54 @@ private fun ShowDialogs(
     }
 }
 
-/**
- * Секция бюджета на экране профиля.
- * @param onNavigateToBudget Обработчик перехода к бюджету.
- * @param modifier Модификатор для внешнего вида.
- */
 @Composable
-private fun BudgetSection(
-    onNavigateToBudget: () -> Unit,
+fun ProfileActionCard(
+    icon: ImageVector,
+    iconBackground: Color,
+    title: String,
+    subtitle: String,
+    onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Card(
         modifier = modifier
             .fillMaxWidth()
-            .clickable { onNavigateToBudget() },
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+            .clickable { onClick() },
+        elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
+        shape = RoundedCornerShape(20.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium)),
+            modifier = Modifier.padding(20.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                imageVector = Icons.Default.AccountBalanceWallet,
-                contentDescription = stringResource(R.string.budget),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
-            )
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-            Text(
-                text = stringResource(R.string.budget),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
-        }
-    }
-}
-
-/**
- * Секция экспорта и импорта на экране профиля.
- * @param onNavigateToExportImport Обработчик перехода к экспорту/импорту.
- * @param modifier Модификатор для внешнего вида.
- */
-@Composable
-private fun ExportImportSection(
-    onNavigateToExportImport: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
-    Card(
-        modifier = modifier
-            .fillMaxWidth(),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
-    ) {
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium))
-                .clickable { onNavigateToExportImport(Screen.ExportImport.route) },
-            verticalArrangement = androidx.compose.foundation.layout.Arrangement.Center
-        ) {
-            Icon(
-                imageVector = Icons.Default.FileUpload,
-                contentDescription = stringResource(R.string.export_import),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
-            )
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-            Text(
-                text = stringResource(R.string.export_import),
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                color = MaterialTheme.colorScheme.onSurface
-            )
+            Box(
+                modifier = Modifier
+                    .size(48.dp)
+                    .background(iconBackground, shape = CircleShape),
+                contentAlignment = Alignment.Center
+            ) {
+                Icon(
+                    imageVector = icon,
+                    contentDescription = null,
+                    tint = Color.White,
+                    modifier = Modifier.size(28.dp)
+                )
+            }
+            Spacer(modifier = Modifier.width(16.dp))
+            Column {
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
         }
     }
 }

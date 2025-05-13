@@ -168,6 +168,7 @@ private fun HomeDialogs(
 
 @Composable
 private fun HomeFeedback(
+    title: String,
     feedbackMessage: String,
     feedbackType: FeedbackType,
     showFeedback: Boolean,
@@ -175,6 +176,7 @@ private fun HomeFeedback(
     modifier: Modifier = Modifier
 ) {
     FeedbackMessage(
+        title = title,
         message = feedbackMessage,
         type = feedbackType,
         visible = showFeedback,
@@ -299,6 +301,12 @@ fun HomeScreen(
                 )
             }
             HomeFeedback(
+                title = when (feedbackType) {
+                    FeedbackType.SUCCESS -> "Успех"
+                    FeedbackType.ERROR -> "Ошибка"
+                    FeedbackType.WARNING -> "Внимание"
+                    FeedbackType.INFO -> "Уведомление"
+                },
                 feedbackMessage = feedbackMessage,
                 feedbackType = feedbackType,
                 showFeedback = showFeedback,
