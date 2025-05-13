@@ -39,6 +39,7 @@
     <color name="bank_tinkoff">#FFDD2D</color>
     <color name="bank_alfabank">#EF3124</color>
     <color name="bank_ozon">#0066C0</color>
+    <color name="bank_csv">#607D8B</color>
     
     <!-- Income/Expense colors -->
     <color name="income">#4CAF50</color>

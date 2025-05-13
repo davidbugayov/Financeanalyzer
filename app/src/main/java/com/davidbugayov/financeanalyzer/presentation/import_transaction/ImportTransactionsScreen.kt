@@ -18,18 +18,20 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -120,7 +122,7 @@ fun ImportTransactionsScreen(
         processUri(selectedUri)
     }
 
-    val storagePermissionLauncher = rememberLauncherForActivityResult(
+    rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission()
     ) { isGranted ->
         if (isGranted) {
@@ -193,40 +195,29 @@ fun ImportTransactionsScreen(
                 // Секция с банками с анимацией
                 AnimatedVisibility(
                     visible = showBanksList,
-                    enter = fadeIn(animationSpec = tween(700)) + 
-                            expandVertically(
+                    enter = fadeIn(animationSpec = tween(700)) +
+                            slideInVertically(
+                                initialOffsetY = { 50 },
                                 animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                                    dampingRatio = Spring.DampingRatioLowBouncy,
                                     stiffness = Spring.StiffnessLow
                                 )
                             )
                 ) {
-                    Column {
-                        Text(
-                            text = stringResource(R.string.supported_banks_title),
-                            style = androidx.compose.material3.MaterialTheme.typography.titleLarge,
-                            modifier = Modifier.fillMaxWidth()
-                        )
-
-                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-
-                        BanksList(
-                            onBankClick = { bankName ->
-                                selectedBank = bankName
-                                showBankInstructionDialog = true
-                            }
-                        )
-                    }
+                    BanksList(
+                        onBankClick = { bank ->
+                            selectedBank = bank
+                            showBankInstructionDialog = true
+                        }
+                    )
                 }
-
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
 
                 // Кнопка выбора файла с анимацией
                 AnimatedVisibility(
                     visible = showButton,
                     enter = fadeIn(animationSpec = tween(700)) + 
                             slideInVertically(
-                                initialOffsetY = { 50 },
+                                initialOffsetY = { 100 },
                                 animationSpec = spring(
                                     dampingRatio = Spring.DampingRatioLowBouncy,
                                     stiffness = Spring.StiffnessLow
@@ -236,27 +227,41 @@ fun ImportTransactionsScreen(
                     Button(
                         onClick = {
                             if (Build.VERSION.SDK_INT >= 35) {
-                                // Для Android 15+ используем ContentResolver напрямую
                                 getContentLauncher.launch("*/*")
                             } else {
-                                // Для старых версий проверяем разрешения
-                                if (PermissionUtils.hasReadExternalStoragePermission(context)) {
-                                    filePickerLauncher.launch(arrayOf("text/csv", "application/pdf", "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
-                                } else {
-                                    val permission = PermissionUtils.getReadStoragePermission()
-                                    storagePermissionLauncher.launch(permission)
-                                }
+                                filePickerLauncher.launch(
+                                    arrayOf(
+                                        "text/csv",
+                                        "application/pdf",
+                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+                                    )
+                                )
                             }
                         },
-                        modifier = Modifier.fillMaxWidth(),
-                        enabled = !state.isLoading
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.button_height))
+                            .padding(top = dimensionResource(R.dimen.space_medium)),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = androidx.compose.ui.graphics.Color.White
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = dimensionResource(R.dimen.button_elevation)
+                        )
                     ) {
                         Icon(
                             imageVector = Icons.Default.CloudUpload,
                             contentDescription = null,
+                            tint = androidx.compose.ui.graphics.Color.White,
                             modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
                         )
-                        Text(text = stringResource(R.string.choose_file_button))
+                        Text(
+                            text = stringResource(R.string.choose_file_button),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = androidx.compose.ui.graphics.Color.White
+                        )
                     }
                 }
 

@@ -465,31 +465,25 @@
     <!-- Import Transactions Screen -->
     <string name="import_transactions_title">Импорт транзакций</string>
     <string name="supported_banks_title">Поддерживаемые банки</string>
-    <string name="choose_file_button">Выбрать файл для импорта (CSV, PDF, XLSX)</string>
+    <string name="choose_file_button">Выбрать файл для импорта</string>
     <string name="how_to_import">Как импортировать транзакции</string>
-    <string name="import_instructions">1. Выгрузите выписку в формате CSV или XLSX из вашего банка\n2. Для Альфа-Банка лучше использовать формат XLSX\n3. Для Сбербанка также поддерживается формат PDF\n4. Выберите файл выписки через кнопку ниже\n5. Приложение автоматически определит формат\n6. Дождитесь завершения импорта\n\nНажмите на карточку банка ниже, чтобы узнать как получить выписку.</string>
+    <string name="import_instructions">1. Скачайте выписку из банка в формате CSV, PDF или XLSX\n2. Для Альфа-Банка лучше использовать формат XLSX\n3. Для Сбербанка поддерживается также PDF\n4. Нажмите кнопку ниже и выберите файл\n5. Дождитесь завершения импорта\n\nНажмите на банк ниже, чтобы узнать подробную инструкцию.</string>
     <string name="import_csv_title">Импорт CSV-файлов</string>
     <string name="csv_requirements_title">Требования к CSV-файлу:</string>
-    <string name="csv_requirements">• Файл должен содержать столбцы: дата, сумма, категория\n• Разделитель полей: запятая или точка с запятой\n• Кодировка: UTF-8\n• Пример: 01.01.2023,1000,Продукты</string>
+    <string name="csv_requirements">• Столбцы: дата, сумма, категория\n• Разделитель: запятая или точка с запятой\n• Кодировка: UTF-8\n• Пример: 01.01.2023,1000,Продукты</string>
     <string name="more_details">Подробнее</string>
-
-    <!-- Banks -->
-    <string name="bank_sberbank">Сбербанк</string>
-    <string name="bank_tinkoff">Т-Банк</string>
-    <string name="bank_alfabank">Альфа-Банк</string>
-    <string name="bank_ozon">Ozon</string>
-    <string name="bank_csv">CSV</string>
-
-    <!-- Import Results -->
-    <string name="import_in_progress">Импорт транзакций…</string>
+    <string name="import_in_progress">Импортируем транзакции…</string>
     <string name="import_progress_count">%1$d из %2$d транзакций</string>
-    <string name="import_success">Импорт успешно завершен</string>
-    <string name="imported_count">Импортировано: %d транзакций</string>
-    <string name="skipped_count">Пропущено: %d транзакций</string>
+    <string name="import_success">Импорт завершён!</string>
+    <string name="imported_count">Импортировано: %d</string>
+    <string name="skipped_count">Пропущено: %d</string>
     <string name="import_total_amount">Общая сумма: %d ₽</string>
     <string name="import_error">Ошибка при импорте</string>
     <string name="import_unknown_error">Неизвестная ошибка</string>
-    <string name="select_file_prompt">Выберите файл для импорта транзакций</string>
+    <string name="select_file_prompt">Выберите файл для импорта</string>
+    <string name="import_section_title">Импорт транзакций</string>
+    <string name="import_section_description">Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
+    <string name="import_button">Импортировать</string>
 
     <!-- Bank Instructions -->
     <string name="bank_instructions_title">Как получить выписку из %s</string>
@@ -889,9 +883,6 @@
     <string name="export_import_screen_title">Экспорт и импорт данных</string>
     <string name="export_section_title">Экспорт данных</string>
     <string name="export_section_description">Экспортируйте все транзакции в CSV файл для использования в Excel или других программах.</string>
-    <string name="import_section_title">Импорт транзакций</string>
-    <string name="import_section_description">Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Озон Банк.</string>
-    <string name="import_button">Импортировать транзакции</string>
     <string name="export_action_error">Не удалось выполнить действие: %1$s</string>
     <string name="error_no_csv_app">Нет приложения для открытия CSV-файлов. Вы можете открыть файл вручную через файловый менеджер или воспользоваться функцией "Поделиться".</string>
     <string name="error_action_failed">Не удалось выполнить действие: %1$s</string>
@@ -906,9 +897,15 @@
     <string name="import_section_description_friendly">Загрузите выписку из банка или CSV-файл, чтобы добавить транзакции в приложение. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
     <string name="import_button_friendly">Импортировать из файла</string>
 
-    <string name="open_csv_with">Открыть CSV файл с помощью...</string>
+    <string name="open_csv_with">Открыть CSV файл с помощью…</string>
 
     <string name="profile_budget_subtitle">Планируйте бюджет и контролируйте расходы</string>
     <string name="profile_export_import_subtitle">Экспортируйте или импортируйте ваши данные</string>
+
+    <string name="bank_sberbank">Сбербанк</string>
+    <string name="bank_tinkoff">Тинькофф</string>
+    <string name="bank_alfabank">Альфа-Банк</string>
+    <string name="bank_ozon">Ozon</string>
+    <string name="bank_csv">CSV</string>
 
 </resources>
