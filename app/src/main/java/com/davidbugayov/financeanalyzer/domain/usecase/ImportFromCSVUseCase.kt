@@ -341,7 +341,10 @@ class ImportFromCSVUseCase(
                             }
 
                             val dateString = cleanField(rawDateValue)
-                            val amountString = cleanField(rawAmountValue).replace(",", ".")
+                            val amountString = cleanField(rawAmountValue)
+                                .replace(",", ".")
+                                .replace("[\\s\\u00A0]+", "") // Удаляем все пробелы, включая неразрывные
+                                .replace("[^0-9.\\-+]", "") // Оставляем только цифры, точку и знаки
 
                             Timber.d("ИМПОРТ: Обрабатываем дату: '$dateString', сумму: '$amountString'")
 
@@ -478,11 +481,42 @@ class ImportFromCSVUseCase(
 
                             // Парсим сумму
                             val amountValue = try {
-                                val parsedAmount = amountString.toDouble()
-                                Timber.d("ИМПОРТ: Сумма успешно распарсена: $amountString -> $parsedAmount")
-                                parsedAmount
+                                if (amountString.isBlank()) {
+                                    Timber.w("ИМПОРТ: Пустая строка суммы после очистки")
+                                    0.0
+                                } else {
+                                    try {
+                                        // Пробуем парсить напрямую - для чистых чисел от экспорта
+                                        val parsedAmount = amountString.toDouble()
+                                        Timber.d("ИМПОРТ: Сумма успешно распарсена: $amountString -> $parsedAmount")
+                                        parsedAmount
+                                    } catch (_: Exception) {
+                                        // Если не получилось напрямую, пробуем через Money.fromString
+                                        try {
+                                            val money = Money.fromString(amountString)
+                                            Timber.d("ИМПОРТ: Сумма успешно распарсена через Money.fromString: $amountString -> ${money.amount}")
+                                            money.amount.toDouble()
+                                        } catch (_: Exception) {
+                                            // Если и так не получилось, используем максимальную очистку и BigDecimal
+                                            Timber.d("ИМПОРТ: Пробуем парсить через BigDecimal с максимальной очисткой: $amountString")
+                                            val cleanedAmount = amountString
+                                                .replace("[\\s\\u00A0]+", "") // Удаляем все пробелы, включая неразрывные
+                                                .replace("[^0-9.\\-+]", "") // Оставляем только цифры, точку и знаки
+                                                .replace(",", ".") // Заменяем запятые на точки
+
+                                            if (cleanedAmount.isBlank()) {
+                                                Timber.w("ИМПОРТ: Пустая строка суммы после тщательной очистки")
+                                                0.0
+                                            } else {
+                                                val parsedAmount = java.math.BigDecimal(cleanedAmount).toDouble()
+                                                Timber.d("ИМПОРТ: Сумма успешно распарсена через BigDecimal с очисткой: $cleanedAmount -> $parsedAmount")
+                                                parsedAmount
+                                            }
+                                        }
+                                    }
+                                }
                             } catch (e: Exception) {
-                                Timber.w("ИМПОРТ: Ошибка парсинга суммы '$amountString': ${e.message}")
+                                Timber.w(e, "ИМПОРТ: Критическая ошибка парсинга суммы '$amountString': ${e.message}")
                                 0.0 // Пропускаем при ошибке парсинга суммы
                             }
 
@@ -702,7 +736,8 @@ class ImportFromCSVUseCase(
      * Очищает значение поля от кавычек и лишних пробелов
      */
     private fun cleanField(value: String): String {
-        val cleaned = value.trim().let {
+        // Сначала очищаем от кавычек
+        val unquoted = value.trim().let {
             // Если поле начинается и заканчивается кавычками, удаляем их
             if (it.startsWith("\"") && it.endsWith("\"") && it.length >= 2) {
                 it.substring(1, it.length - 1)
@@ -710,6 +745,9 @@ class ImportFromCSVUseCase(
                 it
             }
         }
+
+        // Удаляем неразрывные пробелы и другие пробельные символы с краев
+        val cleaned = unquoted.trim().replace("\\s+".toRegex(), " ")
         
         Timber.d("ИМПОРТ: Очищено поле: '$value' -> '$cleaned'")
         return cleaned

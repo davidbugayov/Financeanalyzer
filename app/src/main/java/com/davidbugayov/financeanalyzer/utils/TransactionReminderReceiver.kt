@@ -36,16 +36,16 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
         try {
             when (intent.action) {
                 ACTION_SHOW_PERMISSION_NOTIFICATION -> {
-                    // Показываем уведомление о разрешениях
                     showPermissionNotification(context)
                 }
-
+                Intent.ACTION_BOOT_COMPLETED -> {
+                    // Только перепланировать, не показывать уведомление!
+                    rescheduleReminder()
+                }
                 else -> {
-                    // Показываем стандартное уведомление
+                    // Показываем уведомление только если это не системное событие
                     showNotification(context)
-
-                    // Перепланируем уведомление на следующий день
-                    rescheduleReminder() // Removed context
+                    rescheduleReminder()
                 }
             }
         } catch (e: Exception) {
