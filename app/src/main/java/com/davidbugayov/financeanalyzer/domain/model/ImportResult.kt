@@ -1,15 +1,16 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
 /**
- * Представляет результат операции импорта транзакций.
- * Используется для отслеживания прогресса и результатов импорта.
+ * Класс, представляющий результат операции импорта транзакций.
+ * Может содержать информацию об успехе, прогрессе или ошибке.
  */
 sealed class ImportResult {
     /**
-     * Прогресс импорта.
-     * @property current Текущее количество обработанных транзакций
-     * @property total Общее количество транзакций для импорта
-     * @property message Сообщение о текущем шаге импорта
+     * Прогресс выполнения импорта.
+     *
+     * @param current Текущий прогресс
+     * @param total Общее количество для обработки
+     * @param message Сообщение о прогрессе
      */
     data class Progress(
         val current: Int,
@@ -18,24 +19,73 @@ sealed class ImportResult {
     ) : ImportResult()
 
     /**
-     * Успешное завершение импорта.
-     * @property importedCount Количество успешно импортированных транзакций
-     * @property skippedCount Количество пропущенных транзакций
-     * @property totalAmount Общая сумма импортированных транзакций
+     * Успешный результат импорта.
+     *
+     * @param importedCount Количество успешно импортированных транзакций
+     * @param skippedCount Количество пропущенных транзакций
+     * @param message Дополнительное сообщение
      */
     data class Success(
         val importedCount: Int,
         val skippedCount: Int,
-        val totalAmount: Money
+        val message: String = ""
     ) : ImportResult()
 
     /**
      * Ошибка при импорте.
-     * @property message Сообщение об ошибке
-     * @property exception Исключение, вызвавшее ошибку (если доступно)
+     *
+     * @param exception Исключение, вызвавшее ошибку (если есть)
+     * @param message Сообщение об ошибке
      */
     data class Error(
-        val message: String,
-        val exception: Exception? = null
+        val exception: Exception? = null,
+        val message: String
     ) : ImportResult()
+
+    companion object {
+
+        /**
+         * Создает объект ошибки с указанным сообщением.
+         *
+         * @param message Сообщение об ошибке
+         * @return Объект ошибки
+         */
+        fun error(message: String): Error {
+            return Error(message = message)
+        }
+
+        /**
+         * Создает объект ошибки с указанным исключением.
+         *
+         * @param exception Исключение
+         * @return Объект ошибки
+         */
+        fun error(exception: Exception): Error {
+            return Error(exception, exception.message ?: "Неизвестная ошибка")
+        }
+
+        /**
+         * Создает объект успеха с указанными параметрами.
+         *
+         * @param importedCount Количество успешно импортированных транзакций
+         * @param skippedCount Количество пропущенных транзакций
+         * @param message Дополнительное сообщение
+         * @return Объект успеха
+         */
+        fun success(importedCount: Int, skippedCount: Int, message: String = ""): Success {
+            return Success(importedCount, skippedCount, message)
+        }
+
+        /**
+         * Создает объект прогресса с указанными параметрами.
+         *
+         * @param current Текущий прогресс
+         * @param total Общее количество для обработки
+         * @param message Сообщение о прогрессе
+         * @return Объект прогресса
+         */
+        fun progress(current: Int, total: Int, message: String = ""): Progress {
+            return Progress(current, total, message)
+        }
+    }
 } 

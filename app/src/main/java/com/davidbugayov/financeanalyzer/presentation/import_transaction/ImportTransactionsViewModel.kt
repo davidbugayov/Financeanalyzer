@@ -1,38 +1,43 @@
 package com.davidbugayov.financeanalyzer.presentation.import_transaction
 
+import android.app.Application
 import android.net.Uri
-import androidx.lifecycle.ViewModel
+import android.provider.OpenableColumns
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsState
-import com.davidbugayov.financeanalyzer.utils.logging.FileLogger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
 /**
  * ViewModel для экрана импорта транзакций.
- * Реализует паттерн MVI (Model-View-Intent) и принципы Clean Architecture.
+ * Управляет процессом импорта и состоянием UI.
+ * Использует паттерн MVI (Model-View-Intent).
  */
 class ImportTransactionsViewModel(
-    private val importManager: ImportTransactionsManager
-) : ViewModel() {
+    private val importTransactionsUseCase: ImportTransactionsUseCase,
+    application: Application
+) : AndroidViewModel(application) {
 
-    // Состояние UI, соответствующее MVI
-    private val _state = MutableStateFlow(ImportTransactionsState())
-    val state: StateFlow<ImportTransactionsState> = _state.asStateFlow()
+    // UI состояние для отображения на экране
+    private val _state = MutableStateFlow(ImportState())
+    val state: StateFlow<ImportState> = _state.asStateFlow()
 
+    // Для обратной совместимости с предыдущим подходом
+    private val _uiState = MutableStateFlow<ImportUiState>(ImportUiState.Initial)
+    val uiState: StateFlow<ImportUiState> = _uiState
+    
     /**
-     * Обрабатывает интенты, пришедшие из UI.
-     * Ключевой метод паттерна MVI.
+     * Обрабатывает намерения пользователя в соответствии с паттерном MVI.
      *
-     * @param intent Интент для обработки
+     * @param intent Намерение пользователя
      */
     fun handleIntent(intent: ImportTransactionsIntent) {
         when (intent) {
@@ -43,131 +48,181 @@ class ImportTransactionsViewModel(
     }
 
     /**
-     * Начинает процесс импорта транзакций из выбранного файла.
+     * Запускает импорт транзакций из указанного файла.
      *
-     * @param uri URI выбранного файла
+     * @param uri URI файла для импорта
      */
     private fun startImport(uri: Uri) {
-        Timber.d("Начинаем импорт из URI: $uri")
-        viewModelScope.launch {
-            try {
-                // Сбрасываем состояние перед началом нового импорта
-                _state.update {
-                    it.copy(
-                        isLoading = true,
-                        error = null,
-                        isImportCompleted = false,
-                        progress = 0,
-                        totalCount = 0,
-                        successCount = 0,
-                        skippedCount = 0,
-                        totalAmount = Money(0.0),
-                        currentStep = "Анализ файла..."
-                    )
-                }
+        if (_state.value.isLoading) {
+            Timber.d("Импорт уже выполняется, запрос игнорируется")
+            return
+        }
 
-                // Делегируем процесс импорта в менеджер
-                try {
-                    importManager.importTransactions(uri).collect { result ->
-                        processImportResult(result)
+        Timber.d("Начинаем импорт файла с URI: $uri, схема: ${uri.scheme}, путь: ${uri.path}")
+
+        // Проверяем доступность файла
+        try {
+            getApplication<Application>().contentResolver.openInputStream(uri)?.use { stream ->
+                Timber.d("Файл успешно открыт, размер: ${stream.available()} байт")
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "❌ ОШИБКА при открытии файла: ${e.message}")
+        }
+
+        // Получаем MIME-тип и имя файла для диагностики
+        try {
+            val mimeType = getApplication<Application>().contentResolver.getType(uri)
+            Timber.d("MIME-тип файла: $mimeType")
+
+            getApplication<Application>().contentResolver.query(uri, null, null, null, null)?.use { cursor ->
+                if (cursor.moveToFirst()) {
+                    val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
+                    if (displayNameIndex != -1) {
+                        val fileName = cursor.getString(displayNameIndex)
+                        Timber.d("Имя файла: $fileName")
                     }
-                } catch (e: Exception) {
-                    Timber.e(e, "Ошибка при выполнении импорта")
-                    _state.update {
-                        it.copy(
-                            isLoading = false,
-                            error = "Ошибка импорта: ${e.message ?: "Неизвестная ошибка"}",
-                            isImportCompleted = true
-                        )
+                }
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при получении информации о файле: ${e.message}")
+        }
+
+        // Обновляем состояние, показывая процесс загрузки
+        _state.value = _state.value.copy(
+            isLoading = true,
+            progress = 0,
+            progressMessage = "Начало импорта...",
+            error = null,
+            successCount = 0,
+            skippedCount = 0
+        )
+
+        // Для обратной совместимости
+        _uiState.value = ImportUiState.Loading("Начало импорта...")
+
+        viewModelScope.launch(Dispatchers.IO) {
+            try {
+                importTransactionsUseCase.importTransactions(uri) { current, total, message ->
+                    val progress = if (total > 0) (current * 100 / total) else 0
+                    Timber.d("Прогресс импорта: $current/$total ($progress%) - $message")
+                    _state.value = _state.value.copy(
+                        progress = progress,
+                        progressMessage = message
+                    )
+                    _uiState.value = ImportUiState.Loading(message, progress)
+                }.collect { result ->
+                    when (result) {
+                        is ImportResult.Progress -> {
+                            val progress = if (result.total > 0) (result.current * 100 / result.total) else 0
+                            Timber.d("Получен прогресс: $progress% - ${result.message}")
+                            _state.value = _state.value.copy(
+                                progress = progress,
+                                progressMessage = result.message
+                            )
+                            _uiState.value = ImportUiState.Loading(result.message, progress)
+                        }
+                        is ImportResult.Success -> {
+                            val successMessage = "Импорт успешно завершен. " +
+                                    "Импортировано: ${result.importedCount}, " +
+                                    "Пропущено: ${result.skippedCount}"
+
+                            Timber.d("Импорт успешно завершен: импортировано ${result.importedCount}, пропущено ${result.skippedCount}")
+
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                successCount = result.importedCount,
+                                skippedCount = result.skippedCount,
+                                successMessage = successMessage,
+                                error = null
+                            )
+
+                            _uiState.value = ImportUiState.Success(
+                                message = successMessage,
+                                importedCount = result.importedCount,
+                                skippedCount = result.skippedCount
+                            )
+                        }
+                        is ImportResult.Error -> {
+                            val errorMessage = result.exception?.message ?: result.message
+
+                            Timber.e(result.exception, "❌ Ошибка импорта: $errorMessage")
+
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                error = errorMessage
+                            )
+
+                            _uiState.value = ImportUiState.Error(errorMessage)
+                        }
                     }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Неперехваченная ошибка в процессе импорта")
-                _state.update {
-                    it.copy(
-                        isLoading = false,
-                        error = "Ошибка импорта: ${e.message ?: "Неизвестная ошибка"}",
-                        isImportCompleted = true
-                    )
-                }
+                Timber.e(e, "❌ Необработанное исключение при импорте: ${e.message}")
+
+                _state.value = _state.value.copy(
+                    isLoading = false,
+                    error = e.message ?: "Неизвестная ошибка"
+                )
+
+                _uiState.value = ImportUiState.Error(e.message ?: "Неизвестная ошибка")
             }
         }
     }
 
     /**
-     * Обрабатывает результаты импорта и обновляет состояние UI.
-     * @param result Результат операции импорта
-     */
-    private fun processImportResult(result: ImportResult) {
-        when (result) {
-            is ImportResult.Progress -> handleProgress(result)
-            is ImportResult.Success -> handleSuccess(result)
-            is ImportResult.Error -> handleError(result)
-        }
-    }
-
-    /**
-     * Обрабатывает прогресс импорта.
-     */
-    private fun handleProgress(progress: ImportResult.Progress) {
-        Timber.d("Обработка прогресса: ${progress.current}/${progress.total} - ${progress.message}")
-        _state.update { state ->
-            state.copy(
-                progress = progress.current,
-                totalCount = progress.total,
-                currentStep = progress.message
-            )
-        }
-    }
-
-    /**
-     * Обрабатывает успешное завершение импорта.
-     */
-    private fun handleSuccess(success: ImportResult.Success) {
-        Timber.d("Импорт успешно завершен. Импортировано: ${success.importedCount}, пропущено: ${success.skippedCount}")
-        _state.update { state ->
-            state.copy(
-                isLoading = false,
-                isImportCompleted = true,
-                successCount = success.importedCount,
-                skippedCount = success.skippedCount,
-                totalAmount = success.totalAmount,
-                currentStep = "Импорт завершен"
-            )
-        }
-    }
-
-    /**
-     * Обрабатывает ошибку импорта.
-     */
-    private fun handleError(error: ImportResult.Error) {
-        Timber.e(error.exception, "Ошибка импорта: ${error.message}")
-        _state.update { state ->
-            state.copy(
-                isLoading = false,
-                isImportCompleted = true,
-                error = error.message
-            )
-        }
-    }
-
-    /**
-     * Сбрасывает состояние для нового импорта.
-     */
-    private fun resetState() {
-        Timber.d("Сброс состояния импорта")
-        _state.update { ImportTransactionsState() }
-    }
-    
-    /**
-     * Обновляет логи в состоянии UI.
+     * Обновляет логи импорта.
+     * Эта функция в настоящее время ничего не делает, но оставлена для
+     * совместимости с интерфейсом ImportTransactionsIntent.
      */
     private fun refreshLogs() {
-        val logs = FileLogger.getLastLogs(100).map { it.toString() }
-        _state.update { state ->
-            state.copy(
-                logs = logs
-            )
-        }
+        // В текущей реализации не используется
+        Timber.d("refreshLogs called, but not implemented")
     }
+
+    /**
+     * Сбрасывает состояние импорта.
+     */
+    private fun resetState() {
+        _state.value = ImportState()
+        _uiState.value = ImportUiState.Initial
+    }
+}
+
+/**
+ * Состояния UI для экрана импорта (для обратной совместимости).
+ */
+sealed class ImportUiState {
+
+    /**
+     * Начальное состояние, до начала импорта.
+     */
+    object Initial : ImportUiState()
+
+    /**
+     * Состояние загрузки/импорта.
+     *
+     * @param message Информационное сообщение
+     * @param progress Прогресс импорта (0-100)
+     */
+    data class Loading(val message: String, val progress: Int = 0) : ImportUiState()
+
+    /**
+     * Состояние успешного завершения импорта.
+     *
+     * @param message Сообщение об успешном завершении
+     * @param importedCount Количество импортированных транзакций
+     * @param skippedCount Количество пропущенных транзакций
+     */
+    data class Success(
+        val message: String,
+        val importedCount: Int,
+        val skippedCount: Int
+    ) : ImportUiState()
+
+    /**
+     * Состояние ошибки.
+     *
+     * @param message Сообщение об ошибке
+     */
+    data class Error(val message: String) : ImportUiState()
 } 

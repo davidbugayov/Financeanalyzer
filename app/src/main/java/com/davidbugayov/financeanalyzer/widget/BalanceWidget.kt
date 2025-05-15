@@ -8,7 +8,9 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.fold
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -16,9 +18,6 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.FinanceActivity
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.fold
 
 /**
  * Виджет для отображения текущего баланса, доходов и расходов.

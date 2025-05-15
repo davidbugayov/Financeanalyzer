@@ -10,7 +10,6 @@ import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.DeleteTransactionUseCase
@@ -24,12 +23,15 @@ import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodW
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.GroupTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.ImportTransactionsManager
-import com.davidbugayov.financeanalyzer.domain.usecase.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsManager
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCaseImpl
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -76,6 +78,9 @@ val appModule = module {
     single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
     single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
 
+    // Factories and managers
+    single { ImportTransactionsManager(get()) }
+
     // Use cases
     single { LoadTransactionsUseCase(get()) }
     single { AddTransactionUseCase(get()) }
@@ -85,7 +90,6 @@ val appModule = module {
     single { GroupTransactionsUseCase() }
     single { CalculateCategoryStatsUseCase(get()) }
     single { ExportTransactionsToCSVUseCase(get(), get()) }
-    single { ImportTransactionsManager(get(), androidContext(), get(), get()) }
     single { ValidateTransactionUseCase() }
     single { GetTransactionByIdUseCase(get()) }
     single { CalculateBalanceMetricsUseCase() }
@@ -101,6 +105,7 @@ val appModule = module {
         val metrics = get<CalculateBalanceMetricsUseCase>()
         GetProfileAnalyticsUseCase(androidContext(), repo, metrics)
     }
+    single<ImportTransactionsUseCase> { ImportTransactionsUseCaseImpl(get()) }
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
@@ -132,7 +137,7 @@ val appModule = module {
     viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), androidApplication()) }
     viewModel { BudgetViewModel(get(), get()) }
     viewModel { WalletTransactionsViewModel(get(), get()) }
-    viewModel { ImportTransactionsViewModel(get()) }
+    viewModel { ImportTransactionsViewModel(get(), androidApplication()) }
     viewModel { OnboardingViewModel(get()) }
 }
 

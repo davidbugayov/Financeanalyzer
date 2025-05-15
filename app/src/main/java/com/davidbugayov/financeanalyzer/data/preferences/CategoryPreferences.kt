@@ -35,7 +35,12 @@ class CategoryPreferences private constructor(context: Context) {
         }
     }
 
-    data class CustomCategoryData(val name: String, val iconName: String, val colorHex: String? = null)
+    data class CustomCategoryData(
+        val name: String,
+        val iconName: String,
+        val colorHex: String? = null,
+        val isExpense: Boolean = true // Добавлено новое поле
+    )
 
     /**
      * Сохраняет пользовательские категории расходов
@@ -222,6 +227,33 @@ class CategoryPreferences private constructor(context: Context) {
         if (!categories.contains(category)) {
             categories.add(category)
             saveDeletedDefaultIncomeCategories(categories)
+        }
+    }
+
+    /**
+     * Проверяет, существует ли категория с указанным именем
+     *
+     * @param categoryName Имя категории для проверки
+     * @return true, если категория существует
+     */
+    fun categoryExists(categoryName: String): Boolean {
+        val expenseCategories = loadExpenseCategories()
+        val incomeCategories = loadIncomeCategories()
+
+        return expenseCategories.any { it.name == categoryName } ||
+                incomeCategories.any { it.name == categoryName }
+    }
+
+    /**
+     * Добавляет новую категорию в соответствующий список (расходы или доходы)
+     *
+     * @param categoryData Данные категории для добавления
+     */
+    fun addCategory(categoryData: CustomCategoryData) {
+        if (categoryData.isExpense) {
+            addExpenseCategory(categoryData)
+        } else {
+            addIncomeCategory(categoryData)
         }
     }
 } 

@@ -89,4 +89,23 @@ class SourcePreferences private constructor(context: Context) {
             Timber.d("Source not found for deletion: $sourceName")
         }
     }
+
+    /**
+     * Проверяет, существует ли источник с указанным именем
+     *
+     * @param sourceName Имя источника для проверки
+     * @return true, если источник существует
+     */
+    fun sourceExists(sourceName: String): Boolean {
+        return getCustomSources().any { it.name == sourceName }
+    }
+
+    /**
+     * Добавляет новый источник
+     *
+     * @param source Источник для добавления
+     */
+    fun addSource(source: Source) {
+        addCustomSource(source)
+    }
 } 
