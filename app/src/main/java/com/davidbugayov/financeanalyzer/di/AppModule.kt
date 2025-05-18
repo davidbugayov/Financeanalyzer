@@ -27,6 +27,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.ValidateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportFactory
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCaseImpl
@@ -80,6 +81,7 @@ val appModule = module {
 
     // Factories and managers
     single { ImportTransactionsManager(get()) }
+    single { ImportFactory(androidContext(), get()) }
 
     // Use cases
     single { LoadTransactionsUseCase(get()) }

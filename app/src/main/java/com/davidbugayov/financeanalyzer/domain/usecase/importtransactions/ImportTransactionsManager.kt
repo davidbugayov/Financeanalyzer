@@ -9,8 +9,12 @@ import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.emitAll
+import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
+import org.koin.core.component.get
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStream
@@ -23,6 +27,8 @@ import java.io.InputStreamReader
 class ImportTransactionsManager(
     private val context: Context
 ) : KoinComponent {
+
+    private val importFactory: ImportFactory = get()
 
     init {
         try {
@@ -41,18 +47,18 @@ class ImportTransactionsManager(
      * @param progressCallback Колбэк для отслеживания прогресса
      * @return Результат импорта
      */
-    suspend fun importFromUri(uri: Uri, progressCallback: ImportProgressCallback): ImportResult {
+    fun importFromUri(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
         Timber.d("ImportTransactionsManager - начало importFromUri с URI: $uri")
 
-        // Информация о файле для обработки
-        var fileFormat = FileFormat.UNKNOWN
+        var fileFormat = FileType.UNKNOWN
+        var fileName = ""
         var fileNameForDiagnostics = ""
 
         try {
             val mimeType = context.contentResolver.getType(uri)
             Timber.d("MIME-тип файла: $mimeType")
 
-            val fileName = getFileNameFromUri(uri)
+            fileName = getFileNameFromUri(uri)
             Timber.d("Имя файла из getFileNameFromUri: $fileName")
             fileNameForDiagnostics = fileName
 
@@ -69,19 +75,19 @@ class ImportTransactionsManager(
                         fileFormat = when {
                             fileName.endsWith(".pdf", ignoreCase = true) -> {
                                 Timber.d("Обнаружен PDF-файл")
-                                FileFormat.PDF
+                                FileType.PDF
                             }
                             fileName.endsWith(".xlsx", ignoreCase = true) || fileName.endsWith(".xls", ignoreCase = true) -> {
                                 Timber.d("Обнаружен Excel-файл")
-                                FileFormat.EXCEL
+                                FileType.EXCEL
                             }
                             fileName.endsWith(".csv", ignoreCase = true) -> {
                                 Timber.d("Обнаружен CSV-файл")
-                                FileFormat.CSV
+                                FileType.CSV
                             }
                             else -> {
                                 Timber.d("Неизвестный формат файла")
-                                FileFormat.UNKNOWN
+                                FileType.UNKNOWN
                             }
                         }
                     }
@@ -91,110 +97,54 @@ class ImportTransactionsManager(
             Timber.e(e, "Ошибка при определении типа файла: ${e.message}")
         }
 
-        return withContext(Dispatchers.IO) {
-            try {
-                // Открываем входной поток для чтения файла
-                Timber.d("Пытаемся открыть inputStream")
-                val inputStream = context.contentResolver.openInputStream(uri)
-                    ?: return@withContext ImportResult.error("Не удалось открыть файл")
-
-                Timber.d("inputStream успешно открыт, доступно байт: ${inputStream.available()}")
-
-                // В зависимости от формата выбираем соответствующий обработчик
-                val result = when (fileFormat) {
-                    FileFormat.PDF -> {
-                        progressCallback.onProgress(10, 100, "Обработка PDF файла...")
-                        handlePdfFile(uri, progressCallback)
+        if (fileFormat == FileType.UNKNOWN) {
+            Timber.d("Формат не определен по расширению, пытаемся определить по содержимому URI: $uri")
+            val successfullyDetected = try {
+                withContext(Dispatchers.IO) {
+                    context.contentResolver.openInputStream(uri)?.use { streamForDetection ->
+                        fileFormat = detectFormatByContent(streamForDetection)
+                        Timber.d("Формат после detectFormatByContent: $fileFormat")
+                        true
+                    } ?: run {
+                        Timber.e("Не удалось открыть файл для определения формата по содержимому URI: $uri")
+                        emit(ImportResult.error("Не удалось открыть файл для определения формата"))
+                        false
                     }
-                    FileFormat.CSV -> {
-                        progressCallback.onProgress(10, 100, "Обработка CSV файла...")
-                        handleCsvFile(uri, progressCallback)
-                    }
-                    FileFormat.EXCEL -> {
-                        progressCallback.onProgress(10, 100, "Обработка Excel файла...")
-                        handleExcelFile(uri, progressCallback)
-                    }
-                    else -> {
-                        // Пробуем определить формат по содержимому
-                        val format = detectFormatByContent(inputStream)
-                        progressCallback.onProgress(10, 100, "Обработка файла (формат: $format)...")
-                        ImportResult.error("Неподдерживаемый или неизвестный формат файла")
-                    }
-                }
-
-                Timber.d("Закрываем inputStream")
-                inputStream.close()
-
-                Timber.d("Возвращаем результат: $result")
-
-                // Заполняем результат с диагностической информацией, если он пустой
-                if (result is ImportResult.Success && result.importedCount == 0 && result.skippedCount == 0) {
-                    ImportResult.success(0, 0, "Файл обработан: $fileNameForDiagnostics (формат: $fileFormat)")
-                } else {
-                    result
                 }
             } catch (e: Exception) {
-                Timber.e(e, "❌ Ошибка при импорте файла: ${e.message}")
-                ImportResult.error("Ошибка при импорте: ${e.message}")
+                Timber.e(e, "Ошибка при определении формата по содержимому: ${e.message}")
+                emit(ImportResult.error("Ошибка при определении формата файла по содержимому: ${e.message}"))
+                false
             }
+            if (!successfullyDetected) return@flow
         }
-    }
 
-    /**
-     * Обрабатывает PDF-файл
-     */
-    private fun handlePdfFile(uri: Uri, progressCallback: ImportProgressCallback): ImportResult {
-        Timber.d("Обработка PDF-файла")
-        try {
-            val pdfText = tryReadPdfContent(uri)
-            progressCallback.onProgress(50, 100, "Анализ данных из PDF...")
-            if (pdfText.isNotEmpty()) {
-                Timber.d("Текст из PDF успешно прочитан, длина: ${pdfText.length} символов")
-                return ImportResult.success(0, 0, "PDF файл прочитан успешно, но данные не импортированы")
-            } else {
-                return ImportResult.error("Не удалось извлечь текст из PDF файла")
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "❌ Ошибка при обработке PDF: ${e.message}")
-            return ImportResult.error("Ошибка при обработке PDF: ${e.message}")
+        if (fileFormat == FileType.UNKNOWN) {
+            Timber.w("Не удалось определить формат файла для URI: $uri (имя: $fileNameForDiagnostics)")
+            emit(ImportResult.error("Не удалось определить формат файла."))
+            return@flow
         }
-    }
 
-    /**
-     * Обрабатывает CSV-файл
-     */
-    private fun handleCsvFile(uri: Uri, progressCallback: ImportProgressCallback): ImportResult {
-        Timber.d("Обработка CSV-файла")
-        try {
-            val csvContent = readCsvContent(uri)
-            progressCallback.onProgress(50, 100, "Анализ данных из CSV...")
-            if (csvContent.isNotEmpty()) {
-                Timber.d("CSV файл успешно прочитан, строк: ${csvContent.size}")
-                return ImportResult.success(0, 0, "CSV файл прочитан успешно, но данные не импортированы")
-            } else {
-                return ImportResult.error("CSV файл пустой или неверного формата")
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "❌ Ошибка при обработке CSV: ${e.message}")
-            return ImportResult.error("Ошибка при обработке CSV: ${e.message}")
+        val importerUseCase = withContext(Dispatchers.Default) {
+            Timber.d("Попытка создать импортер через ImportFactory. Файл: $fileNameForDiagnostics, Тип: $fileFormat, URI: $uri")
+            importFactory.getImporter(fileNameForDiagnostics, uri, fileFormat)
         }
-    }
 
-    /**
-     * Обрабатывает Excel-файл
-     */
-    private fun handleExcelFile(uri: Uri, progressCallback: ImportProgressCallback): ImportResult {
-        Timber.d("Обработка Excel-файла")
-        progressCallback.onProgress(50, 100, "Анализ данных из Excel...")
-        // Excel пока не поддерживается полностью
-        return ImportResult.error("Импорт Excel-файлов временно не поддерживается")
+        if (importerUseCase == null) {
+            Timber.e("Не удалось создать импортер для файла: $fileNameForDiagnostics (тип: $fileFormat). Подходящий BankHandler не найден или не поддерживает этот тип файла.")
+            emit(ImportResult.error("Не найден подходящий обработчик для импорта файла $fileNameForDiagnostics."))
+            return@flow
+        }
+
+        Timber.i("Используется импортер: ${(importerUseCase as? BankImportUseCase)?.bankName ?: importerUseCase::class.simpleName} для файла $fileNameForDiagnostics")
+        emitAll(importerUseCase.importTransactions(uri, progressCallback))
     }
 
     /**
      * Читает содержимое CSV-файла
      */
     private fun readCsvContent(uri: Uri): List<String> {
-        Timber.d("Чтение содержимого CSV-файла")
+        Timber.d("Чтение содержимого CSV-файла (readCsvContent - возможно, больше не используется активно)")
         val lines = mutableListOf<String>()
 
         try {
@@ -221,7 +171,7 @@ class ImportTransactionsManager(
     /**
      * Пытается определить формат файла по его содержимому
      */
-    private fun detectFormatByContent(inputStream: InputStream): FileFormat {
+    private fun detectFormatByContent(inputStream: InputStream): FileType {
         try {
             // Сохраняем позицию в потоке
             val markSupported = inputStream.markSupported()
@@ -242,15 +192,15 @@ class ImportTransactionsManager(
                 return when {
                     content.startsWith("%PDF-") -> {
                         Timber.d("По содержимому определен PDF")
-                        FileFormat.PDF
+                        FileType.PDF
                     }
                     content.contains(",") || content.contains(";") -> {
                         Timber.d("По содержимому предположительно CSV")
-                        FileFormat.CSV
+                        FileType.CSV
                     }
                     else -> {
                         Timber.d("Не удалось определить формат по содержимому")
-                        FileFormat.UNKNOWN
+                        FileType.UNKNOWN
                     }
                 }
             }
@@ -258,7 +208,7 @@ class ImportTransactionsManager(
             Timber.e(e, "Ошибка при определении формата по содержимому: ${e.message}")
         }
 
-        return FileFormat.UNKNOWN
+        return FileType.UNKNOWN
     }
 
     /**
@@ -269,7 +219,7 @@ class ImportTransactionsManager(
      * @return Текст из PDF или пустую строку в случае ошибки
      */
     private fun tryReadPdfContent(uri: Uri): String {
-        Timber.d("Пытаемся прочитать содержимое PDF-файла")
+        Timber.d("Пытаемся прочитать содержимое PDF-файла (tryReadPdfContent - возможно, больше не используется активно)")
         try {
             // Повторно инициализируем PDFBox для надежности
             try {
@@ -374,16 +324,5 @@ class ImportTransactionsManager(
         }
 
         return ""
-    }
-
-    /**
-     * Перечисление форматов файлов
-     */
-    enum class FileFormat {
-
-        PDF,
-        CSV,
-        EXCEL,
-        UNKNOWN
     }
 } 

@@ -17,13 +17,12 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlinx.datetime.toJavaLocalDate
 import timber.log.Timber
+import java.time.ZoneId
 import java.util.Calendar
 import java.util.Date
 import java.util.concurrent.locks.ReentrantReadWriteLock
-import java.time.ZoneId
-import kotlinx.datetime.toJavaLocalDate
-import java.time.Instant
 
 /**
  * Абстрактная политика кэширования для различных типов данных.
@@ -486,16 +485,44 @@ class TransactionRepositoryImpl(
      */
     override suspend fun addTransaction(transaction: Transaction): String = withContext(Dispatchers.IO) {
         try {
+            Timber.i("[РЕПОЗИТОРИЙ] Начало добавления транзакции: ID=${transaction.id}, Дата=${transaction.date}, Сумма=${transaction.amount}, Категория='${transaction.category}', Заголовок='${transaction.title}'")
+
+            Timber.d(
+                "[РЕПОЗИТОРИЙ-ОТЛАДКА] 🔍 Полные данные транзакции: ID=${transaction.id}, Дата=${transaction.date}, Сумма=${transaction.amount}, " +
+                        "Категория='${transaction.category}', Заголовок='${transaction.title}', Источник='${transaction.source}', " +
+                        "isExpense=${transaction.isExpense}, isTransfer=${transaction.isTransfer}"
+            )
+            
             val entity = mapDomainToEntity(transaction)
+            Timber.d("[РЕПОЗИТОРИЙ] Сконвертирована в сущность: ID=${entity.id}, idString=${entity.idString}, Дата=${entity.date}, Сумма=${entity.amount}")
+
+            Timber.i("[РЕПОЗИТОРИЙ-ОТЛАДКА] ⚠️ ПЕРЕД вызовом dao.insertTransaction...")
             val id = dao.insertTransaction(entity)
+            Timber.i("[РЕПОЗИТОРИЙ-ОТЛАДКА] ✅ ПОСЛЕ вызова dao.insertTransaction, ID результата=$id")
+            
             invalidateMainCache() // Инвалидируем основной кэш вместо полной очистки
+            Timber.d("[РЕПОЗИТОРИЙ] Кэш инвалидирован после добавления транзакции")
+            
             FinancialMetrics.getInstance().recalculateStats()
+            Timber.d("[РЕПОЗИТОРИЙ] Финансовые метрики пересчитаны")
+            
             internalNotifyDataChanged(transaction.id) // Уведомляем об изменении
-            Timber.d("Транзакция добавлена: ID=$id")
-            return@withContext id.toString()
+            Timber.i("[РЕПОЗИТОРИЙ] Отправлено уведомление об изменении данных для транзакции: ID=${transaction.id}")
+
+            Timber.i("[РЕПОЗИТОРИЙ-ОТЛАДКА] 🧪 Проверка наличия сохраненной транзакции в БД...")
+            val savedTransaction = dao.getTransactionByIdString(transaction.id)
+            if (savedTransaction != null) {
+                Timber.i("[РЕПОЗИТОРИЙ] Транзакция сохранена в базу данных: ID=${transaction.id}")
+            } else {
+                Timber.e("[РЕПОЗИТОРИЙ] ❌ ОШИБКА: Транзакция НЕ найдена в базе после сохранения: ID=${transaction.id}")
+            }
+
+            return@withContext transaction.id
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при добавлении транзакции: ${e.message}")
-            throw e // Пробрасываем исключение для обработки в UseCase
+            Timber.e(e, "[РЕПОЗИТОРИЙ] ❌ Ошибка при добавлении транзакции: ${e.message}")
+            Timber.e("[РЕПОЗИТОРИЙ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}, title=${transaction.title}")
+            Timber.e("[РЕПОЗИТОРИЙ-ОТЛАДКА] 🔍 Стек вызовов: ${e.stackTraceToString()}")
+            throw e // Пробрасываем исключение для обработки выше
         }
     }
     

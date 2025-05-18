@@ -4,7 +4,10 @@ import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.onStart
 import timber.log.Timber
 
 /**
@@ -26,28 +29,21 @@ class ImportTransactionsUseCaseImpl(
         uri: Uri,
         progressCallback: ImportProgressCallback
     ): Flow<ImportResult> = flow {
-        try {
-            Timber.d("ImportTransactionsUseCaseImpl - начало импорта с URI: $uri")
+        Timber.d("ImportTransactionsUseCaseImpl - начало импорта с URI: $uri")
 
-            // Сначала отправляем сообщение о начале импорта
-            emit(ImportResult.progress(0, 100, "Начало импорта..."))
-
-            // Вызываем менеджер и передаем callback для отслеживания прогресса
-            Timber.d("Вызываем ImportTransactionsManager.importFromUri")
-            try {
-                val result = importTransactionsManager.importFromUri(uri, progressCallback)
-                Timber.d("Получен результат импорта: $result")
-
-                // Отправляем финальный результат
-                emit(result)
-            } catch (e: Exception) {
-                Timber.e(e, "❌ ОШИБКА при вызове ImportTransactionsManager.importFromUri: ${e.message}")
-                throw e
+        // ImportTransactionsManager.importFromUri теперь возвращает Flow.
+        // Мы можем напрямую вернуть этот Flow, добавив обработку ошибок и начальное состояние.
+        emitAll(
+            importTransactionsManager.importFromUri(uri, progressCallback)
+                .onStart {
+                    Timber.d("ImportTransactionsUseCaseImpl - Flow от менеджера стартовал")
+                    // Можно эмитить начальный прогресс здесь, если менеджер или BankImportUseCase этого не делают первыми
+                    // emit(ImportResult.progress(0, 100, "Подготовка к импорту..."))
             }
-        } catch (e: Exception) {
-            // В случае ошибки отправляем сообщение об ошибке
-            Timber.e(e, "❌ ОШИБКА при импорте транзакций: ${e.message}")
-            emit(ImportResult.error("Ошибка при импорте: ${e.message}"))
-        }
+                .catch { e ->
+                    Timber.e(e, "❌ ОШИБКА в Flow импорта транзакций: ${e.message}")
+                    emit(ImportResult.error("Ошибка при импорте: ${e.message}"))
+                }
+        )
     }
 } 

@@ -896,6 +896,7 @@
     <string name="import_section_title_emoji">📥 Импорт транзакций</string>
     <string name="import_section_description_friendly">Загрузите выписку из банка или CSV-файл, чтобы добавить транзакции в приложение. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
     <string name="import_button_friendly">Импортировать из файла</string>
+    <string name="importing_file">Импортирую…</string>
 
     <string name="open_csv_with">Открыть CSV файл с помощью…</string>
 

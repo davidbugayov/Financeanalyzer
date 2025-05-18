@@ -12,6 +12,7 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
 import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
+import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -43,6 +44,10 @@ class FinanceApp : Application() {
         try {
             // Сначала инициализируем параметры для POI, Log4j и других библиотек
             initializeExternalLibraries()
+
+            // Инициализация PDFBoxResourceLoader
+            PDFBoxResourceLoader.init(applicationContext)
+            Timber.d("PDFBoxResourceLoader инициализирован")
             
             // Сначала инициализируем обычное логирование Timber
             TimberInitializer.init(BuildConfig.DEBUG)
@@ -127,7 +132,7 @@ class FinanceApp : Application() {
             crashlytics = FirebaseCrashlytics.getInstance()
 
             // Включаем Crashlytics для всех сборок
-            crashlytics.setCrashlyticsCollectionEnabled(true)
+            crashlytics.isCrashlyticsCollectionEnabled = true
 
             // Добавляем ключевую информацию для отладки
             crashlytics.setCustomKey("app_version", BuildConfig.VERSION_NAME)
