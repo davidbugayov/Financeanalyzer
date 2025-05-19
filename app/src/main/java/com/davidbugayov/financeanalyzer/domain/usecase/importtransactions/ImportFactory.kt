@@ -9,6 +9,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.GenericCsvHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.GenericExcelHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.SberbankPdfHandler
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.OzonPdfHandler
 import timber.log.Timber
 
 /**
@@ -25,6 +26,7 @@ class ImportFactory(
             // Specific handlers first
             SberbankPdfHandler(transactionRepository, context),
             AlfaBankExcelHandler(transactionRepository, context),
+            OzonPdfHandler(transactionRepository, context),
             // Generic handlers last as fallbacks
             GenericCsvHandler(transactionRepository, context),
             GenericExcelHandler(transactionRepository, context)

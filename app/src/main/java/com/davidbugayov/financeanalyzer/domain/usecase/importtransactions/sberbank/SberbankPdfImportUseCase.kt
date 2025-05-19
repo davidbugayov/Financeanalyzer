@@ -34,6 +34,9 @@ class SberbankPdfImportUseCase(
 
     override val bankName: String = "Сбербанк (PDF)"
 
+    // Константа для источника транзакций
+    private val transactionSource: String = "Сбер"
+
     /**
      * Модель для обработки многострочных транзакций
      */
@@ -439,7 +442,7 @@ class SberbankPdfImportUseCase(
                 date = transactionDate,
                 isExpense = isExpense,
                 note = noteParts.joinToString("; ").ifBlank { null },
-                source = bankName,
+                source = transactionSource,
                 sourceColor = 0,
                 categoryId = "",
                 title = title
