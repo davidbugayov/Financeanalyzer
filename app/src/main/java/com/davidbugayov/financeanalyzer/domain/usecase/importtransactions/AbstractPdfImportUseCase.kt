@@ -1,0 +1,146 @@
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions
+
+import android.content.Context
+import android.net.Uri
+import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
+import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.tom_roush.pdfbox.pdmodel.PDDocument
+import com.tom_roush.pdfbox.text.PDFTextStripper
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.withContext
+import timber.log.Timber
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.StringReader
+
+abstract class AbstractPdfImportUseCase(
+    context: Context,
+    transactionRepository: TransactionRepository
+) : BankImportUseCase(transactionRepository, context) {
+
+    open val headerMarkers: List<String> = listOf("Дата операции", "Дата", "Операция", "Документ", "Сумма")
+    open val dataStartRegex: Regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}")
+
+    /**
+     * Извлекает текст из PDF-файла по URI
+     */
+    protected open suspend fun extractTextFromPdf(uri: Uri): String = withContext(Dispatchers.IO) {
+        Timber.d("$bankName extractTextFromPdf: Начало извлечения текста из URI: $uri")
+        try {
+            val inputStream = context.contentResolver.openInputStream(uri)
+            if (inputStream != null) {
+                inputStream.use { stream ->
+                    PDDocument.load(stream).use { document ->
+                        val stripper = PDFTextStripper()
+                        val text = stripper.getText(document)
+                        Timber.i("$bankName extractTextFromPdf: Текст успешно извлечен. Длина: ${text.length}, Первые 100 символов: ${text.take(100)}")
+                        return@withContext text
+                    }
+                }
+            } else {
+                Timber.w("$bankName extractTextFromPdf: Не удалось открыть InputStream для PDF: $uri")
+                return@withContext ""
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "$bankName extractTextFromPdf: Ошибка при извлечении текста из PDF.")
+            throw IOException("Ошибка при извлечении текста из PDF для $bankName: ${e.localizedMessage}", e)
+        }
+    }
+
+    /**
+     * Шаблонный метод импорта PDF-файлов (общий для всех PDF-банков)
+     */
+    override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
+        emit(ImportResult.Progress(0, 100, "Начало импорта $bankName"))
+        Timber.i("$bankName importTransactions: Начало импорта из URI: $uri")
+        try {
+            val extractedText = extractTextFromPdf(uri)
+            if (extractedText.isBlank()) {
+                Timber.e("$bankName importTransactions: Извлеченный текст из PDF пуст.")
+                emit(ImportResult.Error(message = "Не удалось извлечь текст из PDF или файл пуст для $bankName."))
+                return@flow
+            }
+            emit(ImportResult.Progress(5, 100, "Текст извлечен, проверка формата..."))
+            Timber.d("$bankName importTransactions: Извлеченный текст, первые 500 символов:\n${extractedText.take(500)}...")
+
+            BufferedReader(StringReader(extractedText)).use { validationReader ->
+                if (!isValidFormat(validationReader)) {
+                    Timber.e("$bankName importTransactions: Файл не прошел валидацию как выписка $bankName.")
+                    emit(ImportResult.Error(message = "Файл не является выпиской $bankName или формат не поддерживается."))
+                    return@flow
+                }
+            }
+            Timber.i("$bankName importTransactions: Формат файла успешно валидирован.")
+            emit(ImportResult.Progress(10, 100, "Формат проверен, пропуск заголовков..."))
+
+            BufferedReader(StringReader(extractedText)).use { contentReader ->
+                skipHeaders(contentReader)
+                Timber.i("$bankName importTransactions: Заголовки пропущены, начинаем обработку транзакций.")
+                emit(ImportResult.Progress(15, 100, "Обработка транзакций..."))
+
+                val transactions = parseTransactions(contentReader, progressCallback, extractedText)
+                if (transactions.isEmpty()) {
+                    Timber.w("$bankName importTransactions: Транзакции не найдены после обработки файла.")
+                    emit(ImportResult.Error(message = "Не найдено ни одной транзакции в файле для $bankName."))
+                } else {
+                    emit(ImportResult.Progress(85, 100, "Сохранение ${transactions.size} транзакций..."))
+                    Timber.i("$bankName importTransactions: Найдено ${transactions.size} транзакций. Начинаем сохранение в базу данных")
+                    var savedCount = 0
+                    transactions.forEach { transaction ->
+                        try {
+                            transactionRepository.addTransaction(transaction)
+                            savedCount++
+                        } catch (e: Exception) {
+                            Timber.e(e, "$bankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}")
+                        }
+                    }
+                    Timber.i("$bankName importTransactions: Импорт завершен. Сохранено: $savedCount из ${transactions.size}")
+                    emit(ImportResult.Success(savedCount, transactions.size - savedCount))
+                }
+            }
+        } catch (e: IOException) {
+            Timber.e(e, "$bankName importTransactions: Ошибка ввода-вывода.")
+            emit(ImportResult.Error(exception = e, message = "Ошибка чтения файла $bankName: ${e.localizedMessage}"))
+        } catch (e: Exception) {
+            Timber.e(e, "$bankName importTransactions: Непредвиденная ошибка.")
+            emit(ImportResult.Error(exception = e, message = "Неизвестная ошибка при импорте $bankName: ${e.localizedMessage}"))
+        }
+    }
+
+    /**
+     * Абстрактный метод для парсинга транзакций из BufferedReader
+     */
+    protected abstract fun parseTransactions(
+        reader: BufferedReader,
+        progressCallback: ImportProgressCallback,
+        rawText: String
+    ): List<com.davidbugayov.financeanalyzer.domain.model.Transaction>
+
+    override fun isValidFormat(reader: BufferedReader): Boolean {
+        val headerLines = mutableListOf<String>()
+        reader.mark(8192)
+        repeat(25) {
+            val line = reader.readLine()?.replace("\u0000", "") ?: return@repeat
+            headerLines.add(line)
+        }
+        reader.reset()
+        val content = headerLines.joinToString("\n")
+        return headerMarkers.any { marker -> content.contains(marker, ignoreCase = true) }
+    }
+
+    override fun skipHeaders(reader: BufferedReader) {
+        var line: String?
+        while (true) {
+            reader.mark(1024)
+            line = reader.readLine()?.replace("\u0000", "")
+            if (line == null) break
+            if (dataStartRegex.containsMatchIn(line)) {
+                reader.reset()
+                break
+            }
+        }
+    }
+} 

@@ -31,7 +31,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudUpload
-import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
@@ -336,54 +335,20 @@ fun ImportTransactionsScreen(
                                 }
                             }
                         }
-
-                        // Добавляем сообщение об ошибке импорта
+                        // Отображение результатов импорта с анимацией
                         AnimatedVisibility(
-                            visible = state.error != null && !state.isLoading,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
+                            visible = state.successCount > 0 || state.isLoading || state.error != null,
+                            enter = fadeIn(animationSpec = tween(500)) +
+                                    expandVertically(
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioMediumBouncy,
+                                            stiffness = Spring.StiffnessLow
+                                        )
+                                    ),
+                            exit = fadeOut(animationSpec = tween(300))
                         ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = dimensionResource(R.dimen.padding_medium)),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.errorContainer
-                                ),
-                                elevation = CardDefaults.cardElevation(
-                                    defaultElevation = dimensionResource(R.dimen.card_elevation)
-                                ),
-                                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card))
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(dimensionResource(R.dimen.padding_medium)),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.Error,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.error,
-                                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
-                                    )
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                                    Text(
-                                        text = stringResource(R.string.import_error),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onErrorContainer,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                                    Text(
-                                        text = state.error ?: stringResource(R.string.import_unknown_error),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onErrorContainer
-                                    )
-                                }
-                            }
+                            ImportResultsSection(state)
                         }
-
                         // Кнопка выбора файла
                         Button(
                             onClick = {
@@ -429,21 +394,6 @@ fun ImportTransactionsScreen(
                             )
                         }
                     }
-                }
-
-                // Отображение результатов импорта с анимацией
-                AnimatedVisibility(
-                    visible = state.successCount > 0 || state.isLoading || state.error != null,
-                    enter = fadeIn(animationSpec = tween(500)) + 
-                            expandVertically(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
-                            ),
-                    exit = fadeOut(animationSpec = tween(300))
-                ) {
-                    ImportResultsSection(state)
                 }
             }
             

@@ -10,6 +10,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.BankImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.TransactionCategoryDetector
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -317,7 +318,7 @@ class GenericExcelImportUseCase(
             val transactionDate = dateString?.let { ds ->
                 try {
                     config.dateFormatConfig.primaryFormat.parse(ds)
-                } catch (e: java.text.ParseException) {
+                } catch (_: java.text.ParseException) {
                     config.dateFormatConfig.fallbackFormats.firstNotNullOfOrNull { it.parse(ds) }
                 }
             } ?: run {
@@ -342,7 +343,7 @@ class GenericExcelImportUseCase(
             val money = Money(absAmount, Currency.fromCode(currencyString.uppercase(Locale.ROOT)))
 
             val category = config.columnMapping.categoryColumnIndex?.let { columns.getOrNull(it)?.takeIf { it.isNotBlank() } }
-                ?: (if (isExpense) "Generic Excel Expense" else "Generic Excel Income")
+                ?: TransactionCategoryDetector.detect(description)
 
             val note = config.columnMapping.noteColumnIndex?.let { columns.getOrNull(it)?.takeIf { it.isNotBlank() } } ?: "Imported from $bankName"
 

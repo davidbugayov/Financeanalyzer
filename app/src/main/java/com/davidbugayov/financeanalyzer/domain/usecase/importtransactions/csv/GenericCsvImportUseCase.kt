@@ -6,6 +6,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.BankImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.TransactionCategoryDetector
 import timber.log.Timber
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
@@ -109,8 +110,8 @@ class GenericCsvImportUseCase(
 
         // Status Check
         if (config.skipTransactionIfStatusInvalid && config.statusColumnIndex != null && config.validStatusValues?.isNotEmpty() == true) {
-            val status = columns.getOrNull(config.statusColumnIndex!!)
-            if (status == null || config.validStatusValues!!.none { it.equals(status, ignoreCase = true) }) {
+            val status = columns.getOrNull(config.statusColumnIndex)
+            if (status == null || config.validStatusValues.none { it.equals(status, ignoreCase = true) }) {
                 Timber.d("[$bankName] Skipping transaction due to invalid status: '$status'. Valid statuses: ${config.validStatusValues}. Line: $line")
                 return null
             }
@@ -157,8 +158,8 @@ class GenericCsvImportUseCase(
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
             val money = Money(absAmount, currency)
 
-            // TODO: Category could also be a configured column index
-            val category = if (isExpense) "Generic Expense" else "Generic Income"
+            val category = TransactionCategoryDetector.detect(description)
+
             // TODO: Source color and categoryId mapping could also be part of config or a separate mapping mechanism
             return Transaction(
                 amount = money,

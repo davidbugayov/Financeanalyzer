@@ -78,4 +78,17 @@ abstract class AbstractBankHandler(
         // Наследники могут добавить здесь проверку fileContent, если nameMatch == false
         return false
     }
+}
+
+abstract class AbstractPdfBankHandler(
+    transactionRepository: TransactionRepository,
+    context: Context
+) : AbstractBankHandler(transactionRepository, context) {
+
+    abstract val pdfKeywords: List<String>
+    override fun supportsFileType(fileType: FileType): Boolean = fileType == FileType.PDF
+    override fun getFileNameKeywords(): List<String> = pdfKeywords
+    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
+        return supportsFileType(fileType) && pdfKeywords.any { fileName.contains(it, ignoreCase = true) }
+    }
 } 

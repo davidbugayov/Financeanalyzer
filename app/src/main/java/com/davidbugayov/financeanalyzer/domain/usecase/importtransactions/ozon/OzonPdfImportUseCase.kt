@@ -9,21 +9,25 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.BankImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.TransactionCategoryDetector
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.io.BufferedReader
-import java.io.IOException
 import java.io.StringReader
-import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 
+/**
+ * Класс для импорта транзакций из PDF-выписок Ozon Банка
+ */
 class OzonPdfImportUseCase(
     context: Context,
     transactionRepository: TransactionRepository
@@ -31,428 +35,537 @@ class OzonPdfImportUseCase(
 
     override val bankName: String = "Ozon Банк (PDF)"
 
-    // Константа для источника транзакций
-    private val transactionSource: String = "Озон"
-
-    private var currentPartialTransaction: PartialTransaction? = null
-
-    private data class PartialTransaction(
+    // Состояние для парсинга многострочной транзакции
+    private data class TransactionState(
         var date: Date? = null,
         var documentNumber: String? = null,
-        val descriptionLines: MutableList<String> = mutableListOf(),
+        var description: StringBuilder = StringBuilder(),
         var amount: Double? = null,
-        var currency: Currency = Currency.RUB,
-        var isExpense: Boolean? = null,
-        var linesProcessedForCurrentTx: Int = 0,
-        var isComplete: Boolean = false
-    ) {
-        fun clear() {
-            date = null
-            documentNumber = null
-            descriptionLines.clear()
-            amount = null
-            currency = Currency.RUB
-            isExpense = null
-            linesProcessedForCurrentTx = 0
-            isComplete = false
-        }
+        var isExpense: Boolean = false,
+        var currency: String = "RUB"
+    )
 
-        fun isValidForFinalization(): Boolean = date != null && documentNumber != null && amount != null && isExpense != null
-
-        fun buildDescription(): String = descriptionLines.joinToString(" ").trim().replace("\\s+".toRegex(), " ")
-    }
-
-    companion object {
-        private val OZON_BANK_INDICATORS = listOf("OZON", "ОЗОН", "Ozon Банк", "Озон Банк")
-        private val OZON_STATEMENT_TITLES = listOf(
-            "Выписка по счёту", "Информация по счёту", "ИСТОРИЯ ОПЕРАЦИЙ", "Справка о движении средств"
-        )
-        private val OZON_TABLE_HEADER_MARKER = "Дата операции Документ Назначение платежа Сумма операции"
-        private const val MAX_VALIDATION_LINES = 30
-        private const val MAX_HEADER_SKIP_LINES = 300
-
-        // Используем Raw Strings с явным экранированием для вложенных regex
-        private val ozonDateDocRegex = Regex("""^(\d{2}\.\d{2}\.\d{4})\s+(\d{2}:\d{2}:\d{2})\s+(\d+).*$""")
-        private val ozonAmountRegex = Regex("""^([+\-])\s*(\d[\d\s.,]*[\d])(?:\s+([A-Z]{3}))?$""")
-
-        private val IGNORE_PATTERNS = listOf(
-            Regex("^ИТОГО ПО СЧЕТУ:", RegexOption.IGNORE_CASE),
-            Regex("^Исходящий остаток:", RegexOption.IGNORE_CASE),
-            Regex("^Период:", RegexOption.IGNORE_CASE),
-            Regex("^Выписка сформирована", RegexOption.IGNORE_CASE),
-            Regex("^Страница \\d+ из \\d+", RegexOption.IGNORE_CASE)
-        )
-        private const val MAX_LINES_PER_TRANSACTION_DESCRIPTION = 10
-
-        // Добавляем новый паттерн для комбинированных строк, содержащих дату, описание и сумму
-        private val combinedTransactionRegex = Regex("""^(\d{2}\.\d{2}\.\d{4})\s+(\d{2}:\d{2}:\d{2})\s+(\d+)\s+(.+?)\s+([+\-])\s*(\d[\d\s.,]*[\d])(?:\s+([A-Z]{3}))?$""")
-    }
+    private var currentTransactionState: TransactionState? = null
 
     private suspend fun extractTextFromPdf(uri: Uri): String = withContext(Dispatchers.IO) {
-        Timber.d("Ozon extractTextFromPdf: Начало извлечения текста из URI: $uri")
+        var text = ""
         try {
             val inputStream = context.contentResolver.openInputStream(uri)
             if (inputStream != null) {
                 inputStream.use { stream ->
                     PDDocument.load(stream).use { document ->
                         val stripper = PDFTextStripper()
-                        val text = stripper.getText(document)
-                        Timber.i("Ozon extractTextFromPdf: Текст успешно извлечен. Длина: ${text.length}")
-                        return@withContext text
+                        text = stripper.getText(document)
                     }
                 }
             } else {
-                Timber.w("Ozon extractTextFromPdf: Не удалось открыть InputStream для PDF: $uri")
-                return@withContext ""
+                Timber.w("Failed to open InputStream for PDF: $uri")
             }
         } catch (e: Exception) {
-            Timber.e(e, "Ozon extractTextFromPdf: Ошибка при извлечении текста из PDF.")
-            throw IOException("Ошибка при извлечении текста из PDF: ${e.localizedMessage}", e)
+            Timber.e(e, "Error extracting text from PDF for Ozon Bank")
         }
+        text
     }
+
+    override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
+        emit(ImportResult.Progress(0, 100, "Начало импорта из PDF для Ozon Банка"))
+        Timber.d("Начало импорта из URI для Ozon Банка: $uri")
+
+        var text = ""
+        try {
+            text = extractTextFromPdf(uri)
+            if (text.isBlank()) {
+                Timber.w("Извлеченный текст из PDF пуст для Ozon Банка.")
+                emit(ImportResult.Error(message = "Не удалось извлечь текст из PDF файла."))
+                return@flow
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при извлечении текста из PDF для Ozon Банка")
+            emit(ImportResult.Error(exception = e, message = e.localizedMessage ?: "Неизвестная ошибка"))
+            return@flow
+        }
+
+        val reader = BufferedReader(StringReader(text))
+
+        if (!isValidFormat(reader)) {
+            Timber.w("Файл не соответствует формату выписки Ozon Банка.")
+            emit(ImportResult.Error(message = "Файл не является выпиской Ozon Банка или его формат не поддерживается."))
+            return@flow
+        }
+        // Сбросить reader, так как isValidFormat его уже прочитал
+        val newReader = BufferedReader(StringReader(text))
+        skipHeaders(newReader)
+
+        // Используем существующий метод processTransactionsFromReader из базового класса
+        emitAll(processTransactionsFromReader(newReader, progressCallback).catch { e ->
+            Timber.e(e, "Ошибка в потоке обработки транзакций Ozon Банка")
+            // Используем конструктор Error напрямую с исключением
+            emit(ImportResult.Error(message = e.localizedMessage ?: "Неизвестная ошибка"))
+        })
+    }
+
 
     override fun isValidFormat(reader: BufferedReader): Boolean {
         Timber.d("Ozon isValidFormat: Начало проверки формата PDF для Ozon Банка...")
-        val headerLines = mutableListOf<String>()
-        var linesReadCount = 0
         try {
-            reader.mark(8192)
-            var currentLineText: String?
-            while (linesReadCount < MAX_VALIDATION_LINES) {
-                currentLineText = reader.readLine()
-                if (currentLineText != null) {
-                    headerLines.add(currentLineText.replace("\u0000", "").trim())
-                    linesReadCount++
-                } else {
-                    break // Конец файла
-                }
+            val headerLines = mutableListOf<String>()
+            reader.mark(8192) // Отметить текущую позицию для последующего сброса
+            repeat(30) {
+                val line = reader.readLine()?.replace("\\u0000", "") // Удаляем нулевые символы
+                if (line != null) {
+                    headerLines.add(line)
+                } else return@repeat
             }
-            reader.reset()
+            reader.reset() // Вернуться к отмеченной позиции
+
+            val textSample = headerLines.joinToString(separator = "\n")
+            // Timber.v("Ozon isValidFormat: Образец текста для валидации (первые %d строк):\n%s", headerLines.size, textSample) // Раскомментируйте, если нужно видеть весь блок
+
+            val hasBankIndicator = textSample.contains("OZON", ignoreCase = true) ||
+                    textSample.contains("ОЗОН", ignoreCase = true) ||
+                    textSample.contains("Ozon Банк", ignoreCase = true) ||
+                    textSample.contains("Озон Банк", ignoreCase = true)
+            Timber.d("Ozon isValidFormat: Проверка индикатора банка (OZON, ОЗОН, Ozon Банк, Озон Банк) -> %s", hasBankIndicator)
+
+            val hasStatementTitle = textSample.contains("Выписка по счёту", ignoreCase = true) ||
+                    textSample.contains("Выписка по счету", ignoreCase = true) ||
+                    textSample.contains("Информация по счёту", ignoreCase = true) ||
+                    textSample.contains("ИСТОРИЯ ОПЕРАЦИЙ", ignoreCase = true) ||
+                    textSample.contains("Справка о движении средств", ignoreCase = true)
+            Timber.d(
+                "Ozon isValidFormat: Проверка заголовка выписки (Выписка по счёту, Информация по счёту, ИСТОРИЯ ОПЕРАЦИЙ, Справка о движении средств) -> %s",
+                hasStatementTitle
+            )
+
+            val hasTableMarker = headerLines.any {
+                it.contains("Дата", ignoreCase = true) &&
+                        it.contains("Описание", ignoreCase = true) &&
+                        it.contains("Сумма", ignoreCase = true)
+            } || headerLines.any {
+                it.contains("ДАТА И ВРЕМЯ", ignoreCase = true) &&
+                        it.contains("ОПИСАНИЕ ОПЕРАЦИИ", ignoreCase = true) &&
+                        it.contains("СУММА", ignoreCase = true)
+            } || headerLines.any {
+                it.contains("История операций", ignoreCase = true)
+            } || headerLines.any {
+                it.contains("Дата операции", ignoreCase = true) &&
+                        it.contains("Документ", ignoreCase = true) &&
+                        it.contains("Назначение платежа", ignoreCase = true) &&
+                        it.contains("Сумма операции", ignoreCase = true)
+            }
+            Timber.d(
+                "Ozon isValidFormat: Проверка маркеров таблицы (Дата, Описание, Сумма / ДАТА И ВРЕМЯ, ОПИСАНИЕ ОПЕРАЦИИ, СУММА / История операций / Дата операции, Документ, Назначение платежа, Сумма операции) -> %s",
+                hasTableMarker
+            )
+
+            val isValid = hasBankIndicator && hasStatementTitle && hasTableMarker
+            Timber.i(
+                "Ozon isValidFormat: Результат валидации: %s. Банк: %s, Заголовок: %s, Маркер таблицы: %s",
+                isValid,
+                hasBankIndicator,
+                hasStatementTitle,
+                hasTableMarker
+            )
+            return isValid
         } catch (e: Exception) {
-            Timber.e(e, "Ozon isValidFormat: Ошибка при чтении строк для валидации.")
+            Timber.e(e, "Ozon isValidFormat: Ошибка в процессе валидации формата")
             return false
         }
-
-        if (headerLines.isEmpty()) {
-            Timber.w("Ozon isValidFormat: Не удалось прочитать ни одной строки для валидации.")
-            return false
-        }
-
-        val content = headerLines.joinToString("\n")
-        Timber.v("Ozon isValidFormat: Анализируемый контент (первые $linesReadCount строк):\n$content")
-
-        val hasBankIndicator = OZON_BANK_INDICATORS.any { content.contains(it, ignoreCase = true) }
-        val hasStatementTitle = OZON_STATEMENT_TITLES.any { content.contains(it, ignoreCase = true) }
-        val hasSpecificTableHeader = headerLines.any { it.contains(OZON_TABLE_HEADER_MARKER, ignoreCase = true) }
-
-        Timber.d("Ozon isValidFormat: Индикатор банка: $hasBankIndicator, Заголовок: $hasStatementTitle, Маркер таблицы: $hasSpecificTableHeader")
-        return hasBankIndicator && hasStatementTitle && hasSpecificTableHeader
     }
 
     override fun skipHeaders(reader: BufferedReader) {
         Timber.d("Ozon skipHeaders: Начало пропуска заголовков...")
-        var linesSkipped = 0
         var line: String?
-        var tableHeaderMarkerFound = false
+        var linesSkipped = 0
+        var tableHeaderFound = false
+        val tableHeaderKeywords = listOf("ДАТА И ВРЕМЯ", "ОПИСАНИЕ ОПЕРАЦИИ", "СУММА", "БАЛАНС")
+        val alternativeHeaderKeyword = "История операций"
 
-        while (linesSkipped < MAX_HEADER_SKIP_LINES) {
-            line = reader.readLine()?.replace("\u0000", "")?.trim()
-            if (line == null) {
-                Timber.w("Ozon skipHeaders: Достигнут конец файла перед нахождением маркера таблицы.")
-                throw IOException("Не удалось найти заголовок таблицы '${OZON_TABLE_HEADER_MARKER}'.")
-            }
+        // Сначала ищем "История операций" или комбинацию ключевых слов
+        while (true) {
+            line = reader.readLine()?.replace("\\u0000", "")
             linesSkipped++
-            Timber.v("Ozon skipHeaders: (Поиск маркера) Строка $linesSkipped: '$line'")
-            if (line.contains(OZON_TABLE_HEADER_MARKER, ignoreCase = true)) {
-                Timber.i("Ozon skipHeaders: Найден маркер таблицы на строке $linesSkipped.")
-                tableHeaderMarkerFound = true
+            if (line == null) {
+                Timber.w("Ozon skipHeaders: Достигнут конец файла (пропущено %d строк) перед нахождением заголовка таблицы.", linesSkipped)
                 return
             }
+            Timber.v("Ozon skipHeaders: (Поиск заголовка) Строка %d: '%s'", linesSkipped, line)
+            if (line.contains(alternativeHeaderKeyword, ignoreCase = true)) {
+                Timber.d("Ozon skipHeaders: Найден альтернативный маркер заголовка '%s' на строке %d", alternativeHeaderKeyword, linesSkipped)
+                // Пропускаем саму строку с "История операций"
+                // Следующая строка может быть периодом или заголовками столбцов
+
+                // Проверяем следующую строку на период
+                reader.mark(1024)
+                val potentialPeriodLine = reader.readLine()?.replace("\\u0000", "")
+                reader.reset()
+                if (potentialPeriodLine != null && potentialPeriodLine.matches(
+                        Regex(
+                            "^за период с \\d{2}\\.\\d{2}\\.\\d{4} по \\d{2}\\.\\d{2}\\.\\d{4}$",
+                            RegexOption.IGNORE_CASE
+                        )
+                    )) {
+                    val skippedPeriodLine = reader.readLine()?.replace("\\u0000", "") // Съедаем строку периода
+                    linesSkipped++
+                    Timber.d(
+                        "Ozon skipHeaders: Пропущена строка с периодом после '%s' (строка %d): %s",
+                        alternativeHeaderKeyword,
+                        linesSkipped,
+                        skippedPeriodLine
+                    )
+                }
+
+                // Ищем фактическое начало данных или заголовки столбцов
+                while (true) {
+                    reader.mark(1024)
+                    val nextLineAfterMarker = reader.readLine()?.replace("\\u0000", "")
+                    reader.reset()
+
+                    if (nextLineAfterMarker == null) {
+                        Timber.w("Ozon skipHeaders: Конец файла (пропущено %d строк) после поиска '%s'.", linesSkipped, alternativeHeaderKeyword)
+                        return
+                    }
+                    Timber.v("Ozon skipHeaders: (После '%s') Строка %d: '%s'", alternativeHeaderKeyword, linesSkipped + 1, nextLineAfterMarker)
+
+                    // Проверяем, является ли это заголовками таблицы
+                    if (tableHeaderKeywords.all { keyword -> nextLineAfterMarker.contains(keyword, ignoreCase = true) }) {
+                        val skippedTableHeaderLine = reader.readLine()?.replace("\\u0000", "") // Съедаем строку заголовков
+                        linesSkipped++
+                        Timber.d(
+                            "Ozon skipHeaders: Найдены и пропущены заголовки таблицы (строка %d) после '%s': %s",
+                            linesSkipped,
+                            alternativeHeaderKeyword,
+                            skippedTableHeaderLine
+                        )
+                        tableHeaderFound = true
+                        break
+                    } else if (nextLineAfterMarker.trim().matches(Regex("^\\d{2}\\.\\d{2}\\.\\d{4}.*"))) { // Или это уже начало данных
+                        Timber.d(
+                            "Ozon skipHeaders: Найдено начало данных (строка %d) после '%s': %s",
+                            linesSkipped + 1,
+                            alternativeHeaderKeyword,
+                            nextLineAfterMarker
+                        )
+                        tableHeaderFound = true // Данные начинаются сразу, заголовков не было или они не подошли
+                        break
+                    } else {
+                        val skippedIrrelevantLine = reader.readLine()?.replace("\\u0000", "") // Пропускаем незначимую строку
+                        linesSkipped++
+                        Timber.v(
+                            "Ozon skipHeaders: Пропущена незначимая строка %d после '%s': %s",
+                            linesSkipped,
+                            alternativeHeaderKeyword,
+                            skippedIrrelevantLine
+                        )
+                    }
+                }
+                if (true) break
+
+            } else if (tableHeaderKeywords.all { keyword -> line.contains(keyword, ignoreCase = true) }) {
+                Timber.d("Ozon skipHeaders: Найдены заголовки таблицы (строка %d): '%s'", linesSkipped, line)
+                // Строка 'line' уже является заголовком, ее мы прочитали. Следующая строка должна быть либо данными, либо пустой.
+                tableHeaderFound = true
+                break
+            }
         }
-        if (!tableHeaderMarkerFound) {
-            Timber.e("Ozon skipHeaders: Маркер таблицы не найден после $linesSkipped строк.")
-            throw IOException("Заголовок таблицы не найден в пределах $MAX_HEADER_SKIP_LINES строк.")
+        Timber.d(
+            "Ozon skipHeaders: Основной заголовок или маркер найден. Пропущено %d строк. Текущая строка (предположительно заголовки или первая строка данных): '%s'",
+            linesSkipped,
+            line
+        )
+
+        // Дополнительный пропуск строк, если после основного заголовка есть еще строки, не являющиеся данными
+        // Например, пустые строки или строки с разделителями, или вторая строка заголовков
+        // Этот цикл нужен, если предыдущий остановился на строке заголовков, а не на данных.
+        var finalLinesSkipped = linesSkipped
+        while (true) {
+            reader.mark(2048) // Отмечаем позицию перед чтением строки
+            val currentLineForDataCheck = reader.readLine()?.replace("\\u0000", "")
+            reader.reset() // Возвращаемся к отмеченной позиции, чтобы не "съесть" строку данных
+
+            if (currentLineForDataCheck == null) {
+                Timber.w(
+                    "Ozon skipHeaders: Достигнут конец файла (всего пропущено %d строк) при пропуске дополнительных строк после заголовка.",
+                    finalLinesSkipped
+                )
+                break
+            }
+
+            Timber.v("Ozon skipHeaders: (Проверка на данные) Строка %d: '%s'", finalLinesSkipped + 1, currentLineForDataCheck)
+
+            // Проверяем, является ли текущая строка началом данных
+            val isDataLine = currentLineForDataCheck.trim().matches(Regex("^\\d{2}\\.\\d{2}\\.\\d{4}.*")) || // Начинается с даты
+                    currentLineForDataCheck.contains(Regex("[+\\-]?[\\d\\s.,]+[\\d]")) && // Содержит суммы
+                    !tableHeaderKeywords.any { currentLineForDataCheck.contains(it, ignoreCase = true) } // И не является строкой заголовка
+
+            if (isDataLine) {
+                Timber.i(
+                    "Ozon skipHeaders: Найдена строка, похожая на начало данных: '%s' (строка %d). Заголовки полностью пропущены.",
+                    currentLineForDataCheck.trim(),
+                    finalLinesSkipped + 1
+                )
+                break // Нашли данные, прекращаем пропуск
+            } else {
+                val skippedLine = reader.readLine()?.replace("\\u0000", "") // Теперь реально "съедаем" строку
+                finalLinesSkipped++
+                Timber.d("Ozon skipHeaders: (Пропуск доп. строки %d) Пропущена строка: %s", finalLinesSkipped, skippedLine)
+            }
         }
+        Timber.i("Ozon skipHeaders: Пропуск заголовков завершен. Всего пропущено %d строк.", finalLinesSkipped)
     }
-    
+
     override fun shouldSkipLine(line: String): Boolean {
         val trimmedLine = line.trim()
+        Timber.v("Ozon shouldSkipLine: Проверка строки: '%s'", line)
         if (trimmedLine.isBlank()) {
-            Timber.v("Ozon shouldSkipLine: ПРОПУСК (пустая): '$line'")
+            Timber.d("Ozon shouldSkipLine: ПРОПУСК (пустая): '%s'", line)
             return true
         }
-        if (IGNORE_PATTERNS.any { it.containsMatchIn(trimmedLine) }) {
-            Timber.v("Ozon shouldSkipLine: ПРОПУСК (по шаблону игнорирования): '$line'")
+
+        val patternsToSkip = listOf(
+            Regex("^Итого:.*", RegexOption.IGNORE_CASE),
+            Regex("^Перенесено со страницы.*", RegexOption.IGNORE_CASE),
+            Regex("^Продолжение на странице.*", RegexOption.IGNORE_CASE),
+            Regex("^Обороты по сч[её]ту за период.*", RegexOption.IGNORE_CASE),
+            Regex("^Входящий остаток на начало периода.*", RegexOption.IGNORE_CASE),
+            Regex("^Исходящий остаток на конец периода.*", RegexOption.IGNORE_CASE),
+            Regex("^Страница \\d+ из \\d+.*", RegexOption.IGNORE_CASE),
+            Regex("^Сформировано .* \\d{2}:\\d{2}:\\d{2}.*", RegexOption.IGNORE_CASE),
+            Regex("^Подпись Банка.*", RegexOption.IGNORE_CASE),
+            Regex("^Выписка по сч[её]ту №.*", RegexOption.IGNORE_CASE),
+            Regex("^Период: с .* по .*", RegexOption.IGNORE_CASE),
+            Regex("^ДАТА И ВРЕМЯ\\s+ОПИСАНИЕ ОПЕРАЦИИ\\s+СУММА.*", RegexOption.IGNORE_CASE)
+        )
+
+        for (pattern in patternsToSkip) {
+            if (pattern.matches(trimmedLine)) {
+                Timber.d("Ozon shouldSkipLine: ПРОПУСК (по паттерну '%s'): '%s'", pattern.pattern, line)
+                return true
+            }
+        }
+
+        if (trimmedLine.equals("ДАТА И ВРЕМЯ ОПИСАНИЕ ОПЕРАЦИИ СУММА БАЛАНС", ignoreCase = true) ||
+            trimmedLine.equals(
+                "ДАТА И ВРЕМЯ МСК ОПИСАНИЕ ОПЕРАЦИИ СУММА В ВАЛЮТЕ ОПЕРАЦИИ СУММА В ВАЛЮТЕ СЧЕТА ОСТАТОК НА СЧЕТЕ",
+                ignoreCase = true
+            ) ||
+            (trimmedLine.contains("ОПИСАНИЕ ОПЕРАЦИИ", ignoreCase = true) &&
+                    trimmedLine.contains("СУММА", ignoreCase = true) &&
+                    trimmedLine.contains("БАЛАНС", ignoreCase = true) &&
+                    trimmedLine.split(Regex("\\s{2,}")).size >= 3) // Более строгая проверка на заголовок таблицы
+        ) {
+            Timber.d("Ozon shouldSkipLine: ПРОПУСК (повторяющийся заголовок таблицы): '%s'", line)
             return true
         }
-        if (trimmedLine.equals(OZON_TABLE_HEADER_MARKER, ignoreCase = true)) {
-            Timber.v("Ozon shouldSkipLine: ПРОПУСК (повтор заголовка таблицы): '$line'")
-            return true
-        }
+
+        Timber.v("Ozon shouldSkipLine: НЕ ПРОПУСК: '%s'", line)
         return false
     }
 
     override fun parseLine(line: String): Transaction? {
-        val trimmedLine = line.replace("\u0000", "").trim()
-        Timber.d("Ozon parseLine: Обработка строки: '$trimmedLine'")
+        Timber.d("Ozon parseLine: Обработка строки для парсинга: '%s'", line)
 
-        if (shouldSkipLine(trimmedLine)) return null
-        
-        // Сначала проверяем комбинированный формат (дата + описание + сумма в одной строке)
-        combinedTransactionRegex.find(trimmedLine)?.let { match ->
-            Timber.d("Ozon parseLine: Обнаружена комбинированная строка с датой, описанием и суммой")
-            
-            val dateStrRaw = match.groupValues[1]
-            val timeStr = match.groupValues[2]
-            val docNumber = match.groupValues[3]
-            val description = match.groupValues[4].trim()
-            val sign = match.groupValues[5]
-            val amountStr = match.groupValues[6].replace("\\s".toRegex(), "").replace(",", ".")
-            val currencyStr = match.groupValues.getOrNull(7)
-            
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
-            
-            try {
-                val date = dateFormat.parse("$dateStrRaw $timeStr") ?: throw ParseException("Не удалось распарсить дату", 0)
-                var amount = amountStr.toDouble()
-                val isExpense = (sign == "-")
-                var currency = Currency.RUB
-                
-                if (currencyStr != null && currencyStr.isNotBlank()) {
-                    try {
-                        currency = Currency.valueOf(currencyStr.uppercase(Locale.ROOT))
-                    } catch (e: IllegalArgumentException) {
-                        Timber.w("Ozon parseLine: Неизвестная валюта '$currencyStr', используем RUB")
-                    }
-                }
-                
-                Timber.i("Ozon parseLine: Создана транзакция из комбинированной строки: Дата='$date', Документ='$docNumber', Сумма=$amount $currency, Расход=$isExpense")
-                
-                return Transaction(
-                    date = date,
-                    title = description,
-                    amount = Money(amount, currency),
-                    isExpense = isExpense,
-                    source = transactionSource,
-                    sourceColor = 0,
-                    category = detectCategory(description),
-                    note = "Документ №$docNumber"
-                )
-            } catch (e: Exception) {
-                Timber.e(e, "Ozon parseLine: Ошибка при обработке комбинированной строки: '$trimmedLine'")
-                // Продолжаем обработку стандартным методом
-            }
+        val trimmedLine = line.trim()
+        if (trimmedLine.isBlank()) {
+            Timber.v("Ozon parseLine: Пропуск пустой строки")
+            return null
         }
 
-        // Обычный формат - попытка распознать начало новой транзакции (Дата, Время, Документ)
-        ozonDateDocRegex.find(trimmedLine)?.let { match ->
-            if (currentPartialTransaction != null && !currentPartialTransaction!!.isComplete) {
-                Timber.w("Ozon parseLine: Начало новой транзакции, но предыдущая ($currentPartialTransaction) не была завершена. Сбрасываем")
-                currentPartialTransaction?.clear()
-            }
-            
-            currentPartialTransaction = PartialTransaction() // Создаем или очищаем для новой транзакции
+        // Оригинальное регулярное выражение
+        val originalTransactionRegex = Regex(
+            "^(\\d{2}\\.\\d{2}\\.\\d{4})\\s+" + // 1: Дата (DD.MM.YYYY)
+                    "((\\d{2}:\\d{2}:\\d{2})|(\\d{2}:\\d{2})|\\s*)\\s*" + // 2: Время (HH:MM:SS или HH:MM) или пробелы если нет времени (Группа 3, 4)
+                    "(.+?)\\s+" +  // 5: Описание операции (нежадный захват до следующего паттерна суммы)
+                    "([+\\-])?\\s*([\\d\\s.,]+[\\d])\\s+" + // 6: Знак (+/-), 7: Сумма операции
+                    "([A-ZА-Я]{3})" + // 8: Валюта операции (RUB, USD, EUR, РУБ - теперь и кириллица)
+                    "(?:\\s+([+\\-])?\\s*([\\d\\s.,]+[\\d])\\s+([A-ZА-Я]{3}))?.*$" // 9: Знак баланса (опц), 10: Сумма баланса, 11: Валюта баланса (опц)
+        )
 
-            val dateStrRaw = match.groupValues[1]
-            val timeStr = match.groupValues[2]
-            val docNumber = match.groupValues[3]
-            val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+        // Новое регулярное выражение для формата "Справка о движении средств"
+        val statementTransactionRegex = Regex(
+            "^(\\d{2}\\.\\d{2}\\.\\d{4})\\s+" +                 // 1: Дата (DD.MM.YYYY)
+                    "(\\d{2}:\\d{2}:\\d{2})\\s+" +                      // 2: Время (HH:MM:SS)
+                    "(\\d+)\\s*$"                                       // 3: Номер документа
+        )
+
+        // Регулярное выражение для строки суммы
+        val amountLineRegex = Regex(
+            "^([+\\-])?\\s*(\\d[\\d\\s.,]*)\\s*$"               // 1: Знак (опционально), 2: Сумма
+        )
+
+        // Проверка на оригинальный формат транзакции
+        val match = originalTransactionRegex.find(trimmedLine)
+        if (match != null) {
+            Timber.v("Ozon parseLine: Строка '%s' соответствует оригинальному регулярному выражению.", line)
+            Timber.v("Ozon parseLine: Группы: %s", match.groupValues.joinToString(" | "))
             try {
-                currentPartialTransaction!!.date = dateFormat.parse("$dateStrRaw $timeStr")
-                currentPartialTransaction!!.documentNumber = docNumber
-                Timber.i("Ozon parseLine: Новая PartialTx: Дата='${currentPartialTransaction!!.date}', Документ='${currentPartialTransaction!!.documentNumber}'")
-                return null // Еще не готовая транзакция
-            } catch (e: ParseException) {
-                Timber.e(e, "Ozon parseLine: Ошибка парсинга даты/времени: '$trimmedLine'")
-                currentPartialTransaction?.clear()
+                // Деструктуризация с учетом возможного отсутствия некоторых групп времени и баланса
+                val dateStr = match.groupValues[1]
+                val timeWithSecondsStr = match.groupValues[3]
+                val timeShortStr = match.groupValues[4]
+                val descriptionDirty = match.groupValues[5]
+                val sign = match.groupValues[6] // Может быть пустым, если сумма положительная и без знака
+                val amountStr = match.groupValues[7]
+                val currencyStr = match.groupValues[8]
+                // val balanceSign = match.groupValues[9] // Не используется пока
+                // val balanceAmountStr = match.groupValues[10] // Не используется пока
+                // val balanceCurrencyStr = match.groupValues[11] // Не используется пока
+
+                val timeStr = if (timeWithSecondsStr.isNotBlank()) timeWithSecondsStr
+                else if (timeShortStr.isNotBlank()) timeShortStr
+                else "00:00:00"
+
+                val dateTimeStr = "$dateStr $timeStr"
+                val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+                val date = dateFormat.parse(dateTimeStr) ?: run {
+                    Timber.w("Ozon parseLine: Не удалось распарсить дату '%s'. Исходная строка: '%s'", dateTimeStr, line)
+                    Date() // Возвращаем текущую дату как fallback, или можно бросить исключение/вернуть null
+                }
+
+                val cleanedAmountStr = amountStr.replace("\\s".toRegex(), "").replace(",", ".")
+                val amount = cleanedAmountStr.toDoubleOrNull() ?: run {
+                    Timber.w(
+                        "Ozon parseLine: Не удалось распарсить сумму '%s' (исходная '%s'). Исходная строка: '%s'",
+                        cleanedAmountStr,
+                        amountStr,
+                        line
+                    )
+                    return null // Критическая ошибка, если сумма не парсится
+                }
+                val finalAmount = if (sign == "-") -amount else amount
+                val isExpense = sign == "-" || finalAmount < 0 // Убыток либо по знаку, либо по отрицательной сумме
+
+                var description = descriptionDirty.trim()
+
+                val category = TransactionCategoryDetector.detect(description)
+
+                Timber.i("Ozon parseLine: Успешный парсинг: Дата='$date', Сумма='$finalAmount', Валюта='$currencyStr', Описание='$description', Категория='$category'")
+
+                // Сбрасываем состояние, т.к. нашли транзакцию стандартного формата
+                currentTransactionState = null
+
+                // Создаем объект Transaction с правильными параметрами согласно определению модели
+                return Transaction(
+                    amount = Money(finalAmount, Currency.valueOf(currencyStr.uppercase(Locale.ROOT))),
+                    category = category,
+                    date = date,
+                    isExpense = isExpense,
+                    source = "Ozon Банк",
+                    sourceColor = 0,
+                    title = description,
+                    note = "Импортировано автоматически: $line"
+                )
+            } catch (e: Exception) {
+                Timber.e(e, "Ozon parseLine: Ошибка при разборе полей из совпадения Regex для строки: '%s'", line)
+                currentTransactionState = null // Сбрасываем состояние в случае ошибки
                 return null
             }
         }
 
-        // Если не начало новой транзакции, и у нас есть активная частичная транзакция
-        val ptx = currentPartialTransaction
-        if (ptx != null && !ptx.isComplete) {
-            // Попытка распознать строку с суммой
-            ozonAmountRegex.find(trimmedLine)?.let { match ->
-                Timber.d("Ozon parseLine: Обнаружена строка с суммой: '$trimmedLine' для PartialTx Doc: ${ptx.documentNumber}")
-                val sign = match.groupValues[1]
-                val amountStr = match.groupValues[2].replace("\\s".toRegex(), "").replace(",", ".")
-                val currencyStr = match.groupValues.getOrNull(3)
+        // Новый формат "Справка о движении средств" - обработка многострочных транзакций
 
-                try {
-                    ptx.amount = amountStr.toDouble()
-                    ptx.isExpense = (sign == "-")
-                    if (currencyStr != null && currencyStr.isNotBlank()) {
-                        try {
-                            ptx.currency = Currency.valueOf(currencyStr.uppercase(Locale.ROOT))
-                        } catch (e: IllegalArgumentException) {
-                            Timber.w("Ozon parseLine: Неизвестная валюта '$currencyStr', используем RUB")
-                            // Оставляем RUB по умолчанию
-                        }
-                    }
-                    ptx.isComplete = true // Основные данные собраны
-                    Timber.i("Ozon parseLine: PartialTx сумма: ${ptx.amount} ${ptx.currency}, Расход=${ptx.isExpense}. PartialTx завершена.")
-                    
-                    // Теперь, когда транзакция полная, создаем и возвращаем ее
-                    if (ptx.isValidForFinalization()) {
-                        val transaction = Transaction(
-                            date = ptx.date!!,
-                            title = ptx.buildDescription().ifEmpty { "Операция №${ptx.documentNumber}" },
-                            amount = Money(ptx.amount!!, ptx.currency),
-                            isExpense = ptx.isExpense!!,
-                            source = transactionSource,
-                            sourceColor = 0,
-                            category = detectCategory(ptx.buildDescription()),
-                            note = "Документ №${ptx.documentNumber}"
-                        )
-                        currentPartialTransaction = null // Сбрасываем для следующей
-                        return transaction
-                    } else {
-                        Timber.w("Ozon parseLine: PartialTx помечена isComplete, но невалидна: $ptx. Сбрасывается.")
-                        currentPartialTransaction?.clear()
-                        return null
-                    }
-                } catch (e: NumberFormatException) {
-                    Timber.e(e, "Ozon parseLine: Ошибка парсинга суммы: '$trimmedLine'")
-                    // Сумма не распознана, возможно это описание
-                }
+        // Попытка обработать строку как заголовок транзакции нового формата
+        val statementMatch = statementTransactionRegex.find(trimmedLine)
+        if (statementMatch != null) {
+            Timber.v("Ozon parseLine: Строка '%s' соответствует формату заголовка транзакции 'Справка о движении средств'", line)
+
+            // Завершаем предыдущую транзакцию, если она есть и содержит достаточно данных
+            val transaction = finalizeCurrentTransaction()
+
+            // Начинаем новую транзакцию
+            val dateStr = statementMatch.groupValues[1]
+            val timeStr = statementMatch.groupValues[2]
+            val documentNumber = statementMatch.groupValues[3]
+
+            val dateTimeStr = "$dateStr $timeStr"
+            val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
+
+            try {
+                val date = dateFormat.parse(dateTimeStr) ?: Date()
+                currentTransactionState = TransactionState(
+                    date = date,
+                    documentNumber = documentNumber
+                )
+                Timber.d("Ozon parseLine: Начата новая транзакция с датой '$dateTimeStr' и номером документа '$documentNumber'")
+            } catch (e: Exception) {
+                Timber.e(e, "Ozon parseLine: Ошибка при парсинге даты '$dateTimeStr'")
+                currentTransactionState = null
             }
 
-            // Если это не сумма и транзакция не завершена, считаем это строкой описания
-            if (!ptx.isComplete && ptx.date != null && ptx.documentNumber != null) {
-                if (ptx.linesProcessedForCurrentTx < MAX_LINES_PER_TRANSACTION_DESCRIPTION) {
-                    // Проверка, что строка не похожа на дату/сумму
-                    val isAmountLine = ozonAmountRegex.find(trimmedLine) != null
-                    val isDateLine = trimmedLine.length >= 10 && ozonDateDocRegex.find(trimmedLine) != null
-
-                    if (!isAmountLine && !isDateLine) {
-                        ptx.descriptionLines.add(trimmedLine)
-                        ptx.linesProcessedForCurrentTx++
-                        Timber.d("Ozon parseLine: Добавлено к описанию: '$trimmedLine'. Строк: ${ptx.linesProcessedForCurrentTx}")
-                    } else {
-                        Timber.d("Ozon parseLine: Строка '$trimmedLine' похожа на сумму/дату, не добавлена в описание.")
-                    }
-                } else {
-                    Timber.w("Ozon parseLine: Превышено макс. строк для описания Doc ${ptx.documentNumber}.")
-                }
-            }
-        } else if (trimmedLine.isNotEmpty() && ptx == null) {
-            Timber.d("Ozon parseLine: Строка не распознана или нет активной PartialTx: '$trimmedLine'")
+            return transaction // Возвращаем предыдущую завершенную транзакцию или null
         }
-        return null // Транзакция еще не готова или это была часть описания
+
+        // Попытка обработать строку с суммой
+        val amountMatch = amountLineRegex.find(trimmedLine)
+        if (amountMatch != null && currentTransactionState != null) {
+            Timber.v("Ozon parseLine: Строка '%s' соответствует формату строки суммы", line)
+
+            val sign = amountMatch.groupValues[1]
+            val amountStr = amountMatch.groupValues[2].replace("\\s".toRegex(), "").replace(",", ".")
+
+            try {
+                val amount = amountStr.toDoubleOrNull() ?: 0.0
+                val isExpense = sign == "-"
+                // Для Ozon Bank в выписке:
+                // "-" перед суммой означает списание/расход
+                // "+" перед суммой означает пополнение/доход
+                // Но в нашем приложении:
+                // Положительное число = доход, Отрицательное число = расход
+                val finalAmount = if (isExpense) -amount else amount
+
+                currentTransactionState?.amount = Math.abs(finalAmount)
+                currentTransactionState?.isExpense = isExpense
+
+                Timber.d("Ozon parseLine: Для текущей транзакции добавлена сумма: $finalAmount, расход: $isExpense")
+
+                // Если нам удалось обработать сумму, это означает конец данных о транзакции
+                val transaction = finalizeCurrentTransaction()
+                currentTransactionState = null
+                return transaction
+            } catch (e: Exception) {
+                Timber.e(e, "Ozon parseLine: Ошибка при парсинге суммы '$amountStr'")
+                // Не сбрасываем состояние, возможно следующие строки помогут заполнить транзакцию
+            }
+
+            return null
+        }
+
+        // Если у нас есть незавершенная транзакция, и текущая строка не пустая, добавляем её к описанию
+        if (currentTransactionState != null && trimmedLine.isNotBlank()) {
+            currentTransactionState?.description?.append(if (currentTransactionState?.description?.isEmpty() == true) "" else " ")
+                ?.append(trimmedLine)
+            Timber.d("Ozon parseLine: Добавлена строка к описанию текущей транзакции: '$trimmedLine'")
+            return null
+        }
+
+        Timber.w("Ozon parseLine: Строка НЕ соответствует формату транзакции: '%s'", line)
+        return null
     }
 
-    override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
-        emit(ImportResult.Progress(0, 100, "Начало импорта Ozon Банка (PDF)"))
-        Timber.i("Ozon importTransactions: Начало импорта из URI: $uri")
-        currentPartialTransaction = null
-        val collectedTransactions = mutableListOf<Transaction>()
+    // Вспомогательный метод для завершения текущей транзакции
+    private fun finalizeCurrentTransaction(): Transaction? {
+        val state = currentTransactionState ?: return null
 
-        try {
-            val extractedText = extractTextFromPdf(uri)
-            if (extractedText.isBlank()) {
-                Timber.e("Ozon importTransactions: Извлеченный текст из PDF пуст.")
-                emit(ImportResult.Error(message = "Не удалось извлечь текст из PDF или файл пуст."))
-                return@flow
-            }
-            emit(ImportResult.Progress(5, 100, "Текст извлечен, проверка формата..."))
-
-            BufferedReader(StringReader(extractedText)).use { validationReader ->
-                if (!isValidFormat(validationReader)) {
-                    Timber.e("Ozon importTransactions: Файл не прошел валидацию как выписка Ozon Банка.")
-                    emit(ImportResult.Error(message = "Файл не является выпиской Ozon Банка или формат не поддерживается."))
-                    return@flow
-                }
-            }
-            Timber.i("Ozon importTransactions: Формат файла успешно валидирован.")
-            emit(ImportResult.Progress(10, 100, "Формат проверен, пропуск заголовков..."))
-
-            BufferedReader(StringReader(extractedText)).use { contentReader ->
-                skipHeaders(contentReader)
-                Timber.i("Ozon importTransactions: Заголовки успешно пропущены.")
-                emit(ImportResult.Progress(15, 100, "Заголовки пропущены, обработка транзакций..."))
-
-                var linesProcessedAfterHeader = 0
-                val totalLinesEstimate = extractedText.lines().size.coerceAtLeast(1)
-
-                var line: String? = contentReader.readLine()
-                while (line != null) {
-                    linesProcessedAfterHeader++
-                    val currentProgress = 15 + (linesProcessedAfterHeader * 70 / totalLinesEstimate).coerceAtMost(70)
-                    emit(ImportResult.Progress(currentProgress, 100, "Обработка строки $linesProcessedAfterHeader / ~$totalLinesEstimate"))
-
-                    parseLine(line)?.let { transaction ->
-                        Timber.i("Ozon importTransactions: Собрана транзакция: ${transaction.title}")
-                        collectedTransactions.add(transaction)
-                    }
-                    line = contentReader.readLine()
-                }
-                
-                currentPartialTransaction?.let { ptx ->
-                    if (ptx.isComplete && ptx.isValidForFinalization()) {
-                        Timber.w("Ozon importTransactions: Обнаружена завершенная, но не добавленная PartialTx. Финализация.")
-                        val transaction = Transaction(
-                            date = ptx.date!!,
-                            title = ptx.buildDescription().ifEmpty { "Операция №${ptx.documentNumber}" },
-                            amount = Money(ptx.amount!!, ptx.currency),
-                            isExpense = ptx.isExpense!!,
-                            source = transactionSource,
-                            sourceColor = 0,
-                            category = detectCategory(ptx.buildDescription()),
-                            note = "Документ №${ptx.documentNumber}"
-                        )
-                        collectedTransactions.add(transaction)
-                    } else if (ptx.date != null) {
-                        Timber.w("Ozon importTransactions: Обнаружена незавершенная PartialTx в конце файла.")
-                    }
-                }
-                currentPartialTransaction = null
-
-                if (collectedTransactions.isEmpty()) {
-                    Timber.w("Ozon importTransactions: Транзакции не найдены.")
-                    emit(ImportResult.Error(message = "Транзакции не найдены в файле."))
-                } else {
-                    // Добавляем транзакции в базу данных
-                    emit(ImportResult.Progress(85, 100, "Сохранение ${collectedTransactions.size} транзакций..."))
-                    Timber.i("Ozon importTransactions: Начинаем сохранение ${collectedTransactions.size} транзакций в базу данных")
-                    
-                    var savedCount = 0
-                    var errorCount = 0
-                    
-                    collectedTransactions.forEach { transaction ->
-                        try {
-                            Timber.d("Ozon importTransactions: Сохранение транзакции: ${transaction.title}, сумма: ${transaction.amount}")
-                            transactionRepository.addTransaction(transaction)
-                            savedCount++
-                            Timber.d("Ozon importTransactions: Транзакция успешно сохранена (${savedCount}/${collectedTransactions.size})")
-                        } catch (e: Exception) {
-                            errorCount++
-                            Timber.e(e, "Ozon importTransactions: Ошибка при сохранении транзакции: ${transaction.title}")
-                        }
-                    }
-                    
-                    Timber.i("Ozon importTransactions: Импорт завершен. Сохранено: $savedCount, Ошибок: $errorCount")
-                    emit(ImportResult.Success(savedCount, errorCount))
-                }
-            }
-        } catch (e: IOException) {
-            Timber.e(e, "Ozon importTransactions: Ошибка ввода-вывода.")
-            emit(ImportResult.Error(exception = e, message = "Ошибка чтения файла: ${e.localizedMessage}"))
-        } catch (e: Exception) {
-            Timber.e(e, "Ozon importTransactions: Непредвиденная ошибка.")
-            emit(ImportResult.Error(exception = e, message = "Неизвестная ошибка: ${e.localizedMessage}"))
+        // Проверяем, есть ли все необходимые данные
+        if (state.date == null || state.amount == null || state.description.isEmpty()) {
+            Timber.w("Ozon finalizeCurrentTransaction: Недостаточно данных для создания транзакции: date=${state.date}, amount=${state.amount}, description=${state.description}")
+            return null
         }
-    }
 
-    fun detectCategory(description: String): String {
-        Timber.d("OzonPdfImportUseCase detectCategory: Описание: '$description'")
-        return when {
-            description.contains("Ozon", ignoreCase = true) || description.contains("Озон", ignoreCase = true) -> "Покупки Ozon"
-            description.contains("СБП", ignoreCase = true) -> "Переводы СБП"
-            description.contains("кафе", ignoreCase = true) || description.contains("ресторан", ignoreCase = true) -> "Кафе и рестораны"
-            description.contains("Пятёрочка", ignoreCase = true) || description.contains("PYATEROCHKA", ignoreCase = true) -> "Супермаркеты"
-            description.contains("HH CAREER SERVICE", ignoreCase = true) -> "Сервисы HH"
-            else -> "Без категории"
-        }
+        val description = state.description.toString().trim()
+        val category = TransactionCategoryDetector.detect(description)
+
+        Timber.i("Ozon finalizeCurrentTransaction: Формирование транзакции из состояния: date=${state.date}, amount=${state.amount}, isExpense=${state.isExpense}, description=${description}, category=${category}")
+
+        return Transaction(
+            amount = Money(state.amount!!, Currency.valueOf(state.currency)),
+            category = category,
+            date = state.date!!,
+            isExpense = state.isExpense,
+            source = "Ozon Банк",
+            sourceColor = 0,
+            title = description,
+            note = "Импортировано автоматически из Справки о движении средств (документ ${state.documentNumber})"
+        )
     }
 } 

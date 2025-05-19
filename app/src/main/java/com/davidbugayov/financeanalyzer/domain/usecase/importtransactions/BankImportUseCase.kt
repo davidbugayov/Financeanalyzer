@@ -95,11 +95,8 @@ abstract class BankImportUseCase(
             var line = reader.readLine()
             var lineNumber = 0
 
-            // TODO: Определить общее количество строк для более точного прогресса, если возможно.
-            // Это сложно сделать, не прочитав весь reader заранее, что не всегда оптимально.
-
-            // Примерное количество строк для расчета прогресса
-            val estimatedLines = 100 // Это приблизительное значение
+            // Прогресс рассчитывается по количеству строк, но если неизвестно — используем шаги по 10 строк
+            val estimatedLines = 100 // Можно доработать для динамического определения
 
             while (line != null) {
                 lineNumber++
@@ -183,57 +180,8 @@ abstract class BankImportUseCase(
     }
 
     /**
-     * Основной метод импорта, который использует BufferedReader.
-     * Конкретные реализации для PDF/Excel могут переопределить importTransactions
-     * или предоставить свою логику, которая в итоге вызовет этот метод, если применимо.
-     */
-    @Deprecated(
-        "Используйте importTransactions, который теперь напрямую работает с URI и вызывает processTransactionsFromReader. Этот метод может быть удален в будущем.",
-        ReplaceWith("importTransactions(uri, progressCallback)")
-    )
-    protected open suspend fun importFromReader(
-        uri: Uri,
-        progressCallback: ImportProgressCallback
-    ): ImportResult = withContext(Dispatchers.IO) {
-        // Эта реализация теперь в основном делегирует processTransactionsFromReader,
-        // но для совместимости и демонстрации, как это могло бы быть.
-        // В новой структуре importTransactions открывает reader и вызывает processTransactionsFromReader.
-        Timber.w("Вызван устаревший метод importFromReader для $bankName. Рассмотрите переход на новую структуру.")
-        try {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    // processTransactionsFromReader возвращает Flow, а importFromReader - ImportResult.
-                    // Это неудобно для прямого вызова.
-                    // Для сохранения старого контракта, мы бы собирали Flow здесь, но это неэффективно.
-                    // Вместо этого, указываем, что этот метод устарел.
-                    // Логика ниже - это то, что было бы, если бы мы адаптировали.
-                    // В текущем рефакторинге, `importTransactions` будет вызывать `processTransactionsFromReader` напрямую.
-                    return@withContext ImportResult.error("importFromReader устарел и не должен вызываться напрямую в новой структуре.")
-
-                    // Пример того, как можно было бы собрать Flow, если бы это было необходимо (НЕ ИСПОЛЬЗУЕТСЯ):
-                    /*
-                    var finalResult: ImportResult = ImportResult.error("Не удалось инициализировать импорт")
-                    processTransactionsFromReader(reader, progressCallback)
-                        .collect { result ->
-                            if (result is ImportResult.Success || result is ImportResult.Error) {
-                                finalResult = result
-                            }
-                            // Прогресс можно логировать или передавать дальше через progressCallback,
-                            // но progressCallback уже используется внутри processTransactionsFromReader.
-                        }
-                    return@withContext finalResult
-                    */
-                }
-            } ?: ImportResult.error("Не удалось открыть файл $uri для банка $bankName")
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка в устаревшем importFromReader для банка $bankName из $uri: ${e.message}")
-            ImportResult.error("Ошибка импорта для $bankName: ${e.message}")
-        }
-    }
-
-    /**
      * Реализация основного метода интерфейса ImportTransactionsUseCase.
-     * По умолчанию вызывает importFromReader.
+     * По умолчанию вызывает processTransactionsFromReader.
      * Может быть переопределен для форматов, не работающих с BufferedReader (например, бинарные Excel или PDF, где текст извлекается иначе).
      */
     override fun importTransactions(
