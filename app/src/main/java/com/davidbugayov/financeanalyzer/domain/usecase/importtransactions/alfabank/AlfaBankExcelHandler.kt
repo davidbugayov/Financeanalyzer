@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.alfabank
 
 import android.content.Context
 import android.net.Uri
@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileTy
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.ExcelParseConfig
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.GenericExcelImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractBankHandler
 import timber.log.Timber
 
 class AlfaBankExcelHandler(
@@ -32,7 +33,7 @@ class AlfaBankExcelHandler(
                 // amountColumnIndex = 2,
                 // dateFormatString = "dd.MM.yyyy" // Example date format
             )
-            Timber.d("[$bankName Handler] Creating GenericExcelImportUseCase with specific config for Alfa-Bank: $alfaBankConfig")
+            Timber.Forest.d("[$bankName Handler] Creating GenericExcelImportUseCase with specific config for Alfa-Bank: $alfaBankConfig")
             return GenericExcelImportUseCase(context, transactionRepository, alfaBankConfig)
         }
         throw IllegalArgumentException("[$bankName Handler] does not support file type: $fileType")
@@ -50,7 +51,7 @@ class AlfaBankExcelHandler(
         }
         // For Excel, content check without parsing is not very effective.
         // If super.canHandle() is false, we assume this handler cannot process it.
-        Timber.d("[$bankName Handler] Did not match file by name/type: $fileName. Content check for Excel is not performed at this stage.")
+        Timber.Forest.d("[$bankName Handler] Did not match file by name/type: $fileName. Content check for Excel is not performed at this stage.")
         return false
     }
-} 
+}

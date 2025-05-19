@@ -1,11 +1,11 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank
 
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank.SberbankPdfImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractBankHandler
 import timber.log.Timber
 
 class SberbankPdfHandler(
@@ -21,7 +21,7 @@ class SberbankPdfHandler(
 
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
-            Timber.d("[$bankName Handler] Creating SberbankPdfImportUseCase")
+            Timber.Forest.d("[$bankName Handler] Creating SberbankPdfImportUseCase")
             return SberbankPdfImportUseCase(context, transactionRepository)
         }
         throw IllegalArgumentException("[$bankName Handler] does not support file type: $fileType")
@@ -39,7 +39,7 @@ class SberbankPdfHandler(
         }
         // For PDF, content check in canHandle is usually not performed beyond basic magic number checks (not implemented here).
         // If super.canHandle() is false (name/type mismatch), then this handler cannot process it.
-        Timber.d("[$bankName Handler] Did not match file by name/type: $fileName. Content check for PDF is complex for a simple preview.")
+        Timber.Forest.d("[$bankName Handler] Did not match file by name/type: $fileName. Content check for PDF is complex for a simple preview.")
         return false
     }
-} 
+}
