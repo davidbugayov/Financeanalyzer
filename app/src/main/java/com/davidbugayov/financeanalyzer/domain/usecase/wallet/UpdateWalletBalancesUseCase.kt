@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase
+package com.davidbugayov.financeanalyzer.domain.usecase.wallet
 
 import com.davidbugayov.financeanalyzer.domain.model.AppException.Unknown
 import com.davidbugayov.financeanalyzer.domain.model.Money

@@ -1,10 +1,10 @@
-package com.davidbugayov.financeanalyzer.domain.usecase
+package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import java.util.Date
-import kotlin.math.abs
 
 /**
  * Юзкейс для расчета статистики по категории.

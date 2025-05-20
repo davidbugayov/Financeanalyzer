@@ -3,9 +3,10 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
-import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers

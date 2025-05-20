@@ -6,8 +6,8 @@ import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
-import com.davidbugayov.financeanalyzer.domain.model.ImportResult
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
 import kotlinx.coroutines.Dispatchers

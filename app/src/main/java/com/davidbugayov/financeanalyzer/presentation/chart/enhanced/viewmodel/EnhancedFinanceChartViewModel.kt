@@ -5,8 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
@@ -84,10 +84,18 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val filteredTransactions = getTransactionsForPeriodUseCase(_state.value.startDate, _state.value.endDate)
                 allTransactions = filteredTransactions
 
-                Timber.d("%s транзакций", "EnhancedFinanceChartViewModel: После фильтрации по дате осталось: " + filteredTransactions.size)
+                Timber.d("EnhancedFinanceChartViewModel: После фильтрации по дате осталось: %d транзакций", filteredTransactions.size)
                 Timber.d(
                     "[DEBUG] Все транзакции за период: %s",
-                    filteredTransactions.map { "${'$'}{it.date}: ${'$'}{it.amount} (${if (it.isExpense) "расход" else "доход"}), категория: ${'$'}{it.category}" })
+                    filteredTransactions.map {
+                        String.format(
+                            "%s: %s (%s), категория: %s",
+                            it.date,
+                            it.amount,
+                            if (it.isExpense) "расход" else "доход",
+                            it.category
+                        )
+                    })
 
                 val metrics = calculateBalanceMetricsUseCase(filteredTransactions, _state.value.startDate, _state.value.endDate)
                 val income = metrics.income
@@ -128,11 +136,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val categoryData = if (showExpenses) expensesByCategory else incomeByCategory
                 val pieChartData = preparePieChartData(categoryData, showExpenses)
 
-                Timber.d(
-                    "%s%s",
-                    "EnhancedFinanceChartViewModel: Категорий расходов: " + expensesByCategory.size + ", доходов: ",
-                    incomeByCategory.size
-                )
+                Timber.d("EnhancedFinanceChartViewModel: Категорий расходов: %d, доходов: %d", expensesByCategory.size, incomeByCategory.size)
                 if (!showExpenses) {
                     Timber.d("[DEBUG] incomeByCategory: %s", incomeByCategory.map { it.key + ": " + it.value.amount })
                     Timber.d("[DEBUG] pieChartData (income): %s", pieChartData.map { it.name + ": " + it.money.amount + ", %: " + it.percentage })

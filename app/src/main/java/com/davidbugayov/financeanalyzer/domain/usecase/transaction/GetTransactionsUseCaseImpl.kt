@@ -1,11 +1,11 @@
-package com.davidbugayov.financeanalyzer.domain.usecase
+package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import java.util.Date
 import java.util.Calendar
+import java.util.Date
 
 /**
  * Реализация Use case для получения потока транзакций за указанный период времени.

@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.model
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 
 /**
  * Функциональный интерфейс для отслеживания прогресса импорта транзакций.

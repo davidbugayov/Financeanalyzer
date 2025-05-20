@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase
+package com.davidbugayov.financeanalyzer.domain.usecase.export
 
 import android.Manifest
 import android.content.Context

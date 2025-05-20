@@ -2,7 +2,7 @@ package com.davidbugayov.financeanalyzer.utils
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow

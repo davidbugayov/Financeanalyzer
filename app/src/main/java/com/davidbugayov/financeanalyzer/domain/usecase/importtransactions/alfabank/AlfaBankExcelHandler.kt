@@ -5,7 +5,7 @@ import android.net.Uri
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.AmountParseConfig
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.DateFormatConfig
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.ExcelColumnMapping

@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category
 
 object TransactionCategoryDetector {
 

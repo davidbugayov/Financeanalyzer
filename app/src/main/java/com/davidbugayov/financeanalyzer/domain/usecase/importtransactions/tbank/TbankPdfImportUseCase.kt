@@ -3,12 +3,12 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.tbank
 import android.content.Context
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.AbstractPdfImportUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.TransactionCategoryDetector
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import timber.log.Timber
 import java.io.BufferedReader
 import java.text.ParseException

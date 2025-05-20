@@ -1,13 +1,14 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager
 
 import android.content.Context
 import android.net.Uri
 import android.provider.OpenableColumns
-import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
-import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.factory.ImportFactory
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
-import com.tom_roush.pdfbox.pdmodel.PDDocument
-import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
@@ -16,9 +17,7 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
-import java.io.BufferedReader
 import java.io.InputStream
-import java.io.InputStreamReader
 
 /**
  * Менеджер для импорта транзакций из различных источников.
@@ -141,34 +140,6 @@ class ImportTransactionsManager(
     }
 
     /**
-     * Читает содержимое CSV-файла
-     */
-    private fun readCsvContent(uri: Uri): List<String> {
-        Timber.d("Чтение содержимого CSV-файла (readCsvContent - возможно, больше не используется активно)")
-        val lines = mutableListOf<String>()
-
-        try {
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                BufferedReader(InputStreamReader(inputStream)).use { reader ->
-                    var line: String?
-                    var lineCount = 0
-                    while (reader.readLine().also { line = it } != null && lineCount < 10) {
-                        line?.let {
-                            lines.add(it)
-                            lineCount++
-                        }
-                    }
-                    Timber.d("Прочитано $lineCount строк CSV")
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "❌ Ошибка при чтении CSV: ${e.message}")
-        }
-
-        return lines
-    }
-
-    /**
      * Пытается определить формат файла по его содержимому
      */
     private fun detectFormatByContent(inputStream: InputStream): FileType {
@@ -209,90 +180,6 @@ class ImportTransactionsManager(
         }
 
         return FileType.UNKNOWN
-    }
-
-    /**
-     * Пытается прочитать содержимое PDF-файла.
-     * Метод только для диагностики проблем.
-     *
-     * @param uri URI PDF-файла
-     * @return Текст из PDF или пустую строку в случае ошибки
-     */
-    private fun tryReadPdfContent(uri: Uri): String {
-        Timber.d("Пытаемся прочитать содержимое PDF-файла (tryReadPdfContent - возможно, больше не используется активно)")
-        try {
-            // Повторно инициализируем PDFBox для надежности
-            try {
-                PDFBoxResourceLoader.init(context)
-                Timber.d("PDFBox инициализирован повторно")
-            } catch (e: Exception) {
-                Timber.e(e, "❌ Ошибка при повторной инициализации PDFBox: ${e.message}")
-            }
-
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                Timber.d("Открыт inputStream для PDF, доступно байт: ${inputStream.available()}")
-
-                try {
-                    // Пытаемся проверить первые байты файла
-                    val header = ByteArray(5)
-                    val bytesRead = inputStream.read(header)
-                    val headerStr = String(header)
-                    Timber.d("Прочитано $bytesRead байт, заголовок: $headerStr")
-
-                    // Проверяем, действительно ли это PDF (должен начинаться с "%PDF-")
-                    if (!headerStr.startsWith("%PDF-")) {
-                        Timber.e("❌ Файл не является PDF (неверный заголовок): $headerStr")
-                        return ""
-                    }
-                } catch (e: Exception) {
-                    Timber.e(e, "❌ Ошибка при чтении заголовка PDF: ${e.message}")
-                }
-            }
-
-            // Открываем новый поток для чтения всего документа
-            context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                try {
-                    Timber.d("Начинаем загрузку PDF документа")
-                    val document = PDDocument.load(inputStream)
-                    val pageCount = document.numberOfPages
-                    Timber.d("PDF документ загружен успешно, количество страниц: $pageCount")
-
-                    // Ограничиваем чтение только первой страницей
-                    val textStripper = PDFTextStripper()
-                    textStripper.startPage = 1
-                    textStripper.endPage = 1
-
-                    Timber.d("Начинаем извлечение текста только из первой страницы PDF")
-                    val text = try {
-                        textStripper.getText(document)
-                    } catch (e: Exception) {
-                        Timber.e(e, "❌ Ошибка при вызове textStripper.getText: ${e.message}")
-                        ""
-                    }
-
-                    if (text.isNotEmpty()) {
-                        Timber.d("Текст успешно извлечен из первой страницы, длина: ${text.length}")
-                    } else {
-                        Timber.e("❌ Извлеченный текст пустой")
-                    }
-
-                    try {
-                        document.close()
-                        Timber.d("PDF документ успешно закрыт")
-                    } catch (e: Exception) {
-                        Timber.e(e, "❌ Ошибка при закрытии документа: ${e.message}")
-                    }
-
-                    return text
-                } catch (e: Exception) {
-                    Timber.e(e, "❌ Ошибка при извлечении текста из PDF: ${e.message}")
-                }
-            }
-        } catch (e: Exception) {
-            Timber.e(e, "❌ Общая ошибка при чтении PDF: ${e.message}")
-        }
-
-        return ""
     }
 
     /**

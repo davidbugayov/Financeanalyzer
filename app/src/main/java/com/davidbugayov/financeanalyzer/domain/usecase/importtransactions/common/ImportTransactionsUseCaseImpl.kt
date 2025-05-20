@@ -1,8 +1,7 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 
 import android.net.Uri
-import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
-import com.davidbugayov.financeanalyzer.domain.model.ImportResult
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.emitAll

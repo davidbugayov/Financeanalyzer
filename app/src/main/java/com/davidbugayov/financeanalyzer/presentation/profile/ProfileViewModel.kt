@@ -5,9 +5,9 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Result
-import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.ExportTransactionsToCSVUseCase.ExportAction
-import com.davidbugayov.financeanalyzer.domain.usecase.GetProfileAnalyticsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time

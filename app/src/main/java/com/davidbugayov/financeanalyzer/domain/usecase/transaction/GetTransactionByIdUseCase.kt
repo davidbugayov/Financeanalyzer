@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase
+package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.AppException
 import com.davidbugayov.financeanalyzer.domain.model.Result

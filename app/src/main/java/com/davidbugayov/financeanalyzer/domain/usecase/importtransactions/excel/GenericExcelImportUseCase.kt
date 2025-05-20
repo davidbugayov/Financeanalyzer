@@ -4,13 +4,13 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
-import com.davidbugayov.financeanalyzer.domain.model.ImportResult
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.BankImportUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.TransactionCategoryDetector
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll

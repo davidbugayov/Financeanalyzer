@@ -4,18 +4,18 @@ import android.content.res.Resources
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.state.FinancialStatisticsContract
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import kotlinx.coroutines.flow.*
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.state.FinancialStatisticsContract
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.Calendar
-import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import java.util.Date
 import timber.log.Timber
-import kotlinx.coroutines.flow.first
-import com.davidbugayov.financeanalyzer.domain.usecase.GetTransactionsForPeriodUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.CalculateBalanceMetricsUseCase
+import java.util.Calendar
+import java.util.Date
 
 // Метрики для UI
 data class FinancialMetrics(
@@ -142,7 +142,9 @@ class FinancialStatisticsViewModel(
                 topIncomeCategory = topIncomeCategory,
                 mostFrequentExpenseDay = mostFrequentExpenseDay
             )
-            Timber.d("Transactions for stats: " + transactions.joinToString { "${it.date} ${it.amount} ${it.category} ${if (it.isExpense) "EXP" else "INC"}" })
+            Timber.d(
+                "Transactions for stats: %s",
+                transactions.joinToString { String.format("%s %s %s %s", it.date, it.amount, it.category, if (it.isExpense) "EXP" else "INC") })
             _state.value = _state.value.copy(
                 transactions = transactions,
                 income = income,

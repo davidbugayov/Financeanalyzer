@@ -4,13 +4,10 @@ import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
-import com.davidbugayov.financeanalyzer.domain.model.ImportResult
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.BankImportUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.TransactionCategoryDetector
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
@@ -70,8 +67,17 @@ class OzonPdfImportUseCase(
         text
     }
 
-    override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
-        emit(ImportResult.Progress(0, 100, "Начало импорта из PDF для Ozon Банка"))
+    override fun importTransactions(
+        uri: Uri,
+        progressCallback: com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
+    ): Flow<com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult> = flow {
+        emit(
+            com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Progress(
+                0,
+                100,
+                "Начало импорта из PDF для Ozon Банка"
+            )
+        )
         Timber.d("Начало импорта из URI для Ozon Банка: $uri")
 
         var text = ""
@@ -79,12 +85,17 @@ class OzonPdfImportUseCase(
             text = extractTextFromPdf(uri)
             if (text.isBlank()) {
                 Timber.w("Извлеченный текст из PDF пуст для Ozon Банка.")
-                emit(ImportResult.Error(message = "Не удалось извлечь текст из PDF файла."))
+                emit(com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(message = "Не удалось извлечь текст из PDF файла."))
                 return@flow
             }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при извлечении текста из PDF для Ozon Банка")
-            emit(ImportResult.Error(exception = e, message = e.localizedMessage ?: "Неизвестная ошибка"))
+            emit(
+                com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(
+                    exception = e,
+                    message = e.localizedMessage ?: "Неизвестная ошибка"
+                )
+            )
             return@flow
         }
 
@@ -92,7 +103,7 @@ class OzonPdfImportUseCase(
 
         if (!isValidFormat(reader)) {
             Timber.w("Файл не соответствует формату выписки Ozon Банка.")
-            emit(ImportResult.Error(message = "Файл не является выпиской Ozon Банка или его формат не поддерживается."))
+            emit(com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(message = "Файл не является выпиской Ozon Банка или его формат не поддерживается."))
             return@flow
         }
         // Сбросить reader, так как isValidFormat его уже прочитал
@@ -103,7 +114,11 @@ class OzonPdfImportUseCase(
         emitAll(processTransactionsFromReader(newReader, progressCallback).catch { e ->
             Timber.e(e, "Ошибка в потоке обработки транзакций Ozon Банка")
             // Используем конструктор Error напрямую с исключением
-            emit(ImportResult.Error(message = e.localizedMessage ?: "Неизвестная ошибка"))
+            emit(
+                com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(
+                    message = e.localizedMessage ?: "Неизвестная ошибка"
+                )
+            )
         })
     }
 
@@ -449,7 +464,7 @@ class OzonPdfImportUseCase(
 
                 // Создаем объект Transaction с правильными параметрами согласно определению модели
                 return Transaction(
-                    amount = Money(finalAmount, Currency.valueOf(currencyStr.uppercase(Locale.ROOT))),
+                    amount = com.davidbugayov.financeanalyzer.domain.model.Money(finalAmount, Currency.valueOf(currencyStr.uppercase(Locale.ROOT))),
                     category = category,
                     date = date,
                     isExpense = isExpense,
@@ -561,7 +576,7 @@ class OzonPdfImportUseCase(
         Timber.i("Ozon finalizeCurrentTransaction: Формирование транзакции из состояния: date=${state.date}, amount=${state.amount}, isExpense=${state.isExpense}, description=${description}, category=${category}")
 
         return Transaction(
-            amount = Money(state.amount!!, Currency.valueOf(state.currency)),
+            amount = com.davidbugayov.financeanalyzer.domain.model.Money(state.amount!!, Currency.valueOf(state.currency)),
             category = category,
             date = state.date!!,
             isExpense = state.isExpense,

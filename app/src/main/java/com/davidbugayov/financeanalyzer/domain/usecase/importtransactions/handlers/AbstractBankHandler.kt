@@ -4,7 +4,7 @@ import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import timber.log.Timber
 
 /**

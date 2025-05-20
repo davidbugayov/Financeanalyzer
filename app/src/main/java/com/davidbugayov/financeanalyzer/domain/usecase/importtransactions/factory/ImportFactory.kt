@@ -1,15 +1,17 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.factory
 
 // Removed SberbankHandler, TinkoffCsvHandler, AlfaBankCsvHandler
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractBankHandler
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.alfabank.AlfaBankExcelHandler
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.GenericCsvHandler
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.csv.GenericCsvHandler
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractBankHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.GenericExcelHandler
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank.SberbankPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon.OzonPdfHandler
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank.SberbankPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.tbank.TbankPdfHandler
 import timber.log.Timber
 
@@ -35,27 +37,6 @@ class ImportFactory(
         ).also {
             Timber.d("ImportFactory: Зарегистрированы обработчики: ${it.joinToString { h -> h.bankName }}")
         }
-    }
-
-    /**
-     * Находит подходящий BankHandler для данного файла.
-     *
-     * @param fileName Имя файла.
-     * @param uri URI файла.
-     * @param fileType Тип файла.
-     * @return Подходящий AbstractBankHandler или null, если ни один не подходит.
-     */
-    fun findBankHandler(fileName: String, uri: Uri, fileType: FileType): AbstractBankHandler? {
-        Timber.d("Поиск обработчика для файла: $fileName, тип: $fileType, uri: $uri")
-        for (handler in handlers) {
-            Timber.d("Проверка обработчика: ${handler.bankName} для файла: $fileName")
-            if (handler.canHandle(fileName, uri, fileType)) {
-                Timber.i("Найден обработчик: ${handler.bankName} для файла $fileName")
-                return handler
-            }
-        }
-        Timber.w("Подходящий обработчик не найден для файла: $fileName, тип: $fileType")
-        return null
     }
 
     /**

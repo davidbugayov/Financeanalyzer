@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.model
+package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 
 /**
  * Класс, представляющий результат операции импорта транзакций.
