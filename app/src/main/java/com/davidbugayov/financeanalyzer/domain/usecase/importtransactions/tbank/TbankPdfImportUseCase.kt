@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.tbank
 
 import android.content.Context
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.model.Money
@@ -21,7 +22,7 @@ class TbankPdfImportUseCase(
 ) : AbstractPdfImportUseCase(context, transactionRepository) {
 
     override val bankName: String = "Тинькофф Банк (PDF)"
-    private val transactionSource: String = "Тинькофф"
+    private val transactionSource: String = context.getString(R.string.transaction_source_tinkoff)
 
     private data class PartialTransaction(
         var date: Date? = null,

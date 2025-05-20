@@ -9,24 +9,29 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import timber.log.Timber
 import java.io.BufferedInputStream
 
+/**
+ * Хендлер для PDF-выписок Тинькофф Банка
+ */
 class TbankPdfHandler(
     transactionRepository: TransactionRepository,
     context: Context
 ) : AbstractPdfBankHandler(transactionRepository, context) {
 
-    override val bankName: String = "Tinkoff PDF"
+    override val bankName: String = "Тинькофф PDF"
 
+    // Ключевые слова для PDF-файлов Тинькофф
     override val pdfKeywords: List<String> = listOf(
         "tinkoff", "тинькофф", "тбанк", "tbank"
     )
 
-    // Собственные негативные ключевые слова для исключения ложных срабатываний
-    private fun getNegativeKeywords(): List<String> {
-        return listOf(
-            "sberbank", "сбербанк", "сбер", "sber", "альфа", "альфабанк", "alfa", "ozon"
-        )
-    }
+    // Негативные ключевые слова для исключения ложных срабатываний
+    private fun getNegativeKeywords(): List<String> = listOf(
+        "sberbank", "сбербанк", "сбер", "sber", "альфа", "альфабанк", "alfa", "ozon"
+    )
 
+    /**
+     * Проверяет, может ли данный хендлер обработать файл по имени и содержимому
+     */
     override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
         if (!supportsFileType(fileType)) return false
         val hasPositiveKeyword = pdfKeywords.any { fileName.lowercase().contains(it.lowercase()) }
@@ -35,6 +40,7 @@ class TbankPdfHandler(
             Timber.d("[$bankName Handler] Файл содержит ключевые слова других банков: $fileName")
             return false
         }
+        // Дополнительная проверка по содержимому файла
         try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
                 val buffer = ByteArray(2048)
@@ -62,11 +68,14 @@ class TbankPdfHandler(
         return hasPositiveKeyword
     }
 
+    /**
+     * Создаёт UseCase для импорта PDF-выписки Тинькофф
+     */
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
-            Timber.d("[$bankName Handler] Creating TbankPdfImportUseCase")
+            Timber.d("[$bankName Handler] Создание TbankPdfImportUseCase")
             return TbankPdfImportUseCase(context, transactionRepository)
         }
-        throw IllegalArgumentException("[$bankName Handler] does not support file type: $fileType")
+        throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
     }
 }

@@ -2,56 +2,123 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.alfab
 
 import android.content.Context
 import android.net.Uri
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.AmountParseConfig
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.DateFormatConfig
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.ExcelColumnMapping
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.ExcelParseConfig
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.GenericExcelImportUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractBankHandler
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.excel.SheetSelector
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractExcelBankHandler
 import timber.log.Timber
+import java.io.BufferedInputStream
+import java.util.Locale
 
+/**
+ * Обработчик Excel-выписок Альфа-Банка
+ */
 class AlfaBankExcelHandler(
     transactionRepository: TransactionRepository,
     context: Context
-) : AbstractBankHandler(transactionRepository, context) {
+) : AbstractExcelBankHandler(transactionRepository, context) {
 
-    override val bankName: String = "Alfa-Bank Excel"
+    override val bankName: String = "Альфа-Банк Excel"
 
-    override fun supportsFileType(fileType: FileType): Boolean {
-        return fileType == FileType.EXCEL
+    // Ключевые слова для Excel-файлов Альфа-Банка
+    override val excelKeywords: List<String> = listOf(
+        "alfabank", "альфабанк", "альфа-банк", "alfa",
+        "statement", "выписка", "операци", "движени",
+        "excel", "xlsx", "xls"
+    )
+
+    // Негативные ключевые слова для исключения ложных срабатываний
+    private fun getNegativeKeywords(): List<String> = listOf(
+        "sberbank", "сбербанк", "сбер", "sber", "тинькофф", "tinkoff", "ozon", "озон"
+    )
+
+    /**
+     * Проверяет, может ли данный хендлер обработать файл по имени и содержимому
+     */
+    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
+        if (!supportsFileType(fileType)) return false
+
+        val hasPositiveKeyword = excelKeywords.any { fileName.lowercase().contains(it.lowercase()) }
+        val containsNegativeKeyword = getNegativeKeywords().any { fileName.lowercase().contains(it.lowercase()) }
+
+        if (containsNegativeKeyword) {
+            Timber.d("[$bankName Handler] Файл содержит ключевые слова других банков: $fileName")
+            return false
+        }
+
+        // Дополнительная проверка по содержимому файла
+        try {
+            context.contentResolver.openInputStream(uri)?.use { inputStream ->
+                val buffer = ByteArray(2048)
+                val bis = BufferedInputStream(inputStream)
+                val bytesRead = bis.read(buffer, 0, buffer.size)
+                if (bytesRead > 0) {
+                    val content = String(buffer, 0, bytesRead)
+                    val alfaBankIndicators = listOf("АЛЬФА-БАНК", "ALFA-BANK", "Альфа-Банк", "Альфа", "Alfa")
+                    val hasAlfaBankIndicator = alfaBankIndicators.any { content.contains(it, ignoreCase = true) }
+                    val otherBankIndicators = listOf("СБЕРБАНК", "SBERBANK", "Тинькофф", "ТИНЬКОФФ", "OZON", "ОЗОН")
+                    val hasOtherBankIndicator = otherBankIndicators.any { content.contains(it, ignoreCase = true) }
+
+                    if (hasOtherBankIndicator) {
+                        Timber.d("[$bankName Handler] Файл содержит указания на другой банк")
+                        return false
+                    }
+
+                    if (hasAlfaBankIndicator) {
+                        Timber.d("[$bankName Handler] Найден индикатор Альфа-Банка в содержимом файла")
+                        return true
+                    }
+                }
+            }
+        } catch (e: Exception) {
+            Timber.w("[$bankName Handler] Ошибка при чтении файла для определения: ${e.message}")
+        }
+
+        return hasPositiveKeyword
     }
 
+    /**
+     * Создаёт UseCase для импорта Excel-выписки Альфа-Банка
+     */
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
-            // TODO: Define a specific ExcelParseConfig for Alfa-Bank if its Excel structure is known and consistent.
-            // For now, using default config. User might need to configure it manually if defaults don't match.
+            val transactionSource = context.getString(R.string.transaction_source_alfa)
+
+            // Конфигурация для Альфа-Банка
             val alfaBankConfig = ExcelParseConfig(
-                // Example: if Alfa-Bank always has 2 header rows and date in column 1 (0-indexed)
-                // headerRowCount = 2,
-                // dateColumnIndex = 0, // Assuming date is the first column after potential headers
-                // descriptionColumnIndex = 1,
-                // amountColumnIndex = 2,
-                // dateFormatString = "dd.MM.yyyy" // Example date format
+                sheetSelector = SheetSelector.ByIndex(0),
+                headerRowCount = 2,  // Уменьшаем до 2, т.к. в логах видны строки заголовков
+                columnMapping = ExcelColumnMapping(
+                    dateColumnIndex = 0,        // Дата операции
+                    descriptionColumnIndex = 3, // Код операции как описание
+                    amountColumnIndex = null,   // Отключаем поиск суммы в файле
+                    categoryColumnIndex = 4     // Категория операции
+                ),
+                defaultCurrencyCode = "RUB",
+                dateFormatConfig = DateFormatConfig(
+                    primaryDateFormatString = "dd.MM.yyyy",
+                    locale = Locale("ru")
+                ),
+                amountParseConfig = AmountParseConfig(
+                    decimalSeparator = ',',
+                    currencySymbolsToRemove = listOf("₽", "руб", "RUB")
+                ),
+                skipEmptyRows = true,
+                expectedMinValuesPerRow = 1  // Требуем только дату
             )
-            Timber.Forest.d("[$bankName Handler] Creating GenericExcelImportUseCase with specific config for Alfa-Bank: $alfaBankConfig")
-            return GenericExcelImportUseCase(context, transactionRepository, alfaBankConfig)
-        }
-        throw IllegalArgumentException("[$bankName Handler] does not support file type: $fileType")
-    }
 
-    override fun getFileNameKeywords(): List<String> {
-        // User will provide these keywords. Using common placeholders for now.
-        return listOf("alfabank", "альфабанк", "альфа-банк", "statement", "выписка", "excel_export")
-    }
-
-    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
-        // Basic check (file type and keywords in the name)
-        if (super.canHandle(fileName, uri, fileType)) {
-            return true
+            // Запускаем с debug-конфигурацией для вывода подробной информации
+            val debugEnabled = true
+            Timber.d("[$bankName Handler] Создание GenericExcelImportUseCase с конфигурацией: $alfaBankConfig")
+            return GenericExcelImportUseCase(context, transactionRepository, alfaBankConfig, transactionSource, debugEnabled)
         }
-        // For Excel, content check without parsing is not very effective.
-        // If super.canHandle() is false, we assume this handler cannot process it.
-        Timber.Forest.d("[$bankName Handler] Did not match file by name/type: $fileName. Content check for Excel is not performed at this stage.")
-        return false
+        throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
     }
 }

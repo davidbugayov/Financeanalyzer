@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon
 
 import android.content.Context
 import android.net.Uri
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.model.ImportResult
@@ -34,6 +35,8 @@ class OzonPdfImportUseCase(
 ) : BankImportUseCase(transactionRepository, context) {
 
     override val bankName: String = "Ozon Банк (PDF)"
+
+    private val transactionSource: String = context.getString(R.string.transaction_source_ozon)
 
     // Состояние для парсинга многострочной транзакции
     private data class TransactionState(
@@ -450,7 +453,7 @@ class OzonPdfImportUseCase(
                     category = category,
                     date = date,
                     isExpense = isExpense,
-                    source = "Ozon Банк",
+                    source = transactionSource,
                     sourceColor = 0,
                     title = description,
                     note = "Импортировано автоматически: $line"
@@ -562,7 +565,7 @@ class OzonPdfImportUseCase(
             category = category,
             date = state.date!!,
             isExpense = state.isExpense,
-            source = "Ozon Банк",
+            source = transactionSource,
             sourceColor = 0,
             title = description,
             note = "Импортировано автоматически из Справки о движении средств (документ ${state.documentNumber})"

@@ -13,185 +13,183 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 
 /**
- * Configuration for parsing CSV files.
- *
- * @param delimiter The character used to separate values in the CSV.
- * @param dateFormatString The date format pattern (e.g., "yyyy-MM-dd").
- * @param locale The locale to use for parsing dates.
- * @param hasHeader True if the CSV file has a header row to be skipped, false otherwise.
- * @param dateColumnIndex The 0-based index of the column containing the transaction date.
- * @param descriptionColumnIndex The 0-based index of the column containing the transaction description.
- * @param amountColumnIndex The 0-based index of the column containing the transaction amount.
- * @param currencyColumnIndex The 0-based index of the column containing the currency code (optional). If null, a default or inference might be used.
- * @param defaultCurrencyCode The currency code to use if `currencyColumnIndex` is null or the column is empty.
- * @param isExpenseColumnIndex The 0-based index of a column that explicitly states if a transaction is an expense (optional).
- *                             If null, expense status is inferred from the sign of the amount.
- * @param isExpenseTrueValue The string value in the `isExpenseColumnIndex` that indicates an expense (e.g., "true", "DR", "EXPENSE"). Ignored if `isExpenseColumnIndex` is null. Case-insensitive.
- * @param expectedMinColumnCount The minimum number of columns expected for a valid transaction line.
- * @param amountDecimalSeparator The character used as a decimal separator in amount strings (e.g., '.' or ',').
- * @param amountCharsToRemoveRegexPattern A regex pattern for characters to remove from amount strings before parsing (e.g., currency symbols, thousand separators).
- * @param statusColumnIndex Optional 0-based index of the column containing transaction status (e.g., "OK", "PENDING").
- * @param validStatusValues Optional list of string values in the `statusColumnIndex` that indicate a transaction should be processed. Case-insensitive. Used if `statusColumnIndex` is not null.
- * @param skipTransactionIfStatusInvalid If true and `statusColumnIndex` and `validStatusValues` are set, transactions with statuses not in `validStatusValues` will be skipped.
+ * Конфигурация для парсинга CSV-файлов.
+ * Позволяет гибко настраивать структуру и правила обработки CSV для разных банков и форматов.
  */
 data class CsvParseConfig(
-    val delimiter: Char = ',',
-    val dateFormatString: String = "yyyy-MM-dd",
-    val locale: Locale = Locale.getDefault(),
-    val hasHeader: Boolean = true,
-    val dateColumnIndex: Int = 0,
-    val descriptionColumnIndex: Int = 1,
-    val amountColumnIndex: Int = 2,
-    val currencyColumnIndex: Int? = 3,
-    val defaultCurrencyCode: String = "USD",
-    val isExpenseColumnIndex: Int? = null,
-    val isExpenseTrueValue: String = "true",
-    val expectedMinColumnCount: Int = 3, // Assumes Date, Description, Amount are minimal
-    val amountDecimalSeparator: Char = '.',
-    val amountCharsToRemoveRegexPattern: String? = null, // e.g., "[\\s€$]"
-    val statusColumnIndex: Int? = null,
-    val validStatusValues: List<String>? = null,
-    val skipTransactionIfStatusInvalid: Boolean = true
+    val delimiter: Char = ',', // Разделитель значений (например, ',' или ';')
+    val dateFormatString: String = "yyyy-MM-dd", // Формат даты (например, "dd.MM.yyyy")
+    val locale: Locale = Locale.getDefault(), // Локаль для парсинга дат
+    val hasHeader: Boolean = true, // Есть ли строка заголовка
+    val dateColumnIndex: Int = 0, // Индекс колонки с датой
+    val descriptionColumnIndex: Int = 1, // Индекс колонки с описанием
+    val amountColumnIndex: Int = 2, // Индекс колонки с суммой
+    val currencyColumnIndex: Int? = 3, // Индекс колонки с валютой (опционально)
+    val defaultCurrencyCode: String = "USD", // Валюта по умолчанию
+    val isExpenseColumnIndex: Int? = null, // Индекс колонки, явно указывающей расход (опционально)
+    val isExpenseTrueValue: String = "true", // Значение, означающее расход (если колонка есть)
+    val expectedMinColumnCount: Int = 3, // Минимальное количество колонок для валидной строки
+    val amountDecimalSeparator: Char = '.', // Разделитель дробной части в сумме
+    val amountCharsToRemoveRegexPattern: String? = null, // Регулярка для удаления лишних символов из суммы
+    val statusColumnIndex: Int? = null, // Индекс колонки со статусом транзакции (опционально)
+    val validStatusValues: List<String>? = null, // Список валидных статусов (если колонка есть)
+    val skipTransactionIfStatusInvalid: Boolean = true // Пропускать ли строки с невалидным статусом
 ) {
 
+    // Регулярка для очистки суммы
     val amountCharsToRemoveRegex: Regex? by lazy {
         amountCharsToRemoveRegexPattern?.let { Regex(it) }
     }
+
+    // Форматтер даты
     val dateFormat: SimpleDateFormat by lazy {
         SimpleDateFormat(dateFormatString, locale)
     }
 }
 
 /**
- * Generic CSV import use case. This UseCase attempts to parse a CSV file based on
- * a provided [CsvParseConfig].
+ * Универсальный класс для импорта транзакций из CSV-файлов.
+ * Гибко настраивается через CsvParseConfig.
  */
 class GenericCsvImportUseCase(
     context: Context,
     transactionRepository: TransactionRepository,
-    private val config: CsvParseConfig = CsvParseConfig() // Provide a default config
+    private val config: CsvParseConfig = CsvParseConfig() // Конфиг по умолчанию
 ) : BankImportUseCase(transactionRepository, context) {
 
     override val bankName: String = "Generic CSV (Configurable)"
 
+    /**
+     * Проверяет, подходит ли файл под ожидаемый CSV-формат (по первой строке).
+     */
     override fun isValidFormat(reader: BufferedReader): Boolean {
         reader.mark(4096)
         val firstLine = reader.readLine()
         reader.reset()
 
         if (firstLine == null) {
-            Timber.w("[$bankName] CSV file is empty.")
+            Timber.w("[$bankName] CSV-файл пуст.")
             return false
         }
         val columns = firstLine.split(config.delimiter)
-        val isValid =
-            columns.isNotEmpty() && columns.size >= config.expectedMinColumnCount - (if (config.currencyColumnIndex != null) 0 else 1) - (if (config.statusColumnIndex != null) 0 else 1)
-        Timber.d("[$bankName] Generic CSV format validation. First line: ${firstLine}. Delimiter: '${config.delimiter}'. IsValid (basic check): $isValid")
+        val isValid = columns.isNotEmpty() && columns.size >= config.expectedMinColumnCount
+        Timber.d("[$bankName] Проверка формата CSV. Первая строка: $firstLine. Разделитель: '${config.delimiter}'. Валиден: $isValid")
         return isValid
     }
 
+    /**
+     * Пропускает строку заголовка, если она есть (согласно конфигу).
+     */
     override fun skipHeaders(reader: BufferedReader) {
         if (config.hasHeader) {
             val headerLine = reader.readLine()
-            Timber.d("[$bankName] Skipped header line (as per config): $headerLine")
+            Timber.d("[$bankName] Пропущена строка заголовка: $headerLine")
         } else {
-            Timber.d("[$bankName] No header to skip (as per config).")
+            Timber.d("[$bankName] Заголовка нет (по конфигу)")
         }
     }
 
+    /**
+     * Парсит строку CSV в объект Transaction.
+     * Возвращает null, если строка невалидна или не содержит транзакцию.
+     */
     override fun parseLine(line: String): Transaction? {
-        Timber.d("[$bankName] Parsing line: $line")
+        Timber.d("[$bankName] Парсинг строки: $line")
         val columns = line.split(config.delimiter).map { it.trim().removeSurrounding("\"") }
 
         if (columns.size < config.expectedMinColumnCount) {
-            Timber.w("[$bankName] Line does not have enough columns. Expected at least ${config.expectedMinColumnCount}, got ${columns.size}. Line: $line")
+            Timber.w("[$bankName] Недостаточно колонок. Ожидалось минимум ${config.expectedMinColumnCount}, получено ${columns.size}. Строка: $line")
             return null
         }
 
-        // Status Check
+        // Проверка статуса транзакции (если настроено)
         if (config.skipTransactionIfStatusInvalid && config.statusColumnIndex != null && config.validStatusValues?.isNotEmpty() == true) {
             val status = columns.getOrNull(config.statusColumnIndex)
             if (status == null || config.validStatusValues.none { it.equals(status, ignoreCase = true) }) {
-                Timber.d("[$bankName] Skipping transaction due to invalid status: '$status'. Valid statuses: ${config.validStatusValues}. Line: $line")
+                Timber.d("[$bankName] Пропуск транзакции из-за невалидного статуса: '$status'. Валидные: ${config.validStatusValues}. Строка: $line")
                 return null
             }
         }
 
         try {
+            // Получаем дату
             val dateString = columns.getOrNull(config.dateColumnIndex) ?: run {
-                Timber.e("[$bankName] Date string missing at configured index ${config.dateColumnIndex}. Line: $line")
+                Timber.e("[$bankName] Не найдена дата по индексу ${config.dateColumnIndex}. Строка: $line")
                 return null
             }
+            // Получаем описание
             val description = columns.getOrNull(config.descriptionColumnIndex) ?: "N/A"
 
+            // Получаем сумму
             var amountString = columns.getOrNull(config.amountColumnIndex) ?: run {
-                Timber.e("[$bankName] Amount string missing at configured index ${config.amountColumnIndex}. Line: $line")
+                Timber.e("[$bankName] Не найдена сумма по индексу ${config.amountColumnIndex}. Строка: $line")
                 return null
             }
-
+            // Очищаем сумму от лишних символов
             config.amountCharsToRemoveRegex?.let { regex ->
                 amountString = regex.replace(amountString, "")
             }
-            if (config.amountDecimalSeparator != '.') { // Normalize to '.' for Double.parseDouble
+            // Приводим разделитель к '.' для Double.parseDouble
+            if (config.amountDecimalSeparator != '.') {
                 amountString = amountString.replace(config.amountDecimalSeparator, '.')
             }
 
+            // Получаем валюту
             val currencyString = config.currencyColumnIndex?.let { index ->
                 columns.getOrNull(index)?.takeIf { it.isNotBlank() }
             } ?: config.defaultCurrencyCode
 
+            // Парсим дату
             val transactionDate = config.dateFormat.parse(dateString) ?: run {
-                Timber.e("[$bankName] Failed to parse date: '${dateString}' with format '${config.dateFormat.toPattern()}'. Line: ${line}")
+                Timber.e("[$bankName] Не удалось распарсить дату: '$dateString' с форматом '${config.dateFormat.toPattern()}'. Строка: $line")
                 return null
             }
+            // Парсим сумму
             val amountValue = amountString.toDoubleOrNull() ?: run {
-                Timber.e("[$bankName] Failed to parse amount: '${amountString}' (after cleanup/normalization). Line: ${line}")
+                Timber.e("[$bankName] Не удалось распарсить сумму: '$amountString' (после очистки). Строка: $line")
                 return null
             }
 
+            // Определяем расход/доход
             val isExpense: Boolean = config.isExpenseColumnIndex?.let { index ->
                 columns.getOrNull(index)?.equals(config.isExpenseTrueValue, ignoreCase = true)
-            } ?: (amountValue < 0) // Infer from amount sign if no specific column or value mismatch
+            } ?: (amountValue < 0) // Если нет отдельной колонки, определяем по знаку суммы
 
             val absAmount = kotlin.math.abs(amountValue)
-
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
             val money = Money(absAmount, currency)
-
             val category = TransactionCategoryDetector.detect(description)
 
-            // TODO: Source color and categoryId mapping could also be part of config or a separate mapping mechanism
+            // Формируем объект транзакции
             return Transaction(
                 amount = money,
                 category = category,
                 date = transactionDate,
                 isExpense = isExpense,
-                note = "Imported from Generic CSV", // TODO: Maybe bankName from config or handler?
-                source = bankName, // This will be "Generic CSV (Configurable)". Consider if this should come from Handler or a config field.
-                sourceColor = 0,
+                note = "Импортировано из Generic CSV", // Можно доработать для передачи имени банка
+                source = bankName,
+                sourceColor = 0, // Можно сделать настраиваемым
                 categoryId = "",
                 title = description
             )
         } catch (e: Exception) {
-            Timber.e(e, "[$bankName] Failed to parse transaction line: $line. Config: $config")
+            Timber.e(e, "[$bankName] Ошибка при парсинге строки: $line. Config: $config")
             return null
         }
     }
 
+    /**
+     * Определяет, нужно ли пропустить строку (например, если она пустая или не содержит достаточно данных).
+     */
     override fun shouldSkipLine(line: String): Boolean {
-        if (super.shouldSkipLine(line)) return true // Skips blank lines
-        // Basic check: if line doesn't have enough parts after splitting by delimiter, skip.
-        // This might be too aggressive if some lines are intentionally shorter (e.g. notes)
-        // but for transaction data, it's a reasonable heuristic.
+        if (super.shouldSkipLine(line)) return true // Пропуск пустых строк
         if (line.split(config.delimiter).size < config.expectedMinColumnCount) {
-            Timber.d("[$bankName] Skipping line due to insufficient columns based on delimiter '${config.delimiter}': $line")
+            Timber.d("[$bankName] Пропуск строки из-за недостаточного количества колонок: $line")
             return true
         }
-        // TODO: Add more (configurable?) conditions to skip specific non-transaction lines
+        // Здесь можно добавить дополнительные условия для пропуска строк
         return false
     }
 
-    // No need to override importTransactions(uri, progressCallback) as the
-    // default implementation in BankImportUseCase (which uses processTransactionsFromReader)
-    // is suitable for CSV files that can be read directly as text streams.
+    // importTransactions(uri, progressCallback) не переопределяем — базовая реализация BankImportUseCase подходит для CSV
 } 

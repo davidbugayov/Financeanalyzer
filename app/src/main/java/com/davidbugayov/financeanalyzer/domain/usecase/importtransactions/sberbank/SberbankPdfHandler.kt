@@ -9,21 +9,29 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import timber.log.Timber
 import java.io.BufferedInputStream
 
+/**
+ * Хендлер для PDF-выписок Сбербанка
+ */
 class SberbankPdfHandler(
     transactionRepository: TransactionRepository,
     context: Context
 ) : AbstractPdfBankHandler(transactionRepository, context) {
 
-    override val bankName: String = "Sberbank PDF"
+    override val bankName: String = "Сбербанк PDF"
 
+    // Ключевые слова для определения PDF-файлов Сбербанка
     override val pdfKeywords: List<String> = listOf(
         "sberbank", "сбербанк", "сбер", "sber",
         "выписка по счету", "выписка по счёту", "выписка сбербанк"
     )
 
+    /**
+     * Проверяет, может ли данный хендлер обработать файл по имени и содержимому
+     */
     override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
         if (!supportsFileType(fileType)) return false
         val hasKeyword = pdfKeywords.any { fileName.lowercase().contains(it.lowercase()) }
+        // Дополнительная проверка по содержимому файла, если в имени только "выписка"
         if (fileName.lowercase().contains("выписка") && !hasKeyword) {
             try {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
@@ -50,11 +58,14 @@ class SberbankPdfHandler(
         return hasKeyword
     }
 
+    /**
+     * Создаёт UseCase для импорта PDF-выписки Сбербанка
+     */
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
-            Timber.d("[$bankName Handler] Creating SberbankPdfImportUseCase")
+            Timber.d("[$bankName Handler] Создание SberbankPdfImportUseCase")
             return SberbankPdfImportUseCase(context, transactionRepository)
         }
-        throw IllegalArgumentException("[$bankName Handler] does not support file type: $fileType")
+        throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
     }
 }

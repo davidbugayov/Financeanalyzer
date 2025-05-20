@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank
 
 import android.content.Context
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.model.Money
@@ -21,8 +22,8 @@ class SberbankPdfImportUseCase(
     transactionRepository: TransactionRepository
 ) : AbstractPdfImportUseCase(context, transactionRepository) {
 
-    override val bankName: String = "Сбербанк (PDF)"
-    private val transactionSource: String = "Сбер"
+    override val bankName: String = context.getString(R.string.bank_sberbank_pdf)
+    private val transactionSource: String = context.getString(R.string.transaction_source_sber)
 
     /**
      * Модель для обработки многострочных транзакций
@@ -175,11 +176,16 @@ class SberbankPdfImportUseCase(
             val absAmount = kotlin.math.abs(amount)
             val money = Money(absAmount, Currency.RUB)
             val noteParts = mutableListOf<String>()
-            if (partial.time != null) noteParts.add("Время: ${partial.time}")
-            if (partial.authCode != null) noteParts.add("Код: ${partial.authCode}")
-            if (partial.balance != null) noteParts.add("Баланс: ${partial.balance}")
-            if (partial.description.isNotEmpty()) noteParts.add("Детали: ${partial.description.joinToString(" ")}")
-            val title = partial.category ?: "Неизвестная операция"
+            if (partial.time != null) noteParts.add(context.getString(R.string.transaction_note_time, partial.time))
+            if (partial.authCode != null) noteParts.add(context.getString(R.string.transaction_note_auth_code, partial.authCode))
+            if (partial.balance != null) noteParts.add(context.getString(R.string.transaction_note_balance, partial.balance))
+            if (partial.description.isNotEmpty()) noteParts.add(
+                context.getString(
+                    R.string.transaction_note_details,
+                    partial.description.joinToString(" ")
+                )
+            )
+            val title = partial.category ?: context.getString(R.string.transaction_title_unknown)
 
             // Используем банковскую категорию напрямую, если она соответствует нашим категориям
             val bankCategory = partial.category ?: ""

@@ -15,29 +15,22 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CloudUpload
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -53,7 +46,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BankInstructionDialog
@@ -220,179 +212,68 @@ fun ImportTransactionsScreen(
                     )
                 }
 
-                // Кнопка выбора файла с анимацией
+                // Оставляем только ImportResultsSection для показа результатов импорта
                 AnimatedVisibility(
-                    visible = showButton,
-                    enter = fadeIn(animationSpec = tween(700)) + 
-                            slideInVertically(
-                                initialOffsetY = { 100 },
+                    visible = state.successCount > 0 || state.isLoading || state.error != null,
+                    enter = fadeIn(animationSpec = tween(500)) +
+                            expandVertically(
                                 animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                    dampingRatio = Spring.DampingRatioMediumBouncy,
                                     stiffness = Spring.StiffnessLow
                                 )
-                            )
+                            ),
+                    exit = fadeOut(animationSpec = tween(300))
                 ) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth()
-                    ) {
-                        // Добавляем прогресс-бар над кнопкой, который виден только во время импорта
-                        AnimatedVisibility(
-                            visible = state.isLoading,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
-                        ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = dimensionResource(R.dimen.padding_medium)),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                ),
-                                elevation = CardDefaults.cardElevation(
-                                    defaultElevation = dimensionResource(R.dimen.card_elevation)
-                                ),
-                                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card))
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(dimensionResource(R.dimen.padding_medium)),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Text(
-                                        text = "${state.progress}%",
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.primary,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                                    LinearProgressIndicator(
-                                        progress = { state.progress / 100f },
-                                        modifier = Modifier.fillMaxWidth(),
-                                        color = MaterialTheme.colorScheme.primary,
-                                        trackColor = MaterialTheme.colorScheme.primaryContainer
-                                    )
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                                    Text(
-                                        text = state.progressMessage,
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                }
-                            }
-                        }
+                    ImportResultsSection(state)
+                }
 
-                        // Добавляем сообщение об успешном завершении импорта
-                        AnimatedVisibility(
-                            visible = state.successCount > 0 && !state.isLoading && state.error == null,
-                            enter = fadeIn() + expandVertically(),
-                            exit = fadeOut() + shrinkVertically()
-                        ) {
-                            Card(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(bottom = dimensionResource(R.dimen.padding_medium)),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = MaterialTheme.colorScheme.surfaceVariant
-                                ),
-                                elevation = CardDefaults.cardElevation(
-                                    defaultElevation = dimensionResource(R.dimen.card_elevation)
-                                ),
-                                shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card))
-                            ) {
-                                Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(dimensionResource(R.dimen.padding_medium)),
-                                    horizontalAlignment = Alignment.CenterHorizontally
-                                ) {
-                                    Icon(
-                                        imageVector = Icons.Default.CheckCircle,
-                                        contentDescription = null,
-                                        tint = MaterialTheme.colorScheme.primary,
-                                        modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium))
+                // Кнопка выбора файла
+                Column(
+                    modifier = Modifier.fillMaxWidth()
+                ) {
+                    // Кнопка выбора файла
+                    Button(
+                        onClick = {
+                            if (Build.VERSION.SDK_INT >= 35) {
+                                getContentLauncher.launch("*/*")
+                            } else {
+                                filePickerLauncher.launch(
+                                    arrayOf(
+                                        "text/csv",
+                                        "application/pdf",
+                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
                                     )
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                                    Text(
-                                        text = stringResource(R.string.import_success),
-                                        style = MaterialTheme.typography.titleMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        fontWeight = FontWeight.Bold
-                                    )
-                                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                                    Text(
-                                        text = stringResource(R.string.imported_count, state.successCount),
-                                        style = MaterialTheme.typography.bodyMedium,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                                    )
-                                    if (state.skippedCount > 0) {
-                                        Text(
-                                            text = stringResource(R.string.skipped_count, state.skippedCount),
-                                            style = MaterialTheme.typography.bodyMedium,
-                                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                                        )
-                                    }
-                                }
+                                )
                             }
-                        }
-                        // Отображение результатов импорта с анимацией
-                        AnimatedVisibility(
-                            visible = state.successCount > 0 || state.isLoading || state.error != null,
-                            enter = fadeIn(animationSpec = tween(500)) +
-                                    expandVertically(
-                                        animationSpec = spring(
-                                            dampingRatio = Spring.DampingRatioMediumBouncy,
-                                            stiffness = Spring.StiffnessLow
-                                        )
-                                    ),
-                            exit = fadeOut(animationSpec = tween(300))
-                        ) {
-                            ImportResultsSection(state)
-                        }
-                        // Кнопка выбора файла
-                        Button(
-                            onClick = {
-                                if (Build.VERSION.SDK_INT >= 35) {
-                                    getContentLauncher.launch("*/*")
-                                } else {
-                                    filePickerLauncher.launch(
-                                        arrayOf(
-                                            "text/csv",
-                                            "application/pdf",
-                                            "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                        )
-                                    )
-                                }
-                            },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(dimensionResource(R.dimen.button_height)),
-                            shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button)),
-                            colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = androidx.compose.ui.graphics.Color.White
-                            ),
-                            elevation = ButtonDefaults.buttonElevation(
-                                defaultElevation = dimensionResource(R.dimen.button_elevation)
-                            ),
-                            // Добавляем возможность отключения кнопки во время импорта
-                            enabled = !state.isLoading
-                        ) {
-                            Icon(
-                                imageVector = Icons.Default.CloudUpload,
-                                contentDescription = null,
-                                tint = androidx.compose.ui.graphics.Color.White,
-                                modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
-                            )
-                            Text(
-                                text = if (state.isLoading)
-                                    stringResource(R.string.importing_file)
-                                else
-                                    stringResource(R.string.choose_file_button),
-                                style = MaterialTheme.typography.titleMedium,
-                                color = androidx.compose.ui.graphics.Color.White
-                            )
-                        }
+                        },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.button_height)),
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button)),
+                        colors = ButtonDefaults.buttonColors(
+                            containerColor = MaterialTheme.colorScheme.primary,
+                            contentColor = androidx.compose.ui.graphics.Color.White
+                        ),
+                        elevation = ButtonDefaults.buttonElevation(
+                            defaultElevation = dimensionResource(R.dimen.button_elevation)
+                        ),
+                        // Добавляем возможность отключения кнопки во время импорта
+                        enabled = !state.isLoading
+                    ) {
+                        Icon(
+                            imageVector = Icons.Default.CloudUpload,
+                            contentDescription = null,
+                            tint = androidx.compose.ui.graphics.Color.White,
+                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
+                        )
+                        Text(
+                            text = if (state.isLoading)
+                                stringResource(R.string.importing_file)
+                            else
+                                stringResource(R.string.choose_file_button),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = androidx.compose.ui.graphics.Color.White
+                        )
                     }
                 }
             }

@@ -909,4 +909,27 @@
     <string name="bank_ozon">Ozon</string>
     <string name="bank_csv">CSV</string>
 
+    <string name="import_progress_starting">Начало импорта %1$s</string>
+    <string name="import_error_pdf_extraction_failed">Не удалось извлечь текст из PDF или файл пуст для %1$s.</string>
+    <string name="import_progress_text_extracted_validating">Текст извлечен, проверка формата…</string>
+    <string name="import_error_invalid_format">Файл не является выпиской %1$s или формат не поддерживается.</string>
+    <string name="import_progress_format_validated_skipping_headers">Формат проверен, пропуск заголовков…</string>
+    <string name="import_progress_processing_transactions">Обработка транзакций…</string>
+    <string name="import_error_no_transactions_found">Не найдено ни одной транзакции в файле для %1$s.</string>
+    <string name="import_progress_saving_transactions">Сохранение %1$d транзакций…</string>
+    <string name="import_error_io_exception">Ошибка чтения файла %1$s: %2$s</string>
+    <string name="import_error_unknown">Неизвестная ошибка при импорте %1$s: %2$s</string>
+    <string name="import_error_pdf_extraction_exception">Ошибка при извлечении текста из PDF для %1$s: %2$s</string>
+
+    <string name="bank_sberbank_pdf">Сбербанк (PDF)</string>
+    <string name="transaction_source_sber">Сбер</string>
+    <string name="transaction_note_time">Время: %1$s</string>
+    <string name="transaction_note_auth_code">Код: %1$s</string>
+    <string name="transaction_note_balance">Баланс: %1$s</string>
+    <string name="transaction_note_details">Детали: %1$s</string>
+    <string name="transaction_title_unknown">Неизвестная операция</string>
+    <string name="transaction_source_alfa">Альфа-Банк</string>
+    <string name="transaction_source_ozon">Ozon</string>
+    <string name="transaction_source_tinkoff">Тинькофф</string>
+
 </resources>

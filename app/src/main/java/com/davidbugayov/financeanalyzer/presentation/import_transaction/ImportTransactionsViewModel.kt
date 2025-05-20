@@ -38,8 +38,7 @@ class ImportTransactionsViewModel(
 
     // Для обратной совместимости с предыдущим подходом
     private val _uiState = MutableStateFlow<ImportUiState>(ImportUiState.Initial)
-    val uiState: StateFlow<ImportUiState> = _uiState
-    
+
     /**
      * Обрабатывает намерения пользователя в соответствии с паттерном MVI.
      *

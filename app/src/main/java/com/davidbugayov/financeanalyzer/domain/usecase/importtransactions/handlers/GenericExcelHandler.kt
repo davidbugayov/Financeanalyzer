@@ -12,13 +12,14 @@ import timber.log.Timber
 class GenericExcelHandler(
     transactionRepository: TransactionRepository,
     context: Context
-) : AbstractBankHandler(transactionRepository, context) {
+) : AbstractExcelBankHandler(transactionRepository, context) {
 
     override val bankName: String = "Generic Excel"
 
-    override fun supportsFileType(fileType: FileType): Boolean {
-        return fileType == FileType.EXCEL
-    }
+    // Ключевые слова для общих Excel-файлов
+    override val excelKeywords: List<String> = listOf(
+        ".xlsx", ".xls", "excel_export", "workbook", "excel", "spreadsheet"
+    )
 
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
@@ -29,10 +30,10 @@ class GenericExcelHandler(
                 // имеют заголовок в 2 строки, можно указать headerRowCount = 2.
                 // Для примера, оставим полностью дефолтный конфиг.
             )
-            Timber.d("[$bankName Handler] Creating GenericExcelImportUseCase with default Excel config: $defaultConfig")
+            Timber.d("[$bankName Handler] Создание GenericExcelImportUseCase с дефолтной конфигурацией: $defaultConfig")
             return GenericExcelImportUseCase(context, transactionRepository, defaultConfig)
         }
-        throw IllegalArgumentException("[$bankName Handler] does not support file type: $fileType")
+        throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
     }
 
     override fun getFileNameKeywords(): List<String> {
