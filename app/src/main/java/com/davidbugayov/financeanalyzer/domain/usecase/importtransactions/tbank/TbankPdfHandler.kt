@@ -21,7 +21,7 @@ class TbankPdfHandler(
 
     // Ключевые слова для PDF-файлов Тинькофф
     override val pdfKeywords: List<String> = listOf(
-        "tinkoff", "тинькофф", "тбанк", "tbank"
+        "tinkoff", "тинькофф", "тбанк", "tbank", "движение средств", "справка о движении"
     )
 
     // Негативные ключевые слова для исключения ложных срабатываний

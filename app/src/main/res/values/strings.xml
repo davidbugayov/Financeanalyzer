@@ -473,6 +473,7 @@
     <string name="csv_requirements">• Столбцы: дата, сумма, категория\n• Разделитель: запятая или точка с запятой\n• Кодировка: UTF-8\n• Пример: 01.01.2023,1000,Продукты</string>
     <string name="more_details">Подробнее</string>
     <string name="import_in_progress">Импортируем транзакции…</string>
+    <string name="importing_transactions">Импортируем транзакции…</string>
     <string name="import_progress_count">%1$d из %2$d транзакций</string>
     <string name="import_success">Импорт завершён!</string>
     <string name="imported_count">Импортировано: %d</string>
@@ -929,7 +930,7 @@
     <string name="transaction_note_details">Детали: %1$s</string>
     <string name="transaction_title_unknown">Неизвестная операция</string>
     <string name="transaction_source_alfa">Альфа-Банк</string>
-    <string name="transaction_source_ozon">Ozon</string>
+    <string name="transaction_source_ozon">Озон</string>
     <string name="transaction_source_tinkoff">Тинькофф</string>
 
 </resources>

@@ -33,7 +33,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsState
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSuccessColor
 
@@ -190,112 +189,6 @@ fun CSVImportCard(onLearnMoreClick: () -> Unit) {
 }
 
 /**
- * Отображение результатов импорта
- */
-@Composable
-fun ImportResultsSection(state: ImportTransactionsState) {
-    Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.space_medium)),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        ),
-        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
-    ) {
-        Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            when {
-                state.isLoading && state.progress > 0 -> {
-                    Text(
-                        text = stringResource(R.string.import_in_progress),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
-                    LinearProgressIndicator(
-                        progress = { state.progress.toFloat() / state.totalCount },
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                    Text(
-                        text = stringResource(
-                            R.string.import_progress_count,
-                            state.progress,
-                            state.totalCount
-                        ),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                    Text(
-                        text = state.currentStep,
-                        style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-                state.isLoading -> {
-                    Text(
-                        text = stringResource(R.string.import_in_progress),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
-                }
-                state.error == null -> {
-                    Text(
-                        text = stringResource(R.string.import_success),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = LocalSuccessColor.current
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
-                    Text(
-                        text = stringResource(R.string.imported_count, state.successCount),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
-                    )
-                    if (state.skippedCount > 0) {
-                        Text(
-                            text = stringResource(R.string.skipped_count, state.skippedCount),
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
-                        )
-                    }
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                    Text(
-                        text = stringResource(
-                            R.string.import_total_amount,
-                            state.totalAmount.amount.toInt()
-                        ),
-                        style = MaterialTheme.typography.titleLarge,
-                        fontWeight = FontWeight.Bold,
-                        color = LocalSuccessColor.current
-                    )
-                }
-                else -> {
-                    Text(
-                        text = stringResource(R.string.import_error),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.error
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
-                    Text(
-                        text = state.error,
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
-                    )
-                }
-            }
-        }
-    }
-}
-
-/**
  * Отображение результатов импорта для нового типа состояния
  */
 @Composable
@@ -311,8 +204,11 @@ fun ImportResultsSection(state: ImportState) {
         elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
     ) {
         Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
-            horizontalAlignment = Alignment.CenterHorizontally
+            modifier = Modifier
+                .padding(dimensionResource(R.dimen.padding_large))
+                .fillMaxWidth(),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
         ) {
             when {
                 state.isLoading && state.progress > 0 -> {
@@ -341,13 +237,21 @@ fun ImportResultsSection(state: ImportState) {
                     )
                 }
                 state.isLoading -> {
-                    Text(
-                        text = stringResource(R.string.import_in_progress),
-                        style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
-                    CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(R.dimen.padding_large)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                        verticalArrangement = Arrangement.Center
+                    ) {
+                        Text(
+                            text = stringResource(R.string.importing_transactions),
+                            style = MaterialTheme.typography.titleMedium,
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
+                        CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
+                    }
                 }
                 state.error == null && state.successCount > 0 -> {
                     Text(
