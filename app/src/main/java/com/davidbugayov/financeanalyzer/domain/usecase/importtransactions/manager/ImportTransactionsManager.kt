@@ -7,13 +7,14 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileTy
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.factory.ImportFactory
 import com.tom_roush.pdfbox.android.PDFBoxResourceLoader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.flowOn
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.get
 import timber.log.Timber
@@ -99,16 +100,27 @@ class ImportTransactionsManager(
         if (fileFormat == FileType.UNKNOWN) {
             Timber.d("Формат не определен по расширению, пытаемся определить по содержимому URI: $uri")
             val successfullyDetected = try {
-                withContext(Dispatchers.IO) {
+                // Используем flow с flowOn вместо withContext для согласования контекстов
+                val detectedFormat = flow<FileType> {
                     context.contentResolver.openInputStream(uri)?.use { streamForDetection ->
-                        fileFormat = detectFormatByContent(streamForDetection)
-                        Timber.d("Формат после detectFormatByContent: $fileFormat")
-                        true
-                    } ?: run {
-                        Timber.e("Не удалось открыть файл для определения формата по содержимому URI: $uri")
-                        emit(ImportResult.error("Не удалось открыть файл для определения формата"))
-                        false
-                    }
+                        emit(detectFormatByContent(streamForDetection))
+                    } ?: emit(FileType.UNKNOWN)
+                }.flowOn(Dispatchers.IO)
+
+                // Собираем одно значение из потока
+                val formatResult = mutableListOf<FileType>()
+                detectedFormat.collect { format ->
+                    formatResult.add(format)
+                }
+
+                if (formatResult.isNotEmpty()) {
+                    fileFormat = formatResult.first()
+                    Timber.d("Формат после detectFormatByContent: $fileFormat")
+                    true
+                } else {
+                    Timber.e("Не удалось открыть файл для определения формата по содержимому URI: $uri")
+                    emit(ImportResult.error("Не удалось открыть файл для определения формата"))
+                    false
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при определении формата по содержимому: ${e.message}")
@@ -124,10 +136,19 @@ class ImportTransactionsManager(
             return@flow
         }
 
-        val importerUseCase = withContext(Dispatchers.Default) {
+        // Используем flow с flowOn вместо withContext для получения импортера
+        val importerFlow = flow {
             Timber.d("Попытка создать импортер через ImportFactory. Файл: $fileNameForDiagnostics, Тип: $fileFormat, URI: $uri")
-            importFactory.getImporter(fileNameForDiagnostics, uri, fileFormat)
+            emit(importFactory.getImporter(fileNameForDiagnostics, uri, fileFormat))
+        }.flowOn(Dispatchers.Default)
+
+        // Собираем одно значение из потока
+        val importerResults = mutableListOf<ImportTransactionsUseCase?>()
+        importerFlow.collect { importer ->
+            importerResults.add(importer)
         }
+
+        val importerUseCase = if (importerResults.isNotEmpty()) importerResults.first() else null
 
         if (importerUseCase == null) {
             Timber.e("Не удалось создать импортер для файла: $fileNameForDiagnostics (тип: $fileFormat). Подходящий BankHandler не найден или не поддерживает этот тип файла.")
@@ -136,8 +157,13 @@ class ImportTransactionsManager(
         }
 
         Timber.i("Используется импортер: ${(importerUseCase as? BankImportUseCase)?.bankName ?: importerUseCase::class.simpleName} для файла $fileNameForDiagnostics")
-        emitAll(importerUseCase.importTransactions(uri, progressCallback))
-    }
+
+        // Использование flowOn для согласования контекста эмиссии
+        val importFlow = importerUseCase.importTransactions(uri, progressCallback)
+            .flowOn(Dispatchers.IO)
+
+        emitAll(importFlow)
+    }.flowOn(Dispatchers.IO) // Обеспечиваем правильный контекст для всех операций в потоке
 
     /**
      * Пытается определить формат файла по его содержимому

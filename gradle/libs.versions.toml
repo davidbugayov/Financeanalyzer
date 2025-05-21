@@ -44,7 +44,7 @@ gson = "2.11.0"
 pdfbox = "2.0.27.0"
 
 # Excel parsing libraries
-poi = "5.2.3"
+poi = "5.2.5"
 
 [libraries]
 # Kotlin
@@ -109,12 +109,12 @@ gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
 # PDF
 pdfbox-android = { group = "com.tom-roush", name = "pdfbox-android", version.ref = "pdfbox" }
 
-# Testing
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-
 # Excel libraries
 poi-core = { group = "org.apache.poi", name = "poi", version.ref = "poi" }
 poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" }
+
+# Testing
+junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

@@ -8,7 +8,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
@@ -175,7 +175,7 @@ abstract class BankImportUseCase(
             Timber.e(e, "[ИМПОРТ] ❌ Общая ошибка при импорте: ${e.message}")
             emit(ImportResult.error("Ошибка при импорте: ${e.message}"))
         }
-    }
+    }.flowOn(Dispatchers.IO) // Ensure Flow emissions happen in the correct context
 
     /**
      * Реализация основного метода интерфейса ImportTransactionsUseCase.
@@ -190,7 +190,9 @@ abstract class BankImportUseCase(
         progressCallback.onProgress(0, 100, "Начало импорта для банка $bankName...")
 
         try {
-            withContext(Dispatchers.IO) {
+            // Важно: мы используем withContext внутри flow, что может привести к проблемам с контекстом
+            // Вместо emitAll внутри withContext, мы сначала создадим новый Flow и применим к нему flowOn
+            val readerFlow = flow {
                 context.contentResolver.openInputStream(uri)?.use { inputStream ->
                     BufferedReader(InputStreamReader(inputStream)).use { reader ->
                         emitAll(processTransactionsFromReader(reader, progressCallback))
@@ -199,10 +201,13 @@ abstract class BankImportUseCase(
                     Timber.e("Не удалось открыть InputStream для URI: $uri в банке $bankName")
                     emit(ImportResult.error("Не удалось открыть файл $uri для банка $bankName"))
                 }
-            }
+            }.flowOn(Dispatchers.IO)
+
+            // Теперь безопасно эмитируем все результаты из readerFlow
+            emitAll(readerFlow)
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при открытии файла или обработке в importTransactions для банка $bankName из $uri: ${e.message}")
             emit(ImportResult.error("Ошибка импорта для $bankName: ${e.message}"))
         }
-    }
+    }.flowOn(Dispatchers.IO) // Ensure all Flow operations happen in the IO context
 } 

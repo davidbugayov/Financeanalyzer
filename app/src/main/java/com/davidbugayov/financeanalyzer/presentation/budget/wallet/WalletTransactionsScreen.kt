@@ -195,7 +195,11 @@ fun WalletTransactionsScreen(
                         Spacer(modifier = Modifier.height(16.dp))
 
                         // Progress bar
-                        val progress = (wallet.spent.amount / wallet.limit.amount).toFloat()
+                        val progress = if (wallet.limit.amount.compareTo(java.math.BigDecimal.ZERO) > 0) {
+                            (wallet.spent.amount.toFloat() / wallet.limit.amount.toFloat())
+                        } else {
+                            0f // Если лимит равен 0, прогресс тоже 0
+                        }
                         val progressColor = if (progress > 1f) Color.Red else MaterialTheme.colorScheme.primary
                         
                         LinearProgressIndicator(

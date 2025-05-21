@@ -27,8 +27,8 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 28
-        versionName = "2.11"
+        versionCode = 29
+        versionName = "2.12"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -255,14 +255,11 @@ dependencies {
     implementation(libs.kotlinx.serialization.core)
 
     // PDFBox for Android (tom_roush)
-    implementation("com.tom-roush:pdfbox-android:2.0.27.0")
-    // Если нужны дополнительные шрифты для PDFBox (например, для кириллицы, если стандартных не хватит)
-    // implementation("com.tom_roush.pdfbox:fontbox:2.0.27.0")
-    // implementation("com.tom_roush.pdfbox:xmpbox:2.0.27.0") // Если нужна работа с XMP метаданными
+    implementation(libs.pdfbox.android)
 
     // Apache POI
-    implementation("org.apache.poi:poi:5.2.5")
-    implementation("org.apache.poi:poi-ooxml:5.2.5")
+    implementation(libs.poi.core)
+    implementation(libs.poi.ooxml)
 }
 
 composeCompiler {

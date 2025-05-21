@@ -125,10 +125,18 @@ class GenericCsvImportUseCase(
                 Timber.e("[$bankName] Не найдена сумма по индексу ${config.amountColumnIndex}. Строка: $line")
                 return null
             }
+
             // Очищаем сумму от лишних символов
             config.amountCharsToRemoveRegex?.let { regex ->
                 amountString = regex.replace(amountString, "")
+            } ?: run {
+                // Если регулярка не задана, удаляем все нечисловые символы кроме разделителей
+                amountString = amountString.replace("[^0-9.,\\-\\s]".toRegex(), "")
             }
+
+            // Удаляем пробелы (разделители тысяч)
+            amountString = amountString.replace("\\s".toRegex(), "")
+            
             // Приводим разделитель к '.' для Double.parseDouble
             if (config.amountDecimalSeparator != '.') {
                 amountString = amountString.replace(config.amountDecimalSeparator, '.')
@@ -140,20 +148,32 @@ class GenericCsvImportUseCase(
             } ?: config.defaultCurrencyCode
 
             // Парсим дату
-            val transactionDate = config.dateFormat.parse(dateString) ?: run {
-                Timber.e("[$bankName] Не удалось распарсить дату: '$dateString' с форматом '${config.dateFormat.toPattern()}'. Строка: $line")
-                return null
-            }
-            // Парсим сумму
-            val amountValue = amountString.toDoubleOrNull() ?: run {
-                Timber.e("[$bankName] Не удалось распарсить сумму: '$amountString' (после очистки). Строка: $line")
+            val transactionDate = try {
+                config.dateFormat.parse(dateString)
+            } catch (e: Exception) {
+                Timber.e(e, "[$bankName] Не удалось распарсить дату: '$dateString' с форматом '${config.dateFormat.toPattern()}'. Строка: $line")
                 return null
             }
 
-            // Определяем расход/доход
-            val isExpense: Boolean = config.isExpenseColumnIndex?.let { index ->
-                columns.getOrNull(index)?.equals(config.isExpenseTrueValue, ignoreCase = true)
-            } ?: (amountValue < 0) // Если нет отдельной колонки, определяем по знаку суммы
+            // Парсим сумму
+            val amountValue = try {
+                amountString.toDoubleOrNull() ?: run {
+                    Timber.e("[$bankName] Не удалось распарсить сумму: '$amountString' (после очистки). Строка: $line")
+                    return null
+                }
+            } catch (e: NumberFormatException) {
+                Timber.e(e, "[$bankName] Ошибка при парсинге суммы: '$amountString'. ${e.message}")
+                return null
+            }
+
+            // Определяем расход/доход по явному указанию или по колонке с типом
+            val isExpense = if (config.isExpenseColumnIndex != null) {
+                val expenseValue = columns.getOrNull(config.isExpenseColumnIndex)
+                expenseValue?.equals(config.isExpenseTrueValue, ignoreCase = true) == true
+            } else {
+                // Если есть колонка с типом транзакции (Расход/Доход)
+                columns.getOrNull(4)?.equals("Расход", ignoreCase = true) ?: (amountValue < 0)
+            }
 
             val absAmount = kotlin.math.abs(amountValue)
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
