@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.csv
 
 import android.content.Context
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -54,10 +55,10 @@ data class CsvParseConfig(
 class GenericCsvImportUseCase(
     context: Context,
     transactionRepository: TransactionRepository,
-    private val config: CsvParseConfig = CsvParseConfig() // Конфиг по умолчанию
+    private val config: CsvParseConfig = CsvParseConfig()
 ) : BankImportUseCase(transactionRepository, context) {
 
-    override val bankName: String = "Generic CSV (Configurable)"
+    override val bankName: String = context.getString(R.string.bank_generic_csv)
 
     /**
      * Проверяет, подходит ли файл под ожидаемый CSV-формат (по первой строке).
@@ -66,14 +67,13 @@ class GenericCsvImportUseCase(
         reader.mark(4096)
         val firstLine = reader.readLine()
         reader.reset()
-
         if (firstLine == null) {
-            Timber.w("[$bankName] CSV-файл пуст.")
+            Timber.w("[$bankName] ${context.getString(R.string.csv_file_empty)}")
             return false
         }
         val columns = firstLine.split(config.delimiter)
         val isValid = columns.isNotEmpty() && columns.size >= config.expectedMinColumnCount
-        Timber.d("[$bankName] Проверка формата CSV. Первая строка: $firstLine. Разделитель: '${config.delimiter}'. Валиден: $isValid")
+        Timber.d("[$bankName] ${context.getString(R.string.csv_format_check, firstLine, config.delimiter, isValid)}")
         return isValid
     }
 
@@ -83,9 +83,9 @@ class GenericCsvImportUseCase(
     override fun skipHeaders(reader: BufferedReader) {
         if (config.hasHeader) {
             val headerLine = reader.readLine()
-            Timber.d("[$bankName] Пропущена строка заголовка: $headerLine")
+            Timber.d("[$bankName] ${context.getString(R.string.csv_header_skipped, headerLine)}")
         } else {
-            Timber.d("[$bankName] Заголовка нет (по конфигу)")
+            Timber.d("[$bankName] ${context.getString(R.string.csv_no_header)}")
         }
     }
 
@@ -94,106 +94,79 @@ class GenericCsvImportUseCase(
      * Возвращает null, если строка невалидна или не содержит транзакцию.
      */
     override fun parseLine(line: String): Transaction? {
-        Timber.d("[$bankName] Парсинг строки: $line")
+        Timber.d("[$bankName] ${context.getString(R.string.csv_parsing_line, line)}")
         val columns = line.split(config.delimiter).map { it.trim().removeSurrounding("\"") }
-
         if (columns.size < config.expectedMinColumnCount) {
-            Timber.w("[$bankName] Недостаточно колонок. Ожидалось минимум ${config.expectedMinColumnCount}, получено ${columns.size}. Строка: $line")
+            Timber.w("[$bankName] ${context.getString(R.string.csv_not_enough_columns, config.expectedMinColumnCount, columns.size, line)}")
             return null
         }
-
-        // Проверка статуса транзакции (если настроено)
         if (config.skipTransactionIfStatusInvalid && config.statusColumnIndex != null && config.validStatusValues?.isNotEmpty() == true) {
             val status = columns.getOrNull(config.statusColumnIndex)
             if (status == null || config.validStatusValues.none { it.equals(status, ignoreCase = true) }) {
-                Timber.d("[$bankName] Пропуск транзакции из-за невалидного статуса: '$status'. Валидные: ${config.validStatusValues}. Строка: $line")
+                Timber.d("[$bankName] ${context.getString(R.string.csv_skip_invalid_status, status, config.validStatusValues, line)}")
                 return null
             }
         }
-
         try {
-            // Получаем дату
             val dateString = columns.getOrNull(config.dateColumnIndex) ?: run {
-                Timber.e("[$bankName] Не найдена дата по индексу ${config.dateColumnIndex}. Строка: $line")
+                Timber.e("[$bankName] ${context.getString(R.string.csv_date_not_found, config.dateColumnIndex, line)}")
                 return null
             }
-            // Получаем описание
-            val description = columns.getOrNull(config.descriptionColumnIndex) ?: "N/A"
-
-            // Получаем сумму
+            val description = columns.getOrNull(config.descriptionColumnIndex) ?: context.getString(R.string.csv_no_description)
             var amountString = columns.getOrNull(config.amountColumnIndex) ?: run {
-                Timber.e("[$bankName] Не найдена сумма по индексу ${config.amountColumnIndex}. Строка: $line")
+                Timber.e("[$bankName] ${context.getString(R.string.csv_amount_not_found, config.amountColumnIndex, line)}")
                 return null
             }
-
-            // Очищаем сумму от лишних символов
             config.amountCharsToRemoveRegex?.let { regex ->
                 amountString = regex.replace(amountString, "")
             } ?: run {
-                // Если регулярка не задана, удаляем все нечисловые символы кроме разделителей
                 amountString = amountString.replace("[^0-9.,\\-\\s]".toRegex(), "")
             }
-
-            // Удаляем пробелы (разделители тысяч)
             amountString = amountString.replace("\\s".toRegex(), "")
-            
-            // Приводим разделитель к '.' для Double.parseDouble
             if (config.amountDecimalSeparator != '.') {
                 amountString = amountString.replace(config.amountDecimalSeparator, '.')
             }
-
-            // Получаем валюту
             val currencyString = config.currencyColumnIndex?.let { index ->
                 columns.getOrNull(index)?.takeIf { it.isNotBlank() }
             } ?: config.defaultCurrencyCode
-
-            // Парсим дату
             val transactionDate = try {
                 config.dateFormat.parse(dateString)
             } catch (e: Exception) {
-                Timber.e(e, "[$bankName] Не удалось распарсить дату: '$dateString' с форматом '${config.dateFormat.toPattern()}'. Строка: $line")
+                Timber.e(e, "[$bankName] ${context.getString(R.string.csv_date_parse_error, dateString, config.dateFormat.toPattern(), line)}")
                 return null
             }
-
-            // Парсим сумму
             val amountValue = try {
                 amountString.toDoubleOrNull() ?: run {
-                    Timber.e("[$bankName] Не удалось распарсить сумму: '$amountString' (после очистки). Строка: $line")
+                    Timber.e("[$bankName] ${context.getString(R.string.csv_amount_parse_error, amountString, line)}")
                     return null
                 }
             } catch (e: NumberFormatException) {
-                Timber.e(e, "[$bankName] Ошибка при парсинге суммы: '$amountString'. ${e.message}")
+                Timber.e(e, "[$bankName] ${context.getString(R.string.csv_amount_parse_exception, amountString, e.message)}")
                 return null
             }
-
-            // Определяем расход/доход по явному указанию или по колонке с типом
             val isExpense = if (config.isExpenseColumnIndex != null) {
                 val expenseValue = columns.getOrNull(config.isExpenseColumnIndex)
                 expenseValue?.equals(config.isExpenseTrueValue, ignoreCase = true) == true
             } else {
-                // Если есть колонка с типом транзакции (Расход/Доход)
-                columns.getOrNull(4)?.equals("Расход", ignoreCase = true) ?: (amountValue < 0)
+                columns.getOrNull(4)?.equals(context.getString(R.string.csv_expense_value), ignoreCase = true) ?: (amountValue < 0)
             }
-
             val absAmount = kotlin.math.abs(amountValue)
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
             val money = Money(absAmount, currency)
             val category = TransactionCategoryDetector.detect(description)
-
-            // Формируем объект транзакции
             return Transaction(
                 amount = money,
                 category = category,
                 date = transactionDate,
                 isExpense = isExpense,
-                note = "Импортировано из Generic CSV", // Можно доработать для передачи имени банка
+                note = context.getString(R.string.csv_imported_note),
                 source = bankName,
-                sourceColor = 0, // Можно сделать настраиваемым
+                sourceColor = 0,
                 categoryId = "",
                 title = description
             )
         } catch (e: Exception) {
-            Timber.e(e, "[$bankName] Ошибка при парсинге строки: $line. Config: $config")
+            Timber.e(e, "[$bankName] ${context.getString(R.string.csv_parse_line_error, line, config)}")
             return null
         }
     }
@@ -202,12 +175,11 @@ class GenericCsvImportUseCase(
      * Определяет, нужно ли пропустить строку (например, если она пустая или не содержит достаточно данных).
      */
     override fun shouldSkipLine(line: String): Boolean {
-        if (super.shouldSkipLine(line)) return true // Пропуск пустых строк
+        if (super.shouldSkipLine(line)) return true
         if (line.split(config.delimiter).size < config.expectedMinColumnCount) {
-            Timber.d("[$bankName] Пропуск строки из-за недостаточного количества колонок: $line")
+            Timber.d("[$bankName] ${context.getString(R.string.csv_skip_line_not_enough_columns, line)}")
             return true
         }
-        // Здесь можно добавить дополнительные условия для пропуска строк
         return false
     }
 

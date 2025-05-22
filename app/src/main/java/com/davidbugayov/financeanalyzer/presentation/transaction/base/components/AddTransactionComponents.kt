@@ -4,6 +4,8 @@ import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -134,7 +136,9 @@ fun CustomCategoryDialog(
         title = { Text(stringResource(R.string.add_category)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
-            Column {
+            Column(
+                modifier = Modifier.fillMaxWidth()
+            ) {
                 OutlinedTextField(
                     value = categoryText,
                     onValueChange = onCategoryTextChange,
@@ -142,15 +146,23 @@ fun CustomCategoryDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_dialog_section_spacing)))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 if (availableIcons.isNotEmpty()) {
-                    Text(text = stringResource(R.string.select_icon), style = MaterialTheme.typography.bodyMedium)
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_dialog_item_spacing_vertical)))
+                    Text(
+                        text = stringResource(R.string.select_icon),
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                     LazyVerticalGrid(
-                        columns = GridCells.Fixed(5),
-                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_dialog_item_spacing)),
-                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.category_dialog_item_spacing)),
-                        modifier = Modifier.heightIn(max = dimensionResource(R.dimen.category_dialog_icon_grid_max_height))
+                        columns = GridCells.Fixed(6),
+                        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
+                        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_tiny)),
+                        contentPadding = PaddingValues(top = dimensionResource(R.dimen.spacing_tiny)),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .heightIn(
+                                min = dimensionResource(R.dimen.category_dialog_icon_grid_max_height) / 2,
+                                max = dimensionResource(R.dimen.category_dialog_icon_grid_max_height)
+                            )
                     ) {
                         items(availableIcons) { icon ->
                             Surface(
@@ -165,26 +177,32 @@ fun CustomCategoryDialog(
                                     imageVector = icon,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(dimensionResource(R.dimen.category_dialog_icon_padding))
+                                    modifier = Modifier.padding(dimensionResource(R.dimen.padding_small))
                                 )
                             }
                         }
                     }
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.category_dialog_item_spacing_vertical)))
                 }
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = onConfirm,
-                enabled = categoryText.isNotBlank() && selectedIcon != null
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.spacing_small),
+                    Alignment.End
+                )
             ) {
-                Text(stringResource(R.string.add_button))
-            }
-        },
-        dismissButton = {
-            TextButton(onClick = onDismiss) {
-                Text(stringResource(R.string.cancel))
+                TextButton(onClick = onDismiss) {
+                    Text(stringResource(R.string.cancel))
+                }
+
+                TextButton(
+                    onClick = onConfirm,
+                    enabled = categoryText.isNotBlank() && selectedIcon != null
+                ) {
+                    Text(stringResource(R.string.add_button))
+                }
             }
         }
     )

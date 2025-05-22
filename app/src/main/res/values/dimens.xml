@@ -366,7 +366,7 @@
     <dimen name="category_dialog_icon_padding">8dp</dimen>
     <dimen name="category_dialog_icon_border">2dp</dimen>
     <dimen name="category_dialog_section_spacing">8dp</dimen>
-    <dimen name="category_dialog_icon_grid_max_height">160dp</dimen>
+    <dimen name="category_dialog_icon_grid_max_height">300dp</dimen>
 
     <!-- TransactionItem specific -->
     <dimen name="card_horizontal_padding">12dp</dimen>

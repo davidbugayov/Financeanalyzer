@@ -11,7 +11,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
-import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryProvider
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -38,7 +37,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * Список доступных иконок для пользовательских категорий (глобально для всех транзакций)
      */
     protected val availableCategoryIcons: List<ImageVector> =
-        CategoryProvider.defaultCategories.map { meta -> CategoryIconProvider.getIconByName(meta.iconName) }
+        CategoryIconProvider.getUniqueIconsForPicker()
 
     // Вся обработка событий теперь только в наследниках
     abstract override fun onEvent(event: E, context: android.content.Context)

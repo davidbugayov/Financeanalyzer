@@ -933,4 +933,27 @@
     <string name="transaction_source_ozon">Озон</string>
     <string name="transaction_source_tinkoff">Тинькофф</string>
 
+    <string name="header_date_operation">Дата операции</string>
+    <string name="header_date">Дата</string>
+    <string name="header_operation">Операция</string>
+    <string name="header_document">Документ</string>
+    <string name="header_amount">Сумма</string>
+    <string name="csv_file_empty">CSV-файл пуст.</string>
+    <string name="csv_format_check">Проверка формата CSV. Первая строка: %1$s. Разделитель: \'%2$s\'. Валиден: %3$s</string>
+    <string name="csv_header_skipped">Пропущена строка заголовка: %1$s</string>
+    <string name="csv_no_header">Заголовка нет (по конфигу)</string>
+    <string name="csv_parsing_line">Парсинг строки: %1$s</string>
+    <string name="csv_not_enough_columns">Недостаточно колонок. Ожидалось минимум %1$d, получено %2$d. Строка: %3$s</string>
+    <string name="csv_skip_invalid_status">Пропуск транзакции из-за невалидного статуса: \'%1$s\'. Валидные: %2$s. Строка: %3$s</string>
+    <string name="csv_date_not_found">Не найдена дата по индексу %1$d. Строка: %2$s</string>
+    <string name="csv_no_description">N/A</string>
+    <string name="csv_amount_not_found">Не найдена сумма по индексу %1$d. Строка: %2$s</string>
+    <string name="csv_date_parse_error">Не удалось распарсить дату: \'%1$s\' с форматом \'%2$s\'. Строка: %3$s</string>
+    <string name="csv_amount_parse_error">Не удалось распарсить сумму: \'%1$s\' (после очистки). Строка: %2$s</string>
+    <string name="csv_amount_parse_exception">Ошибка при парсинге суммы: \'%1$s\'. %2$s</string>
+    <string name="csv_expense_value">Расход</string>
+    <string name="csv_imported_note">Импортировано из Generic CSV</string>
+    <string name="csv_parse_line_error">Ошибка при парсинге строки: %1$s. Config: %2$s</string>
+    <string name="csv_skip_line_not_enough_columns">Пропуск строки из-за недостаточного количества колонок: %1$s</string>
+    <string name="bank_generic_csv">Generic CSV (Configurable)</string>
 </resources>

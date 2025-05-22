@@ -23,7 +23,15 @@ abstract class AbstractPdfImportUseCase(
     transactionRepository: TransactionRepository
 ) : BankImportUseCase(transactionRepository, context) {
 
-    open val headerMarkers: List<String> = listOf("Дата операции", "Дата", "Операция", "Документ", "Сумма")
+    open val headerMarkers: List<String> by lazy {
+        listOf(
+            context.getString(R.string.header_date_operation),
+            context.getString(R.string.header_date),
+            context.getString(R.string.header_operation),
+            context.getString(R.string.header_document),
+            context.getString(R.string.header_amount)
+        )
+    }
     open val dataStartRegex: Regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}")
 
     /**
@@ -56,9 +64,7 @@ abstract class AbstractPdfImportUseCase(
      * Шаблонный метод импорта PDF-файлов (общий для всех PDF-банков)
      */
     override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
-        // val currentBankName = context.getString(bankNameResId) // Предполагается, что bankNameResId будет в дочерних классах
-        val currentBankName = bankName // Пока оставляем так, до рефакторинга bankName
-
+        val currentBankName = bankName
         emit(ImportResult.Progress(0, 100, context.getString(R.string.import_progress_starting, currentBankName)))
         Timber.i("$currentBankName importTransactions: Начало импорта из URI: $uri")
         try {
@@ -90,22 +96,21 @@ abstract class AbstractPdfImportUseCase(
                 if (transactions.isEmpty()) {
                     Timber.w("$currentBankName importTransactions: Транзакции не найдены после обработки файла.")
                     emit(ImportResult.Error(message = context.getString(R.string.import_error_no_transactions_found, currentBankName)))
-                } else {
-                    emit(ImportResult.Progress(85, 100, context.getString(R.string.import_progress_saving_transactions, transactions.size)))
-                    Timber.i("$currentBankName importTransactions: Найдено ${transactions.size} транзакций. Начинаем сохранение в базу данных")
-                    var savedCount = 0
-                    transactions.forEach { transaction ->
-                        try {
-                            transactionRepository.addTransaction(transaction)
-                            savedCount++
-                        } catch (e: Exception) {
-                            Timber.e(e, "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}")
-                            // Можно добавить сообщение пользователю об ошибке сохранения конкретной транзакции, если нужно
-                        }
-                    }
-                    Timber.i("$currentBankName importTransactions: Импорт завершен. Сохранено: $savedCount из ${transactions.size}")
-                    emit(ImportResult.Success(savedCount, transactions.size - savedCount))
+                    return@flow
                 }
+                emit(ImportResult.Progress(85, 100, context.getString(R.string.import_progress_saving_transactions, transactions.size)))
+                Timber.i("$currentBankName importTransactions: Найдено ${transactions.size} транзакций. Начинаем сохранение в базу данных")
+                var savedCount = 0
+                transactions.forEach { transaction ->
+                    try {
+                        transactionRepository.addTransaction(transaction)
+                        savedCount++
+                    } catch (e: Exception) {
+                        Timber.e(e, "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}")
+                    }
+                }
+                Timber.i("$currentBankName importTransactions: Импорт завершен. Сохранено: $savedCount из ${transactions.size}")
+                emit(ImportResult.Success(savedCount, transactions.size - savedCount))
             }
         } catch (e: IOException) {
             Timber.e(e, "$currentBankName importTransactions: Ошибка ввода-вывода.")
