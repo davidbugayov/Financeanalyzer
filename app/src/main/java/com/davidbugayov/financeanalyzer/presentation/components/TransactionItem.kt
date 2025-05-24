@@ -63,8 +63,8 @@ import java.util.Locale
 
 object Formatters {
 
-    fun formatAmount(money: Money, includeSign: Boolean = false): String {
-        return money.format(showSign = includeSign)
+    fun formatAmount(money: Money, includeSign: Boolean = false, useMinimalDecimals: Boolean = false): String {
+        return money.format(showSign = includeSign, useMinimalDecimals = useMinimalDecimals)
     }
 }
 
@@ -157,9 +157,9 @@ fun TransactionItem(
 
         if (isTransfer) {
             // For transfers, display absolute amount, sign logic might be inherent or not needed
-            Formatters.formatAmount(moneyAmount.abs(), includeSign = false)
+            Formatters.formatAmount(moneyAmount.abs(), includeSign = false, useMinimalDecimals = true)
         } else {
-            prefix + Formatters.formatAmount(moneyAmount.abs(), includeSign = false)
+            prefix + Formatters.formatAmount(moneyAmount.abs(), includeSign = false, useMinimalDecimals = true)
         }
     }
 

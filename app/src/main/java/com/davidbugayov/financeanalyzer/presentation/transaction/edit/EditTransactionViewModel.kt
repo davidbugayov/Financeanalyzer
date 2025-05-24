@@ -135,6 +135,7 @@ class EditTransactionViewModel(
         amount: String,
         categoryId: String
     ): Boolean {
+        Timber.d("ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: '%s'", amount)
         val validationBuilder = ValidationBuilder()
         
         // Reset errors
@@ -179,20 +180,14 @@ class EditTransactionViewModel(
             )
         }
 
-        Timber.d(
-            "ТРАНЗАКЦИЯ: Результат валидации: isValid=%b, hasAmountError=%b, hasCategoryError=%b, hasSourceError=%b",
-            validationResult.isValid,
-            validationResult.hasAmountError,
-            validationResult.hasCategoryError,
-            validationResult.hasSourceError
-        )
-                
+        Timber.d("ТРАНЗАКЦИЯ: validateInput - Результат: isValid=%b, hasAmountError=%b", validationResult.isValid, validationResult.hasAmountError)
         return validationResult.isValid
     }
 
     fun submit() {
         viewModelScope.launch {
             val currentState = _state.value
+            Timber.d("ТРАНЗАКЦИЯ: submit - Начальное значение currentState.amount: '%s'", currentState.amount)
 
             Timber.d(
                 "ТРАНЗАКЦИЯ: Начало сохранения изменений, isExpense=%b, category=%s, selectedIncomeCategory=%s",
@@ -201,10 +196,8 @@ class EditTransactionViewModel(
                 currentState.selectedIncomeCategory
             )
             
-            // Установим флаг загрузки
             _state.update { it.copy(isLoading = true) }
             
-            // Check if category is blank but we have a selected category based on transaction type
             if (currentState.category.isBlank()) {
                 val categoryToUse = if (currentState.isExpense) {
                     currentState.selectedExpenseCategory
@@ -217,40 +210,39 @@ class EditTransactionViewModel(
                     Timber.d("ТРАНЗАКЦИЯ: Установлена категория из selectedCategory: %s", categoryToUse)
                 }
             }
-            
-            val transaction = prepareTransactionForEdit() ?: run {
-                // Если транзакция не подготовлена, снимаем флаг загрузки
+
+            // Сначала обрабатываем выражение суммы, удаляем висячий оператор
+            val moneyFromExpression = parseMoneyExpression(currentState.amount)
+            // Для валидации используем строковое представление уже обработанной суммы
+            val amountForValidation = moneyFromExpression.amount.toPlainString()
+            Timber.d("ТРАНЗАКЦИЯ: submit - moneyFromExpression: %s, amountForValidation: '%s'", moneyFromExpression, amountForValidation)
+
+            val transactionToSave = prepareTransactionForEdit(moneyFromExpression) ?: run {
                 _state.update { it.copy(isLoading = false) }
-                Timber.e("ТРАНЗАКЦИЯ: Не удалось подготовить транзакцию к редактированию")
+                Timber.e("ТРАНЗАКЦИЯ: Не удалось подготовить транзакцию к редактированию после парсинга суммы")
                 return@launch
             }
 
-            // Validate input
             val isValid = validateInput(
-                amount = currentState.amount,
+                amount = amountForValidation, // Используем очищенную/вычисленную сумму для валидации
                 categoryId = currentState.category
             )
             
             if (!isValid) {
-                // Если валидация не прошла, снимаем флаг загрузки
                 _state.update { it.copy(isLoading = false) }
-                Timber.e("ТРАНЗАКЦИЯ: Валидация не прошла")
+                Timber.e("ТРАНЗАКЦИЯ: Валидация не прошла для суммы: $amountForValidation")
                 return@launch
             }
 
             try {
-                Timber.d("ТРАНЗАКЦИЯ: Обновление транзакции начато: %s", transaction.id)
-                
-                // Сохраняем исходную транзакцию для сравнения
+                Timber.d("ТРАНЗАКЦИЯ: Обновление транзакции начато: %s", transactionToSave.id)
                 val originalTransaction = currentState.transactionToEdit
-                
-                // Обновляем транзакцию через useCase
-                val result = updateTransactionUseCase(transaction)
+                val result = updateTransactionUseCase(transactionToSave)
                 
                 if (result is DomainResult.Success) {
                     // Обновляем балансы кошельков, если это доход и выбраны кошельки
-                    if (!transaction.isExpense && transaction.walletIds != null && transaction.walletIds.isNotEmpty()) {
-                        updateWalletsBalance(transaction.walletIds, transaction.amount, originalTransaction)
+                    if (!transactionToSave.isExpense && transactionToSave.walletIds != null && transactionToSave.walletIds.isNotEmpty()) {
+                        updateWalletsBalance(transactionToSave.walletIds, transactionToSave.amount, originalTransaction)
                     }
                     
                     // Показываем успешное обновление
@@ -261,7 +253,7 @@ class EditTransactionViewModel(
                         )
                     }
                     updateWidgetsUseCase(application.applicationContext)
-                    Timber.d("ТРАНЗАКЦИЯ: Успешно обновлена, ID=%s", transaction.id)
+                    Timber.d("ТРАНЗАКЦИЯ: Успешно обновлена, ID=%s", transactionToSave.id)
                 } else if (result is DomainResult.Error) {
                     Timber.e(result.exception, "ТРАНЗАКЦИЯ: Ошибка при обновлении: %s", result.exception.message)
                     _state.update {
@@ -293,9 +285,11 @@ class EditTransactionViewModel(
         // Загружаем категории и источники для актуальности
         loadInitialData()
         loadSources()
-        // Форматируем сумму как строку без знака минус
-        val formattedAmount = transaction.amount.abs().amount.toString()
-        Timber.d("ТРАНЗАКЦИЯ: Форматированная сумма: %s (исходная: %s)", formattedAmount, transaction.amount)
+        // Форматируем сумму с использованием Money.format(), показываем символ валюты
+        val moneyObject = transaction.amount.abs() // Получаем объект Money с абсолютной суммой
+        // Теперь showCurrency = true, чтобы видеть символ валюты в поле редактирования
+        val formattedAmount = moneyObject.format(showCurrency = true, showSign = false, useMinimalDecimals = true)
+        Timber.d("ТРАНЗАКЦИЯ: Форматированная сумма для поля ввода: %s (исходная: %s)", formattedAmount, transaction.amount)
 
         // Определяем какую категорию установить в зависимости от типа транзакции
         val selectedExpenseCategory = if (transaction.isExpense) transaction.category else ""
@@ -412,9 +406,11 @@ class EditTransactionViewModel(
         }
     }
 
-    private fun prepareTransactionForEdit(): Transaction? {
+    private fun prepareTransactionForEdit(parsedMoney: Money): Transaction? {
         val currentState = _state.value
-
+        Timber.d(
+            "ТРАНЗАКЦИЯ: prepareTransactionForEdit - Входящий parsedMoney: %s", parsedMoney
+        )
         Timber.d(
             "ТРАНЗАКЦИЯ: Подготовка транзакции к редактированию: category=%s, isExpense=%b, selectedIncomeCategory=%s, selectedExpenseCategory=%s",
             currentState.category,
@@ -422,59 +418,50 @@ class EditTransactionViewModel(
             currentState.selectedIncomeCategory,
             currentState.selectedExpenseCategory
         )
-        
-        // Make sure category is not blank
         if (currentState.category.isBlank()) {
-            // Try to use the appropriate category based on transaction type
-            val categoryToUse = if (currentState.isExpense) {
+            val categoryToUseFromState = if (currentState.isExpense) {
                 currentState.selectedExpenseCategory
             } else {
                 currentState.selectedIncomeCategory
             }
-            
-            if (categoryToUse.isBlank()) {
-                // Display validation error if still blank
+            if (categoryToUseFromState.isBlank()) {
                 _state.update { it.copy(categoryError = true) }
                 Timber.e("ТРАНЗАКЦИЯ: Ошибка - категория не выбрана")
                 return null
             } else {
-                // Update state with the selected category
-                _state.update { it.copy(category = categoryToUse) }
-                Timber.d("ТРАНЗАКЦИЯ: Использую категорию из selectedCategory: %s", categoryToUse)
+                _state.update { it.copy(category = categoryToUseFromState) }
+                Timber.d("ТРАНЗАКЦИЯ: Использую категорию из selectedCategory: %s", categoryToUseFromState)
             }
         }
-        
-        // Convert amount to double
-        val amount = currentState.amount.replace(" ", "").replace(",", ".").toDoubleOrNull() 
-        if (amount == null || amount <= 0) {
-            // Display validation error
-            _state.update { it.copy(amountError = true) }
-            Timber.e("ТРАНЗАКЦИЯ: Ошибка - некорректная сумма: %s", currentState.amount)
+
+        // Используем уже распарсенную сумму (parsedMoney)
+        if (parsedMoney.amount <= java.math.BigDecimal.ZERO) {
+            _state.update { it.copy(amountError = true) } // Ошибка, если после парсинга сумма <= 0
+            Timber.e(
+                "ТРАНЗАКЦИЯ: prepareTransactionForEdit - Ошибка - некорректная сумма после парсинга: %s. Условие (parsedMoney.amount <= 0): %b",
+                parsedMoney.amount,
+                parsedMoney.amount <= java.math.BigDecimal.ZERO
+            )
             return null
         }
-        
-        val finalAmount = if (currentState.isExpense) -amount else amount
+        val finalAmount = if (currentState.isExpense) parsedMoney.copy(amount = parsedMoney.amount.negate()) else parsedMoney
         val sourceToUse = if (currentState.source.isBlank()) currentState.transactionToEdit?.source ?: "" else currentState.source
         val sourceColorToUse = if (currentState.source.isBlank()) currentState.transactionToEdit?.sourceColor ?: 0 else currentState.sourceColor
-        val categoryToUse = currentState.category
-
+        val categoryToUse = currentState.category // Категория уже должна быть установлена
         Timber.d(
             "ТРАНЗАКЦИЯ: Готова к обновлению: amount=%s, category=%s, source=%s",
             finalAmount,
             categoryToUse,
             sourceToUse
         )
-        
-        // Получаем список ID кошельков для сохранения в транзакции
         val selectedWalletIds = getWalletIdsForTransaction(
             isExpense = currentState.isExpense,
             addToWallet = currentState.addToWallet,
             selectedWallets = currentState.selectedWallets
         )
-        
         return currentState.transactionToEdit?.copy(
             title = currentState.title,
-            amount = Money(finalAmount),
+            amount = finalAmount,
             category = categoryToUse,
             note = currentState.note,
             date = currentState.selectedDate,

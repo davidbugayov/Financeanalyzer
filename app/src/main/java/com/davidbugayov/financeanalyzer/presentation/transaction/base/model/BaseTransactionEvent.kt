@@ -56,4 +56,5 @@ sealed class BaseTransactionEvent {
     data class SetExpenseCategory(val category: String) : BaseTransactionEvent()
     data class SetIncomeCategory(val category: String) : BaseTransactionEvent()
     data class SetCustomCategoryIcon(val icon: ImageVector) : BaseTransactionEvent()
+    data class SetAmountError(val isError: Boolean) : BaseTransactionEvent()
 } 

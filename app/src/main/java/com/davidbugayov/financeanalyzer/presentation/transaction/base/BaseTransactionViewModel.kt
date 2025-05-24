@@ -5,6 +5,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -18,7 +19,9 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.objecthunter.exp4j.ExpressionBuilder
 import timber.log.Timber
+import java.math.BigDecimal
 import java.util.Date
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
@@ -490,6 +493,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
 
+            is BaseTransactionEvent.SetAmountError -> _state.update { state ->
+                copyState(state, amountError = event.isError)
+            }
+
             else -> {}
         }
     }
@@ -762,5 +769,44 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             )
         }
         handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
+    }
+
+    /**
+     * Универсальный парсер арифметических выражений для суммы, возвращает Money
+     * @param expr строка с выражением
+     * @param currency валюта (по умолчанию RUB)
+     */
+    protected fun parseMoneyExpression(expr: String, currency: Currency = Currency.RUB): Money {
+        var processedExpr = expr.replace(",", ".")
+
+        // Удаляем "висячий" оператор в конце строки, если он есть
+        if (processedExpr.isNotEmpty()) {
+            val lastChar = processedExpr.last()
+            if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/') {
+                // Убедимся, что это не единсвенный символ (например, просто "-")
+                if (processedExpr.length > 1) {
+                    // И что перед ним цифра или закрывающая скобка (если поддерживаются)
+                    val charBeforeLast = processedExpr[processedExpr.length - 2]
+                    if (charBeforeLast.isDigit() || charBeforeLast == ')') { // Расширить, если есть скобки
+                        processedExpr = processedExpr.dropLast(1)
+                    }
+                } else if (lastChar == '*' || lastChar == '/') { // Одиночные * и / всегда удаляем
+                    processedExpr = ""
+                } // Одиночные + и - могут быть унарными, их не трогаем если они единственные
+            }
+        }
+        // Если после обработки строка пустая, или состоит только из точки (например, после "123." -> "123")
+        // или некорректна, вернем 0
+        if (processedExpr.isBlank() || processedExpr == ".") {
+            return Money(BigDecimal.ZERO, currency)
+        }
+
+        return try {
+            val resNum = ExpressionBuilder(processedExpr).build().evaluate()
+            Money(BigDecimal.valueOf(resNum), currency)
+        } catch (_: Exception) {
+            // Если даже после очистки выражение некорректно, возвращаем 0
+            Money(BigDecimal.ZERO, currency)
+        }
     }
 } 

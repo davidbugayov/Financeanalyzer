@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -236,6 +237,7 @@ fun <E> BaseTransactionScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
+                    .imePadding()
                     .padding(horizontal = dimensionResource(R.dimen.padding_medium))
             ) {
                 // Заголовок с датой и типом транзакции
@@ -252,10 +254,8 @@ fun <E> BaseTransactionScreen(
                     },
                     forceExpense = state.forceExpense
                 )
-
                 Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
-
-                // Секция "Откуда/Куда" (Source) - теперь первая
+                // Секция "Откуда/Куда" (Source)
                 Column {
                     Timber.d(
                         "Rendering SourceSection with isExpense=%b, selectedSource=%s, sources count=%d",
@@ -281,7 +281,6 @@ fun <E> BaseTransactionScreen(
                         isError = state.sourceError
                     )
                 }
-
                 // Секция выбора категории
                 if (state.isExpense) {
                     CategorySection(
@@ -325,21 +324,16 @@ fun <E> BaseTransactionScreen(
                         isError = state.categoryError
                     )
                 }
-
-                // Поле ввода суммы
-                Column {
-                    AmountField(
-                        amount = state.amount,
-                        onAmountChange = { amount ->
-                            viewModel.onEvent(eventFactory(BaseTransactionEvent.SetAmount(amount)), context)
-                        },
-                        isError = state.amountError,
-                        accentColor = currentColor
-                    )
-                }
-
+                // Поле ввода суммы и кнопки операций — после категории
+                AmountField(
+                    amount = state.amount,
+                    onAmountChange = { amount ->
+                        viewModel.onEvent(eventFactory(BaseTransactionEvent.SetAmount(amount)), context)
+                    },
+                    isError = state.amountError,
+                    accentColor = currentColor
+                )
                 Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
-
                 // Поле выбора даты
                 DateField(
                     date = state.selectedDate,
