@@ -779,33 +779,37 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun parseMoneyExpression(expr: String, currency: Currency = Currency.RUB): Money {
         var processedExpr = expr.replace(",", ".")
 
+        Timber.d("parseMoneyExpression: исходное выражение: '$expr', обработанное: '$processedExpr'")
+
         // Удаляем "висячий" оператор в конце строки, если он есть
         if (processedExpr.isNotEmpty()) {
             val lastChar = processedExpr.last()
-            if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/') {
-                // Убедимся, что это не единсвенный символ (например, просто "-")
-                if (processedExpr.length > 1) {
-                    // И что перед ним цифра или закрывающая скобка (если поддерживаются)
-                    val charBeforeLast = processedExpr[processedExpr.length - 2]
-                    if (charBeforeLast.isDigit() || charBeforeLast == ')') { // Расширить, если есть скобки
-                        processedExpr = processedExpr.dropLast(1)
-                    }
-                } else if (lastChar == '*' || lastChar == '/') { // Одиночные * и / всегда удаляем
-                    processedExpr = ""
-                } // Одиночные + и - могут быть унарными, их не трогаем если они единственные
+            if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' ||
+                lastChar == '×' || lastChar == '÷') {
+                // Обрабатываем случай, когда оператор в конце
+                processedExpr = processedExpr.dropLast(1)
+                Timber.d("parseMoneyExpression: удален висячий оператор, новое выражение: '$processedExpr'")
             }
         }
+
+        // Заменяем символы × и ÷ на * и / для корректного вычисления
+        processedExpr = processedExpr.replace("×", "*").replace("÷", "/")
+        
         // Если после обработки строка пустая, или состоит только из точки (например, после "123." -> "123")
         // или некорректна, вернем 0
         if (processedExpr.isBlank() || processedExpr == ".") {
+            Timber.d("parseMoneyExpression: выражение пустое или только точка, возвращаем 0")
             return Money(BigDecimal.ZERO, currency)
         }
 
         return try {
             val resNum = ExpressionBuilder(processedExpr).build().evaluate()
-            Money(BigDecimal.valueOf(resNum), currency)
-        } catch (_: Exception) {
+            val result = Money(BigDecimal.valueOf(resNum), currency)
+            Timber.d("parseMoneyExpression: успешно вычислено, результат: $result")
+            result
+        } catch (e: Exception) {
             // Если даже после очистки выражение некорректно, возвращаем 0
+            Timber.e(e, "parseMoneyExpression: ошибка вычисления выражения '$processedExpr'")
             Money(BigDecimal.ZERO, currency)
         }
     }

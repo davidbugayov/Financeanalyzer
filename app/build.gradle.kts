@@ -262,7 +262,7 @@ dependencies {
     implementation(libs.poi.ooxml)
 
     // exp4j
-    implementation("net.objecthunter:exp4j:0.4.8")
+    implementation(libs.exp4j)
 }
 
 composeCompiler {

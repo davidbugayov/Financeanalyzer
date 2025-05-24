@@ -285,10 +285,9 @@ class EditTransactionViewModel(
         // Загружаем категории и источники для актуальности
         loadInitialData()
         loadSources()
-        // Форматируем сумму с использованием Money.format(), показываем символ валюты
+        // Форматируем сумму с использованием Money.format(), без символа валюты
         val moneyObject = transaction.amount.abs() // Получаем объект Money с абсолютной суммой
-        // Теперь showCurrency = true, чтобы видеть символ валюты в поле редактирования
-        val formattedAmount = moneyObject.format(showCurrency = true, showSign = false, useMinimalDecimals = true)
+        val formattedAmount = moneyObject.format(showCurrency = false, showSign = false, useMinimalDecimals = true)
         Timber.d("ТРАНЗАКЦИЯ: Форматированная сумма для поля ввода: %s (исходная: %s)", formattedAmount, transaction.amount)
 
         // Определяем какую категорию установить в зависимости от типа транзакции
