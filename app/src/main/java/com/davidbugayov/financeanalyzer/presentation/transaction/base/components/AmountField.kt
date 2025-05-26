@@ -4,9 +4,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
@@ -65,7 +63,7 @@ fun AmountField(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
+            .padding(horizontal = 16.dp, vertical = 0.dp)
     ) {
         OutlinedTextField(
             value = textFieldValue,
@@ -106,9 +104,8 @@ fun AmountField(
             }
         )
     }
-    Spacer(modifier = Modifier.height(8.dp))
     Row(
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(space = 6.dp, alignment = Alignment.CenterHorizontally),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
@@ -119,7 +116,14 @@ fun AmountField(
             OutlinedButton(
                 onClick = {
                     // Добавляем оператор и обновляем значение
-                    val newText = amount + op
+                    val currentText = textFieldValue.text
+                    // Add space before operator if last char is not an operator or space, and text is not empty
+                    val textWithPotentialSpace = if (currentText.isNotEmpty() && currentText.last().isDigit()) {
+                        "$currentText "
+                    } else {
+                        currentText
+                    }
+                    val newText = "$textWithPotentialSpace$op " // Add space after operator
                     onAmountChange(newText)
                     // Обновляем textFieldValue с курсором в конце
                     textFieldValue = TextFieldValue(
@@ -127,7 +131,7 @@ fun AmountField(
                         selection = TextRange(newText.length)
                     )
                 },
-                modifier = Modifier.size(36.dp),
+                modifier = Modifier.size(34.dp),
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp),
                 colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor)
