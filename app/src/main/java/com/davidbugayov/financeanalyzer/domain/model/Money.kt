@@ -147,11 +147,11 @@ data class Money(
     }
 
     /**
-     * Проверка, является ли денежное значение положительным
-     * @return true, если значение положительное
+     * Проверка, является ли денежное значение положительным или равным нулю
+     * @return true, если значение положительное или равно нулю
      */
     fun isPositive(): Boolean {
-        return amount > BigDecimal.ZERO
+        return amount >= BigDecimal.ZERO
     }
 
     /**
@@ -181,14 +181,19 @@ data class Money(
     fun format(
         showCurrency: Boolean = true,
         showSign: Boolean = false,
-        useMinimalDecimals: Boolean = false
+        useMinimalDecimals: Boolean = true
     ): String {
         val locale = Locale.getDefault()
         val symbols = DecimalFormatSymbols(locale)
 
-        val strippedAmount = amount.stripTrailingZeros()
+        // Используем разделители из настроек валюты вместо локальных
+        symbols.groupingSeparator = currency.groupingSeparator
+        symbols.decimalSeparator = currency.decimalSeparator
 
-        if (useMinimalDecimals && strippedAmount.scale() <= 0) {
+        val strippedAmount = amount.stripTrailingZeros()
+        val isWholeNumber = strippedAmount.scale() <= 0 || strippedAmount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0
+
+        if (useMinimalDecimals && isWholeNumber) {
             val integerPattern = StringBuilder()
             if (showSign && amount > BigDecimal.ZERO) {
                 integerPattern.append('+')
@@ -199,7 +204,11 @@ data class Money(
             val formatted = formatter.format(strippedAmount)
 
             return if (showCurrency) {
-                "$formatted ${currency.symbol}"
+                if (currency.symbolPosition == SymbolPosition.BEFORE) {
+                    "${currency.symbol}$formatted"
+                } else {
+                    "$formatted ${currency.symbol}"
+                }
             } else {
                 formatted
             }
@@ -211,7 +220,7 @@ data class Money(
             positivePattern.append("#,##0")
 
             if (currency.decimalPlaces > 0) {
-                positivePattern.append('.')
+                positivePattern.append(symbols.decimalSeparator)
                 repeat(currency.decimalPlaces) { positivePattern.append('0') }
             }
 
@@ -223,7 +232,11 @@ data class Money(
             val formattedNum = formatter.format(amount)
 
             return if (showCurrency) {
-                "$formattedNum ${currency.symbol}"
+                if (currency.symbolPosition == SymbolPosition.BEFORE) {
+                    "${currency.symbol}$formattedNum"
+                } else {
+                    "$formattedNum ${currency.symbol}"
+                }
             } else {
                 formattedNum
             }
@@ -233,20 +246,22 @@ data class Money(
     /**
      * Форматирует денежное значение для отображения в интерфейсе
      * @param showSign Показывать ли знак + для положительных значений
+     * @param useMinimalDecimals Если true и число целое, не показывать десятичные знаки
      * @return Отформатированная строка
      */
-    fun formatForDisplay(showSign: Boolean = false): String {
-        return format(true, showSign)
+    fun formatForDisplay(showSign: Boolean = false, useMinimalDecimals: Boolean = true): String {
+        return format(true, showSign, useMinimalDecimals)
     }
 
     /**
      * Алиас для метода format для совместимости
      * @param showCurrency Показывать ли символ валюты
      * @param showSign Показывать ли знак + для положительных значений
+     * @param useMinimalDecimals Если true и число целое, не показывать десятичные знаки
      * @return Отформатированная строка
      */
-    fun formatted(showCurrency: Boolean = true, showSign: Boolean = false): String {
-        return format(showCurrency, showSign)
+    fun formatted(showCurrency: Boolean = true, showSign: Boolean = false, useMinimalDecimals: Boolean = true): String {
+        return format(showCurrency, showSign, useMinimalDecimals)
     }
 
     /**

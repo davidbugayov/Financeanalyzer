@@ -238,21 +238,6 @@ class CategoriesViewModel(
     }
 
     /**
-     * Увеличивает счетчик использования категории и обновляет порядок категорий
-     */
-    fun incrementCategoryUsage(category: String, isExpense: Boolean) {
-        viewModelScope.launch {
-            if (isExpense) {
-                categoryUsagePreferences.incrementExpenseCategoryUsage(category)
-            } else {
-                categoryUsagePreferences.incrementIncomeCategoryUsage(category)
-            }
-            // Перезагружаем категории с новой статистикой использования
-            loadCategories()
-        }
-    }
-
-    /**
      * Проверяет, является ли категория расходов стандартной
      */
     fun isDefaultExpenseCategory(category: String): Boolean {

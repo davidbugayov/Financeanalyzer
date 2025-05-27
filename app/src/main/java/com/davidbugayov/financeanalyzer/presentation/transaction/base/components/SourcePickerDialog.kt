@@ -38,9 +38,9 @@ import timber.log.Timber
 fun SourcePickerDialog(
     sources: List<Source>,
     onSourceSelected: (Source) -> Unit,
-    onDismiss: () -> Unit,
     onAddCustomSource: () -> Unit,
-    onDeleteSource: (String) -> Unit = {}
+    onDismiss: () -> Unit,
+    onDeleteSource: (String) -> Unit
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,

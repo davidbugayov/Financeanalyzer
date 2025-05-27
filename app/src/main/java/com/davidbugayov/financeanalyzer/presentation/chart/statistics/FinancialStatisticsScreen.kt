@@ -1,41 +1,41 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistics
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.ui.Alignment
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.dimensionResource
-import org.koin.androidx.compose.koinViewModel
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.chart.statistics.components.ExpenseAnalysisCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistics.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistics.components.RecommendationsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistics.components.TransactionsStatisticsCard
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialStatisticsViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.statistics.state.FinancialStatisticsContract
-import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarHost
-import androidx.compose.runtime.remember
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialStatisticsViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import kotlinx.coroutines.flow.collectLatest
-import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialMetrics
+import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.FinancialHealthMetricsCard
-import timber.log.Timber
 
 /**
  * Экран подробной финансовой статистики
@@ -114,7 +114,6 @@ fun FinancialStatisticsScreen(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
-                Timber.d("Screen: income = ${state.income}, expense = ${state.expense}, savingsRate = ${metrics.savingsRate}")
                 KeyMetricsCard(
                     income = state.income,
                     expense = state.expense,

@@ -36,7 +36,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import timber.log.Timber
 
 /**
  * Главный экран приложения, содержащий навигацию между различными разделами.
@@ -102,7 +101,6 @@ fun MainScreen(
                 onboardingViewModel.completeOnboarding()
                 shouldShowOnboarding = false
                 onboardingJustCompleted = true
-                Timber.d("Онбординг только что завершен, проверяем разрешения")
             })
         } else {
             Scaffold(modifier = Modifier.fillMaxSize()) {
@@ -134,13 +132,10 @@ private fun ApplyThemeAndSystemBars(themeMode: ThemeMode, isDarkTheme: Boolean, 
 @Composable
 private fun BackgroundInit(homeViewModel: HomeViewModel) {
     LaunchedEffect(Unit) {
-        Timber.d("MainScreen: Планируем фоновую инициализацию данных")
         MainScope().launch(Dispatchers.Default) {
             delay(500)
-            Timber.d("MainScreen: Запускаем initiateBackgroundDataRefresh")
             homeViewModel.initiateBackgroundDataRefresh()
             delay(2000)
-            Timber.d("MainScreen: Запускаем загрузку данных для графиков")
         }
     }
 }

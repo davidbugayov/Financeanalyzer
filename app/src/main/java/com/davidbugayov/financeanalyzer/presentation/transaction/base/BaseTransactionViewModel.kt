@@ -1,10 +1,14 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base
 
+import android.app.Application
 import android.content.res.Resources
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
@@ -41,6 +45,23 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      */
     protected val availableCategoryIcons: List<ImageVector> =
         CategoryIconProvider.getUniqueIconsForPicker()
+
+    // Add sourceUsagePreferences property
+    protected val sourceUsagePreferences: SourceUsagePreferences by lazy {
+        SourceUsagePreferences.getInstance(getApplication())
+    }
+
+    // Add categoryUsagePreferences property
+    protected val categoryUsagePreferences: CategoryUsagePreferences by lazy {
+        CategoryUsagePreferences.getInstance(getApplication())
+    }
+
+    /**
+     * Получает экземпляр Application из CategoriesViewModel
+     */
+    protected fun getApplication(): Application {
+        return (categoriesViewModel as AndroidViewModel).getApplication()
+    }
 
     // Вся обработка событий теперь только в наследниках
     abstract override fun onEvent(event: E, context: android.content.Context)
@@ -546,27 +567,25 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         viewModelScope.launch {
             categoriesViewModel.expenseCategories.collect { categories ->
                 _state.update { state ->
+                    // Сортируем категории расходов по частоте использования
+                    val sortedCategories = categories.sortedByDescending {
+                        getCategoryUsage(it.name, true)
+                    }
+
+                    Timber.d(
+                        "[CATEGORY_SORT] Категории расходов отсортированы по использованию: %s",
+                        sortedCategories.joinToString(", ") { "${it.name}(${getCategoryUsage(it.name, true)})" })
+                    
                     // Выбираем первую категорию, если категория еще не выбрана
-                    val firstCategory = if (state.category.isBlank() && categories.isNotEmpty()) {
-                        categories.first().name
+                    val firstCategory = if (state.category.isBlank() && sortedCategories.isNotEmpty()) {
+                        sortedCategories.first().name
                     } else {
                         state.category
                     }
-                    // Обновляем список категорий, чтобы первая имела флаг wasSelected=true
-                    val updatedCategories = if (categories.isNotEmpty()) {
-                        categories.mapIndexed { index, categoryItem ->
-                            if (index == 0 || categoryItem.name == firstCategory) {
-                                categoryItem.copy()
-                            } else {
-                                categoryItem
-                            }
-                        }
-                    } else {
-                        categories
-                    }
+
                     copyState(
                         state,
-                        expenseCategories = updatedCategories,
+                        expenseCategories = sortedCategories,
                         category = firstCategory,
                         showDatePicker = false,
                         showCategoryPicker = false,
@@ -612,57 +631,29 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         viewModelScope.launch {
             categoriesViewModel.incomeCategories.collect { categories ->
                 _state.update { state ->
-                    copyState(state, incomeCategories = categories)
+                    // Сортируем категории доходов по частоте использования
+                    val sortedCategories = categories.sortedByDescending {
+                        getCategoryUsage(it.name, false)
+                    }
+
+                    Timber.d(
+                        "[CATEGORY_SORT] Категории доходов отсортированы по использованию: %s",
+                        sortedCategories.joinToString(", ") { "${it.name}(${getCategoryUsage(it.name, false)})" })
+
+                    copyState(state, incomeCategories = sortedCategories)
                 }
             }
         }
-        
-        viewModelScope.launch {
-            val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences, resources)
-            _state.update { state ->
-                val firstSource = sources.firstOrNull()
-                copyState(
-                    state,
-                    sources = sources,
-                    source = firstSource?.name ?: "",
-                    sourceColor = firstSource?.color ?: 0,
-                    showDatePicker = false,
-                    showCategoryPicker = false,
-                    showCustomCategoryDialog = false,
-                    showCancelConfirmation = false,
-                    showSourcePicker = false,
-                    showCustomSourceDialog = false,
-                    showColorPicker = false,
-                    isLoading = false,
-                    isSuccess = false,
-                    successMessage = "",
-                    sourceError = false,
-                    preventAutoSubmit = false,
-                    selectedExpenseCategory = "",
-                    selectedIncomeCategory = "",
-                    customCategory = "",
-                    expenseCategories = state.expenseCategories,
-                    incomeCategories = state.incomeCategories,
-                    categoryToDelete = null,
-                    sourceToDelete = null,
-                    showDeleteCategoryConfirmDialog = false,
-                    showDeleteSourceConfirmDialog = false,
-                    editMode = false,
-                    transactionToEdit = null,
-                    amountError = false,
-                    categoryError = false,
-                    note = state.note,
-                    selectedDate = state.selectedDate,
-                    availableCategoryIcons = state.availableCategoryIcons
-                )
-            }
-        }
+
+        // Загружаем источники с учетом сортировки по частоте использования
+        loadSources()
     }
 
     // --- Универсальные поля и коллбэки для работы с транзакциями ---
     override fun updateCategoryPositions() {
         viewModelScope.launch {
-            // Implementation needed
+            // Позиции категорий обновляются при выходе с экрана
+            Timber.d("[CATEGORY_SORT] Обновление позиций категорий")
         }
     }
 
@@ -812,5 +803,75 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             Timber.e(e, "parseMoneyExpression: ошибка вычисления выражения '$processedExpr'")
             Money(BigDecimal.ZERO, currency)
         }
+    }
+
+    /**
+     * Обновляет позиции источников на основе частоты использования
+     */
+    override fun updateSourcePositions() {
+        viewModelScope.launch {
+            // Implementation needed
+            // Позиции источников обновляются при выходе с экрана
+            Timber.d("[SOURCE_SORT] Обновление позиций источников")
+        }
+    }
+
+    /**
+     * Увеличивает счетчик использования категории
+     * @param categoryName Имя категории
+     * @param isExpense Является ли категория расходной
+     */
+    fun incrementCategoryUsage(categoryName: String, isExpense: Boolean) {
+        if (categoryName.isBlank()) return
+
+        viewModelScope.launch {
+            if (isExpense) {
+                categoryUsagePreferences.incrementExpenseCategoryUsage(categoryName)
+                Timber.d("CATEGORY: Увеличен счетчик использования расходной категории: %s", categoryName)
+            } else {
+                categoryUsagePreferences.incrementIncomeCategoryUsage(categoryName)
+                Timber.d("CATEGORY: Увеличен счетчик использования доходной категории: %s", categoryName)
+            }
+        }
+    }
+
+    /**
+     * Возвращает количество использований категории
+     * @param categoryName Имя категории
+     * @param isExpense Является ли категория расходной
+     * @return Количество использований категории
+     */
+    fun getCategoryUsage(categoryName: String, isExpense: Boolean): Int {
+        val usage = if (isExpense) {
+            categoryUsagePreferences.loadExpenseCategoriesUsage()[categoryName] ?: 0
+        } else {
+            categoryUsagePreferences.loadIncomeCategoriesUsage()[categoryName] ?: 0
+        }
+        Timber.d("CATEGORY: Получено количество использований категории %s: %d", categoryName, usage)
+        return usage
+    }
+
+    /**
+     * Увеличивает счетчик использования источника
+     * @param sourceName Имя источника
+     */
+    fun incrementSourceUsage(sourceName: String) {
+        if (sourceName.isBlank()) return
+
+        viewModelScope.launch {
+            sourceUsagePreferences.incrementSourceUsage(sourceName)
+            Timber.d("SOURCE: Увеличен счетчик использования источника: %s", sourceName)
+        }
+    }
+
+    /**
+     * Возвращает количество использований источника
+     * @param sourceName Имя источника
+     * @return Количество использований источника
+     */
+    fun getSourceUsage(sourceName: String): Int {
+        val usage = sourceUsagePreferences.getSourceUsage(sourceName)
+        Timber.d("SOURCE: Получено количество использований источника %s: %d", sourceName, usage)
+        return usage
     }
 } 

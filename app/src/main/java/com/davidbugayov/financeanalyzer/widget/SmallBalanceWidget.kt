@@ -100,7 +100,23 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                         .filter { transaction -> transaction.isExpense }
                         .fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
 
-                    val balance = income - expense
+                    // Преобразуем расходы в отрицательное число для отображения
+                    Money(expense.amount.negate(), expense.currency)
+
+                    // Проверяем, не являются ли расходы уже отрицательными
+                    val firstExpense = transactions.firstOrNull { it.isExpense }
+
+                    // Рассчитываем баланс как сумму доходов и расходов (если расходы уже отрицательные)
+                    // или как разность доходов и расходов (если расходы положительные)
+                    val balance = if (firstExpense != null && firstExpense.amount.isNegative()) {
+                        // Если расходы уже отрицательные, просто складываем
+                        val sumBalance = transactions.fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
+                        sumBalance
+                    } else {
+                        // Если расходы положительные, вычитаем их из доходов
+                        val diffBalance = income - expense
+                        diffBalance
+                    }
 
                     // Обновляем UI виджета
                     withContext(Dispatchers.Main) {

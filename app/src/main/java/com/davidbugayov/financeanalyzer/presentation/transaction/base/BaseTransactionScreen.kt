@@ -36,7 +36,6 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
@@ -59,7 +58,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.components
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 /**
@@ -69,7 +67,6 @@ import timber.log.Timber
 @Composable
 fun <E> BaseTransactionScreen(
     viewModel: TransactionScreenViewModel<out BaseTransactionState, E>,
-    categoriesViewModel: CategoriesViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
     screenTitle: String = "Добавить транзакцию",
     buttonText: String = "Добавить",
@@ -80,6 +77,52 @@ fun <E> BaseTransactionScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
+
+    // Сортируем категории по частоте использования при инициализации экрана
+    val sortedExpenseCategories = remember(state.expenseCategories) {
+        state.expenseCategories.sortedByDescending {
+            (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, true)
+        }
+    }
+
+    val sortedIncomeCategories = remember(state.incomeCategories) {
+        state.incomeCategories.sortedByDescending {
+            (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, false)
+        }
+    }
+
+    // Сортируем источники по частоте использования
+    val sortedSources = remember(state.sources) {
+        state.sources.sortedByDescending {
+            (viewModel as BaseTransactionViewModel<*, *>).getSourceUsage(it.name)
+        }
+    }
+
+    // Устанавливаем первый источник из отсортированного списка при инициализации
+    LaunchedEffect(sortedSources) {
+        if (sortedSources.isNotEmpty()) {
+            val firstSource = sortedSources.first()
+            Timber.d(
+                "[SOURCE_SORT] Принудительная установка первого источника из отсортированного списка: %s (текущий: %s)",
+                firstSource.name, state.source
+            )
+            viewModel.onEvent(eventFactory(BaseTransactionEvent.SetSource(firstSource.name)), context)
+        }
+    }
+
+    // Логируем отсортированные категории при инициализации
+    LaunchedEffect(sortedExpenseCategories, sortedIncomeCategories, sortedSources) {
+        val baseViewModel = viewModel as BaseTransactionViewModel<*, *>
+        Timber.d(
+            "[CATEGORY_SORT] Expense categories sorted on init: %s",
+            sortedExpenseCategories.joinToString(", ") { "${it.name}(${baseViewModel.getCategoryUsage(it.name, true)})" })
+        Timber.d(
+            "[CATEGORY_SORT] Income categories sorted on init: %s",
+            sortedIncomeCategories.joinToString(", ") { "${it.name}(${baseViewModel.getCategoryUsage(it.name, false)})" })
+        Timber.d(
+            "[SOURCE_SORT] Sources sorted on init: %s",
+            sortedSources.joinToString(", ") { "${it.name}(${baseViewModel.getSourceUsage(it.name)})" })
+    }
 
     // Логируем режим экрана
     LaunchedEffect(isEditMode) {
@@ -264,7 +307,7 @@ fun <E> BaseTransactionScreen(
                         state.sources.size
                     )
                     SourceSection(
-                        sources = state.sources,
+                        sources = sortedSources,
                         selectedSource = state.source,
                         onSourceSelected = { selectedSource ->
                             Timber.d("Source selected directly: %s with color %s", selectedSource.name, selectedSource.color)
@@ -284,7 +327,7 @@ fun <E> BaseTransactionScreen(
                 // Секция выбора категории
                 if (state.isExpense) {
                     CategorySection(
-                        categories = state.expenseCategories,
+                        categories = sortedExpenseCategories,
                         selectedCategory = state.category,
                         onCategorySelected = { category ->
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCategory(category.name)), context)
@@ -305,7 +348,7 @@ fun <E> BaseTransactionScreen(
                     )
                 } else {
                     CategorySection(
-                        categories = state.incomeCategories,
+                        categories = sortedIncomeCategories,
                         selectedCategory = state.category,
                         onCategorySelected = { category ->
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.SetCategory(category.name)), context)
@@ -467,18 +510,28 @@ fun <E> BaseTransactionScreen(
             }
 
             if (state.showCategoryPicker) {
+                val categories = if (state.isExpense) state.expenseCategories else state.incomeCategories
+                // Sort categories by usage frequency before displaying them
+                val sortedCategories = categories.sortedByDescending {
+                    if (state.isExpense) {
+                        (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, true)
+                    } else {
+                        (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, false)
+                    }
+                }
+                
                 CategoryPickerDialog(
-                    categories = if (state.isExpense) state.expenseCategories else state.incomeCategories,
+                    categories = sortedCategories,
                     onCategorySelected = { categoryName ->
                         Timber.d("Category selected from dialog: $categoryName")
                         if (state.isExpense) {
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.SetExpenseCategory(categoryName)), context)
                             // Обновление счетчика использования категории расходов через диалог
-                            categoriesViewModel.incrementCategoryUsage(categoryName, true)
+                            (viewModel as BaseTransactionViewModel<*, *>).incrementCategoryUsage(categoryName, true)
                         } else {
                             viewModel.onEvent(eventFactory(BaseTransactionEvent.SetIncomeCategory(categoryName)), context)
                             // Обновление счетчика использования категории доходов через диалог
-                            categoriesViewModel.incrementCategoryUsage(categoryName, false)
+                            (viewModel as BaseTransactionViewModel<*, *>).incrementCategoryUsage(categoryName, false)
                         }
                     },
                     onDismiss = {

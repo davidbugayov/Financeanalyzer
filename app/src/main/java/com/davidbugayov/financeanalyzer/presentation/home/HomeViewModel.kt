@@ -270,7 +270,6 @@ class HomeViewModel(
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
                 val metrics = calculateBalanceMetricsUseCase(transactions, startDate, endDate)
-                Timber.d("[LOG_BALANCE] loadTransactions: startDate=$startDate, endDate=$endDate, income=${metrics.income.formatted()}, expense=${metrics.expense.formatted()}, balance=${(metrics.income - metrics.expense).formatted()}, txCount=${transactions.size}")
                 _state.update {
                     it.copy(
                         transactions = transactions,
@@ -384,14 +383,11 @@ class HomeViewModel(
                 val income = financialMetrics.getTotalIncomeAsMoney()
                 val expense = financialMetrics.getTotalExpenseAsMoney()
                 val balance = financialMetrics.getCurrentBalance()
-                Timber.d("[LOG_BALANCE] updateFilteredTransactions(ALL): income=${income.formatted()}, expense=${expense.formatted()}, balance=${balance.formatted()}, txCount=${filteredTransactions.size}")
                 Triple(income, expense, balance)
             } else {
                 val stats = calculateStats(filteredTransactions)
-                Timber.d("[LOG_BALANCE] updateFilteredTransactions(${filter.name}): income=${stats.first.formatted()}, expense=${stats.second.formatted()}, balance=${stats.third.formatted()}, txCount=${filteredTransactions.size}")
                 stats
             }
-            Timber.d("[DIAG] STATS: income=${filteredIncome.formatted()}, expense=${filteredExpense.formatted()}, balance=${filteredBalance.formatted()}")
             val transactionGroups = groupTransactionsByDate(filteredTransactions)
             _state.update {
                 it.copy(
@@ -402,10 +398,6 @@ class HomeViewModel(
                     filteredBalance = filteredBalance,
                     isLoading = false
                 )
-            }
-            if (filter == TransactionFilter.ALL) {
-                Timber.d("[DIAG] HomeViewModel транзакций: ${filteredTransactions.size}")
-                filteredTransactions.forEach { Timber.d("[DIAG] HVM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") }
             }
         }
     }
@@ -431,14 +423,12 @@ class HomeViewModel(
      */
     private fun calculateStats(transactions: List<Transaction>): Triple<Money, Money, Money> {
         if (transactions.isEmpty()) {
-            Timber.d("[DIAG] calculateStats: пустой список транзакций")
             return Triple(Money.zero(), Money.zero(), Money.zero())
         }
 
         // Проверяем, есть ли эти транзакции в кэше
         val cachedStats = statsCache[transactions]
         if (cachedStats != null) {
-            Timber.d("[DIAG] calculateStats: используем кэш")
             return cachedStats
         }
 
@@ -447,8 +437,6 @@ class HomeViewModel(
         val income = metrics.income
         val expense = metrics.expense
         val balance = income - expense
-
-        Timber.d("[DIAG] calculateStats: income=${income.formatted()}, expense=${expense.formatted()}, balance=${balance.formatted()}")
 
         val result = Triple(income, expense, balance)
         statsCache[transactions] = result

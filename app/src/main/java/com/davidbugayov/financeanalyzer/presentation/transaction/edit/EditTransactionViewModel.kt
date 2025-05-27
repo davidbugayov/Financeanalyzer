@@ -244,6 +244,24 @@ class EditTransactionViewModel(
                     if (!transactionToSave.isExpense && transactionToSave.walletIds != null && transactionToSave.walletIds.isNotEmpty()) {
                         updateWalletsBalance(transactionToSave.walletIds, transactionToSave.amount, originalTransaction)
                     }
+
+                    // Увеличиваем счетчик использования категории
+                    if (transactionToSave.category.isNotBlank()) {
+                        incrementCategoryUsage(transactionToSave.category, transactionToSave.isExpense)
+                        Timber.d(
+                            "ТРАНЗАКЦИЯ: Увеличен счетчик использования категории: %s, isExpense=%b",
+                            transactionToSave.category, transactionToSave.isExpense
+                        )
+                    }
+
+                    // Увеличиваем счетчик использования источника
+                    if (transactionToSave.source.isNotBlank()) {
+                        incrementSourceUsage(transactionToSave.source)
+                        Timber.d(
+                            "ТРАНЗАКЦИЯ: Увеличен счетчик использования источника: %s",
+                            transactionToSave.source
+                        )
+                    }
                     
                     // Показываем успешное обновление
                     _state.update {

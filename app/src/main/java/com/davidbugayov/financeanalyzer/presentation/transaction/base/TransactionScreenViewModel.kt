@@ -13,6 +13,7 @@ interface TransactionScreenViewModel<S, E> {
     fun onEvent(event: E, context: android.content.Context)
     fun resetFields()
     fun updateCategoryPositions()
+    fun updateSourcePositions()
     fun submitTransaction(context: android.content.Context)
     fun clearSelectedWallets()
     fun selectAllWallets(context: android.content.Context)

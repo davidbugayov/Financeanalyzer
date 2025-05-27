@@ -53,12 +53,6 @@ class FinancialMetrics private constructor() : KoinComponent {
         scope.launch {
             try {
                 val visibleTransactions = repository.loadTransactions()
-                Timber.d("[DIAG] FinancialMetrics транзакций: ${visibleTransactions.size}")
-                
-                // Анализируем транзакции для диагностики
-                visibleTransactions.forEach { 
-                    Timber.d("[DIAG] FM TX: id=${it.id}, amount=${it.amount}, date=${it.date}, isExpense=${it.isExpense}") 
-                }
                 
                 val metrics = calculateBalanceMetricsUseCase(visibleTransactions)
                 val income = metrics.income
@@ -72,10 +66,6 @@ class FinancialMetrics private constructor() : KoinComponent {
                 
                 // Логгируем результаты для диагностики
                 Timber.d("Метрики обновлены: доход=${income.formatted()}, расход=${expense.formatted()}, баланс=${balance.formatted()}")
-                
-                // Дополнительная диагностика
-                val expenseIds = visibleTransactions.filter { it.isExpense }.map { it.id }
-                Timber.d("[DIAG] FM EXPENSE IDS: ${expenseIds}")
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при пересчёте метрик")
             }
