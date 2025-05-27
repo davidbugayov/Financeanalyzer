@@ -255,7 +255,7 @@ fun BudgetScreen(
                                 title = "Потрачено",
                                 value = "${state.totalSpent.amount.toInt()} ₽",
                                 containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
-                                contentColor = MaterialTheme.colorScheme.onSecondary,
+                                contentColor = Color.White,
                                 modifier = Modifier.weight(1f)
                             )
                             
@@ -265,7 +265,7 @@ fun BudgetScreen(
                                 title = "Баланс",
                                 value = "${state.totalWalletBalance.amount.toInt()} ₽",
                                 containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.9f),
-                                contentColor = MaterialTheme.colorScheme.onTertiary,
+                                contentColor = Color.White,
                                 modifier = Modifier.weight(1f)
                             )
                         }
@@ -475,8 +475,8 @@ fun BudgetScreen(
                                 }
                             },
                             enabled = selectedWallet?.let { sw ->
-                                walletAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sw.balance.amount } ?: false
-                            } ?: false
+                                walletAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sw.balance.amount } == true
+                            } == true
                         ) {
                             Text("Потратить")
                         }
@@ -571,8 +571,9 @@ fun BudgetScreen(
                                 }
                             },
                             enabled = selectedFromWallet?.let { sfw ->
-                                selectedToWallet != null && transferAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } ?: false
-                            } ?: false
+                                selectedToWallet != null && transferAmount.toBigDecimalOrNull()
+                                    ?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } == true
+                            } == true
                         ) {
                             Text("Перевести")
                         }

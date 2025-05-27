@@ -68,8 +68,8 @@ import timber.log.Timber
 fun <E> BaseTransactionScreen(
     viewModel: TransactionScreenViewModel<out BaseTransactionState, E>,
     onNavigateBack: () -> Unit,
-    screenTitle: String = "Добавить транзакцию",
-    buttonText: String = "Добавить",
+    screenTitle: String? = null,
+    buttonText: String? = null,
     isEditMode: Boolean = false,
     eventFactory: (Any) -> E,
     submitEvent: E,
@@ -77,6 +77,19 @@ fun <E> BaseTransactionScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
+
+    // Устанавливаем значения по умолчанию для строковых ресурсов
+    val actualScreenTitle = if (isEditMode) {
+        stringResource(R.string.edit_transaction_title)
+    } else {
+        screenTitle ?: stringResource(R.string.add_transaction)
+    }
+
+    val actualButtonText = if (isEditMode) {
+        stringResource(R.string.save_button_text)
+    } else {
+        buttonText ?: stringResource(R.string.add_button_text)
+    }
 
     // Сортируем категории по частоте использования при инициализации экрана
     val sortedExpenseCategories = remember(state.expenseCategories) {
@@ -97,6 +110,10 @@ fun <E> BaseTransactionScreen(
             (viewModel as BaseTransactionViewModel<*, *>).getSourceUsage(it.name)
         }
     }
+
+    // Строковые ресурсы для категорий
+    val categoryOther = stringResource(R.string.category_other)
+    val categoryTransfer = stringResource(R.string.category_transfer)
 
     // Устанавливаем первый источник из отсортированного списка при инициализации
     LaunchedEffect(sortedSources) {
@@ -213,10 +230,6 @@ fun <E> BaseTransactionScreen(
         }
     }
 
-    // В режиме редактирования устанавливаем заголовок и текст кнопки
-    val actualScreenTitle = if (isEditMode) stringResource(R.string.edit_transaction_title) else screenTitle
-    val actualButtonText = if (isEditMode) stringResource(R.string.save_button_text) else buttonText
-
     var showCancelConfirmation by remember { mutableStateOf(false) }
     var showImportConfirmation by remember { mutableStateOf(false) }
 
@@ -229,6 +242,8 @@ fun <E> BaseTransactionScreen(
     fun handleExit() {
         // Обновляем позиции категорий перед выходом
         viewModel.updateCategoryPositions()
+        // Обновляем позиции источников перед выходом
+        viewModel.updateSourcePositions()
         // Сбрасываем поля
         viewModel.resetFields()
         // Возвращаемся назад
@@ -297,7 +312,7 @@ fun <E> BaseTransactionScreen(
                     },
                     forceExpense = state.forceExpense
                 )
-                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 // Секция "Откуда/Куда" (Source)
                 Column {
                     Timber.d(
@@ -338,7 +353,7 @@ fun <E> BaseTransactionScreen(
                         onCategoryLongClick = { selectedCategory ->
                             Timber.d("Category long click in BaseTransactionScreen: %s", selectedCategory.name)
                             // Don't allow long press on "Другое" and "Переводы"
-                            if (selectedCategory.name != "Другое" && selectedCategory.name != "Переводы") {
+                            if (selectedCategory.name != categoryOther && selectedCategory.name != categoryTransfer) {
                                 viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(selectedCategory.name)), context)
                             } else {
                                 Timber.d("Ignoring long press on protected category: %s", selectedCategory.name)
@@ -358,7 +373,7 @@ fun <E> BaseTransactionScreen(
                         },
                         onCategoryLongClick = { selectedCategory ->
                             Timber.d("Category long click in BaseTransactionScreen: %s", selectedCategory.name)
-                            if (selectedCategory.name != "Другое" && selectedCategory.name != "Переводы") {
+                            if (selectedCategory.name != categoryOther && selectedCategory.name != categoryTransfer) {
                                 viewModel.onEvent(eventFactory(BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(selectedCategory.name)), context)
                             } else {
                                 Timber.d("Ignoring long press on protected category: %s", selectedCategory.name)
@@ -376,7 +391,7 @@ fun <E> BaseTransactionScreen(
                     isError = state.amountError,
                     accentColor = currentColor
                 )
-                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 // Поле выбора даты
                 DateField(
                     date = state.selectedDate,
@@ -388,7 +403,7 @@ fun <E> BaseTransactionScreen(
                         .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
                 )
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Поле для комментария без иконки прикрепления
                 CommentField(
@@ -398,7 +413,7 @@ fun <E> BaseTransactionScreen(
                     }
                 )
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.padding_small)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Секция выбора кошельков (показывается только для доходов)
                 Timber.d("BaseTransactionScreen: isExpense=${state.isExpense}, addToWallet=${state.addToWallet}, selectedWallets=${state.selectedWallets}, targetWalletId=${state.targetWalletId}")
@@ -415,7 +430,7 @@ fun <E> BaseTransactionScreen(
                     isVisible = !state.isExpense && viewModel.wallets.isNotEmpty() // Показываем только для доходов и если есть кошельки
                 )
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.padding_medium)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
                 // Кнопка добавления/сохранения
                 AddButton(
@@ -428,7 +443,7 @@ fun <E> BaseTransactionScreen(
                     isLoading = state.isLoading
                 )
 
-                Spacer(Modifier.height(dimensionResource(R.dimen.padding_medium)))
+                Spacer(Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             }
 
             // Диалоги

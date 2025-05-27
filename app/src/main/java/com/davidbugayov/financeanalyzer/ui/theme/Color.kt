@@ -6,20 +6,13 @@ import androidx.compose.ui.unit.dp
 
 // New Primary Palette based on #3DCFDC
 val NewPrimary = Color(0xFF3DCFDC)
-val OnNewPrimary = Color.Black // Adjusted for better contrast with a lighter primary
+val OnNewPrimary = Color.White // Adjusted for better contrast with a lighter primary
 val NewPrimaryLight = Color(0xFFE0F7FA) // Very light cyan/turquoise for light theme container
 val OnNewPrimaryContainer = Color(0xFF00373D) // Dark text for light container
 
 val NewPrimaryDark = Color(0xFF007C8C) // Darker cyan/turquoise for dark theme primary
 val DarkPrimaryContainer = Color(0xFF005662) // Dark container for dark theme
 val OnDarkPrimaryContainer = Color(0xFFB2EBF2) // Light text for dark container
-
-// New Teal Palette
-val TealPrimary = Color(0xFF009688) // Основной бирюзовый
-val TealPrimaryDark = Color(0xFF00796B) // Темный бирюзовый для контейнеров или акцентов в темной теме
-val TealPrimaryLight = Color(0xFFB2DFDB) // Светлый бирюзовый для контейнеров в светлой теме
-val OnTealPrimary = Color.White // Текст на основном бирюзовом
-val OnTealPrimaryContainer = Color(0xFF004D40) // Текст на светлых/темных бирюзовых контейнерах
 
 // Friendly Card Background Colors
 val FriendlyCardBackgroundLight = Color(0xFFE0F2F1) // Очень светлый бирюзовый (Soft Teal Light)
@@ -219,8 +212,6 @@ fun Color.toHexString(): String {
 // Добавляем Int ARGB репрезентации для использования в не-Composable контекстах
 val IncomeColorInt = IncomeColorLight.toArgb()
 val ExpenseColorInt = ExpenseColorLight.toArgb()
-val TransferColorInt = TransferColorLight.toArgb()
-val DefaultSourceColorInt = CashColor.toArgb() // Используем CashColor как дефолтный цвет источника
 
 // Palettes (Can be expanded and refined)
 val IncomeChartPalette = listOf(
