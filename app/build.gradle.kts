@@ -21,14 +21,14 @@ fun getKeystoreProperties(): Properties {
 
 android {
     namespace = "com.davidbugayov.financeanalyzer"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 30
-        versionName = "2.13"
+        versionCode = 31
+        versionName = "2.14"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -169,6 +169,7 @@ android {
         // Пример установки уровня серьезности для проверки
         // warning.add("ObsoleteLintCustomCheck")
     }
+    buildToolsVersion = "36.0.0"
 
 }
 
