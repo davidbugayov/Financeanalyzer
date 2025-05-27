@@ -91,14 +91,4 @@ class SourceUsagePreferences private constructor(context: Context) {
         Timber.d("[SOURCE_USAGE] Использований источника '%s': %d", sourceName, usage)
         return usage
     }
-
-    /**
-     * Сбрасывает статистику использования всех источников
-     */
-    fun resetAllSourcesUsage() {
-        prefs.edit {
-            putString(KEY_SOURCES_USAGE, null)
-        }
-        Timber.d("[SOURCE_USAGE] Статистика использования источников сброшена")
-    }
 } 
