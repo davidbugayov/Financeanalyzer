@@ -26,10 +26,12 @@ import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -194,7 +196,9 @@ fun HomeScreen(
     onNavigateToAdd: () -> Unit,
     onNavigateToChart: () -> Unit,
     onNavigateToProfile: () -> Unit,
-    onNavigateToEdit: (String) -> Unit
+    onNavigateToEdit: (String) -> Unit,
+    navController: NavController,
+    achievementsUiViewModel: AchievementsUiViewModel = koinViewModel()
 ) {
     val categoriesViewModel: CategoriesViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
@@ -212,6 +216,25 @@ fun HomeScreen(
     val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
     val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
     val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
+
+    val showAchievementFeedback = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("show_achievement_feedback") == true
+    if (showAchievementFeedback) {
+        feedbackMessage = stringResource(R.string.achievement_first_steps_unlocked)
+        feedbackType = FeedbackType.SUCCESS
+        showFeedback = true
+        navController.currentBackStackEntry?.savedStateHandle?.set("show_achievement_feedback", false)
+    }
+
+    val achievementsUiState by achievementsUiViewModel.uiState.collectAsState()
+    achievementsUiState.current?.let { achievement ->
+        FeedbackMessage(
+            title = stringResource(R.string.achievement_first_steps_unlocked),
+            message = achievement.title,
+            type = FeedbackType.SUCCESS,
+            visible = true,
+            onDismiss = { achievementsUiViewModel.onAchievementShown() }
+        )
+    }
 
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(

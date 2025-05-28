@@ -7,28 +7,33 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 import timber.log.Timber
 
 /**
  * Экран добавления новой транзакции
  * Использует BaseTransactionScreen для отображения UI
+ * @param navController контроллер навигации для передачи флага достижения
  */
 @Composable
 fun AddTransactionScreen(
-    viewModel: AddTransactionViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
-    onNavigateToImport: (() -> Unit)? = null
+    onNavigateToImport: (() -> Unit)? = null,
+    navController: NavController,
+    achievementsUiViewModel: AchievementsUiViewModel
 ) {
     val context = LocalContext.current
+    val viewModel: AddTransactionViewModel = koinViewModel(parameters = { parametersOf(achievementsUiViewModel) })
     val state by viewModel.state.collectAsState()
 
-    // Логируем открытие экрана добавления транзакции
     LaunchedEffect(Unit) {
         Timber.d("AddTransactionScreen: Screen opened, onNavigateToImport is ${if (onNavigateToImport != null) "provided" else "null"}")
         
@@ -38,11 +43,7 @@ fun AddTransactionScreen(
         )
     }
 
-    // Обработка типа транзакции на основе forceExpense
-    // Теперь по умолчанию forceExpense = true (расход)
     LaunchedEffect(state.forceExpense) {
-        // Если forceExpense = true, устанавливаем расход
-        // Если forceExpense = false, устанавливаем доход
         if (state.forceExpense) {
             viewModel.onEvent(BaseTransactionEvent.ForceSetExpenseType, context)
         } else {
@@ -50,14 +51,20 @@ fun AddTransactionScreen(
         }
     }
 
-    // Очищаем callback при выходе из композиции
+    val achievementUnlocked by viewModel.achievementUnlocked.collectAsState()
+    LaunchedEffect(achievementUnlocked) {
+        if (achievementUnlocked) {
+            navController.previousBackStackEntry?.savedStateHandle?.set("show_achievement_feedback", true)
+            viewModel.resetAchievementUnlockedFlag()
+        }
+    }
+
     DisposableEffect(Unit) {
         onDispose {
             // No need to reset navigateBackCallback as it's not used in the new implementation
         }
     }
 
-    // Используем BaseTransactionScreen для отображения UI
     BaseTransactionScreen(
         viewModel = viewModel,
         onNavigateBack = onNavigateBack,

@@ -21,6 +21,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.FileUpload
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -80,7 +81,8 @@ fun ProfileScreen(
     onNavigateToLibraries: () -> Unit,
     onNavigateToChart: () -> Unit,
     onNavigateToBudget: () -> Unit,
-    onNavigateToExportImport: (String) -> Unit
+    onNavigateToExportImport: (String) -> Unit,
+    onNavigateToAchievements: () -> Unit
 ) {
     // Получаем текущее состояние из ViewModel
     val state by viewModel.state.collectAsState()
@@ -178,6 +180,17 @@ fun ProfileScreen(
                     title = stringResource(R.string.export_import),
                     subtitle = stringResource(R.string.profile_export_import_subtitle),
                     onClick = { onNavigateToExportImport(Screen.ExportImport.route) },
+                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding), vertical = 4.dp)
+                )
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+
+                // Кнопка перехода на экран достижений
+                ProfileActionCard(
+                    icon = Icons.Default.Star,
+                    iconBackground = MaterialTheme.colorScheme.primary,
+                    title = stringResource(R.string.achievements),
+                    subtitle = stringResource(R.string.profile_achievements_subtitle),
+                    onClick = onNavigateToAchievements,
                     modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding), vertical = 4.dp)
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))

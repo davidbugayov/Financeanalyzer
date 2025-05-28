@@ -8,11 +8,13 @@ import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
@@ -21,6 +23,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.Base
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.koin.java.KoinJavaComponent.inject
@@ -39,7 +42,9 @@ class AddTransactionViewModel(
     walletRepository: WalletRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val application: Application,
-    updateWalletBalancesUseCase: UpdateWalletBalancesUseCase
+    updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
+    private val achievementsRepository: AchievementsRepository = AchievementsRepository(),
+    private val achievementsUiViewModel: AchievementsUiViewModel
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
@@ -64,6 +69,10 @@ class AddTransactionViewModel(
     private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
     override val wallets: List<Wallet>
         get() = _wallets.value
+
+    // --- Achievement unlocked flag ---
+    private val _achievementUnlocked = MutableStateFlow(false)
+    val achievementUnlocked: StateFlow<Boolean> = _achievementUnlocked
 
     init {
         Timber.d("[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel")
@@ -227,6 +236,17 @@ class AddTransactionViewModel(
                     setDefaultCategoryIfNeeded(force = true)
                     updateWidgetsUseCase(application.applicationContext)
                     Timber.d("ТРАНЗАКЦИЯ_ДОБ: Успешно добавлена, ID=%s", transaction.id)
+
+                    // --- [ГЕЙМИФИКАЦИЯ] ---
+                    val count = getTransactionRepositoryInstance().getTransactionsCount()
+                    if (count == 1) {
+                        achievementsRepository.unlockAchievement("first_transaction")
+                        _achievementUnlocked.value = true
+                        val achievement = achievementsRepository.achievements.value.find { it.id == "first_transaction" }
+                        if (achievement != null) {
+                            achievementsUiViewModel.onAchievementUnlocked(achievement)
+                        }
+                    }
                 } else if (result is DomainResult.Error) {
                     Timber.e(result.exception, "ТРАНЗАКЦИЯ_ДОБ: Ошибка при добавлении: %s", result.exception.message)
                     _state.update {
@@ -574,5 +594,12 @@ class AddTransactionViewModel(
             availableCategoryIcons = availableCategoryIcons,
             customCategoryIcon = customCategoryIcon
         )
+    }
+
+    /**
+     * Сброс флага после показа ачивки
+     */
+    fun resetAchievementUnlockedFlag() {
+        _achievementUnlocked.value = false
     }
 } 

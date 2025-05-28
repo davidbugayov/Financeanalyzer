@@ -39,7 +39,6 @@ import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import kotlinx.coroutines.launch
 
@@ -101,7 +100,7 @@ fun TransactionGroupList(
     ) {
         transactionGroups.forEach { group ->
             val isExpanded = expandedGroups[group.date] == true
-            
+
             // Заголовок группы
             item(key = "header_${group.date}") {
                 ExpandableGroupHeader(
@@ -197,7 +196,13 @@ private fun ExpandableGroupHeader(
 ) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val balanceTextColor = if (balance.amount.signum() >= 0) incomeColor else expenseColor
+    val balanceTextColor = if (balance.isPositive()) incomeColor else expenseColor
+    // Определяем цвет фона карты в зависимости от знака баланса
+    val cardBackgroundColor = if (balance.isPositive()) {
+        LocalIncomeColor.current.copy(alpha = 0.1f) // Светлый оттенок для дохода
+    } else {
+        LocalExpenseColor.current.copy(alpha = 0.1f) // Светлый оттенок для расхода
+    }
 
     Card(
         modifier = Modifier
@@ -207,7 +212,7 @@ private fun ExpandableGroupHeader(
                 vertical = dimensionResource(id = R.dimen.spacing_small)
             )
             .clickable { onToggle(!isExpanded) },
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
     ) {
         Row(
             modifier = Modifier
@@ -228,16 +233,8 @@ private fun ExpandableGroupHeader(
                 fontWeight = FontWeight.Medium
             )
 
-            val rawFormattedBalance = balance.format()
-            val displayText = when {
-                balance.amount.signum() > 0 && !rawFormattedBalance.startsWith("+") -> "+" + rawFormattedBalance
-                balance.amount.signum() < 0 && rawFormattedBalance.startsWith("+-") -> rawFormattedBalance.drop(1)
-                balance.amount.signum() < 0 && rawFormattedBalance.startsWith("+") -> "-" + rawFormattedBalance.drop(1)
-                else -> rawFormattedBalance
-            }
-
             Text(
-                text = displayText,
+                text = balance.format(showSign = true, useMinimalDecimals = true),
                 style = MaterialTheme.typography.bodyLarge,
                 color = balanceTextColor,
                 fontWeight = FontWeight.Bold

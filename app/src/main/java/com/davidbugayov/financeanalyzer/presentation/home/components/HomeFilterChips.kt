@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,7 +17,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import timber.log.Timber
 
 /**
@@ -64,6 +64,12 @@ private fun FilterChipItem(
     isSelected: Boolean,
     onClick: () -> Unit
 ) {
+    val selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
+    val selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
+    val unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+    val unselectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
+    val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.outline
+
     FilterChip(
         selected = isSelected,
         onClick = onClick,
@@ -75,20 +81,12 @@ private fun FilterChipItem(
             )
         },
         colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = LocalFriendlyCardBackgroundColor.current,
-            selectedLabelColor = MaterialTheme.colorScheme.primary,
-            // Оставляем цвета для невыбранного состояния по умолчанию или можно настроить их тоже, если нужно
-            // containerColor = ..., 
-            // labelColor = ..., 
-            // iconColor = ..., 
-            // selectedIconColor = ..., 
-            // disabledContainerColor = ..., 
-            // disabledLabelColor = ..., 
-            // disabledLeadingIconColor = ..., 
-            // disabledSelectedContainerColor = ..., 
-            // disabledSelectedLabelColor = ..., 
-            // disabledTrailingIconColor = ...
-        )
+            selectedContainerColor = selectedContainerColor,
+            selectedLabelColor = selectedLabelColor,
+            containerColor = unselectedContainerColor,
+            labelColor = unselectedLabelColor
+        ),
+        border = BorderStroke(1.2.dp, borderColor)
     )
 }
 

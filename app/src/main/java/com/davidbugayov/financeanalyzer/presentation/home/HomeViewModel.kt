@@ -479,7 +479,7 @@ class HomeViewModel(
                 
             val expense = transactionsForDate
                 .filter { it.isExpense }
-                .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+                .fold(Money.zero()) { acc, transaction -> acc + transaction.amount.abs() }
             
             // Сортируем транзакции внутри группы по времени (сначала новые)
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }

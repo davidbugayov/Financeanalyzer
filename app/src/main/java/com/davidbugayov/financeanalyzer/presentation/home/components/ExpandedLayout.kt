@@ -5,7 +5,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -57,7 +59,8 @@ fun ExpandedLayout(
             state = state,
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
-            onFilterSelected = onFilterSelected
+            onFilterSelected = onFilterSelected,
+            modifier = Modifier.weight(1f)
         )
         ExpandedRightPanel(
             state = state,
@@ -65,7 +68,8 @@ fun ExpandedLayout(
             showGroupSummary = showGroupSummary,
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
-            onAddClick = onAddClick
+            onAddClick = onAddClick,
+            modifier = Modifier.weight(1f)
         )
     }
 }
@@ -75,10 +79,11 @@ private fun ExpandedLeftPanel(
     state: HomeState,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
-    onFilterSelected: (TransactionFilter) -> Unit
+    onFilterSelected: (TransactionFilter) -> Unit,
+    modifier: Modifier = Modifier
 ) {
     Column(
-        modifier = Modifier
+        modifier = modifier
             .padding(end = 8.dp)
             .verticalScroll(rememberScrollState())
     ) {
@@ -113,14 +118,19 @@ private fun ExpandedRightPanel(
     showGroupSummary: Boolean,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = Modifier
-            .padding(start = 8.dp)
+    Timber.d("[UI] ExpandedRightPanel: isLoading=%s, filteredTransactions.isEmpty()=%s", state.isLoading, state.filteredTransactions.isEmpty())
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(start = 8.dp),
+        contentAlignment = Alignment.Center
     ) {
         when {
             !state.isLoading && state.filteredTransactions.isEmpty() -> {
+                Timber.d("[UI] Показываем ExpandedEmptyState (пустое состояние)")
                 ExpandedEmptyState(onAddClick)
             }
             else -> {
@@ -138,48 +148,59 @@ private fun ExpandedRightPanel(
 
 @Composable
 private fun ExpandedEmptyState(onAddClick: () -> Unit) {
-    Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+    Timber.d("[UI] ExpandedEmptyState отображается")
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
-            androidx.compose.material3.Icon(
-                imageVector = androidx.compose.material.icons.Icons.Filled.Add,
-                contentDescription = stringResource(R.string.empty_state_icon_desc),
-                tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .size(48.dp)
-            )
+        androidx.compose.material3.Icon(
+            imageVector = androidx.compose.material.icons.Icons.Filled.Add,
+            contentDescription = stringResource(R.string.empty_state_icon_desc),
+            tint = MaterialTheme.colorScheme.primary,
+            modifier = Modifier
+                .padding(bottom = 8.dp)
+                .size(36.dp)
+        )
+        Text(
+            text = stringResource(R.string.empty_state_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = MaterialTheme.colorScheme.onSurface,
+            maxLines = 2,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(bottom = 4.dp)
+        )
+        Text(
+            text = stringResource(R.string.empty_state_subtitle),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            maxLines = 3,
+            fontSize = 13.sp,
+            textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+            modifier = Modifier.padding(bottom = 16.dp)
+        )
+        androidx.compose.material3.Button(
+            onClick = {
+                Timber.d("[UI] Нажата кнопка 'Добавить первую транзакцию' в ExpandedEmptyState")
+                onAddClick()
+            },
+            shape = RoundedCornerShape(50),
+            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = Color.White
+            ),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp)
+                .heightIn(min = 44.dp)
+        ) {
             Text(
-                text = stringResource(R.string.empty_state_title),
-                style = MaterialTheme.typography.headlineSmall,
-                color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp)
+                text = stringResource(R.string.empty_state_add_first_transaction),
+                fontWeight = FontWeight.Medium,
+                fontSize = 15.sp,
+                maxLines = 1
             )
-            Text(
-                text = stringResource(R.string.empty_state_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 24.dp)
-            )
-            androidx.compose.material3.Button(
-                onClick = onAddClick,
-                shape = RoundedCornerShape(50),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White
-                ),
-                modifier = Modifier
-                    .padding(horizontal = 16.dp)
-                    .height(48.dp)
-            ) {
-                Text(
-                    text = stringResource(R.string.empty_state_add_first_transaction),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
-                )
-            }
         }
     }
 }

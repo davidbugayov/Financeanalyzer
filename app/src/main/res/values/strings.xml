@@ -284,6 +284,7 @@
     <string name="cd_search_icon">Поиск</string>
     <string name="cd_close_icon">Закрыть</string>
     <string name="cd_settings_icon">Настройки</string>
+    <string name="cd_done">Получено</string>
 
     <!-- New strings for FinanceChartScreen -->
     <string name="show_expenses">Показать расходы</string>
@@ -956,4 +957,8 @@
     <string name="csv_parse_line_error">Ошибка при парсинге строки: %1$s. Config: %2$s</string>
     <string name="csv_skip_line_not_enough_columns">Пропуск строки из-за недостаточного количества колонок: %1$s</string>
     <string name="bank_generic_csv">Generic CSV (Configurable)</string>
+
+    <string name="achievements">Достижения</string>
+    <string name="profile_achievements_subtitle">Открывайте достижения за активность и прогресс</string>
+    <string name="achievement_first_steps_unlocked">Достижение разблокировано: Первые шаги!</string>
 </resources>

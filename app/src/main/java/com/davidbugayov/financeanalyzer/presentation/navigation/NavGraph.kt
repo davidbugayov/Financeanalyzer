@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
@@ -15,6 +16,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
+import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedFinanceChartScreen
@@ -72,7 +74,9 @@ fun NavGraphBuilder.mainGraph(
             onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
             onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-            onNavigateToEdit = { transactionId -> navController.navigate(Screen.EditTransaction.createRoute(transactionId)) }
+            onNavigateToEdit = { transactionId -> navController.navigate(Screen.EditTransaction.createRoute(transactionId)) },
+            navController = navController,
+            achievementsUiViewModel = koinViewModel()
         )
     }
     composable(
@@ -143,7 +147,9 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
     ) {
         AddTransactionScreen(
             onNavigateBack = { navController.popBackStack() },
-            onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) }
+            onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) },
+            navController = navController,
+            achievementsUiViewModel = koinViewModel()
         )
     }
     composable(
@@ -176,6 +182,20 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
             onNavigateBack = { navController.popBackStack() }
         )
     }
+    composable(
+        route = Screen.Achievements.route,
+        enterTransition = defaultEnterLeft(),
+        exitTransition = defaultExitRight(),
+        popEnterTransition = defaultEnterLeft(),
+        popExitTransition = defaultExitRight()
+    ) {
+        val achievementsViewModel = koinViewModel<com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel>()
+        val achievements = achievementsViewModel.achievements.collectAsState().value
+        AchievementsScreen(
+            achievements = achievements,
+            onBack = { navController.popBackStack() }
+        )
+    }
 }
 
 fun NavGraphBuilder.profileGraph(
@@ -194,7 +214,8 @@ fun NavGraphBuilder.profileGraph(
             onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
             onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
-            onNavigateToExportImport = { navController.navigate(Screen.ExportImport.route) }
+            onNavigateToExportImport = { navController.navigate(Screen.ExportImport.route) },
+            onNavigateToAchievements = { navController.navigate(Screen.Achievements.route) }
         )
     }
     composable(

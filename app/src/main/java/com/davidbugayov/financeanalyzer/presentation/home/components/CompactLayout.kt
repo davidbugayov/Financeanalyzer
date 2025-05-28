@@ -2,9 +2,9 @@ package com.davidbugayov.financeanalyzer.presentation.home.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -63,8 +63,10 @@ private fun CompactBalanceAndFilters(
 @Composable
 private fun CompactEmptyState(onAddClick: () -> Unit) {
     Box(
-        modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 12.dp),
+        contentAlignment = Alignment.TopCenter
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             androidx.compose.material3.Icon(
@@ -72,20 +74,25 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                 contentDescription = stringResource(R.string.empty_state_icon_desc),
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
-                    .padding(bottom = 16.dp)
-                    .size(48.dp)
+                    .padding(bottom = 8.dp)
+                    .size(36.dp)
             )
             Text(
                 text = stringResource(R.string.empty_state_title),
-                style = MaterialTheme.typography.headlineSmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 8.dp)
+                maxLines = 2,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(bottom = 4.dp)
             )
             Text(
                 text = stringResource(R.string.empty_state_subtitle),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(bottom = 24.dp)
+                maxLines = 3,
+                fontSize = 13.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(bottom = 12.dp)
             )
             androidx.compose.material3.Button(
                 onClick = onAddClick,
@@ -95,13 +102,15 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                     contentColor = Color.White
                 ),
                 modifier = Modifier
+                    .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .height(48.dp)
+                    .heightIn(min = 44.dp)
             ) {
                 Text(
                     text = stringResource(R.string.empty_state_add_first_transaction),
-                    fontWeight = FontWeight.Bold,
-                    fontSize = 18.sp
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 15.sp,
+                    maxLines = 1
                 )
             }
         }
@@ -167,9 +176,8 @@ fun CompactLayout(
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 8.dp)
     ) {
-        Spacer(modifier = Modifier.height(24.dp))
         CompactBalanceAndFilters(
             state = state,
             onFilterSelected = onFilterSelected,

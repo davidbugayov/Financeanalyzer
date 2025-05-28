@@ -50,4 +50,7 @@ sealed class Screen(val route: String) {
 
     /** Экран экспорт и импорт данных */
     data object ExportImport : Screen("export_import")
+
+    /** Экран достижений */
+    data object Achievements : Screen("achievements")
 } 

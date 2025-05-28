@@ -8,6 +8,7 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
+import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -34,6 +35,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransacti
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
+import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -80,6 +83,7 @@ val appModule = module {
     single<TransactionRepository> { get<TransactionRepositoryImpl>() }
     single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
     single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
+    single<AchievementsRepository> { AchievementsRepository() }
 
     // Factories and managers
     single { ImportTransactionsManager(get()) }
@@ -113,7 +117,8 @@ val appModule = module {
 
     // ViewModels
     viewModel { CategoriesViewModel(androidApplication()) }
-    viewModel {
+    viewModel { AchievementsUiViewModel() }
+    viewModel { (achievementsUiViewModel: AchievementsUiViewModel) ->
         AddTransactionViewModel(
             addTransactionUseCase = get(),
             categoriesViewModel = get(),
@@ -121,7 +126,9 @@ val appModule = module {
             walletRepository = get(),
             updateWidgetsUseCase = get(),
             application = androidApplication(),
-            updateWalletBalancesUseCase = get()
+            updateWalletBalancesUseCase = get(),
+            achievementsRepository = get(),
+            achievementsUiViewModel = achievementsUiViewModel
         )
     }
     viewModel { ProfileViewModel(get(), get(), get(), get(), androidContext()) }
@@ -143,6 +150,7 @@ val appModule = module {
     viewModel { WalletTransactionsViewModel(get(), get()) }
     viewModel { ImportTransactionsViewModel(get(), androidApplication()) }
     viewModel { OnboardingViewModel(get()) }
+    viewModel { AchievementsViewModel(get()) }
 }
 
 // Для параметризованных ViewModel (пример: статистика за период)

@@ -186,19 +186,23 @@ data class Money(
         val locale = Locale.getDefault()
         val symbols = DecimalFormatSymbols(locale)
 
-        // Используем разделители из настроек валюты вместо локальных
-        symbols.groupingSeparator = currency.groupingSeparator
+        // Явно устанавливаем пробел как разделитель групп (тысяч)
+        symbols.groupingSeparator = ' '
+        // Используем разделитель десятичных знаков из настроек валюты
         symbols.decimalSeparator = currency.decimalSeparator
 
         val strippedAmount = amount.stripTrailingZeros()
         val isWholeNumber = strippedAmount.scale() <= 0 || strippedAmount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0
+
+        // Используем шаблон с запятой как стандартным местозаполнителем для группировки
+        val groupingPattern = "#,##0"
 
         if (useMinimalDecimals && isWholeNumber) {
             val integerPattern = StringBuilder()
             if (showSign && amount > BigDecimal.ZERO) {
                 integerPattern.append('+')
             }
-            integerPattern.append("#,##0")
+            integerPattern.append(groupingPattern)
 
             val formatter = DecimalFormat(integerPattern.toString(), symbols)
             val formatted = formatter.format(strippedAmount)
@@ -217,7 +221,7 @@ data class Money(
             if (showSign && amount > BigDecimal.ZERO) {
                 positivePattern.append('+')
             }
-            positivePattern.append("#,##0")
+            positivePattern.append(groupingPattern)
 
             if (currency.decimalPlaces > 0) {
                 positivePattern.append(symbols.decimalSeparator)
