@@ -75,4 +75,9 @@ lint/tmp/
 misc.xml
 deploymentTargetDropDown.xml
 render.experimental.xml
-keystore/keystore.properties
+
+# Kotlin compiler cache and temp files
+kotlin-compiler*
+*.kotlin_module
+*.kotlin_metadata
+*.kotlin_builtins

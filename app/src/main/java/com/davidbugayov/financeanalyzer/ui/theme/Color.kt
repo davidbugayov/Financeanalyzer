@@ -223,3 +223,17 @@ val ExpenseChartPalette = listOf(
     Color(0xFFF44336), Color(0xFFEF5350), Color(0xFFE57373),
     Color(0xFFEF9A9A), Color(0xFFFFCDD2), Color(0xFFD50000)
 )
+
+// --- Мягкие цвета для HomeGroupSummary ---
+val SummaryCardBackgroundLight = Color(0xFFF8FAFC)
+val SummaryCardBackgroundDark = Color(0xFF232B36)
+val SummaryTextPrimaryLight = Color(0xFF222222)
+val SummaryTextPrimaryDark = Color(0xFFF5F5F5)
+val SummaryTextSecondaryLight = Color(0xFF757575)
+val SummaryTextSecondaryDark = Color(0xFFB0BEC5)
+val SummaryIncomeLight = Color(0xFF27AE60)
+val SummaryIncomeDark = Color(0xFF6FCF97).copy(alpha = 0.85f)
+val SummaryExpenseLight = Color(0xFFD32F2F)
+val SummaryExpenseDark = Color(0xFFE57373).copy(alpha = 0.85f)
+val SummaryDividerLight = Color(0xFFB0BEC5).copy(alpha = 0.18f)
+val SummaryDividerDark = Color(0xFFB0BEC5).copy(alpha = 0.15f)

@@ -19,6 +19,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -28,9 +29,12 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
-import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
-import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryCardBackground
+import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryDivider
+import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryExpense
+import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryIncome
+import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryTextPrimary
+import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryTextSecondary
 
 /**
  * Компонент для отображения сводки по группам транзакций и категориям.
@@ -49,8 +53,13 @@ fun HomeGroupSummary(
     currentFilter: TransactionFilter = TransactionFilter.MONTH,
     balance: Money? = null
 ) {
-    val incomeColor = LocalIncomeColor.current
-    val expenseColor = LocalExpenseColor.current
+    val cardBg = LocalSummaryCardBackground.current
+    val incomeColor = LocalSummaryIncome.current
+    val expenseColor = LocalSummaryExpense.current
+    val textPrimary = LocalSummaryTextPrimary.current
+    val textSecondary = LocalSummaryTextSecondary.current
+    val dividerColor = LocalSummaryDivider.current
+
     val calculatedBalance = balance ?: totalIncome.minus(totalExpense)
     val balanceColor = if (calculatedBalance.amount.signum() >= 0) incomeColor else expenseColor
     var showAllGroups by rememberSaveable { mutableStateOf(false) }
@@ -73,45 +82,46 @@ fun HomeGroupSummary(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(vertical = 4.dp),
+            .padding(horizontal = 12.dp, vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+        colors = CardDefaults.cardColors(containerColor = cardBg)
     ) {
         Column(
             modifier = Modifier.padding(12.dp)
         ) {
-            SummaryHeader(periodTitle)
-            SummaryTotals(totalIncome, totalExpense, calculatedBalance, incomeColor, expenseColor, balanceColor)
-            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp))
-            SummaryCategorySwitcher(showExpenses, onSwitch = { showExpenses = !showExpenses })
+            SummaryHeader(periodTitle, textPrimary)
+            SummaryTotals(totalIncome, totalExpense, calculatedBalance, incomeColor, expenseColor, balanceColor, textSecondary)
+            HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = dividerColor)
+            SummaryCategorySwitcher(showExpenses, onSwitch = { showExpenses = !showExpenses }, textSecondary = textSecondary)
             val visibleCount = if (showAllGroups) categoryGroups.size else minOf(5, categoryGroups.size)
             val visibleCategories = categoryGroups.take(visibleCount)
             SummaryCategoryList(
                 visibleCategories = visibleCategories,
                 incomeColor = incomeColor,
-                expenseColor = expenseColor
+                expenseColor = expenseColor,
+                textSecondary = textSecondary
             )
             if (visibleCategories.isEmpty()) {
-                SummaryEmptyState(showExpenses)
+                SummaryEmptyState(showExpenses, textSecondary)
             }
             if (categoryGroups.size > 5 && !showAllGroups) {
-                SummaryShowMoreButton(categoryGroups.size - 5) { showAllGroups = true }
+                SummaryShowMoreButton(categoryGroups.size - 5, textSecondary) { showAllGroups = true }
             } else if (showAllGroups && categoryGroups.size > 5) {
-                SummaryHideButton { showAllGroups = false }
+                SummaryHideButton(textSecondary) { showAllGroups = false }
             }
         }
     }
 }
 
 @Composable
-private fun SummaryHeader(periodTitle: String) {
+private fun SummaryHeader(periodTitle: String, textPrimary: Color) {
     Text(
         text = periodTitle,
         style = MaterialTheme.typography.titleMedium,
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(bottom = 4.dp),
-        color = MaterialTheme.colorScheme.primary
+        color = textPrimary
     )
 }
 
@@ -120,9 +130,10 @@ private fun SummaryTotals(
     totalIncome: Money,
     totalExpense: Money,
     balance: Money,
-    incomeColor: androidx.compose.ui.graphics.Color,
-    expenseColor: androidx.compose.ui.graphics.Color,
-    balanceColor: androidx.compose.ui.graphics.Color
+    incomeColor: Color,
+    expenseColor: Color,
+    balanceColor: Color,
+    textSecondary: Color
 ) {
     Row(
         modifier = Modifier
@@ -133,10 +144,11 @@ private fun SummaryTotals(
         Text(
             text = stringResource(R.string.total_income),
             fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = textSecondary
         )
         Text(
-            text = "+" + totalIncome.abs().formatted(false),
+            text = "+" + totalIncome.abs().format(showCurrency = false),
             fontSize = 14.sp,
             color = incomeColor,
             fontWeight = FontWeight.Bold
@@ -151,10 +163,11 @@ private fun SummaryTotals(
         Text(
             text = stringResource(R.string.total_expense),
             fontSize = 14.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
+            color = textSecondary
         )
         Text(
-            text = "-" + totalExpense.abs().formatted(false),
+            text = "-" + totalExpense.abs().format(showCurrency = false),
             fontSize = 14.sp,
             color = expenseColor,
             fontWeight = FontWeight.Bold
@@ -169,10 +182,11 @@ private fun SummaryTotals(
         Text(
             text = stringResource(R.string.balance),
             fontSize = 14.sp,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
+            color = textSecondary
         )
         Text(
-            text = balance.format(false),
+            text = balance.format(showCurrency = false),
             fontSize = 14.sp,
             color = balanceColor,
             fontWeight = FontWeight.Bold
@@ -183,7 +197,8 @@ private fun SummaryTotals(
 @Composable
 private fun SummaryCategorySwitcher(
     showExpenses: Boolean,
-    onSwitch: () -> Unit
+    onSwitch: () -> Unit,
+    textSecondary: Color
 ) {
     Row(
         modifier = Modifier
@@ -196,7 +211,7 @@ private fun SummaryCategorySwitcher(
             style = MaterialTheme.typography.titleSmall,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = textSecondary
         )
         Text(
             text = stringResource(if (showExpenses) R.string.show_income else R.string.show_expenses),
@@ -211,8 +226,9 @@ private fun SummaryCategorySwitcher(
 @Composable
 private fun SummaryCategoryList(
     visibleCategories: List<CategorySummary>,
-    incomeColor: androidx.compose.ui.graphics.Color,
-    expenseColor: androidx.compose.ui.graphics.Color
+    incomeColor: Color,
+    expenseColor: Color,
+    textSecondary: Color
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(2.dp)
@@ -228,7 +244,7 @@ private fun SummaryCategoryList(
                 Text(
                     text = categorySummary.category,
                     fontSize = 13.sp,
-                    color = if (categorySummary.isExpense) expenseColor else incomeColor,
+                    color = textSecondary,
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
@@ -236,9 +252,9 @@ private fun SummaryCategoryList(
                 )
                 Text(
                     text = if (categorySummary.isExpense)
-                        "-" + categorySummary.amount.abs().formatted(false)
+                        "-" + categorySummary.amount.abs().format(showCurrency = false)
                     else
-                        "+" + categorySummary.amount.abs().formatted(false),
+                        "+" + categorySummary.amount.abs().format(showCurrency = false),
                     fontSize = 13.sp,
                     color = if (categorySummary.isExpense) expenseColor else incomeColor,
                     fontWeight = FontWeight.Medium
@@ -249,21 +265,21 @@ private fun SummaryCategoryList(
 }
 
 @Composable
-private fun SummaryEmptyState(showExpenses: Boolean) {
+private fun SummaryEmptyState(showExpenses: Boolean, textSecondary: Color) {
     Text(
         text = stringResource(if (showExpenses) R.string.no_expenses_period else R.string.no_income_period),
         fontSize = 13.sp,
-        color = MaterialTheme.colorScheme.onSurfaceVariant,
+        color = textSecondary,
         modifier = Modifier.padding(vertical = 8.dp)
     )
 }
 
 @Composable
-private fun SummaryShowMoreButton(moreCount: Int, onClick: () -> Unit) {
+private fun SummaryShowMoreButton(moreCount: Int, textSecondary: Color, onClick: () -> Unit) {
     Text(
         text = stringResource(R.string.and_more_categories, moreCount),
         fontSize = 12.sp,
-        color = MaterialTheme.colorScheme.primary,
+        color = textSecondary,
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp)
@@ -273,11 +289,11 @@ private fun SummaryShowMoreButton(moreCount: Int, onClick: () -> Unit) {
 }
 
 @Composable
-private fun SummaryHideButton(onClick: () -> Unit) {
+private fun SummaryHideButton(textSecondary: Color, onClick: () -> Unit) {
     Text(
         text = stringResource(R.string.hide),
         fontSize = 12.sp,
-        color = MaterialTheme.colorScheme.primary,
+        color = textSecondary,
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 4.dp)

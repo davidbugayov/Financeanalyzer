@@ -99,6 +99,13 @@ val LocalErrorStateBackgroundColor = staticCompositionLocalOf { ErrorStateBackgr
 val LocalErrorStateContentColor = staticCompositionLocalOf { ErrorStateContentLight }
 val LocalFriendlyCardBackgroundColor = staticCompositionLocalOf { FriendlyCardBackgroundLight }
 
+val LocalSummaryCardBackground = staticCompositionLocalOf { SummaryCardBackgroundLight }
+val LocalSummaryTextPrimary = staticCompositionLocalOf { SummaryTextPrimaryLight }
+val LocalSummaryTextSecondary = staticCompositionLocalOf { SummaryTextSecondaryLight }
+val LocalSummaryIncome = staticCompositionLocalOf { SummaryIncomeLight }
+val LocalSummaryExpense = staticCompositionLocalOf { SummaryExpenseLight }
+val LocalSummaryDivider = staticCompositionLocalOf { SummaryDividerLight }
+
 @Composable
 fun FinanceAnalyzerTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
@@ -153,7 +160,20 @@ fun FinanceAnalyzerTheme(
     val errorStateContentColor = if (darkTheme) ErrorStateContentDark else ErrorStateContentLight
     val friendlyCardBackgroundColor = if (darkTheme) FriendlyCardBackgroundDark else FriendlyCardBackgroundLight
 
+    val summaryCardBg = if (darkTheme) SummaryCardBackgroundDark else SummaryCardBackgroundLight
+    val summaryTextPrimary = if (darkTheme) SummaryTextPrimaryDark else SummaryTextPrimaryLight
+    val summaryTextSecondary = if (darkTheme) SummaryTextSecondaryDark else SummaryTextSecondaryLight
+    val summaryIncome = if (darkTheme) SummaryIncomeDark else SummaryIncomeLight
+    val summaryExpense = if (darkTheme) SummaryExpenseDark else SummaryExpenseLight
+    val summaryDivider = if (darkTheme) SummaryDividerDark else SummaryDividerLight
+
     CompositionLocalProvider(
+        LocalSummaryCardBackground provides summaryCardBg,
+        LocalSummaryTextPrimary provides summaryTextPrimary,
+        LocalSummaryTextSecondary provides summaryTextSecondary,
+        LocalSummaryIncome provides summaryIncome,
+        LocalSummaryExpense provides summaryExpense,
+        LocalSummaryDivider provides summaryDivider,
         LocalIncomeColor provides incomeColor,
         LocalExpenseColor provides expenseColor,
         LocalFabColor provides fabColor,
