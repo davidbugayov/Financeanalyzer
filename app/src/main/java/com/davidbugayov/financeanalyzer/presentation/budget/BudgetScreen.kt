@@ -84,7 +84,8 @@ fun BudgetScreen(
     onNavigateBack: () -> Unit,
     onNavigateToTransactions: (String) -> Unit,
     viewModel: BudgetViewModel = koinViewModel(),
-    addTransactionViewModel: AddTransactionViewModel = koinViewModel()
+    achievementsUiViewModel: com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel = koinViewModel(),
+    addTransactionViewModel: AddTransactionViewModel = koinViewModel(parameters = { org.koin.core.parameter.parametersOf(achievementsUiViewModel) })
 ) {
     val state by viewModel.state.collectAsState()
 

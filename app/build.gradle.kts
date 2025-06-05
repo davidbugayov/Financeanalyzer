@@ -27,8 +27,8 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 32
-        versionName = "2.15"
+        versionCode = 35
+        versionName = "2.16.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
