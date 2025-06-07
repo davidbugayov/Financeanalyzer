@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
+import timber.log.Timber
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
@@ -183,13 +184,17 @@ data class Money(
         showSign: Boolean = false,
         useMinimalDecimals: Boolean = true
     ): String {
-        val locale = Locale.getDefault()
+        // Используем русскую локаль для гарантированного форматирования с пробелами
+        val locale = Locale.forLanguageTag("ru-RU")
         val symbols = DecimalFormatSymbols(locale)
 
         // Явно устанавливаем пробел как разделитель групп (тысяч)
         symbols.groupingSeparator = ' '
         // Используем разделитель десятичных знаков из настроек валюты
         symbols.decimalSeparator = currency.decimalSeparator
+
+        // Добавляем логирование для отладки
+        Timber.d("Money.format: amount=$amount, locale=$locale, groupingSeparator='${symbols.groupingSeparator}'")
 
         val strippedAmount = amount.stripTrailingZeros()
         val isWholeNumber = strippedAmount.scale() <= 0 || strippedAmount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0
@@ -205,7 +210,12 @@ data class Money(
             integerPattern.append(groupingPattern)
 
             val formatter = DecimalFormat(integerPattern.toString(), symbols)
+            formatter.isGroupingUsed = true
+            formatter.groupingSize = 3
             val formatted = formatter.format(strippedAmount)
+
+            // Логирование результата
+            Timber.d("Money.format result (integer): $formatted")
 
             return if (showCurrency) {
                 if (currency.symbolPosition == SymbolPosition.BEFORE) {
@@ -232,8 +242,13 @@ data class Money(
 
             val formatter = DecimalFormat(fullPattern, symbols)
             formatter.roundingMode = RoundingMode.HALF_EVEN
+            formatter.isGroupingUsed = true
+            formatter.groupingSize = 3
 
             val formattedNum = formatter.format(amount)
+
+            // Логирование результата
+            Timber.d("Money.format result (decimal): $formattedNum")
 
             return if (showCurrency) {
                 if (currency.symbolPosition == SymbolPosition.BEFORE) {

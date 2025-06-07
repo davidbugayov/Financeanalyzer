@@ -4,21 +4,18 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Calendar
-import java.util.UUID
 import java.math.BigDecimal
+import java.util.UUID
 
 class BudgetViewModel(
     private val walletRepository: WalletRepository,
@@ -114,8 +111,8 @@ class BudgetViewModel(
                     }
                     
                     // Рассчитываем сумму трат
-                    val totalSpent = walletTransactions.fold(Money(0.0)) { acc, transaction ->
-                        acc.plus(transaction.amount.abs())
+                    val totalSpent = walletTransactions.fold(Money.zero()) { acc, transaction ->
+                        if (transaction.isExpense) acc.plus(transaction.amount) else acc
                     }
                     
                     // Если сумма трат изменилась, обновляем кошелек

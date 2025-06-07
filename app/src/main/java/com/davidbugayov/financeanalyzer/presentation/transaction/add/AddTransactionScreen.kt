@@ -54,6 +54,7 @@ fun AddTransactionScreen(
     val achievementUnlocked by viewModel.achievementUnlocked.collectAsState()
     LaunchedEffect(achievementUnlocked) {
         if (achievementUnlocked) {
+            navController.previousBackStackEntry?.savedStateHandle?.set("show_rustore_review", true)
             navController.previousBackStackEntry?.savedStateHandle?.set("show_achievement_feedback", true)
             viewModel.resetAchievementUnlockedFlag()
         }

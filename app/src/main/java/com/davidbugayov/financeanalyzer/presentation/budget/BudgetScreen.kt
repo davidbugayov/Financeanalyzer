@@ -244,7 +244,7 @@ fun BudgetScreen(
                         ) {
                             BudgetInfoCard(
                                 title = "Общий лимит",
-                                value = "${state.totalLimit.amount.toInt()} ₽",
+                                value = state.totalLimit.format(showCurrency = true, useMinimalDecimals = true),
                                 containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
                                 contentColor = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.weight(1f)
@@ -254,7 +254,7 @@ fun BudgetScreen(
                             
                             BudgetInfoCard(
                                 title = "Потрачено",
-                                value = "${state.totalSpent.amount.toInt()} ₽",
+                                value = state.totalSpent.format(showCurrency = true, useMinimalDecimals = true),
                                 containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
                                 contentColor = Color.White,
                                 modifier = Modifier.weight(1f)
@@ -264,7 +264,7 @@ fun BudgetScreen(
                             
                             BudgetInfoCard(
                                 title = "Баланс",
-                                value = "${state.totalWalletBalance.amount.toInt()} ₽",
+                                value = state.totalWalletBalance.format(showCurrency = true, useMinimalDecimals = true),
                                 containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.9f),
                                 contentColor = Color.White,
                                 modifier = Modifier.weight(1f)
@@ -944,12 +944,12 @@ fun WalletCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Потрачено: ${wallet.spent.amount.toInt()} ₽",
+                    text = "Потрачено: ${wallet.spent.format(showCurrency = true, useMinimalDecimals = true)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = contentColor
                 )
                 Text(
-                    text = "Лимит: ${wallet.limit.amount.toInt()} ₽",
+                    text = "Лимит: ${wallet.limit.format(showCurrency = true, useMinimalDecimals = true)}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = contentColor
                 )
@@ -985,7 +985,7 @@ fun WalletCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Кошелёк: ${wallet.balance.amount.toInt()} ₽",
+                    text = "Кошелёк: ${wallet.balance.format(showCurrency = true, useMinimalDecimals = true)}",
                     style = MaterialTheme.typography.titleMedium.copy(
                         textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
                     ),

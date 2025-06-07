@@ -188,8 +188,9 @@ fun WalletTransactionsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Бюджет: ${wallet.limit.amount.toInt()} ₽",
-                            style = MaterialTheme.typography.bodyLarge
+                            text = "Бюджет: ${wallet.limit.format(showCurrency = true, useMinimalDecimals = true)}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -222,7 +223,7 @@ fun WalletTransactionsScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = "${wallet.spent.amount.toInt()} ₽",
+                                    text = wallet.spent.format(showCurrency = true, useMinimalDecimals = true),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -236,7 +237,7 @@ fun WalletTransactionsScreen(
                                 val remaining = wallet.limit.minus(wallet.spent)
                                 val remainingColor = if (remaining.isNegative()) Color.Red else MaterialTheme.colorScheme.onSurface
                                 Text(
-                                    text = "${remaining.amount.toInt()} ₽",
+                                    text = remaining.format(showCurrency = true, useMinimalDecimals = true),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = remainingColor
                                 )
@@ -260,7 +261,7 @@ fun WalletTransactionsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = "${wallet.balance.amount.toInt()} ₽",
+                                text = wallet.balance.format(showCurrency = true, useMinimalDecimals = true),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary

@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 
+import android.app.Activity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -51,6 +52,10 @@ import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
+import ru.rustore.sdk.appupdate.manager.factory.RuStoreAppUpdateManagerFactory
+import ru.rustore.sdk.appupdate.model.AppUpdateOptions
+import ru.rustore.sdk.appupdate.model.AppUpdateType
+import ru.rustore.sdk.review.RuStoreReviewManagerFactory
 import timber.log.Timber
 
 /**
@@ -188,6 +193,61 @@ private fun HomeFeedback(
     )
 }
 
+fun showRuStoreReview(activity: Activity) {
+    try {
+        val reviewManager = RuStoreReviewManagerFactory.create(activity)
+        reviewManager.requestReviewFlow()
+            .addOnSuccessListener { reviewInfo ->
+                reviewManager.launchReviewFlow(reviewInfo)
+                    .addOnSuccessListener {
+                        Timber.d("RuStore review flow completed successfully")
+                    }
+                    .addOnFailureListener { throwable ->
+                        Timber.e(throwable, "Failed to launch RuStore review flow")
+                    }
+            }
+            .addOnFailureListener { throwable ->
+                Timber.e(throwable, "Failed to request RuStore review flow")
+            }
+    } catch (e: Exception) {
+        Timber.e(e, "Error initializing RuStore review manager")
+    }
+}
+
+fun checkForRuStoreUpdate(activity: Activity) {
+    try {
+        val updateManager = RuStoreAppUpdateManagerFactory.create(activity)
+
+        // Проверяем наличие обновлений
+        updateManager.getAppUpdateInfo()
+            .addOnSuccessListener { updateInfo ->
+                if (updateInfo.updateAvailability == ru.rustore.sdk.appupdate.model.UpdateAvailability.UPDATE_AVAILABLE) {
+                    Timber.d("RuStore update available, launching update flow")
+
+                    // Запускаем отложенное обновление
+                    val appUpdateOptions = AppUpdateOptions.Builder()
+                        .appUpdateType(AppUpdateType.FLEXIBLE)
+                        .build()
+
+                    updateManager.startUpdateFlow(updateInfo, appUpdateOptions)
+                        .addOnSuccessListener {
+                            Timber.d("RuStore update flow started successfully")
+                        }
+                        .addOnFailureListener { exception ->
+                            Timber.e(exception, "Failed to start RuStore update flow")
+                        }
+                } else {
+                    Timber.d("No RuStore update available")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Timber.e(exception, "Failed to check for RuStore updates")
+            }
+    } catch (e: Exception) {
+        Timber.e(e, "Error initializing RuStore update manager")
+    }
+}
+
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel,
@@ -225,6 +285,15 @@ fun HomeScreen(
         navController.currentBackStackEntry?.savedStateHandle?.set("show_achievement_feedback", false)
     }
 
+    val showRuStoreReviewFlag = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("show_rustore_review") == true
+    LaunchedEffect(showRuStoreReviewFlag) {
+        if (showRuStoreReviewFlag) {
+            kotlinx.coroutines.delay(3000)
+            if (context is Activity) showRuStoreReview(context)
+            navController.currentBackStackEntry?.savedStateHandle?.set("show_rustore_review", false)
+        }
+    }
+
     val achievementsUiState by achievementsUiViewModel.uiState.collectAsState()
     achievementsUiState.current?.let { achievement ->
         FeedbackMessage(
@@ -242,6 +311,7 @@ fun HomeScreen(
             screenClass = "HomeScreen"
         )
         updateWidgetsUseCase(context)
+        if (context is Activity) checkForRuStoreUpdate(context)
     }
     LaunchedEffect(Unit) {
         val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)

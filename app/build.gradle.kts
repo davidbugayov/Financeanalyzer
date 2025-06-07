@@ -264,6 +264,10 @@ dependencies {
 
     // exp4j
     implementation(libs.exp4j)
+
+    // RuStore SDK
+    implementation(libs.rustore.review)
+    implementation(libs.rustore.appupdate)
 }
 
 composeCompiler {
