@@ -54,27 +54,53 @@ android {
     productFlavors {
         create("google") {
             dimension = "store"
-            // Google версия использует Firebase и RuStore
+            // Google Play версия использует Firebase
             buildConfigField("boolean", "USE_FIREBASE", "true")
-            buildConfigField("boolean", "USE_RUSTORE", "true")
+            buildConfigField("boolean", "USE_RUSTORE", "false")
+            
+            // Суффиксы для Google Play
+            versionNameSuffix = ".gp"
+            resValue("string", "app_name", "Деньги под Контролем")
+            resValue("string", "app_store", "Google Play")
 
             // Применяем плагины только для Google flavor
             plugins.apply("com.google.gms.google-services")
             plugins.apply("com.google.firebase.crashlytics")
         }
+        
+        create("rustore") {
+            dimension = "store"
+            // RuStore версия использует Firebase и RuStore SDK
+            buildConfigField("boolean", "USE_FIREBASE", "true")
+            buildConfigField("boolean", "USE_RUSTORE", "true")
+            
+            // Суффиксы для RuStore
+            versionNameSuffix = ".rs"
+            resValue("string", "app_name", "Деньги под Контролем")
+            resValue("string", "app_store", "RuStore")
+            
+            // Применяем плагины Firebase для RuStore flavor
+            plugins.apply("com.google.gms.google-services")
+            plugins.apply("com.google.firebase.crashlytics")
+            
+            // Добавляем зависимости RuStore только для RuStore flavor
+            dependencies {
+                // Используем прямые зависимости
+                implementation("ru.rustore.sdk:review:8.0.0")
+                implementation("ru.rustore.sdk:appupdate:8.0.0")
+            }
+        }
+        
         create("fdroid") {
             dimension = "store"
             // F-Droid версия не использует Firebase и RuStore (в соответствии с требованиями F-Droid)
             buildConfigField("boolean", "USE_FIREBASE", "false")
             buildConfigField("boolean", "USE_RUSTORE", "false")
             
-            // Отключаем все проприетарные зависимости для F-Droid сборки
-            dependencies {
-                // Исключаем Firebase
-                implementation(files())
-                debugImplementation(files())
-                releaseImplementation(files())
-            }
+            // Суффиксы для F-Droid
+            versionNameSuffix = ".fd"
+            resValue("string", "app_name", "Деньги под Контролем (F-Droid)")
+            resValue("string", "app_store", "F-Droid")
         }
     }
 
@@ -263,10 +289,6 @@ dependencies {
     "googleImplementation"(libs.firebase.crashlytics.ktx)
     "googleImplementation"(libs.firebase.perf.ktx)
 
-    // RuStore SDK только для Google flavor
-    "googleImplementation"(libs.rustore.review)
-    "googleImplementation"(libs.rustore.appupdate)
-
     // Logging
     implementation(libs.timber)
 
@@ -361,24 +383,25 @@ configurations.all {
     if (name.contains("fdroid", ignoreCase = true)) {
         exclude(group = "com.google.firebase")
         exclude(group = "com.google.android.gms")
-        exclude(group = "io.appmetrica")
+        // AppMetrica разрешена в F-Droid сборке
+        // exclude(group = "io.appmetrica") 
         exclude(group = "ru.rustore")
     }
 }
 
 // Добавляем задачу для создания релиза для RuStore
 tasks.register<Copy>("prepareRuStoreRelease") {
-    dependsOn("bundleGoogleRelease")
+    dependsOn("bundleRustoreRelease")
     
     // Получаем путь к сгенерированному AAB файлу
-    val aabFile = layout.buildDirectory.file("outputs/bundle/googleRelease/app-google-release.aab")
+    val aabFile = layout.buildDirectory.file("outputs/bundle/rustoreRelease/app-rustore-release.aab")
     
     // Создаем новую директорию для RuStore релизов
     val ruStoreDir = layout.buildDirectory.dir("outputs/rustore")
     
     // Копируем AAB файл в директорию RuStore с добавлением версии
     from(aabFile) {
-        rename { "financeanalyzer-rustore-v${android.defaultConfig.versionName}.aab" }
+        rename { "financeanalyzer-rustore-v${android.defaultConfig.versionName}${android.productFlavors.getByName("rustore").versionNameSuffix}.aab" }
     }
     
     into(ruStoreDir)
@@ -386,7 +409,7 @@ tasks.register<Copy>("prepareRuStoreRelease") {
     doLast {
         println("==========================================")
         println("RuStore Release подготовлен:")
-        println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
+        println("Версия: ${android.defaultConfig.versionName}${android.productFlavors.getByName("rustore").versionNameSuffix} (${android.defaultConfig.versionCode})")
         println("Расположение: ${ruStoreDir.get()}")
         println("==========================================")
     }
@@ -405,11 +428,11 @@ tasks.register<Copy>("prepareFDroidRelease") {
     
     // Копируем AAB и APK файлы в директорию F-Droid с добавлением версии
     from(aabFile) {
-        rename { "financeanalyzer-fdroid-v${android.defaultConfig.versionName}.aab" }
+        rename { "financeanalyzer-fdroid-v${android.defaultConfig.versionName}${android.productFlavors.getByName("fdroid").versionNameSuffix}.aab" }
     }
     
     from(apkFile) {
-        rename { "financeanalyzer-fdroid-v${android.defaultConfig.versionName}.apk" }
+        rename { "financeanalyzer-fdroid-v${android.defaultConfig.versionName}${android.productFlavors.getByName("fdroid").versionNameSuffix}.apk" }
     }
     
     into(fdroidDir)
@@ -417,8 +440,46 @@ tasks.register<Copy>("prepareFDroidRelease") {
     doLast {
         println("==========================================")
         println("F-Droid Release подготовлен:")
-        println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
+        println("Версия: ${android.defaultConfig.versionName}${android.productFlavors.getByName("fdroid").versionNameSuffix} (${android.defaultConfig.versionCode})")
         println("Расположение: ${fdroidDir.get()}")
+        println("==========================================")
+    }
+}
+
+// Добавляем задачу для создания релиза для Google Play
+tasks.register<Copy>("prepareGooglePlayRelease") {
+    dependsOn("bundleGoogleRelease")
+    
+    // Получаем путь к сгенерированному AAB файлу
+    val aabFile = layout.buildDirectory.file("outputs/bundle/googleRelease/app-google-release.aab")
+    
+    // Создаем новую директорию для Google Play релизов
+    val googleDir = layout.buildDirectory.dir("outputs/googleplay")
+    
+    // Копируем AAB файл в директорию Google Play с добавлением версии
+    from(aabFile) {
+        rename { "financeanalyzer-googleplay-v${android.defaultConfig.versionName}${android.productFlavors.getByName("google").versionNameSuffix}.aab" }
+    }
+    
+    into(googleDir)
+    
+    doLast {
+        println("==========================================")
+        println("Google Play Release подготовлен:")
+        println("Версия: ${android.defaultConfig.versionName}${android.productFlavors.getByName("google").versionNameSuffix} (${android.defaultConfig.versionCode})")
+        println("Расположение: ${googleDir.get()}")
+        println("==========================================")
+    }
+}
+
+// Добавляем задачу для создания всех релизов одновременно
+tasks.register("prepareAllReleases") {
+    dependsOn("prepareGooglePlayRelease", "prepareRuStoreRelease", "prepareFDroidRelease")
+    
+    doLast {
+        println("==========================================")
+        println("Все релизы подготовлены!")
+        println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
         println("==========================================")
     }
 }

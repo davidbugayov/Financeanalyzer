@@ -10,6 +10,7 @@ kotlinx-serialization = "1.7.3"
 composeBom = "2025.06.00"
 composeMaterial3 = "1.3.2"
 appmetrica = "6.1.0"
+ktlint = "12.0.3"
 
 # AndroidX
 androidxCore = "1.16.0"
@@ -32,7 +33,6 @@ firebaseBom = "33.15.0"
 
 # Koin
 koin = "3.5.3"
-ktlint = "12.0.3"
 
 # Testing
 junit = "4.13.2"
@@ -49,7 +49,7 @@ pdfbox = "2.0.27.0"
 # Excel parsing libraries
 poi = "5.2.5"
 
-# RuStore SDK
+# RuStore SDK версия (только для Google flavor)
 rustore = "8.0.0"
 
 [libraries]
@@ -125,9 +125,9 @@ junit = { group = "junit", name = "junit", version.ref = "junit" }
 # Exp4j
 exp4j = { group = "net.objecthunter", name = "exp4j", version = "0.4.8" }
 
-# RuStore SDK
-rustore-review = { group = "ru.rustore.sdk", name = "review", version.ref = "rustore" }
-rustore-appupdate = { group = "ru.rustore.sdk", name = "appupdate", version.ref = "rustore" }
+# RuStore SDK - доступны только для Google flavor через ru.rustore:review:8.0.0
+# rustore-review = { group = "ru.rustore.sdk", name = "review", version.ref = "rustore" }
+# rustore-appupdate = { group = "ru.rustore.sdk", name = "appupdate", version.ref = "rustore" }
 
 # AppMetrica
 appmetrica-sdk = { group = "io.appmetrica.analytics", name = "analytics", version.ref = "appmetrica" }
