@@ -30,52 +30,47 @@ import java.math.BigDecimal
  * @param percentChange Процент изменения между периодами (может быть null)
  */
 @Composable
-fun CategoryStatsCard(
-    category: String,
-    currentTotal: Money,
-    previousTotal: Money,
-    percentChange: BigDecimal?
-) {
+fun CategoryStatsCard(category: String, currentTotal: Money, previousTotal: Money, percentChange: BigDecimal?) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
         color = MaterialTheme.colorScheme.surfaceVariant,
-        shape = MaterialTheme.shapes.medium
+        shape = MaterialTheme.shapes.medium,
     ) {
         Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
+            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal)),
         ) {
             Text(
                 text = category,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Column {
                     Text(
                         text = stringResource(R.string.current_period),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
                         text = currentTotal.format(false),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
                         text = stringResource(R.string.previous_period),
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
                         text = previousTotal.format(false),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.secondary
+                        color = MaterialTheme.colorScheme.secondary,
                     )
                 }
             }
@@ -85,11 +80,11 @@ fun CategoryStatsCard(
                 val changeText = when {
                     percentChangeInt > 0 -> stringResource(
                         R.string.change_increase,
-                        percentChangeInt
+                        percentChangeInt,
                     )
                     percentChangeInt < 0 -> stringResource(
                         R.string.change_decrease,
-                        kotlin.math.abs(percentChangeInt)
+                        kotlin.math.abs(percentChangeInt),
                     )
                     else -> stringResource(R.string.change_no_change)
                 }
@@ -101,9 +96,9 @@ fun CategoryStatsCard(
                 Text(
                     text = changeText,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = percentChangeColor
+                    color = percentChangeColor,
                 )
             }
         }
     }
-} 
+}

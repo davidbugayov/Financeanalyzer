@@ -53,7 +53,7 @@ fun CategorySelectionDialog(
     expenseCategories: List<String>,
     incomeCategories: List<String>,
     onCategoriesSelected: (List<String>) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     // Состояние для раскрытия/скрытия групп категорий
     var isExpensesExpanded by remember { mutableStateOf(true) }
@@ -81,7 +81,7 @@ fun CategorySelectionDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             ) {
                 // Опция "Все категории"
                 Row(
@@ -98,7 +98,7 @@ fun CategorySelectionDialog(
                                 }
                         }
                         .padding(vertical = dimensionResource(R.dimen.spacing_small)),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = if (localSelectedCategories.isEmpty()) {
@@ -115,7 +115,7 @@ fun CategorySelectionDialog(
                         } else {
                             MaterialTheme.colorScheme.onSurface
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
 
                     // Чекбокс "Выбрать все"
@@ -127,7 +127,7 @@ fun CategorySelectionDialog(
                             } else {
                                 emptyList()
                             }
-                        }
+                        },
                     )
                 }
 
@@ -135,7 +135,7 @@ fun CategorySelectionDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(dimensionResource(R.dimen.divider_height)),
-                    color = MaterialTheme.colorScheme.outlineVariant
+                    color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
@@ -153,7 +153,7 @@ fun CategorySelectionDialog(
                             emptyList()
                         }
                     },
-                    isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty()
+                    isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty(),
                 )
 
                 AnimatedVisibility(visible = isExpensesExpanded) {
@@ -169,7 +169,7 @@ fun CategorySelectionDialog(
                                     } else {
                                         localSelectedCategories - category
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -179,7 +179,7 @@ fun CategorySelectionDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(dimensionResource(R.dimen.divider_height)),
-                    color = MaterialTheme.colorScheme.outlineVariant
+                    color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -197,7 +197,7 @@ fun CategorySelectionDialog(
                             emptyList()
                         }
                     },
-                    isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty()
+                    isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty(),
                 )
 
                 AnimatedVisibility(visible = isIncomeExpanded) {
@@ -213,7 +213,7 @@ fun CategorySelectionDialog(
                                     } else {
                                         localSelectedCategories - category
                                     }
-                                }
+                                },
                             )
                         }
                     }
@@ -232,7 +232,7 @@ fun CategorySelectionDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.close))
             }
-        }
+        },
     )
 }
 
@@ -246,11 +246,11 @@ private fun CategoryGroupHeader(
     color: Color,
     onToggle: () -> Unit,
     onSelectAll: (Boolean) -> Unit,
-    isAllSelected: Boolean
+    isAllSelected: Boolean,
 ) {
     val rotation by animateFloatAsState(
         targetValue = if (isExpanded) 180f else 0f,
-        label = "arrow_rotation"
+        label = "arrow_rotation",
     )
 
     Row(
@@ -258,19 +258,19 @@ private fun CategoryGroupHeader(
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         // Название группы и иконка раскрытия
         Row(
             modifier = Modifier
                 .weight(1f)
                 .clickable(onClick = onToggle),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                color = color
+                color = color,
             )
 
             Icon(
@@ -281,14 +281,14 @@ private fun CategoryGroupHeader(
                     stringResource(R.string.expand)
                 },
                 modifier = Modifier.rotate(rotation),
-                tint = color
+                tint = color,
             )
         }
 
         // Чекбокс "Выбрать все"
         Checkbox(
             checked = isAllSelected,
-            onCheckedChange = onSelectAll
+            onCheckedChange = onSelectAll,
         )
     }
 }
@@ -302,12 +302,7 @@ private fun CategoryGroupHeader(
  * @param onToggle Callback, вызываемый при выборе/отмене выбора категории
  */
 @Composable
-private fun CategoryCheckboxItem(
-    category: String,
-    isSelected: Boolean,
-    color: Color,
-    onToggle: (Boolean) -> Unit
-) {
+private fun CategoryCheckboxItem(category: String, isSelected: Boolean, color: Color, onToggle: (Boolean) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -318,19 +313,19 @@ private fun CategoryCheckboxItem(
                     MaterialTheme.colorScheme.primaryContainer
                 } else {
                     MaterialTheme.colorScheme.surface
-                }
-            )
+                },
+            ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = { onToggle(!isSelected) })
                 .padding(vertical = dimensionResource(R.dimen.spacing_small)),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
                 checked = isSelected,
-                onCheckedChange = onToggle
+                onCheckedChange = onToggle,
             )
 
             Text(
@@ -342,8 +337,8 @@ private fun CategoryCheckboxItem(
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = dimensionResource(R.dimen.spacing_small))
+                    .padding(start = dimensionResource(R.dimen.spacing_small)),
             )
         }
     }
-} 
+}

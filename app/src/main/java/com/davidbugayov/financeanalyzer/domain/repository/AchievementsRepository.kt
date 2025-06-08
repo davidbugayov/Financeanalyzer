@@ -14,15 +14,15 @@ class AchievementsRepository {
             title = "Первые шаги",
             description = "Добавьте первую транзакцию",
             iconRes = 0,
-            isUnlocked = false
+            isUnlocked = false,
         ),
         Achievement(
             id = "week_no_coffee",
             title = "Неделя без кофе на вынос",
             description = "Не тратьте на кофе 7 дней подряд",
             iconRes = 0,
-            isUnlocked = false
-        )
+            isUnlocked = false,
+        ),
     )
 
     private val _achievements = MutableStateFlow(initialAchievements)
@@ -33,11 +33,11 @@ class AchievementsRepository {
             if (it.id == id && !it.isUnlocked) {
                 it.copy(
                     isUnlocked = true,
-                    dateUnlocked = System.currentTimeMillis()
+                    dateUnlocked = System.currentTimeMillis(),
                 )
             } else {
                 it
             }
         }
     }
-} 
+}

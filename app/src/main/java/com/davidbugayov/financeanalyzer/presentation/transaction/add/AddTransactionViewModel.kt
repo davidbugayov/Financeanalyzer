@@ -45,20 +45,20 @@ class AddTransactionViewModel(
     private val application: Application,
     updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     private val achievementsRepository: AchievementsRepository = AchievementsRepository(),
-    private val achievementsUiViewModel: AchievementsUiViewModel
+    private val achievementsUiViewModel: AchievementsUiViewModel,
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
     walletRepository,
     updateWalletBalancesUseCase,
-    application.resources
+    application.resources,
 ) {
 
     override val _state = MutableStateFlow(
         AddTransactionState(
             expenseCategories = categoriesViewModel.expenseCategories.value,
-            incomeCategories = categoriesViewModel.incomeCategories.value
-        )
+            incomeCategories = categoriesViewModel.incomeCategories.value,
+        ),
     )
 
     // Список доступных кошельков с внутренним MutableStateFlow для обновлений
@@ -72,7 +72,7 @@ class AddTransactionViewModel(
 
     init {
         Timber.d(
-            "[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel"
+            "[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel",
         )
         // Загружаем категории
         loadInitialData()
@@ -119,7 +119,7 @@ class AddTransactionViewModel(
                     _state.update { state ->
                         state.copy(
                             expenseCategories = expenseCategories,
-                            selectedCategory = expenseCategories.firstOrNull()
+                            selectedCategory = expenseCategories.firstOrNull(),
                         )
                     }
                 }
@@ -128,7 +128,7 @@ class AddTransactionViewModel(
                     _state.update { state ->
                         state.copy(
                             incomeCategories = incomeCategories,
-                            selectedCategory = incomeCategories.firstOrNull()
+                            selectedCategory = incomeCategories.firstOrNull(),
                         )
                     }
                 }
@@ -159,7 +159,7 @@ class AddTransactionViewModel(
             val currentState = _state.value
             Timber.d(
                 "ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Начальное значение currentState.amount: '%s'",
-                currentState.amount
+                currentState.amount,
             )
 
             _state.update { it.copy(isLoading = true) }
@@ -171,7 +171,7 @@ class AddTransactionViewModel(
             Timber.d(
                 "ТРАНЗАКЦИЯ_ДОБ: submitTransaction - moneyFromExpression: %s, amountForValidation: '%s'",
                 moneyFromExpression,
-                amountForValidation
+                amountForValidation,
             )
 
             // 3. Вызываем валидацию с обработанной суммой
@@ -180,14 +180,14 @@ class AddTransactionViewModel(
                 amount = amountForValidation,
                 date = currentState.selectedDate,
                 categoryId = currentState.category,
-                isExpense = currentState.isExpense
+                isExpense = currentState.isExpense,
             )
 
             if (!isValid) {
                 _state.update { it.copy(isLoading = false) }
                 Timber.e(
                     "ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Валидация не прошла для суммы: '%s'",
-                    amountForValidation
+                    amountForValidation,
                 )
                 return@launch
             }
@@ -201,7 +201,7 @@ class AddTransactionViewModel(
             val transaction = createTransactionFromState(currentState)
             Timber.d(
                 "ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Транзакция для сохранения: %s",
-                transaction
+                transaction,
             )
 
             try {
@@ -217,7 +217,7 @@ class AddTransactionViewModel(
                         Timber.d(
                             "ТРАНЗАКЦИЯ_ДОБ: Увеличен счетчик использования категории %s (isExpense=%b)",
                             transaction.category,
-                            transaction.isExpense
+                            transaction.isExpense,
                         )
                     }
 
@@ -226,7 +226,7 @@ class AddTransactionViewModel(
                         incrementSourceUsage(transaction.source)
                         Timber.d(
                             "ТРАНЗАКЦИЯ_ДОБ: Увеличен счетчик использования источника %s",
-                            transaction.source
+                            transaction.source,
                         )
                     }
 
@@ -235,7 +235,7 @@ class AddTransactionViewModel(
                         amount = transaction.amount,
                         category = transaction.category,
                         isExpense = transaction.isExpense,
-                        hasDescription = transaction.note?.isNotBlank() ?: false
+                        hasDescription = transaction.note?.isNotBlank() ?: false,
                     )
 
                     _state.update {
@@ -246,7 +246,7 @@ class AddTransactionViewModel(
                             note = "",
                             amountError = false,
                             categoryError = false,
-                            sourceError = false
+                            sourceError = false,
                         )
                     }
                     setDefaultCategoryIfNeeded(force = true)
@@ -267,12 +267,12 @@ class AddTransactionViewModel(
                     Timber.e(
                         result.exception,
                         "ТРАНЗАКЦИЯ_ДОБ: Ошибка при добавлении: %s",
-                        result.exception.message
+                        result.exception.message,
                     )
                     _state.update {
                         it.copy(
                             isLoading = false,
-                            error = result.exception.message ?: "Неизвестная ошибка добавления"
+                            error = result.exception.message ?: "Неизвестная ошибка добавления",
                         )
                     }
                 }
@@ -281,7 +281,7 @@ class AddTransactionViewModel(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = e.message ?: "Исключение при добавлении"
+                        error = e.message ?: "Исключение при добавлении",
                     )
                 }
             }
@@ -308,7 +308,7 @@ class AddTransactionViewModel(
         // Получаем сумму из выражения через базовый метод
         Timber.d(
             "ТРАНЗАКЦИЯ_ДОБ: createTransactionFromState - currentState.amount перед parse: '%s'",
-            currentState.amount
+            currentState.amount,
         )
         val money = parseMoneyExpression(currentState.amount, selectedCurrency)
         Timber.d("ТРАНЗАКЦИЯ_ДОБ: createTransactionFromState - money после parse: %s", money)
@@ -322,13 +322,13 @@ class AddTransactionViewModel(
         Timber.d(
             "Используем ID транзакции: %s (новый: %s)",
             transactionId,
-            (currentState.transactionToEdit == null)
+            (currentState.transactionToEdit == null),
         )
         // Получаем список ID кошельков для сохранения в транзакции
         val selectedWalletIds = getWalletIdsForTransaction(
             isExpense = currentState.isExpense,
             addToWallet = currentState.addToWallet,
-            selectedWallets = currentState.selectedWallets
+            selectedWallets = currentState.selectedWallets,
         )
         // Создаем объект транзакции
         return Transaction(
@@ -341,7 +341,7 @@ class AddTransactionViewModel(
             isExpense = currentState.isExpense,
             sourceColor = currentState.sourceColor,
             isTransfer = isTransfer,
-            walletIds = selectedWalletIds
+            walletIds = selectedWalletIds,
         )
     }
 
@@ -366,7 +366,7 @@ class AddTransactionViewModel(
         amount: String,
         date: Date,
         categoryId: String,
-        isExpense: Boolean
+        isExpense: Boolean,
     ): Boolean {
         Timber.d("ТРАНЗАКЦИЯ_ДОБ: validateInput - Входящая сумма для валидации: '%s'", amount)
         val validationBuilder = ValidationBuilder()
@@ -375,7 +375,7 @@ class AddTransactionViewModel(
             it.copy(
                 amountError = false,
                 categoryError = false,
-                sourceError = false
+                sourceError = false,
             )
         }
 
@@ -428,14 +428,14 @@ class AddTransactionViewModel(
             it.copy(
                 amountError = validationResult.hasAmountError,
                 categoryError = validationResult.hasCategoryError,
-                sourceError = validationResult.hasSourceError
+                sourceError = validationResult.hasSourceError,
             )
         }
 
         Timber.d(
             "ТРАНЗАКЦИЯ_ДОБ: validateInput - Результат: isValid=%b, hasAmountError=%b",
             validationBuilder.build().isValid,
-            validationBuilder.build().hasAmountError
+            validationBuilder.build().hasAmountError,
         )
         return validationResult.isValid && !dateError
     }
@@ -450,7 +450,7 @@ class AddTransactionViewModel(
             is BaseTransactionEvent.SetExpenseCategory -> _state.update { state ->
                 val newState = state.copy(
                     category = event.category,
-                    selectedExpenseCategory = event.category
+                    selectedExpenseCategory = event.category,
                 )
                 newState
             }
@@ -458,7 +458,7 @@ class AddTransactionViewModel(
             is BaseTransactionEvent.SetIncomeCategory -> _state.update { state ->
                 val newState = state.copy(
                     category = event.category,
-                    selectedIncomeCategory = event.category
+                    selectedIncomeCategory = event.category,
                 )
                 newState
             }
@@ -474,7 +474,7 @@ class AddTransactionViewModel(
                         amountError = false,
                         note = "",
                         isSuccess = false,
-                        preventAutoSubmit = false
+                        preventAutoSubmit = false,
                     )
                 }
             }
@@ -487,12 +487,12 @@ class AddTransactionViewModel(
                 val newSource = Source(
                     name = event.source,
                     color = event.color,
-                    isCustom = true
+                    isCustom = true,
                 )
                 val updatedSources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.addCustomSource(
                     sourcePreferences,
                     _state.value.sources,
-                    newSource
+                    newSource,
                 )
                 _state.update {
                     it.copy(
@@ -500,20 +500,20 @@ class AddTransactionViewModel(
                         showCustomSourceDialog = false,
                         customSource = "",
                         sourceColor = newSource.color,
-                        source = newSource.name
+                        source = newSource.name,
                     )
                 }
             }
 
             is BaseTransactionEvent.ToggleAddToWallet -> {
                 val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
-                    currentAddToWallet = _state.value.addToWallet
+                    currentAddToWallet = _state.value.addToWallet,
                 )
 
                 _state.update {
                     it.copy(
                         addToWallet = newAddToWallet,
-                        selectedWallets = newSelectedWallets
+                        selectedWallets = newSelectedWallets,
                     )
                 }
             }
@@ -522,7 +522,7 @@ class AddTransactionViewModel(
                 val updatedWallets = handleSelectWallet(
                     walletId = event.walletId,
                     selected = event.selected,
-                    currentSelectedWallets = _state.value.selectedWallets
+                    currentSelectedWallets = _state.value.selectedWallets,
                 )
 
                 _state.update {
@@ -582,7 +582,7 @@ class AddTransactionViewModel(
         selectedExpenseCategory: String,
         selectedIncomeCategory: String,
         availableCategoryIcons: List<ImageVector>,
-        customCategoryIcon: ImageVector?
+        customCategoryIcon: ImageVector?,
     ): AddTransactionState {
         return state.copy(
             title = title,
@@ -627,7 +627,7 @@ class AddTransactionViewModel(
             selectedExpenseCategory = selectedExpenseCategory,
             selectedIncomeCategory = selectedIncomeCategory,
             availableCategoryIcons = availableCategoryIcons,
-            customCategoryIcon = customCategoryIcon
+            customCategoryIcon = customCategoryIcon,
         )
     }
 
@@ -637,4 +637,4 @@ class AddTransactionViewModel(
     fun resetAchievementUnlockedFlag() {
         _achievementUnlocked.value = false
     }
-} 
+}

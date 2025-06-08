@@ -62,7 +62,7 @@ fun TransactionGroupList(
     onTransactionLongClick: (Transaction) -> Unit,
     onLoadMore: () -> Unit,
     isLoading: Boolean = false,
-    hasMoreData: Boolean = false
+    hasMoreData: Boolean = false,
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
@@ -96,7 +96,7 @@ fun TransactionGroupList(
 
     LazyColumn(
         state = listState,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         transactionGroups.forEach { group ->
             val isExpanded = expandedGroups[group.date] == true
@@ -129,7 +129,7 @@ fun TransactionGroupList(
                                 }
                             }
                         }
-                    }
+                    },
                 )
             }
 
@@ -137,7 +137,7 @@ fun TransactionGroupList(
             if (isExpanded) {
                 items(
                     items = group.transactions,
-                    key = { transaction -> "transaction_${transaction.id}" }
+                    key = { transaction -> "transaction_${transaction.id}" },
                 ) { transaction ->
                     TransactionItem(
                         transaction = transaction,
@@ -145,14 +145,14 @@ fun TransactionGroupList(
                         onClick = { onTransactionClick(transaction) },
                         onTransactionLongClick = { onTransactionLongClick(transaction) },
                         animationDelay = 0L,
-                        animated = false
+                        animated = false,
                     )
 
                     HorizontalDivider(
                         modifier = Modifier.padding(
-                            horizontal = dimensionResource(id = R.dimen.spacing_normal)
+                            horizontal = dimensionResource(id = R.dimen.spacing_normal),
                         ),
-                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     )
                 }
             }
@@ -162,7 +162,7 @@ fun TransactionGroupList(
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .height(dimensionResource(id = R.dimen.spacing_small))
+                        .height(dimensionResource(id = R.dimen.spacing_small)),
                 )
             }
         }
@@ -174,11 +174,11 @@ fun TransactionGroupList(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(dimensionResource(id = R.dimen.spacing_normal)),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(
                         modifier = Modifier.padding(dimensionResource(id = R.dimen.spacing_small)),
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -190,12 +190,7 @@ fun TransactionGroupList(
  * Заголовок для группы транзакций с возможностью сворачивания/разворачивания
  */
 @Composable
-private fun ExpandableGroupHeader(
-    date: String,
-    balance: Money,
-    isExpanded: Boolean,
-    onToggle: (Boolean) -> Unit
-) {
+private fun ExpandableGroupHeader(date: String, balance: Money, isExpanded: Boolean, onToggle: (Boolean) -> Unit) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val balanceTextColor = if (balance.isPositive()) incomeColor else expenseColor
@@ -211,36 +206,36 @@ private fun ExpandableGroupHeader(
             .fillMaxWidth()
             .padding(
                 horizontal = dimensionResource(id = R.dimen.spacing_normal),
-                vertical = dimensionResource(id = R.dimen.spacing_small)
+                vertical = dimensionResource(id = R.dimen.spacing_small),
             )
             .clickable { onToggle(!isExpanded) },
-        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor)
+        colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(dimensionResource(id = R.dimen.spacing_normal)),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = if (isExpanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                 contentDescription = if (isExpanded) "Свернуть" else "Развернуть",
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
             Text(
                 text = date,
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f),
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
 
             Text(
                 text = balance.format(showSign = true, useMinimalDecimals = true),
                 style = MaterialTheme.typography.bodyLarge,
                 color = balanceTextColor,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
     }
-} 
+}

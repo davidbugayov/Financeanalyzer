@@ -29,9 +29,9 @@ fun getInitialSources(sourcePreferences: SourcePreferences, resources: Resources
 fun addCustomSource(
     sourcePreferences: SourcePreferences,
     currentSources: List<Source>,
-    newSource: Source
+    newSource: Source,
 ): List<Source> {
     val updatedSources = (currentSources + newSource).distinctBy { it.name }
     sourcePreferences.saveCustomSources(updatedSources)
     return updatedSources
-} 
+}

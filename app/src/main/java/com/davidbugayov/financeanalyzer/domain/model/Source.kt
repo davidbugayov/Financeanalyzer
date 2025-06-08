@@ -12,5 +12,5 @@ data class Source(
     val id: Long = 0,
     val name: String,
     val color: Int,
-    val isCustom: Boolean = false
-) 
+    val isCustom: Boolean = false,
+)

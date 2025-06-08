@@ -5,7 +5,8 @@ package com.davidbugayov.financeanalyzer.domain.model
  */
 enum class TransactionType {
     INCOME,
-    EXPENSE;
+    EXPENSE,
+    ;
 
     companion object {
         /**
@@ -22,4 +23,4 @@ enum class TransactionType {
     fun isExpense(): Boolean {
         return this == EXPENSE
     }
-} 
+}

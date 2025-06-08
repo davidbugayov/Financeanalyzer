@@ -13,5 +13,5 @@ import java.util.Date
 data class LineChartPoint(
     val date: Date,
     val value: Money,
-    val description: String = ""
-) 
+    val description: String = "",
+)

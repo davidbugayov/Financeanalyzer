@@ -26,22 +26,19 @@ import timber.log.Timber
  * @param onFilterSelected Callback, вызываемый при выборе фильтра
  */
 @Composable
-fun PermissionUtilsHomeFilterChips(
-    currentFilter: TransactionFilter,
-    onFilterSelected: (TransactionFilter) -> Unit
-) {
+fun PermissionUtilsHomeFilterChips(currentFilter: TransactionFilter, onFilterSelected: (TransactionFilter) -> Unit) {
     val filters = listOf(
         FilterChipData(TransactionFilter.TODAY, R.string.filter_today),
         FilterChipData(TransactionFilter.WEEK, R.string.filter_week),
         FilterChipData(TransactionFilter.MONTH, R.string.filter_month),
-        FilterChipData(TransactionFilter.ALL, R.string.all)
+        FilterChipData(TransactionFilter.ALL, R.string.all),
     )
 
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         filters.forEach { filterData ->
             FilterChipItem(
@@ -50,7 +47,7 @@ fun PermissionUtilsHomeFilterChips(
                 onClick = {
                     Timber.d("Выбран фильтр ${filterData.filter}")
                     onFilterSelected(filterData.filter)
-                }
+                },
             )
         }
     }
@@ -73,26 +70,23 @@ private fun FilterChipItem(filterData: FilterChipData, isSelected: Boolean, onCl
             Text(
                 stringResource(filterData.labelRes),
                 fontSize = 14.sp,
-                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             )
         },
         colors = FilterChipDefaults.filterChipColors(
             selectedContainerColor = selectedContainerColor,
             selectedLabelColor = selectedLabelColor,
             containerColor = unselectedContainerColor,
-            labelColor = unselectedLabelColor
+            labelColor = unselectedLabelColor,
         ),
-        border = BorderStroke(1.2.dp, borderColor)
+        border = BorderStroke(1.2.dp, borderColor),
     )
 }
 
 @Composable
-fun HomeFilterChips(
-    currentFilter: TransactionFilter,
-    onFilterSelected: (TransactionFilter) -> Unit
-) {
+fun HomeFilterChips(currentFilter: TransactionFilter, onFilterSelected: (TransactionFilter) -> Unit) {
     PermissionUtilsHomeFilterChips(
         currentFilter = currentFilter,
-        onFilterSelected = onFilterSelected
+        onFilterSelected = onFilterSelected,
     )
-} 
+}

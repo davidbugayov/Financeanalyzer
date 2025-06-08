@@ -14,4 +14,4 @@ fun interface ImportProgressCallback {
      * @param message Дополнительное сообщение о прогрессе
      */
     fun onProgress(current: Int, total: Int, message: String)
-} 
+}

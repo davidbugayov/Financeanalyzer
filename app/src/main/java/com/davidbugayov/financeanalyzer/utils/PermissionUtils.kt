@@ -35,7 +35,7 @@ object PermissionUtils {
             // Начиная с Android 13 (API 33), требуется специальное разрешение для уведомлений
             ContextCompat.checkSelfPermission(
                 context,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             ) == PackageManager.PERMISSION_GRANTED
         } else {
             // До Android 13 отдельное разрешение на уведомления не требуется
@@ -50,12 +50,10 @@ object PermissionUtils {
      * @return Composable функция, которая возвращает лаунчер для запроса разрешений
      */
     @Composable
-    fun rememberNotificationPermissionLauncher(
-        onPermissionResult: (Boolean) -> Unit
-    ): ActivityResultLauncher<String> {
+    fun rememberNotificationPermissionLauncher(onPermissionResult: (Boolean) -> Unit): ActivityResultLauncher<String> {
         val launcher = rememberLauncherForActivityResult(
             ActivityResultContracts.RequestPermission(),
-            onPermissionResult
+            onPermissionResult,
         )
         return remember { launcher }
     }
@@ -92,7 +90,7 @@ object PermissionUtils {
     fun hasReadExternalStoragePermission(context: Context): Boolean {
         return ContextCompat.checkSelfPermission(
             context,
-            Manifest.permission.READ_EXTERNAL_STORAGE
+            Manifest.permission.READ_EXTERNAL_STORAGE,
         ) == PackageManager.PERMISSION_GRANTED
     }
 
@@ -135,7 +133,7 @@ object PermissionUtils {
         launcher: ActivityResultLauncher<String>,
         openSettingsOnDeny: Boolean,
         onGranted: () -> Unit,
-        onDenied: () -> Unit
+        onDenied: () -> Unit,
     ) {
         if (hasNotificationPermission(context)) {
             onGranted()
@@ -164,16 +162,16 @@ object PermissionUtils {
             val hasPermission = hasNotificationPermission(context)
             val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
                 activity,
-                Manifest.permission.POST_NOTIFICATIONS
+                Manifest.permission.POST_NOTIFICATIONS,
             )
             Timber.d(
                 "[PermissionUtils] shouldShowSettingsDialog: hasPermission=%b, shouldShowRationale=%b, context=%s",
                 hasPermission,
                 shouldShowRationale,
-                context::class.java.simpleName
+                context::class.java.simpleName,
             )
             return !hasPermission && !shouldShowRationale
         }
         return false
     }
-} 
+}

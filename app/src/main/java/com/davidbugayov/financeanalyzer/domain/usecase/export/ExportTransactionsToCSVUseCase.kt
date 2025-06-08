@@ -28,7 +28,7 @@ import java.util.Locale
  */
 class ExportTransactionsToCSVUseCase(
     private val applicationContext: Context,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
 ) {
     /**
      * Экспортирует все транзакции в CSV файл в публичную директорию загрузок (Downloads).
@@ -40,7 +40,7 @@ class ExportTransactionsToCSVUseCase(
             if (Build.VERSION.SDK_INT <= Build.VERSION_CODES.P) {
                 val hasWritePermission = ContextCompat.checkSelfPermission(
                     applicationContext,
-                    Manifest.permission.WRITE_EXTERNAL_STORAGE
+                    Manifest.permission.WRITE_EXTERNAL_STORAGE,
                 ) == PackageManager.PERMISSION_GRANTED
 
                 if (!hasWritePermission) {
@@ -61,13 +61,13 @@ class ExportTransactionsToCSVUseCase(
                 val file = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     // Для Android 10+ используем Downloads директорию через getExternalStoragePublicDirectory
                     val downloadsDir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOWNLOADS
+                        Environment.DIRECTORY_DOWNLOADS,
                     )
                     File(downloadsDir, fileName)
                 } else {
                     // Для Android 9 и ниже также используем публичную директорию Downloads
                     val downloadsDir = Environment.getExternalStoragePublicDirectory(
-                        Environment.DIRECTORY_DOWNLOADS
+                        Environment.DIRECTORY_DOWNLOADS,
                     )
                     File(downloadsDir, fileName)
                 }
@@ -99,7 +99,7 @@ class ExportTransactionsToCSVUseCase(
                             transactionType,
                             cleanNote,
                             cleanSource,
-                            sourceColor
+                            sourceColor,
                         ).joinToString(",")
 
                         writer.append(csvLine).append("\n")
@@ -138,7 +138,7 @@ class ExportTransactionsToCSVUseCase(
         // Экранируем запятые и кавычки для формата CSV
         val cleanedText = text.replace("\"", "\"\"")
         return if (cleanedText.contains(",") || cleanedText.contains("\"") || cleanedText.contains(
-                "\n"
+                "\n",
             )
         ) {
             "\"$cleanedText\""
@@ -157,7 +157,7 @@ class ExportTransactionsToCSVUseCase(
         val fileUri: Uri = FileProvider.getUriForFile(
             applicationContext,
             applicationContext.packageName + ".fileprovider",
-            file
+            file,
         )
 
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
@@ -182,7 +182,7 @@ class ExportTransactionsToCSVUseCase(
         val fileUri: Uri = FileProvider.getUriForFile(
             applicationContext,
             applicationContext.packageName + ".fileprovider",
-            file
+            file,
         )
         val openIntent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(fileUri, "text/csv")
@@ -198,6 +198,6 @@ class ExportTransactionsToCSVUseCase(
     enum class ExportAction {
         SHARE, // Поделиться файлом
         OPEN, // Открыть файл
-        SAVE_ONLY // Только сохранить файл
+        SAVE_ONLY, // Только сохранить файл
     }
-} 
+}

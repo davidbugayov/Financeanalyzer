@@ -39,7 +39,7 @@ fun SourceItem(
     isSelected: Boolean,
     onClick: () -> Unit,
     onLongClick: () -> Unit,
-    isError: Boolean = false
+    isError: Boolean = false,
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -47,9 +47,9 @@ fun SourceItem(
             .width(80.dp)
             .combinedClickable(
                 onClick = onClick,
-                onLongClick = onLongClick
+                onLongClick = onLongClick,
             )
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp),
     ) {
         Box(
             modifier = Modifier
@@ -60,7 +60,7 @@ fun SourceItem(
                         SourceItemErrorBackgroundColor
                     } else {
                         Color(source.color)
-                    }
+                    },
                 )
                 .border(
                     width = when {
@@ -73,16 +73,16 @@ fun SourceItem(
                         isError -> MaterialTheme.colorScheme.error
                         else -> Color.Transparent
                     },
-                    shape = CircleShape
+                    shape = CircleShape,
                 ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             // Здесь можно добавить иконку для источника
             Text(
                 text = source.name.first().toString(),
                 color = if (isError) SourceItemErrorContentColor else Color.White,
                 fontSize = 24.sp,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         }
 
@@ -93,7 +93,7 @@ fun SourceItem(
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
             maxLines = 1,
-            color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface
+            color = if (isError) Color.Red else MaterialTheme.colorScheme.onSurface,
         )
     }
-} 
+}

@@ -18,11 +18,11 @@ import com.davidbugayov.financeanalyzer.R
 fun EmptyContent() {
     Box(
         modifier = Modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = stringResource(R.string.no_transactions),
-            color = Color.Gray
+            color = Color.Gray,
         )
     }
-} 
+}

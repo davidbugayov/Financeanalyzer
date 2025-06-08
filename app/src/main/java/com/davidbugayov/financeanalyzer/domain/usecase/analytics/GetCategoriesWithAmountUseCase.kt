@@ -8,12 +8,12 @@ import com.davidbugayov.financeanalyzer.utils.DateTimeUtils.getDefaultStartDate
 import kotlinx.datetime.LocalDate
 
 class GetCategoriesWithAmountUseCase(
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
 ) {
     suspend operator fun invoke(
         isIncome: Boolean,
         startDate: LocalDate = getDefaultStartDate(),
-        endDate: LocalDate = getDefaultEndDate()
+        endDate: LocalDate = getDefaultEndDate(),
     ): List<Pair<Category, Double>> {
         val transactions = transactionRepository.getTransactionsByDateRange(startDate, endDate)
 
@@ -44,4 +44,4 @@ class GetCategoriesWithAmountUseCase(
             }
             .sortedByDescending { (_, amount) -> amount }
     }
-} 
+}

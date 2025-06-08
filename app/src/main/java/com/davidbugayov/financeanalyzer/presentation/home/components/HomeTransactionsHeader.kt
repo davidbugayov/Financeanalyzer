@@ -27,22 +27,22 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
 fun HomeTransactionsHeader(
     currentFilter: TransactionFilter,
     showGroupSummary: Boolean,
-    onToggleGroupSummary: (Boolean) -> Unit
+    onToggleGroupSummary: (Boolean) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = headerTitleForFilter(currentFilter),
             fontSize = 15.sp,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
         )
         TextButton(
-            onClick = { onToggleGroupSummary(!showGroupSummary) }
+            onClick = { onToggleGroupSummary(!showGroupSummary) },
         ) {
             Text(
                 text = if (showGroupSummary) {
@@ -51,7 +51,7 @@ fun HomeTransactionsHeader(
                     stringResource(R.string.show_summary)
                 },
                 fontSize = 13.sp,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
         }
     }
@@ -65,4 +65,4 @@ private fun headerTitleForFilter(filter: TransactionFilter): String {
         TransactionFilter.MONTH -> stringResource(R.string.transactions_month)
         TransactionFilter.ALL -> stringResource(R.string.all_transactions)
     }
-} 
+}

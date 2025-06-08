@@ -28,17 +28,17 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit, onAddAnother: () -> Un
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.Center,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             ) {
                 Icon(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = null,
                     tint = Color.Green,
-                    modifier = Modifier.padding(end = 8.dp)
+                    modifier = Modifier.padding(end = 8.dp),
                 )
                 Text(
                     text = "Успешно!",
-                    style = MaterialTheme.typography.headlineSmall
+                    style = MaterialTheme.typography.headlineSmall,
                 )
             }
         },
@@ -47,13 +47,13 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit, onAddAnother: () -> Un
             Text(
                 text = message,
                 style = MaterialTheme.typography.bodyLarge,
-                modifier = Modifier.padding(top = 8.dp)
+                modifier = Modifier.padding(top = 8.dp),
             )
         },
         confirmButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 TextButton(onClick = onAddAnother) {
                     Text("Добавить еще")
@@ -63,6 +63,6 @@ fun SuccessDialog(message: String, onDismiss: () -> Unit, onAddAnother: () -> Un
                     Text("Готово")
                 }
             }
-        }
+        },
     )
-} 
+}

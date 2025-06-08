@@ -12,7 +12,7 @@ import androidx.compose.ui.unit.dp
  */
 class WindowSize(
     val width: WindowType,
-    val height: WindowType
+    val height: WindowType,
 )
 
 /**
@@ -22,7 +22,7 @@ enum class WindowType {
 
     COMPACT, // Телефон в портретной ориентации
     MEDIUM, // Телефон в ландшафтной ориентации или планшет в портретной
-    EXPANDED // Планшет в ландшафтной ориентации
+    EXPANDED, // Планшет в ландшафтной ориентации
 }
 
 /**
@@ -68,7 +68,7 @@ fun rememberWindowSize(): WindowSize {
     return remember(screenWidth, screenHeight) {
         WindowSize(
             width = getWindowWidthType(screenWidth),
-            height = getWindowHeightType(screenHeight)
+            height = getWindowHeightType(screenHeight),
         )
     }
 }

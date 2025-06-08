@@ -22,4 +22,4 @@ sealed class ImportTransactionsIntent {
      * Интент для сброса состояния импорта.
      */
     data object ResetState : ImportTransactionsIntent()
-} 
+}

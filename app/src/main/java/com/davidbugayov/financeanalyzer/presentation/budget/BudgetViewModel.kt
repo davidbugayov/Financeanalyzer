@@ -19,7 +19,7 @@ import java.util.UUID
 
 class BudgetViewModel(
     private val walletRepository: WalletRepository,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BudgetState())
@@ -46,7 +46,9 @@ class BudgetViewModel(
             is BudgetEvent.AddFundsToWallet -> addFundsToWallet(event.categoryId, event.amount)
             is BudgetEvent.SpendFromWallet -> spendFromWallet(event.categoryId, event.amount)
             is BudgetEvent.TransferBetweenWallets -> transferBetweenWallets(
-                event.fromCategoryId, event.toCategoryId, event.amount
+                event.fromCategoryId,
+                event.toCategoryId,
+                event.amount,
             )
             is BudgetEvent.SetPeriodDuration -> setPeriodDuration(event.days)
             is BudgetEvent.ResetPeriod -> resetPeriod(event.categoryId)
@@ -65,7 +67,7 @@ class BudgetViewModel(
                 _state.update {
                     it.copy(
                         categories = wallets,
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
 
@@ -82,7 +84,7 @@ class BudgetViewModel(
                 _state.update {
                     it.copy(
                         error = e.message ?: "Unknown error",
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             }
@@ -117,7 +119,7 @@ class BudgetViewModel(
                         // чтобы избежать NullPointerException для кошельков без этого поля
                         val updatedWallet = wallet.copy(
                             spent = totalSpent,
-                            linkedCategories = wallet.linkedCategories
+                            linkedCategories = wallet.linkedCategories,
                         )
                         walletRepository.updateWallet(updatedWallet)
                     }
@@ -147,7 +149,7 @@ class BudgetViewModel(
             it.copy(
                 totalLimit = totalLimit,
                 totalSpent = totalSpent,
-                totalWalletBalance = totalWalletBalance
+                totalWalletBalance = totalWalletBalance,
             )
         }
     }
@@ -158,8 +160,11 @@ class BudgetViewModel(
                 _state.update { it.copy(isLoading = true) }
 
                 val newWallet = Wallet(
-                    name = name, limit = limit, spent = Money(0.0), id = UUID.randomUUID().toString(),
-                    balance = Money(0.0)
+                    name = name,
+                    limit = limit,
+                    spent = Money(0.0),
+                    id = UUID.randomUUID().toString(),
+                    balance = Money(0.0),
                 )
 
                 // Добавляем кошелек в репозиторий
@@ -172,7 +177,7 @@ class BudgetViewModel(
                 _state.update {
                     it.copy(
                         error = e.message ?: "Unknown error",
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             }
@@ -194,7 +199,7 @@ class BudgetViewModel(
                 _state.update {
                     it.copy(
                         error = e.message ?: "Unknown error",
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             }
@@ -216,7 +221,7 @@ class BudgetViewModel(
                 _state.update {
                     it.copy(
                         error = e.message ?: "Unknown error",
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             }
@@ -263,7 +268,7 @@ class BudgetViewModel(
                     // Обновляем баланс кошелька
                     val updatedWallet = wallet.copy(
                         balance = wallet.balance.plus(amountToAdd),
-                        linkedCategories = wallet.linkedCategories
+                        linkedCategories = wallet.linkedCategories,
                     )
 
                     // Сохраняем обновленный кошелек
@@ -278,7 +283,7 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при распределении дохода")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при распределении дохода"
+                        error = e.message ?: "Ошибка при распределении дохода",
                     )
                 }
             }
@@ -297,7 +302,7 @@ class BudgetViewModel(
                 // Обновляем баланс кошелька
                 val updatedWallet = wallet.copy(
                     balance = wallet.balance.plus(amount),
-                    linkedCategories = wallet.linkedCategories
+                    linkedCategories = wallet.linkedCategories,
                 )
 
                 // Сохраняем обновленный кошелек
@@ -311,7 +316,7 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при добавлении средств в кошелек")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при добавлении средств в кошелек"
+                        error = e.message ?: "Ошибка при добавлении средств в кошелек",
                     )
                 }
             }
@@ -331,7 +336,7 @@ class BudgetViewModel(
                 if (wallet.balance.amount < amount.amount) {
                     _state.update {
                         it.copy(
-                            error = "Недостаточно средств в кошельке"
+                            error = "Недостаточно средств в кошельке",
                         )
                     }
                     return@launch
@@ -341,7 +346,7 @@ class BudgetViewModel(
                 val updatedWallet = wallet.copy(
                     balance = wallet.balance.minus(amount),
                     spent = wallet.spent.plus(amount),
-                    linkedCategories = wallet.linkedCategories
+                    linkedCategories = wallet.linkedCategories,
                 )
 
                 // Сохраняем обновленный кошелек
@@ -355,7 +360,7 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при трате средств из кошелька")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при трате средств из кошелька"
+                        error = e.message ?: "Ошибка при трате средств из кошелька",
                     )
                 }
             }
@@ -376,7 +381,7 @@ class BudgetViewModel(
                 if (fromWallet.balance.amount < amount.amount) {
                     _state.update {
                         it.copy(
-                            error = "Недостаточно средств в исходном кошельке"
+                            error = "Недостаточно средств в исходном кошельке",
                         )
                     }
                     return@launch
@@ -385,12 +390,12 @@ class BudgetViewModel(
                 // Обновляем балансы кошельков
                 val updatedFromWallet = fromWallet.copy(
                     balance = fromWallet.balance.minus(amount),
-                    linkedCategories = fromWallet.linkedCategories
+                    linkedCategories = fromWallet.linkedCategories,
                 )
 
                 val updatedToWallet = toWallet.copy(
                     balance = toWallet.balance.plus(amount),
-                    linkedCategories = toWallet.linkedCategories
+                    linkedCategories = toWallet.linkedCategories,
                 )
 
                 // Сохраняем обновленные кошельки
@@ -405,7 +410,7 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при переводе средств между кошельками")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при переводе средств между кошельками"
+                        error = e.message ?: "Ошибка при переводе средств между кошельками",
                     )
                 }
             }
@@ -425,7 +430,7 @@ class BudgetViewModel(
                 wallets.forEach { wallet ->
                     val updatedWallet = wallet.copy(
                         periodDuration = days,
-                        linkedCategories = wallet.linkedCategories
+                        linkedCategories = wallet.linkedCategories,
                     )
                     walletRepository.updateWallet(updatedWallet)
                 }
@@ -441,7 +446,7 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при установке продолжительности периода")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при установке продолжительности периода"
+                        error = e.message ?: "Ошибка при установке продолжительности периода",
                     )
                 }
             }
@@ -461,7 +466,7 @@ class BudgetViewModel(
                 val updatedWallet = wallet.copy(
                     periodStartDate = System.currentTimeMillis(),
                     spent = Money(0.0),
-                    linkedCategories = wallet.linkedCategories
+                    linkedCategories = wallet.linkedCategories,
                 )
 
                 // Сохраняем обновленный кошелек
@@ -475,7 +480,7 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при сбросе периода для кошелька")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при сбросе периода для кошелька"
+                        error = e.message ?: "Ошибка при сбросе периода для кошелька",
                     )
                 }
             }
@@ -496,7 +501,7 @@ class BudgetViewModel(
                     val updatedWallet = wallet.copy(
                         periodStartDate = System.currentTimeMillis(),
                         spent = Money(0.0),
-                        linkedCategories = wallet.linkedCategories
+                        linkedCategories = wallet.linkedCategories,
                     )
                     walletRepository.updateWallet(updatedWallet)
                 }
@@ -509,7 +514,7 @@ class BudgetViewModel(
                 Timber.e(e, "Ошибка при сбросе периодов для всех кошельков")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при сбросе периодов для всех кошельков"
+                        error = e.message ?: "Ошибка при сбросе периодов для всех кошельков",
                     )
                 }
             }
@@ -542,4 +547,4 @@ class BudgetViewModel(
             }
         }
     }
-} 
+}

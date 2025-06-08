@@ -26,7 +26,7 @@ import timber.log.Timber
  */
 class ImportTransactionsViewModel(
     private val importTransactionsUseCase: ImportTransactionsUseCase,
-    application: Application
+    application: Application,
 ) : AndroidViewModel(application), KoinComponent {
 
     // Инъекция TransactionDao через Koin
@@ -99,7 +99,7 @@ class ImportTransactionsViewModel(
             progressMessage = "Начало импорта...",
             error = null,
             successCount = 0,
-            skippedCount = 0
+            skippedCount = 0,
         )
 
         // Для обратной совместимости
@@ -112,7 +112,7 @@ class ImportTransactionsViewModel(
                     Timber.d("Прогресс импорта: $current/$total ($progress%) - $message")
                     _state.value = _state.value.copy(
                         progress = progress,
-                        progressMessage = message
+                        progressMessage = message,
                     )
                     _uiState.value = ImportUiState.Loading(message, progress)
                 }.collect { result ->
@@ -122,7 +122,7 @@ class ImportTransactionsViewModel(
                             Timber.d("Получен прогресс: $progress% - ${result.message}")
                             _state.value = _state.value.copy(
                                 progress = progress,
-                                progressMessage = result.message
+                                progressMessage = result.message,
                             )
                             _uiState.value = ImportUiState.Loading(result.message, progress)
                         }
@@ -132,77 +132,77 @@ class ImportTransactionsViewModel(
                                 "Пропущено: ${result.skippedCount}"
 
                             Timber.d(
-                                "Импорт успешно завершен: импортировано ${result.importedCount}, пропущено ${result.skippedCount}"
+                                "Импорт успешно завершен: импортировано ${result.importedCount}, пропущено ${result.skippedCount}",
                             )
 
                             // Добавляем диагностическое логирование для проверки, были ли транзакции действительно сохранены
                             Timber.i(
-                                "[VIEWMODEL] Импорт завершен успешно! Импортировано: ${result.importedCount}, Пропущено: ${result.skippedCount}"
+                                "[VIEWMODEL] Импорт завершен успешно! Импортировано: ${result.importedCount}, Пропущено: ${result.skippedCount}",
                             )
 
                             // Запустим проверку наличия транзакций в базе через 1 секунду
                             viewModelScope.launch(Dispatchers.IO) {
                                 Timber.d(
-                                    "[VIEWMODEL] Планируем проверку наличия транзакций в базе через 1 секунду"
+                                    "[VIEWMODEL] Планируем проверку наличия транзакций в базе через 1 секунду",
                                 )
                                 kotlinx.coroutines.delay(1000)
                                 try {
                                     // Используем инъектированный transactionDao
                                     val count = transactionDao.getTransactionsCount()
                                     Timber.i(
-                                        "[VIEWMODEL] ✅ Проверка после импорта: всего транзакций в базе данных: $count"
+                                        "[VIEWMODEL] ✅ Проверка после импорта: всего транзакций в базе данных: $count",
                                     )
 
                                     // Получим последние 5 транзакций для анализа
                                     Timber.i(
-                                        "[VIEWMODEL-ОТЛАДКА] 🔍 Попытка получить последние транзакции из базы..."
+                                        "[VIEWMODEL-ОТЛАДКА] 🔍 Попытка получить последние транзакции из базы...",
                                     )
                                     try {
                                         val latestTransactions = transactionDao.getTransactionsPaginated(
                                             5,
-                                            0
+                                            0,
                                         )
                                         if (latestTransactions.isNotEmpty()) {
                                             Timber.i(
-                                                "[VIEWMODEL-ОТЛАДКА] ✅ Получено ${latestTransactions.size} последних транзакций:"
+                                                "[VIEWMODEL-ОТЛАДКА] ✅ Получено ${latestTransactions.size} последних транзакций:",
                                             )
                                             latestTransactions.forEachIndexed { index, tx ->
                                                 Timber.i(
                                                     "[VIEWMODEL-ОТЛАДКА] 📝 Транзакция #${index + 1}: ID=${tx.id}, idString=${tx.idString}, " +
-                                                        "Дата=${tx.date}, Сумма=${tx.amount}, Категория='${tx.category}'"
+                                                        "Дата=${tx.date}, Сумма=${tx.amount}, Категория='${tx.category}'",
                                                 )
                                             }
                                         } else {
                                             Timber.e(
-                                                "[VIEWMODEL-ОТЛАДКА] ❌ В базе данных НЕТ транзакций!"
+                                                "[VIEWMODEL-ОТЛАДКА] ❌ В базе данных НЕТ транзакций!",
                                             )
                                         }
                                     } catch (e: Exception) {
                                         Timber.e(
                                             e,
-                                            "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при получении последних транзакций: ${e.message}"
+                                            "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при получении последних транзакций: ${e.message}",
                                         )
                                     }
 
                                     // Еще одна проверка с другим методом
                                     try {
                                         Timber.i(
-                                            "[VIEWMODEL-ОТЛАДКА] 🔍 Альтернативная проверка через getAllTransactions..."
+                                            "[VIEWMODEL-ОТЛАДКА] 🔍 Альтернативная проверка через getAllTransactions...",
                                         )
                                         val allTransactions = transactionDao.getAllTransactions()
                                         Timber.i(
-                                            "[VIEWMODEL-ОТЛАДКА] 📊 Всего транзакций через getAllTransactions: ${allTransactions.size}"
+                                            "[VIEWMODEL-ОТЛАДКА] 📊 Всего транзакций через getAllTransactions: ${allTransactions.size}",
                                         )
                                     } catch (e: Exception) {
                                         Timber.e(
                                             e,
-                                            "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при вызове getAllTransactions: ${e.message}"
+                                            "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при вызове getAllTransactions: ${e.message}",
                                         )
                                     }
                                 } catch (e: Exception) {
                                     Timber.e(
                                         e,
-                                        "[VIEWMODEL] ❌ Ошибка при проверке количества транзакций после импорта: ${e.message}"
+                                        "[VIEWMODEL] ❌ Ошибка при проверке количества транзакций после импорта: ${e.message}",
                                     )
                                 }
                             }
@@ -212,13 +212,13 @@ class ImportTransactionsViewModel(
                                 successCount = result.importedCount,
                                 skippedCount = result.skippedCount,
                                 successMessage = successMessage,
-                                error = null
+                                error = null,
                             )
 
                             _uiState.value = ImportUiState.Success(
                                 message = successMessage,
                                 importedCount = result.importedCount,
-                                skippedCount = result.skippedCount
+                                skippedCount = result.skippedCount,
                             )
                         }
                         is ImportResult.Error -> {
@@ -228,7 +228,7 @@ class ImportTransactionsViewModel(
 
                             _state.value = _state.value.copy(
                                 isLoading = false,
-                                error = errorMessage
+                                error = errorMessage,
                             )
 
                             _uiState.value = ImportUiState.Error(errorMessage)
@@ -240,7 +240,7 @@ class ImportTransactionsViewModel(
 
                 _state.value = _state.value.copy(
                     isLoading = false,
-                    error = e.message ?: "Неизвестная ошибка"
+                    error = e.message ?: "Неизвестная ошибка",
                 )
 
                 _uiState.value = ImportUiState.Error(e.message ?: "Неизвестная ошибка")
@@ -295,7 +295,7 @@ sealed class ImportUiState {
     data class Success(
         val message: String,
         val importedCount: Int,
-        val skippedCount: Int
+        val skippedCount: Int,
     ) : ImportUiState()
 
     /**
@@ -304,4 +304,4 @@ sealed class ImportUiState {
      * @param message Сообщение об ошибке
      */
     data class Error(val message: String) : ImportUiState()
-} 
+}

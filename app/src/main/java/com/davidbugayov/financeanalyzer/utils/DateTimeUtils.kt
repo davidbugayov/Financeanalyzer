@@ -50,7 +50,7 @@ object DateTimeUtils {
         return LocalDate(
             year = today.year,
             monthNumber = today.monthNumber,
-            dayOfMonth = today.dayOfMonth - daysToSubtract
+            dayOfMonth = today.dayOfMonth - daysToSubtract,
         )
     }
 
@@ -78,7 +78,7 @@ object DateTimeUtils {
     fun formatDate(date: LocalDate): String {
         return "${date.dayOfMonth.toString().padStart(2, '0')}.${date.monthNumber.toString().padStart(
             2,
-            '0'
+            '0',
         )}.${date.year}"
     }
-} 
+}

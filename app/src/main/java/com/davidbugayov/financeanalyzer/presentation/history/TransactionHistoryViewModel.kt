@@ -42,7 +42,7 @@ class TransactionHistoryViewModel constructor(
     val categoriesViewModel: CategoriesViewModel,
     private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
-    private val application: Application
+    private val application: Application,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
@@ -60,7 +60,7 @@ class TransactionHistoryViewModel constructor(
             it.copy(
                 periodType = initialPeriod,
                 startDate = startDate,
-                endDate = endDate
+                endDate = endDate,
             )
         }
 
@@ -93,28 +93,28 @@ class TransactionHistoryViewModel constructor(
             is TransactionHistoryEvent.SetSources -> updateSources(event.sources)
             is TransactionHistoryEvent.SetDateRange -> updateDateRange(
                 event.startDate,
-                event.endDate
+                event.endDate,
             )
             is TransactionHistoryEvent.SetStartDate -> updateStartDate(event.date)
             is TransactionHistoryEvent.SetEndDate -> updateEndDate(event.date)
             is TransactionHistoryEvent.ReloadTransactions -> resetAndReloadTransactions()
             is TransactionHistoryEvent.LoadMoreTransactions -> loadMoreTransactions()
             is TransactionHistoryEvent.ShowDeleteConfirmDialog -> showDeleteConfirmDialog(
-                event.transaction
+                event.transaction,
             )
             is TransactionHistoryEvent.HideDeleteConfirmDialog -> hideDeleteConfirmDialog()
             is TransactionHistoryEvent.DeleteCategory -> deleteCategory(
                 event.category,
-                event.isExpense
+                event.isExpense,
             )
             is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> showDeleteCategoryConfirmDialog(
                 event.category,
-                event.isExpense
+                event.isExpense,
             )
             is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> hideDeleteCategoryConfirmDialog()
             is TransactionHistoryEvent.DeleteSource -> deleteSource(event.source)
             is TransactionHistoryEvent.ShowDeleteSourceConfirmDialog -> showDeleteSourceConfirmDialog(
-                event.source
+                event.source,
             )
             is TransactionHistoryEvent.HideDeleteSourceConfirmDialog -> hideDeleteSourceConfirmDialog()
             is TransactionHistoryEvent.ShowPeriodDialog -> showPeriodDialog()
@@ -138,14 +138,14 @@ class TransactionHistoryViewModel constructor(
                     resetAndReloadTransactions()
                     updateWidgetsUseCase(application.applicationContext)
                     Timber.d(
-                        "Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel."
+                        "Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel.",
                     )
 
                     // Логируем событие в аналитику
                     com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
                         amount = transaction.amount.abs(),
                         category = transaction.category,
-                        isExpense = transaction.isExpense
+                        isExpense = transaction.isExpense,
                     )
                 }
                 is Result.Error -> {
@@ -166,7 +166,7 @@ class TransactionHistoryViewModel constructor(
                 hasMoreData = true,
                 transactions = emptyList(),
                 filteredTransactions = emptyList(),
-                groupedTransactions = emptyMap()
+                groupedTransactions = emptyMap(),
             )
         }
         loadTransactionsFirstPage()
@@ -223,11 +223,11 @@ class TransactionHistoryViewModel constructor(
                             }
                             PeriodType.CUSTOM, PeriodType.DAY, PeriodType.QUARTER, PeriodType.YEAR -> {
                                 Timber.d(
-                                    "Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}"
+                                    "Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}",
                                 )
                                 getTransactionsForPeriodWithCacheUseCase(
                                     currentState.startDate,
-                                    currentState.endDate
+                                    currentState.endDate,
                                 )
                             }
                             PeriodType.MONTH -> {
@@ -273,7 +273,7 @@ class TransactionHistoryViewModel constructor(
                         currentPage = 1,
                         hasMoreData = transactions.size < totalCount && currentState.periodType != PeriodType.ALL,
                         isLoading = false,
-                        error = null
+                        error = null,
                     )
                 }
 
@@ -296,7 +296,7 @@ class TransactionHistoryViewModel constructor(
                 _state.update {
                     it.copy(
                         isLoading = false,
-                        error = e.message ?: "Ошибка при загрузке транзакций"
+                        error = e.message ?: "Ошибка при загрузке транзакций",
                     )
                 }
             }
@@ -337,7 +337,7 @@ class TransactionHistoryViewModel constructor(
                                     currentState.startDate,
                                     currentState.endDate,
                                     pageSize,
-                                    offset
+                                    offset,
                                 )
                             }
                             else -> {
@@ -346,7 +346,7 @@ class TransactionHistoryViewModel constructor(
                                     currentState.startDate,
                                     currentState.endDate,
                                     pageSize,
-                                    offset
+                                    offset,
                                 )
                             }
                         }
@@ -361,7 +361,7 @@ class TransactionHistoryViewModel constructor(
                     _state.update {
                         it.copy(
                             hasMoreData = false,
-                            isLoadingMore = false
+                            isLoadingMore = false,
                         )
                     }
                     return@launch
@@ -387,7 +387,7 @@ class TransactionHistoryViewModel constructor(
                     it.copy(
                         transactions = updatedTransactions,
                         currentPage = currentPage + 1,
-                        isLoadingMore = false
+                        isLoadingMore = false,
                     )
                 }
 
@@ -398,7 +398,7 @@ class TransactionHistoryViewModel constructor(
                 _state.update {
                     it.copy(
                         isLoadingMore = false,
-                        error = e.message
+                        error = e.message,
                     )
                 }
             }
@@ -422,7 +422,7 @@ class TransactionHistoryViewModel constructor(
                     categories = listOf(category),
                     periodType = periodType,
                     startDate = startDate,
-                    endDate = endDate
+                    endDate = endDate,
                 )
 
                 _state.update { it.copy(categoryStats = result) }
@@ -442,17 +442,14 @@ class TransactionHistoryViewModel constructor(
     /**
      * Применяет фильтры по категориям и источникам к списку транзакций
      */
-    private fun filterTransactions(
-        transactions: List<Transaction>,
-        state: TransactionHistoryState
-    ): List<Transaction> {
+    private fun filterTransactions(transactions: List<Transaction>, state: TransactionHistoryState): List<Transaction> {
         return filterTransactionsUseCase(
             transactions = transactions,
             periodType = state.periodType,
             startDate = state.startDate,
             endDate = state.endDate,
             categories = state.selectedCategories,
-            sources = state.selectedSources
+            sources = state.selectedSources,
         )
     }
 
@@ -471,7 +468,7 @@ class TransactionHistoryViewModel constructor(
                     _state.update {
                         it.copy(
                             filteredTransactions = emptyList(),
-                            groupedTransactions = emptyMap()
+                            groupedTransactions = emptyMap(),
                         )
                     }
                 }
@@ -509,12 +506,12 @@ class TransactionHistoryViewModel constructor(
                 // Используем более эффективный алгоритм группировки
                 val groups = groupTransactionsUseCase(
                     transactions = filteredTransactions,
-                    groupingType = currentState.groupingType
+                    groupingType = currentState.groupingType,
                 )
 
                 val endTime = System.currentTimeMillis()
                 Timber.d(
-                    "Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс"
+                    "Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс",
                 )
 
                 groups
@@ -527,7 +524,7 @@ class TransactionHistoryViewModel constructor(
                 _state.update {
                     it.copy(
                         filteredTransactions = filteredTransactions,
-                        groupedTransactions = groupedTransactions
+                        groupedTransactions = groupedTransactions,
                     )
                 }
             }
@@ -547,7 +544,7 @@ class TransactionHistoryViewModel constructor(
         val (startDate, endDate) = DateUtils.updatePeriodDates(
             periodType = periodType,
             currentStartDate = currentState.startDate,
-            currentEndDate = currentState.endDate
+            currentEndDate = currentState.endDate,
         )
 
         // Обновляем состояние
@@ -562,7 +559,7 @@ class TransactionHistoryViewModel constructor(
                 // Сбрасываем списки транзакций
                 transactions = emptyList(),
                 filteredTransactions = emptyList(),
-                groupedTransactions = emptyMap()
+                groupedTransactions = emptyMap(),
             )
         }
 
@@ -591,7 +588,7 @@ class TransactionHistoryViewModel constructor(
             it.copy(
                 startDate = startDate,
                 endDate = endDate,
-                periodType = PeriodType.CUSTOM
+                periodType = PeriodType.CUSTOM,
             )
         }
         updateFilteredAndGroupedTransactions()
@@ -739,7 +736,7 @@ class TransactionHistoryViewModel constructor(
                 val startDate = calendar.time
                 val monthlyTransactions = repository.getTransactionsByDateRangeList(
                     startDate,
-                    endDate
+                    endDate,
                 )
                 Timber.d("Транзакций за последний месяц: ${monthlyTransactions.size}")
             } catch (e: Exception) {

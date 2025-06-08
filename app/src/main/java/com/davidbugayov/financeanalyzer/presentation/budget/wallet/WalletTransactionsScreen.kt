@@ -64,7 +64,7 @@ fun WalletTransactionsScreen(
     onNavigateBack: () -> Unit,
     viewModel: WalletTransactionsViewModel = koinViewModel(),
     addTransactionViewModel: AddTransactionViewModel = koinViewModel(),
-    navController: NavController = rememberNavController()
+    navController: NavController = rememberNavController(),
 ) {
     val context = LocalContext.current
     // Загружаем данные для выбранного кошелька
@@ -90,7 +90,7 @@ fun WalletTransactionsScreen(
             addTransactionViewModel.setupForExpenseAddition(
                 amount = "", // Пустая строка для поля суммы
                 walletCategory = wallet.name,
-                context = context
+                context = context,
             )
 
             // Переходим на экран добавления транзакции
@@ -106,27 +106,27 @@ fun WalletTransactionsScreen(
                 onBackClick = onNavigateBack,
                 actions = {
                     IconButton(
-                        onClick = { showImportCategoriesDialog = true }
+                        onClick = { showImportCategoriesDialog = true },
                     ) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Связать категории"
+                            contentDescription = "Связать категории",
                         )
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             // Показываем загрузку, если данные еще не получены
             if (state.isLoading) {
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text("Загрузка...")
                 }
@@ -134,7 +134,7 @@ fun WalletTransactionsScreen(
                 // Показываем сообщение, если кошелек не найден
                 Box(
                     modifier = Modifier.fillMaxSize(),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     Text("Кошелек не найден")
                 }
@@ -148,22 +148,22 @@ fun WalletTransactionsScreen(
                         .fillMaxWidth()
                         .padding(16.dp),
                     shape = RoundedCornerShape(16.dp),
-                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(16.dp)
+                            .padding(16.dp),
                     ) {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = wallet.name,
                                 style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
                             )
 
                             // Warning icon for over budget
@@ -174,12 +174,12 @@ fun WalletTransactionsScreen(
                                         .clip(CircleShape)
                                         .background(Color.Red)
                                         .padding(4.dp),
-                                    contentAlignment = Alignment.Center
+                                    contentAlignment = Alignment.Center,
                                 ) {
                                     Text(
                                         text = "!",
                                         color = Color.White,
-                                        fontWeight = FontWeight.Bold
+                                        fontWeight = FontWeight.Bold,
                                     )
                                 }
                             }
@@ -190,10 +190,10 @@ fun WalletTransactionsScreen(
                         Text(
                             text = "Бюджет: ${wallet.limit.format(
                                 showCurrency = true,
-                                useMinimalDecimals = true
+                                useMinimalDecimals = true,
                             )}",
                             style = MaterialTheme.typography.titleMedium,
-                            fontWeight = FontWeight.Bold
+                            fontWeight = FontWeight.Bold,
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -209,7 +209,7 @@ fun WalletTransactionsScreen(
                         LinearProgressIndicator(
                             progress = { if (progress > 1f) 1f else progress },
                             modifier = Modifier.fillMaxWidth(),
-                            color = progressColor
+                            color = progressColor,
                         )
 
                         Spacer(modifier = Modifier.height(16.dp))
@@ -217,20 +217,20 @@ fun WalletTransactionsScreen(
                         // Категории расходов
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             Column {
                                 Text(
                                     text = "Траты",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Text(
                                     text = wallet.spent.format(
                                         showCurrency = true,
-                                        useMinimalDecimals = true
+                                        useMinimalDecimals = true,
                                     ),
-                                    style = MaterialTheme.typography.bodyLarge
+                                    style = MaterialTheme.typography.bodyLarge,
                                 )
                             }
 
@@ -238,45 +238,45 @@ fun WalletTransactionsScreen(
                                 Text(
                                     text = "Остаток",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 val remaining = wallet.limit.minus(wallet.spent)
                                 val remainingColor = if (remaining.isNegative()) Color.Red else MaterialTheme.colorScheme.onSurface
                                 Text(
                                     text = remaining.format(
                                         showCurrency = true,
-                                        useMinimalDecimals = true
+                                        useMinimalDecimals = true,
                                     ),
                                     style = MaterialTheme.typography.bodyLarge,
-                                    color = remainingColor
+                                    color = remainingColor,
                                 )
                             }
                         }
 
                         HorizontalDivider(
                             modifier = Modifier.padding(vertical = 16.dp),
-                            color = MaterialTheme.colorScheme.outlineVariant
+                            color = MaterialTheme.colorScheme.outlineVariant,
                         )
 
                         // Баланс кошелька
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween,
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Text(
                                 text = "Баланс кошелька:",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
                                 text = wallet.balance.format(
                                     showCurrency = true,
-                                    useMinimalDecimals = true
+                                    useMinimalDecimals = true,
                                 ),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
+                                color = MaterialTheme.colorScheme.primary,
                             )
                         }
 
@@ -285,21 +285,21 @@ fun WalletTransactionsScreen(
                         Button(
                             onClick = navigateToAddTransaction,
                             modifier = Modifier.fillMaxWidth(),
-                            shape = RoundedCornerShape(8.dp)
+                            shape = RoundedCornerShape(8.dp),
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(vertical = 8.dp)
+                                modifier = Modifier.padding(vertical = 8.dp),
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Payment,
                                     contentDescription = null,
-                                    modifier = Modifier.size(24.dp)
+                                    modifier = Modifier.size(24.dp),
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Потратить из кошелька",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                             }
                         }
@@ -309,12 +309,12 @@ fun WalletTransactionsScreen(
                 // Отображение связанных категорий
                 if (state.wallet?.linkedCategories?.isNotEmpty() == true) {
                     Column(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     ) {
                         Text(
                             text = "Связанные категории:",
                             style = MaterialTheme.typography.titleSmall,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
                         )
 
                         Spacer(modifier = Modifier.height(4.dp))
@@ -323,13 +323,13 @@ fun WalletTransactionsScreen(
                         Text(
                             text = linkedCategories.joinToString(", "),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
 
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
+                        color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f),
                     )
                 }
 
@@ -341,8 +341,8 @@ fun WalletTransactionsScreen(
                         start = 16.dp,
                         top = 24.dp,
                         end = 16.dp,
-                        bottom = 8.dp
-                    )
+                        bottom = 8.dp,
+                    ),
                 )
 
                 // Если транзакций нет, показываем сообщение
@@ -351,25 +351,25 @@ fun WalletTransactionsScreen(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 32.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "Нет транзакций",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 } else {
                     // Список транзакций
                     LazyColumn(
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier.fillMaxSize(),
                     ) {
                         items(state.transactions) { transaction ->
                             TransactionItem(
                                 transaction = transaction,
                                 categoriesViewModel = categoriesViewModel,
                                 onClick = {},
-                                onTransactionLongClick = { /* TODO: Handle long click */ }
+                                onTransactionLongClick = { /* TODO: Handle long click */ },
                             )
                         }
                     }
@@ -390,7 +390,7 @@ fun WalletTransactionsScreen(
                 title = "Связать категории",
                 subtitle = "Выберите категории расходов, которые будут учитываться в этом кошельке:",
                 confirmButtonText = "Связать",
-                preselectedCategories = state.wallet?.linkedCategories ?: emptyList()
+                preselectedCategories = state.wallet?.linkedCategories ?: emptyList(),
             )
         }
 
@@ -404,8 +404,8 @@ fun WalletTransactionsScreen(
                     TextButton(onClick = { viewModel.onEvent(WalletTransactionsEvent.ClearError) }) {
                         Text("ОК")
                     }
-                }
+                },
             )
         }
     }
-} 
+}

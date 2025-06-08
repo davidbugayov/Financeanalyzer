@@ -13,7 +13,7 @@ import androidx.compose.runtime.Composable
 fun TransactionActionsHandler(
     transactionDialogState: TransactionDialogState,
     onEvent: (TransactionEvent) -> Unit,
-    onNavigateToEdit: ((String) -> Unit)? = null
+    onNavigateToEdit: ((String) -> Unit)? = null,
 ) {
     // Диалог подтверждения удаления транзакции
     if (transactionDialogState.showDeleteConfirmDialog && transactionDialogState.transactionToDelete != null) {
@@ -21,13 +21,13 @@ fun TransactionActionsHandler(
             transaction = transactionDialogState.transactionToDelete,
             onConfirm = {
                 onEvent(
-                    TransactionEvent.DeleteTransaction(transactionDialogState.transactionToDelete)
+                    TransactionEvent.DeleteTransaction(transactionDialogState.transactionToDelete),
                 )
                 onEvent(TransactionEvent.HideDeleteConfirmDialog)
             },
             onDismiss = {
                 onEvent(TransactionEvent.HideDeleteConfirmDialog)
-            }
+            },
         )
     }
 
@@ -41,4 +41,4 @@ fun TransactionActionsHandler(
             onEvent(TransactionEvent.HideEditDialog)
         }
     }
-} 
+}

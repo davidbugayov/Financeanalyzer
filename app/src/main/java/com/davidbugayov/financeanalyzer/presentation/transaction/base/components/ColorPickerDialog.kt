@@ -34,11 +34,11 @@ fun ColorPickerDialog(initialColor: Int, onColorSelected: (Int) -> Unit, onDismi
             Column {
                 FlowRow(
                     horizontalArrangement = Arrangement.spacedBy(
-                        dimensionResource(R.dimen.spacing_medium)
+                        dimensionResource(R.dimen.spacing_medium),
                     ),
                     verticalArrangement = Arrangement.spacedBy(
-                        dimensionResource(R.dimen.spacing_medium)
-                    )
+                        dimensionResource(R.dimen.spacing_medium),
+                    ),
                 ) {
                     ExpenseChartPalette.forEach { composeColor ->
                         val argbColor = composeColor.toArgb()
@@ -54,9 +54,9 @@ fun ColorPickerDialog(initialColor: Int, onColorSelected: (Int) -> Unit, onDismi
                                     } else {
                                         Color.Transparent
                                     },
-                                    shape = CircleShape
+                                    shape = CircleShape,
                                 )
-                                .clickable { onColorSelected(argbColor) }
+                                .clickable { onColorSelected(argbColor) },
                         )
                     }
                 }
@@ -66,6 +66,6 @@ fun ColorPickerDialog(initialColor: Int, onColorSelected: (Int) -> Unit, onDismi
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.close))
             }
-        }
+        },
     )
-} 
+}

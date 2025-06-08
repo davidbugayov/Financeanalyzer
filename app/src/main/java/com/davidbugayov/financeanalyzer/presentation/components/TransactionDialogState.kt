@@ -17,5 +17,5 @@ data class TransactionDialogState(
     val transactionToDelete: Transaction? = null,
 
     /** Показывать ли диалог подтверждения удаления */
-    val showDeleteConfirmDialog: Boolean = false
-) 
+    val showDeleteConfirmDialog: Boolean = false,
+)

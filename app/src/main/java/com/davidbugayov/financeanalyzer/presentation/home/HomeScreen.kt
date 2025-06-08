@@ -65,11 +65,11 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
         navigationIcon = {
             if (BuildConfig.DEBUG) {
                 IconButton(
-                    onClick = onGenerateTestData
+                    onClick = onGenerateTestData,
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
-                        contentDescription = stringResource(R.string.generate_test_data)
+                        contentDescription = stringResource(R.string.generate_test_data),
                     )
                 }
             }
@@ -78,25 +78,21 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
             IconButton(onClick = onNavigateToProfile) {
                 Icon(
                     imageVector = Icons.Default.Person,
-                    contentDescription = stringResource(R.string.profile)
+                    contentDescription = stringResource(R.string.profile),
                 )
             }
         },
-        titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+        titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
     )
 }
 
 @Composable
-private fun HomeBottomBar(
-    onNavigateToChart: () -> Unit,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToAdd: () -> Unit
-) {
+private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: () -> Unit, onNavigateToAdd: () -> Unit) {
     AnimatedBottomNavigationBar(
         visible = true,
         onChartClick = onNavigateToChart,
         onHistoryClick = onNavigateToHistory,
-        onAddClick = onNavigateToAdd
+        onAddClick = onNavigateToAdd,
     )
 }
 
@@ -110,7 +106,7 @@ private fun HomeMainContent(
     onFilterSelected: (TransactionFilter) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
 ) {
     if (windowSizeIsCompact) {
         CompactLayout(
@@ -121,7 +117,7 @@ private fun HomeMainContent(
             onFilterSelected = onFilterSelected,
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
-            onAddClick = onAddClick
+            onAddClick = onAddClick,
         )
     } else {
         ExpandedLayout(
@@ -132,7 +128,7 @@ private fun HomeMainContent(
             onFilterSelected = onFilterSelected,
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
-            onAddClick = onAddClick
+            onAddClick = onAddClick,
         )
     }
 }
@@ -146,21 +142,21 @@ private fun HomeDialogs(
     onEditTransaction: (Transaction) -> Unit,
     transactionToDelete: Transaction?,
     onConfirmDelete: () -> Unit,
-    onDismissDelete: () -> Unit
+    onDismissDelete: () -> Unit,
 ) {
     if (showActionsDialog && selectedTransaction != null) {
         TransactionActionsDialog(
             transaction = selectedTransaction,
             onDismiss = onDismissActionsDialog,
             onDelete = onDeleteTransaction,
-            onEdit = onEditTransaction
+            onEdit = onEditTransaction,
         )
     }
     transactionToDelete?.let { transaction ->
         DeleteTransactionDialog(
             transaction = transaction,
             onConfirm = onConfirmDelete,
-            onDismiss = onDismissDelete
+            onDismiss = onDismissDelete,
         )
     }
 }
@@ -172,7 +168,7 @@ private fun HomeFeedback(
     feedbackType: FeedbackType,
     showFeedback: Boolean,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     FeedbackMessage(
         title = title,
@@ -181,7 +177,7 @@ private fun HomeFeedback(
         visible = showFeedback,
         onDismiss = onDismiss,
         modifier = modifier
-            .padding(top = dimensionResource(R.dimen.padding_small))
+            .padding(top = dimensionResource(R.dimen.padding_small)),
     )
 }
 
@@ -192,7 +188,7 @@ fun HomeScreen(
     categoriesViewModel: CategoriesViewModel = koinViewModel(),
     editViewModel: EditTransactionViewModel = koinViewModel(),
     achievementsUiViewModel: AchievementsUiViewModel = koinViewModel(),
-    updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject()
+    updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject(),
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -210,7 +206,7 @@ fun HomeScreen(
     val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
 
     val showAchievementFeedback = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>(
-        "show_achievement_feedback"
+        "show_achievement_feedback",
     ) == true
     if (showAchievementFeedback) {
         feedbackMessage = stringResource(R.string.achievement_first_steps_unlocked)
@@ -218,14 +214,14 @@ fun HomeScreen(
         showFeedback = true
         navController.currentBackStackEntry?.savedStateHandle?.set(
             "show_achievement_feedback",
-            false
+            false,
         )
     }
 
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "home",
-            screenClass = "HomeScreen"
+            screenClass = "HomeScreen",
         )
         updateWidgetsUseCase(context)
     }
@@ -278,21 +274,21 @@ fun HomeScreen(
                     feedbackType = FeedbackType.SUCCESS
                     showFeedback = true
                 },
-                onNavigateToProfile = { /* Implementation needed */ }
+                onNavigateToProfile = { /* Implementation needed */ },
             )
         },
         bottomBar = {
             HomeBottomBar(
                 onNavigateToChart = { /* Implementation needed */ },
                 onNavigateToHistory = { /* Implementation needed */ },
-                onNavigateToAdd = { /* Implementation needed */ }
+                onNavigateToAdd = { /* Implementation needed */ },
             )
-        }
+        },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             if (state.isLoading && state.transactions.isEmpty()) {
                 CenteredLoadingIndicator()
@@ -306,7 +302,7 @@ fun HomeScreen(
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = { /* Implementation needed */ }
+                    onAddClick = { /* Implementation needed */ },
                 )
             }
             HomeFeedback(
@@ -320,7 +316,7 @@ fun HomeScreen(
                 feedbackType = feedbackType,
                 showFeedback = showFeedback,
                 onDismiss = { showFeedback = false },
-                modifier = Modifier.align(Alignment.TopCenter)
+                modifier = Modifier.align(Alignment.TopCenter),
             )
         }
     }
@@ -362,7 +358,7 @@ fun HomeScreen(
         },
         onDismissDelete = {
             viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
-        }
+        },
     )
 
     val achievementsUiState by achievementsUiViewModel.uiState.collectAsState()
@@ -372,7 +368,7 @@ fun HomeScreen(
             message = achievement.title,
             type = FeedbackType.SUCCESS,
             visible = true,
-            onDismiss = { achievementsUiViewModel.onAchievementShown() }
+            onDismiss = { achievementsUiViewModel.onAchievementShown() },
         )
     }
 }

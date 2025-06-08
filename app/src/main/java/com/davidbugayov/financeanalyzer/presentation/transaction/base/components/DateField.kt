@@ -30,12 +30,12 @@ fun DateField(date: Date, onClick: () -> Unit, modifier: Modifier = Modifier) {
             IconButton(onClick = onClick) {
                 Icon(
                     imageVector = Icons.Default.DateRange,
-                    contentDescription = stringResource(R.string.select_date_button)
+                    contentDescription = stringResource(R.string.select_date_button),
                 )
             }
         },
         modifier = modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick),
     )
-} 
+}

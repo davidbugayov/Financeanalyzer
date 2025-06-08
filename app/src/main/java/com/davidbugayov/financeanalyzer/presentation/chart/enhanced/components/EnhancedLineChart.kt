@@ -109,7 +109,7 @@ fun EnhancedLineChart(
             value >= 1_000_000_000 -> String.format(
                 Locale.getDefault(),
                 "%.1fB",
-                value / 1_000_000_000
+                value / 1_000_000_000,
             )
             value >= 1_000_000 -> String.format(Locale.getDefault(), "%.1fM", value / 1_000_000)
             value >= 1_000 -> String.format(Locale.getDefault(), "%.1fK", value / 1_000)
@@ -119,7 +119,7 @@ fun EnhancedLineChart(
     onPointSelected: (LineChartPoint?) -> Unit = {},
     modifier: Modifier = Modifier,
     chartHeight: Dp = DefaultChartHeight,
-    selectionThresholdDp: Dp = DefaultSelectionThreshold
+    selectionThresholdDp: Dp = DefaultSelectionThreshold,
 ) {
     // Проверяем, есть ли данные для отображения
     val hasIncomeData = incomeData.isNotEmpty() && showIncome
@@ -140,7 +140,7 @@ fun EnhancedLineChart(
     val animatedProgress by animateFloatAsState(
         targetValue = 1f,
         animationSpec = tween(ANIMATION_DURATION, easing = FastOutSlowInEasing),
-        label = "ChartAnimation"
+        label = "ChartAnimation",
     )
 
     // Преобразуем selectionThreshold в пиксели заранее
@@ -168,14 +168,26 @@ fun EnhancedLineChart(
 
     // Вычисляем максимальные и минимальные значения для каждого типа данных
     val (minValue, maxValue) = remember(allPoints) {
-        val maxIncomeValue = if (hasIncomeData) incomeData.maxOfOrNull { it.value.amount } ?: BigDecimal.ZERO else BigDecimal.ZERO
-        val maxExpenseValue = if (hasExpenseData) expenseData.maxOfOrNull { it.value.amount } ?: BigDecimal.ZERO else BigDecimal.ZERO
+        val maxIncomeValue = if (hasIncomeData) {
+            incomeData.maxOfOrNull {
+                it.value.amount
+            } ?: BigDecimal.ZERO
+        } else {
+            BigDecimal.ZERO
+        }
+        val maxExpenseValue = if (hasExpenseData) {
+            expenseData.maxOfOrNull {
+                it.value.amount
+            } ?: BigDecimal.ZERO
+        } else {
+            BigDecimal.ZERO
+        }
         val effectiveMaxValue = maxOf(maxIncomeValue, maxExpenseValue)
         val calculatedMaxValue = if (effectiveMaxValue == BigDecimal.ZERO) {
             BigDecimal.ONE
         } else {
             effectiveMaxValue.multiply(
-                BigDecimal("1.1")
+                BigDecimal("1.1"),
             ) // Ensure not zero, add padding
         }
         0f to calculatedMaxValue.toFloat()
@@ -188,14 +200,14 @@ fun EnhancedLineChart(
         hasIncomeData,
         hasExpenseData,
         incomeData.size,
-        expenseData.size
+        expenseData.size,
     ) {
         Timber.d("EnhancedLineChart: Y range: $minValue - $maxValue")
         Timber.d(
-            "EnhancedLineChart: Income - ${if (hasIncomeData) "${incomeData.size} points" else "no data"}"
+            "EnhancedLineChart: Income - ${if (hasIncomeData) "${incomeData.size} points" else "no data"}",
         )
         Timber.d(
-            "EnhancedLineChart: Expense - ${if (hasExpenseData) "${expenseData.size} points" else "no data"}"
+            "EnhancedLineChart: Expense - ${if (hasExpenseData) "${expenseData.size} points" else "no data"}",
         )
     }
 
@@ -238,7 +250,7 @@ fun EnhancedLineChart(
     val fullDateFormatter = remember {
         SimpleDateFormat(
             "dd MMMM yyyy",
-            Locale.forLanguageTag("ru-RU")
+            Locale.forLanguageTag("ru-RU"),
         )
     }
 
@@ -254,37 +266,37 @@ fun EnhancedLineChart(
             .fillMaxWidth()
             .clip(RoundedCornerShape(cardCornerRadius)),
         colors = CardDefaults.cardColors(containerColor = surfaceColor),
-        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation)
+        elevation = CardDefaults.cardElevation(defaultElevation = cardElevation),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(spacingNormal)
+                .padding(spacingNormal),
         ) {
             // Заголовок и подзаголовок
             Text(
                 text = title,
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             if (subtitle.isNotEmpty() || period.isNotEmpty()) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (subtitle.isNotEmpty()) {
                         Text(
                             text = subtitle,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     if (period.isNotEmpty()) {
                         Text(
                             text = period,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -297,7 +309,7 @@ fun EnhancedLineChart(
             // Анимируем высоту контейнера для выбранной точки (простая анимация)
             val animatedSpacerHeight by animateFloatAsState(
                 targetValue = if (selectedPoint != null) spacingMedium.value else 0f,
-                label = "SelectedPointSpacerHeight"
+                label = "SelectedPointSpacerHeight",
             )
             if (animatedSpacerHeight > 0f) {
                 Spacer(modifier = Modifier.height(animatedSpacerHeight.dp))
@@ -306,18 +318,18 @@ fun EnhancedLineChart(
             if (selectedPoint != null) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.SpaceBetween
+                    horizontalArrangement = Arrangement.SpaceBetween,
                 ) {
                     Text(
                         text = fullDateFormatter.format(selectedPoint.date),
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
                     )
                     Text(
                         text = selectedPoint.value.format(true),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
-                        color = if (selectedPoint == selectedIncomePoint) currentIncomeColor else currentExpenseColor
+                        color = if (selectedPoint == selectedIncomePoint) currentIncomeColor else currentExpenseColor,
                     )
                 }
                 Spacer(modifier = Modifier.height(spacingMedium)) // Add space after selected point info
@@ -334,8 +346,8 @@ fun EnhancedLineChart(
                         start = AxisPaddingStart,
                         end = AxisPaddingEnd,
                         top = AxisPaddingTop,
-                        bottom = AxisPaddingBottom
-                    )
+                        bottom = AxisPaddingBottom,
+                    ),
             ) {
                 Canvas(
                     modifier = Modifier
@@ -348,7 +360,7 @@ fun EnhancedLineChart(
                             minValue,
                             maxValue,
                             thresholdPx,
-                            animatedProgress
+                            animatedProgress,
                         ) {
                             detectTapGestures { offset ->
                                 Timber.d("Tap detected in Canvas at $offset")
@@ -369,7 +381,7 @@ fun EnhancedLineChart(
                                         chartWidth = canvasWidth,
                                         chartHeight = canvasHeight,
                                         threshold = thresholdPx,
-                                        animatedProgress = animatedProgress
+                                        animatedProgress = animatedProgress,
                                     )
                                 } else {
                                     null
@@ -386,14 +398,14 @@ fun EnhancedLineChart(
                                         chartWidth = canvasWidth,
                                         chartHeight = canvasHeight,
                                         threshold = thresholdPx,
-                                        animatedProgress = animatedProgress
+                                        animatedProgress = animatedProgress,
                                     )
                                 } else {
                                     null
                                 }
 
                                 Timber.d(
-                                    "findNearestPoint result - income: ${incomePoint?.value?.amount}, expense: ${expensePoint?.value?.amount}"
+                                    "findNearestPoint result - income: ${incomePoint?.value?.amount}, expense: ${expensePoint?.value?.amount}",
                                 )
 
                                 val currentlySelected = selectedIncomePoint ?: selectedExpensePoint
@@ -411,7 +423,7 @@ fun EnhancedLineChart(
                                                 maxValue,
                                                 canvasWidth,
                                                 canvasHeight,
-                                                animatedProgress
+                                                animatedProgress,
                                             )
                                         val expenseDist =
                                             calculateDistance(
@@ -423,10 +435,10 @@ fun EnhancedLineChart(
                                                 maxValue,
                                                 canvasWidth,
                                                 canvasHeight,
-                                                animatedProgress
+                                                animatedProgress,
                                             )
                                         Timber.d(
-                                            "Tap Handler: Both points. IncomeDist=$incomeDist, ExpenseDist=$expenseDist"
+                                            "Tap Handler: Both points. IncomeDist=$incomeDist, ExpenseDist=$expenseDist",
                                         )
                                         if (incomeDist <= expenseDist) incomePoint else expensePoint
                                     }
@@ -439,7 +451,7 @@ fun EnhancedLineChart(
                                 if (newSelection != currentlySelected) {
                                     if (newSelection == null) {
                                         Timber.d(
-                                            "Tap Handler: No point found nearby or tapped empty space, clearing selection."
+                                            "Tap Handler: No point found nearby or tapped empty space, clearing selection.",
                                         )
                                         selectedIncomePoint = null
                                         selectedExpensePoint = null
@@ -461,7 +473,7 @@ fun EnhancedLineChart(
                                 // Если тапнули на уже выбранную точку - ничего не делаем
                                 else {
                                     Timber.d(
-                                        "Tap Handler: Tapped on the already selected point or no change."
+                                        "Tap Handler: Tapped on the already selected point or no change.",
                                     )
                                 }
                             }
@@ -473,7 +485,7 @@ fun EnhancedLineChart(
                                 TextStyle(
                                     fontSize = AxisLabelFontSize,
                                     color = axisLabelColor.copy(alpha = 0.8f),
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
                                 )
                             val xLabelStyle = yLabelStyle.copy(textAlign = TextAlign.Center)
                             val gridDashEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 4f), 0f)
@@ -483,13 +495,13 @@ fun EnhancedLineChart(
                                 color = axisColor,
                                 start = Offset(0f, height),
                                 end = Offset(width, height),
-                                strokeWidth = AxisStrokeWidth
+                                strokeWidth = AxisStrokeWidth,
                             )
                             drawLine(
                                 color = axisColor,
                                 start = Offset(0f, 0f),
                                 end = Offset(0f, height),
-                                strokeWidth = AxisStrokeWidth
+                                strokeWidth = AxisStrokeWidth,
                             )
 
                             // Рисуем горизонтальные линии и метки на оси Y
@@ -504,26 +516,26 @@ fun EnhancedLineChart(
                                         start = Offset(0f, y),
                                         end = Offset(width, y),
                                         strokeWidth = GridStrokeWidth,
-                                        pathEffect = gridDashEffect
+                                        pathEffect = gridDashEffect,
                                     )
 
                                     val formattedValue = formatYValue(value)
                                     val textLayoutResult = textMeasurer.measure(
                                         text = formattedValue,
-                                        style = yLabelStyle
+                                        style = yLabelStyle,
                                     )
                                     drawText(
                                         textLayoutResult = textLayoutResult,
                                         topLeft = Offset(
                                             -textLayoutResult.size.width - yLabelOffsetPx,
-                                            y - textLayoutResult.size.height / 2
-                                        )
+                                            y - textLayoutResult.size.height / 2,
+                                        ),
                                     )
                                     drawLine(
                                         color = axisColor,
                                         start = Offset(-axisTickLengthPx, y),
                                         end = Offset(0f, y),
-                                        strokeWidth = SelectedPointLineStrokeWidth
+                                        strokeWidth = SelectedPointLineStrokeWidth,
                                     )
                                 }
                             }
@@ -544,26 +556,26 @@ fun EnhancedLineChart(
                                             start = Offset(x, 0f),
                                             end = Offset(x, height),
                                             strokeWidth = GridStrokeWidth,
-                                            pathEffect = gridDashEffect
+                                            pathEffect = gridDashEffect,
                                         )
                                     }
 
                                     val textLayoutResult = textMeasurer.measure(
                                         text = formattedDate,
-                                        style = xLabelStyle
+                                        style = xLabelStyle,
                                     )
                                     drawText(
                                         textLayoutResult = textLayoutResult,
                                         topLeft = Offset(
                                             x - textLayoutResult.size.width / 2,
-                                            height + xLabelOffsetPx
-                                        )
+                                            height + xLabelOffsetPx,
+                                        ),
                                     )
                                     drawLine(
                                         color = axisColor,
                                         start = Offset(x, height),
                                         end = Offset(x, height + axisTickLengthPx),
-                                        strokeWidth = SelectedPointLineStrokeWidth
+                                        strokeWidth = SelectedPointLineStrokeWidth,
                                     )
                                 }
                             }
@@ -571,9 +583,9 @@ fun EnhancedLineChart(
                                 width,
                                 height,
                                 color = gridColor,
-                                pathEffect = gridDashEffect
+                                pathEffect = gridDashEffect,
                             )
-                        }
+                        },
                 ) {
                     // Отрисовка графиков
                     if (hasIncomeData) {
@@ -586,7 +598,7 @@ fun EnhancedLineChart(
                             lineColor = currentIncomeColor,
                             fillColor = currentIncomeColor.copy(alpha = 0.2f),
                             animatedProgress = animatedProgress,
-                            selectedPoint = selectedIncomePoint
+                            selectedPoint = selectedIncomePoint,
                         )
                     }
                     if (hasExpenseData) {
@@ -599,7 +611,7 @@ fun EnhancedLineChart(
                             lineColor = currentExpenseColor,
                             fillColor = currentExpenseColor.copy(alpha = 0.2f),
                             animatedProgress = animatedProgress,
-                            selectedPoint = selectedExpensePoint
+                            selectedPoint = selectedExpensePoint,
                         )
                     }
                 }
@@ -613,12 +625,12 @@ fun EnhancedLineChart(
                     .fillMaxWidth()
                     .padding(top = spacingMedium),
                 horizontalArrangement = Arrangement.Center,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 if (showIncome) {
                     ChartLegendItem(
                         color = currentIncomeColor,
-                        text = stringResource(id = R.string.chart_title_income) // Use string resource
+                        text = stringResource(id = R.string.chart_title_income), // Use string resource
                     )
                     if (showExpense) {
                         Spacer(modifier = Modifier.width(spacingNormal))
@@ -627,7 +639,7 @@ fun EnhancedLineChart(
                 if (showExpense) {
                     ChartLegendItem(
                         color = currentExpenseColor,
-                        text = stringResource(id = R.string.chart_title_expense) // Use string resource
+                        text = stringResource(id = R.string.chart_title_expense), // Use string resource
                     )
                 }
             }
@@ -637,7 +649,7 @@ fun EnhancedLineChart(
     // Отслеживаем изменения видимости и сбрасываем точки, если нужно
     LaunchedEffect(showIncome, showExpense) {
         Timber.d(
-            "Visibility changed: showIncome=$showIncome, showExpense=$showExpense. Selected: I=${selectedIncomePoint?.value?.amount} E=${selectedExpensePoint?.value?.amount}"
+            "Visibility changed: showIncome=$showIncome, showExpense=$showExpense. Selected: I=${selectedIncomePoint?.value?.amount} E=${selectedExpensePoint?.value?.amount}",
         )
         if (!showIncome && selectedIncomePoint != null) {
             Timber.d("Hiding income, deselecting income point.")
@@ -657,7 +669,7 @@ fun EnhancedLineChart(
         } else if (selectedIncomePoint == null && selectedExpensePoint == null) onPointSelected(null)
 
         Timber.d(
-            "Visibility change processed. Selected: I=${selectedIncomePoint?.value?.amount} E=${selectedExpensePoint?.value?.amount}"
+            "Visibility change processed. Selected: I=${selectedIncomePoint?.value?.amount} E=${selectedExpensePoint?.value?.amount}",
         )
     }
 }
@@ -672,7 +684,7 @@ private fun calculateDistance(
     maxValue: Float,
     chartWidth: Float,
     chartHeight: Float,
-    animatedProgress: Float
+    animatedProgress: Float,
 ): Float {
     if (endDate <= startDate || maxValue <= minValue) return Float.MAX_VALUE // Avoid division by zero
     val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
@@ -683,4 +695,4 @@ private fun calculateDistance(
     val x = normalizedX * chartWidth * animatedProgress
     val y = normalizedY * chartHeight
     return hypot(x - tapPosition.x, y - tapPosition.y)
-} 
+}

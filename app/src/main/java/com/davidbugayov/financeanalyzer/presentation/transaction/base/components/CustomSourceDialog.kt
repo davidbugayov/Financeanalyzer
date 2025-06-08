@@ -43,7 +43,7 @@ fun CustomSourceDialog(
     onSourceNameChange: (String) -> Unit,
     onColorClick: (Int) -> Unit,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     var showColorPicker by remember { mutableStateOf(false) }
 
@@ -75,14 +75,14 @@ fun CustomSourceDialog(
                     },
                     label = { Text(stringResource(R.string.source_name)) },
                     isError = sourceName.trim().length < 2,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 if (sourceName.trim().length < 2) {
                     Text(
                         text = "Название должно содержать минимум 2 символа",
                         color = Color.Red,
-                        modifier = Modifier.padding(top = 4.dp)
+                        modifier = Modifier.padding(top = 4.dp),
                     )
                 }
 
@@ -96,11 +96,11 @@ fun CustomSourceDialog(
                             Timber.d("Color picker clicked, showing color picker dialog")
                             showColorPicker = true
                         }
-                        .padding(vertical = 8.dp)
+                        .padding(vertical = 8.dp),
                 ) {
                     Text(
                         text = "Выберите цвет:",
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
 
                     Box(
@@ -108,7 +108,7 @@ fun CustomSourceDialog(
                             .size(40.dp)
                             .clip(CircleShape)
                             .background(Color(color))
-                            .clickable { showColorPicker = true }
+                            .clickable { showColorPicker = true },
                     )
                 }
             }
@@ -119,7 +119,7 @@ fun CustomSourceDialog(
                     Timber.d("Confirm button clicked with sourceName='$sourceName', color=$color")
                     onConfirm()
                 },
-                enabled = sourceName.trim().length >= 2
+                enabled = sourceName.trim().length >= 2,
             ) {
                 Text("Добавить")
             }
@@ -131,7 +131,7 @@ fun CustomSourceDialog(
             }) {
                 Text(stringResource(R.string.cancel))
             }
-        }
+        },
     )
 
     if (showColorPicker) {
@@ -145,7 +145,7 @@ fun CustomSourceDialog(
             onDismiss = {
                 Timber.d("Color picker dismissed")
                 showColorPicker = false
-            }
+            },
         )
     }
-} 
+}

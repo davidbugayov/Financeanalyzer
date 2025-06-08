@@ -14,7 +14,7 @@ import java.io.BufferedInputStream
  */
 class SberbankPdfHandler(
     transactionRepository: TransactionRepository,
-    context: Context
+    context: Context,
 ) : AbstractPdfBankHandler(transactionRepository, context) {
 
     override val bankName: String = "Сбербанк PDF"
@@ -27,7 +27,7 @@ class SberbankPdfHandler(
         "sber",
         "выписка по счету",
         "выписка по счёту",
-        "выписка сбербанк"
+        "выписка сбербанк",
     )
 
     /**
@@ -53,17 +53,17 @@ class SberbankPdfHandler(
                             "900 www.sberbank.ru",
                             "СберБанк Онлайн",
                             "ПАО Сбербанк",
-                            "Для проверки подлинности документа"
+                            "Для проверки подлинности документа",
                         )
                         val hasSberIndicator = sberIndicators.any {
                             content.contains(
                                 it,
-                                ignoreCase = true
+                                ignoreCase = true,
                             )
                         }
                         if (hasSberIndicator) {
                             Timber.d(
-                                "[$bankName Handler] Найден индикатор Сбербанка в содержимом файла"
+                                "[$bankName Handler] Найден индикатор Сбербанка в содержимом файла",
                             )
                             return true
                         }
@@ -71,7 +71,7 @@ class SberbankPdfHandler(
                 }
             } catch (e: Exception) {
                 Timber.w(
-                    "[$bankName Handler] Ошибка при чтении файла для определения: ${e.message}"
+                    "[$bankName Handler] Ошибка при чтении файла для определения: ${e.message}",
                 )
             }
         }

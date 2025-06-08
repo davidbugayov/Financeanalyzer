@@ -30,11 +30,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
  * @param onDismiss Обработчик закрытия диалога.
  */
 @Composable
-fun ThemeSelectionDialog(
-    selectedTheme: ThemeMode,
-    onThemeSelected: (ThemeMode) -> Unit,
-    onDismiss: () -> Unit
-) {
+fun ThemeSelectionDialog(selectedTheme: ThemeMode, onThemeSelected: (ThemeMode) -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.profile_theme_select)) },
@@ -43,7 +39,7 @@ fun ThemeSelectionDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .selectableGroup()
+                    .selectableGroup(),
             ) {
                 ThemeOption(
                     text = stringResource(R.string.profile_theme_light),
@@ -51,7 +47,7 @@ fun ThemeSelectionDialog(
                     onClick = {
                         onThemeSelected(ThemeMode.LIGHT)
                         onDismiss()
-                    }
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -62,7 +58,7 @@ fun ThemeSelectionDialog(
                     onClick = {
                         onThemeSelected(ThemeMode.DARK)
                         onDismiss()
-                    }
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -73,7 +69,7 @@ fun ThemeSelectionDialog(
                     onClick = {
                         onThemeSelected(ThemeMode.SYSTEM)
                         onDismiss()
-                    }
+                    },
                 )
             }
         },
@@ -81,7 +77,7 @@ fun ThemeSelectionDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.done))
             }
-        }
+        },
     )
 }
 
@@ -99,21 +95,21 @@ private fun ThemeOption(text: String, selected: Boolean, onClick: () -> Unit) {
             .selectable(
                 selected = selected,
                 onClick = onClick,
-                role = Role.RadioButton
+                role = Role.RadioButton,
             )
             .padding(dimensionResource(R.dimen.spacing_medium)),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
             selected = selected,
-            onClick = null // null, так как обработка происходит внутри Row
+            onClick = null, // null, так как обработка происходит внутри Row
         )
 
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
 
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyLarge
+            style = MaterialTheme.typography.bodyLarge,
         )
     }
-} 
+}

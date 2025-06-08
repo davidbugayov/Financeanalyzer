@@ -68,7 +68,7 @@ import timber.log.Timber
 fun TransactionHistoryState.toTransactionDialogState(): TransactionDialogState {
     return TransactionDialogState(
         transactionToDelete = this.transactionToDelete,
-        showDeleteConfirmDialog = this.transactionToDelete != null
+        showDeleteConfirmDialog = this.transactionToDelete != null,
     )
 }
 
@@ -78,7 +78,7 @@ fun TransactionHistoryScreen(
     viewModel: TransactionHistoryViewModel,
     editTransactionViewModel: EditTransactionViewModel,
     onNavigateBack: () -> Unit,
-    navController: NavController
+    navController: NavController,
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -116,7 +116,7 @@ fun TransactionHistoryScreen(
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "transaction_history",
-            screenClass = "TransactionHistoryScreen"
+            screenClass = "TransactionHistoryScreen",
         )
         Timber.d("TransactionHistoryScreen открыт, текущий период: ${state.periodType}")
         viewModel.loadTransactions()
@@ -126,7 +126,7 @@ fun TransactionHistoryScreen(
     // Отслеживаем изменения периода
     LaunchedEffect(state.periodType) {
         Timber.d(
-            "Период изменился на: ${state.periodType}, загружено транзакций: ${state.transactions.size}"
+            "Период изменился на: ${state.periodType}, загружено транзакций: ${state.transactions.size}",
         )
     }
 
@@ -166,7 +166,7 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HidePeriodDialog)
-            }
+            },
         )
     }
 
@@ -181,7 +181,7 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideStartDatePicker)
-            }
+            },
         )
     }
 
@@ -196,7 +196,7 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideEndDatePicker)
-            }
+            },
         )
     }
 
@@ -212,7 +212,7 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideCategoryDialog)
-            }
+            },
         )
     }
 
@@ -233,7 +233,7 @@ fun TransactionHistoryScreen(
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideDeleteCategoryConfirmDialog)
             },
-            isDefaultCategory = isDefaultCategory
+            isDefaultCategory = isDefaultCategory,
         )
     }
 
@@ -247,7 +247,7 @@ fun TransactionHistoryScreen(
             // Переходим на экран редактирования
             navController.navigate(Screen.EditTransaction.createRoute(transactionId))
             Timber.d("Navigating to edit transaction with ID: $transactionId")
-        }
+        },
     )
 
     // Диалог выбора источника
@@ -269,7 +269,7 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
-            }
+            },
         )
     }
 
@@ -282,7 +282,7 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideDeleteSourceConfirmDialog)
-            }
+            },
         )
     }
 
@@ -299,7 +299,7 @@ fun TransactionHistoryScreen(
                 showActionsDialog = false
                 // Загружаем транзакцию в ViewModel для редактирования и переходим на экран редактирования
                 handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction.id))
-            }
+            },
         )
     }
 
@@ -311,61 +311,61 @@ fun TransactionHistoryScreen(
                     IconButton(onClick = onNavigateBack) {
                         Icon(
                             imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back)
+                            contentDescription = stringResource(R.string.back),
                         )
                     }
                 },
                 actions = {
                     IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) },
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterAlt,
-                            contentDescription = stringResource(R.string.select_period)
+                            contentDescription = stringResource(R.string.select_period),
                         )
                     }
                     IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) },
                     ) {
                         Icon(
                             imageVector = Icons.Default.FilterList,
-                            contentDescription = stringResource(R.string.filter_by_category)
+                            contentDescription = stringResource(R.string.filter_by_category),
                         )
                     }
                     IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) },
                     ) {
                         Icon(
                             imageVector = Icons.Default.AccountBalance,
-                            contentDescription = stringResource(R.string.filter_by_source)
+                            contentDescription = stringResource(R.string.filter_by_source),
                         )
                     }
                 },
-                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
             )
-        }
+        },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
+                    .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     GroupingChips(
                         currentGrouping = state.groupingType,
                         onGroupingSelected = {
                             viewModel.onEvent(
-                                TransactionHistoryEvent.SetGroupingType(it)
+                                TransactionHistoryEvent.SetGroupingType(it),
                             )
-                        }
+                        },
                     )
                 }
 
@@ -374,17 +374,17 @@ fun TransactionHistoryScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(vertical = dimensionResource(R.dimen.spacing_small)),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = UiUtils.formatPeriod(
                             state.periodType,
                             state.startDate,
-                            state.endDate
+                            state.endDate,
                         ),
                         fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
                         color = MaterialTheme.colorScheme.primary,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
                     )
                 }
 
@@ -395,7 +395,7 @@ fun TransactionHistoryScreen(
                             category = state.selectedCategories.first(),
                             currentTotal = currentTotal,
                             previousTotal = previousTotal,
-                            percentChange = percentChange
+                            percentChange = percentChange,
                         )
                     }
                 }
@@ -403,7 +403,7 @@ fun TransactionHistoryScreen(
                 if (state.error != null) {
                     ErrorContent(
                         error = state.error,
-                        onRetry = { viewModel.onEvent(TransactionHistoryEvent.ReloadTransactions) }
+                        onRetry = { viewModel.onEvent(TransactionHistoryEvent.ReloadTransactions) },
                     )
                 } else if (state.isLoading && !state.isLoadingMore) {
                     CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
@@ -433,7 +433,7 @@ fun TransactionHistoryScreen(
                             TransactionGroup(
                                 date = period,
                                 transactions = transactions,
-                                balance = balance
+                                balance = balance,
                             )
                         }
                     }
@@ -454,7 +454,7 @@ fun TransactionHistoryScreen(
                             viewModel.onEvent(TransactionHistoryEvent.LoadMoreTransactions)
                         },
                         isLoading = state.isLoadingMore,
-                        hasMoreData = state.hasMoreData
+                        hasMoreData = state.hasMoreData,
                     )
                 }
             }

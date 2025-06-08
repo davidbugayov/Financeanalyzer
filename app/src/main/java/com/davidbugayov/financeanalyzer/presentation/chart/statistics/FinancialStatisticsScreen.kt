@@ -72,8 +72,8 @@ fun FinancialStatisticsScreen(startDate: Long, endDate: Long, onNavigateBack: ()
     val backgroundGradient = Brush.verticalGradient(
         colors = listOf(
             MaterialTheme.colorScheme.surface,
-            MaterialTheme.colorScheme.surfaceVariant
-        )
+            MaterialTheme.colorScheme.surfaceVariant,
+        ),
     )
 
     Scaffold(
@@ -81,73 +81,73 @@ fun FinancialStatisticsScreen(startDate: Long, endDate: Long, onNavigateBack: ()
             AppTopBar(
                 title = stringResource(R.string.financial_statistics_title),
                 showBackButton = true,
-                onBackClick = onNavigateBack
+                onBackClick = onNavigateBack,
             )
         },
-        snackbarHost = { SnackbarHost(snackbarHostState) }
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(backgroundGradient)
+                .background(backgroundGradient),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(scrollState)
-                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding))
+                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
             ) {
                 // Заголовок с периодом
                 Text(
                     text = stringResource(R.string.financial_statistics_period),
                     style = MaterialTheme.typography.headlineSmall,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Text(
                     text = state.period,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large)
-                    )
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
                 )
                 KeyMetricsCard(
                     income = state.income,
                     expense = state.expense,
                     savingsRate = metrics.savingsRate,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large)
-                    )
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
                 )
                 TransactionsStatisticsCard(
                     metrics = metrics,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large)
-                    )
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
                 )
                 ExpenseAnalysisCard(
                     metrics = metrics,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large)
-                    )
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
                 )
                 RecommendationsCard(
                     metrics = metrics,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
             }
         }
     }
-} 
+}

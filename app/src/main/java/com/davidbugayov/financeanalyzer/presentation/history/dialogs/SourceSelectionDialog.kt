@@ -43,7 +43,7 @@ fun SourceSelectionDialog(
     sources: List<Source>,
     selectedSources: List<String>,
     onSourcesSelected: (List<String>) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     var localSelectedSources by remember { mutableStateOf(selectedSources) }
     val sourceNames = sources.map { it.name }
@@ -67,7 +67,7 @@ fun SourceSelectionDialog(
                                 }
                         }
                         .padding(vertical = 8.dp),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = if (localSelectedSources.isEmpty()) {
@@ -84,7 +84,7 @@ fun SourceSelectionDialog(
                         } else {
                             MaterialTheme.colorScheme.onSurface
                         },
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
 
                     Checkbox(
@@ -95,7 +95,7 @@ fun SourceSelectionDialog(
                             } else {
                                 emptyList()
                             }
-                        }
+                        },
                     )
                 }
 
@@ -111,7 +111,7 @@ fun SourceSelectionDialog(
                             sourceName = source.name,
                             sourceColorHex = null, // Так как source.color (Int) не был валидным HEX
                             isExpense = false, // Для диалога выбора источника не применимо
-                            isDarkTheme = isDarkTheme
+                            isDarkTheme = isDarkTheme,
                         )
                     }
                     SourceCheckboxItem(
@@ -124,7 +124,7 @@ fun SourceSelectionDialog(
                             } else {
                                 localSelectedSources - source.name
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -141,7 +141,7 @@ fun SourceSelectionDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.close))
             }
-        }
+        },
     )
 }
 
@@ -154,12 +154,7 @@ fun SourceSelectionDialog(
  * @param onToggle Callback, вызываемый при выборе/отмене выбора источника
  */
 @Composable
-private fun SourceCheckboxItem(
-    sourceName: String,
-    color: Color,
-    isSelected: Boolean,
-    onToggle: (Boolean) -> Unit
-) {
+private fun SourceCheckboxItem(sourceName: String, color: Color, isSelected: Boolean, onToggle: (Boolean) -> Unit) {
     Surface(
         modifier = Modifier
             .fillMaxWidth()
@@ -170,19 +165,19 @@ private fun SourceCheckboxItem(
                     MaterialTheme.colorScheme.primaryContainer
                 } else {
                     MaterialTheme.colorScheme.surface
-                }
-            )
+                },
+            ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = { onToggle(!isSelected) })
                 .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
                 checked = isSelected,
-                onCheckedChange = onToggle
+                onCheckedChange = onToggle,
             )
 
             Text(
@@ -194,8 +189,8 @@ private fun SourceCheckboxItem(
                 },
                 modifier = Modifier
                     .weight(1f)
-                    .padding(start = 8.dp)
+                    .padding(start = 8.dp),
             )
         }
     }
-} 
+}

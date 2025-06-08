@@ -63,4 +63,4 @@ object CrashlyticsUtils {
     fun setCustomKey(key: String, value: Double) {
         Timber.d("Установка Crashlytics key: $key = $value (только Timber)")
     }
-} 
+}

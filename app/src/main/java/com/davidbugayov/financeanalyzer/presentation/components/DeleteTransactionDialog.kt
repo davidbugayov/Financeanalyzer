@@ -37,11 +37,7 @@ import java.util.Locale
  * @param onDismiss Callback, вызываемый при отмене удаления
  */
 @Composable
-fun DeleteTransactionDialog(
-    transaction: Transaction,
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
+fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onDismiss: () -> Unit) {
     val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     val moneyFormatter = transaction.amount
 
@@ -50,7 +46,7 @@ fun DeleteTransactionDialog(
         transaction.source,
         transaction.sourceColor,
         transaction.isExpense,
-        isDarkTheme
+        isDarkTheme,
     ) {
         val sourceColorInt = transaction.sourceColor
         val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
@@ -59,7 +55,7 @@ fun DeleteTransactionDialog(
             sourceName = transaction.source,
             sourceColorHex = null,
             isExpense = transaction.isExpense,
-            isDarkTheme = isDarkTheme
+            isDarkTheme = isDarkTheme,
         )
     }
 
@@ -72,7 +68,7 @@ fun DeleteTransactionDialog(
                 Text(
                     text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -88,14 +84,14 @@ fun DeleteTransactionDialog(
                         MaterialTheme.colorScheme.error
                     } else {
                         MaterialTheme.colorScheme.primary
-                    }
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = "Дата: ${dateFormatter.format(transaction.date)}",
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -104,14 +100,14 @@ fun DeleteTransactionDialog(
                     Box(
                         modifier = Modifier
                             .size(12.dp)
-                            .background(effectiveSourceColor, CircleShape)
+                            .background(effectiveSourceColor, CircleShape),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
                         text = "Источник: ${transaction.source}",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = effectiveSourceColor
+                        color = effectiveSourceColor,
                     )
                 }
 
@@ -120,7 +116,7 @@ fun DeleteTransactionDialog(
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
                             text = "Примечание: $note",
-                            style = MaterialTheme.typography.bodySmall
+                            style = MaterialTheme.typography.bodySmall,
                         )
                     }
                 }
@@ -130,7 +126,7 @@ fun DeleteTransactionDialog(
                 Text(
                     text = "Вы уверены, что хотите удалить эту транзакцию?",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         },
@@ -138,7 +134,7 @@ fun DeleteTransactionDialog(
             TextButton(onClick = onConfirm) {
                 Text(
                     text = stringResource(R.string.delete),
-                    color = MaterialTheme.colorScheme.error
+                    color = MaterialTheme.colorScheme.error,
                 )
             }
         },
@@ -146,6 +142,6 @@ fun DeleteTransactionDialog(
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.cancel))
             }
-        }
+        },
     )
-} 
+}

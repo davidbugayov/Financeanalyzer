@@ -10,5 +10,5 @@ import java.util.Date
  */
 data class DailyExpense(
     val date: Date,
-    val amount: Money
+    val amount: Money,
 )

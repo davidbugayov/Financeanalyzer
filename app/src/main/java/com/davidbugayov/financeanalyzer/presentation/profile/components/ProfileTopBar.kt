@@ -17,6 +17,6 @@ fun ProfileTopBar(onNavigateBack: () -> Unit) {
         title = stringResource(R.string.profile_title),
         showBackButton = true,
         onBackClick = onNavigateBack,
-        titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+        titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
     )
-} 
+}

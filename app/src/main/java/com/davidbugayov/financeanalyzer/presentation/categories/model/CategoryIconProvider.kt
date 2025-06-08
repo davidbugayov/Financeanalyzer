@@ -1194,8 +1194,8 @@ object CategoryIconProvider {
             Icons.Filled.StarBorder,
             Icons.Filled.Favorite,
             Icons.AutoMirrored.Filled.Chat,
-            Icons.AutoMirrored.Filled.Comment
+            Icons.AutoMirrored.Filled.Comment,
 
         ).distinct() // Убедимся, что все иконки уникальны
     }
-} 
+}

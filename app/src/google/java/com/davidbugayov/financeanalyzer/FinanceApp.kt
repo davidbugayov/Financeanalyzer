@@ -21,7 +21,7 @@ import timber.log.Timber
 class FinanceApp : Application() {
 
     // AppMetrica API ключ
-    private val APP_METRICA_API_KEY = "d4ec51de-47c3-4997-812f-97b9a6663dad"
+    private val appMetricaApiKey = "d4ec51de-47c3-4997-812f-97b9a6663dad"
 
     // Составной адаптер для объединения всех систем аналитики
     private val compositeAnalytics = CompositeAnalytics()
@@ -66,7 +66,7 @@ class FinanceApp : Application() {
     private fun initAppMetrica() {
         try {
             // Настройка AppMetrica
-            val config = AppMetricaConfig.newConfigBuilder(APP_METRICA_API_KEY)
+            val config = AppMetricaConfig.newConfigBuilder(appMetricaApiKey)
                 .withLogs()
                 .withSessionTimeout(60)
                 .withCrashReporting(true)
@@ -105,7 +105,7 @@ class FinanceApp : Application() {
             firebaseAdapter.setUserProperty("app_version", BuildConfig.VERSION_NAME)
             firebaseAdapter.setUserProperty(
                 "build_type",
-                if (BuildConfig.DEBUG) "debug" else "release"
+                if (BuildConfig.DEBUG) "debug" else "release",
             )
             firebaseAdapter.setUserProperty("device_model", android.os.Build.MODEL)
             firebaseAdapter.setUserProperty("android_version", android.os.Build.VERSION.RELEASE)
@@ -127,4 +127,4 @@ class FinanceApp : Application() {
         Timber.d("Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
         Timber.d("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
-} 
+}

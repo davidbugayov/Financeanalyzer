@@ -40,7 +40,7 @@ fun SourcePickerDialog(
     onSourceSelected: (Source) -> Unit,
     onAddCustomSource: () -> Unit,
     onDismiss: () -> Unit,
-    onDeleteSource: (String) -> Unit
+    onDeleteSource: (String) -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -58,21 +58,21 @@ fun SourcePickerDialog(
                                     onLongClick = {
                                         Timber.d("Long press on source: ${source.name}")
                                         onDeleteSource(source.name)
-                                    }
+                                    },
                                 )
                                 .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
                                 modifier = Modifier
                                     .padding(end = dimensionResource(R.dimen.spacing_medium))
                                     .size(dimensionResource(R.dimen.icon_size_small))
                                     .clip(CircleShape)
-                                    .background(Color(source.color))
+                                    .background(Color(source.color)),
                             )
                             Text(
                                 text = source.name,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
 
                             Icon(
@@ -82,7 +82,7 @@ fun SourcePickerDialog(
                                 modifier = Modifier
                                     .padding(start = 8.dp)
                                     .size(18.dp)
-                                    .clickable { onDeleteSource(source.name) }
+                                    .clickable { onDeleteSource(source.name) },
                             )
                         }
                     }
@@ -92,14 +92,14 @@ fun SourcePickerDialog(
                                 .fillMaxWidth()
                                 .clickable { onAddCustomSource() }
                                 .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
-                            verticalAlignment = Alignment.CenterVertically
+                            verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = stringResource(R.string.add_custom_source),
                                 modifier = Modifier
                                     .padding(end = dimensionResource(R.dimen.spacing_medium))
-                                    .size(dimensionResource(R.dimen.icon_size_small))
+                                    .size(dimensionResource(R.dimen.icon_size_small)),
                             )
                             Text(stringResource(R.string.add_custom_source))
                         }
@@ -111,6 +111,6 @@ fun SourcePickerDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.cancel))
             }
-        }
+        },
     )
-} 
+}

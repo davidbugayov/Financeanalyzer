@@ -14,7 +14,7 @@ import java.io.BufferedInputStream
  */
 class TbankPdfHandler(
     transactionRepository: TransactionRepository,
-    context: Context
+    context: Context,
 ) : AbstractPdfBankHandler(transactionRepository, context) {
 
     override val bankName: String = "Тинькофф PDF"
@@ -26,7 +26,7 @@ class TbankPdfHandler(
         "тбанк",
         "tbank",
         "движение средств",
-        "справка о движении"
+        "справка о движении",
     )
 
     // Негативные ключевые слова для исключения ложных срабатываний
@@ -38,7 +38,7 @@ class TbankPdfHandler(
         "альфа",
         "альфабанк",
         "alfa",
-        "ozon"
+        "ozon",
     )
 
     /**
@@ -49,7 +49,7 @@ class TbankPdfHandler(
         val hasPositiveKeyword = pdfKeywords.any { fileName.lowercase().contains(it.lowercase()) }
         val containsNegativeKeyword = getNegativeKeywords().any {
             fileName.lowercase().contains(
-                it.lowercase()
+                it.lowercase(),
             )
         }
         if (containsNegativeKeyword) {
@@ -70,12 +70,12 @@ class TbankPdfHandler(
                         "Тинькофф Банк",
                         "Тинькофф",
                         "ТБАНК",
-                        "TBANK"
+                        "TBANK",
                     )
                     val hasTinkoffIndicator = tinkoffIndicators.any {
                         content.contains(
                             it,
-                            ignoreCase = true
+                            ignoreCase = true,
                         )
                     }
                     val otherBankIndicators = listOf(
@@ -84,12 +84,12 @@ class TbankPdfHandler(
                         "СберБанк",
                         "Альфа-Банк",
                         "АЛЬФА-БАНК",
-                        "OZON"
+                        "OZON",
                     )
                     val hasOtherBankIndicator = otherBankIndicators.any {
                         content.contains(
                             it,
-                            ignoreCase = true
+                            ignoreCase = true,
                         )
                     }
                     if (hasOtherBankIndicator) {

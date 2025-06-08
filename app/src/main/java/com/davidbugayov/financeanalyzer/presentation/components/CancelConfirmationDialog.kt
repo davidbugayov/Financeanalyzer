@@ -24,6 +24,6 @@ fun CancelConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.no))
             }
-        }
+        },
     )
-} 
+}

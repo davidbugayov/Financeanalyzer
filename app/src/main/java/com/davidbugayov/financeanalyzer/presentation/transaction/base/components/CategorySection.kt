@@ -54,7 +54,7 @@ fun CategorySection(
     onCategorySelected: (UiCategory) -> Unit,
     onAddCategoryClick: () -> Unit,
     onCategoryLongClick: (UiCategory) -> Unit = {},
-    isError: Boolean = false
+    isError: Boolean = false,
 ) {
     val maxRows = 2
     val columns = 4
@@ -65,7 +65,7 @@ fun CategorySection(
         categories
     } else {
         categories.take(
-            maxVisibleCategories
+            maxVisibleCategories,
         )
     }
 
@@ -77,40 +77,40 @@ fun CategorySection(
             .fillMaxWidth()
             .padding(
                 horizontal = dimensionResource(R.dimen.category_section_padding_horizontal),
-                vertical = dimensionResource(R.dimen.category_section_padding_vertical)
+                vertical = dimensionResource(R.dimen.category_section_padding_vertical),
             ),
         verticalArrangement = Arrangement.spacedBy(
-            dimensionResource(R.dimen.category_section_spacing)
-        )
+            dimensionResource(R.dimen.category_section_spacing),
+        ),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
             horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.category_header_spacing)
-                )
+                    dimensionResource(R.dimen.category_header_spacing),
+                ),
             ) {
                 Text(
                     text = stringResource(R.string.category) + " *",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
                     ),
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.category_header_padding_horizontal),
-                        vertical = dimensionResource(R.dimen.category_header_padding_vertical)
+                        vertical = dimensionResource(R.dimen.category_header_padding_vertical),
                     ),
-                    color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                    color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                 )
             }
             if (showExpand) {
                 Spacer(
                     modifier = Modifier.width(
-                        dimensionResource(R.dimen.category_expand_spacer_width)
-                    )
+                        dimensionResource(R.dimen.category_expand_spacer_width),
+                    ),
                 )
                 if (!expanded) {
                     Text(
@@ -120,11 +120,11 @@ fun CategorySection(
                             .clickable { setExpanded(true) }
                             .padding(
                                 vertical = dimensionResource(
-                                    R.dimen.category_expand_text_padding_vertical
-                                )
+                                    R.dimen.category_expand_text_padding_vertical,
+                                ),
                             ),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 } else {
                     Text(
@@ -134,11 +134,11 @@ fun CategorySection(
                             .clickable { setExpanded(false) }
                             .padding(
                                 vertical = dimensionResource(
-                                    R.dimen.category_expand_text_padding_vertical
-                                )
+                                    R.dimen.category_expand_text_padding_vertical,
+                                ),
                             ),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
                 }
             }
@@ -151,19 +151,19 @@ fun CategorySection(
                 .then(
                     if (expanded || !showExpand) {
                         Modifier.heightIn(
-                            max = dimensionResource(R.dimen.category_max_height)
+                            max = dimensionResource(R.dimen.category_max_height),
                         )
                     } else {
                         Modifier.height(dimensionResource(R.dimen.category_collapsed_height))
-                    }
+                    },
                 ),
             horizontalArrangement = Arrangement.spacedBy(
-                dimensionResource(R.dimen.category_grid_spacing)
+                dimensionResource(R.dimen.category_grid_spacing),
             ),
             verticalArrangement = Arrangement.spacedBy(
-                dimensionResource(R.dimen.category_grid_spacing)
+                dimensionResource(R.dimen.category_grid_spacing),
             ),
-            userScrollEnabled = expanded || !showExpand
+            userScrollEnabled = expanded || !showExpand,
         ) {
             items(visibleCategories) { category ->
                 contentColorFor(backgroundColor = category.color)
@@ -175,11 +175,11 @@ fun CategorySection(
                         .width(dimensionResource(R.dimen.category_item_width))
                         .combinedClickable(
                             onClick = { onCategorySelected(category) },
-                            onLongClick = { onCategoryLongClick(category) }
+                            onLongClick = { onCategoryLongClick(category) },
                         )
                         .padding(
-                            vertical = dimensionResource(R.dimen.category_item_vertical_padding)
-                        )
+                            vertical = dimensionResource(R.dimen.category_item_vertical_padding),
+                        ),
                 ) {
                     Box(
                         modifier = Modifier
@@ -190,7 +190,7 @@ fun CategorySection(
                                     isError && selectedCategory.isBlank() -> errorBackgroundColor
                                     category.name == selectedCategory -> MaterialTheme.colorScheme.primaryContainer
                                     else -> category.color
-                                }
+                                },
                             )
                             .border(
                                 width = when {
@@ -203,9 +203,9 @@ fun CategorySection(
                                     isError && selectedCategory.isBlank() -> MaterialTheme.colorScheme.error
                                     else -> category.color.copy(alpha = 0.5f)
                                 },
-                                shape = CircleShape
+                                shape = CircleShape,
                             ),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             imageVector = category.icon ?: Icons.Default.Category,
@@ -216,14 +216,14 @@ fun CategorySection(
                                 else -> Color.White
                             },
                             modifier = Modifier.size(
-                                dimensionResource(R.dimen.category_item_icon_size)
-                            )
+                                dimensionResource(R.dimen.category_item_icon_size),
+                            ),
                         )
                     }
                     Spacer(
                         modifier = Modifier.height(
-                            dimensionResource(R.dimen.category_item_spacer_height)
-                        )
+                            dimensionResource(R.dimen.category_item_spacer_height),
+                        ),
                     )
                     Text(
                         text = category.name,
@@ -234,7 +234,7 @@ fun CategorySection(
                             isError && selectedCategory.isBlank() -> errorContentColor
                             category.name == selectedCategory -> selectedContentColor
                             else -> MaterialTheme.colorScheme.onSurface
-                        }
+                        },
                     )
                 }
             }
@@ -244,8 +244,8 @@ fun CategorySection(
                     modifier = Modifier
                         .width(dimensionResource(R.dimen.category_item_width))
                         .padding(
-                            vertical = dimensionResource(R.dimen.category_item_vertical_padding)
-                        )
+                            vertical = dimensionResource(R.dimen.category_item_vertical_padding),
+                        ),
                 )
             }
         }
@@ -262,7 +262,7 @@ fun AddCategoryItem(onClick: () -> Unit, modifier: Modifier = Modifier) {
         modifier = modifier
             .width(dimensionResource(R.dimen.category_item_width))
             .clickable(onClick = onClick)
-            .padding(vertical = dimensionResource(R.dimen.category_item_vertical_padding))
+            .padding(vertical = dimensionResource(R.dimen.category_item_vertical_padding)),
     ) {
         Box(
             modifier = Modifier
@@ -272,15 +272,15 @@ fun AddCategoryItem(onClick: () -> Unit, modifier: Modifier = Modifier) {
                 .border(
                     width = dimensionResource(R.dimen.border_width_small),
                     color = MaterialTheme.colorScheme.outline,
-                    shape = CircleShape
+                    shape = CircleShape,
                 ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(R.string.add_custom_category),
                 tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.size(dimensionResource(R.dimen.category_item_icon_size))
+                modifier = Modifier.size(dimensionResource(R.dimen.category_item_icon_size)),
             )
         }
 
@@ -290,7 +290,7 @@ fun AddCategoryItem(onClick: () -> Unit, modifier: Modifier = Modifier) {
             text = stringResource(R.string.add_custom_category),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
         )
     }
-} 
+}

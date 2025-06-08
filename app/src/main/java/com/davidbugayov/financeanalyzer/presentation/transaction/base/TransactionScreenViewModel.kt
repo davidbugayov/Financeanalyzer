@@ -68,15 +68,14 @@ interface BaseTransactionState {
     val customCategoryIcon: ImageVector?
 }
 
-fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent =
-    { eventData ->
-        when (eventData) {
-            is com.davidbugayov.financeanalyzer.domain.model.Source -> BaseTransactionEvent.SetSource(
-                eventData.name
-            )
-            is UiCategory -> BaseTransactionEvent.SetCategory(eventData.name)
-            is java.util.Date -> BaseTransactionEvent.SetDate(eventData)
-            is BaseTransactionEvent -> eventData
-            else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
-        }
+fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent = { eventData ->
+    when (eventData) {
+        is com.davidbugayov.financeanalyzer.domain.model.Source -> BaseTransactionEvent.SetSource(
+            eventData.name,
+        )
+        is UiCategory -> BaseTransactionEvent.SetCategory(eventData.name)
+        is java.util.Date -> BaseTransactionEvent.SetDate(eventData)
+        is BaseTransactionEvent -> eventData
+        else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
     }
+}

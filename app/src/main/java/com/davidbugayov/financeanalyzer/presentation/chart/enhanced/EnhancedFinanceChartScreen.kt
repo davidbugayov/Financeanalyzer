@@ -91,13 +91,13 @@ import java.util.Locale
  */
 @OptIn(
     ExperimentalMaterial3Api::class,
-    androidx.compose.foundation.ExperimentalFoundationApi::class
+    androidx.compose.foundation.ExperimentalFoundationApi::class,
 )
 @Composable
 fun EnhancedFinanceChartScreen(
     navController: NavController,
     onNavigateBack: () -> Unit,
-    onNavigateToTransactions: ((String, Date, Date) -> Unit)? = null
+    onNavigateToTransactions: ((String, Date, Date) -> Unit)? = null,
 ) {
     // Используем новую ViewModel
     val viewModel: EnhancedFinanceChartViewModel = viewModel()
@@ -143,8 +143,8 @@ fun EnhancedFinanceChartScreen(
     val backgroundGradient = Brush.verticalGradient(
         colors = listOf(
             MaterialTheme.colorScheme.surface,
-            MaterialTheme.colorScheme.surfaceVariant
-        )
+            MaterialTheme.colorScheme.surfaceVariant,
+        ),
     )
 
     // Форматтер дат
@@ -157,30 +157,30 @@ fun EnhancedFinanceChartScreen(
                 showBackButton = true,
                 onBackClick = {
                     onNavigateBack()
-                }
+                },
             )
         },
-        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) }
+        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .background(backgroundGradient)
+                .background(backgroundGradient),
         ) {
             if (state.isLoading) {
                 CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
             } else if (state.error != null) {
                 ErrorContent(
                     error = state.error ?: stringResource(R.string.unknown_error),
-                    onRetry = { viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData) }
+                    onRetry = { viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData) },
                 )
             } else {
                 // Основной контент с графиками и фильтрами всегда отображается
                 Column(
                     modifier = Modifier
                         .fillMaxSize()
-                        .verticalScroll(scrollState)
+                        .verticalScroll(scrollState),
                 ) {
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
                     if (state.transactions.isEmpty()) {
@@ -192,38 +192,38 @@ fun EnhancedFinanceChartScreen(
                                 .fillMaxWidth()
                                 .padding(
                                     horizontal = dimensionResource(
-                                        R.dimen.finance_chart_screen_padding
+                                        R.dimen.finance_chart_screen_padding,
                                     ),
-                                    vertical = 16.dp
+                                    vertical = 16.dp,
                                 )
                                 .clickable {
                                     viewModel.handleIntent(
-                                        EnhancedFinanceChartIntent.AddTransactionClicked
+                                        EnhancedFinanceChartIntent.AddTransactionClicked,
                                     )
-                                }
+                                },
                         ) {
                             Row(
                                 verticalAlignment = Alignment.CenterVertically,
-                                modifier = Modifier.padding(16.dp)
+                                modifier = Modifier.padding(16.dp),
                             ) {
                                 Icon(
                                     imageVector = Icons.Filled.Add,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(28.dp),
                                 )
                                 Spacer(modifier = Modifier.width(12.dp))
                                 Column {
                                     Text(
                                         text = stringResource(R.string.add_first_transaction),
                                         style = MaterialTheme.typography.bodyLarge,
-                                        color = MaterialTheme.colorScheme.primary
+                                        color = MaterialTheme.colorScheme.primary,
                                     )
                                     Text(
                                         text = stringResource(R.string.analytics_magic_hint),
                                         style = MaterialTheme.typography.bodySmall,
                                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                                        modifier = Modifier.alpha(0.8f)
+                                        modifier = Modifier.alpha(0.8f),
                                     )
                                 }
                             }
@@ -239,13 +239,13 @@ fun EnhancedFinanceChartScreen(
                         viewModel = viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding))
+                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
                     )
 
                     // Табы для переключения между типами графиков
                     TabRow(
                         selectedTabIndex = pagerState.currentPage,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Tab(
                             selected = pagerState.currentPage == 0,
@@ -254,7 +254,7 @@ fun EnhancedFinanceChartScreen(
                                     pagerState.scrollToPage(0)
                                 }
                             },
-                            text = { Text(stringResource(R.string.tab_categories)) }
+                            text = { Text(stringResource(R.string.tab_categories)) },
                         )
                         Tab(
                             selected = pagerState.currentPage == 1,
@@ -263,7 +263,7 @@ fun EnhancedFinanceChartScreen(
                                     pagerState.scrollToPage(1)
                                 }
                             },
-                            text = { Text(stringResource(R.string.tab_dynamics)) }
+                            text = { Text(stringResource(R.string.tab_dynamics)) },
                         )
                         Tab(
                             selected = pagerState.currentPage == 2,
@@ -272,7 +272,7 @@ fun EnhancedFinanceChartScreen(
                                     pagerState.scrollToPage(2)
                                 }
                             },
-                            text = { Text(stringResource(R.string.tab_analysis)) }
+                            text = { Text(stringResource(R.string.tab_analysis)) },
                         )
                     }
 
@@ -283,9 +283,9 @@ fun EnhancedFinanceChartScreen(
                             .fillMaxWidth()
                             .padding(
                                 horizontal = dimensionResource(
-                                    R.dimen.finance_chart_screen_tab_row_padding
-                                )
-                            )
+                                    R.dimen.finance_chart_screen_tab_row_padding,
+                                ),
+                            ),
                     ) { page ->
                         when (page) {
                             0 -> {
@@ -296,33 +296,37 @@ fun EnhancedFinanceChartScreen(
                                         .fillMaxSize()
                                         .padding(
                                             vertical = dimensionResource(
-                                                R.dimen.finance_chart_screen_padding
-                                            )
-                                        )
+                                                R.dimen.finance_chart_screen_padding,
+                                            ),
+                                        ),
                                 ) {
                                     // Получаем данные категорий в зависимости от выбранного режима
                                     val categoryData = if (state.showExpenses) {
                                         Timber.d(
                                             "Данные по расходам за период ${DateUtils.formatDate(
-                                                state.startDate
-                                            )} – ${DateUtils.formatDate(state.endDate)}: ${state.expensesByCategory.size} категорий, сумма: ${state.expensesByCategory.values.fold(
-                                                BigDecimal.ZERO
-                                            ) { acc, money -> acc.add(money.amount) }}"
+                                                state.startDate,
+                                            )} – ${DateUtils.formatDate(
+                                                state.endDate,
+                                            )}: ${state.expensesByCategory.size} категорий, сумма: ${state.expensesByCategory.values.fold(
+                                                BigDecimal.ZERO,
+                                            ) { acc, money -> acc.add(money.amount) }}",
                                         )
                                         Timber.d(
-                                            "Список категорий расходов: ${state.expensesByCategory.keys.joinToString()}"
+                                            "Список категорий расходов: ${state.expensesByCategory.keys.joinToString()}",
                                         )
                                         state.expensesByCategory
                                     } else {
                                         Timber.d(
                                             "Данные по доходам за период ${DateUtils.formatDate(
-                                                state.startDate
-                                            )} – ${DateUtils.formatDate(state.endDate)}: ${state.incomeByCategory.size} категорий, сумма: ${state.incomeByCategory.values.fold(
-                                                BigDecimal.ZERO
-                                            ) { acc, money -> acc.add(money.amount) }}"
+                                                state.startDate,
+                                            )} – ${DateUtils.formatDate(
+                                                state.endDate,
+                                            )}: ${state.incomeByCategory.size} категорий, сумма: ${state.incomeByCategory.values.fold(
+                                                BigDecimal.ZERO,
+                                            ) { acc, money -> acc.add(money.amount) }}",
                                         )
                                         Timber.d(
-                                            "Список категорий доходов: ${state.incomeByCategory.keys.joinToString()}"
+                                            "Список категорий доходов: ${state.incomeByCategory.keys.joinToString()}",
                                         )
                                         state.incomeByCategory
                                     }
@@ -334,21 +338,21 @@ fun EnhancedFinanceChartScreen(
                                                 .fillMaxWidth()
                                                 .height(
                                                     dimensionResource(
-                                                        R.dimen.finance_chart_screen_piechart_height
-                                                    )
+                                                        R.dimen.finance_chart_screen_piechart_height,
+                                                    ),
                                                 )
                                                 .padding(
                                                     top = dimensionResource(
-                                                        R.dimen.finance_chart_screen_padding
-                                                    )
+                                                        R.dimen.finance_chart_screen_padding,
+                                                    ),
                                                 ),
-                                            contentAlignment = Alignment.Center
+                                            contentAlignment = Alignment.Center,
                                         ) {
                                             Text(
                                                 text = stringResource(
-                                                    R.string.enhanced_chart_no_data
+                                                    R.string.enhanced_chart_no_data,
                                                 ),
-                                                style = MaterialTheme.typography.bodyLarge
+                                                style = MaterialTheme.typography.bodyLarge,
                                             )
                                         }
                                     } else {
@@ -363,7 +367,7 @@ fun EnhancedFinanceChartScreen(
                                                         onNavigateToTransactions?.invoke(
                                                             categoryName,
                                                             state.startDate,
-                                                            state.endDate
+                                                            state.endDate,
                                                         )
                                                     }
                                                 } else {
@@ -372,17 +376,17 @@ fun EnhancedFinanceChartScreen(
                                             },
                                             modifier = Modifier.padding(
                                                 top = dimensionResource(
-                                                    R.dimen.finance_chart_screen_padding
-                                                )
+                                                    R.dimen.finance_chart_screen_padding,
+                                                ),
                                             ),
                                             showExpenses = state.showExpenses,
                                             onShowExpensesChange = { showExpenses ->
                                                 viewModel.handleIntent(
                                                     EnhancedFinanceChartIntent.ToggleExpenseView(
-                                                        showExpenses
-                                                    )
+                                                        showExpenses,
+                                                    ),
                                                 )
-                                            }
+                                            },
                                         )
                                     }
                                 }
@@ -395,18 +399,18 @@ fun EnhancedFinanceChartScreen(
                                         .fillMaxWidth()
                                         .padding(
                                             vertical = dimensionResource(
-                                                R.dimen.finance_chart_screen_padding
-                                            )
-                                        )
+                                                R.dimen.finance_chart_screen_padding,
+                                            ),
+                                        ),
                                 ) {
                                     // Линейный график
                                     LineChartTypeSelector(
                                         selectedMode = lineChartDisplayMode,
-                                        onModeSelected = { lineChartDisplayMode = it }
+                                        onModeSelected = { lineChartDisplayMode = it },
                                     )
 
                                     val periodText = "${dateFormat.format(state.startDate)} – ${dateFormat.format(
-                                        state.endDate
+                                        state.endDate,
                                     )}"
 
                                     EnhancedLineChart(
@@ -415,7 +419,7 @@ fun EnhancedFinanceChartScreen(
                                         showIncome = lineChartDisplayMode.showIncome,
                                         showExpense = lineChartDisplayMode.showExpense,
                                         title = stringResource(id = R.string.chart_title_dynamics),
-                                        period = periodText
+                                        period = periodText,
                                     )
                                 }
                             }
@@ -426,7 +430,7 @@ fun EnhancedFinanceChartScreen(
                                     modifier = Modifier
                                         .fillMaxWidth()
                                         .padding(top = 24.dp, bottom = 4.dp),
-                                    horizontalAlignment = Alignment.CenterHorizontally
+                                    horizontalAlignment = Alignment.CenterHorizontally,
                                 ) {
                                     // Карточка "Полная статистика"
                                     Card(
@@ -434,59 +438,59 @@ fun EnhancedFinanceChartScreen(
                                             .fillMaxWidth()
                                             .padding(
                                                 bottom = dimensionResource(
-                                                    R.dimen.finance_chart_screen_card_bottom_padding
-                                                )
+                                                    R.dimen.finance_chart_screen_card_bottom_padding,
+                                                ),
                                             )
                                             .clickable {
                                                 // Переход на экран подробной статистики через navController
                                                 navController.navigate(
                                                     Screen.FinancialStatistics.createRoute(
                                                         state.startDate.time,
-                                                        state.endDate.time
-                                                    )
+                                                        state.endDate.time,
+                                                    ),
                                                 )
                                             },
                                         shape = RoundedCornerShape(16.dp),
                                         elevation = CardDefaults.cardElevation(
-                                            defaultElevation = 4.dp
+                                            defaultElevation = 4.dp,
                                         ),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = LocalFriendlyCardBackgroundColor.current
-                                        )
+                                            containerColor = LocalFriendlyCardBackgroundColor.current,
+                                        ),
                                     ) {
                                         Row(
                                             modifier = Modifier
                                                 .fillMaxWidth()
                                                 .padding(
                                                     dimensionResource(
-                                                        R.dimen.finance_chart_screen_card_content_padding
-                                                    )
+                                                        R.dimen.finance_chart_screen_card_content_padding,
+                                                    ),
                                                 ),
                                             verticalAlignment = Alignment.CenterVertically,
-                                            horizontalArrangement = Arrangement.SpaceBetween
+                                            horizontalArrangement = Arrangement.SpaceBetween,
                                         ) {
                                             Column {
                                                 Text(
                                                     text = stringResource(
-                                                        R.string.detailed_financial_statistics
+                                                        R.string.detailed_financial_statistics,
                                                     ),
                                                     style = MaterialTheme.typography.titleMedium,
-                                                    fontWeight = FontWeight.Bold
+                                                    fontWeight = FontWeight.Bold,
                                                 )
 
                                                 Text(
                                                     text = stringResource(
-                                                        R.string.explore_your_financial_metrics
+                                                        R.string.explore_your_financial_metrics,
                                                     ),
                                                     style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                                 )
                                             }
 
                                             Icon(
                                                 imageVector = Icons.Filled.Analytics,
                                                 contentDescription = null,
-                                                tint = MaterialTheme.colorScheme.primary
+                                                tint = MaterialTheme.colorScheme.primary,
                                             )
                                         }
                                     }
@@ -495,9 +499,9 @@ fun EnhancedFinanceChartScreen(
                                     Spacer(
                                         modifier = Modifier.height(
                                             dimensionResource(
-                                                R.dimen.finance_chart_screen_vertical_spacing
-                                            )
-                                        )
+                                                R.dimen.finance_chart_screen_vertical_spacing,
+                                            ),
+                                        ),
                                     )
 
                                     // Блок рекомендаций по бюджету
@@ -505,49 +509,49 @@ fun EnhancedFinanceChartScreen(
                                         modifier = Modifier
                                             .fillMaxWidth()
                                             .padding(vertical = 4.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally
+                                        horizontalAlignment = Alignment.CenterHorizontally,
                                     ) {
                                         Text(
                                             text = stringResource(R.string.budget_tips_title),
                                             style = MaterialTheme.typography.titleMedium,
                                             color = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.padding(bottom = 8.dp)
+                                            modifier = Modifier.padding(bottom = 8.dp),
                                         )
                                         BudgetTip(
                                             icon = Icons.Filled.AccountBalanceWallet,
                                             title = stringResource(
-                                                R.string.budget_tip_save_10_title
+                                                R.string.budget_tip_save_10_title,
                                             ),
                                             description = stringResource(
-                                                R.string.budget_tip_save_10_desc
-                                            )
+                                                R.string.budget_tip_save_10_desc,
+                                            ),
                                         )
                                         BudgetTip(
                                             icon = Icons.Filled.BarChart,
                                             title = stringResource(
-                                                R.string.budget_tip_control_categories_title
+                                                R.string.budget_tip_control_categories_title,
                                             ),
                                             description = stringResource(
-                                                R.string.budget_tip_control_categories_desc
-                                            )
+                                                R.string.budget_tip_control_categories_desc,
+                                            ),
                                         )
                                         BudgetTip(
                                             icon = Icons.AutoMirrored.Filled.TrendingUp,
                                             title = stringResource(
-                                                R.string.budget_tip_set_goals_title
+                                                R.string.budget_tip_set_goals_title,
                                             ),
                                             description = stringResource(
-                                                R.string.budget_tip_set_goals_desc
-                                            )
+                                                R.string.budget_tip_set_goals_desc,
+                                            ),
                                         )
                                         BudgetTip(
                                             icon = Icons.Filled.Check,
                                             title = stringResource(
-                                                R.string.budget_tip_check_weekly_title
+                                                R.string.budget_tip_check_weekly_title,
                                             ),
                                             description = stringResource(
-                                                R.string.budget_tip_check_weekly_desc
-                                            )
+                                                R.string.budget_tip_check_weekly_desc,
+                                            ),
                                         )
                                     }
                                 }
@@ -565,9 +569,9 @@ fun EnhancedFinanceChartScreen(
                             .padding(
                                 horizontal = dimensionResource(R.dimen.finance_chart_screen_padding),
                                 vertical = dimensionResource(
-                                    R.dimen.finance_chart_screen_vertical_spacing
-                                )
-                            )
+                                    R.dimen.finance_chart_screen_vertical_spacing,
+                                ),
+                            ),
                     )
 
                     // Если нужно прокручивать к карточке

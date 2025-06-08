@@ -111,4 +111,4 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при установке ключа с плавающей точкой в Crashlytics")
         }
     }
-} 
+}

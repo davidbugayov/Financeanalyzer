@@ -17,5 +17,5 @@ data class UiCategory(
     val transactions: List<Transaction> = emptyList(),
     val original: Category? = null,
     val color: Color = Color.Gray,
-    val icon: ImageVector? = null
-) 
+    val icon: ImageVector? = null,
+)

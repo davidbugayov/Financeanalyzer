@@ -13,7 +13,7 @@ import timber.log.Timber
  */
 class WalletRepositoryImpl(
     private val walletPreferences: WalletPreferences,
-    private val transactionRepository: TransactionRepository? = null
+    private val transactionRepository: TransactionRepository? = null,
 ) : WalletRepository {
 
     override suspend fun getAllWallets(): List<Wallet> {
@@ -105,4 +105,4 @@ class WalletRepositoryImpl(
             return null
         }
     }
-} 
+}

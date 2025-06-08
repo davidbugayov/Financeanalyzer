@@ -82,7 +82,7 @@ fun ProfileScreen(
     onNavigateToChart: () -> Unit,
     onNavigateToBudget: () -> Unit,
     onNavigateToExportImport: (String) -> Unit,
-    onNavigateToAchievements: () -> Unit
+    onNavigateToAchievements: () -> Unit,
 ) {
     // Получаем текущее состояние из ViewModel
     val state by viewModel.state.collectAsState()
@@ -102,7 +102,7 @@ fun ProfileScreen(
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "profile",
-            screenClass = "ProfileScreen"
+            screenClass = "ProfileScreen",
         )
     }
 
@@ -115,7 +115,7 @@ fun ProfileScreen(
                 Timber.e(e, "Failed to start activity for intent: $intent")
                 scope.launch {
                     snackbarHostState.showSnackbar(
-                        "Не удалось выполнить действие: ${e.localizedMessage}"
+                        "Не удалось выполнить действие: ${e.localizedMessage}",
                     )
                 }
             }
@@ -132,7 +132,7 @@ fun ProfileScreen(
 
         LaunchedEffect(state.isTransactionReminderEnabled) {
             Timber.d(
-                "[UI] ProfileScreen: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}"
+                "[UI] ProfileScreen: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}",
             )
         }
 
@@ -140,13 +140,13 @@ fun ProfileScreen(
             topBar = {
                 ProfileTopBar(onNavigateBack = onNavigateBack)
             },
-            snackbarHost = { SnackbarHost(snackbarHostState) }
+            snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { paddingValues ->
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             ) {
                 // Секция финансовой аналитики
                 AnalyticsSection(
@@ -163,11 +163,11 @@ fun ProfileScreen(
                     onSavingsRateClick = onNavigateToChart,
                     modifier = Modifier
                         .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
-                        .clickable { onNavigateToChart() }
+                        .clickable { onNavigateToChart() },
                 )
 
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
                 // Секция бюджета
                 ProfileActionCard(
@@ -178,11 +178,11 @@ fun ProfileScreen(
                     onClick = onNavigateToBudget,
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
-                        vertical = 4.dp
-                    )
+                        vertical = 4.dp,
+                    ),
                 )
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
                 // Секция экспорт и импорт
                 ProfileActionCard(
@@ -193,11 +193,11 @@ fun ProfileScreen(
                     onClick = { onNavigateToExportImport(Screen.ExportImport.route) },
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
-                        vertical = 4.dp
-                    )
+                        vertical = 4.dp,
+                    ),
                 )
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
                 // Кнопка перехода на экран достижений
@@ -209,11 +209,11 @@ fun ProfileScreen(
                     onClick = onNavigateToAchievements,
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
-                        vertical = 4.dp
-                    )
+                        vertical = 4.dp,
+                    ),
                 )
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
                 // Секция настроек
@@ -223,7 +223,7 @@ fun ProfileScreen(
                     onCurrencyClick = { /* Открыть диалог выбора валюты */ },
                     onTransactionReminderClick = {
                         viewModel.onEvent(
-                            ProfileEvent.ShowNotificationSettingsDialog
+                            ProfileEvent.ShowNotificationSettingsDialog,
                         )
                     },
                     themeMode = state.themeMode,
@@ -231,12 +231,12 @@ fun ProfileScreen(
                     transactionReminderTime = state.transactionReminderTime,
                     hasNotificationPermission = state.hasNotificationPermission,
                     modifier = Modifier.padding(
-                        horizontal = dimensionResource(R.dimen.profile_section_padding)
-                    )
+                        horizontal = dimensionResource(R.dimen.profile_section_padding),
+                    ),
                 )
 
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
                 // Секция информации о приложении
@@ -245,12 +245,12 @@ fun ProfileScreen(
                     buildVersion = buildVersion,
                     onNavigateToLibraries = onNavigateToLibraries,
                     modifier = Modifier.padding(
-                        horizontal = dimensionResource(R.dimen.profile_section_padding)
-                    )
+                        horizontal = dimensionResource(R.dimen.profile_section_padding),
+                    ),
                 )
 
                 Spacer(
-                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
                 // Диалоги
@@ -259,8 +259,8 @@ fun ProfileScreen(
                 // Отступ внизу экрана для улучшения UX
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.profile_section_spacing) * 2
-                    )
+                        dimensionResource(R.dimen.profile_section_spacing) * 2,
+                    ),
                 )
             }
         }
@@ -289,7 +289,7 @@ private fun SetupStatusBarAppearance(themeMode: ThemeMode, context: Context) {
 private fun HandleExportMessages(
     state: ProfileState,
     snackbarHostState: SnackbarHostState,
-    viewModel: ProfileViewModel
+    viewModel: ProfileViewModel,
 ) {
     LaunchedEffect(state.exportSuccess) {
         state.exportSuccess?.let {
@@ -318,7 +318,7 @@ private fun ShowDialogs(state: ProfileState, viewModel: ProfileViewModel) {
             onThemeSelected = { theme ->
                 viewModel.onEvent(ProfileEvent.ChangeTheme(theme))
             },
-            onDismiss = { viewModel.onEvent(ProfileEvent.HideThemeDialog) }
+            onDismiss = { viewModel.onEvent(ProfileEvent.HideThemeDialog) },
         )
     }
 
@@ -326,7 +326,7 @@ private fun ShowDialogs(state: ProfileState, viewModel: ProfileViewModel) {
     if (state.isEditingNotifications) {
         NotificationSettingsDialog(
             onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) },
-            viewModel = viewModel
+            viewModel = viewModel,
         )
     }
 }
@@ -338,7 +338,7 @@ fun ProfileActionCard(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
@@ -346,23 +346,23 @@ fun ProfileActionCard(
             .clickable { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
             modifier = Modifier.padding(20.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier = Modifier
                     .size(48.dp)
                     .background(iconBackground, shape = CircleShape),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(28.dp)
+                    modifier = Modifier.size(28.dp),
                 )
             }
             Spacer(modifier = Modifier.width(16.dp))
@@ -370,13 +370,13 @@ fun ProfileActionCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

@@ -29,37 +29,38 @@ fun AddButton(
     color: Color,
     modifier: Modifier = Modifier,
     text: String? = null,
-    isLoading: Boolean = false
+    isLoading: Boolean = false,
 ) {
     Button(
         onClick = onClick,
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                horizontal = dimensionResource(R.dimen.add_button_padding_horizontal), vertical = dimensionResource(R.dimen.add_button_padding_vertical)
+                horizontal = dimensionResource(R.dimen.add_button_padding_horizontal),
+                vertical = dimensionResource(R.dimen.add_button_padding_vertical),
             )
             .height(dimensionResource(R.dimen.add_button_height)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.add_button_corner_radius)),
         colors = ButtonDefaults.buttonColors(
-            containerColor = color
+            containerColor = color,
         ),
-        enabled = !isLoading
+        enabled = !isLoading,
     ) {
         Box(contentAlignment = Alignment.Center) {
             if (isLoading) {
                 CircularProgressIndicator(
                     modifier = Modifier.size(dimensionResource(R.dimen.add_button_progress_size)),
                     color = MaterialTheme.colorScheme.onPrimary,
-                    strokeWidth = dimensionResource(R.dimen.add_button_progress_stroke_width)
+                    strokeWidth = dimensionResource(R.dimen.add_button_progress_stroke_width),
                 )
             } else {
                 Text(
                     text = text ?: stringResource(R.string.add_button),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = Color.White
+                    color = Color.White,
                 )
             }
         }
     }
-} 
+}

@@ -12,10 +12,11 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         
-        // Репозиторий для RuStore SDK
-        maven {
-            url = uri("https://artifactory-external.vkpartner.ru/artifactory/maven")
-        }
+        // Репозиторий для RuStore SDK - используется только для google flavor
+        // Отключен для соответствия требованиям F-Droid
+        // maven {
+        //    url = uri("https://artifactory-external.vkpartner.ru/artifactory/maven")
+        // }
     }
 }
 

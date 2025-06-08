@@ -58,7 +58,7 @@ fun AnimatedBottomNavigationBar(
     onChartClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onAddClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Получаем отступы от системной навигации
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
@@ -74,19 +74,19 @@ fun AnimatedBottomNavigationBar(
         visible = visible,
         enter = fadeIn(animationSpec = tween(400, easing = EaseInOut)) + slideInVertically(
             initialOffsetY = { it },
-            animationSpec = tween(400, easing = EaseInOut)
+            animationSpec = tween(400, easing = EaseInOut),
         ),
         exit = fadeOut(animationSpec = tween(400, easing = EaseInOut)) + slideOutVertically(
             targetOffsetY = { it },
-            animationSpec = tween(400, easing = EaseInOut)
+            animationSpec = tween(400, easing = EaseInOut),
         ),
-        modifier = modifier
+        modifier = modifier,
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.97f),
             shadowElevation = 0.dp,
-            tonalElevation = dimensionResource(R.dimen.elevation_small)
+            tonalElevation = dimensionResource(R.dimen.elevation_small),
         ) {
             Row(
                 modifier = Modifier
@@ -95,31 +95,31 @@ fun AnimatedBottomNavigationBar(
                         start = dimensionResource(R.dimen.spacing_small),
                         end = dimensionResource(R.dimen.spacing_small),
                         top = dimensionResource(R.dimen.spacing_xxsmall),
-                        bottom = dimensionResource(R.dimen.spacing_xxsmall) + navBarPadding.calculateBottomPadding()
+                        bottom = dimensionResource(R.dimen.spacing_xxsmall) + navBarPadding.calculateBottomPadding(),
                     )
                     .heightIn(min = dimensionResource(R.dimen.nav_bar_height)),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Статистика (слева)
                 NavButton(
                     icon = Icons.Default.Assessment,
                     text = stringResource(R.string.statistics),
-                    onClick = onChartClick
+                    onClick = onChartClick,
                 )
 
                 // Добавить (центр)
                 NavButton(
                     icon = Icons.Default.Add,
                     text = "Добавить",
-                    onClick = onAddClick
+                    onClick = onAddClick,
                 )
 
                 // История (справа)
                 NavButton(
                     icon = Icons.Default.History,
                     text = stringResource(R.string.history),
-                    onClick = onHistoryClick
+                    onClick = onHistoryClick,
                 )
             }
         }
@@ -141,22 +141,22 @@ private fun NavButton(icon: ImageVector, text: String, onClick: () -> Unit) {
             .padding(horizontal = dimensionResource(R.dimen.spacing_xxsmall))
             .widthIn(
                 min = dimensionResource(R.dimen.main_nav_button_size) + dimensionResource(
-                    R.dimen.spacing_xxsmall
-                )
-            )
+                    R.dimen.spacing_xxsmall,
+                ),
+            ),
     ) {
         FilledIconButton(
             onClick = onClick,
             modifier = Modifier.size(dimensionResource(R.dimen.main_nav_button_size)),
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.primary, // Используем основной цвет темы для фона кнопки
-                contentColor = Color.White // Явно задаем белый цвет для иконки
-            )
+                contentColor = Color.White, // Явно задаем белый цвет для иконки
+            ),
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.size(dimensionResource(R.dimen.main_nav_icon_size))
+                modifier = Modifier.size(dimensionResource(R.dimen.main_nav_icon_size)),
                 // tint = Color.White - Уже управляется через contentColor в IconButtonDefaults
             )
         }
@@ -168,7 +168,7 @@ private fun NavButton(icon: ImageVector, text: String, onClick: () -> Unit) {
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(top = 2.dp),
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1
+            maxLines = 1,
         )
     }
 }

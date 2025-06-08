@@ -9,7 +9,7 @@ import com.davidbugayov.financeanalyzer.utils.OnboardingManager
  * и отмечает его как завершенный при необходимости.
  */
 class OnboardingViewModel(
-    private val onboardingManager: OnboardingManager
+    private val onboardingManager: OnboardingManager,
 ) : ViewModel() {
 
     /**
@@ -27,4 +27,4 @@ class OnboardingViewModel(
     fun completeOnboarding() {
         onboardingManager.setOnboardingCompleted()
     }
-} 
+}

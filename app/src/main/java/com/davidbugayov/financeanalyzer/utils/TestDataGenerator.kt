@@ -20,10 +20,11 @@ object TestDataGenerator {
         "Продукты",
         "Транспорт",
         "Развлечения",
-        "Здоровье", "Одежда",
+        "Здоровье",
+        "Одежда",
         "Рестораны",
         "Коммунальные платежи",
-        "Другое"
+        "Другое",
     )
 
     private val incomeCategories = listOf(
@@ -31,7 +32,7 @@ object TestDataGenerator {
         "Фриланс",
         "Подарки",
         "Инвестиции",
-        "Другое"
+        "Другое",
     )
 
     /**
@@ -99,12 +100,12 @@ object TestDataGenerator {
                     note = if (Random.nextBoolean()) "Примечание к транзакции" else null,
                     source = source,
                     sourceColor = ColorUtils.getSourceColorByName(source)?.toArgb()
-                        ?: if (isExpense) ExpenseColorInt else IncomeColorInt
-                )
+                        ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
+                ),
             )
         }
 
         // Сортируем по дате (от новых к старым)
         return transactions.sortedByDescending { it.date }
     }
-} 
+}

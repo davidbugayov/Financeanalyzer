@@ -22,11 +22,11 @@ sealed class BudgetEvent {
     data class TransferBetweenWallets(
         val fromCategoryId: String,
         val toCategoryId: String,
-        val amount: Money
+        val amount: Money,
     ) : BudgetEvent()
 
     // События для настройки периодов
     data class SetPeriodDuration(val days: Int) : BudgetEvent()
     data class ResetPeriod(val categoryId: String) : BudgetEvent()
     data object ResetAllPeriods : BudgetEvent()
-} 
+}

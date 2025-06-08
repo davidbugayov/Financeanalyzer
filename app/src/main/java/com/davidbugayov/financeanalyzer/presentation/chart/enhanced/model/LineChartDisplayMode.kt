@@ -7,7 +7,7 @@ import com.davidbugayov.financeanalyzer.R
  * Режимы отображения для линейного графика
  */
 enum class LineChartDisplayMode(
-    @StringRes val titleResId: Int
+    @StringRes val titleResId: Int,
 ) {
     INCOME(R.string.chart_title_income) {
         override val showIncome: Boolean get() = true
@@ -20,8 +20,8 @@ enum class LineChartDisplayMode(
     BOTH(R.string.chart_title_both) {
         override val showIncome: Boolean get() = true
         override val showExpense: Boolean get() = true
-    };
+    }, ;
 
     abstract val showIncome: Boolean
     abstract val showExpense: Boolean
-} 
+}

@@ -20,12 +20,12 @@ import timber.log.Timber
 fun EditTransactionScreen(
     viewModel: EditTransactionViewModel = koinViewModel(),
     onNavigateBack: () -> Unit,
-    transactionId: String? = null
+    transactionId: String? = null,
 ) {
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "edit_transaction",
-            screenClass = "EditTransactionScreen"
+            screenClass = "EditTransactionScreen",
         )
 
         // Проверяем ID транзакции и загружаем её если ID валидный
@@ -43,7 +43,7 @@ fun EditTransactionScreen(
     val state by viewModel.state.collectAsState()
     LaunchedEffect(state.transactionToEdit) {
         Timber.d(
-            "ТРАНЗАКЦИЯ-ЭКРАН: editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}, amount=${state.amount}"
+            "ТРАНЗАКЦИЯ-ЭКРАН: editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}, amount=${state.amount}",
         )
     }
 
@@ -54,6 +54,6 @@ fun EditTransactionScreen(
         buttonText = stringResource(R.string.save_button_text),
         isEditMode = true,
         eventFactory = defaultTransactionEventFactory(true),
-        submitEvent = BaseTransactionEvent.SubmitEdit
+        submitEvent = BaseTransactionEvent.SubmitEdit,
     )
-} 
+}

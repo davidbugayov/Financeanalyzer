@@ -54,7 +54,7 @@ fun FeatureAnnouncement(
     icon: ImageVector = Icons.Default.CloudUpload,
     preferencesKey: String,
     onActionClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val context = LocalContext.current
     val preferencesManager = remember(context) { PreferencesManager(context) }
@@ -66,7 +66,7 @@ fun FeatureAnnouncement(
         val isDismissed = preferencesManager.getBooleanPreference(preferencesKey, false)
         visible = !isDismissed
         Timber.d(
-            "FeatureAnnouncement: key=$preferencesKey, isDismissed=$isDismissed, visible=$visible"
+            "FeatureAnnouncement: key=$preferencesKey, isDismissed=$isDismissed, visible=$visible",
         )
     }
 
@@ -77,33 +77,33 @@ fun FeatureAnnouncement(
             shadowElevation = 2.dp,
             modifier = modifier
                 .fillMaxWidth()
-                .padding(horizontal = dimensionResource(R.dimen.spacing_normal), vertical = 12.dp)
+                .padding(horizontal = dimensionResource(R.dimen.spacing_normal), vertical = 12.dp),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.padding(end = 12.dp)
+                        modifier = Modifier.padding(end = 12.dp),
                     )
                     Text(
                         text = title,
                         style = MaterialTheme.typography.titleMedium,
                         color = MaterialTheme.colorScheme.onPrimaryContainer,
-                        modifier = Modifier.weight(1f)
+                        modifier = Modifier.weight(1f),
                     )
                     IconButton(onClick = {
                         coroutineScope.launch {
                             Timber.d(
-                                "FeatureAnnouncement: closing by clicking X button, key=$preferencesKey"
+                                "FeatureAnnouncement: closing by clicking X button, key=$preferencesKey",
                             )
                             preferencesManager.setBooleanPreference(preferencesKey, true)
                             visible = false
@@ -112,7 +112,7 @@ fun FeatureAnnouncement(
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Закрыть",
-                            tint = MaterialTheme.colorScheme.onPrimaryContainer
+                            tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                     }
                 }
@@ -122,7 +122,7 @@ fun FeatureAnnouncement(
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onPrimaryContainer
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -134,7 +134,7 @@ fun FeatureAnnouncement(
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable(onClick = {
                         Timber.d(
-                            "FeatureAnnouncement: closing by clicking action text, key=$preferencesKey"
+                            "FeatureAnnouncement: closing by clicking action text, key=$preferencesKey",
                         )
                         onActionClick()
                         // Закрываем объявление после клика
@@ -142,9 +142,9 @@ fun FeatureAnnouncement(
                             preferencesManager.setBooleanPreference(preferencesKey, true)
                             visible = false
                         }
-                    })
+                    }),
                 )
             }
         }
     }
-} 
+}

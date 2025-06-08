@@ -33,7 +33,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected val sourcePreferences: SourcePreferences,
     protected val walletRepository: WalletRepository,
     private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
-    protected val resources: Resources
+    protected val resources: Resources,
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
 
     protected abstract val _state: MutableStateFlow<S>
@@ -81,13 +81,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun updateWalletsBalance(
         walletIds: List<String>,
         amount: Money,
-        originalTransaction: com.davidbugayov.financeanalyzer.domain.model.Transaction?
+        originalTransaction: com.davidbugayov.financeanalyzer.domain.model.Transaction?,
     ) {
         viewModelScope.launch {
             val result = updateWalletBalancesUseCase(
                 walletIdsToUpdate = walletIds,
                 amountForWallets = amount,
-                originalTransaction = originalTransaction
+                originalTransaction = originalTransaction,
             )
             if (result is com.davidbugayov.financeanalyzer.domain.model.Result.Error) {
                 Timber.e(result.exception, "Ошибка при обновлении баланса кошельков через UseCase")
@@ -105,14 +105,14 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun getWalletIdsForTransaction(
         isExpense: Boolean,
         addToWallet: Boolean,
-        selectedWallets: List<String>
+        selectedWallets: List<String>,
     ): List<String>? {
         return if (!isExpense && addToWallet && selectedWallets.isNotEmpty()) {
             Timber.d("Сохраняем выбранные кошельки: ${selectedWallets.size} шт.")
             selectedWallets
         } else {
             Timber.d(
-                "Не сохраняем кошельки: isExpense=$isExpense, addToWallet=$addToWallet, selectedWallets=${selectedWallets.size}"
+                "Не сохраняем кошельки: isExpense=$isExpense, addToWallet=$addToWallet, selectedWallets=${selectedWallets.size}",
             )
             null
         }
@@ -137,16 +137,14 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param currentAddToWallet Текущее значение флага
      * @return Пара (новое значение флага, новый список выбранных кошельков)
      */
-    protected fun handleToggleAddToWallet(
-        currentAddToWallet: Boolean
-    ): Pair<Boolean, List<String>> {
+    protected fun handleToggleAddToWallet(currentAddToWallet: Boolean): Pair<Boolean, List<String>> {
         val newAddToWallet = !currentAddToWallet
 
         return if (newAddToWallet) {
             // При включении автоматически выбираем все кошельки, если список пуст
             val allWalletIds = wallets.map { it.id }
             Timber.d(
-                "Включение кошельков, автоматический выбор всех ${allWalletIds.size} кошельков"
+                "Включение кошельков, автоматический выбор всех ${allWalletIds.size} кошельков",
             )
             Pair(true, allWalletIds)
         } else {
@@ -166,7 +164,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun handleSelectWallet(
         walletId: String,
         selected: Boolean,
-        currentSelectedWallets: List<String>
+        currentSelectedWallets: List<String>,
     ): List<String> {
         Timber.d("SelectWallet событие - walletId=$walletId, selected=$selected")
 
@@ -177,7 +175,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         }
 
         Timber.d(
-            "Обновление списка выбранных кошельков: было ${currentSelectedWallets.size}, стало ${updatedWallets.size}"
+            "Обновление списка выбранных кошельков: было ${currentSelectedWallets.size}, стало ${updatedWallets.size}",
         )
 
         return updatedWallets
@@ -228,7 +226,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 customCategory = "",
                 sourceColor = 0,
                 customSource = "",
-                availableCategoryIcons = state.availableCategoryIcons
+                availableCategoryIcons = state.availableCategoryIcons,
             )
         }
     }
@@ -327,7 +325,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         copyState(
                             state,
                             source = selectedSource.name,
-                            sourceColor = selectedSource.color
+                            sourceColor = selectedSource.color,
                         )
                     }
                 }
@@ -393,7 +391,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                             customCategoryIcon = null,
                             expenseCategories = updatedCategories,
                             category = event.category,
-                            selectedExpenseCategory = event.category
+                            selectedExpenseCategory = event.category,
                         )
                     } else {
                         copyState(
@@ -403,7 +401,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                             customCategoryIcon = null,
                             incomeCategories = updatedCategories,
                             category = event.category,
-                            selectedIncomeCategory = event.category
+                            selectedIncomeCategory = event.category,
                         )
                     }
                 }
@@ -414,7 +412,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(
                         state,
                         categoryToDelete = event.category,
-                        showDeleteCategoryConfirmDialog = true
+                        showDeleteCategoryConfirmDialog = true,
                     )
                 }
             }
@@ -447,7 +445,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                                         copyState(
                                             state,
                                             category = "",
-                                            selectedExpenseCategory = ""
+                                            selectedExpenseCategory = "",
                                         )
                                     } else {
                                         copyState(state, category = "", selectedIncomeCategory = "")
@@ -465,7 +463,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(
                         state,
                         showDeleteCategoryConfirmDialog = false,
-                        categoryToDelete = null
+                        categoryToDelete = null,
                     )
                 }
             }
@@ -495,7 +493,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                                         copyState(
                                             state,
                                             source = firstSource?.name ?: "",
-                                            sourceColor = firstSource?.color ?: 0
+                                            sourceColor = firstSource?.color ?: 0,
                                         )
                                     }
                                 }
@@ -518,7 +516,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(
                         state,
                         sourceToDelete = event.source,
-                        showDeleteSourceConfirmDialog = true
+                        showDeleteSourceConfirmDialog = true,
                     )
                 }
             }
@@ -563,12 +561,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(current, category = current.selectedExpenseCategory)
                 } else {
                     Timber.d(
-                        "Setting default expense category: ${current.expenseCategories.first().name}"
+                        "Setting default expense category: ${current.expenseCategories.first().name}",
                     )
                     copyState(
                         current,
                         category = current.expenseCategories.first().name,
-                        selectedExpenseCategory = current.expenseCategories.first().name
+                        selectedExpenseCategory = current.expenseCategories.first().name,
                     )
                 }
             } else if (!current.isExpense && current.incomeCategories.isNotEmpty()) {
@@ -578,12 +576,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     copyState(current, category = current.selectedIncomeCategory)
                 } else {
                     Timber.d(
-                        "Setting default income category: ${current.incomeCategories.first().name}"
+                        "Setting default income category: ${current.incomeCategories.first().name}",
                     )
                     copyState(
                         current,
                         category = current.incomeCategories.first().name,
-                        selectedIncomeCategory = current.incomeCategories.first().name
+                        selectedIncomeCategory = current.incomeCategories.first().name,
                     )
                 }
             } else {
@@ -608,9 +606,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         sortedCategories.joinToString(", ") {
                             "${it.name}(${getCategoryUsage(
                                 it.name,
-                                true
+                                true,
                             )})"
-                        }
+                        },
                     )
 
                     // Выбираем первую категорию, если категория еще не выбрана
@@ -659,7 +657,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         categoryError = false,
                         note = state.note,
                         selectedDate = state.selectedDate,
-                        availableCategoryIcons = state.availableCategoryIcons
+                        availableCategoryIcons = state.availableCategoryIcons,
                     )
                 }
             }
@@ -678,9 +676,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                         sortedCategories.joinToString(", ") {
                             "${it.name}(${getCategoryUsage(
                                 it.name,
-                                false
+                                false,
                             )})"
-                        }
+                        },
                     )
 
                     copyState(state, incomeCategories = sortedCategories)
@@ -715,7 +713,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     state,
                     selectedWallets = allWalletIds,
                     addToWallet = true,
-                    showWalletSelector = false
+                    showWalletSelector = false,
                 )
             }
         }
@@ -769,7 +767,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         selectedExpenseCategory: String = state.selectedExpenseCategory,
         selectedIncomeCategory: String = state.selectedIncomeCategory,
         availableCategoryIcons: List<ImageVector> = state.availableCategoryIcons,
-        customCategoryIcon: ImageVector? = state.customCategoryIcon
+        customCategoryIcon: ImageVector? = state.customCategoryIcon,
     ): S
 
     // Utility methods
@@ -782,7 +780,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             try {
                 val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(
                     sourcePreferences,
-                    resources
+                    resources,
                 )
                 _state.update { state ->
                     copyState(state, sources = sources)
@@ -794,11 +792,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     // --- Универсальные методы для настройки и сброса состояния ---
-    open fun setupForExpenseAddition(
-        amount: String,
-        walletCategory: String,
-        context: android.content.Context
-    ) {
+    open fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
         _state.update { state ->
             copyState(
                 state,
@@ -806,7 +800,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 category = walletCategory,
                 targetWalletId = state.targetWalletId,
                 selectedWallets = state.selectedWallets,
-                addToWallet = state.addToWallet
+                addToWallet = state.addToWallet,
             )
         }
         handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
@@ -821,7 +815,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         var processedExpr = expr.replace(",", ".")
 
         Timber.d(
-            "parseMoneyExpression: исходное выражение: '$expr', обработанное: '$processedExpr'"
+            "parseMoneyExpression: исходное выражение: '$expr', обработанное: '$processedExpr'",
         )
 
         // Удаляем "висячий" оператор в конце строки, если он есть
@@ -833,7 +827,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 // Обрабатываем случай, когда оператор в конце
                 processedExpr = processedExpr.dropLast(1)
                 Timber.d(
-                    "parseMoneyExpression: удален висячий оператор, новое выражение: '$processedExpr'"
+                    "parseMoneyExpression: удален висячий оператор, новое выражение: '$processedExpr'",
                 )
             }
         }
@@ -884,13 +878,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 categoryUsagePreferences.incrementExpenseCategoryUsage(categoryName)
                 Timber.d(
                     "CATEGORY: Увеличен счетчик использования расходной категории: %s",
-                    categoryName
+                    categoryName,
                 )
             } else {
                 categoryUsagePreferences.incrementIncomeCategoryUsage(categoryName)
                 Timber.d(
                     "CATEGORY: Увеличен счетчик использования доходной категории: %s",
-                    categoryName
+                    categoryName,
                 )
             }
         }
@@ -911,7 +905,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         Timber.d(
             "CATEGORY: Получено количество использований категории %s: %d",
             categoryName,
-            usage
+            usage,
         )
         return usage
     }
@@ -939,4 +933,4 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         Timber.d("SOURCE: Получено количество использований источника %s: %d", sourceName, usage)
         return usage
     }
-} 
+}

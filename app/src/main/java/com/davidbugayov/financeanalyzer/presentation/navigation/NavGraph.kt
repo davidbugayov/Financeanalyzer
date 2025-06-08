@@ -36,13 +36,10 @@ import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 @Composable
-fun NavGraph(
-    navController: NavHostController = rememberNavController(),
-    startDestination: String = Screen.Home.route
-) {
+fun NavGraph(navController: NavHostController = rememberNavController(), startDestination: String = Screen.Home.route) {
     NavHost(
         navController = navController,
-        startDestination = startDestination
+        startDestination = startDestination,
     ) {
         mainGraph(navController)
         transactionGraph(navController)
@@ -51,7 +48,7 @@ fun NavGraph(
 
         composable(Screen.Home.route) {
             HomeScreenWrapper(
-                navController = navController
+                navController = navController,
             )
         }
     }
@@ -63,10 +60,10 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         enterTransition = defaultEnterRight(),
         exitTransition = defaultExitLeft(),
         popEnterTransition = defaultEnterRight(),
-        popExitTransition = defaultExitLeft()
+        popExitTransition = defaultExitLeft(),
     ) {
         HomeScreenWrapper(
-            navController = navController
+            navController = navController,
         )
     }
     composable(
@@ -74,13 +71,13 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
         TransactionHistoryScreen(
             viewModel = koinViewModel<TransactionHistoryViewModel>(),
             editTransactionViewModel = koinViewModel<EditTransactionViewModel>(),
             onNavigateBack = { navController.navigateUp() },
-            navController = navController
+            navController = navController,
         )
     }
     composable(
@@ -88,11 +85,11 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
         EnhancedFinanceChartScreen(
             navController = navController,
-            onNavigateBack = { navController.popBackStack() }
+            onNavigateBack = { navController.popBackStack() },
         )
     }
     composable(
@@ -100,14 +97,14 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
         BudgetScreen(
             navController = navController,
             onNavigateBack = { navController.navigateUp() },
             onNavigateToTransactions = { walletId ->
                 navController.navigate(Screen.WalletTransactions.createRoute(walletId))
-            }
+            },
         )
     }
     composable(
@@ -116,13 +113,13 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) { backStackEntry ->
         val walletId = backStackEntry.arguments?.getString("walletId") ?: return@composable
         WalletTransactionsScreen(
             walletId = walletId,
             onNavigateBack = { navController.navigateUp() },
-            navController = navController
+            navController = navController,
         )
     }
 }
@@ -133,13 +130,13 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         enterTransition = defaultEnterUp(),
         exitTransition = defaultExitDown(),
         popEnterTransition = defaultEnterUp(),
-        popExitTransition = defaultExitDown()
+        popExitTransition = defaultExitDown(),
     ) {
         AddTransactionScreen(
             onNavigateBack = { navController.popBackStack() },
             onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) },
             navController = navController,
-            achievementsUiViewModel = koinViewModel()
+            achievementsUiViewModel = koinViewModel(),
         )
     }
     composable(
@@ -148,7 +145,7 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         enterTransition = defaultEnterUp(),
         exitTransition = defaultExitDown(),
         popEnterTransition = defaultEnterUp(),
-        popExitTransition = defaultExitDown()
+        popExitTransition = defaultExitDown(),
     ) { backStackEntry ->
         val transactionId = backStackEntry.arguments?.getString("transactionId")
         if (transactionId.isNullOrBlank()) {
@@ -158,7 +155,7 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         EditTransactionScreen(
             viewModel = koinViewModel<EditTransactionViewModel>(),
             onNavigateBack = { navController.navigateUp() },
-            transactionId = transactionId
+            transactionId = transactionId,
         )
     }
     composable(
@@ -166,10 +163,10 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
         ImportTransactionsScreen(
-            onNavigateBack = { navController.popBackStack() }
+            onNavigateBack = { navController.popBackStack() },
         )
     }
     composable(
@@ -177,13 +174,14 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
-        val achievementsViewModel = koinViewModel<com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel>()
+        val achievementsViewModel =
+            koinViewModel<com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel>()
         val achievements = achievementsViewModel.achievements.collectAsState().value
         AchievementsScreen(
             achievements = achievements,
-            onBack = { navController.popBackStack() }
+            onBack = { navController.popBackStack() },
         )
     }
 }
@@ -194,7 +192,7 @@ fun NavGraphBuilder.profileGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
         ProfileScreen(
             onNavigateBack = { navController.popBackStack() },
@@ -202,7 +200,7 @@ fun NavGraphBuilder.profileGraph(navController: NavHostController) {
             onNavigateToChart = { navController.navigate(Screen.Chart.route) },
             onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
             onNavigateToExportImport = { navController.navigate(Screen.ExportImport.route) },
-            onNavigateToAchievements = { navController.navigate(Screen.Achievements.route) }
+            onNavigateToAchievements = { navController.navigate(Screen.Achievements.route) },
         )
     }
     composable(
@@ -210,10 +208,10 @@ fun NavGraphBuilder.profileGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
         LibrariesScreen(
-            onNavigateBack = { navController.navigateUp() }
+            onNavigateBack = { navController.navigateUp() },
         )
     }
     composable(
@@ -221,12 +219,12 @@ fun NavGraphBuilder.profileGraph(navController: NavHostController) {
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) {
         ExportImportScreen(
             onNavigateBack = { navController.popBackStack() },
             onImportClick = { navController.navigate(Screen.ImportTransactions.route) },
-            viewModel = koinViewModel<ProfileViewModel>()
+            viewModel = koinViewModel<ProfileViewModel>(),
         )
     }
 }
@@ -236,19 +234,19 @@ fun NavGraphBuilder.statisticsGraph(navController: NavHostController) {
         route = Screen.FinancialStatistics.route,
         arguments = listOf(
             navArgument("startDate") { type = NavType.LongType },
-            navArgument("endDate") { type = NavType.LongType }
+            navArgument("endDate") { type = NavType.LongType },
         ),
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),
         popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight()
+        popExitTransition = defaultExitRight(),
     ) { backStackEntry ->
         val startDate = backStackEntry.arguments?.getLong("startDate") ?: 0L
         val endDate = backStackEntry.arguments?.getLong("endDate") ?: 0L
         FinancialStatisticsScreen(
             startDate = startDate,
             endDate = endDate,
-            onNavigateBack = { navController.popBackStack() }
+            onNavigateBack = { navController.popBackStack() },
         )
     }
 }
@@ -257,41 +255,41 @@ fun NavGraphBuilder.statisticsGraph(navController: NavHostController) {
 private fun defaultEnterLeft(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
     slideIntoContainer(
         towards = AnimatedContentTransitionScope.SlideDirection.Left,
-        animationSpec = tween(400, easing = EaseInOut)
+        animationSpec = tween(400, easing = EaseInOut),
     ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
 }
 
 private fun defaultExitRight(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
     slideOutOfContainer(
         towards = AnimatedContentTransitionScope.SlideDirection.Right,
-        animationSpec = tween(400, easing = EaseInOut)
+        animationSpec = tween(400, easing = EaseInOut),
     ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
 }
 
 private fun defaultEnterRight(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
     slideIntoContainer(
         towards = AnimatedContentTransitionScope.SlideDirection.Right,
-        animationSpec = tween(400, easing = EaseInOut)
+        animationSpec = tween(400, easing = EaseInOut),
     ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
 }
 
 private fun defaultExitLeft(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
     slideOutOfContainer(
         towards = AnimatedContentTransitionScope.SlideDirection.Left,
-        animationSpec = tween(400, easing = EaseInOut)
+        animationSpec = tween(400, easing = EaseInOut),
     ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
 }
 
 private fun defaultEnterUp(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
     slideIntoContainer(
         towards = AnimatedContentTransitionScope.SlideDirection.Up,
-        animationSpec = tween(300, easing = EaseInOut)
+        animationSpec = tween(300, easing = EaseInOut),
     ) + fadeIn(animationSpec = tween(300))
 }
 
 private fun defaultExitDown(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
     slideOutOfContainer(
         towards = AnimatedContentTransitionScope.SlideDirection.Down,
-        animationSpec = tween(350, easing = EaseInOut)
+        animationSpec = tween(350, easing = EaseInOut),
     ) + fadeOut(animationSpec = tween(300))
-} 
+}

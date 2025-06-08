@@ -9,7 +9,7 @@ import timber.log.Timber
  * Используется только в Google flavor.
  */
 class FirebaseAnalyticsAdapter(
-    private val firebaseAnalytics: FirebaseAnalytics
+    private val firebaseAnalytics: FirebaseAnalytics,
 ) : IAnalytics {
 
     override fun logEvent(eventName: String) {
@@ -31,4 +31,4 @@ class FirebaseAnalyticsAdapter(
         Timber.d("Setting Firebase user ID: $userId")
         firebaseAnalytics.setUserId(userId)
     }
-} 
+}

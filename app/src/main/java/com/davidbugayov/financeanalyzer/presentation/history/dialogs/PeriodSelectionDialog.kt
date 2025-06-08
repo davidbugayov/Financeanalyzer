@@ -46,7 +46,7 @@ fun PeriodSelectionDialog(
     onStartDateClick: () -> Unit,
     onEndDateClick: () -> Unit,
     onConfirm: () -> Unit = {},
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
 
@@ -58,14 +58,14 @@ fun PeriodSelectionDialog(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .verticalScroll(rememberScrollState())
+                    .verticalScroll(rememberScrollState()),
             ) {
                 // Все время
                 PeriodOption(
                     periodType = PeriodType.ALL,
                     selectedPeriod = selectedPeriod,
                     title = stringResource(R.string.all_time),
-                    onPeriodSelected = onPeriodSelected
+                    onPeriodSelected = onPeriodSelected,
                 )
 
                 // День
@@ -73,7 +73,7 @@ fun PeriodSelectionDialog(
                     periodType = PeriodType.DAY,
                     selectedPeriod = selectedPeriod,
                     title = stringResource(R.string.day),
-                    onPeriodSelected = onPeriodSelected
+                    onPeriodSelected = onPeriodSelected,
                 )
 
                 // Неделя
@@ -81,7 +81,7 @@ fun PeriodSelectionDialog(
                     periodType = PeriodType.WEEK,
                     selectedPeriod = selectedPeriod,
                     title = stringResource(R.string.week),
-                    onPeriodSelected = onPeriodSelected
+                    onPeriodSelected = onPeriodSelected,
                 )
 
                 // Месяц
@@ -89,7 +89,7 @@ fun PeriodSelectionDialog(
                     periodType = PeriodType.MONTH,
                     selectedPeriod = selectedPeriod,
                     title = stringResource(R.string.month),
-                    onPeriodSelected = onPeriodSelected
+                    onPeriodSelected = onPeriodSelected,
                 )
 
                 // Квартал
@@ -97,7 +97,7 @@ fun PeriodSelectionDialog(
                     periodType = PeriodType.QUARTER,
                     selectedPeriod = selectedPeriod,
                     title = stringResource(R.string.period_quarter),
-                    onPeriodSelected = onPeriodSelected
+                    onPeriodSelected = onPeriodSelected,
                 )
 
                 // Год
@@ -105,7 +105,7 @@ fun PeriodSelectionDialog(
                     periodType = PeriodType.YEAR,
                     selectedPeriod = selectedPeriod,
                     title = stringResource(R.string.year),
-                    onPeriodSelected = onPeriodSelected
+                    onPeriodSelected = onPeriodSelected,
                 )
 
                 // Произвольный период
@@ -113,7 +113,7 @@ fun PeriodSelectionDialog(
                     periodType = PeriodType.CUSTOM,
                     selectedPeriod = selectedPeriod,
                     title = stringResource(R.string.custom_period),
-                    onPeriodSelected = onPeriodSelected
+                    onPeriodSelected = onPeriodSelected,
                 )
 
                 // Если выбран произвольный период, показываем поля для выбора дат
@@ -125,7 +125,7 @@ fun PeriodSelectionDialog(
                         label = stringResource(R.string.start_date),
                         date = startDate,
                         dateFormat = dateFormat,
-                        onClick = onStartDateClick
+                        onClick = onStartDateClick,
                     )
 
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
@@ -135,7 +135,7 @@ fun PeriodSelectionDialog(
                         label = stringResource(R.string.end_date),
                         date = endDate,
                         dateFormat = dateFormat,
-                        onClick = onEndDateClick
+                        onClick = onEndDateClick,
                     )
                 }
             }
@@ -157,7 +157,7 @@ fun PeriodSelectionDialog(
                     Text(stringResource(R.string.cancel))
                 }
             }
-        }
+        },
     )
 }
 
@@ -169,23 +169,23 @@ private fun PeriodOption(
     periodType: PeriodType,
     selectedPeriod: PeriodType,
     title: String,
-    onPeriodSelected: (PeriodType) -> Unit
+    onPeriodSelected: (PeriodType) -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onPeriodSelected(periodType) }
             .padding(vertical = dimensionResource(R.dimen.spacing_small)),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
             selected = selectedPeriod == periodType,
-            onClick = { onPeriodSelected(periodType) }
+            onClick = { onPeriodSelected(periodType) },
         )
         Text(
             text = title,
             style = MaterialTheme.typography.bodyMedium,
-            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small))
+            modifier = Modifier.padding(start = dimensionResource(R.dimen.spacing_small)),
         )
     }
 }
@@ -194,29 +194,24 @@ private fun PeriodOption(
  * Поле для отображения и выбора даты.
  */
 @Composable
-private fun DateField(
-    label: String,
-    date: Date,
-    dateFormat: SimpleDateFormat,
-    onClick: () -> Unit
-) {
+private fun DateField(label: String, date: Date, dateFormat: SimpleDateFormat, onClick: () -> Unit) {
     Column {
         Text(
             text = label,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .clickable(onClick = onClick)
                 .padding(vertical = dimensionResource(R.dimen.spacing_small)),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
                 text = dateFormat.format(date),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
         }
     }
-} 
+}

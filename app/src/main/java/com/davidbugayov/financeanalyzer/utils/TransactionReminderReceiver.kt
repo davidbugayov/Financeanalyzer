@@ -71,7 +71,7 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
             context,
             TRANSACTION_REMINDER_NOTIFICATION_ID,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         // Создаем уведомление
@@ -105,7 +105,7 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
             context,
             TRANSACTION_REMINDER_NOTIFICATION_ID,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         // Создаем уведомление
@@ -134,11 +134,11 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
             if (notificationScheduler is NotificationScheduler) {
                 (notificationScheduler as NotificationScheduler).scheduleTransactionReminder(
                     hour,
-                    minute
+                    minute,
                 )
             } else {
                 Timber.e(
-                    "Cannot reschedule reminder: notificationScheduler is not an instance of NotificationScheduler"
+                    "Cannot reschedule reminder: notificationScheduler is not an instance of NotificationScheduler",
                 )
             }
             Timber.d("Rescheduled reminder for tomorrow at %02d:%02d", hour, minute)
@@ -148,4 +148,4 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
             Timber.e(e, "Error rescheduling reminder")
         }
     }
-} 
+}

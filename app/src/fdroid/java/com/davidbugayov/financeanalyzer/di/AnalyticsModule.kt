@@ -27,4 +27,4 @@ val analyticsModule = module {
 
     // Предоставляем NoOpAnalytics для использования, когда аналитика отключена
     factory { NoOpAnalytics() }
-} 
+}

@@ -63,7 +63,7 @@ class FinanceActivity : ComponentActivity() {
             // Перезапускаем приложение
             val intent = Intent(this, FinanceActivity::class.java)
             intent.addFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK,
             )
             startActivity(intent)
 
@@ -100,7 +100,7 @@ fun FinanceAppContent() {
     FinanceAnalyzerTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = MaterialTheme.colorScheme.background,
         ) {
             MainScreen()
         }

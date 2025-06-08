@@ -35,17 +35,13 @@ fun MainScreen() {
         // Отображаем навигационный граф
         NavGraph(
             navController = navController,
-            startDestination = Screen.Home.route
+            startDestination = Screen.Home.route,
         )
     }
 }
 
 @Composable
-private fun ApplyThemeAndSystemBars(
-    themeMode: ThemeMode,
-    isDarkTheme: Boolean,
-    view: android.view.View
-) {
+private fun ApplyThemeAndSystemBars(themeMode: ThemeMode, isDarkTheme: Boolean, view: android.view.View) {
     LaunchedEffect(themeMode) {
         val window = (view.context as? Activity)?.window
         if (window != null) {

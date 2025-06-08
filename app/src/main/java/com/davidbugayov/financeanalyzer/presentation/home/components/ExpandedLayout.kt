@@ -48,19 +48,19 @@ fun ExpandedLayout(
     onFilterSelected: (TransactionFilter) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
 ) {
     Row(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 16.dp)
+            .padding(horizontal = 16.dp),
     ) {
         ExpandedLeftPanel(
             state = state,
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
         ExpandedRightPanel(
             state = state,
@@ -69,7 +69,7 @@ fun ExpandedLayout(
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
-            modifier = Modifier.weight(1f)
+            modifier = Modifier.weight(1f),
         )
     }
 }
@@ -80,23 +80,23 @@ private fun ExpandedLeftPanel(
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
             .padding(end = 8.dp)
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(rememberScrollState()),
     ) {
         BalanceCard(balance = state.balance)
         Spacer(modifier = Modifier.height(16.dp))
         HomeFilterChips(
             currentFilter = state.currentFilter,
-            onFilterSelected = onFilterSelected
+            onFilterSelected = onFilterSelected,
         )
         HomeTransactionsHeader(
             currentFilter = state.currentFilter,
             showGroupSummary = showGroupSummary,
-            onToggleGroupSummary = onToggleGroupSummary
+            onToggleGroupSummary = onToggleGroupSummary,
         )
         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -105,7 +105,7 @@ private fun ExpandedLeftPanel(
                 totalIncome = state.filteredIncome,
                 totalExpense = state.filteredExpense,
                 currentFilter = state.currentFilter,
-                balance = state.filteredBalance
+                balance = state.filteredBalance,
             )
         }
     }
@@ -119,18 +119,18 @@ private fun ExpandedRightPanel(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Timber.d(
         "[UI] ExpandedRightPanel: isLoading=%s, filteredTransactions.isEmpty()=%s",
         state.isLoading,
-        state.filteredTransactions.isEmpty()
+        state.filteredTransactions.isEmpty(),
     )
     Box(
         modifier = modifier
             .fillMaxSize()
             .padding(start = 8.dp),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         when {
             !state.isLoading && state.filteredTransactions.isEmpty() -> {
@@ -143,7 +143,7 @@ private fun ExpandedRightPanel(
                     categoriesViewModel = categoriesViewModel,
                     showGroupSummary = showGroupSummary,
                     onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick
+                    onTransactionLongClick = onTransactionLongClick,
                 )
             }
         }
@@ -157,7 +157,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         androidx.compose.material3.Icon(
             imageVector = androidx.compose.material.icons.Icons.Filled.Add,
@@ -165,7 +165,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
             tint = MaterialTheme.colorScheme.primary,
             modifier = Modifier
                 .padding(bottom = 8.dp)
-                .size(36.dp)
+                .size(36.dp),
         )
         Text(
             text = stringResource(R.string.empty_state_title),
@@ -173,7 +173,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
             color = MaterialTheme.colorScheme.onSurface,
             maxLines = 2,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier.padding(bottom = 4.dp)
+            modifier = Modifier.padding(bottom = 4.dp),
         )
         Text(
             text = stringResource(R.string.empty_state_subtitle),
@@ -182,7 +182,7 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
             maxLines = 3,
             fontSize = 13.sp,
             textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
         androidx.compose.material3.Button(
             onClick = {
@@ -192,18 +192,18 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
             shape = RoundedCornerShape(50),
             colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
+                contentColor = Color.White,
             ),
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = 16.dp)
-                .heightIn(min = 44.dp)
+                .heightIn(min = 44.dp),
         ) {
             Text(
                 text = stringResource(R.string.empty_state_add_first_transaction),
                 fontWeight = FontWeight.Medium,
                 fontSize = 15.sp,
-                maxLines = 1
+                maxLines = 1,
             )
         }
     }
@@ -215,7 +215,7 @@ private fun ExpandedTransactionList(
     categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit
+    onTransactionLongClick: (Transaction) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     LaunchedEffect(showGroupSummary) {
@@ -226,19 +226,19 @@ private fun ExpandedTransactionList(
     }
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         items(
             items = state.filteredTransactions,
             key = { it.id },
-            contentType = { "transaction" }
+            contentType = { "transaction" },
         ) { transaction ->
             TransactionItem(
                 transaction = transaction,
                 categoriesViewModel = categoriesViewModel,
                 onClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick
+                onTransactionLongClick = onTransactionLongClick,
             )
         }
     }
-} 
+}

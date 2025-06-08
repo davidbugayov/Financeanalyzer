@@ -27,45 +27,45 @@ fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(
-            dimensionResource(R.dimen.financial_statistics_card_corner_radius)
+            dimensionResource(R.dimen.financial_statistics_card_corner_radius),
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)
+            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
         ),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.financial_statistics_card_padding))
+                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.expense_analysis),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(
                 modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_large)
-                )
+                    dimensionResource(R.dimen.financial_statistics_spacer_large),
+                ),
             )
 
             // Ежедневные расходы
             MetricRow(
                 title = stringResource(R.string.avg_daily_expense),
-                value = metrics.averageDailyExpense.format(true)
+                value = metrics.averageDailyExpense.format(true),
             )
 
             MetricRow(
                 title = stringResource(R.string.avg_monthly_expense),
-                value = metrics.averageMonthlyExpense.format(true)
+                value = metrics.averageMonthlyExpense.format(true),
             )
 
             Spacer(
                 modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium)
-                )
+                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                ),
             )
 
             // Основная категория доходов
@@ -73,12 +73,12 @@ fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
                 Text(
                     text = stringResource(R.string.main_income_category, metrics.topIncomeCategory),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_medium)
-                    )
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                    ),
                 )
             }
             // Основная категория расходов
@@ -86,15 +86,15 @@ fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
                 Text(
                     text = stringResource(
                         R.string.main_expense_category,
-                        metrics.topExpenseCategory
+                        metrics.topExpenseCategory,
                     ),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_medium)
-                    )
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                    ),
                 )
             }
             // Перечисление топ-3 категорий расходов
@@ -104,21 +104,21 @@ fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
                         .fillMaxWidth()
                         .padding(
                             vertical = dimensionResource(
-                                R.dimen.financial_statistics_metric_row_vertical
-                            )
+                                R.dimen.financial_statistics_metric_row_vertical,
+                            ),
                         ),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
                         text = "${index + 1}. $category",
-                        style = MaterialTheme.typography.bodyMedium
+                        style = MaterialTheme.typography.bodyMedium,
                     )
 
                     Text(
                         text = amount.format(true),
                         style = MaterialTheme.typography.bodyMedium,
-                        fontWeight = FontWeight.Bold
+                        fontWeight = FontWeight.Bold,
                     )
                 }
             }
@@ -126,17 +126,17 @@ fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
             if (metrics.mostFrequentExpenseDay.isNotEmpty()) {
                 Spacer(
                     modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_medium)
-                    )
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                    ),
                 )
                 Text(
                     text = stringResource(
                         R.string.most_frequent_expense_day,
-                        metrics.mostFrequentExpenseDay
+                        metrics.mostFrequentExpenseDay,
                     ),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             }
         }
     }
-} 
+}

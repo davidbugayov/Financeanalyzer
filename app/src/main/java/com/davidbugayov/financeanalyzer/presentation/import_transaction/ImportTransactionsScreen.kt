@@ -74,7 +74,7 @@ import timber.log.Timber
 fun ImportTransactionsScreen(
     onNavigateBack: () -> Unit,
     viewModel: ImportTransactionsViewModel = koinViewModel(),
-    preferencesManager: PreferencesManager = koinInject()
+    preferencesManager: PreferencesManager = koinInject(),
 ) {
     val context = LocalContext.current
     val themeMode by preferencesManager.themeModeFlow.collectAsState()
@@ -110,28 +110,28 @@ fun ImportTransactionsScreen(
 
     // На Android 15 используем GetContent напрямую
     val getContentLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent()
+        contract = ActivityResultContracts.GetContent(),
     ) { selectedUri ->
         processUri(selectedUri)
     }
 
     // На Android < 15 используем стандартные разрешения и открытие документа
     val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument()
+        contract = ActivityResultContracts.OpenDocument(),
     ) { selectedUri ->
         processUri(selectedUri)
     }
 
     rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission()
+        contract = ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
         if (isGranted) {
             filePickerLauncher.launch(
                 arrayOf(
                     "text/csv",
                     "application/pdf",
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                )
+                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                ),
             )
         } else {
             val activity = context as? Activity
@@ -154,7 +154,7 @@ fun ImportTransactionsScreen(
                     openApplicationSettings(context)
                     showPermissionSettingsDialog = false
                 },
-                onDismiss = { showPermissionSettingsDialog = false }
+                onDismiss = { showPermissionSettingsDialog = false },
             )
         }
 
@@ -164,9 +164,9 @@ fun ImportTransactionsScreen(
                     title = stringResource(R.string.import_transactions_title),
                     showBackButton = true,
                     onBackClick = onNavigateBack,
-                    titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+                    titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
                 )
-            }
+            },
         ) { paddingValues ->
             Column(
                 modifier = Modifier
@@ -175,7 +175,7 @@ fun ImportTransactionsScreen(
                     .padding(dimensionResource(R.dimen.padding_large))
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_medium))
+                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_medium)),
             ) {
                 // Инструкции по импорту с анимацией
                 AnimatedVisibility(
@@ -184,9 +184,9 @@ fun ImportTransactionsScreen(
                         initialOffsetY = { -50 },
                         animationSpec = spring(
                             dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessLow
-                        )
-                    )
+                            stiffness = Spring.StiffnessLow,
+                        ),
+                    ),
                 ) {
                     ImportInstructions()
                 }
@@ -199,15 +199,15 @@ fun ImportTransactionsScreen(
                             initialOffsetY = { 50 },
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessLow
-                            )
-                        )
+                                stiffness = Spring.StiffnessLow,
+                            ),
+                        ),
                 ) {
                     BanksList(
                         onBankClick = { bank ->
                             selectedBank = bank
                             showBankInstructionDialog = true
-                        }
+                        },
                     )
                 }
 
@@ -218,17 +218,17 @@ fun ImportTransactionsScreen(
                         expandVertically(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow
-                            )
+                                stiffness = Spring.StiffnessLow,
+                            ),
                         ),
-                    exit = fadeOut(animationSpec = tween(300))
+                    exit = fadeOut(animationSpec = tween(300)),
                 ) {
                     ImportResultsSection(state)
                 }
 
                 // Кнопка выбора файла
                 Column(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     // Кнопка выбора файла
                     Button(
@@ -240,8 +240,8 @@ fun ImportTransactionsScreen(
                                     arrayOf(
                                         "text/csv",
                                         "application/pdf",
-                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
-                                    )
+                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                    ),
                                 )
                             }
                         },
@@ -251,21 +251,21 @@ fun ImportTransactionsScreen(
                         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button)),
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = androidx.compose.ui.graphics.Color.White
+                            contentColor = androidx.compose.ui.graphics.Color.White,
                         ),
                         elevation = ButtonDefaults.buttonElevation(
-                            defaultElevation = dimensionResource(R.dimen.button_elevation)
+                            defaultElevation = dimensionResource(R.dimen.button_elevation),
                         ),
                         // Добавляем возможность отключения кнопки во время импорта
-                        enabled = !state.isLoading
+                        enabled = !state.isLoading,
                     ) {
                         Icon(
                             imageVector = Icons.Default.CloudUpload,
                             contentDescription = null,
                             tint = androidx.compose.ui.graphics.Color.White,
                             modifier = Modifier.padding(
-                                end = dimensionResource(R.dimen.padding_medium)
-                            )
+                                end = dimensionResource(R.dimen.padding_medium),
+                            ),
                         )
                         Text(
                             text = if (state.isLoading) {
@@ -274,7 +274,7 @@ fun ImportTransactionsScreen(
                                 stringResource(R.string.choose_file_button)
                             },
                             style = MaterialTheme.typography.titleMedium,
-                            color = androidx.compose.ui.graphics.Color.White
+                            color = androidx.compose.ui.graphics.Color.White,
                         )
                     }
                 }
@@ -284,7 +284,7 @@ fun ImportTransactionsScreen(
             if (showBankInstructionDialog) {
                 BankInstructionDialog(
                     bankName = selectedBank,
-                    onDismiss = { showBankInstructionDialog = false }
+                    onDismiss = { showBankInstructionDialog = false },
                 )
             }
         }
@@ -302,4 +302,4 @@ fun openApplicationSettings(context: Context) {
         Timber.e(e, "Failed to open application settings")
         // Опционально: показать Toast или Snackbar об ошибке
     }
-} 
+}

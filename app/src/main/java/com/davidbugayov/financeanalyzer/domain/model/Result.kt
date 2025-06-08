@@ -36,4 +36,4 @@ sealed class Result<out T> {
             Error(mapException(e))
         }
     }
-} 
+}

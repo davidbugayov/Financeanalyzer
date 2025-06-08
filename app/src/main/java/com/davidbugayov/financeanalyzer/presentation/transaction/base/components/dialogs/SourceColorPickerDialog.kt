@@ -29,32 +29,28 @@ import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
  * Диалог выбора цвета источника
  */
 @Composable
-fun SourceColorPickerDialog(
-    initialColor: Int,
-    onColorSelected: (Int) -> Unit,
-    onDismiss: () -> Unit
-) {
+fun SourceColorPickerDialog(initialColor: Int, onColorSelected: (Int) -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.select_color)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
-                modifier = Modifier.padding(dimensionResource(R.dimen.source_color_picker_padding))
+                modifier = Modifier.padding(dimensionResource(R.dimen.source_color_picker_padding)),
             ) {
                 // Горизонтальный скроллируемый ряд цветов
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.spacedBy(
-                        dimensionResource(R.dimen.source_color_picker_item_spacing)
-                    )
+                        dimensionResource(R.dimen.source_color_picker_item_spacing),
+                    ),
                 ) {
                     items(ExpenseChartPalette) { composeColor ->
                         val argbColor = composeColor.toArgb()
                         ColorItem(
                             color = argbColor,
                             isSelected = argbColor == initialColor,
-                            onClick = { onColorSelected(argbColor) }
+                            onClick = { onColorSelected(argbColor) },
                         )
                     }
                 }
@@ -64,7 +60,7 @@ fun SourceColorPickerDialog(
             TextButton(onClick = onDismiss) {
                 Text(stringResource(R.string.close))
             }
-        }
+        },
     )
 }
 
@@ -76,15 +72,15 @@ private fun ColorItem(color: Int, isSelected: Boolean, onClick: () -> Unit) {
             .size(dimensionResource(R.dimen.source_color_picker_item_size))
             .clip(CircleShape)
             .background(Color(color))
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick),
     ) {
         if (isSelected) {
             Box(
                 modifier = Modifier
                     .size(dimensionResource(R.dimen.source_color_picker_item_size))
                     .clip(CircleShape)
-                    .background(Color.Black.copy(alpha = 0.2f))
+                    .background(Color.Black.copy(alpha = 0.2f)),
             )
         }
     }
-} 
+}

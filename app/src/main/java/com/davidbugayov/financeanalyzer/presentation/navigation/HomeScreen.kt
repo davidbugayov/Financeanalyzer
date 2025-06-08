@@ -10,6 +10,6 @@ import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 @Composable
 fun HomeScreenWrapper(navController: NavController) {
     HomeScreen(
-        navController = navController
+        navController = navController,
     )
-} 
+}

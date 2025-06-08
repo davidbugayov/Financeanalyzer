@@ -41,13 +41,13 @@ interface TransactionDao {
      * @return Список транзакций, отфильтрованный по датам с учетом пагинации
      */
     @Query(
-        "SELECT * FROM transactions WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC LIMIT :limit OFFSET :offset"
+        "SELECT * FROM transactions WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC LIMIT :limit OFFSET :offset",
     )
     suspend fun getTransactionsByDateRangePaginated(
         startDate: Date,
         endDate: Date,
         limit: Int,
-        offset: Int
+        offset: Int,
     ): List<TransactionEntity>
 
     /**
@@ -73,7 +73,7 @@ interface TransactionDao {
      * @return Список всех транзакций в указанном диапазоне дат
      */
     @Query(
-        "SELECT * FROM transactions WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC"
+        "SELECT * FROM transactions WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC",
     )
     suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): List<TransactionEntity>
 
@@ -128,4 +128,4 @@ interface TransactionDao {
      */
     @Query("DELETE FROM transactions WHERE id_string = :id")
     suspend fun deleteTransactionById(id: String)
-} 
+}

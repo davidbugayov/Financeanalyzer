@@ -12,7 +12,7 @@ import java.util.Date
  * Следует принципу единственной ответственности (SRP) из SOLID.
  */
 class CalculateCategoryStatsUseCase(
-    private val filterTransactionsUseCase: FilterTransactionsUseCase
+    private val filterTransactionsUseCase: FilterTransactionsUseCase,
 ) {
 
     /**
@@ -25,7 +25,7 @@ class CalculateCategoryStatsUseCase(
         categories: List<String>,
         periodType: PeriodType,
         startDate: Date,
-        endDate: Date
+        endDate: Date,
     ): Triple<Money, Money, BigDecimal?> {
         // Если список пуст или нет выбранных категорий, быстро возвращаем нулевые значения
         if (transactions.isEmpty() || categories.isEmpty()) {
@@ -48,7 +48,7 @@ class CalculateCategoryStatsUseCase(
             periodType = periodType,
             startDate = startDate,
             endDate = endDate,
-            categories = categories
+            categories = categories,
         )
 
         // Оптимизированный расчет суммы с одним проходом
@@ -73,7 +73,7 @@ class CalculateCategoryStatsUseCase(
                 periodType = PeriodType.CUSTOM,
                 startDate = previousStartDate,
                 endDate = previousEndDate,
-                categories = categories
+                categories = categories,
             )
         } else {
             emptyList()
@@ -93,4 +93,4 @@ class CalculateCategoryStatsUseCase(
 
         return Triple(currentPeriodTotal, previousPeriodTotal, percentChange)
     }
-} 
+}

@@ -51,7 +51,7 @@ fun HomeGroupSummary(
     totalIncome: Money,
     totalExpense: Money,
     currentFilter: TransactionFilter = TransactionFilter.MONTH,
-    balance: Money? = null
+    balance: Money? = null,
 ) {
     val cardBg = LocalSummaryCardBackground.current
     val incomeColor = LocalSummaryIncome.current
@@ -74,7 +74,7 @@ fun HomeGroupSummary(
             CategorySummary(
                 category = category,
                 amount = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount },
-                isExpense = showExpenses
+                isExpense = showExpenses,
             )
         }.sortedByDescending { it.amount.amount }
     }
@@ -84,10 +84,10 @@ fun HomeGroupSummary(
             .fillMaxWidth()
             .padding(horizontal = 12.dp, vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 1.dp),
-        colors = CardDefaults.cardColors(containerColor = cardBg)
+        colors = CardDefaults.cardColors(containerColor = cardBg),
     ) {
         Column(
-            modifier = Modifier.padding(12.dp)
+            modifier = Modifier.padding(12.dp),
         ) {
             SummaryHeader(periodTitle, textPrimary)
             SummaryTotals(
@@ -97,20 +97,20 @@ fun HomeGroupSummary(
                 incomeColor,
                 expenseColor,
                 balanceColor,
-                textSecondary
+                textSecondary,
             )
             HorizontalDivider(modifier = Modifier.padding(vertical = 4.dp), color = dividerColor)
             SummaryCategorySwitcher(
                 showExpenses,
                 onSwitch = { showExpenses = !showExpenses },
-                textSecondary = textSecondary
+                textSecondary = textSecondary,
             )
             val visibleCount = if (showAllGroups) {
                 categoryGroups.size
             } else {
                 minOf(
                     5,
-                    categoryGroups.size
+                    categoryGroups.size,
                 )
             }
             val visibleCategories = categoryGroups.take(visibleCount)
@@ -118,7 +118,7 @@ fun HomeGroupSummary(
                 visibleCategories = visibleCategories,
                 incomeColor = incomeColor,
                 expenseColor = expenseColor,
-                textSecondary = textSecondary
+                textSecondary = textSecondary,
             )
             if (visibleCategories.isEmpty()) {
                 SummaryEmptyState(showExpenses, textSecondary)
@@ -140,7 +140,7 @@ private fun SummaryHeader(periodTitle: String, textPrimary: Color) {
         fontSize = 16.sp,
         fontWeight = FontWeight.Bold,
         modifier = Modifier.padding(bottom = 4.dp),
-        color = textPrimary
+        color = textPrimary,
     )
 }
 
@@ -152,96 +152,92 @@ private fun SummaryTotals(
     incomeColor: Color,
     expenseColor: Color,
     balanceColor: Color,
-    textSecondary: Color
+    textSecondary: Color,
 ) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = stringResource(R.string.total_income),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = textSecondary
+            color = textSecondary,
         )
         Text(
             text = "+" + totalIncome.abs().format(showCurrency = false),
             fontSize = 14.sp,
             color = incomeColor,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = stringResource(R.string.total_expense),
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = textSecondary
+            color = textSecondary,
         )
         Text(
             text = "-" + totalExpense.abs().format(showCurrency = false),
             fontSize = 14.sp,
             color = expenseColor,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
     }
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 4.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = stringResource(R.string.balance),
             fontSize = 14.sp,
             fontWeight = FontWeight.Bold,
-            color = textSecondary
+            color = textSecondary,
         )
         Text(
             text = balance.format(showCurrency = false),
             fontSize = 14.sp,
             color = balanceColor,
-            fontWeight = FontWeight.Bold
+            fontWeight = FontWeight.Bold,
         )
     }
 }
 
 @Composable
-private fun SummaryCategorySwitcher(
-    showExpenses: Boolean,
-    onSwitch: () -> Unit,
-    textSecondary: Color
-) {
+private fun SummaryCategorySwitcher(showExpenses: Boolean, onSwitch: () -> Unit, textSecondary: Color) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = 8.dp),
-        horizontalArrangement = Arrangement.SpaceBetween
+        horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
             text = stringResource(
-                if (showExpenses) R.string.expense_categories else R.string.income_categories
+                if (showExpenses) R.string.expense_categories else R.string.income_categories,
             ),
             style = MaterialTheme.typography.titleSmall,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
-            color = textSecondary
+            color = textSecondary,
         )
         Text(
             text = stringResource(
-                if (showExpenses) R.string.show_income else R.string.show_expenses
+                if (showExpenses) R.string.show_income else R.string.show_expenses,
             ),
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium,
-            modifier = Modifier.clickable { onSwitch() }
+            modifier = Modifier.clickable { onSwitch() },
         )
     }
 }
@@ -251,10 +247,10 @@ private fun SummaryCategoryList(
     visibleCategories: List<CategorySummary>,
     incomeColor: Color,
     expenseColor: Color,
-    textSecondary: Color
+    textSecondary: Color,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.spacedBy(2.dp),
     ) {
         visibleCategories.forEach { categorySummary ->
             Row(
@@ -262,7 +258,7 @@ private fun SummaryCategoryList(
                     .fillMaxWidth()
                     .padding(vertical = 2.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = categorySummary.category,
@@ -271,7 +267,7 @@ private fun SummaryCategoryList(
                     fontWeight = FontWeight.Medium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
                 Text(
                     text = if (categorySummary.isExpense) {
@@ -281,7 +277,7 @@ private fun SummaryCategoryList(
                     },
                     fontSize = 13.sp,
                     color = if (categorySummary.isExpense) expenseColor else incomeColor,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
         }
@@ -292,11 +288,11 @@ private fun SummaryCategoryList(
 private fun SummaryEmptyState(showExpenses: Boolean, textSecondary: Color) {
     Text(
         text = stringResource(
-            if (showExpenses) R.string.no_expenses_period else R.string.no_income_period
+            if (showExpenses) R.string.no_expenses_period else R.string.no_income_period,
         ),
         fontSize = 13.sp,
         color = textSecondary,
-        modifier = Modifier.padding(vertical = 8.dp)
+        modifier = Modifier.padding(vertical = 8.dp),
     )
 }
 
@@ -310,7 +306,7 @@ private fun SummaryShowMoreButton(moreCount: Int, textSecondary: Color, onClick:
             .fillMaxWidth()
             .padding(top = 4.dp)
             .clickable { onClick() },
-        fontWeight = FontWeight.Medium
+        fontWeight = FontWeight.Medium,
     )
 }
 
@@ -324,7 +320,7 @@ private fun SummaryHideButton(textSecondary: Color, onClick: () -> Unit) {
             .fillMaxWidth()
             .padding(top = 4.dp)
             .clickable { onClick() },
-        fontWeight = FontWeight.Medium
+        fontWeight = FontWeight.Medium,
     )
 }
 
@@ -344,5 +340,5 @@ private fun periodTitleForFilter(filter: TransactionFilter): String {
 data class CategorySummary(
     val category: String,
     val amount: Money,
-    val isExpense: Boolean
+    val isExpense: Boolean,
 )

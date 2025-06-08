@@ -36,4 +36,4 @@ interface IAnalytics {
      * @param userId ID пользователя
      */
     fun setUserId(userId: String)
-} 
+}

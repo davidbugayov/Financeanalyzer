@@ -62,16 +62,16 @@ fun SettingsSection(
     isTransactionReminderEnabled: Boolean,
     transactionReminderTime: Time?,
     hasNotificationPermission: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier
-            .fillMaxWidth()
+            .fillMaxWidth(),
     ) {
         Text(
             text = stringResource(R.string.profile_settings_title),
             style = MaterialTheme.typography.titleMedium,
-            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp)
+            modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp),
         )
         AnimatedVisibility(visible = true, enter = fadeIn()) {
             SettingsActionCard(
@@ -87,7 +87,7 @@ fun SettingsSection(
                     ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
                     ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
                 },
-                onClick = onThemeClick
+                onClick = onThemeClick,
             )
         }
         AnimatedVisibility(visible = true, enter = fadeIn()) {
@@ -96,7 +96,7 @@ fun SettingsSection(
                 iconBackground = MaterialTheme.colorScheme.secondary,
                 title = stringResource(R.string.settings_language_title),
                 subtitle = stringResource(R.string.settings_language_current_value),
-                onClick = onLanguageClick
+                onClick = onLanguageClick,
             )
         }
         AnimatedVisibility(visible = true, enter = fadeIn()) {
@@ -105,7 +105,7 @@ fun SettingsSection(
                 iconBackground = MaterialTheme.colorScheme.tertiary,
                 title = stringResource(R.string.profile_currency_title),
                 subtitle = stringResource(R.string.settings_currency_current_value),
-                onClick = onCurrencyClick
+                onClick = onCurrencyClick,
             )
         }
         AnimatedVisibility(visible = true, enter = fadeIn()) {
@@ -119,13 +119,13 @@ fun SettingsSection(
                     stringResource(
                         R.string.settings_reminder_time_format,
                         transactionReminderTime.hours,
-                        transactionReminderTime.minutes
+                        transactionReminderTime.minutes,
                     )
                 } else {
                     stringResource(R.string.off)
                 },
                 subtitleColor = if (!hasNotificationPermission) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
-                onClick = onTransactionReminderClick
+                onClick = onTransactionReminderClick,
             )
         }
     }
@@ -138,7 +138,7 @@ fun SettingsActionCard(
     title: String,
     subtitle: String? = null,
     subtitleColor: Color = MaterialTheme.colorScheme.onSurfaceVariant,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     Card(
         modifier = Modifier
@@ -148,23 +148,23 @@ fun SettingsActionCard(
             .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(18.dp),
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         Row(
             modifier = Modifier.padding(18.dp),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
                 modifier = Modifier
                     .size(40.dp)
                     .background(iconBackground, shape = CircleShape),
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = icon,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(22.dp)
+                    modifier = Modifier.size(22.dp),
                 )
             }
             Spacer(modifier = Modifier.width(14.dp))
@@ -172,17 +172,17 @@ fun SettingsActionCard(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall.copy(fontWeight = FontWeight.Bold),
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
                 if (subtitle != null) {
                     Text(
                         text = subtitle,
                         style = MaterialTheme.typography.bodySmall,
                         color = subtitleColor,
-                        modifier = Modifier.padding(top = 2.dp)
+                        modifier = Modifier.padding(top = 2.dp),
                     )
                 }
             }
         }
     }
-} 
+}

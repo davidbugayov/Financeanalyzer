@@ -28,22 +28,22 @@ import com.davidbugayov.financeanalyzer.R
 fun CenteredLoadingIndicator(message: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.Center,
-            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
+            modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal)),
         ) {
             CircularProgressIndicator(
                 modifier = Modifier.size(dimensionResource(R.dimen.icon_size_medium)),
-                color = MaterialTheme.colorScheme.primary
+                color = MaterialTheme.colorScheme.primary,
             )
             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
             Text(
                 text = message,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }
-} 
+}

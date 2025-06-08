@@ -24,7 +24,7 @@ import java.util.Date
  */
 class AlfaBankExcelHandler(
     transactionRepository: TransactionRepository,
-    context: Context
+    context: Context,
 ) : AbstractExcelBankHandler(transactionRepository, context) {
 
     override val bankName: String = "Альфа-Банк Excel"
@@ -33,7 +33,7 @@ class AlfaBankExcelHandler(
     override val excelKeywords: List<String> = listOf(
         "alfabank", "альфабанк", "альфа-банк", "alfa",
         "statement", "выписка", "операци", "движени",
-        "excel", "xlsx", "xls"
+        "excel", "xlsx", "xls",
     )
 
     // Негативные ключевые слова для исключения ложных срабатываний
@@ -45,7 +45,7 @@ class AlfaBankExcelHandler(
         "тинькофф",
         "tinkoff",
         "ozon",
-        "озон"
+        "озон",
     )
 
     /**
@@ -57,7 +57,7 @@ class AlfaBankExcelHandler(
         val hasPositiveKeyword = excelKeywords.any { fileName.lowercase().contains(it.lowercase()) }
         val containsNegativeKeyword = getNegativeKeywords().any {
             fileName.lowercase().contains(
-                it.lowercase()
+                it.lowercase(),
             )
         }
 
@@ -79,12 +79,12 @@ class AlfaBankExcelHandler(
                         "ALFA-BANK",
                         "Альфа-Банк",
                         "Альфа",
-                        "Alfa"
+                        "Alfa",
                     )
                     val hasAlfaBankIndicator = alfaBankIndicators.any {
                         content.contains(
                             it,
-                            ignoreCase = true
+                            ignoreCase = true,
                         )
                     }
                     val otherBankIndicators = listOf(
@@ -93,12 +93,12 @@ class AlfaBankExcelHandler(
                         "Тинькофф",
                         "ТИНЬКОФФ",
                         "OZON",
-                        "ОЗОН"
+                        "ОЗОН",
                     )
                     val hasOtherBankIndicator = otherBankIndicators.any {
                         content.contains(
                             it,
-                            ignoreCase = true
+                            ignoreCase = true,
                         )
                     }
 
@@ -109,7 +109,7 @@ class AlfaBankExcelHandler(
 
                     if (hasAlfaBankIndicator) {
                         Timber.d(
-                            "[$bankName Handler] Найден индикатор Альфа-Банка в содержимом файла"
+                            "[$bankName Handler] Найден индикатор Альфа-Банка в содержимом файла",
                         )
                         return true
                     }
@@ -137,32 +137,32 @@ class AlfaBankExcelHandler(
                     dateColumnIndex = 0, // Дата операции
                     descriptionColumnIndex = 3, // Код операции как описание
                     amountColumnIndex = null, // Отключаем поиск суммы в файле
-                    categoryColumnIndex = 4 // Категория операции
+                    categoryColumnIndex = 4, // Категория операции
                 ),
                 defaultCurrencyCode = "RUB",
                 dateFormatConfig = DateFormatConfig(
                     primaryDateFormatString = "dd.MM.yyyy",
-                    locale = Locale.forLanguageTag("ru")
+                    locale = Locale.forLanguageTag("ru"),
                 ),
                 amountParseConfig = AmountParseConfig(
                     decimalSeparator = ',',
-                    currencySymbolsToRemove = listOf("₽", "руб", "RUB")
+                    currencySymbolsToRemove = listOf("₽", "руб", "RUB"),
                 ),
                 skipEmptyRows = true,
-                expectedMinValuesPerRow = 1 // Требуем только дату
+                expectedMinValuesPerRow = 1, // Требуем только дату
             )
 
             // Запускаем с debug-конфигурацией для вывода подробной информации
             val debugEnabled = true
             Timber.d(
-                "[$bankName Handler] Создание GenericExcelImportUseCase с конфигурацией: $alfaBankConfig"
+                "[$bankName Handler] Создание GenericExcelImportUseCase с конфигурацией: $alfaBankConfig",
             )
             return GenericExcelImportUseCase(
                 context,
                 transactionRepository,
                 alfaBankConfig,
                 transactionSource,
-                debugEnabled
+                debugEnabled,
             )
         }
         throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")

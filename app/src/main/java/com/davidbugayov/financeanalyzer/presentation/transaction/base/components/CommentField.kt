@@ -22,26 +22,26 @@ fun CommentField(note: String, onNoteChange: (String) -> Unit, modifier: Modifie
             .fillMaxWidth()
             .padding(
                 horizontal = dimensionResource(R.dimen.comment_field_padding_horizontal),
-                vertical = dimensionResource(R.dimen.comment_field_padding_vertical)
+                vertical = dimensionResource(R.dimen.comment_field_padding_vertical),
             ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.comment_field_corner_radius)),
         color = MaterialTheme.colorScheme.surface,
-        tonalElevation = dimensionResource(R.dimen.comment_field_elevation)
+        tonalElevation = dimensionResource(R.dimen.comment_field_elevation),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
                     horizontal = dimensionResource(R.dimen.comment_field_inner_padding_horizontal),
-                    vertical = dimensionResource(R.dimen.comment_field_inner_padding_vertical)
+                    vertical = dimensionResource(R.dimen.comment_field_inner_padding_vertical),
                 ),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             NoteField(
                 note = note,
                 onNoteChange = onNoteChange,
-                modifier = Modifier.fillMaxWidth()
+                modifier = Modifier.fillMaxWidth(),
             )
         }
     }
-} 
+}

@@ -11,5 +11,5 @@ data class ImportState(
     val successCount: Int = 0,
     val skippedCount: Int = 0,
     val successMessage: String = "",
-    val error: String? = null
-) 
+    val error: String? = null,
+)

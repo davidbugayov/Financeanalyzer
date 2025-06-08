@@ -31,4 +31,4 @@ sealed class TransactionEvent {
      * Удалить транзакцию
      */
     data class DeleteTransaction(val transaction: Transaction) : TransactionEvent()
-} 
+}

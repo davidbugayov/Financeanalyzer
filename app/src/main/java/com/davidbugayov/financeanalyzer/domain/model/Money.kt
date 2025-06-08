@@ -16,7 +16,7 @@ import java.util.Locale
  */
 data class Money(
     val amount: BigDecimal,
-    val currency: Currency = Currency.RUB
+    val currency: Currency = Currency.RUB,
 ) {
 
     init {
@@ -27,22 +27,22 @@ data class Money(
 
     constructor(amount: Double, currency: Currency = Currency.RUB) : this(
         BigDecimal.valueOf(amount).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN),
-        currency
+        currency,
     )
 
     constructor(amount: Int, currency: Currency = Currency.RUB) : this(
         BigDecimal.valueOf(amount.toLong()).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN),
-        currency
+        currency,
     )
 
     constructor(amount: Long, currency: Currency = Currency.RUB) : this(
         BigDecimal.valueOf(amount).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN),
-        currency
+        currency,
     )
 
     constructor(amount: String, currency: Currency = Currency.RUB) : this(
         BigDecimal(amount).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN),
-        currency
+        currency,
     )
 
     /**
@@ -82,7 +82,7 @@ data class Money(
         }
         return Money(
             amount.multiply(multiplier).setScale(currency.decimalPlaces, RoundingMode.HALF_EVEN),
-            currency
+            currency,
         )
     }
 
@@ -112,7 +112,7 @@ data class Money(
     operator fun div(divisor: BigDecimal): Money {
         return Money(
             amount.divide(divisor, currency.decimalPlaces, RoundingMode.HALF_EVEN),
-            currency
+            currency,
         )
     }
 
@@ -184,11 +184,7 @@ data class Money(
      * @param useMinimalDecimals Если true и число целое, не показывать десятичные знаки (например, .00)
      * @return Отформатированная строка
      */
-    fun format(
-        showCurrency: Boolean = true,
-        showSign: Boolean = false,
-        useMinimalDecimals: Boolean = true
-    ): String {
+    fun format(showCurrency: Boolean = true, showSign: Boolean = false, useMinimalDecimals: Boolean = true): String {
         // Используем русскую локаль для гарантированного форматирования с пробелами
         val locale = Locale.forLanguageTag("ru-RU")
         val symbols = DecimalFormatSymbols(locale)
@@ -200,12 +196,12 @@ data class Money(
 
         // Добавляем логирование для отладки
         Timber.d(
-            "Money.format: amount=$amount, locale=$locale, groupingSeparator='${symbols.groupingSeparator}'"
+            "Money.format: amount=$amount, locale=$locale, groupingSeparator='${symbols.groupingSeparator}'",
         )
 
         val strippedAmount = amount.stripTrailingZeros()
         val isWholeNumber = strippedAmount.scale() <= 0 || strippedAmount.remainder(BigDecimal.ONE).compareTo(
-            BigDecimal.ZERO
+            BigDecimal.ZERO,
         ) == 0
 
         // Используем шаблон с запятой как стандартным местозаполнителем для группировки
@@ -288,11 +284,7 @@ data class Money(
      * @param useMinimalDecimals Если true и число целое, не показывать десятичные знаки
      * @return Отформатированная строка
      */
-    fun formatted(
-        showCurrency: Boolean = true,
-        showSign: Boolean = false,
-        useMinimalDecimals: Boolean = true
-    ): String {
+    fun formatted(showCurrency: Boolean = true, showSign: Boolean = false, useMinimalDecimals: Boolean = true): String {
         return format(showCurrency, showSign, useMinimalDecimals)
     }
 
@@ -318,7 +310,7 @@ data class Money(
         require(currency == other.currency) { "Cannot calculate percentage difference with different currencies" }
         if (other.isZero()) return if (isZero()) BigDecimal.ZERO else BigDecimal(100)
         return (amount.subtract(other.amount)).divide(other.amount, 4, RoundingMode.HALF_EVEN).multiply(
-            BigDecimal(100)
+            BigDecimal(100),
         )
     }
 
@@ -337,4 +329,4 @@ data class Money(
             return Money(BigDecimal.ZERO, currency)
         }
     }
-} 
+}

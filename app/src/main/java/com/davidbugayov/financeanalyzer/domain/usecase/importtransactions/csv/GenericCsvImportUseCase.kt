@@ -34,7 +34,7 @@ data class CsvParseConfig(
     val amountCharsToRemoveRegexPattern: String? = null, // Регулярка для удаления лишних символов из суммы
     val statusColumnIndex: Int? = null, // Индекс колонки со статусом транзакции (опционально)
     val validStatusValues: List<String>? = null, // Список валидных статусов (если колонка есть)
-    val skipTransactionIfStatusInvalid: Boolean = true // Пропускать ли строки с невалидным статусом
+    val skipTransactionIfStatusInvalid: Boolean = true, // Пропускать ли строки с невалидным статусом
 ) {
 
     // Регулярка для очистки суммы
@@ -55,7 +55,7 @@ data class CsvParseConfig(
 class GenericCsvImportUseCase(
     context: Context,
     transactionRepository: TransactionRepository,
-    private val config: CsvParseConfig = CsvParseConfig()
+    private val config: CsvParseConfig = CsvParseConfig(),
 ) : BankImportUseCase(transactionRepository, context) {
 
     override val bankName: String = context.getString(R.string.bank_generic_csv)
@@ -78,8 +78,8 @@ class GenericCsvImportUseCase(
                 R.string.csv_format_check,
                 firstLine,
                 config.delimiter,
-                isValid
-            )}"
+                isValid,
+            )}",
         )
         return isValid
     }
@@ -109,27 +109,27 @@ class GenericCsvImportUseCase(
                     R.string.csv_not_enough_columns,
                     config.expectedMinColumnCount,
                     columns.size,
-                    line
-                )}"
+                    line,
+                )}",
             )
             return null
         }
         if (config.skipTransactionIfStatusInvalid && config.statusColumnIndex != null && config.validStatusValues?.isNotEmpty() == true) {
             val status = columns.getOrNull(config.statusColumnIndex)
             if (status == null || config.validStatusValues.none {
-                it.equals(
+                    it.equals(
                         status,
-                        ignoreCase = true
+                        ignoreCase = true,
                     )
-            }
+                }
             ) {
                 Timber.d(
                     "[$bankName] ${context.getString(
                         R.string.csv_skip_invalid_status,
                         status,
                         config.validStatusValues,
-                        line
-                    )}"
+                        line,
+                    )}",
                 )
                 return null
             }
@@ -140,21 +140,21 @@ class GenericCsvImportUseCase(
                     "[$bankName] ${context.getString(
                         R.string.csv_date_not_found,
                         config.dateColumnIndex,
-                        line
-                    )}"
+                        line,
+                    )}",
                 )
                 return null
             }
             val description = columns.getOrNull(config.descriptionColumnIndex) ?: context.getString(
-                R.string.csv_no_description
+                R.string.csv_no_description,
             )
             var amountString = columns.getOrNull(config.amountColumnIndex) ?: run {
                 Timber.e(
                     "[$bankName] ${context.getString(
                         R.string.csv_amount_not_found,
                         config.amountColumnIndex,
-                        line
-                    )}"
+                        line,
+                    )}",
                 )
                 return null
             }
@@ -179,8 +179,8 @@ class GenericCsvImportUseCase(
                         R.string.csv_date_parse_error,
                         dateString,
                         config.dateFormat.toPattern(),
-                        line
-                    )}"
+                        line,
+                    )}",
                 )
                 return null
             }
@@ -190,8 +190,8 @@ class GenericCsvImportUseCase(
                         "[$bankName] ${context.getString(
                             R.string.csv_amount_parse_error,
                             amountString,
-                            line
-                        )}"
+                            line,
+                        )}",
                     )
                     return null
                 }
@@ -201,8 +201,8 @@ class GenericCsvImportUseCase(
                     "[$bankName] ${context.getString(
                         R.string.csv_amount_parse_exception,
                         amountString,
-                        e.message
-                    )}"
+                        e.message,
+                    )}",
                 )
                 return null
             }
@@ -212,7 +212,7 @@ class GenericCsvImportUseCase(
             } else {
                 columns.getOrNull(4)?.equals(
                     context.getString(R.string.csv_expense_value),
-                    ignoreCase = true
+                    ignoreCase = true,
                 ) ?: (amountValue < 0)
             }
             val absAmount = kotlin.math.abs(amountValue)
@@ -228,12 +228,12 @@ class GenericCsvImportUseCase(
                 source = bankName,
                 sourceColor = 0,
                 categoryId = "",
-                title = description
+                title = description,
             )
         } catch (e: Exception) {
             Timber.e(
                 e,
-                "[$bankName] ${context.getString(R.string.csv_parse_line_error, line, config)}"
+                "[$bankName] ${context.getString(R.string.csv_parse_line_error, line, config)}",
             )
             return null
         }
@@ -246,7 +246,7 @@ class GenericCsvImportUseCase(
         if (super.shouldSkipLine(line)) return true
         if (line.split(config.delimiter).size < config.expectedMinColumnCount) {
             Timber.d(
-                "[$bankName] ${context.getString(R.string.csv_skip_line_not_enough_columns, line)}"
+                "[$bankName] ${context.getString(R.string.csv_skip_line_not_enough_columns, line)}",
             )
             return true
         }
@@ -254,4 +254,4 @@ class GenericCsvImportUseCase(
     }
 
     // importTransactions(uri, progressCallback) не переопределяем — базовая реализация BankImportUseCase подходит для CSV
-} 
+}

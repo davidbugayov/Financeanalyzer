@@ -15,7 +15,7 @@ class SourceUsagePreferences private constructor(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFERENCES_NAME,
-        Context.MODE_PRIVATE
+        Context.MODE_PRIVATE,
     )
     private val gson = Gson()
 
@@ -84,7 +84,7 @@ class SourceUsagePreferences private constructor(context: Context) {
         Timber.d(
             "[SOURCE_USAGE] Увеличен счетчик использования источника '%s': %d",
             sourceName,
-            currentCount + 1
+            currentCount + 1,
         )
     }
 
@@ -98,4 +98,4 @@ class SourceUsagePreferences private constructor(context: Context) {
         Timber.d("[SOURCE_USAGE] Использований источника '%s': %d", sourceName, usage)
         return usage
     }
-} 
+}

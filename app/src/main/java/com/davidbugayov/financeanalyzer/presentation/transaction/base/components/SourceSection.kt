@@ -41,19 +41,19 @@ fun SourceSection(
     onSourceSelected: (Source) -> Unit,
     onAddSourceClick: () -> Unit,
     onSourceLongClick: (Source) -> Unit = {},
-    isError: Boolean = false
+    isError: Boolean = false,
 ) {
     Column(modifier = Modifier.fillMaxWidth()) {
         Text(
             text = stringResource(R.string.source) + " *",
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+            color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
         )
 
         LazyRow(
             contentPadding = PaddingValues(horizontal = 16.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp),
         ) {
             items(sources) { source ->
                 SourceItem(
@@ -61,7 +61,7 @@ fun SourceSection(
                     isSelected = source.name == selectedSource,
                     onClick = { onSourceSelected(source) },
                     onLongClick = { onSourceLongClick(source) },
-                    isError = isError && selectedSource.isBlank()
+                    isError = isError && selectedSource.isBlank(),
                 )
             }
 
@@ -82,7 +82,7 @@ fun AddSourceItem(onClick: () -> Unit) {
         modifier = Modifier
             .width(80.dp)
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp)
+            .padding(vertical = 8.dp),
     ) {
         Box(
             modifier = Modifier
@@ -92,14 +92,14 @@ fun AddSourceItem(onClick: () -> Unit) {
                 .border(
                     width = 1.dp,
                     color = MaterialTheme.colorScheme.outline,
-                    shape = CircleShape
+                    shape = CircleShape,
                 ),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Icon(
                 imageVector = Icons.Default.Add,
                 contentDescription = stringResource(R.string.add_custom_source),
-                tint = MaterialTheme.colorScheme.onSurfaceVariant
+                tint = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
 
@@ -109,7 +109,7 @@ fun AddSourceItem(onClick: () -> Unit) {
             text = stringResource(R.string.add_custom_source),
             style = MaterialTheme.typography.bodySmall,
             textAlign = TextAlign.Center,
-            maxLines = 1
+            maxLines = 1,
         )
     }
-} 
+}

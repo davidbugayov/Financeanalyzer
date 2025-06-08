@@ -41,35 +41,35 @@ private val SelectorButtonTextVerticalPadding = 8.dp
 fun LineChartTypeSelector(
     selectedMode: LineChartDisplayMode,
     onModeSelected: (LineChartDisplayMode) -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = SelectorVerticalPadding),
         horizontalArrangement = Arrangement.Center,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         // Кнопка для отображения расходов
         SelectorButton(
             text = stringResource(id = R.string.chart_type_selector_expense),
             isSelected = selectedMode == LineChartDisplayMode.EXPENSE,
             color = LocalExpenseColor.current,
-            onClick = { onModeSelected(LineChartDisplayMode.EXPENSE) }
+            onClick = { onModeSelected(LineChartDisplayMode.EXPENSE) },
         )
 
         SelectorButton(
             text = stringResource(id = R.string.chart_type_selector_income),
             isSelected = selectedMode == LineChartDisplayMode.INCOME,
             color = LocalIncomeColor.current,
-            onClick = { onModeSelected(LineChartDisplayMode.INCOME) }
+            onClick = { onModeSelected(LineChartDisplayMode.INCOME) },
         )
 
         SelectorButton(
             text = stringResource(id = R.string.chart_type_selector_both),
             isSelected = selectedMode == LineChartDisplayMode.BOTH,
             color = MaterialTheme.colorScheme.tertiary,
-            onClick = { onModeSelected(LineChartDisplayMode.BOTH) }
+            onClick = { onModeSelected(LineChartDisplayMode.BOTH) },
         )
     }
 }
@@ -89,20 +89,20 @@ private fun SelectorButton(text: String, isSelected: Boolean, color: Color, onCl
                 } else {
                     MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                 },
-                shape = RoundedCornerShape(SelectorButtonCornerRadius)
+                shape = RoundedCornerShape(SelectorButtonCornerRadius),
             )
             .clickable(onClick = onClick)
             .padding(
                 horizontal = SelectorButtonTextHorizontalPadding,
-                vertical = SelectorButtonTextVerticalPadding
+                vertical = SelectorButtonTextVerticalPadding,
             ),
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodyMedium,
             fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-            color = if (isSelected) color else MaterialTheme.colorScheme.onSurfaceVariant
+            color = if (isSelected) color else MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-} 
+}

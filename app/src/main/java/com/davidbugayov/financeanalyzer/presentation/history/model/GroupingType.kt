@@ -14,5 +14,5 @@ enum class GroupingType {
     WEEK,
 
     /** Группировка по месяцам (объединяет транзакции за месяц) */
-    MONTH
-} 
+    MONTH,
+}

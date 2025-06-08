@@ -16,6 +16,6 @@ fun NoteField(note: String, onNoteChange: (String) -> Unit, modifier: Modifier =
         label = { Text(stringResource(R.string.note_optional)) },
         modifier = modifier,
         singleLine = false,
-        keyboardOptions = KeyboardOptions.Default
+        keyboardOptions = KeyboardOptions.Default,
     )
-} 
+}

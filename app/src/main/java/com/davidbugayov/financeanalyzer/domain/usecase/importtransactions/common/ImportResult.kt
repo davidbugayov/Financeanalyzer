@@ -15,7 +15,7 @@ sealed class ImportResult {
     data class Progress(
         val current: Int,
         val total: Int,
-        val message: String
+        val message: String,
     ) : ImportResult()
 
     /**
@@ -28,7 +28,7 @@ sealed class ImportResult {
     data class Success(
         val importedCount: Int,
         val skippedCount: Int,
-        val message: String = ""
+        val message: String = "",
     ) : ImportResult()
 
     /**
@@ -39,7 +39,7 @@ sealed class ImportResult {
      */
     data class Error(
         val exception: Exception? = null,
-        val message: String
+        val message: String,
     ) : ImportResult()
 
     companion object {
@@ -88,4 +88,4 @@ sealed class ImportResult {
             return Progress(current, total, message)
         }
     }
-} 
+}

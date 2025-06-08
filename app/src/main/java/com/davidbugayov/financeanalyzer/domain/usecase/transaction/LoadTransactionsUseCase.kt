@@ -13,7 +13,7 @@ import com.davidbugayov.financeanalyzer.domain.util.safeCall
  * @property repository Репозиторий для работы с транзакциями
  */
 class LoadTransactionsUseCase(
-    private val repository: ITransactionRepository
+    private val repository: ITransactionRepository,
 ) {
 
     /**
@@ -27,4 +27,4 @@ class LoadTransactionsUseCase(
             repository.loadTransactions()
         }
     }
-} 
+}

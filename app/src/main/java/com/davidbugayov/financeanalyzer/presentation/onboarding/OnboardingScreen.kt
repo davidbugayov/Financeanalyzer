@@ -60,28 +60,28 @@ fun OnboardingScreen(onFinish: () -> Unit) {
         OnboardingPage(
             title = "Управление финансами",
             description = "Легко отслеживайте доходы и расходы, добавляя транзакции в удобном интерфейсе",
-            icon = Icons.Default.AccountBalance
+            icon = Icons.Default.AccountBalance,
         ),
         OnboardingPage(
             title = "Аналитика и графики",
             description = "Анализируйте свои финансы с помощью наглядных графиков и диаграмм",
-            icon = Icons.AutoMirrored.Filled.ShowChart
+            icon = Icons.AutoMirrored.Filled.ShowChart,
         ),
         OnboardingPage(
             title = "Импорт транзакций",
             description = "Импортируйте транзакции из различных банков и источников",
-            icon = Icons.Default.FileDownload
+            icon = Icons.Default.FileDownload,
         ),
         OnboardingPage(
             title = "Категории",
             description = "Создавайте, редактируйте и удаляйте категории для лучшей организации финансов",
-            icon = Icons.Default.Category
+            icon = Icons.Default.Category,
         ),
         OnboardingPage(
             title = "Уведомления",
             description = "Получайте уведомления для регулярного ввода транзакций и контроля бюджета",
-            icon = Icons.Default.Notifications
-        )
+            icon = Icons.Default.Notifications,
+        ),
     )
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
@@ -102,27 +102,27 @@ fun OnboardingScreen(onFinish: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxSize()
-            .background(MaterialTheme.colorScheme.background)
+            .background(MaterialTheme.colorScheme.background),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween
+            verticalArrangement = Arrangement.SpaceBetween,
         ) {
             // Контент страницы с пейджером для свайпа
             HorizontalPager(
                 state = pagerState,
                 modifier = Modifier
                     .weight(1f)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) { position ->
                 Box(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(bottom = 32.dp),
-                    contentAlignment = Alignment.Center
+                    contentAlignment = Alignment.Center,
                 ) {
                     OnboardingPageContent(pages[position])
                 }
@@ -133,19 +133,19 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(bottom = 32.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Индикаторы страниц
                 Row(
                     modifier = Modifier
                         .padding(16.dp),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = Arrangement.Center,
                 ) {
                     pages.forEachIndexed { index, _ ->
                         val width by animateDpAsState(
                             targetValue = if (pagerState.currentPage == index) 24.dp else 10.dp,
                             animationSpec = tween(400, easing = EaseInOut),
-                            label = "indicator"
+                            label = "indicator",
                         )
 
                         Box(
@@ -159,8 +159,8 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                                         MaterialTheme.colorScheme.primary
                                     } else {
                                         MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
-                                    }
-                                )
+                                    },
+                                ),
                         )
                     }
                 }
@@ -173,7 +173,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     if (pagerState.currentPage > 0) {
                         TextButton(
@@ -181,7 +181,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                                 coroutineScope.launch {
                                     pagerState.animateScrollToPage(pagerState.currentPage - 1)
                                 }
-                            }
+                            },
                         ) {
                             Text("Назад")
                         }
@@ -198,8 +198,8 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                             },
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = Color.White
-                            )
+                                contentColor = Color.White,
+                            ),
                         ) {
                             Text("Далее")
                         }
@@ -208,8 +208,8 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                             onClick = onFinish,
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary,
-                                contentColor = Color.White
-                            )
+                                contentColor = Color.White,
+                            ),
                         ) {
                             Text("Начать")
                         }
@@ -220,11 +220,11 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                 if (pagerState.currentPage < pages.size - 1) {
                     TextButton(
                         onClick = onFinish,
-                        modifier = Modifier.padding(top = 8.dp)
+                        modifier = Modifier.padding(top = 8.dp),
                     ) {
                         Text(
                             "Пропустить",
-                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f),
                         )
                     }
                 }
@@ -242,7 +242,7 @@ private fun OnboardingPageContent(page: OnboardingPage) {
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Icon(
             imageVector = page.icon,
@@ -250,7 +250,7 @@ private fun OnboardingPageContent(page: OnboardingPage) {
             modifier = Modifier
                 .size(120.dp)
                 .padding(bottom = 24.dp),
-            tint = MaterialTheme.colorScheme.primary
+            tint = MaterialTheme.colorScheme.primary,
         )
 
         Text(
@@ -258,14 +258,14 @@ private fun OnboardingPageContent(page: OnboardingPage) {
             style = MaterialTheme.typography.headlineMedium,
             fontWeight = FontWeight.Bold,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(bottom = 16.dp)
+            modifier = Modifier.padding(bottom = 16.dp),
         )
 
         Text(
             text = page.description,
             style = MaterialTheme.typography.bodyLarge,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f)
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
         )
     }
 }
@@ -276,5 +276,5 @@ private fun OnboardingPageContent(page: OnboardingPage) {
 data class OnboardingPage(
     val title: String,
     val description: String,
-    val icon: ImageVector
-) 
+    val icon: ImageVector,
+)

@@ -23,4 +23,4 @@ class NoOpAnalytics : IAnalytics {
     override fun setUserId(userId: String) {
         Timber.d("Analytics user ID: $userId (no-op)")
     }
-} 
+}

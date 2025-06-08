@@ -16,7 +16,7 @@ class SourcePreferences private constructor(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFERENCES_NAME,
-        Context.MODE_PRIVATE
+        Context.MODE_PRIVATE,
     )
     private val gson = Gson()
 
@@ -111,4 +111,4 @@ class SourcePreferences private constructor(context: Context) {
     fun addSource(source: Source) {
         addCustomSource(source)
     }
-} 
+}

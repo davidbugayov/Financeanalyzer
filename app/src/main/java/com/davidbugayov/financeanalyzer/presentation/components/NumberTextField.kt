@@ -21,7 +21,7 @@ fun NumberTextField(
     onValueChange: (String) -> Unit,
     label: @Composable () -> Unit,
     modifier: Modifier = Modifier,
-    allowNegative: Boolean = false
+    allowNegative: Boolean = false,
 ) {
     OutlinedTextField(
         value = value,
@@ -33,7 +33,7 @@ fun NumberTextField(
                 (
                     newValue.matches(Regex("-?\\d*\\.?\\d*")) && (
                         allowNegative || !newValue.startsWith(
-                            "-"
+                            "-",
                         )
                         )
                     )
@@ -44,6 +44,6 @@ fun NumberTextField(
         },
         label = label,
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-        modifier = modifier
+        modifier = modifier,
     )
-} 
+}

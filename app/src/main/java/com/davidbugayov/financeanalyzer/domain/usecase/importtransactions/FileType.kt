@@ -8,5 +8,5 @@ enum class FileType {
     PDF,
     CSV,
     EXCEL,
-    UNKNOWN
-} 
+    UNKNOWN,
+}

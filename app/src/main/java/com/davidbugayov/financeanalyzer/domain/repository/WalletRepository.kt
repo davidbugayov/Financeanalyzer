@@ -76,4 +76,4 @@ interface WalletRepository {
      * @return Список кошельков, связанных с данной транзакцией
      */
     suspend fun getWalletsForTransaction(transactionId: String): List<Wallet>
-} 
+}

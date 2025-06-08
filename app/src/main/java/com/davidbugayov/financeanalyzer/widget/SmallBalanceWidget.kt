@@ -37,11 +37,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
     private val loadTransactionsUseCase: LoadTransactionsUseCase by inject()
     private val scope = CoroutineScope(Dispatchers.IO + SupervisorJob())
 
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
-    ) {
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // Обновляем каждый экземпляр виджета
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
@@ -51,11 +47,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
     /**
      * Обновляет виджет с актуальными данными о балансе
      */
-    private fun updateAppWidget(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetId: Int
-    ) {
+    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         // Создаем RemoteViews для обновления виджета
         val views = RemoteViews(context.packageName, R.layout.small_balance_widget_layout)
 
@@ -63,7 +55,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         if (launchAppIntent != null) {
             launchAppIntent.addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP,
             )
 
             // Создаем PendingIntent для запуска приложения
@@ -72,14 +64,14 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                     context,
                     1, // Используем другой requestCode, чтобы не конфликтовать с основным виджетом
                     launchAppIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                    PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 )
             } else {
                 PendingIntent.getActivity(
                     context,
                     1,
                     launchAppIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT
+                    PendingIntent.FLAG_UPDATE_CURRENT,
                 )
             }
 
@@ -112,7 +104,9 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                     // или как разность доходов и расходов (если расходы положительные)
                     val balance = if (firstExpense != null && firstExpense.amount.isNegative()) {
                         // Если расходы уже отрицательные, просто складываем
-                        val sumBalance = transactions.fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
+                        val sumBalance = transactions.fold(
+                            Money.zero(currency),
+                        ) { acc, transaction -> acc + transaction.amount }
                         sumBalance
                     } else {
                         // Если расходы положительные, вычитаем их из доходов
@@ -142,7 +136,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                         views.setTextViewText(R.id.small_widget_balance, "?")
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
-                }
+                },
             )
         }
     }
@@ -162,9 +156,9 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, SmallBalanceWidget::class.java)
+                ComponentName(context, SmallBalanceWidget::class.java),
             )
             onUpdate(context, appWidgetManager, appWidgetIds)
         }
     }
-} 
+}

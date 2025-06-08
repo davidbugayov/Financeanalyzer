@@ -5,5 +5,8 @@ package com.davidbugayov.financeanalyzer.presentation.home.model
  */
 enum class TransactionFilter {
 
-    TODAY, WEEK, MONTH, ALL
-} 
+    TODAY,
+    WEEK,
+    MONTH,
+    ALL,
+}

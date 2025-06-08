@@ -73,7 +73,7 @@ fun <E> BaseTransactionScreen(
     isEditMode: Boolean = false,
     eventFactory: (Any) -> E,
     submitEvent: E,
-    onNavigateToImport: (() -> Unit)? = null
+    onNavigateToImport: (() -> Unit)? = null,
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -122,11 +122,11 @@ fun <E> BaseTransactionScreen(
             Timber.d(
                 "[SOURCE_SORT] Принудительная установка первого источника из отсортированного списка: %s (текущий: %s)",
                 firstSource.name,
-                state.source
+                state.source,
             )
             viewModel.onEvent(
                 eventFactory(BaseTransactionEvent.SetSource(firstSource.name)),
-                context
+                context,
             )
         }
     }
@@ -139,22 +139,22 @@ fun <E> BaseTransactionScreen(
             sortedExpenseCategories.joinToString(", ") {
                 "${it.name}(${baseViewModel.getCategoryUsage(
                     it.name,
-                    true
+                    true,
                 )})"
-            }
+            },
         )
         Timber.d(
             "[CATEGORY_SORT] Income categories sorted on init: %s",
             sortedIncomeCategories.joinToString(", ") {
                 "${it.name}(${baseViewModel.getCategoryUsage(
                     it.name,
-                    false
+                    false,
                 )})"
-            }
+            },
         )
         Timber.d(
             "[SOURCE_SORT] Sources sorted on init: %s",
-            sortedSources.joinToString(", ") { "${it.name}(${baseViewModel.getSourceUsage(it.name)})" }
+            sortedSources.joinToString(", ") { "${it.name}(${baseViewModel.getSourceUsage(it.name)})" },
         )
     }
 
@@ -164,7 +164,7 @@ fun <E> BaseTransactionScreen(
             "ТРАНЗАКЦИЯ-ЭКРАН: Инициализирован в режиме %s. editMode=%b, transactionToEdit=%s",
             if (isEditMode) "редактирования" else "добавления",
             state.editMode,
-            state.transactionToEdit?.id
+            state.transactionToEdit?.id,
         )
 
         if (isEditMode && state.transactionToEdit != null) {
@@ -175,14 +175,14 @@ fun <E> BaseTransactionScreen(
                 transaction.amount,
                 transaction.category,
                 transaction.source,
-                transaction.date
+                transaction.date,
             )
             Timber.d(
                 "ТРАНЗАКЦИЯ-ЭКРАН: Текущее состояние полей: amount=%s, category=%s, source=%s, isExpense=%b",
                 state.amount,
                 state.category,
                 state.source,
-                state.isExpense
+                state.isExpense,
             )
         }
     }
@@ -192,7 +192,7 @@ fun <E> BaseTransactionScreen(
             "Состояние ошибок: categoryError=%b, sourceError=%b, amountError=%b",
             state.categoryError,
             state.sourceError,
-            state.amountError
+            state.amountError,
         )
     }
 
@@ -204,7 +204,7 @@ fun <E> BaseTransactionScreen(
                 state.amount,
                 state.category,
                 state.source,
-                state.isExpense
+                state.isExpense,
             )
         }
     }
@@ -219,13 +219,14 @@ fun <E> BaseTransactionScreen(
             containerColor = MaterialTheme.colorScheme.surface,
             title = {
                 Text(
-                    text = stringResource(R.string.error_title), style = MaterialTheme.typography.titleLarge
+                    text = stringResource(R.string.error_title),
+                    style = MaterialTheme.typography.titleLarge,
                 )
             },
             text = {
                 Text(
                     text = state.error ?: stringResource(R.string.unknown_error_message),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
             },
             confirmButton = {
@@ -234,7 +235,7 @@ fun <E> BaseTransactionScreen(
                 }) {
                     Text(stringResource(R.string.dialog_ok))
                 }
-            }
+            },
         )
     }
 
@@ -299,27 +300,27 @@ fun <E> BaseTransactionScreen(
                             Icon(
                                 imageVector = Icons.Default.Upload,
                                 contentDescription = stringResource(
-                                    R.string.import_transactions_content_description
+                                    R.string.import_transactions_content_description,
                                 ),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                         }
                     }
-                }
+                },
             )
-        }
+        },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxSize()
                     .verticalScroll(rememberScrollState())
                     .imePadding()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_medium))
+                    .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
             ) {
                 // Заголовок с датой и типом транзакции
                 TransactionHeader(
@@ -330,16 +331,16 @@ fun <E> BaseTransactionScreen(
                     onDateClick = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.ShowDatePicker),
-                            context
+                            context,
                         )
                     },
                     onToggleTransactionType = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.ToggleTransactionType),
-                            context
+                            context,
                         )
                     },
-                    forceExpense = state.forceExpense
+                    forceExpense = state.forceExpense,
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 // Секция "Откуда/Куда" (Source)
@@ -348,7 +349,7 @@ fun <E> BaseTransactionScreen(
                         "Rendering SourceSection with isExpense=%b, selectedSource=%s, sources count=%d",
                         state.isExpense,
                         state.source,
-                        state.sources.size
+                        state.sources.size,
                     )
                     SourceSection(
                         sources = sortedSources,
@@ -357,7 +358,7 @@ fun <E> BaseTransactionScreen(
                             Timber.d(
                                 "Source selected directly: %s with color %s",
                                 selectedSource.name,
-                                selectedSource.color
+                                selectedSource.color,
                             )
                             viewModel.onEvent(eventFactory(selectedSource), context)
                         },
@@ -365,7 +366,7 @@ fun <E> BaseTransactionScreen(
                             Timber.d("Add source button clicked")
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.ShowCustomSourceDialog),
-                                context
+                                context,
                             )
                         },
                         onSourceLongClick = { selectedSource ->
@@ -373,13 +374,13 @@ fun <E> BaseTransactionScreen(
                             viewModel.onEvent(
                                 eventFactory(
                                     BaseTransactionEvent.ShowDeleteSourceConfirmDialog(
-                                        selectedSource.name
-                                    )
+                                        selectedSource.name,
+                                    ),
                                 ),
-                                context
+                                context,
                             )
                         },
-                        isError = state.sourceError
+                        isError = state.sourceError,
                     )
                 }
                 // Секция выбора категории
@@ -390,38 +391,38 @@ fun <E> BaseTransactionScreen(
                         onCategorySelected = { category ->
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.SetCategory(category.name)),
-                                context
+                                context,
                             )
                         },
                         onAddCategoryClick = {
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog),
-                                context
+                                context,
                             )
                         },
                         onCategoryLongClick = { selectedCategory ->
                             Timber.d(
                                 "Category long click in BaseTransactionScreen: %s",
-                                selectedCategory.name
+                                selectedCategory.name,
                             )
                             // Don't allow long press on "Другое" and "Переводы"
                             if (selectedCategory.name != categoryOther && selectedCategory.name != categoryTransfer) {
                                 viewModel.onEvent(
                                     eventFactory(
                                         BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(
-                                            selectedCategory.name
-                                        )
+                                            selectedCategory.name,
+                                        ),
                                     ),
-                                    context
+                                    context,
                                 )
                             } else {
                                 Timber.d(
                                     "Ignoring long press on protected category: %s",
-                                    selectedCategory.name
+                                    selectedCategory.name,
                                 )
                             }
                         },
-                        isError = state.categoryError
+                        isError = state.categoryError,
                     )
                 } else {
                     CategorySection(
@@ -430,37 +431,37 @@ fun <E> BaseTransactionScreen(
                         onCategorySelected = { category ->
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.SetCategory(category.name)),
-                                context
+                                context,
                             )
                         },
                         onAddCategoryClick = {
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog),
-                                context
+                                context,
                             )
                         },
                         onCategoryLongClick = { selectedCategory ->
                             Timber.d(
                                 "Category long click in BaseTransactionScreen: %s",
-                                selectedCategory.name
+                                selectedCategory.name,
                             )
                             if (selectedCategory.name != categoryOther && selectedCategory.name != categoryTransfer) {
                                 viewModel.onEvent(
                                     eventFactory(
                                         BaseTransactionEvent.ShowDeleteCategoryConfirmDialog(
-                                            selectedCategory.name
-                                        )
+                                            selectedCategory.name,
+                                        ),
                                     ),
-                                    context
+                                    context,
                                 )
                             } else {
                                 Timber.d(
                                     "Ignoring long press on protected category: %s",
-                                    selectedCategory.name
+                                    selectedCategory.name,
                                 )
                             }
                         },
-                        isError = state.categoryError
+                        isError = state.categoryError,
                     )
                 }
                 // Поле ввода суммы и кнопки операций — после категории
@@ -469,11 +470,11 @@ fun <E> BaseTransactionScreen(
                     onAmountChange = { amount ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetAmount(amount)),
-                            context
+                            context,
                         )
                     },
                     isError = state.amountError,
-                    accentColor = currentColor
+                    accentColor = currentColor,
                 )
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
                 // Поле выбора даты
@@ -482,12 +483,12 @@ fun <E> BaseTransactionScreen(
                     onClick = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.ShowDatePicker),
-                            context
+                            context,
                         )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.spacing_normal))
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
                 )
 
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
@@ -497,14 +498,14 @@ fun <E> BaseTransactionScreen(
                     note = state.note,
                     onNoteChange = { note ->
                         viewModel.onEvent(eventFactory(BaseTransactionEvent.SetNote(note)), context)
-                    }
+                    },
                 )
 
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
 
                 // Секция выбора кошельков (показывается только для доходов)
                 Timber.d(
-                    "BaseTransactionScreen: isExpense=${state.isExpense}, addToWallet=${state.addToWallet}, selectedWallets=${state.selectedWallets}, targetWalletId=${state.targetWalletId}"
+                    "BaseTransactionScreen: isExpense=${state.isExpense}, addToWallet=${state.addToWallet}, selectedWallets=${state.selectedWallets}, targetWalletId=${state.targetWalletId}",
                 )
 
                 WalletSelectionSection(
@@ -513,16 +514,16 @@ fun <E> BaseTransactionScreen(
                     onToggleAddToWallet = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.ToggleAddToWallet),
-                            context
+                            context,
                         )
                     },
                     onSelectWalletsClick = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.ShowWalletSelector),
-                            context
+                            context,
                         )
                     },
-                    isVisible = !state.isExpense && viewModel.wallets.isNotEmpty() // Показываем только для доходов и если есть кошельки
+                    isVisible = !state.isExpense && viewModel.wallets.isNotEmpty(), // Показываем только для доходов и если есть кошельки
                 )
 
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -535,7 +536,7 @@ fun <E> BaseTransactionScreen(
                     },
                     text = actualButtonText,
                     color = currentColor,
-                    isLoading = state.isLoading
+                    isLoading = state.isLoading,
                 )
 
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_medium)))
@@ -550,7 +551,7 @@ fun <E> BaseTransactionScreen(
                     },
                     onDismiss = {
                         showCancelConfirmation = false
-                    }
+                    },
                 )
             }
 
@@ -569,18 +570,18 @@ fun <E> BaseTransactionScreen(
                                     viewModel.resetFields()
                                     onNavigateToImport()
                                 }
-                            }
+                            },
                         ) {
                             Text(stringResource(R.string.proceed_to_import))
                         }
                     },
                     dismissButton = {
                         TextButton(
-                            onClick = { showImportConfirmation = false }
+                            onClick = { showImportConfirmation = false },
                         ) {
                             Text(stringResource(R.string.dialog_cancel))
                         }
-                    }
+                    },
                 )
             }
 
@@ -588,14 +589,14 @@ fun <E> BaseTransactionScreen(
                 AnimatedVisibility(
                     visible = state.isSuccess,
                     enter = scaleIn(animationSpec = tween(400)),
-                    exit = scaleOut(animationSpec = tween(400))
+                    exit = scaleOut(animationSpec = tween(400)),
                 ) {
                     SuccessDialog(
                         message = stringResource(R.string.transaction_saved_success),
                         onDismiss = {
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.HideSuccessDialog),
-                                context
+                                context,
                             )
                             handleExit()
                         },
@@ -603,17 +604,17 @@ fun <E> BaseTransactionScreen(
                             Timber.d("UI: Нажато 'Добавить еще'")
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.PreventAutoSubmit),
-                                context
+                                context,
                             )
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.HideSuccessDialog),
-                                context
+                                context,
                             )
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.ResetAmountOnly),
-                                context
+                                context,
                             )
-                        }
+                        },
                     )
                 }
             }
@@ -628,9 +629,9 @@ fun <E> BaseTransactionScreen(
                     onDismiss = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideDatePicker),
-                            context
+                            context,
                         )
-                    }
+                    },
                 )
             }
 
@@ -641,12 +642,12 @@ fun <E> BaseTransactionScreen(
                     if (state.isExpense) {
                         (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(
                             it.name,
-                            true
+                            true,
                         )
                     } else {
                         (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(
                             it.name,
-                            false
+                            false,
                         )
                     }
                 }
@@ -658,37 +659,37 @@ fun <E> BaseTransactionScreen(
                         if (state.isExpense) {
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.SetExpenseCategory(categoryName)),
-                                context
+                                context,
                             )
                             // Обновление счетчика использования категории расходов через диалог
                             (viewModel as BaseTransactionViewModel<*, *>).incrementCategoryUsage(
                                 categoryName,
-                                true
+                                true,
                             )
                         } else {
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.SetIncomeCategory(categoryName)),
-                                context
+                                context,
                             )
                             // Обновление счетчика использования категории доходов через диалог
                             (viewModel as BaseTransactionViewModel<*, *>).incrementCategoryUsage(
                                 categoryName,
-                                false
+                                false,
                             )
                         }
                     },
                     onDismiss = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideCategoryPicker),
-                            context
+                            context,
                         )
                     },
                     onCustomCategoryClick = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.ShowCustomCategoryDialog),
-                            context
+                            context,
                         )
-                    }
+                    },
                 )
             }
 
@@ -699,21 +700,21 @@ fun <E> BaseTransactionScreen(
                     onCategoryTextChange = { name ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetCustomCategory(name)),
-                            context
+                            context,
                         )
                     },
                     onConfirm = {
                         viewModel.onEvent(
                             eventFactory(
-                                BaseTransactionEvent.AddCustomCategory(state.customCategory)
+                                BaseTransactionEvent.AddCustomCategory(state.customCategory),
                             ),
-                            context
+                            context,
                         )
                     },
                     onDismiss = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideCustomCategoryDialog),
-                            context
+                            context,
                         )
                     },
                     availableIcons = addState?.availableCategoryIcons ?: emptyList(),
@@ -721,9 +722,9 @@ fun <E> BaseTransactionScreen(
                     onIconSelected = { icon ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetCustomCategoryIcon(icon)),
-                            context
+                            context,
                         )
-                    }
+                    },
                 )
             }
 
@@ -733,14 +734,14 @@ fun <E> BaseTransactionScreen(
                         onDismissRequest = {
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.HideDeleteCategoryConfirmDialog),
-                                context
+                                context,
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
                         title = { Text(stringResource(R.string.delete_category_title)) },
                         text = {
                             Text(
-                                stringResource(R.string.delete_category_confirmation, category)
+                                stringResource(R.string.delete_category_confirmation, category),
                             )
                         },
                         confirmButton = {
@@ -748,9 +749,9 @@ fun <E> BaseTransactionScreen(
                                 onClick = {
                                     viewModel.onEvent(
                                         eventFactory(BaseTransactionEvent.DeleteCategory(category)),
-                                        context
+                                        context,
                                     )
-                                }
+                                },
                             ) {
                                 Text(stringResource(R.string.dialog_delete))
                             }
@@ -760,15 +761,15 @@ fun <E> BaseTransactionScreen(
                                 onClick = {
                                     viewModel.onEvent(
                                         eventFactory(
-                                            BaseTransactionEvent.HideDeleteCategoryConfirmDialog
+                                            BaseTransactionEvent.HideDeleteCategoryConfirmDialog,
                                         ),
-                                        context
+                                        context,
                                     )
-                                }
+                                },
                             ) {
                                 Text(stringResource(R.string.dialog_cancel))
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -779,7 +780,7 @@ fun <E> BaseTransactionScreen(
                         onDismissRequest = {
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.HideDeleteSourceConfirmDialog),
-                                context
+                                context,
                             )
                         },
                         containerColor = MaterialTheme.colorScheme.surface,
@@ -790,9 +791,9 @@ fun <E> BaseTransactionScreen(
                                 onClick = {
                                     viewModel.onEvent(
                                         eventFactory(BaseTransactionEvent.DeleteSource(source)),
-                                        context
+                                        context,
                                     )
-                                }
+                                },
                             ) {
                                 Text(stringResource(R.string.dialog_delete))
                             }
@@ -802,13 +803,13 @@ fun <E> BaseTransactionScreen(
                                 onClick = {
                                     viewModel.onEvent(
                                         eventFactory(BaseTransactionEvent.HideDeleteSourceConfirmDialog),
-                                        context
+                                        context,
                                     )
-                                }
+                                },
                             ) {
                                 Text(stringResource(R.string.dialog_cancel))
                             }
-                        }
+                        },
                     )
                 }
             }
@@ -819,30 +820,30 @@ fun <E> BaseTransactionScreen(
                     onSourceSelected = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetSource(it.name)),
-                            context
+                            context,
                         )
                     },
                     onAddCustomSource = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.ShowCustomSourceDialog),
-                            context
+                            context,
                         )
                     },
                     onDismiss = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideSourcePicker),
-                            context
+                            context,
                         )
                     },
                     onDeleteSource = { sourceName ->
                         Timber.d("Delete source requested: $sourceName")
                         viewModel.onEvent(
                             eventFactory(
-                                BaseTransactionEvent.ShowDeleteSourceConfirmDialog(sourceName)
+                                BaseTransactionEvent.ShowDeleteSourceConfirmDialog(sourceName),
                             ),
-                            context
+                            context,
                         )
-                    }
+                    },
                 )
             }
 
@@ -853,13 +854,13 @@ fun <E> BaseTransactionScreen(
                     onSourceNameChange = { name ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetCustomSource(name)),
-                            context
+                            context,
                         )
                     },
                     onColorClick = { selectedColor ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetSourceColor(selectedColor)),
-                            context
+                            context,
                         )
                     },
                     onConfirm = {
@@ -867,18 +868,18 @@ fun <E> BaseTransactionScreen(
                             eventFactory(
                                 BaseTransactionEvent.AddCustomSource(
                                     state.customSource,
-                                    state.sourceColor
-                                )
+                                    state.sourceColor,
+                                ),
                             ),
-                            context
+                            context,
                         )
                     },
                     onDismiss = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideCustomSourceDialog),
-                            context
+                            context,
                         )
-                    }
+                    },
                 )
             }
 
@@ -888,15 +889,15 @@ fun <E> BaseTransactionScreen(
                     onColorSelected = { color ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SetSourceColor(color)),
-                            context
+                            context,
                         )
                     },
                     onDismiss = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideColorPicker),
-                            context
+                            context,
                         )
-                    }
+                    },
                 )
             }
 
@@ -907,21 +908,21 @@ fun <E> BaseTransactionScreen(
                     onWalletSelected = { walletId, selected ->
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.SelectWallet(walletId, selected)),
-                            context
+                            context,
                         )
                     },
                     onConfirm = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideWalletSelector),
-                            context
+                            context,
                         )
                     },
                     onDismiss = {
                         viewModel.onEvent(
                             eventFactory(BaseTransactionEvent.HideWalletSelector),
-                            context
+                            context,
                         )
-                    }
+                    },
                 )
             }
         }

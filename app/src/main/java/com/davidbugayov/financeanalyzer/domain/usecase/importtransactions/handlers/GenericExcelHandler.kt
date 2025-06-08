@@ -11,7 +11,7 @@ import timber.log.Timber
 
 class GenericExcelHandler(
     transactionRepository: TransactionRepository,
-    context: Context
+    context: Context,
 ) : AbstractExcelBankHandler(transactionRepository, context) {
 
     override val bankName: String = "Generic Excel"
@@ -23,7 +23,7 @@ class GenericExcelHandler(
         "excel_export",
         "workbook",
         "excel",
-        "spreadsheet"
+        "spreadsheet",
     )
 
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
@@ -36,7 +36,7 @@ class GenericExcelHandler(
                 // Для примера, оставим полностью дефолтный конфиг.
             )
             Timber.d(
-                "[$bankName Handler] Создание GenericExcelImportUseCase с дефолтной конфигурацией: $defaultConfig"
+                "[$bankName Handler] Создание GenericExcelImportUseCase с дефолтной конфигурацией: $defaultConfig",
             )
             return GenericExcelImportUseCase(context, transactionRepository, defaultConfig)
         }
@@ -59,8 +59,8 @@ class GenericExcelHandler(
         // В будущем здесь можно добавить проверку "магических чисел" файла,
         // если будет реализовано чтение начальных байт из uri.
         Timber.d(
-            "[$bankName Handler] Did not match file by name: $fileName. Content check for Excel is typically not done on string preview or simple URI read."
+            "[$bankName Handler] Did not match file by name: $fileName. Content check for Excel is typically not done on string preview or simple URI read.",
         )
         return false // Если дошли сюда, значит super.canHandle() был false.
     }
-} 
+}

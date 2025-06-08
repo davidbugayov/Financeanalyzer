@@ -37,12 +37,12 @@ fun AchievementsScreen(achievements: List<Achievement>, onBack: () -> Unit) {
         AppTopBar(
             title = stringResource(R.string.achievements),
             showBackButton = true,
-            onBackClick = onBack
+            onBackClick = onBack,
         )
         LazyColumn(
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp),
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         ) {
             items(achievements) { achievement ->
                 AchievementCard(achievement)
@@ -60,7 +60,7 @@ fun AchievementCard(achievement: Achievement) {
     }
     val cardColor = if (achievement.isUnlocked) {
         MaterialTheme.colorScheme.primary.copy(
-            alpha = 0.08f
+            alpha = 0.08f,
         )
     } else {
         MaterialTheme.colorScheme.surfaceVariant
@@ -71,17 +71,17 @@ fun AchievementCard(achievement: Achievement) {
         shape = MaterialTheme.shapes.medium,
         elevation = CardDefaults.cardElevation(6.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(20.dp)
+            modifier = Modifier.padding(20.dp),
         ) {
             androidx.compose.material3.Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = iconTint,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             )
             Spacer(modifier = Modifier.size(20.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -89,12 +89,12 @@ fun AchievementCard(achievement: Achievement) {
                     text = achievement.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (achievement.isUnlocked) MaterialTheme.colorScheme.onSurface else Color.Gray
+                    color = if (achievement.isUnlocked) MaterialTheme.colorScheme.onSurface else Color.Gray,
                 )
                 Text(
                     text = achievement.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (achievement.isUnlocked) MaterialTheme.colorScheme.onSurfaceVariant else Color.Gray
+                    color = if (achievement.isUnlocked) MaterialTheme.colorScheme.onSurfaceVariant else Color.Gray,
                 )
             }
             if (achievement.isUnlocked) {
@@ -102,9 +102,9 @@ fun AchievementCard(achievement: Achievement) {
                     imageVector = Icons.Filled.CheckCircle,
                     contentDescription = stringResource(R.string.cd_done),
                     tint = Color(0xFF4CAF50),
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(32.dp),
                 )
             }
         }
     }
-} 
+}

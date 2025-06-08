@@ -28,18 +28,18 @@ fun ErrorContent(error: String?, onRetry: () -> Unit) {
             .fillMaxSize()
             .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
         verticalArrangement = Arrangement.Center,
-        horizontalAlignment = Alignment.CenterHorizontally
+        horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
             text = error ?: stringResource(R.string.error_occurred),
             color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal))
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal)),
         )
         Button(
             onClick = onRetry,
-            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal))
+            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal)),
         ) {
             Text(stringResource(R.string.retry))
         }
     }
-} 
+}

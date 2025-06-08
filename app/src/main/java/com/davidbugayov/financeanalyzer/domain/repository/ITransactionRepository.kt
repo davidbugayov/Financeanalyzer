@@ -66,12 +66,7 @@ interface ITransactionRepository {
      * @param offset Смещение (количество пропускаемых транзакций)
      * @return Список транзакций с учетом пагинации и диапазона дат
      */
-    suspend fun getTransactionsPaginated(
-        startDate: Date,
-        endDate: Date,
-        limit: Int,
-        offset: Int
-    ): List<Transaction>
+    suspend fun getTransactionsPaginated(startDate: Date, endDate: Date, limit: Int, offset: Int): List<Transaction>
 
     /**
      * Получает общее количество транзакций в указанном диапазоне дат
@@ -87,4 +82,4 @@ interface ITransactionRepository {
      * @return Транзакция или null, если транзакция не найдена
      */
     suspend fun getTransactionById(id: String): Transaction?
-} 
+}

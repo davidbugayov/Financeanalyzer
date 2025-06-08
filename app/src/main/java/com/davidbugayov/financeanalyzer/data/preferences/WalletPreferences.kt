@@ -17,7 +17,7 @@ class WalletPreferences private constructor(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFERENCES_NAME,
-        Context.MODE_PRIVATE
+        Context.MODE_PRIVATE,
     )
     private val gson = Gson()
 
@@ -96,4 +96,4 @@ class WalletPreferences private constructor(context: Context) {
             saveWallets(currentWallets)
         }
     }
-} 
+}

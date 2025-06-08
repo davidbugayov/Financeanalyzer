@@ -129,7 +129,7 @@ val appModule = module {
             application = androidApplication(),
             updateWalletBalancesUseCase = get(),
             achievementsRepository = get(),
-            achievementsUiViewModel = achievementsUiViewModel
+            achievementsUiViewModel = achievementsUiViewModel,
         )
     }
     viewModel { ProfileViewModel(get(), get(), get(), get(), androidContext()) }
@@ -143,10 +143,12 @@ val appModule = module {
             walletRepository = get(),
             updateWidgetsUseCase = get(),
             application = androidApplication(),
-            updateWalletBalancesUseCase = get()
+            updateWalletBalancesUseCase = get(),
         )
     }
-    viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), androidApplication()) }
+    viewModel {
+        TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), get(), get(), androidApplication())
+    }
     viewModel { BudgetViewModel(get(), get()) }
     viewModel { WalletTransactionsViewModel(get(), get()) }
     viewModel { ImportTransactionsViewModel(get(), androidApplication()) }

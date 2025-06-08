@@ -69,5 +69,5 @@ data class TransactionHistoryState(
     val sourceToDelete: String? = null,
     val expenseCategories: List<UiCategory> = emptyList(),
     val incomeCategories: List<UiCategory> = emptyList(),
-    val protectedCategories: List<String> = listOf("Другое") // Категории, которые нельзя удалить
-) 
+    val protectedCategories: List<String> = listOf("Другое"), // Категории, которые нельзя удалить
+)

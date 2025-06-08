@@ -41,7 +41,7 @@ private val LightColors = lightColorScheme(
     onSurface = md_theme_light_onSurface,
     surfaceVariant = md_theme_light_surfaceVariant,
     onSurfaceVariant = md_theme_light_onSurfaceVariant,
-    outline = md_theme_light_outline
+    outline = md_theme_light_outline,
 )
 
 // Цвета для темной темы (используются стандартные Material Design слоты)
@@ -68,7 +68,7 @@ private val DarkColors = darkColorScheme(
     onSurface = md_theme_dark_onSurface,
     surfaceVariant = md_theme_dark_surfaceVariant,
     onSurfaceVariant = md_theme_dark_onSurfaceVariant,
-    outline = md_theme_dark_outline
+    outline = md_theme_dark_outline,
 )
 
 // Local providers для кастомных семантических цветов
@@ -110,7 +110,7 @@ val LocalSummaryDivider = staticCompositionLocalOf { SummaryDividerLight }
 fun FinanceAnalyzerTheme(
     themeMode: ThemeMode = ThemeMode.SYSTEM,
     dynamicColor: Boolean = false,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     val darkTheme = when (themeMode) {
         ThemeMode.LIGHT -> false
@@ -192,13 +192,13 @@ fun FinanceAnalyzerTheme(
         LocalNegativeTextColor provides negativeTextColor,
         LocalErrorStateBackgroundColor provides errorStateBackgroundColor,
         LocalErrorStateContentColor provides errorStateContentColor,
-        LocalFriendlyCardBackgroundColor provides friendlyCardBackgroundColor
+        LocalFriendlyCardBackgroundColor provides friendlyCardBackgroundColor,
     ) {
         MaterialTheme(
             colorScheme = colorScheme,
             typography = Typography,
             shapes = Shapes,
-            content = content
+            content = content,
         )
     }
 }

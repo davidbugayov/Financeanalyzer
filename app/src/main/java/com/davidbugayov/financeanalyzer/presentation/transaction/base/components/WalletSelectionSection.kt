@@ -44,33 +44,33 @@ fun WalletSelectionSection(
     onToggleAddToWallet: () -> Unit,
     onSelectWalletsClick: () -> Unit,
     isVisible: Boolean,
-    targetWalletName: String? = null
+    targetWalletName: String? = null,
 ) {
     // Добавляем логирование состояния
     Timber.d(
-        "WalletSelectionSection: isVisible=$isVisible, addToWallet=$addToWallet, selectedWallets=$selectedWallets, targetWallet=$targetWalletName"
+        "WalletSelectionSection: isVisible=$isVisible, addToWallet=$addToWallet, selectedWallets=$selectedWallets, targetWallet=$targetWalletName",
     )
 
     if (isVisible) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = 16.dp),
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(R.string.add_to_wallets),
-                    modifier = Modifier.weight(1f)
+                    modifier = Modifier.weight(1f),
                 )
 
                 Switch(
                     checked = addToWallet,
-                    onCheckedChange = { onToggleAddToWallet() }
+                    onCheckedChange = { onToggleAddToWallet() },
                 )
             }
 
@@ -80,7 +80,7 @@ fun WalletSelectionSection(
                 SelectWalletsButton(
                     selectedWallets = selectedWallets,
                     onClick = onSelectWalletsClick,
-                    targetWalletName = targetWalletName
+                    targetWalletName = targetWalletName,
                 )
 
                 // Добавляем явный вывод о том, сколько кошельков выбрано
@@ -93,7 +93,7 @@ fun WalletSelectionSection(
                             stringResource(R.string.wallet_selected_plural, selectedWallets.size)
                         },
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                 }
             }
@@ -107,11 +107,7 @@ fun WalletSelectionSection(
  * Кнопка выбора кошельков
  */
 @Composable
-private fun SelectWalletsButton(
-    selectedWallets: List<String>,
-    onClick: () -> Unit,
-    targetWalletName: String?
-) {
+private fun SelectWalletsButton(selectedWallets: List<String>, onClick: () -> Unit, targetWalletName: String?) {
     val text = if (selectedWallets.isEmpty()) {
         stringResource(R.string.select_wallets)
     } else if (selectedWallets.size == 1 && targetWalletName != null) {
@@ -123,7 +119,7 @@ private fun SelectWalletsButton(
     WalletSelectorButton(
         text = text,
         onClick = onClick,
-        modifier = Modifier.fillMaxWidth()
+        modifier = Modifier.fillMaxWidth(),
     )
 }
 
@@ -139,11 +135,11 @@ private fun WalletSelectorButton(text: String, onClick: () -> Unit, modifier: Mo
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f),
-                shape = RoundedCornerShape(8.dp)
+                shape = RoundedCornerShape(8.dp),
             )
             .clickable { onClick() }
             .padding(horizontal = 12.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
             text = text,
@@ -151,7 +147,7 @@ private fun WalletSelectorButton(text: String, onClick: () -> Unit, modifier: Mo
             color = MaterialTheme.colorScheme.onSecondaryContainer,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
-            modifier = Modifier.weight(1f, fill = false)
+            modifier = Modifier.weight(1f, fill = false),
         )
 
         Spacer(modifier = Modifier.width(4.dp))
@@ -159,7 +155,7 @@ private fun WalletSelectorButton(text: String, onClick: () -> Unit, modifier: Mo
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = stringResource(R.string.select_wallets_content_description),
-            tint = MaterialTheme.colorScheme.onSecondaryContainer
+            tint = MaterialTheme.colorScheme.onSecondaryContainer,
         )
     }
-} 
+}

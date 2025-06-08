@@ -36,10 +36,10 @@ fun DatePickerDialog(
     minDate: Date? = null,
     maxDate: Date? = null,
     onDateSelected: (Date) -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDate.time
+        initialSelectedDateMillis = initialDate.time,
     )
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
@@ -63,7 +63,7 @@ fun DatePickerDialog(
                             dateAfterMaximumMessage
                         } else {
                             invalidDateMessage
-                        }
+                        },
                     )
                 }
             } else {
@@ -92,12 +92,12 @@ fun DatePickerDialog(
                                         dateAfterMaximumMessage
                                     } else {
                                         invalidDateMessage
-                                    }
+                                    },
                                 )
                             }
                         }
                     }
-                }
+                },
             ) {
                 Text(stringResource(R.string.confirm))
             }
@@ -107,14 +107,14 @@ fun DatePickerDialog(
                 Text(stringResource(R.string.cancel))
             }
         },
-        colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.surface)
+        colors = DatePickerDefaults.colors(containerColor = MaterialTheme.colorScheme.surface),
     ) {
         androidx.compose.foundation.layout.Column {
             DatePicker(
                 state = datePickerState,
                 colors = DatePickerDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surface
-                )
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
             )
             SnackbarHost(
                 hostState = snackbarHostState,
@@ -123,10 +123,10 @@ fun DatePickerDialog(
                         containerColor = MaterialTheme.colorScheme.errorContainer,
                         contentColor = MaterialTheme.colorScheme.onErrorContainer,
                         shape = MaterialTheme.shapes.medium,
-                        content = { Text(data.visuals.message) }
+                        content = { Text(data.visuals.message) },
                     )
-                }
+                },
             )
         }
     }
-} 
+}

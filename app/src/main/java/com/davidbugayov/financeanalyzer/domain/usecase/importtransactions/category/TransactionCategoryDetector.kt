@@ -8,14 +8,14 @@ object TransactionCategoryDetector {
             "внутренний перевод",
             "сбп",
             "перевод",
-            "перевод сбп"
+            "перевод сбп",
         ),
         "Пополнения" to listOf(
             "пополнение",
             "перевод от",
             "зачисление",
             "возврат",
-            "внесение наличных"
+            "внесение наличных",
         ),
         "Продукты" to listOf(
             "пятёрочка",
@@ -28,7 +28,7 @@ object TransactionCategoryDetector {
             "самбери",
             "близкий",
             "магазин причал",
-            "супермаркеты"
+            "супермаркеты",
         ),
         "Кафе и рестораны" to listOf(
             "кафе",
@@ -43,7 +43,7 @@ object TransactionCategoryDetector {
             "coffee",
             "рестораны",
             "бары",
-            "фастфуд"
+            "фастфуд",
         ),
         "Транспорт" to listOf(
             "такси",
@@ -59,7 +59,7 @@ object TransactionCategoryDetector {
             "mos.transport",
             "мострансп",
             "mosgortrans",
-            "мосгортранс"
+            "мосгортранс",
         ),
         "Покупки Ozon" to listOf("ozon", "озон"),
         "Онлайн-покупки" to listOf(
@@ -72,7 +72,7 @@ object TransactionCategoryDetector {
             "али",
             "вайме",
             "vimemc",
-            "интернет-магазины"
+            "интернет-магазины",
         ),
         "Автомобиль" to listOf(
             "азс",
@@ -82,7 +82,7 @@ object TransactionCategoryDetector {
             "парковк",
             "стоянк",
             "автоуслуги",
-            "автосервис"
+            "автосервис",
         ),
         "Аптека" to listOf("аптека", "apteka"),
         "Здоровье" to listOf("здоровье", "клиник", "врач", "доктор", "здоровье и красота"),
@@ -95,7 +95,7 @@ object TransactionCategoryDetector {
             "билайн",
             "мегафон",
             "tele2",
-            "мобильная связь"
+            "мобильная связь",
         ),
         "Развлечения" to listOf("кино", "cinema", "развлечения", "кинотеатр"),
         "Подписки" to listOf("подписк", "subscription", "spotify", "netflix", "okko", "кинопоиск"),
@@ -104,7 +104,7 @@ object TransactionCategoryDetector {
             "обслуживание",
             "процент",
             "interest",
-            "банковские услуги"
+            "банковские услуги",
         ),
         "Супермаркеты" to listOf(
             "пятёрочка",
@@ -113,9 +113,9 @@ object TransactionCategoryDetector {
             "magnit",
             "лента",
             "ашан",
-            "вкусвилл"
+            "вкусвилл",
         ),
-        "Прочие расходы" to listOf("прочие операции", "прочие покупки", "разные товары")
+        "Прочие расходы" to listOf("прочие операции", "прочие покупки", "разные товары"),
     )
 
     fun detect(description: String): String {
@@ -125,4 +125,4 @@ object TransactionCategoryDetector {
         }
         return "Без категории"
     }
-} 
+}

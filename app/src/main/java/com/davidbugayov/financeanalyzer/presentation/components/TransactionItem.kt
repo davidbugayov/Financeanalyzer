@@ -63,11 +63,7 @@ import java.util.Locale
 
 object Formatters {
 
-    fun formatAmount(
-        money: Money,
-        includeSign: Boolean = false,
-        useMinimalDecimals: Boolean = false
-    ): String {
+    fun formatAmount(money: Money, includeSign: Boolean = false, useMinimalDecimals: Boolean = false): String {
         return money.format(showSign = includeSign, useMinimalDecimals = useMinimalDecimals)
     }
 }
@@ -98,12 +94,12 @@ fun TransactionItem(
     animated: Boolean = true,
     animationDelay: Long = 0L,
     onClick: (Transaction) -> Unit = {},
-    onTransactionLongClick: (Transaction) -> Unit
+    onTransactionLongClick: (Transaction) -> Unit,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
 
     val transferCategoryString = stringResource(id = R.string.category_transfer).lowercase(
-        Locale.getDefault()
+        Locale.getDefault(),
     )
 
     val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
@@ -117,7 +113,7 @@ fun TransactionItem(
             transferActualColor,
             expenseColor,
             incomeColor,
-            transferCategoryString
+            transferCategoryString,
         ) {
             when {
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||
@@ -134,7 +130,7 @@ fun TransactionItem(
         transaction.category,
         transaction.isExpense,
         expenseCategories,
-        incomeCategories
+        incomeCategories,
     ) {
         val categories = if (transaction.isExpense) expenseCategories else incomeCategories
         categories.find { it.name.equals(transaction.category, ignoreCase = true) }
@@ -147,7 +143,7 @@ fun TransactionItem(
         val colorFromInt = if (transaction.sourceColor != 0) Color(transaction.sourceColor) else null
         // Fallback to a slightly transparent default color if no specific source color is found
         colorFromInt ?: ColorUtils.getSourceColorByName(transaction.source) ?: DefaultCategoryColor.copy(
-            alpha = 0.7f
+            alpha = 0.7f,
         )
     }
 
@@ -167,7 +163,7 @@ fun TransactionItem(
         transaction.amount,
         transaction.isExpense,
         transaction.category,
-        transferCategoryString
+        transferCategoryString,
     ) {
         val moneyAmount = transaction.amount
 
@@ -185,13 +181,13 @@ fun TransactionItem(
             Formatters.formatAmount(
                 moneyAmount.abs(),
                 includeSign = false,
-                useMinimalDecimals = true
+                useMinimalDecimals = true,
             )
         } else {
             prefix + Formatters.formatAmount(
                 moneyAmount.abs(),
                 includeSign = false,
-                useMinimalDecimals = true
+                useMinimalDecimals = true,
             )
         }
     }
@@ -210,7 +206,7 @@ fun TransactionItem(
     val animatedAlpha by animateFloatAsState(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(durationMillis = 300),
-        label = "TransactionItemAlpha"
+        label = "TransactionItemAlpha",
     )
 
     // Corrected Dp to Float conversion for targetValue
@@ -221,9 +217,9 @@ fun TransactionItem(
         targetValue = if (visible) 0f else targetTranslationYPx, // Use Px value here
         animationSpec = spring(
             dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow // Softer spring
+            stiffness = Spring.StiffnessLow, // Softer spring
         ),
-        label = "TransactionItemTranslationY"
+        label = "TransactionItemTranslationY",
     )
 
     Card(
@@ -231,7 +227,7 @@ fun TransactionItem(
             .fillMaxWidth()
             .padding(
                 horizontal = dimensionResource(id = R.dimen.card_horizontal_padding), // e.g., 12dp or 16dp from dimens
-                vertical = dimensionResource(id = R.dimen.card_vertical_padding) // e.g., 6dp or 8dp from dimens
+                vertical = dimensionResource(id = R.dimen.card_vertical_padding), // e.g., 6dp or 8dp from dimens
             )
             .graphicsLayer {
                 alpha = animatedAlpha
@@ -239,32 +235,36 @@ fun TransactionItem(
             }
             .combinedClickable(
                 onClick = { onClick(transaction) },
-                onLongClick = { onTransactionLongClick(transaction) }
+                onLongClick = { onTransactionLongClick(transaction) },
             ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(id = R.dimen.card_elevation_default)
+            defaultElevation = dimensionResource(id = R.dimen.card_elevation_default),
         ), // e.g., 2dp or 4dp
         shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius_medium)), // e.g., 12dp
-        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant) // Slightly different surface for differentiation
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ), // Slightly different surface for differentiation
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(dimensionResource(id = R.dimen.card_content_padding_medium)), // e.g., 12dp or 16dp
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             // Transaction type indicator bar
             Box(
                 modifier = Modifier
                     .width(dimensionResource(id = R.dimen.transaction_type_indicator_width)) // e.g., 4dp
-                    .height(dimensionResource(id = R.dimen.icon_container_size_large)) // e.g., 48dp, to match a slightly larger icon area
+                    .height(
+                        dimensionResource(id = R.dimen.icon_container_size_large),
+                    ) // e.g., 48dp, to match a slightly larger icon area
                     .background(
                         color = transactionTypeColor,
                         shape = RoundedCornerShape(
                             topStart = dimensionResource(id = R.dimen.radius_small), // e.g., 4dp
-                            bottomStart = dimensionResource(id = R.dimen.radius_small)
-                        )
-                    )
+                            bottomStart = dimensionResource(id = R.dimen.radius_small),
+                        ),
+                    ),
             )
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium))) // e.g., 12dp
 
@@ -274,13 +274,13 @@ fun TransactionItem(
                     .size(dimensionResource(id = R.dimen.icon_container_size_large)) // e.g., 48dp
                     .clip(CircleShape)
                     .background(categoryActualColor.copy(alpha = 0.2f)), // Slightly more pronounced background
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = categoryIcon,
                     contentDescription = transaction.category, // For accessibility
                     tint = categoryActualColor,
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)) // e.g., 24dp
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)), // e.g., 24dp
                 )
             }
 
@@ -289,7 +289,7 @@ fun TransactionItem(
             // Transaction Details: Category, Description, (New) Source, and Date
             Column(
                 modifier = Modifier.weight(1f), // Takes available space
-                verticalArrangement = Arrangement.Center // Vertically center content within this column
+                verticalArrangement = Arrangement.Center, // Vertically center content within this column
             ) {
                 // Category Name
                 Text(
@@ -299,7 +299,7 @@ fun TransactionItem(
                     style = MaterialTheme.typography.titleMedium, // Slightly larger/bolder for category
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.onSurface,
                 )
 
                 // Source Name - NEW
@@ -311,8 +311,8 @@ fun TransactionItem(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         modifier = Modifier.padding(
-                            top = dimensionResource(id = R.dimen.line_chart_stroke_width)
-                        ) // Placeholder, will be updated or requires user to add to dimens.xml
+                            top = dimensionResource(id = R.dimen.line_chart_stroke_width),
+                        ), // Placeholder, will be updated or requires user to add to dimens.xml
                     )
                 }
 
@@ -325,8 +325,8 @@ fun TransactionItem(
                         overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onSurfaceVariant, // Slightly muted color
                         modifier = Modifier.padding(
-                            top = dimensionResource(id = R.dimen.spacing_small)
-                        ) // Placeholder, will be updated or requires user to add to dimens.xml
+                            top = dimensionResource(id = R.dimen.spacing_small),
+                        ), // Placeholder, will be updated or requires user to add to dimens.xml
                     )
                 }
             }
@@ -336,18 +336,18 @@ fun TransactionItem(
             // Amount and Date Column
             Column(
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center // Vertically center content within this column
+                verticalArrangement = Arrangement.Center, // Vertically center content within this column
             ) {
                 Text(
                     text = formattedAmount,
                     style = MaterialTheme.typography.titleMedium, // Consistent with category title
                     fontWeight = FontWeight.Bold,
-                    color = transactionTypeColor // Color indicates income/expense/transfer
+                    color = transactionTypeColor, // Color indicates income/expense/transfer
                 )
                 Text(
                     text = formattedDate,
                     style = MaterialTheme.typography.bodySmall, // Smaller font for date
-                    color = MaterialTheme.colorScheme.onSurfaceVariant // Muted color
+                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Muted color
                 )
             }
         }

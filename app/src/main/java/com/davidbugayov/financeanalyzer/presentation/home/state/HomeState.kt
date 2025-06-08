@@ -26,5 +26,5 @@ data class HomeState(
     val filteredExpense: Money = Money.zero(),
     val filteredBalance: Money = Money.zero(),
     val transactionToDelete: Transaction? = null,
-    val topCategories: Map<String, Money> = emptyMap()
-) 
+    val topCategories: Map<String, Money> = emptyMap(),
+)

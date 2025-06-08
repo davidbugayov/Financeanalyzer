@@ -21,7 +21,7 @@ fun DeleteCategoryConfirmDialog(
     category: String,
     onConfirm: () -> Unit,
     onDismiss: () -> Unit,
-    isDefaultCategory: Boolean = false
+    isDefaultCategory: Boolean = false,
 ) {
     val messageText = if (isDefaultCategory) {
         "Вы уверены, что хотите удалить стандартную категорию \"$category\"?\n\n" +
@@ -45,6 +45,6 @@ fun DeleteCategoryConfirmDialog(
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.cancel))
             }
-        }
+        },
     )
-} 
+}

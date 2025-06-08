@@ -71,12 +71,7 @@ object AnalyticsUtils {
     /**
      * Логирует событие добавления транзакции
      */
-    fun logTransactionAdded(
-        amount: Money,
-        category: String,
-        isExpense: Boolean,
-        hasDescription: Boolean
-    ) {
+    fun logTransactionAdded(amount: Money, category: String, isExpense: Boolean, hasDescription: Boolean) {
         val params = Bundle().apply {
             putString(Params.TRANSACTION_TYPE, if (isExpense) "expense" else "income")
             putString(Params.TRANSACTION_AMOUNT, amount.toString())
@@ -85,7 +80,7 @@ object AnalyticsUtils {
         }
         logEvent(Events.TRANSACTION_ADDED, params)
         Timber.d(
-            "Transaction added logged: $amount, $category, ${if (isExpense) "expense" else "income"}"
+            "Transaction added logged: $amount, $category, ${if (isExpense) "expense" else "income"}",
         )
     }
 
@@ -100,7 +95,7 @@ object AnalyticsUtils {
         }
         logEvent(Events.TRANSACTION_EDITED, params)
         Timber.d(
-            "Transaction edited logged: $amount, $category, ${if (isExpense) "expense" else "income"}"
+            "Transaction edited logged: $amount, $category, ${if (isExpense) "expense" else "income"}",
         )
     }
 
@@ -115,7 +110,7 @@ object AnalyticsUtils {
         }
         logEvent(Events.TRANSACTION_DELETED, params)
         Timber.d(
-            "Transaction deleted logged: $amount, $category, ${if (isExpense) "expense" else "income"}"
+            "Transaction deleted logged: $amount, $category, ${if (isExpense) "expense" else "income"}",
         )
     }
 
@@ -142,7 +137,7 @@ object AnalyticsUtils {
         }
         logEvent(Events.CATEGORY_EDITED, params)
         Timber.d(
-            "Category edited: $oldCategory -> $newCategory (${if (isExpense) "expense" else "income"})"
+            "Category edited: $oldCategory -> $newCategory (${if (isExpense) "expense" else "income"})",
         )
     }
 
@@ -283,4 +278,4 @@ object AnalyticsUtils {
         const val ERROR_MESSAGE = "error_message"
         const val ERROR_TYPE = "error_type"
     }
-} 
+}

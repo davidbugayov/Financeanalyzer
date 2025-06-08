@@ -57,7 +57,7 @@ object ColorUtils {
         sourceName: String,
         sourceColorHex: String?, // Ожидаем HEX-строку или null
         isExpense: Boolean,
-        isDarkTheme: Boolean // Нужно передавать состояние темы
+        isDarkTheme: Boolean, // Нужно передавать состояние темы
     ): Color {
         // Пытаемся получить цвет из sourceColorHex, если он есть
         sourceColorHex?.let { hex ->
@@ -89,4 +89,4 @@ object ColorUtils {
     fun getIntColorFromXml(context: android.content.Context, resId: Int): Int {
         return androidx.core.content.ContextCompat.getColor(context, resId)
     }
-} 
+}

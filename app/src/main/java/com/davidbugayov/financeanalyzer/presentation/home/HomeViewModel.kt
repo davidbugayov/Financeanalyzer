@@ -47,7 +47,7 @@ class HomeViewModel(
     private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
     private val repository: TransactionRepository,
-    private val updateWidgetsUseCase: UpdateWidgetsUseCase
+    private val updateWidgetsUseCase: UpdateWidgetsUseCase,
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(HomeState())
@@ -61,7 +61,8 @@ class HomeViewModel(
      * Значение: отфильтрованные транзакции, статистика (доход, расход, баланс), группы транзакций.
      * * Это позволяет избежать повторных вычислений, если список транзакций и фильтр не изменились.
      */
-    private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<TransactionGroup>>>()
+    private val filteredTransactionsCache =
+        mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<TransactionGroup>>>()
 
     /**
      * Кэш для базовой статистики (доход, расход, баланс) по списку транзакций.
@@ -125,7 +126,7 @@ class HomeViewModel(
                         // Сбрасываем статистику для фильтра
                         filteredIncome = Money.zero(),
                         filteredExpense = Money.zero(),
-                        filteredBalance = Money.zero()
+                        filteredBalance = Money.zero(),
                     )
                 }
                 // Запускаем обновление отфильтрованных транзакций в фоне
@@ -183,16 +184,16 @@ class HomeViewModel(
                         com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
                             amount = transaction.amount.abs(),
                             category = transaction.category,
-                            isExpense = transaction.isExpense
+                            isExpense = transaction.isExpense,
                         )
 
                         context?.let { ctx ->
                             updateWidgetsUseCase(ctx)
                             Timber.d(
-                                "Виджеты обновлены после удаления транзакции из HomeViewModel."
+                                "Виджеты обновлены после удаления транзакции из HomeViewModel.",
                             )
                         } ?: Timber.w(
-                            "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления."
+                            "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
                         )
                     },
                     onFailure = { exception ->
@@ -200,17 +201,17 @@ class HomeViewModel(
                         _state.update {
                             it.copy(
                                 error = exception.message ?: "Failed to delete transaction",
-                                transactionToDelete = null
+                                transactionToDelete = null,
                             )
                         }
-                    }
+                    },
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Error deleting transaction")
                 _state.update {
                     it.copy(
                         error = e.message ?: "Error deleting transaction",
-                        transactionToDelete = null
+                        transactionToDelete = null,
                     )
                 }
             }
@@ -287,7 +288,7 @@ class HomeViewModel(
                         filteredExpense = metrics.expense,
                         filteredBalance = metrics.income - metrics.expense,
                         isLoading = false,
-                        error = null
+                        error = null,
                     )
                 }
                 viewModelScope.launch(Dispatchers.Default) {
@@ -356,9 +357,9 @@ class HomeViewModel(
                             hasError = true
                             Timber.e(
                                 exception,
-                                "Failed to save test transaction: ${transaction.category}"
+                                "Failed to save test transaction: ${transaction.category}",
                             )
-                        }
+                        },
                     )
                 }
                 if (!hasError) {
@@ -368,7 +369,7 @@ class HomeViewModel(
                 } else {
                     _state.update {
                         it.copy(
-                            error = "Ошибка при сохранении некоторых тестовых транзакций"
+                            error = "Ошибка при сохранении некоторых тестовых транзакций",
                         )
                     }
                 }
@@ -407,7 +408,7 @@ class HomeViewModel(
                     filteredIncome = filteredIncome,
                     filteredExpense = filteredExpense,
                     filteredBalance = filteredBalance,
-                    isLoading = false
+                    isLoading = false,
                 )
             }
         }
@@ -507,7 +508,7 @@ class HomeViewModel(
                 transactions = sortedTransactions,
                 balance = balance,
                 name = dateString,
-                total = balance
+                total = balance,
             )
         }
     }
@@ -522,7 +523,7 @@ class HomeViewModel(
      */
     private data class FilterCacheKey(
         val filter: TransactionFilter,
-        val transactionListHashCode: Int // Используем хэш-код списка для точности кэширования
+        val transactionListHashCode: Int, // Используем хэш-код списка для точности кэширования
     )
 
     private fun getPeriodDates(filter: TransactionFilter): Pair<java.util.Date, java.util.Date> {

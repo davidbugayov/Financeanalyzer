@@ -19,7 +19,7 @@ import timber.log.Timber
  */
 class WalletTransactionsViewModel(
     private val walletRepository: WalletRepository,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(WalletTransactionsState())
@@ -44,7 +44,8 @@ class WalletTransactionsViewModel(
                 if (wallet == null) {
                     _state.update {
                         it.copy(
-                            error = "Кошелек не найден", isLoading = false
+                            error = "Кошелек не найден",
+                            isLoading = false,
                         )
                     }
                     return@launch
@@ -59,7 +60,7 @@ class WalletTransactionsViewModel(
                     val updatedWallet = wallet.copy(
                         spent = wallet.spent.copy(amount = java.math.BigDecimal.ZERO),
                         periodStartDate = now,
-                        linkedCategories = wallet.linkedCategories
+                        linkedCategories = wallet.linkedCategories,
                     )
 
                     walletRepository.updateWallet(updatedWallet)
@@ -67,14 +68,14 @@ class WalletTransactionsViewModel(
                     _state.update {
                         it.copy(
                             wallet = updatedWallet,
-                            isLoading = false
+                            isLoading = false,
                         )
                     }
                 } else {
                     _state.update {
                         it.copy(
                             wallet = wallet,
-                            isLoading = false
+                            isLoading = false,
                         )
                     }
                 }
@@ -83,7 +84,7 @@ class WalletTransactionsViewModel(
                 _state.update {
                     it.copy(
                         error = e.message ?: "Ошибка при загрузке кошелька",
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             }
@@ -101,7 +102,8 @@ class WalletTransactionsViewModel(
                 if (wallet == null) {
                     _state.update {
                         it.copy(
-                            error = "Кошелек не найден", isLoading = false
+                            error = "Кошелек не найден",
+                            isLoading = false,
                         )
                     }
                     return@launch
@@ -126,7 +128,7 @@ class WalletTransactionsViewModel(
                     it.copy(
                         wallet = wallet,
                         transactions = walletTransactions,
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
 
@@ -136,7 +138,7 @@ class WalletTransactionsViewModel(
                 _state.update {
                     it.copy(
                         error = e.message ?: "Ошибка при загрузке транзакций",
-                        isLoading = false
+                        isLoading = false,
                     )
                 }
             }
@@ -161,7 +163,7 @@ class WalletTransactionsViewModel(
                 if (currentWallet == null) {
                     _state.update {
                         it.copy(
-                            error = "Кошелек не найден"
+                            error = "Кошелек не найден",
                         )
                     }
                     return@launch
@@ -169,7 +171,7 @@ class WalletTransactionsViewModel(
 
                 // Обновляем кошелек с новым списком связанных категорий
                 val updatedWallet = currentWallet.copy(
-                    linkedCategories = categories
+                    linkedCategories = categories,
                 )
 
                 // Сохраняем обновленный кошелек
@@ -178,7 +180,7 @@ class WalletTransactionsViewModel(
                 // Обновляем состояние с новым кошельком
                 _state.update {
                     it.copy(
-                        wallet = updatedWallet
+                        wallet = updatedWallet,
                     )
                 }
 
@@ -186,16 +188,16 @@ class WalletTransactionsViewModel(
                 loadTransactions(updatedWallet.id)
 
                 Timber.d(
-                    "Categories linked to wallet ${updatedWallet.name}: ${categories.joinToString()}"
+                    "Categories linked to wallet ${updatedWallet.name}: ${categories.joinToString()}",
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Error linking categories")
                 _state.update {
                     it.copy(
-                        error = e.message ?: "Ошибка при связывании категорий"
+                        error = e.message ?: "Ошибка при связывании категорий",
                     )
                 }
             }
         }
     }
-} 
+}

@@ -67,7 +67,7 @@ class FinancialMetrics private constructor() : KoinComponent {
 
                 // Логгируем результаты для диагностики
                 Timber.d(
-                    "Метрики обновлены: доход=${income.formatted()}, расход=${expense.formatted()}, баланс=${balance.formatted()}"
+                    "Метрики обновлены: доход=${income.formatted()}, расход=${expense.formatted()}, баланс=${balance.formatted()}",
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при пересчёте метрик")

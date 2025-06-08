@@ -13,7 +13,7 @@ import timber.log.Timber
  */
 class OzonPdfHandler(
     transactionRepository: TransactionRepository,
-    context: Context
+    context: Context,
 ) : AbstractPdfBankHandler(transactionRepository, context) {
 
     override val bankName: String = "Ozon PDF"
@@ -23,7 +23,7 @@ class OzonPdfHandler(
         "ozon",
         "озон",
         "ozon statement",
-        "выписка ozon"
+        "выписка ozon",
     )
 
     /**

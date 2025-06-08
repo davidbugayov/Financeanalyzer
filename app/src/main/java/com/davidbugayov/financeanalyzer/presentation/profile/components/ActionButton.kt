@@ -27,7 +27,7 @@ fun ActionButton(
     modifier: Modifier = Modifier,
     enabled: Boolean = true,
     containerColor: Color = MaterialTheme.colorScheme.primary,
-    contentColor: Color = Color.White
+    contentColor: Color = Color.White,
 ) {
     Button(
         onClick = onClick,
@@ -36,8 +36,8 @@ fun ActionButton(
         shape = RoundedCornerShape(50),
         colors = ButtonDefaults.buttonColors(
             containerColor = containerColor,
-            contentColor = contentColor
-        )
+            contentColor = contentColor,
+        ),
     ) {
         if (isLoading) {
             CircularProgressIndicator(
@@ -45,21 +45,21 @@ fun ActionButton(
                     .padding(end = 12.dp)
                     .size(20.dp),
                 strokeWidth = 2.dp,
-                color = contentColor
+                color = contentColor,
             )
         } else {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 modifier = Modifier.padding(end = 12.dp),
-                tint = contentColor
+                tint = contentColor,
             )
         }
         Text(
             text = text,
             fontWeight = FontWeight.Bold,
             fontSize = 18.sp,
-            color = contentColor
+            color = contentColor,
         )
     }
-} 
+}

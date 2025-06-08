@@ -79,7 +79,7 @@ fun EnhancedCategoryPieChart(
     selectedIndex: Int? = null,
     onSectorClick: (UiCategory?) -> Unit = {},
     showExpenses: Boolean = true,
-    onShowExpensesChange: (Boolean) -> Unit = {}
+    onShowExpensesChange: (Boolean) -> Unit = {},
 ) {
     // Filter out items with zero or negative percentages
     val filteredData = remember(items, showExpenses) {
@@ -90,11 +90,11 @@ fun EnhancedCategoryPieChart(
         // Show empty state if no valid data
         Box(
             modifier = modifier.fillMaxWidth(),
-            contentAlignment = Alignment.Center
+            contentAlignment = Alignment.Center,
         ) {
             Text(
                 text = stringResource(R.string.enhanced_chart_no_data),
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
         return
@@ -114,7 +114,7 @@ fun EnhancedCategoryPieChart(
                 setOf(selectedIndex)
             } else {
                 emptySet()
-            }
+            },
         )
     }
 
@@ -137,31 +137,31 @@ fun EnhancedCategoryPieChart(
     Card(
         modifier = modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = cardColor
+            containerColor = cardColor,
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(id = R.dimen.enhanced_pie_chart_card_elevation)
+            defaultElevation = dimensionResource(id = R.dimen.enhanced_pie_chart_card_elevation),
         ),
         shape = RoundedCornerShape(
-            dimensionResource(id = R.dimen.enhanced_pie_chart_card_corner_radius)
-        )
+            dimensionResource(id = R.dimen.enhanced_pie_chart_card_corner_radius),
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    all = dimensionResource(id = R.dimen.padding_medium) // Use standard padding
+                    all = dimensionResource(id = R.dimen.padding_medium), // Use standard padding
                 )
                 .clickable(
                     interactionSource = remember { MutableInteractionSource() },
-                    indication = null // Убираем визуальный эффект нажатия
+                    indication = null, // Убираем визуальный эффект нажатия
                 ) {
                     // Сбрасываем выбор только если что-то выбрано
                     if (selectedIndices.value.isNotEmpty()) {
                         selectedIndices.value = emptySet()
                         onSectorClick(null)
                     }
-                }
+                },
         ) {
             // Горизонтальный переключатель доходы/расходы
             Row(
@@ -169,24 +169,24 @@ fun EnhancedCategoryPieChart(
                     .fillMaxWidth()
                     .padding(bottom = dimensionResource(id = R.dimen.padding_medium)), // Use standard padding
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(R.string.chart_type_selector_expense),
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal,
                     ),
                     color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.clickable { onShowExpensesChange(true) }
+                    modifier = Modifier.clickable { onShowExpensesChange(true) },
                 )
 
                 Text(
                     text = stringResource(R.string.chart_type_selector_income),
                     style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal
+                        fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal,
                     ),
                     color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.clickable { onShowExpensesChange(false) }
+                    modifier = Modifier.clickable { onShowExpensesChange(false) },
                 )
             }
 
@@ -195,11 +195,11 @@ fun EnhancedCategoryPieChart(
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(dimensionResource(id = R.dimen.enhanced_pie_chart_size)), // Keep specific size
-                contentAlignment = Alignment.Center
+                contentAlignment = Alignment.Center,
             ) {
                 DrawPieChart(
                     modifier = Modifier.size(
-                        dimensionResource(id = R.dimen.enhanced_pie_chart_size)
+                        dimensionResource(id = R.dimen.enhanced_pie_chart_size),
                     ), // Keep specific size
                     data = filteredData,
                     selectedIndices = selectedIndices.value,
@@ -231,7 +231,7 @@ fun EnhancedCategoryPieChart(
                     totalMoney = totalMoney,
                     selectedItem = selectedItem,
                     isIncome = isIncome,
-                    backgroundColor = cardColor
+                    backgroundColor = cardColor,
                 )
             }
 
@@ -245,8 +245,8 @@ fun EnhancedCategoryPieChart(
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                 modifier = Modifier.padding(
                     start = dimensionResource(id = R.dimen.padding_small),
-                    bottom = dimensionResource(id = R.dimen.padding_small) // Use standard padding
-                )
+                    bottom = dimensionResource(id = R.dimen.padding_small), // Use standard padding
+                ),
             )
 
             // Сортируем элементы по сумме (от большей к меньшей)
@@ -266,7 +266,7 @@ fun EnhancedCategoryPieChart(
                     .fillMaxWidth()
                     .padding(horizontal = dimensionResource(id = R.dimen.padding_extra_small)) // Use standard padding
                     .height(legendHeight) // Calculated height with constraints
-                    .verticalScroll(rememberScrollState()) // Оставляем скроллинг на всякий случай
+                    .verticalScroll(rememberScrollState()), // Оставляем скроллинг на всякий случай
             ) {
                 // Выводим содержимое категорий для отладки
                 sortedItems.forEachIndexed { index, item ->
@@ -302,13 +302,13 @@ fun EnhancedCategoryPieChart(
                                     item.color.copy(alpha = 0.15f)
                                 } else {
                                     Color.Transparent
-                                }
+                                },
                             )
                             .padding(
                                 vertical = dimensionResource(id = R.dimen.padding_extra_small),
-                                horizontal = dimensionResource(id = R.dimen.padding_tiny)
+                                horizontal = dimensionResource(id = R.dimen.padding_tiny),
                             ),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Цветной индикатор категории
                         Box(
@@ -318,26 +318,26 @@ fun EnhancedCategoryPieChart(
                                     color = item.color,
                                     shape = if (isSelected) {
                                         RoundedCornerShape(
-                                            dimensionResource(id = R.dimen.radius_small)
+                                            dimensionResource(id = R.dimen.radius_small),
                                         )
                                     } else {
                                         CircleShape
-                                    }
-                                )
+                                    },
+                                ),
                         )
 
                         // Название категории
                         Text(
                             text = item.name,
                             style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal
+                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
                             ),
                             color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier
                                 .padding(start = dimensionResource(id = R.dimen.padding_small))
                                 .weight(1f),
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
                         )
 
                         // Сумма
@@ -345,24 +345,24 @@ fun EnhancedCategoryPieChart(
                         Text(
                             text = money.formatForDisplay(),
                             style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.SemiBold
+                                fontWeight = FontWeight.SemiBold,
                             ),
                             color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(
-                                horizontal = dimensionResource(id = R.dimen.padding_tiny)
-                            )
+                                horizontal = dimensionResource(id = R.dimen.padding_tiny),
+                            ),
                         )
 
                         // Процент с цветом категории для выделенного элемента
                         Text(
                             text = stringResource(
                                 R.string.enhanced_chart_percent_format,
-                                item.percentage
+                                item.percentage,
                             ),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isSelected) item.color else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.width(45.dp),
-                            textAlign = TextAlign.End
+                            textAlign = TextAlign.End,
                         )
                     }
 
@@ -373,8 +373,8 @@ fun EnhancedCategoryPieChart(
                                 .fillMaxWidth()
                                 .height(dimensionResource(id = R.dimen.divider_height))
                                 .background(
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f)
-                                )
+                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
+                                ),
                         )
                     }
                 }
@@ -416,7 +416,7 @@ private fun DrawScope.drawInnerText(
     incomeText: String,
     expenseText: String,
     incomeColor: Color,
-    expenseColor: Color
+    expenseColor: Color,
 ) {
     if (selectedItem != null) {
         drawSelectedItemText(center, size, selectedItem)
@@ -429,7 +429,7 @@ private fun DrawScope.drawInnerText(
             incomeText,
             expenseText,
             incomeColor,
-            expenseColor
+            expenseColor,
         )
     }
 }
@@ -438,7 +438,7 @@ private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedI
     drawIntoCanvas { canvas ->
         val itemMoney = selectedItem.money
 
-        val amountColor = selectedItem.color 
+        val amountColor = selectedItem.color
         val amountPaint = Paint().apply {
             isAntiAlias = true
             textSize = min(size.width, size.height) * DonutTextConstants.AMOUNT_TEXT_SIZE_FACTOR
@@ -454,12 +454,12 @@ private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedI
             itemMoney.formatForDisplay(),
             center.x,
             amountY,
-            amountPaint
+            amountPaint,
         )
 
         // Рисуем название категории под суммой с цветом категории
         val categoryPaint = Paint().apply {
-            color = selectedItem.color.toArgb() 
+            color = selectedItem.color.toArgb()
             textAlign = Paint.Align.CENTER
             textSize = min(size.width, size.height) * DonutTextConstants.CATEGORY_TEXT_SIZE_FACTOR
             isFakeBoldText = true
@@ -479,7 +479,7 @@ private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedI
             categoryName,
             center.x,
             categoryY,
-            categoryPaint
+            categoryPaint,
         )
 
         // Рисуем процент ниже названия категории
@@ -497,7 +497,7 @@ private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedI
             String.format(Locale.getDefault(), "%.1f%%", selectedItem.percentage),
             center.x,
             percentY,
-            percentPaint
+            percentPaint,
         )
     }
 }
@@ -510,7 +510,7 @@ private fun DrawScope.drawTotalAmountText(
     incomeText: String,
     expenseText: String,
     incomeColor: Color,
-    expenseColor: Color
+    expenseColor: Color,
 ) {
     drawIntoCanvas { canvas ->
         val amountColor = if (isIncome) incomeColor else expenseColor
@@ -530,7 +530,7 @@ private fun DrawScope.drawTotalAmountText(
             totalMoney.formatForDisplay(),
             center.x,
             amountY,
-            amountPaint
+            amountPaint,
         )
 
         // Рисуем тип (доход/расход) - с цветом соответствующим типу
@@ -548,7 +548,7 @@ private fun DrawScope.drawTotalAmountText(
             if (isIncome) incomeText else expenseText,
             center.x,
             typeY,
-            typePaint
+            typePaint,
         )
     }
 }
@@ -558,7 +558,7 @@ private fun getClickedSectorIndex(
     sectorAngles: List<Triple<Float, Float, Float>>,
     distance: Float,
     innerRadius: Float,
-    outerRadius: Float
+    outerRadius: Float,
 ): Int {
     // Если клик в центральную область или за пределами диаграммы - возвращаем -1
     if (distance <= innerRadius || distance > outerRadius) {
@@ -595,14 +595,15 @@ private fun getClickedSectorIndex(
 
             // Увеличиваем область до максимум 30°, но не менее размера сектора
             val effectiveAngle = min(
-                sweep * DonutTextConstants.SMALL_SECTOR_DETECTION_MULTIPLIER, DonutTextConstants.SMALL_SECTOR_MAX_DETECTION_ANGLE
+                sweep * DonutTextConstants.SMALL_SECTOR_DETECTION_MULTIPLIER,
+                DonutTextConstants.SMALL_SECTOR_MAX_DETECTION_ANGLE,
             )
             val halfEffective = effectiveAngle / 2f
 
             // Проверка расстояния от центра сектора до места клика
             val distanceToMid = min(
                 abs((angle - midAngle + 360f) % 360f),
-                abs((midAngle - angle + 360f) % 360f)
+                abs((midAngle - angle + 360f) % 360f),
             )
 
             if (distanceToMid <= halfEffective) {
@@ -623,7 +624,7 @@ private fun DrawPieChart(
     totalMoney: Money,
     selectedItem: UiCategory?,
     isIncome: Boolean,
-    backgroundColor: Color
+    backgroundColor: Color,
 ) {
     val incomeText = stringResource(id = R.string.chart_type_selector_income)
     val expenseText = stringResource(id = R.string.chart_type_selector_expense)
@@ -637,16 +638,16 @@ private fun DrawPieChart(
     LaunchedEffect(data, isIncome) {
         animatedProgress.animateTo(
             targetValue = 0f,
-            animationSpec = tween(0) // Мгновенно сбрасываем прогресс
+            animationSpec = tween(0), // Мгновенно сбрасываем прогресс
         )
         animatedProgress.animateTo(
             targetValue = 1f,
             animationSpec = tween(
                 durationMillis = context.resources.getInteger(
-                    R.integer.enhanced_pie_chart_animation_duration
+                    R.integer.enhanced_pie_chart_animation_duration,
                 ),
-                easing = FastOutSlowInEasing
-            )
+                easing = FastOutSlowInEasing,
+            ),
         )
     }
 
@@ -680,7 +681,7 @@ private fun DrawPieChart(
 
     Box(
         modifier = modifier,
-        contentAlignment = Alignment.Center
+        contentAlignment = Alignment.Center,
     ) {
         Canvas(
             modifier = Modifier
@@ -713,13 +714,13 @@ private fun DrawPieChart(
                             sectorAngles = sectorAngles,
                             distance = distanceFromCenter,
                             innerRadius = innerRadius,
-                            outerRadius = radius
+                            outerRadius = radius,
                         )
 
                         // Если сектор найден, логируем информацию
                         if (selectedSector >= 0) {
                             Timber.tag("[D]").d(
-                                "PieChart: выбран сектор №$selectedSector '${data[selectedSector].name}'"
+                                "PieChart: выбран сектор №$selectedSector '${data[selectedSector].name}'",
                             )
                         } else {
                             Timber.tag("[D]").d("PieChart: сектор не найден")
@@ -729,7 +730,7 @@ private fun DrawPieChart(
 
                         onSectorClick(selectedSector)
                     }
-                }
+                },
         ) {
             val progressValue = animatedProgress.value
             val size = this.size
@@ -754,7 +755,7 @@ private fun DrawPieChart(
                     color = data[index].color,
                     holeColor = backgroundColor, addOutline = isSelected,
                     alpha = 1f,
-                    outlineBaseColor = outlineColorForDonut
+                    outlineBaseColor = outlineColorForDonut,
                 )
             }
 
@@ -762,7 +763,7 @@ private fun DrawPieChart(
             drawCircle(
                 color = backgroundColor,
                 radius = innerRadius,
-                center = center
+                center = center,
             )
 
             // Рисуем текст в центре
@@ -775,7 +776,7 @@ private fun DrawPieChart(
                 incomeText = incomeText,
                 expenseText = expenseText,
                 incomeColor = currentIncomeColor,
-                expenseColor = currentExpenseColor
+                expenseColor = currentExpenseColor,
             )
         }
     }
@@ -803,7 +804,7 @@ private fun DrawScope.drawDonutSection(
     holeColor: Color,
     addOutline: Boolean = false,
     alpha: Float = 1f,
-    outlineBaseColor: Color
+    outlineBaseColor: Color,
 ) {
     // Используем цвет, контрастный фону (holeColor) для обводки
     // Предполагаем, что onSurface обеспечит хороший контраст с surface (который является holeColor)
@@ -828,7 +829,7 @@ private fun DrawScope.drawDonutSection(
         useCenter = true,
         topLeft = center - Offset(outerRadius, outerRadius),
         size = Size(outerRadius * 2, outerRadius * 2),
-        alpha = alpha
+        alpha = alpha,
     )
 
     // Вырезаем центральную часть для создания эффекта доната
@@ -839,7 +840,7 @@ private fun DrawScope.drawDonutSection(
         useCenter = true,
         topLeft = center - Offset(innerRadius, innerRadius),
         size = Size(innerRadius * 2, innerRadius * 2),
-        alpha = alpha
+        alpha = alpha,
     )
 
     // Добавляем обводку для выделенных секторов
@@ -853,7 +854,7 @@ private fun DrawScope.drawDonutSection(
             style = Stroke(width = outlineWidths.outer),
             topLeft = center - Offset(outerRadius, outerRadius),
             size = Size(outerRadius * 2, outerRadius * 2),
-            alpha = alpha
+            alpha = alpha,
         )
 
         // Внутренняя обводка
@@ -865,7 +866,7 @@ private fun DrawScope.drawDonutSection(
             style = Stroke(width = outlineWidths.inner),
             topLeft = center - Offset(innerRadius, innerRadius),
             size = Size(innerRadius * 2, innerRadius * 2),
-            alpha = alpha
+            alpha = alpha,
         )
     }
-} 
+}

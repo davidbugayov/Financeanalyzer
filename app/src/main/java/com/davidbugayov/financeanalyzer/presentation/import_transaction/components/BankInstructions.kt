@@ -23,13 +23,13 @@ fun SberbankInstructions() {
                     append(stringResource(R.string.sberbank_instructions_title) + "\n\n")
                 }
                 append(stringResource(R.string.sberbank_instructions))
-            }
+            },
         )
 
         Text(
             text = stringResource(R.string.sberbank_note),
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.primary
+            color = MaterialTheme.colorScheme.primary,
         )
     }
 }
@@ -45,7 +45,7 @@ fun TinkoffInstructions() {
                 append(stringResource(R.string.tinkoff_instructions_title) + "\n\n")
             }
             append(stringResource(R.string.tinkoff_instructions))
-        }
+        },
     )
 }
 
@@ -69,13 +69,13 @@ fun AlfaBankInstructions() {
             withStyle(
                 style = SpanStyle(
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                    color = MaterialTheme.colorScheme.primary,
+                ),
             ) {
                 append(stringResource(R.string.alfabank_note_important) + " ")
             }
             append(stringResource(R.string.alfabank_note))
-        }
+        },
     )
 }
 
@@ -90,7 +90,7 @@ fun OzonInstructions() {
                 append(stringResource(R.string.ozon_instructions_title) + "\n\n")
             }
             append(stringResource(R.string.ozon_instructions))
-        }
+        },
     )
 }
 
@@ -115,12 +115,12 @@ fun CSVInstructions() {
             withStyle(
                 style = SpanStyle(
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary
-                )
+                    color = MaterialTheme.colorScheme.primary,
+                ),
             ) {
                 append(stringResource(R.string.csv_note_title) + " ")
             }
             append(stringResource(R.string.csv_note))
-        }
+        },
     )
-} 
+}

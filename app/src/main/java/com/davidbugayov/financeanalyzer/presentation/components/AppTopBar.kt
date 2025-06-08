@@ -37,7 +37,7 @@ fun AppTopBar(
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable (() -> Unit)? = null,
     titleFontSize: Int = dimensionResource(R.dimen.text_size_normal).value.toInt(),
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     TopAppBar(
         title = {
@@ -45,7 +45,7 @@ fun AppTopBar(
                 text = title,
                 fontSize = titleFontSize.sp,
                 maxLines = 1,
-                overflow = TextOverflow.Ellipsis
+                overflow = TextOverflow.Ellipsis,
             )
         },
         navigationIcon = {
@@ -53,7 +53,7 @@ fun AppTopBar(
                 IconButton(onClick = { onBackClick?.invoke() }) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                        contentDescription = stringResource(R.string.cd_back_button)
+                        contentDescription = stringResource(R.string.cd_back_button),
                     )
                 }
             } else {
@@ -67,8 +67,8 @@ fun AppTopBar(
             containerColor = MaterialTheme.colorScheme.surface,
             titleContentColor = MaterialTheme.colorScheme.onSurface,
             navigationIconContentColor = MaterialTheme.colorScheme.onSurface,
-            actionIconContentColor = MaterialTheme.colorScheme.onSurface
+            actionIconContentColor = MaterialTheme.colorScheme.onSurface,
         ),
-        modifier = modifier
+        modifier = modifier,
     )
-} 
+}

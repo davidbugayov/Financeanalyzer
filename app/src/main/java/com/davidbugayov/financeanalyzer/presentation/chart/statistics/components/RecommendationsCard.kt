@@ -33,8 +33,8 @@ fun RecommendationsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
             add(
                 stringResource(
                     R.string.recommendation_top_expense_category,
-                    metrics.topExpenseCategory
-                )
+                    metrics.topExpenseCategory,
+                ),
             )
         }
         if (metrics.monthsOfSavings < 3) {
@@ -53,28 +53,28 @@ fun RecommendationsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(
-            dimensionResource(R.dimen.financial_statistics_card_corner_radius)
+            dimensionResource(R.dimen.financial_statistics_card_corner_radius),
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)
+            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
         ),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.financial_statistics_card_padding))
+                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.recommendations),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(
                 modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_large)
-                )
+                    dimensionResource(R.dimen.financial_statistics_spacer_large),
+                ),
             )
 
             if (effectiveRecommendations.isNotEmpty()) {
@@ -84,16 +84,16 @@ fun RecommendationsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
                         style = MaterialTheme.typography.bodyMedium,
                         modifier = Modifier.padding(
                             vertical = dimensionResource(
-                                R.dimen.financial_statistics_metric_row_vertical
-                            )
-                        )
+                                R.dimen.financial_statistics_metric_row_vertical,
+                            ),
+                        ),
                     )
                 }
             } else {
                 Text(
                     text = stringResource(R.string.no_recommendations),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }

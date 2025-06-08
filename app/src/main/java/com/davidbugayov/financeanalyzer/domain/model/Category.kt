@@ -14,7 +14,7 @@ data class Category(
     val name: String,
     val isExpense: Boolean,
     val count: Int = 0,
-    val isCustom: Boolean = false
+    val isCustom: Boolean = false,
 ) {
     companion object {
         /**
@@ -25,7 +25,7 @@ data class Category(
                 name = name,
                 isExpense = true,
                 count = count,
-                isCustom = isCustom
+                isCustom = isCustom,
             )
         }
 
@@ -36,8 +36,9 @@ data class Category(
             return Category(
                 name = name,
                 isExpense = false,
-                count = count, isCustom = isCustom
+                count = count,
+                isCustom = isCustom,
             )
         }
     }
-} 
+}

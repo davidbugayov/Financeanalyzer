@@ -15,5 +15,5 @@ data class WalletTransactionsState(
     val wallet: Wallet? = null,
     val transactions: List<Transaction> = emptyList(),
     val isLoading: Boolean = false,
-    val error: String? = null
-) 
+    val error: String? = null,
+)

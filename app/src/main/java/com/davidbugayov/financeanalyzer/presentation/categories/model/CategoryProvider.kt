@@ -15,7 +15,7 @@ object CategoryProvider {
         val nameRes: Int,
         val iconName: String,
         val categoryKey: String,
-        val isExpense: Boolean
+        val isExpense: Boolean,
     )
 
     val defaultCategories = listOf(
@@ -38,7 +38,7 @@ object CategoryProvider {
         CategoryMeta(R.string.category_gift, "Payments", "gifts", false),
         CategoryMeta(R.string.category_interest, "TrendingUp", "interest", false),
         CategoryMeta(R.string.category_rent, "Work", "rental", false),
-        CategoryMeta(R.string.category_other, "MoreHoriz", "other_income", false)
+        CategoryMeta(R.string.category_other, "MoreHoriz", "other_income", false),
     )
 
     private fun getCategoryColorByKey(key: String, isExpense: Boolean): Color {
@@ -61,7 +61,7 @@ object CategoryProvider {
                 count = 0,
                 original = cat,
                 color = getCategoryColorByKey(meta.categoryKey, true),
-                icon = CategoryIconProvider.getIconByName(meta.iconName)
+                icon = CategoryIconProvider.getIconByName(meta.iconName),
             )
         }
 
@@ -77,7 +77,7 @@ object CategoryProvider {
                 count = 0,
                 original = cat,
                 color = getCategoryColorByKey(meta.categoryKey, false),
-                icon = CategoryIconProvider.getIconByName(meta.iconName)
+                icon = CategoryIconProvider.getIconByName(meta.iconName),
             )
         }
 
@@ -89,4 +89,4 @@ object CategoryProvider {
         val palette = if (isExpense) ExpenseChartPalette else IncomeChartPalette
         return palette.ifEmpty { listOf(DefaultCategoryColor) }.random()
     }
-} 
+}

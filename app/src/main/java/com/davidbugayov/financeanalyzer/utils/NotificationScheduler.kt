@@ -22,7 +22,7 @@ interface INotificationScheduler {
  */
 class NotificationScheduler(
     private val applicationContext: Context,
-    private val preferencesManager: PreferencesManager // Добавляем PreferencesManager как зависимость
+    private val preferencesManager: PreferencesManager, // Добавляем PreferencesManager как зависимость
 ) : INotificationScheduler {
 
     private val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
@@ -34,7 +34,7 @@ class NotificationScheduler(
     private fun createNotificationChannel() { // Убираем context из параметра
         val name = applicationContext.getString(R.string.transaction_reminder_channel_name)
         val description = applicationContext.getString(
-            R.string.transaction_reminder_channel_description
+            R.string.transaction_reminder_channel_description,
         )
         val importance = NotificationManager.IMPORTANCE_DEFAULT
 
@@ -63,7 +63,7 @@ class NotificationScheduler(
             applicationContext,
             TRANSACTION_REMINDER_REQUEST_CODE,
             alarmIntent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         // Устанавливаем время для уведомления
@@ -86,7 +86,7 @@ class NotificationScheduler(
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
-                alarmPendingIntent
+                alarmPendingIntent,
             )
             Timber.d("Scheduled exact alarm with setExactAndAllowWhileIdle")
         } catch (e: SecurityException) {
@@ -94,7 +94,7 @@ class NotificationScheduler(
             alarmManager.set(
                 AlarmManager.RTC_WAKEUP,
                 calendar.timeInMillis,
-                alarmPendingIntent
+                alarmPendingIntent,
             )
         }
     }
@@ -108,7 +108,7 @@ class NotificationScheduler(
             applicationContext,
             TRANSACTION_REMINDER_REQUEST_CODE,
             intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
         )
 
         val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
@@ -135,4 +135,4 @@ class NotificationScheduler(
             cancelTransactionReminder()
         }
     }
-} 
+}

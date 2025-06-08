@@ -37,7 +37,7 @@ fun BankImportCard(
     description: String? = null,
     tintColor: Color? = null,
     onClick: (() -> Unit)? = null,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.then(
@@ -45,21 +45,21 @@ fun BankImportCard(
                 Modifier.clickable(onClick = onClick)
             } else {
                 Modifier
-            }
+            },
         ),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
+            containerColor = MaterialTheme.colorScheme.surface,
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = 2.dp
-        )
+            defaultElevation = 2.dp,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             // Цветной индикатор банка вместо иконки
             if (tintColor != null) {
@@ -67,7 +67,7 @@ fun BankImportCard(
                     modifier = Modifier
                         .height(8.dp)
                         .fillMaxWidth()
-                        .background(tintColor, RoundedCornerShape(4.dp))
+                        .background(tintColor, RoundedCornerShape(4.dp)),
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -77,7 +77,7 @@ fun BankImportCard(
                 text = bankName,
                 style = MaterialTheme.typography.bodyMedium,
                 fontWeight = FontWeight.Bold,
-                textAlign = TextAlign.Center
+                textAlign = TextAlign.Center,
             )
 
             if (description != null) {
@@ -87,9 +87,9 @@ fun BankImportCard(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
     }
-} 
+}

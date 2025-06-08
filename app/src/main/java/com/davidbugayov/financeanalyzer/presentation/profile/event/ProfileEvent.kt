@@ -97,4 +97,4 @@ sealed class ProfileEvent {
      * Событие навигации к экрану библиотек.
      */
     data object NavigateToLibraries : ProfileEvent()
-} 
+}

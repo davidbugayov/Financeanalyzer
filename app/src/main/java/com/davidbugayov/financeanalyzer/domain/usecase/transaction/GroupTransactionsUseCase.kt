@@ -22,10 +22,7 @@ class GroupTransactionsUseCase {
      * @param groupingType Тип группировки (день, неделя, месяц)
      * @return Карта, где ключ - название периода, значение - список транзакций
      */
-    operator fun invoke(
-        transactions: List<Transaction>,
-        groupingType: GroupingType
-    ): Map<String, List<Transaction>> {
+    operator fun invoke(transactions: List<Transaction>, groupingType: GroupingType): Map<String, List<Transaction>> {
         return when (groupingType) {
             GroupingType.DAY -> groupByDay(transactions)
             GroupingType.WEEK -> groupByWeek(transactions)
@@ -79,11 +76,11 @@ class GroupTransactionsUseCase {
             calendar.time = transaction.date
             calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
             val firstDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(
-                calendar.time
+                calendar.time,
             )
             calendar.add(Calendar.DAY_OF_WEEK, 6)
             val lastDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(
-                calendar.time
+                calendar.time,
             )
             val year = calendar.get(Calendar.YEAR)
             val weekKey = "$firstDay - $lastDay $year"
@@ -156,4 +153,4 @@ class GroupTransactionsUseCase {
             else -> 0
         }
     }
-} 
+}

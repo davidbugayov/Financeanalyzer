@@ -12,7 +12,7 @@ import timber.log.Timber
  */
 abstract class AbstractExcelBankHandler(
     transactionRepository: TransactionRepository,
-    context: Context
+    context: Context,
 ) : AbstractBankHandler(transactionRepository, context) {
 
     /**
@@ -52,4 +52,4 @@ abstract class AbstractExcelBankHandler(
         // реализовать дополнительную проверку содержимого файла
         return false
     }
-} 
+}

@@ -15,7 +15,7 @@ class CategoryUsagePreferences private constructor(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFS_NAME,
-        Context.MODE_PRIVATE
+        Context.MODE_PRIVATE,
     )
     private val gson = Gson()
 
@@ -121,4 +121,4 @@ class CategoryUsagePreferences private constructor(context: Context) {
         usageMap[category] = currentCount + 1
         saveIncomeCategoriesUsage(usageMap)
     }
-} 
+}

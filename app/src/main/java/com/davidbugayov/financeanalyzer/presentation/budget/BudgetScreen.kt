@@ -85,10 +85,11 @@ fun BudgetScreen(
     onNavigateBack: () -> Unit,
     onNavigateToTransactions: (String) -> Unit,
     viewModel: BudgetViewModel = koinViewModel(),
-    achievementsUiViewModel: com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel = koinViewModel(),
+    achievementsUiViewModel: com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel =
+        koinViewModel(),
     addTransactionViewModel: AddTransactionViewModel = koinViewModel(
-        parameters = { org.koin.core.parameter.parametersOf(achievementsUiViewModel) }
-    )
+        parameters = { org.koin.core.parameter.parametersOf(achievementsUiViewModel) },
+    ),
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -121,7 +122,7 @@ fun BudgetScreen(
             when (event) {
                 is DataChangeEvent.TransactionChanged -> {
                     Timber.d(
-                        "BudgetScreen: получено событие изменения транзакции, обновляем данные"
+                        "BudgetScreen: получено событие изменения транзакции, обновляем данные",
                     )
                     viewModel.onEvent(BudgetEvent.LoadCategories)
                 }
@@ -173,27 +174,27 @@ fun BudgetScreen(
                     }) {
                         Icon(
                             imageVector = Icons.Default.Add,
-                            contentDescription = "Добавить доход"
+                            contentDescription = "Добавить доход",
                         )
                     }
                     IconButton(onClick = { showPeriodSettingsDialog = true }) {
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
-                            contentDescription = "Настройки периода"
+                            contentDescription = "Настройки периода",
                         )
                     }
-                }
+                },
             )
         },
-        floatingActionButton = { }
+        floatingActionButton = { },
     ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(paddingValues)
+                .padding(paddingValues),
         ) {
             Column(
-                modifier = Modifier.fillMaxSize()
+                modifier = Modifier.fillMaxSize(),
             ) {
                 // Улучшенный блок сводки бюджета
                 Card(
@@ -203,64 +204,64 @@ fun BudgetScreen(
                     shape = RoundedCornerShape(24.dp),
                     elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.surface
-                    )
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
                 ) {
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(20.dp)
+                            .padding(20.dp),
                     ) {
                         Text(
                             text = "Сводка бюджета",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            modifier = Modifier.padding(bottom = 16.dp),
                         )
 
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(bottom = 16.dp)
+                            modifier = Modifier.padding(bottom = 16.dp),
                         ) {
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
                                     .background(
                                         MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                                        CircleShape
+                                        CircleShape,
                                     ),
-                                contentAlignment = Alignment.Center
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Icon(
                                     imageVector = Icons.Rounded.Schedule,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(16.dp)
+                                    modifier = Modifier.size(16.dp),
                                 )
                             }
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Расчетный период: ${state.selectedPeriodDuration} дней",
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
+                            horizontalArrangement = Arrangement.SpaceBetween,
                         ) {
                             BudgetInfoCard(
                                 title = "Общий лимит",
                                 value = state.totalLimit.format(
                                     showCurrency = true,
-                                    useMinimalDecimals = true
+                                    useMinimalDecimals = true,
                                 ),
                                 containerColor = MaterialTheme.colorScheme.primary.copy(
-                                    alpha = 0.9f
+                                    alpha = 0.9f,
                                 ),
                                 contentColor = MaterialTheme.colorScheme.onPrimary,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
 
                             Spacer(modifier = Modifier.width(8.dp))
@@ -269,13 +270,13 @@ fun BudgetScreen(
                                 title = "Потрачено",
                                 value = state.totalSpent.format(
                                     showCurrency = true,
-                                    useMinimalDecimals = true
+                                    useMinimalDecimals = true,
                                 ),
                                 containerColor = MaterialTheme.colorScheme.secondary.copy(
-                                    alpha = 0.9f
+                                    alpha = 0.9f,
                                 ),
                                 contentColor = Color.White,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
 
                             Spacer(modifier = Modifier.width(8.dp))
@@ -284,13 +285,13 @@ fun BudgetScreen(
                                 title = "Баланс",
                                 value = state.totalWalletBalance.format(
                                     showCurrency = true,
-                                    useMinimalDecimals = true
+                                    useMinimalDecimals = true,
                                 ),
                                 containerColor = MaterialTheme.colorScheme.tertiary.copy(
-                                    alpha = 0.9f
+                                    alpha = 0.9f,
                                 ),
                                 contentColor = Color.White,
-                                modifier = Modifier.weight(1f)
+                                modifier = Modifier.weight(1f),
                             )
                         }
 
@@ -303,23 +304,23 @@ fun BudgetScreen(
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
                                 containerColor = MaterialTheme.colorScheme.primary.copy(
-                                    alpha = 0.1f
-                                )
-                            )
+                                    alpha = 0.1f,
+                                ),
+                            ),
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.size(18.dp)
+                                modifier = Modifier.size(18.dp),
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
                                 text = "Добавить кошелек",
                                 color = MaterialTheme.colorScheme.primary,
                                 style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.SemiBold
-                                )
+                                    fontWeight = FontWeight.SemiBold,
+                                ),
                             )
                         }
                     }
@@ -329,20 +330,20 @@ fun BudgetScreen(
                 Text(
                     text = "Мои кошельки",
                     style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                 )
 
                 // Список категорий
                 LazyColumn(
                     modifier = Modifier
-                        .weight(1f)
+                        .weight(1f),
                     // Убираем нижний отступ, так как FAB больше нет
                     // .padding(bottom = 80.dp)
                 ) {
                     items(state.categories) { category ->
                         WalletCard(
                             wallet = category,
-                            onClick = { onNavigateToTransactions(category.id) }
+                            onClick = { onNavigateToTransactions(category.id) },
                         )
                     }
                 }
@@ -360,7 +361,7 @@ fun BudgetScreen(
                                 onValueChange = { categoryName = it },
                                 label = { Text("Название кошелька") },
                                 singleLine = true,
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             )
 
                             Spacer(modifier = Modifier.height(8.dp))
@@ -369,7 +370,7 @@ fun BudgetScreen(
                                 value = categoryLimit,
                                 onValueChange = { categoryLimit = it },
                                 label = { Text("Лимит расходов") },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             )
                         }
                     },
@@ -382,8 +383,8 @@ fun BudgetScreen(
                                         viewModel.onEvent(
                                             BudgetEvent.AddCategory(
                                                 name = categoryName,
-                                                limit = Money(limit)
-                                            )
+                                                limit = Money(limit),
+                                            ),
                                         )
                                         categoryName = ""
                                         categoryLimit = ""
@@ -393,7 +394,7 @@ fun BudgetScreen(
                                     }
                                 }
                             },
-                            enabled = categoryName.isNotBlank() && categoryLimit.toBigDecimalOrNull() != null
+                            enabled = categoryName.isNotBlank() && categoryLimit.toBigDecimalOrNull() != null,
                         ) {
                             Text("Добавить")
                         }
@@ -403,7 +404,7 @@ fun BudgetScreen(
                             Text("Отмена")
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
                 )
             }
 
@@ -417,7 +418,7 @@ fun BudgetScreen(
                             Text(
                                 text = "Доход будет распределен между кошельками пропорционально лимитам категорий",
                                 style = MaterialTheme.typography.bodySmall,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -426,7 +427,7 @@ fun BudgetScreen(
                                 value = incomeAmount,
                                 onValueChange = { incomeAmount = it },
                                 label = { Text("Сумма дохода") },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             )
                         }
                     },
@@ -440,7 +441,7 @@ fun BudgetScreen(
                                     showDistributeIncomeDialog = false
                                 }
                             },
-                            enabled = incomeAmount.toBigDecimalOrNull() != null && incomeAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO
+                            enabled = incomeAmount.toBigDecimalOrNull() != null && incomeAmount.toBigDecimalOrNull()!! > BigDecimal.ZERO,
                         ) {
                             Text("Распределить")
                         }
@@ -450,7 +451,7 @@ fun BudgetScreen(
                             Text("Отмена")
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
                 )
             }
 
@@ -464,12 +465,12 @@ fun BudgetScreen(
                             Text(
                                 text = "Категория: ${selectedWallet!!.name}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
                             )
 
                             Text(
                                 text = "Баланс кошелька: ${selectedWallet!!.balance} ₽",
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -478,7 +479,7 @@ fun BudgetScreen(
                                 value = walletAmount,
                                 onValueChange = { walletAmount = it },
                                 label = { Text("Сумма") },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             )
                         }
                     },
@@ -492,8 +493,8 @@ fun BudgetScreen(
                                         viewModel.onEvent(
                                             BudgetEvent.SpendFromWallet(
                                                 sw.id, // Corrected: pass ID
-                                                Money(amount)
-                                            )
+                                                Money(amount),
+                                            ),
                                         )
                                         walletAmount = ""
                                         showSpendFromWalletDialog = false
@@ -502,7 +503,7 @@ fun BudgetScreen(
                             },
                             enabled = selectedWallet?.let { sw ->
                                 walletAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sw.balance.amount } == true
-                            } == true
+                            } == true,
                         ) {
                             Text("Потратить")
                         }
@@ -512,7 +513,7 @@ fun BudgetScreen(
                             Text("Отмена")
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
                 )
             }
 
@@ -526,19 +527,19 @@ fun BudgetScreen(
                             Text(
                                 text = "Из категории: ${selectedFromWallet!!.name}",
                                 style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.Medium
+                                fontWeight = FontWeight.Medium,
                             )
 
                             Text(
                                 text = "Баланс: ${selectedFromWallet!!.balance} ₽",
-                                style = MaterialTheme.typography.bodySmall
+                                style = MaterialTheme.typography.bodySmall,
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
 
                             Text(
                                 text = "В категорию:",
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
                             )
 
                             // Список категорий для выбора получателя
@@ -547,7 +548,7 @@ fun BudgetScreen(
                                     if (category.id != selectedFromWallet?.id) {
                                         Button(
                                             onClick = { selectedToWallet = category },
-                                            modifier = Modifier.fillMaxWidth()
+                                            modifier = Modifier.fillMaxWidth(),
                                         ) {
                                             Text(category.name)
                                         }
@@ -562,7 +563,7 @@ fun BudgetScreen(
                                 Text(
                                     text = "Выбрано: ${selectedToWallet!!.name}",
                                     style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.Medium
+                                    fontWeight = FontWeight.Medium,
                                 )
 
                                 Spacer(modifier = Modifier.height(8.dp))
@@ -571,7 +572,7 @@ fun BudgetScreen(
                                     value = transferAmount,
                                     onValueChange = { transferAmount = it },
                                     label = { Text("Сумма перевода") },
-                                    modifier = Modifier.fillMaxWidth()
+                                    modifier = Modifier.fillMaxWidth(),
                                 )
                             }
                         }
@@ -587,8 +588,8 @@ fun BudgetScreen(
                                             BudgetEvent.TransferBetweenWallets(
                                                 selectedFromWallet!!.id, // Corrected: pass ID
                                                 selectedToWallet!!.id, // Corrected: pass ID
-                                                Money(amount)
-                                            )
+                                                Money(amount),
+                                            ),
                                         )
                                         transferAmount = ""
                                         selectedToWallet = null
@@ -599,7 +600,7 @@ fun BudgetScreen(
                             enabled = selectedFromWallet?.let { sfw ->
                                 selectedToWallet != null && transferAmount.toBigDecimalOrNull()
                                     ?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } == true
-                            } == true
+                            } == true,
                         ) {
                             Text("Перевести")
                         }
@@ -609,12 +610,12 @@ fun BudgetScreen(
                             onClick = {
                                 showTransferDialog = false
                                 selectedToWallet = null
-                            }
+                            },
                         ) {
                             Text("Отмена")
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
                 )
             }
 
@@ -627,7 +628,7 @@ fun BudgetScreen(
                         Column {
                             Text(
                                 text = "Установите продолжительность периода в днях",
-                                style = MaterialTheme.typography.bodyMedium
+                                style = MaterialTheme.typography.bodyMedium,
                             )
 
                             Spacer(modifier = Modifier.height(16.dp))
@@ -640,10 +641,10 @@ fun BudgetScreen(
                                     }
                                 },
                                 keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number
+                                    keyboardType = KeyboardType.Number,
                                 ),
                                 label = { Text("Количество дней") },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             )
                         }
                     },
@@ -656,7 +657,7 @@ fun BudgetScreen(
                                     showPeriodSettingsDialog = false
                                 }
                             },
-                            enabled = periodDuration.toIntOrNull() != null && periodDuration.toInt() > 0
+                            enabled = periodDuration.toIntOrNull() != null && periodDuration.toInt() > 0,
                         ) {
                             Text("Сохранить")
                         }
@@ -666,7 +667,7 @@ fun BudgetScreen(
                             Text("Отмена")
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
                 )
             }
 
@@ -681,14 +682,14 @@ fun BudgetScreen(
                             Text("ОК")
                         }
                     },
-                    containerColor = MaterialTheme.colorScheme.surface
+                    containerColor = MaterialTheme.colorScheme.surface,
                 )
             }
 
             // Диалог подтверждения распределения дохода
             if (showDistributeConfirmation) {
                 Dialog(
-                    onDismissRequest = { showDistributeConfirmation = false }
+                    onDismissRequest = { showDistributeConfirmation = false },
                 ) {
                     Card(
                         modifier = Modifier
@@ -696,33 +697,33 @@ fun BudgetScreen(
                             .padding(16.dp),
                         shape = RoundedCornerShape(16.dp),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface
-                        )
+                            containerColor = MaterialTheme.colorScheme.surface,
+                        ),
                     ) {
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .padding(24.dp),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             // Заголовок с иконкой
                             Row(
                                 modifier = Modifier.fillMaxWidth(),
                                 verticalAlignment = Alignment.CenterVertically,
-                                horizontalArrangement = Arrangement.Center
+                                horizontalArrangement = Arrangement.Center,
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.AccountBalanceWallet,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.size(28.dp)
+                                    modifier = Modifier.size(28.dp),
                                 )
                                 Spacer(modifier = Modifier.width(8.dp))
                                 Text(
                                     text = "Распределить доход",
                                     style = MaterialTheme.typography.headlineSmall,
                                     fontWeight = FontWeight.Bold,
-                                    color = MaterialTheme.colorScheme.onSurface
+                                    color = MaterialTheme.colorScheme.onSurface,
                                 )
                             }
 
@@ -734,7 +735,7 @@ fun BudgetScreen(
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 textAlign = TextAlign.Center,
-                                modifier = Modifier.padding(horizontal = 8.dp)
+                                modifier = Modifier.padding(horizontal = 8.dp),
                             )
 
                             Spacer(modifier = Modifier.height(24.dp))
@@ -749,8 +750,8 @@ fun BudgetScreen(
                                     if (!hasWallets) {
                                         viewModel.onEvent(
                                             BudgetEvent.SetError(
-                                                "Нет доступных кошельков для распределения"
-                                            )
+                                                "Нет доступных кошельков для распределения",
+                                            ),
                                         )
                                         return@Button
                                     }
@@ -759,11 +760,11 @@ fun BudgetScreen(
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
-                                shape = RoundedCornerShape(12.dp)
+                                shape = RoundedCornerShape(12.dp),
                             ) {
                                 Text(
                                     text = "Распределить",
-                                    style = MaterialTheme.typography.titleMedium
+                                    style = MaterialTheme.typography.titleMedium,
                                 )
                             }
 
@@ -775,12 +776,12 @@ fun BudgetScreen(
 
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
-                                modifier = Modifier.fillMaxWidth()
+                                modifier = Modifier.fillMaxWidth(),
                             ) {
                                 Text(
                                     text = "Добавить без распределения",
                                     style = MaterialTheme.typography.titleMedium,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                             }
                         }
@@ -798,7 +799,7 @@ fun BudgetScreen(
                         override fun isSelectableDate(utcTimeMillis: Long): Boolean {
                             return true // Разрешаем выбирать любую дату
                         }
-                    }
+                    },
                 )
 
                 EditWalletDialog(
@@ -818,14 +819,14 @@ fun BudgetScreen(
                             val updatedWallet = currentSelectedWallet.copy(
                                 name = editWalletName,
                                 limit = Money(newLimit),
-                                periodStartDate = newStartDate
+                                periodStartDate = newStartDate,
                             )
                             viewModel.onEvent(BudgetEvent.UpdateCategory(updatedWallet))
                             showEditWalletDialog = false
                         } else {
                             // TODO: Показать ошибку валидации
                         }
-                    }
+                    },
                 )
 
                 if (showDatePickerDialog) {
@@ -840,7 +841,7 @@ fun BudgetScreen(
                             TextButton(onClick = { showDatePickerDialog = false }) {
                                 Text("Отмена")
                             }
-                        }
+                        },
                     ) {
                         DatePicker(state = editDatePickerState)
                     }
@@ -856,33 +857,33 @@ fun BudgetInfoCard(
     value: String,
     containerColor: Color,
     contentColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier
             .padding(vertical = 4.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = containerColor
+            containerColor = containerColor,
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp)
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
             modifier = Modifier
                 .padding(vertical = 16.dp, horizontal = 12.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
                 text = title,
                 style = MaterialTheme.typography.bodySmall,
-                color = contentColor.copy(alpha = 0.8f)
+                color = contentColor.copy(alpha = 0.8f),
             )
             Text(
                 text = value,
                 style = MaterialTheme.typography.titleLarge,
                 fontWeight = FontWeight.Bold,
                 color = contentColor,
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 4.dp),
             )
         }
     }
@@ -926,18 +927,18 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = backgroundColor
-        )
+            containerColor = backgroundColor,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(20.dp)
+                .padding(20.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
@@ -945,15 +946,15 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
                             .size(44.dp)
                             .background(
                                 color = contentColor.copy(alpha = 0.2f),
-                                shape = CircleShape
+                                shape = CircleShape,
                             ),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             imageVector = Icons.Default.AccountBalanceWallet,
                             contentDescription = null,
                             tint = contentColor,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         )
                     }
                     Spacer(modifier = Modifier.width(12.dp))
@@ -961,37 +962,37 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
                         text = wallet.name,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
-                        color = contentColor
+                        color = contentColor,
                     )
                 }
                 IconButton(onClick = { /* TODO: show menu */ }) {
                     Icon(
                         imageVector = Icons.Default.MoreVert,
                         contentDescription = "Опции",
-                        tint = contentColor
+                        tint = contentColor,
                     )
                 }
             }
             Spacer(modifier = Modifier.height(12.dp))
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
                     text = "Потрачено: ${wallet.spent.format(
                         showCurrency = true,
-                        useMinimalDecimals = true
+                        useMinimalDecimals = true,
                     )}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = contentColor
+                    color = contentColor,
                 )
                 Text(
                     text = "Лимит: ${wallet.limit.format(
                         showCurrency = true,
-                        useMinimalDecimals = true
+                        useMinimalDecimals = true,
                     )}",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = contentColor
+                    color = contentColor,
                 )
             }
             Spacer(modifier = Modifier.height(8.dp))
@@ -1002,38 +1003,38 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
                     .height(6.dp)
                     .clip(RoundedCornerShape(3.dp)),
                 color = progressIndicatorColor,
-                trackColor = progressTrackColor
+                trackColor = progressTrackColor,
             )
             Spacer(modifier = Modifier.height(8.dp))
             Text(
                 text = "$percentUsed% использовано",
                 style = MaterialTheme.typography.bodySmall,
-                color = contentColor.copy(alpha = 0.7f)
+                color = contentColor.copy(alpha = 0.7f),
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 4.dp),
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Default.AccountBalanceWallet,
                     contentDescription = null,
                     tint = contentColor,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
                     text = "Кошелёк: ${wallet.balance.format(
                         showCurrency = true,
-                        useMinimalDecimals = true
+                        useMinimalDecimals = true,
                     )}",
                     style = MaterialTheme.typography.titleMedium.copy(
-                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
+                        textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
                     ),
                     fontWeight = FontWeight.Medium,
-                    color = contentColor
+                    color = contentColor,
                 )
             }
         }
@@ -1050,7 +1051,7 @@ fun EditWalletDialog(
     dateFormatter: SimpleDateFormat,
     onShowDatePicker: () -> Unit,
     onDismiss: () -> Unit,
-    onConfirm: () -> Unit
+    onConfirm: () -> Unit,
 ) {
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -1062,7 +1063,7 @@ fun EditWalletDialog(
                     onValueChange = onNameChange,
                     label = { Text("Название кошелька") },
                     singleLine = true,
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 Spacer(modifier = Modifier.height(8.dp))
@@ -1071,7 +1072,7 @@ fun EditWalletDialog(
                     value = limit,
                     onValueChange = onLimitChange,
                     label = { Text("Лимит расходов") },
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -1086,12 +1087,12 @@ fun EditWalletDialog(
                         Icon(
                             imageVector = Icons.Default.CalendarMonth,
                             contentDescription = "Выбрать дату",
-                            modifier = Modifier.clickable(onClick = onShowDatePicker)
+                            modifier = Modifier.clickable(onClick = onShowDatePicker),
                         )
                     },
                     modifier = Modifier
                         .fillMaxWidth()
-                        .clickable(onClick = onShowDatePicker) // Кликабельно всё поле
+                        .clickable(onClick = onShowDatePicker), // Кликабельно всё поле
                 )
             }
         },
@@ -1101,6 +1102,6 @@ fun EditWalletDialog(
         dismissButton = {
             TextButton(onClick = onDismiss) { Text("Отмена") }
         },
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.surface,
     )
-} 
+}

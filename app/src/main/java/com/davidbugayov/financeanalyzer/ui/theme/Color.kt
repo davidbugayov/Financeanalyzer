@@ -175,7 +175,7 @@ val incomeCategoryColorsMap: Map<String, Color> = mapOf(
     "gifts" to CategoryGifts,
     "other_income" to CategoryOtherIncome,
     "freelance" to CategoryFreelance,
-    "interest" to CategoryInterest
+    "interest" to CategoryInterest,
 ).withDefault { DefaultCategoryColor }
 
 val expenseCategoryColorsMap: Map<String, Color> = mapOf(
@@ -195,7 +195,7 @@ val expenseCategoryColorsMap: Map<String, Color> = mapOf(
     "services" to CategoryServices,
     "charity" to CategoryCharity,
     "credit" to CategoryCredit,
-    "transfer" to CategoryTransfer
+    "transfer" to CategoryTransfer,
 ).withDefault { DefaultCategoryColor }
 
 /**
@@ -220,7 +220,7 @@ val IncomeChartPalette = listOf(
     Color(0xFF81C784),
     Color(0xFFA5D6A7),
     Color(0xFFC8E6C9),
-    Color(0xFF00C853)
+    Color(0xFF00C853),
 )
 
 val ExpenseChartPalette = listOf(
@@ -229,7 +229,7 @@ val ExpenseChartPalette = listOf(
     Color(0xFFE57373),
     Color(0xFFEF9A9A),
     Color(0xFFFFCDD2),
-    Color(0xFFD50000)
+    Color(0xFFD50000),
 )
 
 // --- Мягкие цвета для HomeGroupSummary ---

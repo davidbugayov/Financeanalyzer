@@ -12,7 +12,7 @@ class OnboardingManager(context: Context) {
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
         PREFERENCES_NAME,
-        Context.MODE_PRIVATE
+        Context.MODE_PRIVATE,
     )
 
     /**
@@ -45,4 +45,4 @@ class OnboardingManager(context: Context) {
         private const val PREFERENCES_NAME = "onboarding_preferences"
         private const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
     }
-} 
+}

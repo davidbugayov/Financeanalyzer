@@ -23,4 +23,4 @@ sealed class WalletTransactionsEvent {
      * Очистить сообщение об ошибке
      */
     data object ClearError : WalletTransactionsEvent()
-} 
+}

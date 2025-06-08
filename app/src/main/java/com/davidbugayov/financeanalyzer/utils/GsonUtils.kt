@@ -33,4 +33,4 @@ object GsonUtils {
     fun toJsonFromStringList(gson: Gson, list: List<String>): String {
         return gson.toJson(list, getStringListType())
     }
-} 
+}

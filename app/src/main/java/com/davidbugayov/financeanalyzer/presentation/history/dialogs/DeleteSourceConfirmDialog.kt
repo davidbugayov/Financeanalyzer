@@ -24,7 +24,7 @@ fun DeleteSourceConfirmDialog(source: String, onConfirm: () -> Unit, onDismiss: 
         text = {
             Text(
                 text = "Вы уверены, что хотите удалить источник \"$source\"?\n\n" +
-                    "Удаление источника не повлияет на существующие транзакции."
+                    "Удаление источника не повлияет на существующие транзакции.",
             )
         },
         confirmButton = {
@@ -36,6 +36,6 @@ fun DeleteSourceConfirmDialog(source: String, onConfirm: () -> Unit, onDismiss: 
             TextButton(onClick = onDismiss) {
                 Text(text = stringResource(R.string.cancel))
             }
-        }
+        },
     )
-} 
+}

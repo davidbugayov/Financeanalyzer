@@ -16,7 +16,7 @@ import timber.log.Timber
  * Делегирует работу импорта транзакций в ImportTransactionsManager.
  */
 class ImportTransactionsUseCaseImpl(
-    private val importTransactionsManager: ImportTransactionsManager
+    private val importTransactionsManager: ImportTransactionsManager,
 ) : ImportTransactionsUseCase {
 
     /**
@@ -26,10 +26,7 @@ class ImportTransactionsUseCaseImpl(
      * @param progressCallback Колбэк для отслеживания прогресса
      * @return Поток с информацией о ходе импорта и его результатах
      */
-    override fun importTransactions(
-        uri: Uri,
-        progressCallback: ImportProgressCallback
-    ): Flow<ImportResult> = flow {
+    override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
         Timber.d("ImportTransactionsUseCaseImpl - начало импорта с URI: $uri")
 
         // ImportTransactionsManager.importFromUri теперь возвращает Flow.
@@ -47,5 +44,7 @@ class ImportTransactionsUseCaseImpl(
             .flowOn(Dispatchers.IO) // Убедимся, что эмиссии от managerFlow происходят в правильном контексте
 
         emitAll(managerFlow)
-    }.flowOn(Dispatchers.IO) // Применяем flowOn ко всему Flow, чтобы гарантировать правильный контекст для всех операций
-} 
+    }.flowOn(
+        Dispatchers.IO,
+    ) // Применяем flowOn ко всему Flow, чтобы гарантировать правильный контекст для всех операций
+}

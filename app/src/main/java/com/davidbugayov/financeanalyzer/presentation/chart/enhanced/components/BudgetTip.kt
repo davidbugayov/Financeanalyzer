@@ -19,48 +19,43 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
 
 @Composable
-fun BudgetTip(
-    icon: ImageVector,
-    title: String,
-    description: String,
-    modifier: Modifier = Modifier
-) {
+fun BudgetTip(icon: ImageVector, title: String, description: String, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.budget_tip_vertical_margin)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.budget_tip_corner_radius)),
         tonalElevation = dimensionResource(R.dimen.budget_tip_elevation),
-        color = MaterialTheme.colorScheme.surfaceVariant
+        color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         Row(
             modifier = Modifier
                 .padding(dimensionResource(R.dimen.budget_tip_content_padding)),
-            verticalAlignment = Alignment.CenterVertically
+            verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier.padding(
-                    end = dimensionResource(R.dimen.budget_tip_icon_end_padding)
-                )
+                    end = dimensionResource(R.dimen.budget_tip_icon_end_padding),
+                ),
             )
             Column(
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary
+                    color = MaterialTheme.colorScheme.primary,
                 )
                 Spacer(modifier = Modifier.padding(dimensionResource(R.dimen.budget_tip_spacer)))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
     }
-} 
+}

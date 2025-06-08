@@ -174,7 +174,7 @@ object DateUtils {
     fun updatePeriodDates(
         periodType: PeriodType,
         currentStartDate: Date = Date(),
-        currentEndDate: Date = Date()
+        currentEndDate: Date = Date(),
     ): Pair<Date, Date> {
         return when (periodType) {
             PeriodType.CUSTOM -> {
@@ -200,4 +200,4 @@ object DateUtils {
         val diffInMillis = Math.abs(date2.time - date1.time)
         return (diffInMillis / TimeUnit.DAYS.toMillis(1)).toInt()
     }
-} 
+}

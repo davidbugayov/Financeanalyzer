@@ -46,16 +46,16 @@ fun ImportInstructions() {
             .fillMaxWidth()
             .padding(bottom = dimensionResource(R.dimen.space_medium)),
         colors = CardDefaults.cardColors(
-            containerColor = LocalFriendlyCardBackgroundColor.current
+            containerColor = LocalFriendlyCardBackgroundColor.current,
         ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.card_elevation)
-        )
+            defaultElevation = dimensionResource(R.dimen.card_elevation),
+        ),
     ) {
         Row(
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
-            verticalAlignment = Alignment.Top
+            verticalAlignment = Alignment.Top,
         ) {
             Icon(
                 imageVector = Icons.Default.Lightbulb,
@@ -63,19 +63,19 @@ fun ImportInstructions() {
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .padding(end = dimensionResource(R.dimen.padding_large))
-                    .size(dimensionResource(R.dimen.icon_size_large))
+                    .size(dimensionResource(R.dimen.icon_size_large)),
             )
             Column {
                 Text(
                     text = stringResource(R.string.how_to_import),
                     style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
                 Text(
                     text = stringResource(R.string.import_instructions),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
@@ -96,43 +96,43 @@ fun BanksList(onBankClick: (String) -> Unit = {}) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_small))
+        verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_small)),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_small))
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_small)),
         ) {
             BankImportCard(
                 bankName = sberbankName,
                 tintColor = colorResource(id = R.color.bank_sberbank),
                 modifier = Modifier.weight(1f),
-                onClick = { onBankClick(sberbankName) }
+                onClick = { onBankClick(sberbankName) },
             )
 
             BankImportCard(
                 bankName = tinkoffName,
                 tintColor = colorResource(id = R.color.bank_tinkoff),
                 modifier = Modifier.weight(1f),
-                onClick = { onBankClick(tinkoffName) }
+                onClick = { onBankClick(tinkoffName) },
             )
         }
 
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_small))
+            horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_small)),
         ) {
             BankImportCard(
                 bankName = alfabankName,
                 tintColor = colorResource(id = R.color.bank_alfabank),
                 modifier = Modifier.weight(1f),
-                onClick = { onBankClick(alfabankName) }
+                onClick = { onBankClick(alfabankName) },
             )
 
             BankImportCard(
                 bankName = ozonName,
                 tintColor = colorResource(id = R.color.bank_ozon),
                 modifier = Modifier.weight(1f),
-                onClick = { onBankClick(ozonName) }
+                onClick = { onBankClick(ozonName) },
             )
         }
 
@@ -149,18 +149,18 @@ fun CSVImportCard(onLearnMoreClick: () -> Unit) {
     Card(
         modifier = Modifier.fillMaxWidth(),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
-        )
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
+        ),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.padding_large))
+                .padding(dimensionResource(R.dimen.padding_large)),
         ) {
             Text(
                 text = stringResource(R.string.import_csv_title),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
@@ -168,21 +168,21 @@ fun CSVImportCard(onLearnMoreClick: () -> Unit) {
             Text(
                 text = stringResource(R.string.csv_requirements_title),
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.padding_small)))
 
             Text(
                 text = stringResource(R.string.csv_requirements),
-                style = MaterialTheme.typography.bodyMedium
+                style = MaterialTheme.typography.bodyMedium,
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
 
             TextButton(
                 onClick = onLearnMoreClick,
-                modifier = Modifier.align(Alignment.End)
+                modifier = Modifier.align(Alignment.End),
             ) {
                 Text(stringResource(R.string.more_details))
             }
@@ -200,44 +200,44 @@ fun ImportResultsSection(state: ImportState) {
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.space_medium)),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surfaceVariant,
         ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.card_elevation)
-        )
+            defaultElevation = dimensionResource(R.dimen.card_elevation),
+        ),
     ) {
         Column(
             modifier = Modifier
                 .padding(dimensionResource(R.dimen.padding_large))
                 .fillMaxWidth(),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
+            verticalArrangement = Arrangement.Center,
         ) {
             when {
                 state.isLoading && state.progress > 0 -> {
                     Text(
                         text = stringResource(R.string.import_in_progress),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
                     LinearProgressIndicator(
                         progress = { state.progress / 100f },
                         modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary
+                        color = MaterialTheme.colorScheme.primary,
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
                     Text(
                         text = "${state.progress}%",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
                     Text(
                         text = state.progressMessage,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
                 state.isLoading -> {
@@ -246,12 +246,12 @@ fun ImportResultsSection(state: ImportState) {
                             .fillMaxWidth()
                             .padding(vertical = dimensionResource(R.dimen.padding_large)),
                         horizontalAlignment = Alignment.CenterHorizontally,
-                        verticalArrangement = Arrangement.Center
+                        verticalArrangement = Arrangement.Center,
                     ) {
                         Text(
                             text = stringResource(R.string.importing_transactions),
                             style = MaterialTheme.typography.titleMedium,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
                         CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
@@ -261,19 +261,19 @@ fun ImportResultsSection(state: ImportState) {
                     Text(
                         text = stringResource(R.string.import_success),
                         style = MaterialTheme.typography.titleMedium,
-                        color = LocalSuccessColor.current
+                        color = LocalSuccessColor.current,
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
                     Text(
                         text = stringResource(R.string.imported_count, state.successCount),
                         style = MaterialTheme.typography.bodyLarge,
-                        color = MaterialTheme.colorScheme.onSurface
+                        color = MaterialTheme.colorScheme.onSurface,
                     )
                     if (state.skippedCount > 0) {
                         Text(
                             text = stringResource(R.string.skipped_count, state.skippedCount),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     if (state.successMessage.isNotEmpty()) {
@@ -281,7 +281,7 @@ fun ImportResultsSection(state: ImportState) {
                         Text(
                             text = state.successMessage,
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -289,13 +289,13 @@ fun ImportResultsSection(state: ImportState) {
                     Text(
                         text = stringResource(R.string.import_error),
                         style = MaterialTheme.typography.titleMedium,
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
                     Text(
                         text = state.error,
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
@@ -313,8 +313,8 @@ fun BankInstructionDialog(bankName: String, onDismiss: () -> Unit) {
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = true,
-            usePlatformDefaultWidth = false
-        )
+            usePlatformDefaultWidth = false,
+        ),
     ) {
         Card(
             modifier = Modifier
@@ -322,19 +322,19 @@ fun BankInstructionDialog(bankName: String, onDismiss: () -> Unit) {
                 .padding(dimensionResource(R.dimen.spacing_small)),
             shape = RoundedCornerShape(dimensionResource(R.dimen.dialog_corner_radius)),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surface,
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.dialog_elevation)
-            )
+                defaultElevation = dimensionResource(R.dimen.dialog_elevation),
+            ),
         ) {
             Column(
-                modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding))
+                modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding)),
             ) {
                 Text(
                     text = stringResource(R.string.bank_instructions_title, bankName),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 BankInstructionsContent(bankName)
@@ -344,9 +344,9 @@ fun BankInstructionDialog(bankName: String, onDismiss: () -> Unit) {
                     modifier = Modifier.align(Alignment.End),
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary,
-                        contentColor = MaterialTheme.colorScheme.onPrimary
+                        contentColor = MaterialTheme.colorScheme.onPrimary,
                     ),
-                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button))
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button)),
                 ) {
                     Text(stringResource(R.string.got_it))
                 }
@@ -387,8 +387,8 @@ fun PermissionDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit) {
         properties = DialogProperties(
             dismissOnBackPress = true,
             dismissOnClickOutside = true,
-            usePlatformDefaultWidth = false
-        )
+            usePlatformDefaultWidth = false,
+        ),
     ) {
         Card(
             modifier = Modifier
@@ -396,29 +396,29 @@ fun PermissionDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit) {
                 .padding(dimensionResource(R.dimen.spacing_small)),
             shape = RoundedCornerShape(dimensionResource(R.dimen.dialog_corner_radius)),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
+                containerColor = MaterialTheme.colorScheme.surface,
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.dialog_elevation)
-            )
+                defaultElevation = dimensionResource(R.dimen.dialog_elevation),
+            ),
         ) {
             Column(
-                modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding))
+                modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding)),
             ) {
                 Text(
                     text = stringResource(R.string.import_permission_required),
                     style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 Text(
                     text = stringResource(R.string.permission_message_android15),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(stringResource(R.string.cancel))
@@ -428,9 +428,9 @@ fun PermissionDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit) {
                         onClick = onOpenSettings,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
                         ),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button))
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button)),
                     ) {
                         Text(stringResource(R.string.open_settings))
                     }
@@ -438,4 +438,4 @@ fun PermissionDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit) {
             }
         }
     }
-} 
+}

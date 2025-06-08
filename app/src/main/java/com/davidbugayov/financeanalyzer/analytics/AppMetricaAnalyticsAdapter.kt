@@ -54,4 +54,4 @@ class AppMetricaAnalyticsAdapter : IAnalytics {
         Timber.d("Setting AppMetrica user ID: $userId")
         AppMetrica.setUserProfileID(userId)
     }
-} 
+}

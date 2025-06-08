@@ -24,4 +24,4 @@ class FirebaseAnalyticsAdapter : IAnalytics {
     override fun setUserId(userId: String) {
         Timber.d("Stub Firebase user ID: $userId")
     }
-} 
+}

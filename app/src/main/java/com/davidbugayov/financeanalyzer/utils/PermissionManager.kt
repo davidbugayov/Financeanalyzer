@@ -24,7 +24,7 @@ class PermissionManager(context: Context) {
         PERMISSION_REQUESTED, // Запрос разрешения отправлен
         PERMISSION_GRANTED, // Разрешение предоставлено
         PERMISSION_DENIED, // Разрешение отклонено
-        PERMANENTLY_DENIED // Разрешение отклонено постоянно ("не спрашивать снова")
+        PERMANENTLY_DENIED, // Разрешение отклонено постоянно ("не спрашивать снова")
     }
 
     /**
@@ -37,7 +37,7 @@ class PermissionManager(context: Context) {
         GRANT_PERMISSION, // Предоставление разрешения
         DENY_PERMISSION, // Отклонение разрешения
         DISMISS_DIALOG, // Закрытие диалога
-        OPEN_SETTINGS // Открытие настроек приложения
+        OPEN_SETTINGS, // Открытие настроек приложения
     }
 
     /**
@@ -46,7 +46,7 @@ class PermissionManager(context: Context) {
     fun getCurrentState(): NotificationPermissionState {
         val stateOrdinal = sharedPreferences.getInt(
             "notification_permission_state",
-            NotificationPermissionState.INITIAL.ordinal
+            NotificationPermissionState.INITIAL.ordinal,
         )
         return NotificationPermissionState.entries[stateOrdinal]
     }
@@ -67,7 +67,8 @@ class PermissionManager(context: Context) {
             PermissionEvent.REQUEST_PERMISSION -> {
                 when (currentState) {
                     NotificationPermissionState.ONBOARDING_COMPLETED,
-                    NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMISSION_REQUESTED
+                    NotificationPermissionState.PERMISSION_DENIED,
+                    -> NotificationPermissionState.PERMISSION_REQUESTED
 
                     else -> currentState
                 }
@@ -120,4 +121,4 @@ class PermissionManager(context: Context) {
     fun wasPermissionDialogShown(): Boolean {
         return sharedPreferences.getBoolean("was_permission_dialog_shown", false)
     }
-} 
+}

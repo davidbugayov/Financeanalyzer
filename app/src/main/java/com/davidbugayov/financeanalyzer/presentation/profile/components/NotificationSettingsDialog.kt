@@ -58,7 +58,7 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
     var showPermissionDialog by remember { mutableStateOf(false) }
     var hasNotificationPermission by remember {
         mutableStateOf(
-            PermissionUtils.hasNotificationPermission(context)
+            PermissionUtils.hasNotificationPermission(context),
         )
     }
 
@@ -75,7 +75,7 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
 
     LaunchedEffect(state.isTransactionReminderEnabled) {
         Timber.d(
-            "[UI] NotificationSettingsDialog: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}"
+            "[UI] NotificationSettingsDialog: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}",
         )
     }
 
@@ -87,12 +87,12 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                 viewModel.onEvent(
                     ProfileEvent.UpdateTransactionReminder(
                         state.isTransactionReminderEnabled,
-                        Pair(hour, minute)
-                    )
+                        Pair(hour, minute),
+                    ),
                 )
                 showTimePicker = false
             },
-            onDismiss = { showTimePicker = false }
+            onDismiss = { showTimePicker = false },
         )
     }
 
@@ -104,28 +104,28 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
             hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
             viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
         },
-        onPermissionDenied = { showPermissionDialog = false }
+        onPermissionDenied = { showPermissionDialog = false },
     )
 
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
             dismissOnBackPress = true,
-            dismissOnClickOutside = true
-        )
+            dismissOnClickOutside = true,
+        ),
     ) {
         Surface(
             shape = MaterialTheme.shapes.medium,
-            color = MaterialTheme.colorScheme.surface
+            color = MaterialTheme.colorScheme.surface,
         ) {
             Column(
                 modifier = Modifier
                     .padding(16.dp)
-                    .fillMaxWidth()
+                    .fillMaxWidth(),
             ) {
                 Text(
                     text = stringResource(R.string.notification_settings),
-                    style = MaterialTheme.typography.titleLarge
+                    style = MaterialTheme.typography.titleLarge,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -134,16 +134,16 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                     Text(
                         text = stringResource(R.string.notification_permission_required),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.error
+                        color = MaterialTheme.colorScheme.error,
                     )
                     Button(
                         onClick = {
                             permissionManager.processEvent(
-                                PermissionManager.PermissionEvent.REQUEST_PERMISSION
+                                PermissionManager.PermissionEvent.REQUEST_PERMISSION,
                             )
                             showPermissionDialog = true
                         },
-                        modifier = Modifier.align(Alignment.CenterHorizontally)
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
                     ) {
                         Text(stringResource(R.string.request_permission))
                     }
@@ -152,17 +152,17 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = stringResource(R.string.enable_reminders),
-                            style = MaterialTheme.typography.bodyLarge
+                            style = MaterialTheme.typography.bodyLarge,
                         )
                         Text(
                             text = stringResource(R.string.reminder_description),
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                     Switch(
@@ -170,7 +170,7 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                         onCheckedChange = { checked ->
                             if (checked && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
                                 permissionManager.processEvent(
-                                    PermissionManager.PermissionEvent.REQUEST_PERMISSION
+                                    PermissionManager.PermissionEvent.REQUEST_PERMISSION,
                                 )
                                 showPermissionDialog = true
                                 pendingEnableNotifications = true
@@ -178,7 +178,7 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                                 viewModel.onEvent(ProfileEvent.ChangeNotifications(checked))
                                 pendingEnableNotifications = false
                             }
-                        }
+                        },
                     )
                 }
 
@@ -186,12 +186,12 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                     Spacer(modifier = Modifier.height(16.dp))
                     Row(
                         modifier = Modifier.fillMaxWidth(),
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Column(modifier = Modifier.weight(1f)) {
                             Text(
                                 text = stringResource(R.string.reminder_time),
-                                style = MaterialTheme.typography.bodyLarge
+                                style = MaterialTheme.typography.bodyLarge,
                             )
                             Text(
                                 text = stringResource(
@@ -200,17 +200,17 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                                         Locale.getDefault(),
                                         "%02d:%02d",
                                         state.transactionReminderTime?.hours ?: 20,
-                                        state.transactionReminderTime?.minutes ?: 0
-                                    )
+                                        state.transactionReminderTime?.minutes ?: 0,
+                                    ),
                                 ),
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                         }
                         IconButton(onClick = { showTimePicker = true }) {
                             Icon(
                                 imageVector = Icons.Default.Edit,
-                                contentDescription = stringResource(R.string.edit_time)
+                                contentDescription = stringResource(R.string.edit_time),
                             )
                         }
                     }
@@ -220,7 +220,7 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
 
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(stringResource(R.string.close))
@@ -229,4 +229,4 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
             }
         }
     }
-} 
+}

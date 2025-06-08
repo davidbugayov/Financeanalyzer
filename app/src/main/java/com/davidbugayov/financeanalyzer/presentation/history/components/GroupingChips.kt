@@ -34,7 +34,7 @@ fun GroupingChips(currentGrouping: GroupingType, onGroupingSelected: (GroupingTy
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
-        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
+        horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
         FilterChip(
             selected = currentGrouping == GroupingType.DAY,
@@ -44,8 +44,8 @@ fun GroupingChips(currentGrouping: GroupingType, onGroupingSelected: (GroupingTy
                 selectedContainerColor = selectedContainerColor,
                 selectedLabelColor = selectedLabelColor,
                 containerColor = unselectedContainerColor,
-                labelColor = unselectedLabelColor
-            )
+                labelColor = unselectedLabelColor,
+            ),
         )
 
         FilterChip(
@@ -56,8 +56,8 @@ fun GroupingChips(currentGrouping: GroupingType, onGroupingSelected: (GroupingTy
                 selectedContainerColor = selectedContainerColor,
                 selectedLabelColor = selectedLabelColor,
                 containerColor = unselectedContainerColor,
-                labelColor = unselectedLabelColor
-            )
+                labelColor = unselectedLabelColor,
+            ),
         )
 
         FilterChip(
@@ -68,8 +68,8 @@ fun GroupingChips(currentGrouping: GroupingType, onGroupingSelected: (GroupingTy
                 selectedContainerColor = selectedContainerColor,
                 selectedLabelColor = selectedLabelColor,
                 containerColor = unselectedContainerColor,
-                labelColor = unselectedLabelColor
-            )
+                labelColor = unselectedLabelColor,
+            ),
         )
     }
-} 
+}

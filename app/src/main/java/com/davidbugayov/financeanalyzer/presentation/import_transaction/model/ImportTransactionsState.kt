@@ -16,5 +16,5 @@ data class ImportTransactionsState(
     val error: String? = null,
     val isImportCompleted: Boolean = false,
     val totalAmount: Money = Money.zero(),
-    val logs: List<String> = emptyList()
-) 
+    val logs: List<String> = emptyList(),
+)

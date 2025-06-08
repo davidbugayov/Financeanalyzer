@@ -11,5 +11,5 @@ enum class PeriodType {
     QUARTER,
     YEAR,
     ALL,
-    CUSTOM
-} 
+    CUSTOM,
+}

@@ -12,7 +12,11 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
 sealed class EnhancedFinanceChartIntent {
     object LoadData : EnhancedFinanceChartIntent()
-    data class ChangePeriod(val periodType: PeriodType, val startDate: Date, val endDate: Date) : EnhancedFinanceChartIntent()
+    data class ChangePeriod(
+        val periodType: PeriodType,
+        val startDate: Date,
+        val endDate: Date,
+    ) : EnhancedFinanceChartIntent()
     data class SelectCategory(val category: Category?) : EnhancedFinanceChartIntent()
     data class ChangeChartTab(val tabIndex: Int) : EnhancedFinanceChartIntent()
     data class ChangeLineChartMode(val mode: LineChartDisplayMode) : EnhancedFinanceChartIntent()
@@ -60,6 +64,6 @@ data class EnhancedFinanceChartState(
     val savingsRate: Double = 0.0,
     val averageDailyExpense: Money = Money.zero(),
     val monthsOfSavings: Double = 0.0,
-    val pieChartData: List<UiCategory> = emptyList()
+    val pieChartData: List<UiCategory> = emptyList(),
     // Добавляй другие поля по необходимости
-) 
+)

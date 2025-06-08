@@ -13,7 +13,7 @@ import java.util.Date
 @Entity(
     tableName = "transactions",
     // Используем id как основной ключ, а id_string как индексированное поле для поиска по строке
-    indices = [androidx.room.Index(value = ["id_string"], unique = true)]
+    indices = [androidx.room.Index(value = ["id_string"], unique = true)],
 )
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,
@@ -28,5 +28,5 @@ data class TransactionEntity(
     val isTransfer: Boolean = false,
     val categoryId: String = "",
     val title: String = "",
-    @ColumnInfo(name = "wallet_ids") val walletIds: List<String>? = null
+    @ColumnInfo(name = "wallet_ids") val walletIds: List<String>? = null,
 )

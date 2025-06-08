@@ -58,7 +58,7 @@ interface TransactionRepository {
         startDate: Date,
         endDate: Date,
         limit: Int,
-        offset: Int
+        offset: Int,
     ): List<Transaction>
 
     /**
@@ -77,7 +77,7 @@ interface TransactionRepository {
      */
     suspend fun getTransactionsByDateRange(
         startDate: kotlinx.datetime.LocalDate,
-        endDate: kotlinx.datetime.LocalDate
+        endDate: kotlinx.datetime.LocalDate,
     ): List<Transaction>
 
     /**
@@ -149,4 +149,4 @@ interface TransactionRepository {
      * @param id Идентификатор транзакции для удаления.
      */
     suspend fun deleteTransaction(id: String)
-} 
+}

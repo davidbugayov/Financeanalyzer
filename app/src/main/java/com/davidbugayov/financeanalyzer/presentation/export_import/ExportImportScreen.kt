@@ -57,11 +57,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColo
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ExportImportScreen(
-    onNavigateBack: () -> Unit,
-    onImportClick: () -> Unit,
-    viewModel: ProfileViewModel
-) {
+fun ExportImportScreen(onNavigateBack: () -> Unit, onImportClick: () -> Unit, viewModel: ProfileViewModel) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val showFeedbackState = remember { mutableStateOf(false) }
@@ -85,7 +81,7 @@ fun ExportImportScreen(
             } catch (e: Exception) {
                 feedbackMessageState.value = context.getString(
                     R.string.error_action_failed,
-                    e.localizedMessage ?: ""
+                    e.localizedMessage ?: "",
                 )
                 feedbackTypeState.value = FeedbackType.ERROR
                 showFeedbackState.value = true
@@ -114,9 +110,9 @@ fun ExportImportScreen(
                 title = stringResource(R.string.export_import_screen_title),
                 showBackButton = true,
                 onBackClick = onNavigateBack,
-                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt()
+                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
             )
-        }
+        },
     ) { paddingValues ->
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -124,7 +120,7 @@ fun ExportImportScreen(
                     .fillMaxSize()
                     .padding(paddingValues)
                     .padding(8.dp),
-                verticalArrangement = Arrangement.spacedBy(20.dp)
+                verticalArrangement = Arrangement.spacedBy(20.dp),
             ) {
                 Card(
                     modifier = Modifier
@@ -134,31 +130,31 @@ fun ExportImportScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = LocalFriendlyCardBackgroundColor.current
-                    )
+                        containerColor = LocalFriendlyCardBackgroundColor.current,
+                    ),
                 ) {
                     Column(
                         modifier = Modifier.padding(28.dp),
-                        verticalArrangement = Arrangement.spacedBy(18.dp)
+                        verticalArrangement = Arrangement.spacedBy(18.dp),
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.FileDownload,
                                 contentDescription = null,
                                 modifier = Modifier.padding(end = 14.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                             Text(
                                 text = stringResource(R.string.export_section_title),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 22.sp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                         Text(
                             text = stringResource(R.string.export_section_description_friendly),
                             fontSize = 15.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         ActionButton(
                             text = stringResource(R.string.export_button_friendly),
@@ -167,29 +163,29 @@ fun ExportImportScreen(
                             onClick = { showExportDialog.value = true },
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(48.dp)
+                                .height(48.dp),
                         )
                         ExportActionDialog(
                             visible = showExportDialog.value,
                             onDismiss = { showExportDialog.value = false },
                             onShare = {
                                 viewModel.onEvent(
-                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.SHARE)
+                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.SHARE),
                                 )
                                 showExportDialog.value = false
                             },
                             onOpen = {
                                 viewModel.onEvent(
-                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.OPEN)
+                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.OPEN),
                                 )
                                 showExportDialog.value = false
                             },
                             onSave = {
                                 viewModel.onEvent(
-                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.SAVE_ONLY)
+                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.SAVE_ONLY),
                                 )
                                 showExportDialog.value = false
-                            }
+                            },
                         )
                     }
                 }
@@ -201,31 +197,31 @@ fun ExportImportScreen(
                     elevation = CardDefaults.cardElevation(defaultElevation = 6.dp),
                     shape = RoundedCornerShape(24.dp),
                     colors = CardDefaults.cardColors(
-                        containerColor = LocalFriendlyCardBackgroundColor.current
-                    )
+                        containerColor = LocalFriendlyCardBackgroundColor.current,
+                    ),
                 ) {
                     Column(
                         modifier = Modifier.padding(28.dp),
-                        verticalArrangement = Arrangement.spacedBy(18.dp)
+                        verticalArrangement = Arrangement.spacedBy(18.dp),
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
                             Icon(
                                 imageVector = Icons.Default.FileUpload,
                                 contentDescription = null,
                                 modifier = Modifier.padding(end = 14.dp),
-                                tint = MaterialTheme.colorScheme.primary
+                                tint = MaterialTheme.colorScheme.primary,
                             )
                             Text(
                                 text = stringResource(R.string.import_section_title),
                                 fontWeight = FontWeight.Bold,
                                 fontSize = 22.sp,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
                         }
                         Text(
                             text = stringResource(R.string.import_section_description_friendly),
                             fontSize = 15.sp,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         ActionButton(
                             text = stringResource(R.string.import_button_friendly),
@@ -234,7 +230,7 @@ fun ExportImportScreen(
                             onClick = onImportClick,
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .height(48.dp)
+                                .height(48.dp),
                         )
                     }
                 }
@@ -249,7 +245,7 @@ fun ExportImportScreen(
                     viewModel.onEvent(ProfileEvent.ResetExportState)
                 },
                 modifier = Modifier.align(Alignment.Center),
-                isFilePath = feedbackType == FeedbackType.SUCCESS
+                isFilePath = feedbackType == FeedbackType.SUCCESS,
             )
         }
     }
@@ -261,7 +257,7 @@ fun ExportActionDialog(
     onDismiss: () -> Unit,
     onShare: () -> Unit,
     onOpen: () -> Unit,
-    onSave: () -> Unit
+    onSave: () -> Unit,
 ) {
     if (!visible) return
     AlertDialog(
@@ -275,7 +271,7 @@ fun ExportActionDialog(
                 modifier = Modifier
                     .padding(bottom = 8.dp)
                     .height(40.dp)
-                    .width(40.dp)
+                    .width(40.dp),
             )
         },
         title = {
@@ -283,18 +279,18 @@ fun ExportActionDialog(
                 stringResource(R.string.export_choose_action),
                 style = MaterialTheme.typography.titleLarge,
                 color = MaterialTheme.colorScheme.onSurface,
-                modifier = Modifier.padding(bottom = 2.dp)
+                modifier = Modifier.padding(bottom = 2.dp),
             )
         },
         text = {
             Column(
-                modifier = Modifier.padding(top = 4.dp)
+                modifier = Modifier.padding(top = 4.dp),
             ) {
                 Text(
                     text = stringResource(R.string.export_description),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(bottom = 18.dp)
+                    modifier = Modifier.padding(bottom = 18.dp),
                 )
                 AnimatedVisibility(visible = true, enter = fadeIn()) {
                     Button(
@@ -302,18 +298,18 @@ fun ExportActionDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Share,
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp),
-                            tint = MaterialTheme.colorScheme.onPrimary
+                            tint = MaterialTheme.colorScheme.onPrimary,
                         )
                         Text(
                             stringResource(R.string.export_share),
                             color = MaterialTheme.colorScheme.onPrimary,
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                 }
@@ -324,18 +320,18 @@ fun ExportActionDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
                     ) {
                         Icon(
                             imageVector = Icons.Default.FileOpen,
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp),
-                            tint = MaterialTheme.colorScheme.onSecondaryContainer
+                            tint = MaterialTheme.colorScheme.onSecondaryContainer,
                         )
                         Text(
                             stringResource(R.string.export_open),
                             color = MaterialTheme.colorScheme.onSecondaryContainer,
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                 }
@@ -346,24 +342,24 @@ fun ExportActionDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 4.dp),
-                        shape = MaterialTheme.shapes.medium
+                        shape = MaterialTheme.shapes.medium,
                     ) {
                         Icon(
                             imageVector = Icons.Default.Save,
                             contentDescription = null,
                             modifier = Modifier.padding(end = 8.dp),
-                            tint = MaterialTheme.colorScheme.primary
+                            tint = MaterialTheme.colorScheme.primary,
                         )
                         Text(
                             stringResource(R.string.export_only_save),
                             color = MaterialTheme.colorScheme.primary,
-                            style = MaterialTheme.typography.labelLarge
+                            style = MaterialTheme.typography.labelLarge,
                         )
                     }
                 }
             }
         },
         confirmButton = {},
-        dismissButton = {}
+        dismissButton = {},
     )
-} 
+}

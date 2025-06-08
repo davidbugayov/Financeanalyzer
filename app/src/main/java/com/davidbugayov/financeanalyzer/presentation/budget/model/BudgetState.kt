@@ -21,5 +21,5 @@ data class BudgetState(
     val totalLimit: Money = Money.zero(),
     val totalSpent: Money = Money.zero(),
     val totalWalletBalance: Money = Money.zero(),
-    val selectedPeriodDuration: Int = 14
-) 
+    val selectedPeriodDuration: Int = 14,
+)

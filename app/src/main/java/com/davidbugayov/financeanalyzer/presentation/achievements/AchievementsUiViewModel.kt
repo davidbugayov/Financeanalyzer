@@ -9,7 +9,7 @@ import kotlinx.coroutines.flow.update
 // State для очереди достижений
 data class AchievementsUiState(
     val queue: List<Achievement> = emptyList(),
-    val current: Achievement? = null
+    val current: Achievement? = null,
 )
 
 class AchievementsUiViewModel : ViewModel() {
@@ -29,8 +29,8 @@ class AchievementsUiViewModel : ViewModel() {
             val newQueue = state.queue.drop(1)
             state.copy(
                 queue = newQueue,
-                current = newQueue.firstOrNull()
+                current = newQueue.firstOrNull(),
             )
         }
     }
-} 
+}

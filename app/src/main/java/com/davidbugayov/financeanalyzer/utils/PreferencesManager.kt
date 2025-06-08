@@ -16,11 +16,13 @@ class PreferencesManager(context: Context) {
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
         PREFERENCES_NAME,
-        Context.MODE_PRIVATE
+        Context.MODE_PRIVATE,
     )
 
     // Flow для темы
-    private val _themeModeFlow = MutableStateFlow(getThemeModeInternal()) // Используем внутренний метод для инициализации
+    private val _themeModeFlow = MutableStateFlow(
+        getThemeModeInternal(),
+    ) // Используем внутренний метод для инициализации
     val themeModeFlow: StateFlow<ThemeMode> = _themeModeFlow.asStateFlow()
 
     /**
@@ -105,4 +107,4 @@ class PreferencesManager(context: Context) {
         val minute = sharedPreferences.getInt(KEY_REMINDER_MINUTE, 0) // Используем константу ключа
         return Pair(hour, minute)
     }
-} 
+}

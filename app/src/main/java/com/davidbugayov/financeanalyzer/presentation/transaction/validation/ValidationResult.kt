@@ -13,5 +13,5 @@ data class ValidationResult(
     val hasAmountError: Boolean = false,
     val hasCategoryError: Boolean = false,
     val hasSourceError: Boolean = false,
-    val hasWalletError: Boolean = false
-) 
+    val hasWalletError: Boolean = false,
+)

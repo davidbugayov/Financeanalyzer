@@ -23,7 +23,7 @@ import timber.log.Timber
  */
 class ImportFactory(
     private val context: Context,
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
 ) {
 
     private val handlers: List<AbstractBankHandler> by lazy {
@@ -37,10 +37,10 @@ class ImportFactory(
             GenericExcelHandler(transactionRepository, context),
             // TbankPdfHandler последним, чтобы он мог обрабатывать все PDF,
             // которые не были обработаны другими хендлерами
-            TbankPdfHandler(transactionRepository, context)
+            TbankPdfHandler(transactionRepository, context),
         ).also {
             Timber.d(
-                "ImportFactory: Зарегистрированы обработчики: ${it.joinToString { h -> h.bankName }}"
+                "ImportFactory: Зарегистрированы обработчики: ${it.joinToString { h -> h.bankName }}",
             )
         }
     }
@@ -58,14 +58,14 @@ class ImportFactory(
 
         // Явно проверяем, является ли файл выпиской с движением средств
         if (fileType == FileType.PDF && (
-            fileName.contains("движени", ignoreCase = true) ||
-                fileName.contains("справка", ignoreCase = true)
-            )
+                fileName.contains("движени", ignoreCase = true) ||
+                    fileName.contains("справка", ignoreCase = true)
+                )
         ) {
             // Сначала проверяем на Ozon в имени файла
             if (fileName.contains("ozon", ignoreCase = true) || fileName.contains(
                     "озон",
-                    ignoreCase = true
+                    ignoreCase = true,
                 )
             ) {
                 val ozonHandler = handlers.find { it is OzonPdfHandler }
@@ -76,7 +76,7 @@ class ImportFactory(
                         is Result.Error -> {
                             Timber.e(
                                 result.exception,
-                                "Error creating importer with OzonPdfHandler for $fileName"
+                                "Error creating importer with OzonPdfHandler for $fileName",
                             )
                             null
                         }
@@ -93,7 +93,7 @@ class ImportFactory(
                     is Result.Error -> {
                         Timber.e(
                             result.exception,
-                            "Error creating importer with TbankPdfHandler for $fileName"
+                            "Error creating importer with TbankPdfHandler for $fileName",
                         )
                         null
                     }
@@ -110,7 +110,7 @@ class ImportFactory(
                     is Result.Error -> {
                         Timber.e(
                             result.exception,
-                            "Error creating importer with handler ${handler.bankName} for $fileName"
+                            "Error creating importer with handler ${handler.bankName} for $fileName",
                         )
                         null
                     }
@@ -120,4 +120,4 @@ class ImportFactory(
         Timber.w("No suitable handler found for: $fileName, type: $fileType")
         return null
     }
-} 
+}

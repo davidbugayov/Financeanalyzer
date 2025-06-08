@@ -16,7 +16,7 @@ import java.util.Locale
 class GetProfileAnalyticsUseCase(
     private val context: Context,
     private val transactionRepository: ITransactionRepository,
-    private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase
+    private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
 ) {
 
     // SimpleDateFormat вынесен в поле класса
@@ -42,8 +42,8 @@ class GetProfileAnalyticsUseCase(
                         totalIncomeCategories = 0,
                         averageExpense = Money.zero().format(), // или "0" или соответствующая строка
                         totalSourcesUsed = 0,
-                        dateRange = context.getString(R.string.no_transactions_available) // <-- Использовать ресурс
-                    )
+                        dateRange = context.getString(R.string.no_transactions_available), // <-- Использовать ресурс
+                    ),
                 )
             }
 
@@ -105,8 +105,8 @@ class GetProfileAnalyticsUseCase(
                     totalIncomeCategories = uniqueIncomeCategories,
                     averageExpense = formattedAvgExpense,
                     totalSourcesUsed = uniqueSources,
-                    dateRange = dateRangeString
-                )
+                    dateRange = dateRangeString,
+                ),
             )
         } catch (e: Exception) {
             Timber.e(e, "Error executing GetProfileAnalyticsUseCase") // Логируем ошибку
@@ -116,11 +116,11 @@ class GetProfileAnalyticsUseCase(
                 GenericAppException(
                     context.getString(
                         R.string.error_loading_profile_analytics_detail,
-                        e.localizedMessage ?: e.toString()
+                        e.localizedMessage ?: e.toString(),
                     ),
-                    e
-                )
+                    e,
+                ),
             )
         }
     }
-} 
+}

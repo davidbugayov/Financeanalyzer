@@ -41,4 +41,4 @@ class CompositeAnalytics : IAnalytics {
     override fun setUserId(userId: String) {
         analytics.forEach { it.setUserId(userId) }
     }
-} 
+}

@@ -19,7 +19,7 @@ import java.util.Locale
 
 class TbankPdfImportUseCase(
     context: Context,
-    transactionRepository: TransactionRepository
+    transactionRepository: TransactionRepository,
 ) : AbstractPdfImportUseCase(context, transactionRepository) {
 
     override val bankName: String = "Тинькофф Банк (PDF)"
@@ -33,7 +33,7 @@ class TbankPdfImportUseCase(
         var currency: Currency = Currency.RUB,
         var isExpense: Boolean? = null,
         var linesProcessedForCurrentTx: Int = 0,
-        var isComplete: Boolean = false
+        var isComplete: Boolean = false,
     ) {
         fun clear() {
             date = null
@@ -48,7 +48,7 @@ class TbankPdfImportUseCase(
         fun isValidForFinalization(): Boolean = date != null && amount != null && isExpense != null
         fun buildDescription(): String = descriptionLines.joinToString(" ").trim().replace(
             "\\s+".toRegex(),
-            " "
+            " ",
         )
     }
 
@@ -57,15 +57,16 @@ class TbankPdfImportUseCase(
             "TINKOFF",
             "ТИНЬКОФФ",
             "Тинькофф Банк",
-            "Тинькофф", "ТБАНК",
+            "Тинькофф",
+            "ТБАНК",
             "TBANK",
             "АО «ТБАНК»",
-            "АО «Тинькофф Банк»"
+            "АО «Тинькофф Банк»",
         )
         private val TBANK_STATEMENT_TITLES = listOf(
             "Выписка по счетам", "Выписка по карте", "Операции по счету", "История операций",
             "Справка о движении средств", "Движение средств", "Платежное поручение",
-            "С движением средств", "Справка о движении"
+            "С движением средств", "Справка о движении",
         )
         private const val MAX_VALIDATION_LINES = 40
         private const val MAX_HEADER_SKIP_LINES = 300
@@ -73,7 +74,7 @@ class TbankPdfImportUseCase(
         private val tbankTimeRegex = Regex("""^(\d{2}:\d{2})$""")
         private val tbankAmountWithDescRegex =
             Regex(
-                """([+\-])?[\s]*(\d[\d\s.,]*[\d])[\s]*[₽PР][\s]+([+\-])?[\s]*(\d[\d\s.,]*[\d])[\s]*[₽PР][\s]+(.+)"""
+                """([+\-])?[\s]*(\d[\d\s.,]*[\d])[\s]*[₽PР][\s]+([+\-])?[\s]*(\d[\d\s.,]*[\d])[\s]*[₽PР][\s]+(.+)""",
             )
         private val tbankSimpleAmountRegex = Regex("""([+\-])?[\s]*(\d[\d\s.,]*[\d])[\s]*[₽PР]""")
         private val IGNORE_PATTERNS = listOf(
@@ -87,7 +88,7 @@ class TbankPdfImportUseCase(
             Regex("^Руководитель", RegexOption.IGNORE_CASE),
             Regex("^АО «Тинькофф Банк»", RegexOption.IGNORE_CASE),
             Regex("^БИК", RegexOption.IGNORE_CASE),
-            Regex("^Страница \\d+ из \\d+", RegexOption.IGNORE_CASE)
+            Regex("^Страница \\d+ из \\d+", RegexOption.IGNORE_CASE),
         )
     }
 
@@ -151,13 +152,10 @@ class TbankPdfImportUseCase(
     }
 
     override fun parseLine(line: String): Transaction? = throw NotImplementedError(
-        "parseLine(line: String) не используется в TbankPdfImportUseCase"
+        "parseLine(line: String) не используется в TbankPdfImportUseCase",
     )
 
-    private fun parseLineInternal(
-        line: String,
-        ptx: PartialTransaction?
-    ): Pair<Transaction?, PartialTransaction?> {
+    private fun parseLineInternal(line: String, ptx: PartialTransaction?): Pair<Transaction?, PartialTransaction?> {
         val trimmedLine = line.replace("\u0000", "").trim()
         if (shouldSkipLine(trimmedLine)) return null to ptx
         val partial = ptx ?: PartialTransaction()
@@ -184,7 +182,7 @@ class TbankPdfImportUseCase(
             val sign = amountWithDescMatch.groupValues[1].ifEmpty { amountWithDescMatch.groupValues[3] }
             val amountStr = amountWithDescMatch.groupValues[2].replace("\\s".toRegex(), "").replace(
                 ",",
-                "."
+                ".",
             )
             val description = amountWithDescMatch.groupValues[5].trim()
             try {
@@ -211,14 +209,14 @@ class TbankPdfImportUseCase(
                 val sign = simpleAmountMatch.groupValues[1]
                 val amountStr = simpleAmountMatch.groupValues[2].replace("\\s".toRegex(), "").replace(
                     ",",
-                    "."
+                    ".",
                 )
                 val amountValue = amountStr.toBigDecimalOrNull() ?: BigDecimal.ZERO
                 partial.amount = amountValue.toDouble()
                 partial.isExpense = sign == "-" || (
                     sign.isEmpty() && !partial.buildDescription().contains(
                         "Пополнение",
-                        ignoreCase = true
+                        ignoreCase = true,
                     )
                     )
                 partial.currency = Currency.RUB
@@ -248,7 +246,7 @@ class TbankPdfImportUseCase(
     override fun parseTransactions(
         reader: BufferedReader,
         progressCallback: ImportProgressCallback,
-        rawText: String
+        rawText: String,
     ): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         var linesProcessed = 0
@@ -259,14 +257,14 @@ class TbankPdfImportUseCase(
             linesProcessed++
             if (linesProcessed % 100 == 0) {
                 Timber.d(
-                    "$bankName: Обработано $linesProcessed строк, найдено ${transactions.size} транзакций"
+                    "$bankName: Обработано $linesProcessed строк, найдено ${transactions.size} транзакций",
                 )
             }
             val progress = 15 + (linesProcessed * 70 / totalLines).coerceAtMost(70)
             progressCallback.onProgress(
                 progress,
                 100,
-                "Обработка строки $linesProcessed / ~$totalLines"
+                "Обработка строки $linesProcessed / ~$totalLines",
             )
             parseLineInternal(line, currentPartialTransaction).let { (tx, updatedPartial) ->
                 if (tx != null) transactions.add(tx)
@@ -287,7 +285,7 @@ class TbankPdfImportUseCase(
         val description = ptx.buildDescription().ifEmpty {
             "Операция от " + SimpleDateFormat(
                 "dd.MM.yyyy",
-                Locale.getDefault()
+                Locale.getDefault(),
             ).format(ptx.date!!)
         }
         val category = TransactionCategoryDetector.detect(description)
@@ -299,7 +297,7 @@ class TbankPdfImportUseCase(
             source = transactionSource,
             sourceColor = 0,
             category = category,
-            note = if (ptx.documentNumber != null) "Время: ${ptx.documentNumber}" else ""
+            note = if (ptx.documentNumber != null) "Время: ${ptx.documentNumber}" else "",
         )
     }
 
@@ -311,4 +309,4 @@ class TbankPdfImportUseCase(
             null
         }
     }
-} 
+}

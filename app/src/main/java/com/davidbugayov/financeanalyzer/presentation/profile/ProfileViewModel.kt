@@ -36,7 +36,7 @@ class ProfileViewModel(
     private val getProfileAnalyticsUseCase: GetProfileAnalyticsUseCase,
     private val preferencesManager: PreferencesManager,
     private val notificationScheduler: INotificationScheduler,
-    private val appContext: Context
+    private val appContext: Context,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -74,14 +74,14 @@ class ProfileViewModel(
                     it.copy(
                         exportSuccess = null,
                         exportError = null,
-                        exportedFilePath = null
+                        exportedFilePath = null,
                     )
                 }
             }
             is ProfileEvent.SetExportError -> {
                 _state.update {
                     it.copy(
-                        exportError = event.message
+                        exportError = event.message,
                     )
                 }
             }
@@ -143,7 +143,7 @@ class ProfileViewModel(
                 preferencesManager.setTransactionReminderEnabled(event.enabled)
                 notificationScheduler.updateTransactionReminder(event.enabled, null)
                 Timber.d(
-                    "[ProfileViewModel] Calling syncNotificationState after ChangeNotifications"
+                    "[ProfileViewModel] Calling syncNotificationState after ChangeNotifications",
                 )
                 syncNotificationState()
             }
@@ -172,7 +172,7 @@ class ProfileViewModel(
         // Здесь можно добавить логирование аналитики
         AnalyticsUtils.logScreenView(
             screenName = "libraries",
-            screenClass = "LibrariesScreen"
+            screenClass = "LibrariesScreen",
         )
     }
 
@@ -188,7 +188,7 @@ class ProfileViewModel(
                         currentState.copy(
                             exportSuccess = "Export successful: $filePath",
                             exportedFilePath = filePath,
-                            exportError = null
+                            exportError = null,
                         )
                     }
                     val intentToLaunch: Intent? = when (action) {
@@ -204,7 +204,7 @@ class ProfileViewModel(
                         currentState.copy(
                             exportError = result.exceptionOrNull()?.message ?: "Unknown export error",
                             exportSuccess = null,
-                            exportedFilePath = null
+                            exportedFilePath = null,
                         )
                     }
                 }
@@ -236,7 +236,7 @@ class ProfileViewModel(
                             averageExpense = analytics.averageExpense,
                             totalSourcesUsed = analytics.totalSourcesUsed,
                             dateRange = analytics.dateRange,
-                            error = null
+                            error = null,
                         )
                     }
                 }
@@ -245,7 +245,7 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            error = result.exception.message ?: "Error loading analytics"
+                            error = result.exception.message ?: "Error loading analytics",
                         )
                     }
                 }
@@ -262,15 +262,15 @@ class ProfileViewModel(
                 "[ProfileViewModel] syncNotificationState: remindersEnabled=%b, reminderTime=%s, hasPermission=%b",
                 remindersEnabled,
                 reminderTimePair,
-                permission
+                permission,
             )
             _state.update {
                 it.copy(
                     isTransactionReminderEnabled = remindersEnabled,
                     transactionReminderTime = Time(reminderTimePair.first, reminderTimePair.second),
-                    hasNotificationPermission = permission
+                    hasNotificationPermission = permission,
                 )
             }
         }
     }
-} 
+}

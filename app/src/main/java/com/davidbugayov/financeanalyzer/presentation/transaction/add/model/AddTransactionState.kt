@@ -56,5 +56,5 @@ data class AddTransactionState(
     override val selectedCategory: UiCategory? = null,
     override val categories: List<UiCategory> = emptyList(),
     override val customCategoryIcon: ImageVector? = null,
-    override val availableCategoryIcons: List<ImageVector> = emptyList()
+    override val availableCategoryIcons: List<ImageVector> = emptyList(),
 ) : BaseTransactionState

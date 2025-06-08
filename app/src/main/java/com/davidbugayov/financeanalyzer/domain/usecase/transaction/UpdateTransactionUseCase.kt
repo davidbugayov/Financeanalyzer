@@ -10,7 +10,7 @@ import timber.log.Timber
  * Use case для обновления существующей транзакции.
  */
 class UpdateTransactionUseCase(
-    private val repository: TransactionRepository
+    private val repository: TransactionRepository,
 ) {
     /**
      * Обновляет транзакцию в базе данных.
@@ -24,4 +24,4 @@ class UpdateTransactionUseCase(
             repository.updateTransaction(transaction)
         }
     }
-} 
+}

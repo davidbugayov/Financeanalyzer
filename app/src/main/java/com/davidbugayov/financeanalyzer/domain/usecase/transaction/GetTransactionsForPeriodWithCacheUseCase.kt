@@ -5,7 +5,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import java.util.Date
 
 class GetTransactionsForPeriodWithCacheUseCase(
-    private val repository: ITransactionRepository
+    private val repository: ITransactionRepository,
 ) {
 
     private val cache = mutableMapOf<Pair<Long, Long>, List<Transaction>>()
@@ -32,4 +32,4 @@ class GetTransactionsForPeriodWithCacheUseCase(
         cache.clear()
         cacheTimestamps.clear()
     }
-} 
+}

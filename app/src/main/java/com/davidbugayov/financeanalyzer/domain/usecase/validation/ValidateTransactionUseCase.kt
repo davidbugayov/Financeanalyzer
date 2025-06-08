@@ -8,7 +8,7 @@ class ValidateTransactionUseCase {
         val amountError: Boolean,
         val categoryError: Boolean,
         val sourceError: Boolean,
-        val errorMessage: String?
+        val errorMessage: String?,
     )
 
     operator fun invoke(amount: String, category: String, source: String): Result {
@@ -22,9 +22,9 @@ class ValidateTransactionUseCase {
         val errorMsg = if (amountError) "Введите сумму транзакции" else null
 
         Timber.d(
-            "Validation result: isValid=$isValid, amountError=$amountError, categoryError=$categoryError, sourceError=$sourceError, errorMsg=$errorMsg"
+            "Validation result: isValid=$isValid, amountError=$amountError, categoryError=$categoryError, sourceError=$sourceError, errorMsg=$errorMsg",
         )
 
         return Result(isValid, amountError, categoryError, sourceError, errorMsg)
     }
-} 
+}

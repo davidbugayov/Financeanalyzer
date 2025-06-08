@@ -6,7 +6,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 
 class GetTransactionByIdUseCase(
-    private val transactionRepository: TransactionRepository
+    private val transactionRepository: TransactionRepository,
 ) {
 
     suspend operator fun invoke(id: String): Result<Transaction> {
@@ -21,4 +21,4 @@ class GetTransactionByIdUseCase(
             Result.error(AppException.mapException(e))
         }
     }
-} 
+}

@@ -15,7 +15,7 @@ class CategoryPreferences private constructor(context: Context) {
 
     private val prefs: SharedPreferences = context.getSharedPreferences(
         PREFS_NAME,
-        Context.MODE_PRIVATE
+        Context.MODE_PRIVATE,
     )
     private val gson = Gson()
     private val typeCustomCategoryList = object : com.google.gson.reflect.TypeToken<List<CustomCategoryData>>() {}.type
@@ -42,7 +42,7 @@ class CategoryPreferences private constructor(context: Context) {
         val name: String,
         val iconName: String,
         val colorHex: String? = null,
-        val isExpense: Boolean = true // Добавлено новое поле
+        val isExpense: Boolean = true, // Добавлено новое поле
     )
 
     /**
@@ -259,4 +259,4 @@ class CategoryPreferences private constructor(context: Context) {
             addIncomeCategory(categoryData)
         }
     }
-} 
+}

@@ -43,7 +43,7 @@ fun ImportCategoriesDialog(
     title: String = "Импорт категорий",
     subtitle: String = "Выберите категории расходов для добавления в бюджет:",
     confirmButtonText: String = "Импортировать",
-    preselectedCategories: List<String> = emptyList()
+    preselectedCategories: List<String> = emptyList(),
 ) {
     // Список выбранных категорий
     val selectedCategories = remember {
@@ -58,7 +58,7 @@ fun ImportCategoriesDialog(
             Text(
                 text = title,
                 style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
         },
         containerColor = MaterialTheme.colorScheme.surface,
@@ -66,13 +66,13 @@ fun ImportCategoriesDialog(
             Column {
                 Text(
                     text = subtitle,
-                    style = MaterialTheme.typography.bodyLarge
+                    style = MaterialTheme.typography.bodyLarge,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 LazyColumn(
-                    modifier = Modifier.fillMaxWidth()
+                    modifier = Modifier.fillMaxWidth(),
                 ) {
                     items(availableCategories) { category ->
                         CategoryCheckboxItem(
@@ -86,7 +86,7 @@ fun ImportCategoriesDialog(
                                     // Удаляем категорию из списка выбранных
                                     selectedCategories.remove(category.name)
                                 }
-                            }
+                            },
                         )
                     }
                 }
@@ -98,18 +98,18 @@ fun ImportCategoriesDialog(
                     // Вызываем функцию импорта с выбранными категориями
                     onImport(selectedCategories.toList())
                 },
-                enabled = selectedCategories.isNotEmpty()
+                enabled = selectedCategories.isNotEmpty(),
             ) {
                 Text(text = confirmButtonText)
             }
         },
         dismissButton = {
             TextButton(
-                onClick = onDismiss
+                onClick = onDismiss,
             ) {
                 Text(text = "Отмена")
             }
-        }
+        },
     )
 }
 
@@ -117,31 +117,27 @@ fun ImportCategoriesDialog(
  * Элемент списка с чекбоксом для выбора категории
  */
 @Composable
-private fun CategoryCheckboxItem(
-    category: String,
-    isChecked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
+private fun CategoryCheckboxItem(category: String, isChecked: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
             checked = isChecked,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
         )
 
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(start = 8.dp)
+                .padding(start = 8.dp),
         ) {
             Text(
                 text = category,
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
             )
         }
     }
-} 
+}

@@ -15,5 +15,5 @@ data class TransactionGroup(
     val transactions: List<Transaction>,
     val balance: Money,
     val name: String = date,
-    val total: Money = balance
-) 
+    val total: Money = balance,
+)

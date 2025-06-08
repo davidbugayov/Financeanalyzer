@@ -11,7 +11,7 @@ object FinancialStatisticsContract {
         val transactions: List<Transaction> = emptyList(),
         val income: Money = Money.zero(),
         val expense: Money = Money.zero(),
-        val period: String = ""
+        val period: String = "",
     )
 
     // Интенты (события)
@@ -25,4 +25,4 @@ object FinancialStatisticsContract {
         data class ShowError(val message: String) : Effect()
         // Добавь другие эффекты по необходимости
     }
-} 
+}

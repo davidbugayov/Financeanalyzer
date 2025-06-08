@@ -41,7 +41,7 @@ fun TransactionActionsDialog(
     transaction: Transaction,
     onDismiss: () -> Unit,
     onDelete: (Transaction) -> Unit,
-    onEdit: (Transaction) -> Unit
+    onEdit: (Transaction) -> Unit,
 ) {
     val isDarkTheme = isSystemInDarkTheme()
 
@@ -54,7 +54,7 @@ fun TransactionActionsDialog(
                 Text(
                     text = transaction.category,
                     style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold
+                    fontWeight = FontWeight.Bold,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -63,7 +63,7 @@ fun TransactionActionsDialog(
                     text = if (transaction.isExpense) {
                         "-${transaction.amount.abs().formatted(
                             showCurrency = true,
-                            showSign = false
+                            showSign = false,
                         )}"
                     } else {
                         "+${transaction.amount.formatted(showCurrency = true, showSign = false)}"
@@ -73,16 +73,16 @@ fun TransactionActionsDialog(
                         LocalExpenseColor.current
                     } else {
                         LocalIncomeColor.current
-                    }
+                    },
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
                     text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
-                        transaction.date
+                        transaction.date,
                     ),
-                    style = MaterialTheme.typography.bodyMedium
+                    style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -97,15 +97,15 @@ fun TransactionActionsDialog(
                             .size(12.dp)
                             .background(
                                 effectiveSourceColor,
-                                CircleShape
-                            )
+                                CircleShape,
+                            ),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
                         text = "Источник: ${transaction.source}",
                         style = MaterialTheme.typography.bodySmall,
-                        color = effectiveSourceColor
+                        color = effectiveSourceColor,
                     )
                 }
 
@@ -117,7 +117,7 @@ fun TransactionActionsDialog(
                         Text(
                             text = "Примечание: $note",
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
@@ -128,7 +128,7 @@ fun TransactionActionsDialog(
                 onClick = {
                     onDelete(transaction)
                     onDismiss()
-                }
+                },
             ) {
                 Text("Удалить")
             }
@@ -138,11 +138,11 @@ fun TransactionActionsDialog(
                 onClick = {
                     onEdit(transaction)
                     onDismiss()
-                }
+                },
             ) {
                 Text("Редактировать")
             }
-        }
+        },
     )
 }
 
@@ -164,7 +164,7 @@ private fun rememberSourceColor(transaction: Transaction, isDarkTheme: Boolean):
             sourceName = transaction.source,
             sourceColorHex = null,
             isExpense = transaction.isExpense,
-            isDarkTheme = isDarkTheme
+            isDarkTheme = isDarkTheme,
         )
     }
-} 
+}

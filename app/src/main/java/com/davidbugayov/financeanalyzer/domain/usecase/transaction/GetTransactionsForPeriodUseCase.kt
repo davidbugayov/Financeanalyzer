@@ -6,7 +6,7 @@ import java.util.Calendar
 import java.util.Date
 
 class GetTransactionsForPeriodUseCase(
-    private val transactionRepository: ITransactionRepository
+    private val transactionRepository: ITransactionRepository,
 ) {
     suspend operator fun invoke(startDate: Date, endDate: Date): List<Transaction> {
         val allTransactions = transactionRepository.loadTransactions()
@@ -28,4 +28,4 @@ class GetTransactionsForPeriodUseCase(
         val end = calendarEnd.time
         return allTransactions.filter { it.date >= start && it.date <= end }
     }
-} 
+}

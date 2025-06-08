@@ -31,4 +31,4 @@ fun <T> safeCallSync(block: () -> T): Result<T> {
     } catch (e: Exception) {
         Result.Error(mapException(e))
     }
-} 
+}

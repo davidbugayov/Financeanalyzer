@@ -41,7 +41,7 @@ private fun BalanceCardTitle(balance: Money) {
         style = MaterialTheme.typography.titleMedium,
         fontSize = 22.sp,
         fontWeight = FontWeight.Medium,
-        color = titleColor
+        color = titleColor,
     )
 }
 
@@ -54,7 +54,7 @@ private fun BalanceCardAmount(balance: Money) {
         style = MaterialTheme.typography.headlineMedium,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,
-        color = if (balance.amount.signum() >= 0) incomeColor else expenseColor
+        color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
     )
 }
 
@@ -68,17 +68,17 @@ fun BalanceCard(balance: Money, modifier: Modifier = Modifier) {
         modifier = modifier.fillMaxWidth(),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         colors = CardDefaults.cardColors(containerColor = cardColor),
-        border = BorderStroke(width = 3.dp, color = balanceTextColor)
+        border = BorderStroke(width = 3.dp, color = balanceTextColor),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(vertical = 16.dp, horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BalanceCardTitle(balance)
             Spacer(modifier = Modifier.height(12.dp))
             BalanceCardAmount(balance)
         }
     }
-} 
+}

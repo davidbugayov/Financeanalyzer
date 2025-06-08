@@ -17,7 +17,7 @@ fun PermissionDialogs(
     show: Boolean,
     onDismiss: () -> Unit,
     onPermissionGranted: () -> Unit = {},
-    onPermissionDenied: () -> Unit = {}
+    onPermissionDenied: () -> Unit = {},
 ) {
     if (!show) return
 
@@ -38,7 +38,7 @@ fun PermissionDialogs(
                     launcher = permissionLauncher,
                     openSettingsOnDeny = true,
                     onGranted = onPermissionGranted,
-                    onDenied = onPermissionDenied
+                    onDenied = onPermissionDenied,
                 )
             }) {
                 Text(stringResource(R.string.request_permission))
@@ -51,6 +51,6 @@ fun PermissionDialogs(
             }) {
                 Text(stringResource(R.string.cancel))
             }
-        }
+        },
     )
-} 
+}

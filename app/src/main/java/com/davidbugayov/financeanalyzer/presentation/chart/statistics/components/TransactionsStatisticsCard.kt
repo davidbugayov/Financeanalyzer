@@ -25,84 +25,84 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(
-            dimensionResource(R.dimen.financial_statistics_card_corner_radius)
+            dimensionResource(R.dimen.financial_statistics_card_corner_radius),
         ),
         elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)
+            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
         ),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
+        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.financial_statistics_card_padding))
+                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.transaction_statistics),
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
 
             Spacer(
                 modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_large)
-                )
+                    dimensionResource(R.dimen.financial_statistics_spacer_large),
+                ),
             )
 
             // Количество транзакций
             MetricRow(
                 title = stringResource(R.string.total_transactions),
-                value = "${metrics.totalTransactions}"
+                value = "${metrics.totalTransactions}",
             )
 
             MetricRow(
                 title = stringResource(R.string.income_transactions),
-                value = "${metrics.incomeTransactionsCount}"
+                value = "${metrics.incomeTransactionsCount}",
             )
 
             MetricRow(
                 title = stringResource(R.string.expense_transactions),
-                value = "${metrics.expenseTransactionsCount}"
+                value = "${metrics.expenseTransactionsCount}",
             )
 
             Spacer(
                 modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium)
-                )
+                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                ),
             )
 
             // Средние значения
             MetricRow(
                 title = stringResource(R.string.avg_income_per_transaction),
-                value = metrics.averageIncomePerTransaction.format(true)
+                value = metrics.averageIncomePerTransaction.format(true),
             )
 
             MetricRow(
                 title = stringResource(R.string.avg_expense_per_transaction),
-                value = metrics.averageExpensePerTransaction.format(true)
+                value = metrics.averageExpensePerTransaction.format(true),
             )
 
             Spacer(
                 modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium)
-                )
+                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                ),
             )
 
             // Максимальные значения
             MetricRow(
                 title = stringResource(R.string.max_income),
-                value = metrics.maxIncome.format(true)
+                value = metrics.maxIncome.format(true),
             )
 
             MetricRow(
                 title = stringResource(R.string.max_expense),
-                value = metrics.maxExpense.format(true)
+                value = metrics.maxExpense.format(true),
             )
 
             Spacer(
                 modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium)
-                )
+                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                ),
             )
 
             // Дополнительные метрики
@@ -110,13 +110,13 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
                 title = stringResource(R.string.savings_rate_label),
                 value = "${metrics.savingsRate.toBigDecimal().setScale(
                     0,
-                    java.math.RoundingMode.FLOOR
-                ).toPlainString()}%"
+                    java.math.RoundingMode.FLOOR,
+                ).toPlainString()}%",
             )
             MetricRow(
                 title = stringResource(R.string.months_of_savings_label),
-                value = String.format(Locale.US, "%.1f", metrics.monthsOfSavings)
+                value = String.format(Locale.US, "%.1f", metrics.monthsOfSavings),
             )
         }
     }
-} 
+}

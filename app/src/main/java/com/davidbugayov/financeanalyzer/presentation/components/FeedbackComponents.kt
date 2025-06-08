@@ -48,7 +48,10 @@ import kotlinx.coroutines.delay
  */
 enum class FeedbackType {
 
-    SUCCESS, ERROR, WARNING, INFO
+    SUCCESS,
+    ERROR,
+    WARNING,
+    INFO,
 }
 
 /**
@@ -63,7 +66,7 @@ fun FeedbackMessage(
     onDismiss: () -> Unit,
     duration: Long = 3000L,
     modifier: Modifier = Modifier,
-    isFilePath: Boolean = false
+    isFilePath: Boolean = false,
 ) {
     val context = LocalContext.current
     var isCopied by remember { mutableStateOf(false) }
@@ -71,7 +74,7 @@ fun FeedbackMessage(
         visible = visible,
         enter = slideInVertically(initialOffsetY = { it }) + fadeIn(),
         exit = slideOutVertically(targetOffsetY = { it }) + fadeOut(),
-        modifier = modifier
+        modifier = modifier,
     ) {
         Surface(
             color = when (type) {
@@ -81,11 +84,11 @@ fun FeedbackMessage(
                 FeedbackType.INFO -> MaterialTheme.colorScheme.secondaryContainer
             },
             shape = MaterialTheme.shapes.medium,
-            shadowElevation = 8.dp
+            shadowElevation = 8.dp,
         ) {
             Column(
                 horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(20.dp)
+                modifier = Modifier.padding(20.dp),
             ) {
                 Icon(
                     imageVector = when (type) {
@@ -101,13 +104,13 @@ fun FeedbackMessage(
                         FeedbackType.WARNING -> MaterialTheme.colorScheme.tertiary
                         FeedbackType.INFO -> MaterialTheme.colorScheme.secondary
                     },
-                    modifier = Modifier.size(40.dp)
+                    modifier = Modifier.size(40.dp),
                 )
                 Spacer(Modifier.height(8.dp))
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleMedium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
                 if (!message.isNullOrBlank()) {
                     Spacer(Modifier.height(4.dp))
@@ -115,33 +118,37 @@ fun FeedbackMessage(
                         Text(
                             text = message,
                             style = MaterialTheme.typography.bodySmall.copy(
-                                fontFamily = FontFamily.Monospace
+                                fontFamily = FontFamily.Monospace,
                             ),
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .background(
                                     if (isCopied) {
                                         MaterialTheme.colorScheme.primary.copy(
-                                            alpha = 0.18f
+                                            alpha = 0.18f,
                                         )
                                     } else {
                                         Color.Transparent
                                     },
-                                    shape = MaterialTheme.shapes.small
+                                    shape = MaterialTheme.shapes.small,
                                 )
                                 .clickable {
                                     val clipboard = android.content.Context.CLIPBOARD_SERVICE
                                     val clip = android.content.ClipData.newPlainText(
                                         "file path",
-                                        message
+                                        message,
                                     )
-                                    (context.getSystemService(clipboard) as? android.content.ClipboardManager)?.setPrimaryClip(
-                                        clip
+                                    (
+                                        context.getSystemService(
+                                            clipboard,
+                                        ) as? android.content.ClipboardManager
+                                        )?.setPrimaryClip(
+                                        clip,
                                     )
                                     Toast.makeText(context, "Путь скопирован", Toast.LENGTH_SHORT).show()
                                     isCopied = true
                                 }
-                                .padding(horizontal = 8.dp, vertical = 4.dp)
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
                         )
                         if (isCopied) {
                             LaunchedEffect(isCopied) {
@@ -153,7 +160,7 @@ fun FeedbackMessage(
                         Text(
                             text = message,
                             style = MaterialTheme.typography.bodySmall,
-                            textAlign = TextAlign.Center
+                            textAlign = TextAlign.Center,
                         )
                     }
                 }
@@ -173,7 +180,7 @@ fun EnhancedEmptyContent() {
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center
+        verticalArrangement = Arrangement.Center,
     ) {
         Icon(
             imageVector = Icons.Default.AccountBalance,
@@ -181,20 +188,20 @@ fun EnhancedEmptyContent() {
             modifier = Modifier
                 .size(128.dp)
                 .padding(dimensionResource(R.dimen.spacing_normal)),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
+            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
         )
 
         Text(
             text = stringResource(id = R.string.empty_transactions),
             style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center
+            textAlign = TextAlign.Center,
         )
 
         Text(
             text = stringResource(id = R.string.empty_transactions_description),
             style = MaterialTheme.typography.bodyMedium,
             textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-} 
+}

@@ -6,5 +6,5 @@ package com.davidbugayov.financeanalyzer.presentation.profile.model
 enum class ThemeMode {
     LIGHT, // Светлая тема
     DARK, // Темная тема
-    SYSTEM // Системная тема (зависит от настроек устройства)
-} 
+    SYSTEM, // Системная тема (зависит от настроек устройства)
+}

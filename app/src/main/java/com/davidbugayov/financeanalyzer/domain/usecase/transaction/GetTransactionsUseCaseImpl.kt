@@ -16,7 +16,7 @@ import java.util.Date
  * @property repository Репозиторий для работы с транзакциями
  */
 class GetTransactionsUseCaseImpl(
-    private val repository: TransactionRepository
+    private val repository: TransactionRepository,
 ) : GetTransactionsUseCase {
 
     /**
@@ -56,4 +56,4 @@ class GetTransactionsUseCaseImpl(
 
         return repository.getTransactionsByDateRangeList(startDate, endDate)
     }
-} 
+}

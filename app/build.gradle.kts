@@ -30,8 +30,8 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = 26
         targetSdk = 35
-        versionCode = 35
-        versionName = "2.16.1"
+        versionCode = 36
+        versionName = "2.17.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -45,7 +45,7 @@ android {
         // Enable R8 support
         proguardFiles(
             getDefaultProguardFile("proguard-android-optimize.txt"),
-            "proguard-rules.pro"
+            "proguard-rules.pro",
         )
     }
 
@@ -57,16 +57,24 @@ android {
             // Google версия использует Firebase и RuStore
             buildConfigField("boolean", "USE_FIREBASE", "true")
             buildConfigField("boolean", "USE_RUSTORE", "true")
-            
+
             // Применяем плагины только для Google flavor
             plugins.apply("com.google.gms.google-services")
             plugins.apply("com.google.firebase.crashlytics")
         }
         create("fdroid") {
             dimension = "store"
-            // F-Droid версия не использует Firebase и RuStore
+            // F-Droid версия не использует Firebase и RuStore (в соответствии с требованиями F-Droid)
             buildConfigField("boolean", "USE_FIREBASE", "false")
             buildConfigField("boolean", "USE_RUSTORE", "false")
+            
+            // Отключаем все проприетарные зависимости для F-Droid сборки
+            dependencies {
+                // Исключаем Firebase
+                implementation(files())
+                debugImplementation(files())
+                releaseImplementation(files())
+            }
         }
     }
 
@@ -79,7 +87,7 @@ android {
         create("release") {
             val keystoreProperties = getKeystoreProperties()
             storeFile = file(
-                keystoreProperties.getProperty("keystore.file", "keystore/release.keystore")
+                keystoreProperties.getProperty("keystore.file", "keystore/release.keystore"),
             )
             storePassword = keystoreProperties.getProperty("keystore.password", "")
             keyAlias = keystoreProperties.getProperty("keystore.key.alias", "")
@@ -90,7 +98,7 @@ android {
             val requiredProperties = listOf(
                 "keystore.password",
                 "keystore.key.alias",
-                "keystore.key.password"
+                "keystore.key.password",
             )
             requiredProperties.forEach { prop ->
                 if (!keystoreProperties.containsKey(prop)) {
@@ -106,7 +114,7 @@ android {
             isShrinkResources = true
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
-                "proguard-rules.pro"
+                "proguard-rules.pro",
             )
             signingConfig = signingConfigs.getByName("release")
             isDebuggable = false
@@ -164,7 +172,7 @@ android {
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
             "-Xjvm-default=all",
-            "-Xcontext-receivers"
+            "-Xcontext-receivers",
         )
     }
 
@@ -334,12 +342,83 @@ ktlint {
         include("**/src/google/**/*.kt")
         include("**/src/fdroid/**/*.kt")
     }
-    disabledRules.set(
-        listOf(
-            "no-wildcard-imports",
-            "filename",
-            "import-ordering",
-            "experimental:trailing-comma"
-        )
-    )
+}
+
+// Отключаем Google Services для F-Droid флейвора
+tasks.whenTaskAdded {
+    if (name.contains("fdroid", ignoreCase = true) &&
+        (
+            name.contains("ProcessGoogleServices", ignoreCase = true) ||
+                name.contains("FirebaseCrashlytics", ignoreCase = true)
+            )
+    ) {
+        enabled = false
+    }
+}
+
+// Исключаем все проприетарные зависимости из F-Droid сборки
+configurations.all {
+    if (name.contains("fdroid", ignoreCase = true)) {
+        exclude(group = "com.google.firebase")
+        exclude(group = "com.google.android.gms")
+        exclude(group = "io.appmetrica")
+        exclude(group = "ru.rustore")
+    }
+}
+
+// Добавляем задачу для создания релиза для RuStore
+tasks.register<Copy>("prepareRuStoreRelease") {
+    dependsOn("bundleGoogleRelease")
+    
+    // Получаем путь к сгенерированному AAB файлу
+    val aabFile = layout.buildDirectory.file("outputs/bundle/googleRelease/app-google-release.aab")
+    
+    // Создаем новую директорию для RuStore релизов
+    val ruStoreDir = layout.buildDirectory.dir("outputs/rustore")
+    
+    // Копируем AAB файл в директорию RuStore с добавлением версии
+    from(aabFile) {
+        rename { "financeanalyzer-rustore-v${android.defaultConfig.versionName}.aab" }
+    }
+    
+    into(ruStoreDir)
+    
+    doLast {
+        println("==========================================")
+        println("RuStore Release подготовлен:")
+        println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
+        println("Расположение: ${ruStoreDir.get()}")
+        println("==========================================")
+    }
+}
+
+// Добавляем задачу для создания релиза для F-Droid
+tasks.register<Copy>("prepareFDroidRelease") {
+    dependsOn("bundleFdroidRelease")
+    
+    // Получаем путь к сгенерированному AAB файлу
+    val aabFile = layout.buildDirectory.file("outputs/bundle/fdroidRelease/app-fdroid-release.aab")
+    val apkFile = layout.buildDirectory.file("outputs/apk/fdroid/release/app-fdroid-release.apk")
+    
+    // Создаем новую директорию для F-Droid релизов
+    val fdroidDir = layout.buildDirectory.dir("outputs/fdroid")
+    
+    // Копируем AAB и APK файлы в директорию F-Droid с добавлением версии
+    from(aabFile) {
+        rename { "financeanalyzer-fdroid-v${android.defaultConfig.versionName}.aab" }
+    }
+    
+    from(apkFile) {
+        rename { "financeanalyzer-fdroid-v${android.defaultConfig.versionName}.apk" }
+    }
+    
+    into(fdroidDir)
+    
+    doLast {
+        println("==========================================")
+        println("F-Droid Release подготовлен:")
+        println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
+        println("Расположение: ${fdroidDir.get()}")
+        println("==========================================")
+    }
 }

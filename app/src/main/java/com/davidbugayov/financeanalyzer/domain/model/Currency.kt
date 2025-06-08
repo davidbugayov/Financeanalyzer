@@ -11,7 +11,7 @@ enum class Currency(
     val symbolPosition: SymbolPosition = SymbolPosition.AFTER,
     val decimalPlaces: Int = 2,
     val groupingSeparator: Char = ' ',
-    val decimalSeparator: Char = '.'
+    val decimalSeparator: Char = '.',
 ) {
 
     RUB("RUB", "₽", "Российский рубль", SymbolPosition.AFTER, 2, ' ', ','),
@@ -22,7 +22,8 @@ enum class Currency(
     CNY("CNY", "¥", "Китайский юань", SymbolPosition.BEFORE, 2, ',', '.'),
     KZT("KZT", "₸", "Казахстанский тенге", SymbolPosition.AFTER, 2, ' ', ','),
     BYN("BYN", "Br", "Белорусский рубль", SymbolPosition.AFTER, 2, ' ', ','),
-    UAH("UAH", "₴", "Украинская гривна", SymbolPosition.AFTER, 2, ' ', ',');
+    UAH("UAH", "₴", "Украинская гривна", SymbolPosition.AFTER, 2, ' ', ','),
+    ;
 
     companion object {
 
@@ -43,5 +44,5 @@ enum class Currency(
 enum class SymbolPosition {
 
     BEFORE, // Символ перед суммой (например, $100)
-    AFTER // Символ после суммы (например, 100₽)
-} 
+    AFTER, // Символ после суммы (например, 100₽)
+}

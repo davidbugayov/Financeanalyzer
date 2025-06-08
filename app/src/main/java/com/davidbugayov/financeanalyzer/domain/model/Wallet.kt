@@ -22,5 +22,5 @@ data class Wallet(
     val periodDuration: Int = 14,
     val periodStartDate: Long = System.currentTimeMillis(),
     val linkedCategories: List<String> = emptyList(),
-    val color: Int? = null
+    val color: Int? = null,
 )

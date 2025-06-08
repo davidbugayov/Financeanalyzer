@@ -11,14 +11,14 @@ data class BalanceMetrics(
     val expense: Money,
     val savingsRate: Double,
     val averageDailyExpense: Money = Money.zero(),
-    val monthsOfSavings: Double = 0.0
+    val monthsOfSavings: Double = 0.0,
 )
 
 class CalculateBalanceMetricsUseCase {
     operator fun invoke(
         transactions: List<Transaction>,
         startDate: java.util.Date? = null,
-        endDate: java.util.Date? = null
+        endDate: java.util.Date? = null,
     ): BalanceMetrics {
         val income = transactions.filter { !it.isExpense }.fold(Money.zero()) { acc, t -> acc + t.amount }
         val expense = transactions.filter { it.isExpense }.fold(Money.zero()) { acc, t -> acc + t.amount.abs() }
@@ -51,7 +51,7 @@ class CalculateBalanceMetricsUseCase {
             expense = expense,
             savingsRate = savingsRate.toDouble(),
             averageDailyExpense = averageDailyExpense,
-            monthsOfSavings = monthsOfSavings.toDouble()
+            monthsOfSavings = monthsOfSavings.toDouble(),
         )
     }
-} 
+}

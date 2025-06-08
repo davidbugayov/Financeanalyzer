@@ -19,7 +19,7 @@ import java.util.Locale
  */
 class SberbankPdfImportUseCase(
     context: Context,
-    transactionRepository: TransactionRepository
+    transactionRepository: TransactionRepository,
 ) : AbstractPdfImportUseCase(context, transactionRepository) {
 
     override val bankName: String = context.getString(R.string.bank_sberbank_pdf)
@@ -36,7 +36,7 @@ class SberbankPdfImportUseCase(
         var description: MutableList<String> = mutableListOf(),
         var amount: String? = null,
         var balance: String? = null,
-        var isComplete: Boolean = false
+        var isComplete: Boolean = false,
     ) {
         fun isValid(): Boolean = date != null && amount != null
     }
@@ -44,13 +44,13 @@ class SberbankPdfImportUseCase(
     // Шаблоны для анализа строк
     private val mainLineRegex =
         Regex(
-            "^(\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{2}:\\d{2})\\s+(\\d+)\\s+(.+?)\\s+([+-]?[\\d\\s.,]+[\\d])\\s+([\\d\\s.,]+[\\d])$"
+            "^(\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{2}:\\d{2})\\s+(\\d+)\\s+(.+?)\\s+([+-]?[\\d\\s.,]+[\\d])\\s+([\\d\\s.,]+[\\d])$",
         )
     private val dateTimeRegex = Regex("^(\\d{2}\\.\\d{2}\\.\\d{4})\\s+(\\d{2}:\\d{2}).*$")
     private val descriptionLineRegex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}\\s+(.+)$")
     private val cardNumberRegex = Regex(
         "^(?:карте|карты)\\s+\\*{4}(\\d{4})$",
-        RegexOption.IGNORE_CASE
+        RegexOption.IGNORE_CASE,
     )
 
     override fun isValidFormat(reader: BufferedReader): Boolean {
@@ -64,23 +64,23 @@ class SberbankPdfImportUseCase(
         val textSample = headerLines.joinToString(separator = "\n")
         val hasBankIndicator = textSample.contains("СБЕР", ignoreCase = true) || textSample.contains(
             "Сбербанк",
-            ignoreCase = true
+            ignoreCase = true,
         )
         val hasStatementTitle =
             textSample.contains("Выписка по счёту", ignoreCase = true) || textSample.contains(
                 "Выписка по счету",
-                ignoreCase = true
+                ignoreCase = true,
             )
         val hasTableMarker = headerLines.any {
             it.contains(
                 "Расшифровка операций",
-                ignoreCase = true
+                ignoreCase = true,
             )
         } ||
             headerLines.any {
                 it.contains("ДАТА ОПЕРАЦИИ", ignoreCase = true) && it.contains(
                     "КАТЕГОРИЯ",
-                    ignoreCase = true
+                    ignoreCase = true,
                 )
             }
         return hasBankIndicator && hasStatementTitle && hasTableMarker
@@ -114,13 +114,13 @@ class SberbankPdfImportUseCase(
         if (line.isBlank()) return true
         val tableHeaders = setOf(
             "ДАТА ОПЕРАЦИИ (МСК)", "Дата обработки¹ и код авторизации", "КАТЕГОРИЯ", "Описание операции",
-            "СУММА В ВАЛЮТЕ СЧЁТА", "Сумма в валюте", "операции²", "ОСТАТОК СРЕДСТВ", "В ВАЛЮТЕ СЧЁТА"
+            "СУММА В ВАЛЮТЕ СЧЁТА", "Сумма в валюте", "операции²", "ОСТАТОК СРЕДСТВ", "В ВАЛЮТЕ СЧЁТА",
         )
         if (tableHeaders.any { line.equals(it, ignoreCase = true) }) return true
         val footerOrPageLinesPatterns = listOf(
             Regex(
                 "^Выписка по счёту дебетовой карты Страница \\d+ из \\d+$",
-                RegexOption.IGNORE_CASE
+                RegexOption.IGNORE_CASE,
             ),
             Regex("^Продолжение на следующей странице$", RegexOption.IGNORE_CASE),
             Regex("^Дата формирования \\d{2}\\.\\d{2}\\.\\d{4}$", RegexOption.IGNORE_CASE),
@@ -131,11 +131,11 @@ class SberbankPdfImportUseCase(
             Regex("^\\d$"),
             Regex(
                 "^Дата списания / зачисления денежных средств на счёт карты$",
-                RegexOption.IGNORE_CASE
+                RegexOption.IGNORE_CASE,
             ),
             Regex("^По курсу банка на дату обработки операции$", RegexOption.IGNORE_CASE),
             Regex("^Дергунова К\\. А\\.$", RegexOption.IGNORE_CASE),
-            Regex("^Управляющий директор Дивизиона «Забота о клиентах»$", RegexOption.IGNORE_CASE)
+            Regex("^Управляющий директор Дивизиона «Забота о клиентах»$", RegexOption.IGNORE_CASE),
         )
         return footerOrPageLinesPatterns.any { line.matches(it) }
     }
@@ -143,7 +143,7 @@ class SberbankPdfImportUseCase(
     override fun parseTransactions(
         reader: BufferedReader,
         progressCallback: ImportProgressCallback,
-        rawText: String
+        rawText: String,
     ): List<Transaction> {
         val importedTransactions = mutableListOf<Transaction>()
         var line: String?
@@ -171,12 +171,12 @@ class SberbankPdfImportUseCase(
                         authCode = authCode,
                         category = category,
                         amount = amountStr,
-                        balance = balanceStr
+                        balance = balanceStr,
                     )
                     val descMatch = descriptionLineRegex.find(line)
                     if (descMatch != null) {
                         currentTransaction.description.add(
-                            descMatch.groupValues[1]
+                            descMatch.groupValues[1],
                         )
                     } else {
                         val cardMatch = cardNumberRegex.find(line)
@@ -184,7 +184,7 @@ class SberbankPdfImportUseCase(
                             currentTransaction.description.add(line)
                         } else if (!dateTimeRegex.matches(line)) {
                             currentTransaction.description.add(
-                                line
+                                line,
                             )
                         }
                     }
@@ -203,7 +203,7 @@ class SberbankPdfImportUseCase(
         try {
             if (!partial.isValid()) return null
             val transactionDate = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(
-                partial.date!!
+                partial.date!!,
             ) ?: Date()
             val cleanedAmount = partial.amount!!.replace("\\s".toRegex(), "").replace(',', '.')
             val amount = cleanedAmount.toDoubleOrNull() ?: return null
@@ -220,25 +220,25 @@ class SberbankPdfImportUseCase(
             val noteParts = mutableListOf<String>()
             if (partial.time != null) {
                 noteParts.add(
-                    context.getString(R.string.transaction_note_time, partial.time)
+                    context.getString(R.string.transaction_note_time, partial.time),
                 )
             }
             if (partial.authCode != null) {
                 noteParts.add(
-                    context.getString(R.string.transaction_note_auth_code, partial.authCode)
+                    context.getString(R.string.transaction_note_auth_code, partial.authCode),
                 )
             }
             if (partial.balance != null) {
                 noteParts.add(
-                    context.getString(R.string.transaction_note_balance, partial.balance)
+                    context.getString(R.string.transaction_note_balance, partial.balance),
                 )
             }
             if (partial.description.isNotEmpty()) {
                 noteParts.add(
                     context.getString(
                         R.string.transaction_note_details,
-                        partial.description.joinToString(" ")
-                    )
+                        partial.description.joinToString(" "),
+                    ),
                 )
             }
             val title = partial.category ?: context.getString(R.string.transaction_title_unknown)
@@ -254,7 +254,7 @@ class SberbankPdfImportUseCase(
                 // Используем все доступные данные для определения категории
                 val fullDescription = listOf(
                     bankCategory,
-                    partial.description.joinToString(" ")
+                    partial.description.joinToString(" "),
                 ).joinToString(" ")
                 TransactionCategoryDetector.detect(fullDescription)
             }
@@ -268,7 +268,7 @@ class SberbankPdfImportUseCase(
                 source = transactionSource,
                 sourceColor = 0,
                 categoryId = "",
-                title = title
+                title = title,
             )
         } catch (_: Exception) {
             return null
@@ -276,6 +276,6 @@ class SberbankPdfImportUseCase(
     }
 
     override fun parseLine(line: String): Transaction? = throw NotImplementedError(
-        "parseLine не используется в SberbankPdfImportUseCase"
+        "parseLine не используется в SberbankPdfImportUseCase",
     )
-} 
+}

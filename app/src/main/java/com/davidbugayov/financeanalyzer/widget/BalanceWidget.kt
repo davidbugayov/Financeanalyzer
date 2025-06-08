@@ -33,11 +33,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
     private val loadTransactionsUseCase: LoadTransactionsUseCase by inject()
     private val scope = CoroutineScope(Dispatchers.IO)
 
-    override fun onUpdate(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetIds: IntArray
-    ) {
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         // Обновляем каждый экземпляр виджета
         for (appWidgetId in appWidgetIds) {
             updateAppWidget(context, appWidgetManager, appWidgetId)
@@ -47,11 +43,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
     /**
      * Обновляет виджет с актуальными данными о балансе
      */
-    private fun updateAppWidget(
-        context: Context,
-        appWidgetManager: AppWidgetManager,
-        appWidgetId: Int
-    ) {
+    private fun updateAppWidget(context: Context, appWidgetManager: AppWidgetManager, appWidgetId: Int) {
         // Создаем RemoteViews для обновления виджета
         val views = RemoteViews(context.packageName, R.layout.balance_widget_layout)
 
@@ -59,7 +51,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         if (launchAppIntent != null) {
             launchAppIntent.addFlags(
-                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP,
             )
 
             // Создаем PendingIntent для запуска приложения
@@ -67,7 +59,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                 context,
                 0,
                 launchAppIntent,
-                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
             )
 
             // Устанавливаем обработчик нажатия на весь виджет
@@ -102,7 +94,9 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                     // или как разность доходов и расходов (если расходы положительные)
                     val balance = if (firstExpense != null && firstExpense.amount.isNegative()) {
                         // Если расходы уже отрицательные, просто складываем
-                        val sumBalance = transactions.fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
+                        val sumBalance = transactions.fold(
+                            Money.zero(currency),
+                        ) { acc, transaction -> acc + transaction.amount }
                         sumBalance
                     } else {
                         // Если расходы положительные, вычитаем их из доходов
@@ -116,7 +110,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                         views.setTextViewText(R.id.widget_income, income.formatForDisplay())
                         views.setTextViewText(
                             R.id.widget_expense,
-                            negativeExpense.formatForDisplay()
+                            negativeExpense.formatForDisplay(),
                         )
 
                         // Устанавливаем цвет в зависимости от значения баланса
@@ -139,7 +133,7 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                         views.setTextViewText(R.id.widget_expense, "?")
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
-                }
+                },
             )
         }
     }
@@ -154,9 +148,9 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
             val appWidgetManager = AppWidgetManager.getInstance(context)
             val appWidgetIds = appWidgetManager.getAppWidgetIds(
-                ComponentName(context, BalanceWidget::class.java)
+                ComponentName(context, BalanceWidget::class.java),
             )
             onUpdate(context, appWidgetManager, appWidgetIds)
         }
     }
-} 
+}

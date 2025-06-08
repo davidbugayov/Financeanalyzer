@@ -14,7 +14,7 @@ import timber.log.Timber
  */
 abstract class AbstractBankHandler(
     protected val transactionRepository: TransactionRepository,
-    protected val context: Context
+    protected val context: Context,
 ) {
 
     /**
@@ -82,7 +82,7 @@ abstract class AbstractBankHandler(
 
 abstract class AbstractPdfBankHandler(
     transactionRepository: TransactionRepository,
-    context: Context
+    context: Context,
 ) : AbstractBankHandler(transactionRepository, context) {
 
     abstract val pdfKeywords: List<String>
@@ -92,8 +92,8 @@ abstract class AbstractPdfBankHandler(
         return supportsFileType(fileType) && pdfKeywords.any {
             fileName.contains(
                 it,
-                ignoreCase = true
+                ignoreCase = true,
             )
         }
     }
-} 
+}

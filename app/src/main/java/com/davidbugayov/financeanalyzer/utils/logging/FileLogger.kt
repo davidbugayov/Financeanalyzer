@@ -34,7 +34,7 @@ object FileLogger {
         val timestamp: Long,
         val level: String,
         val tag: String,
-        val message: String
+        val message: String,
     ) {
         override fun toString(): String {
             val formatter = SimpleDateFormat("HH:mm:ss.SSS", Locale.US)
@@ -74,7 +74,7 @@ object FileLogger {
                 timestamp = System.currentTimeMillis(),
                 level = "I",
                 tag = "FileLogger",
-                message = initMessage
+                message = initMessage,
             )
             logBuffer.add(entry)
             writeToFile(entry.toString())
@@ -133,7 +133,7 @@ object FileLogger {
             timestamp = System.currentTimeMillis(),
             level = level,
             tag = tag,
-            message = message
+            message = message,
         )
 
         // Добавляем запись в буфер
@@ -214,4 +214,4 @@ object FileLogger {
             }
         }
     }
-} 
+}

@@ -46,7 +46,7 @@ fun WalletSelectorDialog(
     selectedWalletIds: List<String>,
     onWalletSelected: (String, Boolean) -> Unit,
     onConfirm: () -> Unit,
-    onDismiss: () -> Unit
+    onDismiss: () -> Unit,
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
@@ -55,19 +55,19 @@ fun WalletSelectorDialog(
                 .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface
-            )
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
         ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(16.dp)
+                    .padding(16.dp),
             ) {
                 Text(
                     text = "Выберите кошельки",
                     style = MaterialTheme.typography.titleLarge,
                     fontWeight = FontWeight.Bold,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                    modifier = Modifier.padding(bottom = 16.dp),
                 )
 
                 if (wallets.isEmpty()) {
@@ -75,19 +75,19 @@ fun WalletSelectorDialog(
                         modifier = Modifier
                             .fillMaxWidth()
                             .height(100.dp),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Text(
                             text = "Нет доступных кошельков",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 } else {
                     LazyColumn(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .heightIn(max = 300.dp)
+                            .heightIn(max = 300.dp),
                     ) {
                         items(wallets) { wallet ->
                             WalletItem(
@@ -95,7 +95,7 @@ fun WalletSelectorDialog(
                                 isSelected = selectedWalletIds.contains(wallet.id),
                                 onCheckedChange = { isSelected ->
                                     onWalletSelected(wallet.id, isSelected)
-                                }
+                                },
                             )
                         }
                     }
@@ -105,7 +105,7 @@ fun WalletSelectorDialog(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(top = 16.dp),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text("Отмена")
@@ -115,7 +115,7 @@ fun WalletSelectorDialog(
 
                     Button(
                         onClick = onConfirm,
-                        enabled = selectedWalletIds.isNotEmpty()
+                        enabled = selectedWalletIds.isNotEmpty(),
                     ) {
                         Text("Готово")
                     }
@@ -134,29 +134,29 @@ private fun WalletItem(wallet: Wallet, isSelected: Boolean, onCheckedChange: (Bo
         modifier = Modifier
             .fillMaxWidth()
             .padding(vertical = 8.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
             checked = isSelected,
-            onCheckedChange = onCheckedChange
+            onCheckedChange = onCheckedChange,
         )
 
         Column(
             modifier = Modifier
                 .weight(1f)
-                .padding(start = 8.dp)
+                .padding(start = 8.dp),
         ) {
             Text(
                 text = wallet.name,
                 style = MaterialTheme.typography.bodyMedium,
-                fontWeight = FontWeight.Medium
+                fontWeight = FontWeight.Medium,
             )
 
             Text(
                 text = "Баланс: ${wallet.balance}",
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
         }
     }
-} 
+}

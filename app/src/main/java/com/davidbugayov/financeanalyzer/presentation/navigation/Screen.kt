@@ -52,4 +52,4 @@ sealed class Screen(val route: String) {
 
     /** Экран достижений */
     data object Achievements : Screen("achievements")
-} 
+}

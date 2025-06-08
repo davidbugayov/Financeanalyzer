@@ -11,7 +11,7 @@ import timber.log.Timber
  * Следует принципу единственной ответственности (Single Responsibility Principle).
  */
 class AddTransactionUseCase(
-    private val repository: ITransactionRepository
+    private val repository: ITransactionRepository,
 ) {
 
     /**
@@ -22,9 +22,9 @@ class AddTransactionUseCase(
     suspend operator fun invoke(transaction: Transaction): Result<Unit> {
         return safeCall {
             Timber.d(
-                "Добавление транзакции: сумма=${transaction.amount}, категория=${transaction.category}"
+                "Добавление транзакции: сумма=${transaction.amount}, категория=${transaction.category}",
             )
             repository.addTransaction(transaction)
         }
     }
-} 
+}

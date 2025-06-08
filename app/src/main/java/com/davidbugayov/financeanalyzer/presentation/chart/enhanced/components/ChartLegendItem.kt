@@ -30,13 +30,13 @@ fun ChartLegendItem(color: Color, text: String) {
     val cornerRadius = dimensionResource(id = R.dimen.chart_corner_radius)
 
     Row(
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
             modifier = Modifier
                 .width(legendItemWidth)
                 .height(legendItemHeight)
-                .background(color, RoundedCornerShape(cornerRadius))
+                .background(color, RoundedCornerShape(cornerRadius)),
         )
 
         Spacer(modifier = Modifier.width(legendSpacing))
@@ -44,7 +44,7 @@ fun ChartLegendItem(color: Color, text: String) {
         Text(
             text = text,
             style = MaterialTheme.typography.bodySmall,
-            color = MaterialTheme.colorScheme.onSurfaceVariant
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-} 
+}

@@ -30,7 +30,7 @@ class FilterTransactionsUseCase {
         startDate: Date? = null,
         endDate: Date? = null,
         categories: List<String> = emptyList(),
-        sources: List<String> = emptyList()
+        sources: List<String> = emptyList(),
     ): List<Transaction> {
         val filteredByPeriod = if (periodType == PeriodType.CUSTOM && startDate != null && endDate != null) {
             filterByDateRange(transactions, startDate, endDate)
@@ -83,11 +83,7 @@ class FilterTransactionsUseCase {
      * @param endDate Конечная дата для фильтрации
      * @return Отфильтрованный по дате список транзакций
      */
-    fun filterByDateRange(
-        transactions: List<Transaction>,
-        startDate: Date,
-        endDate: Date
-    ): List<Transaction> {
+    fun filterByDateRange(transactions: List<Transaction>, startDate: Date, endDate: Date): List<Transaction> {
         return transactions.filter { transaction ->
             transaction.date >= startDate && transaction.date <= endDate
         }
@@ -101,10 +97,7 @@ class FilterTransactionsUseCase {
      * @param categories Список категорий для фильтрации
      * @return Отфильтрованный по категориям список транзакций
      */
-    private fun filterByCategories(
-        transactions: List<Transaction>,
-        categories: List<String>
-    ): List<Transaction> {
+    private fun filterByCategories(transactions: List<Transaction>, categories: List<String>): List<Transaction> {
         return if (categories.isNotEmpty()) {
             transactions.filter { transaction -> transaction.category in categories }
         } else {
@@ -120,10 +113,7 @@ class FilterTransactionsUseCase {
      * @param sources Список источников для фильтрации
      * @return Отфильтрованный по источникам список транзакций
      */
-    private fun filterBySources(
-        transactions: List<Transaction>,
-        sources: List<String>
-    ): List<Transaction> {
+    private fun filterBySources(transactions: List<Transaction>, sources: List<String>): List<Transaction> {
         return if (sources.isNotEmpty()) {
             transactions.filter { transaction ->
                 transaction.source in sources
@@ -132,4 +122,4 @@ class FilterTransactionsUseCase {
             transactions
         }
     }
-} 
+}

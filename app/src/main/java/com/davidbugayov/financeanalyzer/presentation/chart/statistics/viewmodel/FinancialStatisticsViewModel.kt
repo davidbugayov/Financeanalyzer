@@ -33,7 +33,7 @@ data class FinancialMetrics(
     val topExpenseCategory: String = "",
     val topExpenseCategories: List<Pair<String, Money>> = emptyList(),
     val topIncomeCategory: String = "",
-    val mostFrequentExpenseDay: String = ""
+    val mostFrequentExpenseDay: String = "",
 )
 
 class FinancialStatisticsViewModel(
@@ -41,7 +41,7 @@ class FinancialStatisticsViewModel(
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase,
     startDate: Long,
     endDate: Long,
-    private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase
+    private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FinancialStatisticsContract.State())
     val state: StateFlow<FinancialStatisticsContract.State> = _state
@@ -70,7 +70,7 @@ class FinancialStatisticsViewModel(
             val metrics = calculateBalanceMetricsUseCase(
                 transactions,
                 periodStartDate,
-                periodEndDate
+                periodEndDate,
             )
             val income = metrics.income
             val expense = metrics.expense
@@ -150,7 +150,7 @@ class FinancialStatisticsViewModel(
                 topExpenseCategory = topExpenseCategory,
                 topExpenseCategories = topExpenseCategories,
                 topIncomeCategory = topIncomeCategory,
-                mostFrequentExpenseDay = mostFrequentExpenseDay
+                mostFrequentExpenseDay = mostFrequentExpenseDay,
             )
             Timber.d(
                 "Transactions for stats: %s",
@@ -160,16 +160,16 @@ class FinancialStatisticsViewModel(
                         it.date,
                         it.amount,
                         it.category,
-                        if (it.isExpense) "EXP" else "INC"
+                        if (it.isExpense) "EXP" else "INC",
                     )
-                }
+                },
             )
             _state.value = _state.value.copy(
                 transactions = transactions,
                 income = income,
                 expense = expense,
                 period = formatPeriod(periodStartDate, periodEndDate),
-                isLoading = false
+                isLoading = false,
             )
         }
     }
@@ -178,4 +178,4 @@ class FinancialStatisticsViewModel(
         val format = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
         return "${format.format(start)} - ${format.format(end)}"
     }
-} 
+}

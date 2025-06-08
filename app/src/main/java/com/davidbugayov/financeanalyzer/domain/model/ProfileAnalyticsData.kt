@@ -13,5 +13,5 @@ data class ProfileAnalyticsData(
     val totalIncomeCategories: Int,
     val averageExpense: String, // Рассмотреть возможность возвращать Money и форматировать в UI
     val totalSourcesUsed: Int,
-    val dateRange: String
-) 
+    val dateRange: String,
+)

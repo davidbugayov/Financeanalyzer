@@ -37,4 +37,4 @@ val analyticsModule = module {
 
         composite
     }
-} 
+}

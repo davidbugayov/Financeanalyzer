@@ -36,7 +36,7 @@ fun TransactionHeader(
     onDateClick: () -> Unit,
     onToggleTransactionType: () -> Unit,
     forceExpense: Boolean,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Добавляем лог для отслеживания состояния при каждом рендеринге
     Timber.d("TransactionHeader рендеринг: isExpense=$isExpense, forceExpense=$forceExpense")
@@ -46,7 +46,7 @@ fun TransactionHeader(
             .fillMaxWidth()
             .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         val dateFormat = SimpleDateFormat("dd MMMM", Locale.forLanguageTag("ru"))
         val formattedDate = dateFormat.format(date)
@@ -58,11 +58,11 @@ fun TransactionHeader(
             modifier = Modifier
                 .clip(RoundedCornerShape(8.dp))
                 .clickable(onClick = onDateClick)
-                .padding(vertical = 4.dp, horizontal = 8.dp)
+                .padding(vertical = 4.dp, horizontal = 8.dp),
         )
 
         Row(
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
         ) {
             FilterChip(
                 selected = !isExpense,
@@ -72,8 +72,8 @@ fun TransactionHeader(
                 label = { Text(stringResource(R.string.income_type)) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = incomeColor.copy(alpha = 0.2f),
-                    selectedLabelColor = incomeColor
-                )
+                    selectedLabelColor = incomeColor,
+                ),
             )
 
             FilterChip(
@@ -84,9 +84,9 @@ fun TransactionHeader(
                 label = { Text(stringResource(R.string.expense_type)) },
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = expenseColor.copy(alpha = 0.2f),
-                    selectedLabelColor = expenseColor
-                )
+                    selectedLabelColor = expenseColor,
+                ),
             )
         }
     }
-} 
+}

@@ -40,7 +40,7 @@ fun AmountField(
     onAmountChange: (String) -> Unit,
     isError: Boolean,
     accentColor: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     // Внутреннее состояние для "сырого" значения, синхронизированное с amount от ViewModel
     var internalRawAmount by remember { mutableStateOf(amount) }
@@ -50,7 +50,7 @@ fun AmountField(
         val numericAmount = amount.toDoubleOrNull()
         val initialText = if (numericAmount != null) Money(numericAmount).format() else amount
         mutableStateOf(
-            TextFieldValue(text = initialText, selection = TextRange(initialText.length))
+            TextFieldValue(text = initialText, selection = TextRange(initialText.length)),
         )
     }
 
@@ -80,7 +80,7 @@ fun AmountField(
         if (textFieldValueForDisplay.text != textToShow) {
             textFieldValueForDisplay = TextFieldValue(
                 text = textToShow,
-                selection = TextRange(textToShow.length)
+                selection = TextRange(textToShow.length),
             )
         }
     }
@@ -88,7 +88,7 @@ fun AmountField(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 0.dp)
+            .padding(horizontal = 16.dp, vertical = 0.dp),
     ) {
         OutlinedTextField(
             value = textFieldValueForDisplay,
@@ -108,19 +108,19 @@ fun AmountField(
                     val originalSelection = newTextFieldValue.selection
                     val newSelectionStart = originalSelection.start - newTextFieldValue.text.substring(
                         0,
-                        originalSelection.start
+                        originalSelection.start,
                     ).count { it == ' ' }
                     val newSelectionEnd = originalSelection.end - newTextFieldValue.text.substring(
                         0,
-                        originalSelection.end
+                        originalSelection.end,
                     ).count { it == ' ' }
 
                     textFieldValueForDisplay = TextFieldValue(
                         text = rawTextWithoutSpaces,
                         selection = TextRange(
                             start = newSelectionStart.coerceIn(0, rawTextWithoutSpaces.length),
-                            end = newSelectionEnd.coerceIn(0, rawTextWithoutSpaces.length)
-                        )
+                            end = newSelectionEnd.coerceIn(0, rawTextWithoutSpaces.length),
+                        ),
                     )
                 }
                 // Если поле теряет фокус, LaunchedEffect(amount, isFocused)
@@ -138,7 +138,7 @@ fun AmountField(
             textStyle = MaterialTheme.typography.titleLarge.copy(
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
-                color = accentColor
+                color = accentColor,
             ),
             singleLine = true,
             minLines = 1,
@@ -147,11 +147,11 @@ fun AmountField(
                 Text(
                     text = "0",
                     style = MaterialTheme.typography.titleLarge.copy(
-                        textAlign = TextAlign.End
+                        textAlign = TextAlign.End,
                     ),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f)
+                    color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
                 )
             },
             supportingText = {
@@ -162,20 +162,20 @@ fun AmountField(
                 Text(
                     text = "₽",
                     style = MaterialTheme.typography.titleLarge,
-                    color = accentColor
+                    color = accentColor,
                 )
-            }
+            },
         )
     }
     Row(
         horizontalArrangement = Arrangement.spacedBy(
             space = 6.dp,
-            alignment = Alignment.CenterHorizontally
+            alignment = Alignment.CenterHorizontally,
         ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         val opButtons = listOf("+", "-", "×", "÷")
         opButtons.forEach { op ->
@@ -198,7 +198,7 @@ fun AmountField(
                     if (isFocused) {
                         textFieldValueForDisplay = TextFieldValue(
                             text = newRawText,
-                            selection = TextRange(newRawText.length)
+                            selection = TextRange(newRawText.length),
                         )
                     }
                     // Если поле не в фокусе, LaunchedEffect(amount, isFocused)
@@ -207,7 +207,7 @@ fun AmountField(
                 modifier = Modifier.size(34.dp),
                 shape = CircleShape,
                 contentPadding = PaddingValues(0.dp),
-                colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor)
+                colors = ButtonDefaults.outlinedButtonColors(contentColor = accentColor),
             ) {
                 Text(op, style = MaterialTheme.typography.titleMedium)
             }

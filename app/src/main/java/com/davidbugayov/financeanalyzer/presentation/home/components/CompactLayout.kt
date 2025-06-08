@@ -39,24 +39,24 @@ private fun CompactBalanceAndFilters(
     state: HomeState,
     onFilterSelected: (TransactionFilter) -> Unit,
     onToggleGroupSummary: (Boolean) -> Unit,
-    showGroupSummary: Boolean
+    showGroupSummary: Boolean,
 ) {
     BalanceCard(balance = state.balance)
     state.error?.let {
         Text(
             text = it,
             color = MaterialTheme.colorScheme.error,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 4.dp),
         )
     }
     HomeFilterChips(
         currentFilter = state.currentFilter,
-        onFilterSelected = onFilterSelected
+        onFilterSelected = onFilterSelected,
     )
     HomeTransactionsHeader(
         currentFilter = state.currentFilter,
         showGroupSummary = showGroupSummary,
-        onToggleGroupSummary = onToggleGroupSummary
+        onToggleGroupSummary = onToggleGroupSummary,
     )
 }
 
@@ -66,7 +66,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
         modifier = Modifier
             .fillMaxSize()
             .padding(top = 12.dp),
-        contentAlignment = Alignment.TopCenter
+        contentAlignment = Alignment.TopCenter,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
             androidx.compose.material3.Icon(
@@ -75,7 +75,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                 tint = MaterialTheme.colorScheme.primary,
                 modifier = Modifier
                     .padding(bottom = 8.dp)
-                    .size(36.dp)
+                    .size(36.dp),
             )
             Text(
                 text = stringResource(R.string.empty_state_title),
@@ -83,7 +83,7 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                 color = MaterialTheme.colorScheme.onSurface,
                 maxLines = 2,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                modifier = Modifier.padding(bottom = 4.dp)
+                modifier = Modifier.padding(bottom = 4.dp),
             )
             Text(
                 text = stringResource(R.string.empty_state_subtitle),
@@ -92,25 +92,25 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                 maxLines = 3,
                 fontSize = 13.sp,
                 textAlign = androidx.compose.ui.text.style.TextAlign.Center,
-                modifier = Modifier.padding(bottom = 12.dp)
+                modifier = Modifier.padding(bottom = 12.dp),
             )
             androidx.compose.material3.Button(
                 onClick = onAddClick,
                 shape = RoundedCornerShape(50),
                 colors = androidx.compose.material3.ButtonDefaults.buttonColors(
                     containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White
+                    contentColor = Color.White,
                 ),
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 16.dp)
-                    .heightIn(min = 44.dp)
+                    .heightIn(min = 44.dp),
             ) {
                 Text(
                     text = stringResource(R.string.empty_state_add_first_transaction),
                     fontWeight = FontWeight.Medium,
                     fontSize = 15.sp,
-                    maxLines = 1
+                    maxLines = 1,
                 )
             }
         }
@@ -123,7 +123,7 @@ private fun CompactTransactionList(
     categoriesViewModel: CategoriesViewModel,
     showGroupSummary: Boolean,
     onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit
+    onTransactionLongClick: (Transaction) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
     LaunchedEffect(showGroupSummary) {
@@ -134,7 +134,7 @@ private fun CompactTransactionList(
     }
     LazyColumn(
         state = lazyListState,
-        modifier = Modifier.fillMaxSize()
+        modifier = Modifier.fillMaxSize(),
     ) {
         if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
             item {
@@ -143,20 +143,20 @@ private fun CompactTransactionList(
                     totalIncome = state.filteredIncome,
                     totalExpense = state.filteredExpense,
                     currentFilter = state.currentFilter,
-                    balance = state.filteredBalance
+                    balance = state.filteredBalance,
                 )
             }
         }
         items(
             items = state.filteredTransactions,
             key = { it.id },
-            contentType = { "transaction" }
+            contentType = { "transaction" },
         ) { transaction ->
             TransactionItem(
                 transaction = transaction,
                 categoriesViewModel = categoriesViewModel,
                 onClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick
+                onTransactionLongClick = onTransactionLongClick,
             )
         }
     }
@@ -171,18 +171,18 @@ fun CompactLayout(
     onFilterSelected: (TransactionFilter) -> Unit,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
-    onAddClick: () -> Unit
+    onAddClick: () -> Unit,
 ) {
     Column(
         modifier = Modifier
             .fillMaxSize()
-            .padding(horizontal = 8.dp)
+            .padding(horizontal = 8.dp),
     ) {
         CompactBalanceAndFilters(
             state = state,
             onFilterSelected = onFilterSelected,
             onToggleGroupSummary = onToggleGroupSummary,
-            showGroupSummary = showGroupSummary
+            showGroupSummary = showGroupSummary,
         )
         when {
             !state.isLoading && state.filteredTransactions.isEmpty() -> {
@@ -194,9 +194,9 @@ fun CompactLayout(
                     categoriesViewModel = categoriesViewModel,
                     showGroupSummary = showGroupSummary,
                     onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick
+                    onTransactionLongClick = onTransactionLongClick,
                 )
             }
         }
     }
-} 
+}
