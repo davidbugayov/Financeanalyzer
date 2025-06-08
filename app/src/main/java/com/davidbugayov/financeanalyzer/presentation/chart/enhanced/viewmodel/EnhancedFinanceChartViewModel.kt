@@ -253,17 +253,17 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
             )
         }
         val totalMoney = if (showExpenses) {
-            pieChartDataList.sumOf { it.money.amount.toDouble() }
+            pieChartDataList.fold(BigDecimal.ZERO) { acc, item -> acc + item.money.amount }
         } else {
             // Для доходов считаем сумму только по положительным значениям
-            pieChartDataList.sumOf { it.money.amount.toDouble().coerceAtLeast(0.0) }
+            pieChartDataList.fold(BigDecimal.ZERO) { acc, item -> acc + item.money.amount.max(BigDecimal.ZERO) }
         }
-        return if (pieChartDataList.isNotEmpty() && totalMoney != 0.0) {
+        return if (pieChartDataList.isNotEmpty() && totalMoney != BigDecimal.ZERO) {
             pieChartDataList.map { item ->
                 val percent = if (showExpenses) {
-                    (item.money.amount.toDouble() / totalMoney * 100.0).toFloat()
+                    item.money.amount.divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
                 } else {
-                    (item.money.amount.toDouble().coerceAtLeast(0.0) / totalMoney * 100.0).toFloat()
+                    item.money.amount.max(BigDecimal.ZERO).divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
                 }
                 item.copy(percentage = percent)
             }

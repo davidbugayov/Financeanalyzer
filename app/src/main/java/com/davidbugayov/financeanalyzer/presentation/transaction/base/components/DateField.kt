@@ -22,7 +22,7 @@ fun DateField(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
+    val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
     val formattedDate = dateFormat.format(date)
 
     OutlinedTextField(

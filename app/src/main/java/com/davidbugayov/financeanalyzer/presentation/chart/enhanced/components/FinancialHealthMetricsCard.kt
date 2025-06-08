@@ -232,7 +232,7 @@ private fun SavingsRateSection(savingsRate: Double) {
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
-                    text = stringResource(R.string.savings_rate_percent, savingsRate.toInt()),
+                    text = stringResource(R.string.savings_rate_percent, savingsRate.toBigDecimal().setScale(0, java.math.RoundingMode.FLOOR).toPlainString()),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onSurface
@@ -312,7 +312,7 @@ private fun FinancialCushionSection(
                         verticalAlignment = Alignment.Bottom
                     ) {
                         Text(
-                            text = stringResource(R.string.financial_cushion_months, monthsOfSavings.toInt()),
+                            text = stringResource(R.string.financial_cushion_months, monthsOfSavings.toBigDecimal().setScale(0, java.math.RoundingMode.FLOOR).toPlainString()),
                             style = MaterialTheme.typography.headlineMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onSurface

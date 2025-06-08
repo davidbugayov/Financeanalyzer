@@ -11,6 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.catego
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import timber.log.Timber
 import java.io.BufferedReader
+import java.math.BigDecimal
 import java.text.ParseException
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -169,8 +170,8 @@ class TbankPdfImportUseCase(
             val amountStr = amountWithDescMatch.groupValues[2].replace("\\s".toRegex(), "").replace(",", ".")
             val description = amountWithDescMatch.groupValues[5].trim()
             try {
-                val amountValue = amountStr.toDouble()
-                partial.amount = amountValue
+                val amountValue = amountStr.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                partial.amount = amountValue.toDouble()
                 partial.descriptionLines.add(description)
                 val isExpenseBySign = sign == "-"
                 val isExpenseByDescription = !description.contains("Пополнение", ignoreCase = true) &&
@@ -191,8 +192,8 @@ class TbankPdfImportUseCase(
             try {
                 val sign = simpleAmountMatch.groupValues[1]
                 val amountStr = simpleAmountMatch.groupValues[2].replace("\\s".toRegex(), "").replace(",", ".")
-                val amountValue = amountStr.toDouble()
-                partial.amount = amountValue
+                val amountValue = amountStr.toBigDecimalOrNull() ?: BigDecimal.ZERO
+                partial.amount = amountValue.toDouble()
                 partial.isExpense = sign == "-" || (sign.isEmpty() && !partial.buildDescription().contains("Пополнение", ignoreCase = true))
                 partial.currency = Currency.RUB
                 val remainingText = trimmedLine.substring(simpleAmountMatch.range.last + 1).trim()

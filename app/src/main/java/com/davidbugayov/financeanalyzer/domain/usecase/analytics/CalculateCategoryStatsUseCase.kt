@@ -4,6 +4,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import java.math.BigDecimal
 import java.util.Date
 
 /**
@@ -26,7 +27,7 @@ class CalculateCategoryStatsUseCase(
         periodType: PeriodType,
         startDate: Date,
         endDate: Date
-    ): Triple<Money, Money, Int?> {
+    ): Triple<Money, Money, BigDecimal?> {
         // Если список пуст или нет выбранных категорий, быстро возвращаем нулевые значения
         if (transactions.isEmpty() || categories.isEmpty()) {
             return Triple(Money.zero(), Money.zero(), null)
@@ -86,7 +87,7 @@ class CalculateCategoryStatsUseCase(
 
         // Рассчитываем процентное изменение только если оба периода имеют данные
         val percentChange = if (!previousPeriodTotal.isZero()) {
-            currentPeriodTotal.percentageDifference(previousPeriodTotal).toInt()
+            currentPeriodTotal.percentageDifference(previousPeriodTotal)
         } else null
 
         return Triple(currentPeriodTotal, previousPeriodTotal, percentChange)

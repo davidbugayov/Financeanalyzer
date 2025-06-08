@@ -2,11 +2,14 @@ package com.davidbugayov.financeanalyzer
 
 import android.content.Intent
 import android.os.Bundle
+import android.os.Process
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -23,9 +26,7 @@ class FinanceActivity : ComponentActivity() {
     private var startDestination = Screen.Home.route
     
     override fun onCreate(savedInstanceState: Bundle?) {
-        // Устанавливаем сплеш-скрин перед вызовом super.onCreate()
         val splashScreen = installSplashScreen()
-        
         super.onCreate(savedInstanceState)
         
         // Обрабатываем deep links
@@ -55,17 +56,23 @@ class FinanceActivity : ComponentActivity() {
         var isReady = false
         splashScreen.setKeepOnScreenCondition { !isReady }
         
-        setContent {
-            FinanceAnalyzerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    MainScreen(startDestination = startDestination)
-                    isReady = true
-                }
-            }
+        enableEdgeToEdge()
+
+        Thread.setDefaultUncaughtExceptionHandler { _, e ->
+            // Логирование и оповещение об ошибке
+            android.util.Log.e("FinanceActivity", "Unhandled exception", e)
+            
+            // Перезапускаем приложение
+            val intent = Intent(this, FinanceActivity::class.java)
+            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            startActivity(intent)
+            
+            // Завершаем текущий процесс
+            Process.killProcess(Process.myPid())
+            System.exit(10)
         }
+        
+        applyContent()
     }
 
     /**
@@ -78,6 +85,24 @@ class FinanceActivity : ComponentActivity() {
                     startDestination = "add"
                 }
             }
+        }
+    }
+
+    private fun applyContent() {
+        setContent {
+            FinanceAppContent()
+        }
+    }
+}
+
+@Composable
+fun FinanceAppContent() {
+    FinanceAnalyzerTheme {
+        Surface(
+            modifier = Modifier.fillMaxSize(),
+            color = MaterialTheme.colorScheme.background
+        ) {
+            MainScreen()
         }
     }
 }

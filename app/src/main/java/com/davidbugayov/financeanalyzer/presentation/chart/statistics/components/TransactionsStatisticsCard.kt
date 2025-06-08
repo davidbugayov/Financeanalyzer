@@ -91,7 +91,7 @@ fun TransactionsStatisticsCard(
             // Дополнительные метрики
             MetricRow(
                 title = stringResource(R.string.savings_rate_label),
-                value = "${metrics.savingsRate.toInt()}%"
+                value = "${metrics.savingsRate.toBigDecimal().setScale(0, java.math.RoundingMode.FLOOR).toPlainString()}%"
             )
             MetricRow(
                 title = stringResource(R.string.months_of_savings_label),

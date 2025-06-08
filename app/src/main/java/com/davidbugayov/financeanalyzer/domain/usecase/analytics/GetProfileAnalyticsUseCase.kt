@@ -20,7 +20,7 @@ class GetProfileAnalyticsUseCase(
 ) {
 
     // SimpleDateFormat вынесен в поле класса
-    private val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+    private val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru-RU"))
 
     suspend fun execute(): Result<ProfileAnalyticsData> = withContext(Dispatchers.Default) {
         try {
@@ -53,7 +53,7 @@ class GetProfileAnalyticsUseCase(
             val balance = totalIncome - totalExpense
 
             val savingsRate = if (!totalIncome.isZero()) {
-                (balance.percentageOf(totalIncome)).coerceIn(0.0, 100.0)
+                (balance.percentageOf(totalIncome)).toDouble().coerceIn(0.0, 100.0)
             } else {
                 0.0
             }

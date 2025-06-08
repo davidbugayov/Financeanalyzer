@@ -16,6 +16,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import timber.log.Timber
 import java.io.BufferedInputStream
 import java.util.Locale
+import java.text.SimpleDateFormat
+import java.util.Date
 
 /**
  * Обработчик Excel-выписок Альфа-Банка
@@ -104,7 +106,7 @@ class AlfaBankExcelHandler(
                 defaultCurrencyCode = "RUB",
                 dateFormatConfig = DateFormatConfig(
                     primaryDateFormatString = "dd.MM.yyyy",
-                    locale = Locale("ru")
+                    locale = Locale.forLanguageTag("ru")
                 ),
                 amountParseConfig = AmountParseConfig(
                     decimalSeparator = ',',
@@ -120,5 +122,16 @@ class AlfaBankExcelHandler(
             return GenericExcelImportUseCase(context, transactionRepository, alfaBankConfig, transactionSource, debugEnabled)
         }
         throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
+    }
+
+    private fun parseDate(dateStr: String): Date? {
+        val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        
+        return try {
+            simpleDateFormat.parse(dateStr)
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка парсинга даты: $dateStr")
+            null
+        }
     }
 }

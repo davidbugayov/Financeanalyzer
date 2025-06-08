@@ -41,7 +41,7 @@ class GroupTransactionsUseCase {
      * @return Карта сгруппированных по дням транзакций
      */
     private fun groupByDay(transactions: List<Transaction>): Map<String, List<Transaction>> {
-        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale("ru"))
+        val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
         val groupedTransactions = transactions
             .sortedByDescending { it.date }
             .groupBy { dateFormat.format(it.date).replaceFirstChar { it.uppercase() } }
@@ -78,9 +78,9 @@ class GroupTransactionsUseCase {
         for (transaction in sortedTransactions) {
             calendar.time = transaction.date
             calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
-            val firstDay = SimpleDateFormat("dd.MM", Locale("ru")).format(calendar.time)
+            val firstDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(calendar.time)
             calendar.add(Calendar.DAY_OF_WEEK, 6)
-            val lastDay = SimpleDateFormat("dd.MM", Locale("ru")).format(calendar.time)
+            val lastDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(calendar.time)
             val year = calendar.get(Calendar.YEAR)
             val weekKey = "$firstDay - $lastDay $year"
 
@@ -115,7 +115,7 @@ class GroupTransactionsUseCase {
      * @return Карта сгруппированных по месяцам транзакций
      */
     private fun groupByMonth(transactions: List<Transaction>): Map<String, List<Transaction>> {
-        val format = SimpleDateFormat("MMMM yyyy", Locale("ru"))
+        val format = SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru"))
         val groupedTransactions = transactions
             .sortedByDescending { it.date }
             .groupBy { format.format(it.date).replaceFirstChar { it.uppercase() } }

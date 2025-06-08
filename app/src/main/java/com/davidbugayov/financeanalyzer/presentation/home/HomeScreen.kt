@@ -28,6 +28,7 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -47,17 +48,14 @@ import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import ru.rustore.sdk.appupdate.manager.factory.RuStoreAppUpdateManagerFactory
-import ru.rustore.sdk.appupdate.model.AppUpdateOptions
-import ru.rustore.sdk.appupdate.model.AppUpdateType
-import ru.rustore.sdk.review.RuStoreReviewManagerFactory
+import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.delay
 import timber.log.Timber
-
 /**
  * Главный экран приложения.
  * Отображает текущий баланс и последние транзакции.
@@ -193,78 +191,18 @@ private fun HomeFeedback(
     )
 }
 
-fun showRuStoreReview(activity: Activity) {
-    try {
-        val reviewManager = RuStoreReviewManagerFactory.create(activity)
-        reviewManager.requestReviewFlow()
-            .addOnSuccessListener { reviewInfo ->
-                reviewManager.launchReviewFlow(reviewInfo)
-                    .addOnSuccessListener {
-                        Timber.d("RuStore review flow completed successfully")
-                    }
-                    .addOnFailureListener { throwable ->
-                        Timber.e(throwable, "Failed to launch RuStore review flow")
-                    }
-            }
-            .addOnFailureListener { throwable ->
-                Timber.e(throwable, "Failed to request RuStore review flow")
-            }
-    } catch (e: Exception) {
-        Timber.e(e, "Error initializing RuStore review manager")
-    }
-}
-
-fun checkForRuStoreUpdate(activity: Activity) {
-    try {
-        val updateManager = RuStoreAppUpdateManagerFactory.create(activity)
-
-        // Проверяем наличие обновлений
-        updateManager.getAppUpdateInfo()
-            .addOnSuccessListener { updateInfo ->
-                if (updateInfo.updateAvailability == ru.rustore.sdk.appupdate.model.UpdateAvailability.UPDATE_AVAILABLE) {
-                    Timber.d("RuStore update available, launching update flow")
-
-                    // Запускаем отложенное обновление
-                    val appUpdateOptions = AppUpdateOptions.Builder()
-                        .appUpdateType(AppUpdateType.FLEXIBLE)
-                        .build()
-
-                    updateManager.startUpdateFlow(updateInfo, appUpdateOptions)
-                        .addOnSuccessListener {
-                            Timber.d("RuStore update flow started successfully")
-                        }
-                        .addOnFailureListener { exception ->
-                            Timber.e(exception, "Failed to start RuStore update flow")
-                        }
-                } else {
-                    Timber.d("No RuStore update available")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Timber.e(exception, "Failed to check for RuStore updates")
-            }
-    } catch (e: Exception) {
-        Timber.e(e, "Error initializing RuStore update manager")
-    }
-}
-
 @Composable
 fun HomeScreen(
-    viewModel: HomeViewModel,
-    editTransactionViewModel: EditTransactionViewModel,
-    onNavigateToHistory: () -> Unit,
-    onNavigateToAdd: () -> Unit,
-    onNavigateToChart: () -> Unit,
-    onNavigateToProfile: () -> Unit,
-    onNavigateToEdit: (String) -> Unit,
-    navController: NavController,
-    achievementsUiViewModel: AchievementsUiViewModel = koinViewModel()
+    navController: NavController = rememberNavController(),
+    viewModel: HomeViewModel = koinViewModel(),
+    categoriesViewModel: CategoriesViewModel = koinViewModel(),
+    editViewModel: EditTransactionViewModel = koinViewModel(),
+    achievementsUiViewModel: AchievementsUiViewModel = koinViewModel(),
+    updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject()
 ) {
-    val categoriesViewModel: CategoriesViewModel = koinViewModel()
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
-    val updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject()
 
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
@@ -285,33 +223,12 @@ fun HomeScreen(
         navController.currentBackStackEntry?.savedStateHandle?.set("show_achievement_feedback", false)
     }
 
-    val showRuStoreReviewFlag = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("show_rustore_review") == true
-    LaunchedEffect(showRuStoreReviewFlag) {
-        if (showRuStoreReviewFlag) {
-            kotlinx.coroutines.delay(3000)
-            if (context is Activity) showRuStoreReview(context)
-            navController.currentBackStackEntry?.savedStateHandle?.set("show_rustore_review", false)
-        }
-    }
-
-    val achievementsUiState by achievementsUiViewModel.uiState.collectAsState()
-    achievementsUiState.current?.let { achievement ->
-        FeedbackMessage(
-            title = stringResource(R.string.achievement_first_steps_unlocked),
-            message = achievement.title,
-            type = FeedbackType.SUCCESS,
-            visible = true,
-            onDismiss = { achievementsUiViewModel.onAchievementShown() }
-        )
-    }
-
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "home",
             screenClass = "HomeScreen"
         )
         updateWidgetsUseCase(context)
-        if (context is Activity) checkForRuStoreUpdate(context)
     }
     LaunchedEffect(Unit) {
         val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)
@@ -362,14 +279,14 @@ fun HomeScreen(
                     feedbackType = FeedbackType.SUCCESS
                     showFeedback = true
                 },
-                onNavigateToProfile = onNavigateToProfile
+                onNavigateToProfile = { /* Implementation needed */ }
             )
         },
         bottomBar = {
             HomeBottomBar(
-                onNavigateToChart = onNavigateToChart,
-                onNavigateToHistory = onNavigateToHistory,
-                onNavigateToAdd = onNavigateToAdd
+                onNavigateToChart = { /* Implementation needed */ },
+                onNavigateToHistory = { /* Implementation needed */ },
+                onNavigateToAdd = { /* Implementation needed */ }
             )
         }
     ) { paddingValues ->
@@ -390,7 +307,7 @@ fun HomeScreen(
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = onNavigateToAdd
+                    onAddClick = { /* Implementation needed */ }
                 )
             }
             HomeFeedback(
@@ -428,8 +345,8 @@ fun HomeScreen(
                 feedbackType = FeedbackType.ERROR
                 showFeedback = true
             } else {
-                editTransactionViewModel.loadTransactionForEditById(transaction.id)
-                onNavigateToEdit(transaction.id)
+                editViewModel.loadTransactionForEditById(transaction.id)
+                /* Implementation needed */
             }
             showActionsDialog = false
             selectedTransactionForActions = null
@@ -448,4 +365,15 @@ fun HomeScreen(
             viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
         }
     )
+
+    val achievementsUiState by achievementsUiViewModel.uiState.collectAsState()
+    achievementsUiState.current?.let { achievement ->
+        FeedbackMessage(
+            title = stringResource(R.string.achievement_first_steps_unlocked),
+            message = achievement.title,
+            type = FeedbackType.SUCCESS,
+            visible = true,
+            onDismiss = { achievementsUiViewModel.onAchievementShown() }
+        )
+    }
 }

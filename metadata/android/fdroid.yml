@@ -1,0 +1,33 @@
+Categories:
+  - Money
+License: MIT
+AuthorName: David Bugayov
+SourceCode: https://github.com/yourusername/Financeanalyzer
+IssueTracker: https://github.com/yourusername/Financeanalyzer/issues
+Changelog: https://github.com/yourusername/Financeanalyzer/releases
+
+AutoName: Finance Analyzer
+
+RepoType: git
+Repo: https://github.com/yourusername/Financeanalyzer
+
+Builds:
+  - versionName: 1.0.0
+    versionCode: 1
+    commit: v1.0.0
+    subdir: app
+    gradle:
+      - fdroid
+    rm:
+      - app/google-services.json
+    scanignore:
+      - lib/
+
+MaintainerNotes: |-
+  This app uses Gradle build flavors to provide a proprietary variant with Google/Firebase
+  and RuStore features, and a free variant without any proprietary dependencies.
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 1.0.0
+CurrentVersionCode: 1 

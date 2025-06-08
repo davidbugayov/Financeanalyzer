@@ -23,8 +23,10 @@ class CalculateBalanceMetricsUseCase {
         val income = transactions.filter { !it.isExpense }.fold(Money.zero()) { acc, t -> acc + t.amount }
         val expense = transactions.filter { it.isExpense }.fold(Money.zero()) { acc, t -> acc + t.amount.abs() }
         val savingsRate = if (!income.isZero()) {
-            (income.minus(expense).amount.toDouble() / income.amount.toDouble()) * 100
-        } else 0.0
+            income.minus(expense).amount
+                .divide(income.amount, 4, java.math.RoundingMode.HALF_EVEN)
+                .multiply(java.math.BigDecimal(100))
+        } else java.math.BigDecimal.ZERO
         val daysInPeriod = if (startDate != null && endDate != null) {
             ((endDate.time - startDate.time) / (1000 * 60 * 60 * 24) + 1).toInt().coerceAtLeast(1)
         } else 1
@@ -32,14 +34,15 @@ class CalculateBalanceMetricsUseCase {
             expense / daysInPeriod.toBigDecimal() else Money.zero()
         val averageMonthlyExpense = averageDailyExpense * 30.toBigDecimal()
         val monthsOfSavings = if (!averageMonthlyExpense.isZero()) {
-            income.minus(expense).amount.toDouble() / averageMonthlyExpense.amount.toDouble()
-        } else 0.0
+            income.minus(expense).amount
+                .divide(averageMonthlyExpense.amount, 4, java.math.RoundingMode.HALF_EVEN)
+        } else java.math.BigDecimal.ZERO
         return BalanceMetrics(
             income = income,
             expense = expense,
-            savingsRate = savingsRate,
+            savingsRate = savingsRate.toDouble(),
             averageDailyExpense = averageDailyExpense,
-            monthsOfSavings = monthsOfSavings
+            monthsOfSavings = monthsOfSavings.toDouble()
         )
     }
 } 

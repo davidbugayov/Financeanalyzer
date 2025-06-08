@@ -30,6 +30,7 @@ import org.koin.java.KoinJavaComponent.inject
 import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
+import java.math.BigDecimal
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -59,11 +60,6 @@ class AddTransactionViewModel(
             incomeCategories = categoriesViewModel.incomeCategories.value
         )
     )
-
-    // Расширение для преобразования строки в Double
-    private fun String.toDouble(): Double {
-        return this.replace(" ", "").replace(",", ".").toDoubleOrNull() ?: 0.0
-    }
 
     // Список доступных кошельков с внутренним MutableStateFlow для обновлений
     private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
@@ -364,8 +360,8 @@ class AddTransactionViewModel(
             validationBuilder.addAmountError()
         } else {
             try {
-                val amountValue = amount.replace(",", ".").toDouble()
-                if (amountValue <= 0) {
+                val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
+                if (amountValue <= BigDecimal.ZERO) {
                     Timber.d("Ошибка: сумма должна быть больше нуля")
                     validationBuilder.addAmountError()
                 }

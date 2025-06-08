@@ -15,6 +15,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
@@ -37,28 +38,29 @@ import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 @Composable
-fun AppNavGraph(
-    navController: NavHostController,
-    startDestination: String,
-    homeViewModel: HomeViewModel,
-    editTransactionViewModel: EditTransactionViewModel,
-    profileViewModel: ProfileViewModel
+fun NavGraph(
+    navController: NavHostController = rememberNavController(),
+    startDestination: String = Screen.Home.route
 ) {
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = startDestination
     ) {
-        mainGraph(navController, homeViewModel, editTransactionViewModel)
+        mainGraph(navController)
         transactionGraph(navController)
-        profileGraph(navController, profileViewModel)
+        profileGraph(navController)
         statisticsGraph(navController)
+
+        composable(Screen.Home.route) {
+            HomeScreenWrapper(
+                navController = navController
+            )
+        }
     }
 }
 
 fun NavGraphBuilder.mainGraph(
-    navController: NavHostController,
-    homeViewModel: HomeViewModel,
-    editTransactionViewModel: EditTransactionViewModel
+    navController: NavHostController
 ) {
     composable(
         route = Screen.Home.route,
@@ -67,16 +69,8 @@ fun NavGraphBuilder.mainGraph(
         popEnterTransition = defaultEnterRight(),
         popExitTransition = defaultExitLeft()
     ) {
-        HomeScreen(
-            viewModel = homeViewModel,
-            editTransactionViewModel = editTransactionViewModel,
-            onNavigateToHistory = { navController.navigate(Screen.History.route) },
-            onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
-            onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-            onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
-            onNavigateToEdit = { transactionId -> navController.navigate(Screen.EditTransaction.createRoute(transactionId)) },
-            navController = navController,
-            achievementsUiViewModel = koinViewModel()
+        HomeScreenWrapper(
+            navController = navController
         )
     }
     composable(
@@ -88,7 +82,7 @@ fun NavGraphBuilder.mainGraph(
     ) {
         TransactionHistoryScreen(
             viewModel = koinViewModel<TransactionHistoryViewModel>(),
-            editTransactionViewModel = editTransactionViewModel,
+            editTransactionViewModel = koinViewModel<EditTransactionViewModel>(),
             onNavigateBack = { navController.navigateUp() },
             navController = navController
         )
@@ -198,10 +192,7 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
     }
 }
 
-fun NavGraphBuilder.profileGraph(
-    navController: NavHostController,
-    profileViewModel: ProfileViewModel
-) {
+fun NavGraphBuilder.profileGraph(navController: NavHostController) {
     composable(
         route = Screen.Profile.route,
         enterTransition = defaultEnterLeft(),
@@ -239,7 +230,7 @@ fun NavGraphBuilder.profileGraph(
         ExportImportScreen(
             onNavigateBack = { navController.popBackStack() },
             onImportClick = { navController.navigate(Screen.ImportTransactions.route) },
-            viewModel = profileViewModel
+            viewModel = koinViewModel<ProfileViewModel>()
         )
     }
 }

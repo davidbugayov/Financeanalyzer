@@ -13,7 +13,7 @@ import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUi
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.defaultTransactionEventFactory
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
 import timber.log.Timber

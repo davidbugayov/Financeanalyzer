@@ -374,3 +374,6 @@
 
 # Keep R8 from potentially optimizing away classes that are accessed via reflection
 -keepattributes InnerClasses,Signature,*Annotation*
+
+# Правила для javax.lang.model
+-dontwarn javax.lang.model.element.Modifier

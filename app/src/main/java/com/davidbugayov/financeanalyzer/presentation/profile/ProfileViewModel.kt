@@ -11,7 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactions
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager

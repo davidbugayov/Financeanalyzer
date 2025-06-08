@@ -73,6 +73,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransact
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import java.math.BigDecimal
+import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -353,7 +354,7 @@ fun BudgetScreen(
                             onClick = {
                                 if (categoryName.isNotBlank() && categoryLimit.isNotBlank()) {
                                     try {
-                                        val limit = categoryLimit.toDouble()
+                                        val limit = categoryLimit.toBigDecimal()
                                         viewModel.onEvent(
                                             BudgetEvent.AddCategory(
                                                 name = categoryName,
@@ -873,7 +874,10 @@ fun WalletCard(
     val contentColor = contentColorFor(backgroundColor)
 
     val percentUsed = if (wallet.limit.amount > BigDecimal.ZERO) {
-        ((wallet.spent.amount / wallet.limit.amount) * BigDecimal("100")).toInt().coerceIn(0, 100)
+        (wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
+            .multiply(BigDecimal(100)))
+            .setScale(0, RoundingMode.FLOOR)
+            .toInt().coerceIn(0, 100)
     } else 0
 
     val progressIndicatorColor = when {

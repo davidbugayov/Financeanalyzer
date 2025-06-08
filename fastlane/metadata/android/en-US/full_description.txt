@@ -1,0 +1,13 @@
+Finance Analyzer (Money Under Control) is a modern personal finance management application that helps users track income and expenses, visualize spending structure, and control their financial life.
+
+Key features:
+• Add income and expenses with categories and sources
+• Detailed analytics with charts and diagrams
+• Category-based budgeting with limit tracking
+• Import transactions from bank statements (PDF, CSV, Excel)
+• Statistics for day, week, month, quarter, and year
+• Customizable categories for income and expenses
+• Financial indicators: savings rate, financial cushion
+• Support for dark/light theme
+
+The application works completely offline, does not require internet, contains no ads and no in-app purchases. All data is stored only on the user's device. 

@@ -53,6 +53,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import timber.log.Timber
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
@@ -163,11 +164,11 @@ fun EnhancedLineChart(
 
     // Вычисляем максимальные и минимальные значения для каждого типа данных
     val (minValue, maxValue) = remember(allPoints) {
-        val maxIncomeValue = if (hasIncomeData) incomeData.maxOfOrNull { it.value.amount.toDouble() }?.toFloat() ?: 0f else 0f
-        val maxExpenseValue = if (hasExpenseData) expenseData.maxOfOrNull { it.value.amount.toDouble() }?.toFloat() ?: 0f else 0f
+        val maxIncomeValue = if (hasIncomeData) incomeData.maxOfOrNull { it.value.amount } ?: BigDecimal.ZERO else BigDecimal.ZERO
+        val maxExpenseValue = if (hasExpenseData) expenseData.maxOfOrNull { it.value.amount } ?: BigDecimal.ZERO else BigDecimal.ZERO
         val effectiveMaxValue = maxOf(maxIncomeValue, maxExpenseValue)
-        val calculatedMaxValue = if (effectiveMaxValue == 0f) 1f else effectiveMaxValue * 1.1f // Ensure not zero, add padding
-        0f to calculatedMaxValue
+        val calculatedMaxValue = if (effectiveMaxValue == BigDecimal.ZERO) BigDecimal.ONE else effectiveMaxValue.multiply(BigDecimal("1.1")) // Ensure not zero, add padding
+        0f to calculatedMaxValue.toFloat()
     }
 
     // Логируем значения для отладки масштабирования
@@ -212,8 +213,8 @@ fun EnhancedLineChart(
     val textMeasurer = rememberTextMeasurer()
 
     // Форматтеры дат
-    val shortDateFormatter = remember { SimpleDateFormat("dd MMM", Locale("ru")) }
-    val fullDateFormatter = remember { SimpleDateFormat("dd MMMM yyyy", Locale("ru")) }
+    val shortDateFormatter = remember { SimpleDateFormat("dd MMM", Locale.forLanguageTag("ru-RU")) }
+    val fullDateFormatter = remember { SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru-RU")) }
 
     // Получаем стандартные размеры из ресурсов
     val cardCornerRadius = dimensionResource(id = R.dimen.chart_card_corner_radius)

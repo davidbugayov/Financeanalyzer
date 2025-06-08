@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import java.util.Calendar
 import java.util.Date
+import java.math.BigDecimal
 
 /**
  * Состояние экрана истории транзакций.
@@ -57,7 +58,7 @@ data class TransactionHistoryState(
     val periodType: PeriodType = PeriodType.ALL,
     val startDate: Date = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time,
     val endDate: Date = Calendar.getInstance().time,
-    val categoryStats: Triple<Money, Money, Int?>? = null,
+    val categoryStats: Triple<Money, Money, BigDecimal?>? = null,
     val showPeriodDialog: Boolean = false,
     val showCategoryDialog: Boolean = false,
     val showSourceDialog: Boolean = false,

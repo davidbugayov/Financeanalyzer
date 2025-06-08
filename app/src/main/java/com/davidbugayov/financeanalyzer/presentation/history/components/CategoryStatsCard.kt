@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import java.math.BigDecimal
 
 /**
  * Карточка со статистикой по выбранной категории.
@@ -35,7 +36,7 @@ fun CategoryStatsCard(
     category: String,
     currentTotal: Money,
     previousTotal: Money,
-    percentChange: Int?
+    percentChange: BigDecimal?
 ) {
     Surface(
         modifier = Modifier
@@ -82,14 +83,15 @@ fun CategoryStatsCard(
             }
             if (percentChange != null) {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
+                val percentChangeInt = percentChange.setScale(0, java.math.RoundingMode.FLOOR).toInt()
                 val changeText = when {
-                    percentChange > 0 -> stringResource(R.string.change_increase, percentChange)
-                    percentChange < 0 -> stringResource(R.string.change_decrease, kotlin.math.abs(percentChange))
+                    percentChangeInt > 0 -> stringResource(R.string.change_increase, percentChangeInt)
+                    percentChangeInt < 0 -> stringResource(R.string.change_decrease, kotlin.math.abs(percentChangeInt))
                     else -> stringResource(R.string.change_no_change)
                 }
                 val percentChangeColor = when {
-                    percentChange > 0 -> MaterialTheme.colorScheme.error // Красный для увеличения расходов
-                    percentChange < 0 -> MaterialTheme.colorScheme.primary // Зеленый для уменьшения расходов
+                    percentChangeInt > 0 -> MaterialTheme.colorScheme.error // Красный для увеличения расходов
+                    percentChangeInt < 0 -> MaterialTheme.colorScheme.primary // Зеленый для уменьшения расходов
                     else -> MaterialTheme.colorScheme.onSurfaceVariant
                 }
                 Text(

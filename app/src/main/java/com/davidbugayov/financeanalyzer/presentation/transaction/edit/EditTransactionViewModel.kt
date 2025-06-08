@@ -24,6 +24,7 @@ import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
+import java.math.BigDecimal
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -153,8 +154,8 @@ class EditTransactionViewModel(
             Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая сумма")
         } else {
             try {
-                val amountValue = amount.replace(",", ".").toDouble()
-                if (amountValue <= 0) {
+                val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
+                if (amountValue <= BigDecimal.ZERO) {
                     validationBuilder.addAmountError()
                     Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %f", amountValue)
                 }

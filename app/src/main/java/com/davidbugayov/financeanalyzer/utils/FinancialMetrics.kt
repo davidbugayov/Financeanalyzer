@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.utils
 
+import android.content.Context
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
@@ -75,4 +76,19 @@ class FinancialMetrics private constructor() : KoinComponent {
     fun getCurrentBalance(): Money = _balance.value
     fun getTotalIncomeAsMoney(): Money = _totalIncome.value
     fun getTotalExpenseAsMoney(): Money = _totalExpense.value
+
+    /**
+     * Инициализация метрик (публичный метод)
+     */
+    fun initialize(context: Context) {
+        Timber.d("Initializing financial metrics")
+        // Здесь может быть код для загрузки настроек или предварительных данных
+    }
+
+    /**
+     * Инициализация метрик (устаревший метод для обратной совместимости)
+     */
+    fun init(context: Context) {
+        initialize(context)
+    }
 }

@@ -289,10 +289,10 @@ data class Money(
      * @return Процентное соотношение (текущее / другое * 100)
      * @throws IllegalArgumentException если валюты не совпадают
      */
-    fun percentageOf(other: Money): Double {
+    fun percentageOf(other: Money): BigDecimal {
         require(currency == other.currency) { "Cannot calculate percentage with different currencies" }
-        if (other.isZero()) return 0.0
-        return (amount.toDouble() / other.amount.toDouble()) * 100.0
+        if (other.isZero()) return BigDecimal.ZERO
+        return amount.divide(other.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100))
     }
 
     /**
@@ -301,10 +301,10 @@ data class Money(
      * @return Процентная разница ((текущее - другое) / другое * 100)
      * @throws IllegalArgumentException если валюты не совпадают
      */
-    fun percentageDifference(other: Money): Double {
+    fun percentageDifference(other: Money): BigDecimal {
         require(currency == other.currency) { "Cannot calculate percentage difference with different currencies" }
-        if (other.isZero()) return if (isZero()) 0.0 else 100.0
-        return ((amount.toDouble() - other.amount.toDouble()) / other.amount.toDouble()) * 100.0
+        if (other.isZero()) return if (isZero()) BigDecimal.ZERO else BigDecimal(100)
+        return (amount.subtract(other.amount)).divide(other.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100))
     }
 
     override fun toString(): String {

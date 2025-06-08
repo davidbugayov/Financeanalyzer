@@ -75,6 +75,7 @@ import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import java.math.BigDecimal
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -142,6 +143,9 @@ fun EnhancedFinanceChartScreen(
             MaterialTheme.colorScheme.surfaceVariant
         )
     )
+
+    // Форматтер дат
+    val dateFormat = remember { SimpleDateFormat("dd MMMM", Locale.forLanguageTag("ru-RU")) }
 
     Scaffold(
         topBar = {
@@ -278,11 +282,11 @@ fun EnhancedFinanceChartScreen(
                                 ) {
                                     // Получаем данные категорий в зависимости от выбранного режима
                                     val categoryData = if (state.showExpenses) {
-                                        Timber.d("Данные по расходам за период ${DateUtils.formatDate(state.startDate)} – ${DateUtils.formatDate(state.endDate)}: ${state.expensesByCategory.size} категорий, сумма: ${state.expensesByCategory.values.sumOf { it.amount.toDouble() }}")
+                                        Timber.d("Данные по расходам за период ${DateUtils.formatDate(state.startDate)} – ${DateUtils.formatDate(state.endDate)}: ${state.expensesByCategory.size} категорий, сумма: ${state.expensesByCategory.values.fold(BigDecimal.ZERO) { acc, money -> acc.add(money.amount) }}")
                                         Timber.d("Список категорий расходов: ${state.expensesByCategory.keys.joinToString()}")
                                         state.expensesByCategory
                                     } else {
-                                        Timber.d("Данные по доходам за период ${DateUtils.formatDate(state.startDate)} – ${DateUtils.formatDate(state.endDate)}: ${state.incomeByCategory.size} категорий, сумма: ${state.incomeByCategory.values.sumOf { it.amount.toDouble() }}")
+                                        Timber.d("Данные по доходам за период ${DateUtils.formatDate(state.startDate)} – ${DateUtils.formatDate(state.endDate)}: ${state.incomeByCategory.size} категорий, сумма: ${state.incomeByCategory.values.fold(BigDecimal.ZERO) { acc, money -> acc.add(money.amount) }}")
                                         Timber.d("Список категорий доходов: ${state.incomeByCategory.keys.joinToString()}")
                                         state.incomeByCategory
                                     }
@@ -339,7 +343,6 @@ fun EnhancedFinanceChartScreen(
                                         onModeSelected = { lineChartDisplayMode = it }
                                     )
 
-                                    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
                                     val periodText = "${dateFormat.format(state.startDate)} – ${dateFormat.format(state.endDate)}"
 
                                     EnhancedLineChart(

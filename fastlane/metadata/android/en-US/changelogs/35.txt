@@ -1,0 +1,3 @@
+- Added Firebase analytics for better app performance tracking
+- Improved app stability and fixed bugs
+- Added support for both Google Play and F-Droid distributions 

@@ -48,7 +48,7 @@ fun TransactionHeader(
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically
     ) {
-        val dateFormat = SimpleDateFormat("dd MMMM", Locale("ru"))
+        val dateFormat = SimpleDateFormat("dd MMMM", Locale.forLanguageTag("ru"))
         val formattedDate = dateFormat.format(date)
 
         Text(

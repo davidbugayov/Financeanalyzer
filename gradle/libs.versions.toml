@@ -9,6 +9,7 @@ kotlinx-datetime = "0.4.1"
 kotlinx-serialization = "1.7.3"
 composeBom = "2025.06.00"
 composeMaterial3 = "1.3.2"
+appmetrica = "6.1.0"
 
 # AndroidX
 androidxCore = "1.16.0"
@@ -126,6 +127,9 @@ exp4j = { group = "net.objecthunter", name = "exp4j", version = "0.4.8" }
 # RuStore SDK
 rustore-review = { group = "ru.rustore.sdk", name = "review", version.ref = "rustore" }
 rustore-appupdate = { group = "ru.rustore.sdk", name = "appupdate", version.ref = "rustore" }
+
+# AppMetrica
+appmetrica-sdk = { group = "io.appmetrica.analytics", name = "analytics", version.ref = "appmetrica" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

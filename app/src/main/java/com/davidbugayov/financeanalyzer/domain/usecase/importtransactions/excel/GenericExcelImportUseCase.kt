@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import org.apache.poi.ss.usermodel.Cell as PoiCell
 import org.apache.poi.ss.usermodel.Row as PoiRow
+import java.math.BigDecimal
 
 // --- Configuration Data Classes Start ---
 
@@ -145,7 +146,7 @@ class GenericExcelImportUseCase(
                     dateFormatConfig = DateFormatConfig(
                         primaryDateFormatString = "dd.MM.yyyy",
                         fallbackDateFormatStrings = listOf("dd.MM.yyyy HH:mm:ss", "yyyy-MM-dd", "MM/dd/yyyy"),
-                        locale = Locale("ru")
+                        locale = Locale.forLanguageTag("ru-RU")
                     ),
                     amountParseConfig = AmountParseConfig(
                         decimalSeparator = ',',
@@ -276,9 +277,8 @@ class GenericExcelImportUseCase(
                                 rowsProcessedForProgress++
                             }
                             if (physicalRows > 0 && rowsProcessedForProgress % 20 == 0) {
-                                val currentProgress =
-                                    10 + ((rowsProcessedForProgress.toDouble() / physicalRows.toDouble()) * 80).toInt().coerceIn(0, 80)
-                                progressCallback.onProgress(currentProgress, 100, "Чтение строк: $rowsProcessedForProgress/$physicalRows")
+                                val progress = BigDecimal(rowsProcessedForProgress).divide(BigDecimal(physicalRows), 4, java.math.RoundingMode.HALF_EVEN).multiply(BigDecimal(80)).setScale(0, java.math.RoundingMode.FLOOR).toInt().coerceIn(0, 80) + 10
+                                progressCallback.onProgress(progress, 100, "Чтение строк: $rowsProcessedForProgress/$physicalRows")
                             }
                         }
                         Timber.d("[$bankName] Excel data extraction successful. Data rows processed: $actualDataRowsProcessed. Config: $config")

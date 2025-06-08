@@ -48,7 +48,8 @@ import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewMo
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.IAnalytics
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
@@ -75,7 +76,8 @@ val appModule = module {
     single { PreferencesManager(androidContext()) }
 
     // Utils & Managers
-    single { AnalyticsUtils }
+    // Получаем аналитику из отдельного модуля analyticsModule, определенного по флейворам
+    single { get<IAnalytics>() }
     single { OnboardingManager(androidContext()) }
 
     // Repositories
@@ -160,3 +162,6 @@ val statisticsModule = module {
         FinancialStatisticsViewModel(get(), get(), startDate, endDate, get())
     }
 }
+
+// Все модули приложения
+val allModules = listOf(appModule, statisticsModule, analyticsModule)

@@ -19,7 +19,7 @@ object UiUtils {
      * @return Строка с форматированным периодом
      */
     fun formatPeriod(periodType: PeriodType, startDate: Date, endDate: Date): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         
         return when (periodType) {
             PeriodType.ALL -> "Все время"
@@ -41,7 +41,7 @@ object UiUtils {
      * @return Строка с кратким форматированным периодом
      */
     fun formatPeriodCompact(periodType: PeriodType, startDate: Date, endDate: Date): String {
-        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale("ru"))
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         
         return when (periodType) {
             PeriodType.ALL -> "Все время"
@@ -49,5 +49,21 @@ object UiUtils {
             PeriodType.WEEK, PeriodType.MONTH, PeriodType.QUARTER, PeriodType.YEAR, PeriodType.CUSTOM ->
                 "${dateFormat.format(startDate)} - ${dateFormat.format(endDate)}"
         }
+    }
+
+    /**
+     * Форматирует дату для отображения в формате дд.мм.гггг
+     */
+    fun formatDate(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        return dateFormat.format(date)
+    }
+
+    /**
+     * Форматирует дату для отображения в формате дд.мм.гггг
+     */
+    fun formatDateTime(date: Date): String {
+        val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
+        return dateFormat.format(date)
     }
 } 

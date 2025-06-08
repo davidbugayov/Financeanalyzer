@@ -59,7 +59,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import timber.log.Timber
 
 /**

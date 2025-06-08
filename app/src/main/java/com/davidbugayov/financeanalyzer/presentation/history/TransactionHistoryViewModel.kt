@@ -17,7 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.utils.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -31,9 +31,8 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
-import javax.inject.Inject
 
-class TransactionHistoryViewModel @Inject constructor(
+class TransactionHistoryViewModel constructor(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
@@ -589,7 +588,7 @@ class TransactionHistoryViewModel @Inject constructor(
     private fun deleteCategory(category: String, isExpense: Boolean) {
         viewModelScope.launch {
             // Логируем удаление категории
-            analyticsUtils.logCategoryDeleted(category, isExpense)
+            AnalyticsUtils.logCategoryDeleted(category, isExpense)
 
             // Обновляем состояние
             _state.update { it.copy(categoryToDelete = null) }
@@ -618,7 +617,7 @@ class TransactionHistoryViewModel @Inject constructor(
         // Реализовать удаление источника
         viewModelScope.launch {
             // Логируем удаление источника
-            analyticsUtils.logCategoryDeleted(source, false)
+            AnalyticsUtils.logCategoryDeleted(source, false)
 
             // Обновляем состояние
             _state.update { it.copy(sourceToDelete = null) }

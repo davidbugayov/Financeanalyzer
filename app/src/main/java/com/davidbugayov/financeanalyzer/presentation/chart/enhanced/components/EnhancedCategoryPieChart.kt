@@ -56,6 +56,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import timber.log.Timber
+import java.math.BigDecimal
 import java.util.Locale
 import kotlin.math.abs
 import kotlin.math.atan2
@@ -631,7 +632,7 @@ private fun DrawPieChart(
         var currentAngle = 0f
         
         // Сначала вычисляем общую сумму процентов
-        val totalPercent = data.sumOf { it.percentage.toDouble() }.toFloat()
+        val totalPercent = data.fold(BigDecimal.ZERO) { acc, item -> acc + item.percentage.toBigDecimal() }.toFloat()
         
         // Нормализуем до 100% для корректного отображения
         val normalizationFactor = if (totalPercent > 0) 100f / totalPercent else 1f

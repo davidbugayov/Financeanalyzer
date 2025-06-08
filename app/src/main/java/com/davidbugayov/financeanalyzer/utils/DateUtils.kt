@@ -7,6 +7,7 @@ import java.util.Date
 import java.util.Locale
 import java.time.LocalDate
 import timber.log.Timber
+import java.util.concurrent.TimeUnit
 
 /**
  * Утилитарный класс для работы с датами
@@ -14,10 +15,14 @@ import timber.log.Timber
 object DateUtils {
 
     /**
-     * Форматирует дату в строку для отображения
+     * Форматирует дату по указанному шаблону
+     *
+     * @param date дата для форматирования
+     * @param pattern шаблон форматирования
+     * @return отформатированная строка
      */
     fun formatDate(date: Date, pattern: String = "dd.MM.yyyy"): String {
-        val format = SimpleDateFormat(pattern, Locale("ru"))
+        val format = SimpleDateFormat(pattern, Locale.forLanguageTag("ru"))
         return format.format(date)
     }
 
@@ -60,7 +65,7 @@ object DateUtils {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
                 
-                Timber.d("DAY период: начало дня = ${formatDate(time)}")
+                Timber.d("DAY период: начало дня = ${formatDate(time, "dd.MM.yyyy")}")
             }.time
             
             PeriodType.WEEK -> calendar.apply {
@@ -70,7 +75,7 @@ object DateUtils {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
                 
-                Timber.d("WEEK период: неделя назад = ${formatDate(time)}")
+                Timber.d("WEEK период: неделя назад = ${formatDate(time, "dd.MM.yyyy")}")
             }.time
             
             PeriodType.MONTH -> calendar.apply {
@@ -180,5 +185,17 @@ object DateUtils {
                 calculateDatesForPeriod(periodType)
             }
         }
+    }
+
+    /**
+     * Вычисляет разницу между датами в днях
+     *
+     * @param date1 первая дата
+     * @param date2 вторая дата
+     * @return разница в днях
+     */
+    fun getDaysBetween(date1: Date, date2: Date): Int {
+        val diffInMillis = Math.abs(date2.time - date1.time)
+        return (diffInMillis / TimeUnit.DAYS.toMillis(1)).toInt()
     }
 } 

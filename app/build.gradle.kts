@@ -1,13 +1,17 @@
 import java.io.FileInputStream
 import java.util.Properties
+import com.android.build.api.variant.ApplicationAndroidComponentsExtension
+import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
-    alias(libs.plugins.google.services)
-    alias(libs.plugins.firebase.crashlytics)
     alias(libs.plugins.compose.compiler)
+    
+    // Применяем Firebase плагины только для google flavor
+    alias(libs.plugins.google.services) apply false
+    alias(libs.plugins.firebase.crashlytics) apply false
 }
 
 fun getKeystoreProperties(): Properties {
@@ -35,11 +39,36 @@ android {
             useSupportLibrary = true
         }
 
+        // Добавляем глобальные флаги для Firebase и RuStore
+        buildConfigField("boolean", "USE_FIREBASE", "true")
+        buildConfigField("boolean", "USE_RUSTORE", "true")
+
         // Enable R8 support
         proguardFiles(
             getDefaultProguardFile("proguard-android-optimize.txt"),
             "proguard-rules.pro"
         )
+    }
+
+    // Добавляем flavors для разных магазинов приложений
+    flavorDimensions += "store"
+    productFlavors {
+        create("google") {
+            dimension = "store"
+            // Google версия использует Firebase и RuStore
+            buildConfigField("boolean", "USE_FIREBASE", "true")
+            buildConfigField("boolean", "USE_RUSTORE", "true")
+            
+            // Применяем плагины только для Google flavor
+            plugins.apply("com.google.gms.google-services")
+            plugins.apply("com.google.firebase.crashlytics")
+        }
+        create("fdroid") {
+            dimension = "store"
+            // F-Droid версия не использует Firebase и RuStore
+            buildConfigField("boolean", "USE_FIREBASE", "false")
+            buildConfigField("boolean", "USE_RUSTORE", "false")
+        }
     }
 
     // Room schema location
@@ -96,20 +125,17 @@ android {
         }
     }
 
-    // Specify different google-services.json files for different build types
+    // Указываем исходные директории для каждого флейвора
     sourceSets {
-        getByName("debug") {
-            assets.srcDir("src/debug/assets")
-            res.srcDir("src/debug/res")
-            java.srcDir("src/debug/java")
-            // google-services.json is located directly in the src/debug/ folder
+        getByName("google") {
+            java.srcDirs("src/google/java")
+            res.srcDirs("src/google/res")
+            manifest.srcFile("src/google/AndroidManifest.xml")
         }
-        
-        getByName("release") {
-            assets.srcDir("src/release/assets")
-            res.srcDir("src/release/res")
-            java.srcDir("src/release/java")
-            // google-services.json is located directly in the src/release/ folder
+        getByName("fdroid") {
+            java.srcDirs("src/fdroid/java")
+            res.srcDirs("src/fdroid/res")
+            manifest.srcFile("src/fdroid/AndroidManifest.xml")
         }
     }
 
@@ -170,7 +196,6 @@ android {
         // warning.add("ObsoleteLintCustomCheck")
     }
     buildToolsVersion = "36.0.0"
-
 }
 
 dependencies {
@@ -188,6 +213,9 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.splashscreen)
     implementation(libs.material)
+    
+    // AppMetrica для всех флейворов
+    implementation(libs.appmetrica.sdk)
     
     // Compose
     implementation(platform(libs.compose.bom))
@@ -216,20 +244,24 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
     
-    // Firebase
-    implementation(platform(libs.firebase.bom))
-    implementation(libs.firebase.analytics.ktx)
-    implementation(libs.firebase.crashlytics.ktx)
-    implementation(libs.firebase.perf.ktx)
+    // Firebase - только для google flavor
+    "googleImplementation"(platform(libs.firebase.bom))
+    "googleImplementation"(libs.firebase.analytics.ktx)
+    "googleImplementation"(libs.firebase.crashlytics.ktx)
+    "googleImplementation"(libs.firebase.perf.ktx)
+    
+    // RuStore SDK только для Google flavor
+    "googleImplementation"(libs.rustore.review)
+    "googleImplementation"(libs.rustore.appupdate)
 
     // Logging
     implementation(libs.timber)
-
+    
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
-
+    
     // JSON
     implementation(libs.gson)
     
@@ -258,16 +290,8 @@ dependencies {
     // PDFBox for Android (tom_roush)
     implementation(libs.pdfbox.android)
 
-    // Apache POI
-    implementation(libs.poi.core)
-    implementation(libs.poi.ooxml)
-
-    // exp4j
+    // Exp4j
     implementation(libs.exp4j)
-
-    // RuStore SDK
-    implementation(libs.rustore.review)
-    implementation(libs.rustore.appupdate)
 }
 
 composeCompiler {
