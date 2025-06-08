@@ -82,13 +82,6 @@ android {
             // Применяем плагины Firebase для RuStore flavor
             plugins.apply("com.google.gms.google-services")
             plugins.apply("com.google.firebase.crashlytics")
-            
-            // Добавляем зависимости RuStore только для RuStore flavor
-            dependencies {
-                // Используем прямые зависимости
-                implementation("ru.rustore.sdk:review:8.0.0")
-                implementation("ru.rustore.sdk:appupdate:8.0.0")
-            }
         }
         
         create("fdroid") {
@@ -283,11 +276,23 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
-    // Firebase - только для google flavor
+    // Firebase - только для google и rustore flavor
     "googleImplementation"(platform(libs.firebase.bom))
     "googleImplementation"(libs.firebase.analytics.ktx)
     "googleImplementation"(libs.firebase.crashlytics.ktx)
     "googleImplementation"(libs.firebase.perf.ktx)
+    
+    // Firebase зависимости для RuStore
+    "rustoreImplementation"(platform(libs.firebase.bom))
+    "rustoreImplementation"(libs.firebase.analytics.ktx)
+    "rustoreImplementation"(libs.firebase.crashlytics.ktx)
+    "rustoreImplementation"(libs.firebase.perf.ktx)
+    
+    // RuStore SDK для Google и RuStore флейворов
+    "googleImplementation"("ru.rustore.sdk:review:8.0.0")
+    "googleImplementation"("ru.rustore.sdk:appupdate:8.0.0")
+    "rustoreImplementation"("ru.rustore.sdk:review:8.0.0") 
+    "rustoreImplementation"("ru.rustore.sdk:appupdate:8.0.0")
 
     // Logging
     implementation(libs.timber)

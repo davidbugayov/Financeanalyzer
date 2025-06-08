@@ -23,12 +23,6 @@ dependencyResolutionManagement {
                 
                 // Исключаем использование для F-Droid
                 excludeGroupByRegex(".*fdroid.*")
-                excludeConfigurationName("fdroidImplementation")
-                excludeConfigurationName("fdroidApi")
-                excludeConfigurationName("fdroidRuntimeOnly")
-                excludeConfigurationName("fdroidCompileOnly")
-                excludeConfigurationName("fdroidDebugImplementation")
-                excludeConfigurationName("fdroidReleaseImplementation")
             }
         }
     }

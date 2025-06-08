@@ -4,20 +4,20 @@ import android.content.Context
 import timber.log.Timber
 
 /**
- * Пустая реализация RuStoreUtils для F-Droid flavor
+ * Заглушка для RuStore SDK в F-Droid flavor
  */
 object RuStoreUtils {
     /**
-     * Пустая реализация метода requestReview
+     * Заглушка для запуска диалога отзыва в RuStore
      */
     fun requestReview(context: Context) {
-        Timber.d("RuStore not available in F-Droid flavor")
+        Timber.d("RuStore review not available in F-Droid flavor")
     }
 
     /**
-     * Пустая реализация метода checkForUpdates
+     * Заглушка для проверки обновлений в RuStore
      */
     fun checkForUpdates(context: Context) {
-        Timber.d("RuStore not available in F-Droid flavor")
+        Timber.d("RuStore updates not available in F-Droid flavor")
     }
 } 

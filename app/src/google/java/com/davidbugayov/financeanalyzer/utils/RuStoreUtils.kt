@@ -5,6 +5,8 @@ import timber.log.Timber
 import ru.rustore.sdk.review.RuStoreReviewManager
 import ru.rustore.sdk.review.RuStoreReviewManagerFactory
 import ru.rustore.sdk.appupdate.manager.factory.RuStoreAppUpdateManagerFactory
+import ru.rustore.sdk.appupdate.model.AppUpdateInfo
+import ru.rustore.sdk.appupdate.model.UpdateAvailability
 
 /**
  * Утилиты для работы с RuStore SDK
@@ -57,5 +59,12 @@ object RuStoreUtils {
         } catch (e: Exception) {
             Timber.e(e, "Error when trying to check for RuStore updates")
         }
+    }
+    
+    /**
+     * Метод расширения для проверки наличия обновления
+     */
+    private fun AppUpdateInfo.updateAvailable(): Boolean {
+        return updateAvailability == UpdateAvailability.UPDATE_AVAILABLE
     }
 } 
