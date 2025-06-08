@@ -16,11 +16,7 @@ import com.davidbugayov.financeanalyzer.R
  * Поле для комментария без иконки прикрепления
  */
 @Composable
-fun CommentField(
-    note: String,
-    onNoteChange: (String) -> Unit,
-    modifier: Modifier = Modifier
-) {
+fun CommentField(note: String, onNoteChange: (String) -> Unit, modifier: Modifier = Modifier) {
     Surface(
         modifier = modifier
             .fillMaxWidth()

@@ -10,13 +10,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 
 /**
@@ -27,10 +25,7 @@ import com.davidbugayov.financeanalyzer.R
  * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
-fun CenteredLoadingIndicator(
-    message: String,
-    modifier: Modifier = Modifier
-) {
+fun CenteredLoadingIndicator(message: String, modifier: Modifier = Modifier) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

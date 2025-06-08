@@ -37,8 +37,7 @@ object DateUtils {
      * Рассчитывает даты начала и конца периода на основе типа периода.
      * Этот метод должен использоваться во всем приложении для обеспечения
      * согласованности расчета периодов между различными экранами.
-     * 
-     * @param periodType Тип периода (день, неделя, месяц и т.д.)
+     * * @param periodType Тип периода (день, неделя, месяц и т.д.)
      * @return Пара дат (начало, конец) для указанного периода
      */
     fun calculateDatesForPeriod(periodType: PeriodType): Pair<Date, Date> {
@@ -58,26 +57,26 @@ object DateUtils {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }.time
-            
+
             PeriodType.DAY -> calendar.apply {
                 set(Calendar.HOUR_OF_DAY, 0)
                 set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
-                
+
                 Timber.d("DAY период: начало дня = ${formatDate(time, "dd.MM.yyyy")}")
             }.time
-            
+
             PeriodType.WEEK -> calendar.apply {
                 add(Calendar.DAY_OF_YEAR, -7)
                 set(Calendar.HOUR_OF_DAY, 0)
                 set(Calendar.MINUTE, 0)
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
-                
+
                 Timber.d("WEEK период: неделя назад = ${formatDate(time, "dd.MM.yyyy")}")
             }.time
-            
+
             PeriodType.MONTH -> calendar.apply {
                 add(Calendar.MONTH, -1)
                 set(Calendar.HOUR_OF_DAY, 0)
@@ -93,7 +92,7 @@ object DateUtils {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }.time
-            
+
             PeriodType.YEAR -> calendar.apply {
                 add(Calendar.YEAR, -1)
                 set(Calendar.HOUR_OF_DAY, 0)
@@ -101,7 +100,7 @@ object DateUtils {
                 set(Calendar.SECOND, 0)
                 set(Calendar.MILLISECOND, 0)
             }.time
-            
+
             PeriodType.CUSTOM -> calendar.apply {
                 add(Calendar.MONTH, -1)
                 set(Calendar.HOUR_OF_DAY, 0)
@@ -110,7 +109,7 @@ object DateUtils {
                 set(Calendar.MILLISECOND, 0)
             }.time
         }
-        
+
         return Pair(startDate, endDate)
     }
 
@@ -120,28 +119,28 @@ object DateUtils {
     fun getTodayDate(): LocalDate {
         return LocalDate.now()
     }
-    
+
     /**
      * Возвращает дату начала текущего года
      */
     fun getYearStartDate(): LocalDate {
         return LocalDate.now().withDayOfYear(1)
     }
-    
+
     /**
      * Возвращает дату начала текущего месяца
      */
     fun getMonthStartDate(): LocalDate {
         return LocalDate.now().withDayOfMonth(1)
     }
-    
+
     /**
      * Возвращает дату начала предыдущего месяца
      */
     fun getPreviousMonthStartDate(): LocalDate {
         return LocalDate.now().minusMonths(1).withDayOfMonth(1)
     }
-    
+
     /**
      * Возвращает дату начала текущей недели (понедельник)
      */
@@ -167,13 +166,16 @@ object DateUtils {
     /**
      * Обновляет тип периода и возвращает рассчитанные даты начала и конца.
      * Единая логика работы с периодами для всего приложения.
-     * 
-     * @param periodType Тип периода (день, неделя, месяц и т.д.)
+     * * @param periodType Тип периода (день, неделя, месяц и т.д.)
      * @param currentStartDate Текущая дата начала (для CUSTOM периода)
      * @param currentEndDate Текущая дата конца (для CUSTOM периода)
      * @return Пара дат (начало, конец) для указанного периода
      */
-    fun updatePeriodDates(periodType: PeriodType, currentStartDate: Date = Date(), currentEndDate: Date = Date()): Pair<Date, Date> {
+    fun updatePeriodDates(
+        periodType: PeriodType,
+        currentStartDate: Date = Date(),
+        currentEndDate: Date = Date()
+    ): Pair<Date, Date> {
         return when (periodType) {
             PeriodType.CUSTOM -> {
                 // Для пользовательского периода сохраняем текущие даты

@@ -42,7 +42,9 @@ fun BudgetTip(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(end = dimensionResource(R.dimen.budget_tip_icon_end_padding))
+                modifier = Modifier.padding(
+                    end = dimensionResource(R.dimen.budget_tip_icon_end_padding)
+                )
             )
             Column(
                 verticalArrangement = Arrangement.Center
@@ -50,13 +52,13 @@ fun BudgetTip(
                 Text(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.primary
                 )
                 Spacer(modifier = Modifier.padding(dimensionResource(R.dimen.budget_tip_spacer)))
                 Text(
                     text = description,
                     style = MaterialTheme.typography.bodySmall,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
         }

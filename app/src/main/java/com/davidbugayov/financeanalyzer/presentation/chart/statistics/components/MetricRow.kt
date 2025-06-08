@@ -9,11 +9,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun MetricRow(
-    title: String,
-    value: String,
-    modifier: Modifier = Modifier
-) {
+fun MetricRow(title: String, value: String, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier
             .fillMaxWidth()

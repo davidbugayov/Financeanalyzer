@@ -15,7 +15,7 @@ object CrashlyticsUtils {
     private fun getCrashlyticsInstance(): FirebaseCrashlytics {
         return FirebaseCrashlytics.getInstance()
     }
-    
+
     /**
      * Логирует нефатальное исключение в Crashlytics и Timber
      */
@@ -27,7 +27,7 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при логировании исключения в Crashlytics")
         }
     }
-    
+
     /**
      * Логирует произвольное сообщение в Crashlytics и Timber
      */
@@ -39,7 +39,7 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при логировании сообщения в Crashlytics")
         }
     }
-    
+
     /**
      * Устанавливает пользовательский идентификатор для Crashlytics
      */
@@ -51,7 +51,7 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при установке userId в Crashlytics")
         }
     }
-    
+
     /**
      * Добавляет строковый ключ-значение в отчет о сбое
      */
@@ -63,7 +63,7 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при установке строкового ключа в Crashlytics")
         }
     }
-    
+
     /**
      * Добавляет целочисленный ключ-значение в отчет о сбое
      */
@@ -75,7 +75,7 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при установке целочисленного ключа в Crashlytics")
         }
     }
-    
+
     /**
      * Добавляет булевский ключ-значение в отчет о сбое
      */
@@ -87,7 +87,7 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при установке булевского ключа в Crashlytics")
         }
     }
-    
+
     /**
      * Добавляет число с плавающей точкой ключ-значение в отчет о сбое
      */
@@ -99,7 +99,7 @@ object CrashlyticsUtils {
             Timber.e(e, "Ошибка при установке ключа с плавающей точкой в Crashlytics")
         }
     }
-    
+
     /**
      * Добавляет число с плавающей точкой ключ-значение в отчет о сбое
      */

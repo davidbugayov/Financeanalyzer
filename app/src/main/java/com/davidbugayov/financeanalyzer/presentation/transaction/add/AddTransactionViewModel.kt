@@ -71,7 +71,9 @@ class AddTransactionViewModel(
     val achievementUnlocked: StateFlow<Boolean> = _achievementUnlocked
 
     init {
-        Timber.d("[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel")
+        Timber.d(
+            "[VM] AddTransactionViewModel создан: $this, categoriesViewModel: $categoriesViewModel"
+        )
         // Загружаем категории
         loadInitialData()
         // Принудительно выставить дефолтную категорию после инициализации (после collect)
@@ -155,7 +157,10 @@ class AddTransactionViewModel(
     override fun submitTransaction(context: android.content.Context) {
         viewModelScope.launch {
             val currentState = _state.value
-            Timber.d("ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Начальное значение currentState.amount: '%s'", currentState.amount)
+            Timber.d(
+                "ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Начальное значение currentState.amount: '%s'",
+                currentState.amount
+            )
 
             _state.update { it.copy(isLoading = true) }
 
@@ -180,7 +185,10 @@ class AddTransactionViewModel(
 
             if (!isValid) {
                 _state.update { it.copy(isLoading = false) }
-                Timber.e("ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Валидация не прошла для суммы: '%s'", amountForValidation)
+                Timber.e(
+                    "ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Валидация не прошла для суммы: '%s'",
+                    amountForValidation
+                )
                 return@launch
             }
 
@@ -191,7 +199,10 @@ class AddTransactionViewModel(
             // Чтобы гарантировать консистентность, лучше бы createTransactionFromState принимал Money.
             // Пока оставим как есть, но это потенциальное место для рефакторинга.
             val transaction = createTransactionFromState(currentState)
-            Timber.d("ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Транзакция для сохранения: %s", transaction)
+            Timber.d(
+                "ТРАНЗАКЦИЯ_ДОБ: submitTransaction - Транзакция для сохранения: %s",
+                transaction
+            )
 
             try {
                 val result = addTransactionUseCase(transaction)
@@ -205,7 +216,8 @@ class AddTransactionViewModel(
                         incrementCategoryUsage(transaction.category, transaction.isExpense)
                         Timber.d(
                             "ТРАНЗАКЦИЯ_ДОБ: Увеличен счетчик использования категории %s (isExpense=%b)",
-                            transaction.category, transaction.isExpense
+                            transaction.category,
+                            transaction.isExpense
                         )
                     }
 
@@ -217,7 +229,15 @@ class AddTransactionViewModel(
                             transaction.source
                         )
                     }
-                    
+
+                    // Логируем событие в аналитику
+                    com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionAdded(
+                        amount = transaction.amount,
+                        category = transaction.category,
+                        isExpense = transaction.isExpense,
+                        hasDescription = transaction.note?.isNotBlank() ?: false
+                    )
+
                     _state.update {
                         it.copy(
                             isLoading = false,
@@ -244,7 +264,11 @@ class AddTransactionViewModel(
                         }
                     }
                 } else if (result is DomainResult.Error) {
-                    Timber.e(result.exception, "ТРАНЗАКЦИЯ_ДОБ: Ошибка при добавлении: %s", result.exception.message)
+                    Timber.e(
+                        result.exception,
+                        "ТРАНЗАКЦИЯ_ДОБ: Ошибка при добавлении: %s",
+                        result.exception.message
+                    )
                     _state.update {
                         it.copy(
                             isLoading = false,
@@ -282,7 +306,10 @@ class AddTransactionViewModel(
      */
     private fun createTransactionFromState(currentState: AddTransactionState): Transaction {
         // Получаем сумму из выражения через базовый метод
-        Timber.d("ТРАНЗАКЦИЯ_ДОБ: createTransactionFromState - currentState.amount перед parse: '%s'", currentState.amount)
+        Timber.d(
+            "ТРАНЗАКЦИЯ_ДОБ: createTransactionFromState - currentState.amount перед parse: '%s'",
+            currentState.amount
+        )
         val money = parseMoneyExpression(currentState.amount, selectedCurrency)
         Timber.d("ТРАНЗАКЦИЯ_ДОБ: createTransactionFromState - money после parse: %s", money)
 
@@ -292,7 +319,11 @@ class AddTransactionViewModel(
         val isTransfer = currentState.category == "Переводы"
         // Генерируем UUID для новой транзакции, если id не задан
         val transactionId = currentState.transactionToEdit?.id ?: java.util.UUID.randomUUID().toString()
-        Timber.d("Используем ID транзакции: %s (новый: %s)", transactionId, (currentState.transactionToEdit == null))
+        Timber.d(
+            "Используем ID транзакции: %s (новый: %s)",
+            transactionId,
+            (currentState.transactionToEdit == null)
+        )
         // Получаем список ID кошельков для сохранения в транзакции
         val selectedWalletIds = getWalletIdsForTransaction(
             isExpense = currentState.isExpense,
@@ -437,7 +468,15 @@ class AddTransactionViewModel(
             }
 
             is BaseTransactionEvent.ResetAmountOnly -> {
-                _state.update { it.copy(amount = "", amountError = false, note = "", isSuccess = false, preventAutoSubmit = false) }
+                _state.update {
+                    it.copy(
+                        amount = "",
+                        amountError = false,
+                        note = "",
+                        isSuccess = false,
+                        preventAutoSubmit = false
+                    )
+                }
             }
 
             is BaseTransactionEvent.PreventAutoSubmit -> {
@@ -470,7 +509,7 @@ class AddTransactionViewModel(
                 val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
                     currentAddToWallet = _state.value.addToWallet
                 )
-                
+
                 _state.update {
                     it.copy(
                         addToWallet = newAddToWallet,
@@ -478,14 +517,14 @@ class AddTransactionViewModel(
                     )
                 }
             }
-            
+
             is BaseTransactionEvent.SelectWallet -> {
                 val updatedWallets = handleSelectWallet(
                     walletId = event.walletId,
                     selected = event.selected,
                     currentSelectedWallets = _state.value.selectedWallets
                 )
-                
+
                 _state.update {
                     it.copy(selectedWallets = updatedWallets)
                 }

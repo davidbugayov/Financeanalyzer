@@ -45,7 +45,7 @@ class GroupTransactionsUseCase {
         val groupedTransactions = transactions
             .sortedByDescending { it.date }
             .groupBy { dateFormat.format(it.date).replaceFirstChar { it.uppercase() } }
-            
+
         // Сортируем группы по убыванию даты
         return groupedTransactions.toList()
             .sortedByDescending { (key, _) ->
@@ -55,7 +55,7 @@ class GroupTransactionsUseCase {
                 val monthName = parts.getOrNull(1) ?: ""
                 val month = getMonthNumber(monthName)
                 val year = parts.getOrNull(2)?.toIntOrNull() ?: 0
-                
+
                 // Создаем числовое представление для сортировки (год*10000 + месяц*100 + день)
                 year * 10000 + month * 100 + day
             }
@@ -78,9 +78,13 @@ class GroupTransactionsUseCase {
         for (transaction in sortedTransactions) {
             calendar.time = transaction.date
             calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
-            val firstDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(calendar.time)
+            val firstDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(
+                calendar.time
+            )
             calendar.add(Calendar.DAY_OF_WEEK, 6)
-            val lastDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(calendar.time)
+            val lastDay = SimpleDateFormat("dd.MM", Locale.forLanguageTag("ru")).format(
+                calendar.time
+            )
             val year = calendar.get(Calendar.YEAR)
             val weekKey = "$firstDay - $lastDay $year"
 
@@ -92,15 +96,14 @@ class GroupTransactionsUseCase {
 
         // Сортируем группы по убыванию даты
         return result.toList()
-            .sortedByDescending { (key, _) -> 
-                // Извлекаем год из ключа
+            .sortedByDescending { (key, _) -> // Извлекаем год из ключа
                 val year = key.split(" ").lastOrNull()?.toIntOrNull() ?: 0
                 // Извлекаем дату из конца периода (последний день недели)
                 val lastDate = key.split(" ").firstOrNull()?.split("-")?.lastOrNull()?.trim() ?: ""
                 val dateParts = lastDate.split(".")
                 val month = dateParts.getOrNull(1)?.toIntOrNull() ?: 0
                 val day = dateParts.getOrNull(0)?.toIntOrNull() ?: 0
-                
+
                 // Создаем числовое представление для сортировки (год*10000 + месяц*100 + день)
                 year * 10000 + month * 100 + day
             }
@@ -119,7 +122,7 @@ class GroupTransactionsUseCase {
         val groupedTransactions = transactions
             .sortedByDescending { it.date }
             .groupBy { format.format(it.date).replaceFirstChar { it.uppercase() } }
-        
+
         // Сортируем группы (ключи) по убыванию даты
         return groupedTransactions.toList()
             .sortedByDescending { (key, _) ->

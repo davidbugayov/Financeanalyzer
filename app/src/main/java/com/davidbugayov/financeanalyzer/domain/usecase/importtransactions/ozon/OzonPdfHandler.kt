@@ -20,7 +20,10 @@ class OzonPdfHandler(
 
     // Ключевые слова для PDF-файлов Ozon
     override val pdfKeywords: List<String> = listOf(
-        "ozon", "озон", "ozon statement", "выписка ozon"
+        "ozon",
+        "озон",
+        "ozon statement",
+        "выписка ozon"
     )
 
     /**

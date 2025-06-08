@@ -53,7 +53,7 @@ fun DatePickerDialog(
         datePickerState.selectedDateMillis?.let { millis ->
             val selectedDate = Date(millis)
             val isValid = (minDate == null || selectedDate >= minDate) &&
-                    (maxDate == null || selectedDate <= maxDate)
+                (maxDate == null || selectedDate <= maxDate)
             if (!isValid) {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
@@ -80,7 +80,7 @@ fun DatePickerDialog(
                     datePickerState.selectedDateMillis?.let { millis ->
                         val selectedDate = Date(millis)
                         val isValid = (minDate == null || selectedDate >= minDate) &&
-                                (maxDate == null || selectedDate <= maxDate)
+                            (maxDate == null || selectedDate <= maxDate)
                         if (isValid) {
                             onDateSelected(selectedDate)
                         } else {
@@ -113,7 +113,7 @@ fun DatePickerDialog(
             DatePicker(
                 state = datePickerState,
                 colors = DatePickerDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surface,
+                    containerColor = MaterialTheme.colorScheme.surface
                 )
             )
             SnackbarHost(

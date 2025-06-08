@@ -32,10 +32,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 
 @Composable
-fun AchievementsScreen(
-    achievements: List<Achievement>,
-    onBack: () -> Unit
-) {
+fun AchievementsScreen(achievements: List<Achievement>, onBack: () -> Unit) {
     Column(modifier = Modifier.fillMaxSize()) {
         AppTopBar(
             title = stringResource(R.string.achievements),
@@ -61,7 +58,13 @@ fun AchievementCard(achievement: Achievement) {
         "week_no_coffee" -> Icons.Filled.LocalCafe
         else -> Icons.Filled.EmojiEvents
     }
-    val cardColor = if (achievement.isUnlocked) MaterialTheme.colorScheme.primary.copy(alpha = 0.08f) else MaterialTheme.colorScheme.surfaceVariant
+    val cardColor = if (achievement.isUnlocked) {
+        MaterialTheme.colorScheme.primary.copy(
+            alpha = 0.08f
+        )
+    } else {
+        MaterialTheme.colorScheme.surfaceVariant
+    }
     val iconTint = if (achievement.isUnlocked) MaterialTheme.colorScheme.primary else Color.Gray
 
     Card(

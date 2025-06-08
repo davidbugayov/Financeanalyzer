@@ -21,7 +21,9 @@ class AddTransactionUseCase(
      */
     suspend operator fun invoke(transaction: Transaction): Result<Unit> {
         return safeCall {
-            Timber.d("Добавление транзакции: сумма=${transaction.amount}, категория=${transaction.category}")
+            Timber.d(
+                "Добавление транзакции: сумма=${transaction.amount}, категория=${transaction.category}"
+            )
             repository.addTransaction(transaction)
         }
     }

@@ -23,15 +23,12 @@ import com.davidbugayov.financeanalyzer.R
  * @param text Текст элемента легенды
  */
 @Composable
-fun ChartLegendItem(
-    color: Color,
-    text: String
-) {
+fun ChartLegendItem(color: Color, text: String) {
     val legendItemWidth = dimensionResource(id = R.dimen.chart_legend_item_width)
     val legendItemHeight = dimensionResource(id = R.dimen.chart_legend_item_height)
     val legendSpacing = dimensionResource(id = R.dimen.chart_legend_spacing)
     val cornerRadius = dimensionResource(id = R.dimen.chart_corner_radius)
-    
+
     Row(
         verticalAlignment = Alignment.CenterVertically
     ) {

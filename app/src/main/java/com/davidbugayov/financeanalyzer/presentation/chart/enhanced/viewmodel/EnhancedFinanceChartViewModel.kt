@@ -81,10 +81,16 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 Timber.d("EnhancedFinanceChartViewModel: Начало загрузки транзакций для графиков")
                 _state.update { it.copy(isLoading = true, error = null) }
 
-                val filteredTransactions = getTransactionsForPeriodUseCase(_state.value.startDate, _state.value.endDate)
+                val filteredTransactions = getTransactionsForPeriodUseCase(
+                    _state.value.startDate,
+                    _state.value.endDate
+                )
                 allTransactions = filteredTransactions
 
-                Timber.d("EnhancedFinanceChartViewModel: После фильтрации по дате осталось: %d транзакций", filteredTransactions.size)
+                Timber.d(
+                    "EnhancedFinanceChartViewModel: После фильтрации по дате осталось: %d транзакций",
+                    filteredTransactions.size
+                )
                 Timber.d(
                     "[DEBUG] Все транзакции за период: %s",
                     filteredTransactions.map {
@@ -95,16 +101,23 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                             if (it.isExpense) "расход" else "доход",
                             it.category
                         )
-                    })
+                    }
+                )
 
-                val metrics = calculateBalanceMetricsUseCase(filteredTransactions, _state.value.startDate, _state.value.endDate)
+                val metrics = calculateBalanceMetricsUseCase(
+                    filteredTransactions,
+                    _state.value.startDate,
+                    _state.value.endDate
+                )
                 val income = metrics.income
                 val expense = metrics.expense
                 val savingsRate = metrics.savingsRate
                 val averageDailyExpense = metrics.averageDailyExpense
                 val monthsOfSavings = metrics.monthsOfSavings
 
-                Timber.d("[DEBUG] Сумма доходов: $income, сумма расходов: $expense, баланс: ${income - expense}")
+                Timber.d(
+                    "[DEBUG] Сумма доходов: $income, сумма расходов: $expense, баланс: ${income - expense}"
+                )
 
                 // Агрегируем по категориям
                 val expensesByCategory = filteredTransactions
@@ -136,10 +149,20 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val categoryData = if (showExpenses) expensesByCategory else incomeByCategory
                 val pieChartData = preparePieChartData(categoryData, showExpenses)
 
-                Timber.d("EnhancedFinanceChartViewModel: Категорий расходов: %d, доходов: %d", expensesByCategory.size, incomeByCategory.size)
+                Timber.d(
+                    "EnhancedFinanceChartViewModel: Категорий расходов: %d, доходов: %d",
+                    expensesByCategory.size,
+                    incomeByCategory.size
+                )
                 if (!showExpenses) {
-                    Timber.d("[DEBUG] incomeByCategory: %s", incomeByCategory.map { it.key + ": " + it.value.amount })
-                    Timber.d("[DEBUG] pieChartData (income): %s", pieChartData.map { it.name + ": " + it.money.amount + ", %: " + it.percentage })
+                    Timber.d(
+                        "[DEBUG] incomeByCategory: %s",
+                        incomeByCategory.map { it.key + ": " + it.value.amount }
+                    )
+                    Timber.d(
+                        "[DEBUG] pieChartData (income): %s",
+                        pieChartData.map { it.name + ": " + it.money.amount + ", %: " + it.percentage }
+                    )
                 }
 
                 _state.update {
@@ -164,9 +187,14 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         pieChartData = pieChartData
                     )
                 }
-                Timber.d("EnhancedFinanceChartViewModel: Загрузка транзакций для графиков завершена успешно")
+                Timber.d(
+                    "EnhancedFinanceChartViewModel: Загрузка транзакций для графиков завершена успешно"
+                )
             } catch (e: Exception) {
-                Timber.e(e, "EnhancedFinanceChartViewModel: Ошибка загрузки транзакций для графиков")
+                Timber.e(
+                    e,
+                    "EnhancedFinanceChartViewModel: Ошибка загрузки транзакций для графиков"
+                )
                 _state.update { it.copy(isLoading = false, error = e.message) }
                 _effect.emit(EnhancedFinanceChartEffect.ShowError(e.message ?: "Unknown error"))
             }
@@ -175,7 +203,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
 
     private fun createLineChartData(
         transactions: List<Transaction>,
-        isIncome: Boolean,
+        isIncome: Boolean
     ): List<com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model.LineChartPoint> {
         // Фильтруем транзакции по типу (доход/расход)
         val filteredTransactions = transactions.filter {
@@ -256,17 +284,29 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
             pieChartDataList.fold(BigDecimal.ZERO) { acc, item -> acc + item.money.amount }
         } else {
             // Для доходов считаем сумму только по положительным значениям
-            pieChartDataList.fold(BigDecimal.ZERO) { acc, item -> acc + item.money.amount.max(BigDecimal.ZERO) }
+            pieChartDataList.fold(BigDecimal.ZERO) { acc, item ->
+                acc + item.money.amount.max(
+                    BigDecimal.ZERO
+                )
+            }
         }
         return if (pieChartDataList.isNotEmpty() && totalMoney != BigDecimal.ZERO) {
             pieChartDataList.map { item ->
                 val percent = if (showExpenses) {
-                    item.money.amount.divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
+                    item.money.amount.divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(
+                        BigDecimal(100)
+                    ).toFloat()
                 } else {
-                    item.money.amount.max(BigDecimal.ZERO).divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
+                    item.money.amount.max(BigDecimal.ZERO).divide(
+                        totalMoney,
+                        4,
+                        java.math.RoundingMode.HALF_EVEN
+                    ).multiply(BigDecimal(100)).toFloat()
                 }
                 item.copy(percentage = percent)
             }
-        } else emptyList()
+        } else {
+            emptyList()
+        }
     }
 } 

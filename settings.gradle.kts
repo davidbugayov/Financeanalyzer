@@ -12,14 +12,9 @@ dependencyResolutionManagement {
         google()
         mavenCentral()
         
-        // Репозиторий для RuStore (только для google flavor)
-        val isFdroid = gradle.startParameter.taskRequests.any {
-            it.args.any { arg -> arg.contains("fdroid", ignoreCase = true) } ||
-            it.args.toString().contains("fdroid", ignoreCase = true)
-        }
-        
-        if (!isFdroid) {
-            maven { url = uri("https://artifactory-external.vkpartner.ru/artifactory/maven") }
+        // Репозиторий для RuStore SDK
+        maven {
+            url = uri("https://artifactory-external.vkpartner.ru/artifactory/maven")
         }
     }
 }

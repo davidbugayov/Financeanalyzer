@@ -80,17 +80,17 @@ fun EnhancedSummaryCard(
     val balance = income.minus(expense)
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    
+
     // Состояние для отображения диалогов выбора периода и дат
     var showPeriodDialog by remember { mutableStateOf(false) }
     var showStartDatePicker by remember { mutableStateOf(false) }
     var showEndDatePicker by remember { mutableStateOf(false) }
-    
+
     // Используем только входящие параметры для периода
     var selectedPeriodType by remember { mutableStateOf(PeriodType.MONTH) }
     var currentStartDate by remember { mutableStateOf(startDate) }
     var currentEndDate by remember { mutableStateOf(endDate) }
-    
+
     // Форматируем период
     val formattedPeriod by remember(selectedPeriodType, currentStartDate, currentEndDate) {
         derivedStateOf {
@@ -112,7 +112,7 @@ fun EnhancedSummaryCard(
         targetValue = if (visible) 1f else 0f,
         animationSpec = tween(durationMillis = 500, easing = FastOutSlowInEasing)
     )
-    
+
     // Запуск анимации
     LaunchedEffect(key1 = Unit) {
         delay(100)
@@ -120,10 +120,11 @@ fun EnhancedSummaryCard(
     }
 
     // Определяем цвет рамки в зависимости от баланса (как в BalanceCard)
-    val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) 
+    val balanceTextColor = if (balance.amount >= BigDecimal.ZERO) {
         incomeColor // Зеленый цвет для положительного баланса
-    else 
+    } else {
         expenseColor // Красный цвет для отрицательного баланса
+    }
 
     // Диалог выбора периода
     if (showPeriodDialog) {
@@ -143,7 +144,11 @@ fun EnhancedSummaryCard(
                     currentEndDate = newEndDate
                     // Обновляем данные через EnhancedFinanceChartViewModel
                     viewModel?.handleIntent(
-                        EnhancedFinanceChartIntent.ChangePeriod(periodType, newStartDate, newEndDate)
+                        EnhancedFinanceChartIntent.ChangePeriod(
+                            periodType,
+                            newStartDate,
+                            newEndDate
+                        )
                     )
                     showPeriodDialog = false
                 }
@@ -157,7 +162,11 @@ fun EnhancedSummaryCard(
             onConfirm = {
                 showPeriodDialog = false
                 viewModel?.handleIntent(
-                    EnhancedFinanceChartIntent.ChangePeriod(PeriodType.CUSTOM, currentStartDate, currentEndDate)
+                    EnhancedFinanceChartIntent.ChangePeriod(
+                        PeriodType.CUSTOM,
+                        currentStartDate,
+                        currentEndDate
+                    )
                 )
             },
             onDismiss = {
@@ -212,8 +221,7 @@ fun EnhancedSummaryCard(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(
-                    horizontal = dimensionResource(R.dimen.enhanced_summary_card_padding_horizontal), 
-                    vertical = dimensionResource(R.dimen.enhanced_summary_card_padding_vertical)
+                    horizontal = dimensionResource(R.dimen.enhanced_summary_card_padding_horizontal), vertical = dimensionResource(R.dimen.enhanced_summary_card_padding_vertical)
                 )
         ) {
             // Используем Column с анимацией alpha
@@ -221,7 +229,9 @@ fun EnhancedSummaryCard(
                 modifier = Modifier
                     .fillMaxWidth()
                     .alpha(contentAlpha),
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.enhanced_summary_card_spacing))
+                verticalArrangement = Arrangement.spacedBy(
+                    dimensionResource(R.dimen.enhanced_summary_card_spacing)
+                )
             ) {
                 // Период с возможностью клика для открытия диалога выбора периода
                 Row(
@@ -251,8 +261,12 @@ fun EnhancedSummaryCard(
                     text = balance.format(true),
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Bold,
-                        fontSize = dimensionResource(R.dimen.enhanced_summary_card_balance_font_size).value.sp * balanceScale,
-                        letterSpacing = dimensionResource(R.dimen.enhanced_summary_card_balance_letter_spacing).value.sp
+                        fontSize = dimensionResource(
+                            R.dimen.enhanced_summary_card_balance_font_size
+                        ).value.sp * balanceScale,
+                        letterSpacing = dimensionResource(
+                            R.dimen.enhanced_summary_card_balance_letter_spacing
+                        ).value.sp
                     ),
                     color = if (balance.amount.signum() >= 0) incomeColor else expenseColor,
                     modifier = Modifier
@@ -282,23 +296,31 @@ fun EnhancedSummaryCard(
                                 tint = incomeColor,
                                 modifier = Modifier
                                     .padding(end = 4.dp)
-                                    .height(dimensionResource(R.dimen.enhanced_summary_card_icon_size))
-                                    .width(dimensionResource(R.dimen.enhanced_summary_card_icon_size))
+                                    .height(
+                                        dimensionResource(R.dimen.enhanced_summary_card_icon_size)
+                                    )
+                                    .width(
+                                        dimensionResource(R.dimen.enhanced_summary_card_icon_size)
+                                    )
                             )
                             Text(
                                 text = income.format(true),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = dimensionResource(R.dimen.enhanced_summary_card_income_expense_font_size).value.sp
+                                    fontSize = dimensionResource(
+                                        R.dimen.enhanced_summary_card_income_expense_font_size
+                                    ).value.sp
                                 ),
                                 color = incomeColor
                             )
                         }
-                        
+
                         Text(
                             text = stringResource(R.string.enhanced_summary_income),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = dimensionResource(R.dimen.enhanced_summary_card_label_font_size).value.sp
+                                fontSize = dimensionResource(
+                                    R.dimen.enhanced_summary_card_label_font_size
+                                ).value.sp
                             ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.padding(start = 20.dp, top = 2.dp)
@@ -318,23 +340,31 @@ fun EnhancedSummaryCard(
                                 tint = expenseColor,
                                 modifier = Modifier
                                     .padding(end = 4.dp)
-                                    .height(dimensionResource(R.dimen.enhanced_summary_card_icon_size))
-                                    .width(dimensionResource(R.dimen.enhanced_summary_card_icon_size))
+                                    .height(
+                                        dimensionResource(R.dimen.enhanced_summary_card_icon_size)
+                                    )
+                                    .width(
+                                        dimensionResource(R.dimen.enhanced_summary_card_icon_size)
+                                    )
                             )
                             Text(
                                 text = expense.format(true),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
-                                    fontSize = dimensionResource(R.dimen.enhanced_summary_card_income_expense_font_size).value.sp
+                                    fontSize = dimensionResource(
+                                        R.dimen.enhanced_summary_card_income_expense_font_size
+                                    ).value.sp
                                 ),
                                 color = expenseColor
                             )
                         }
-                        
+
                         Text(
                             text = stringResource(R.string.enhanced_summary_expense),
                             style = MaterialTheme.typography.labelSmall.copy(
-                                fontSize = dimensionResource(R.dimen.enhanced_summary_card_label_font_size).value.sp
+                                fontSize = dimensionResource(
+                                    R.dimen.enhanced_summary_card_label_font_size
+                                ).value.sp
                             ),
                             color = MaterialTheme.colorScheme.onSurfaceVariant,
                             textAlign = TextAlign.End,

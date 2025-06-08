@@ -23,12 +23,12 @@ class MoneyConverter {
             require(it.isNotBlank()) { "Money string cannot be blank" }
             val parts = it.split(",")
             require(parts.isNotEmpty()) { "Invalid money format: empty string" }
-            
+
             val amountStr = parts[0]
             require(amountStr.matches(Regex("""^-?\d+(\.\d+)?$"""))) {
                 "Invalid amount format: $amountStr"
             }
-            
+
             val currency = if (parts.size > 1) {
                 val currencyCode = parts[1]
                 require(currencyCode.isNotBlank()) { "Currency code cannot be blank" }
@@ -36,7 +36,7 @@ class MoneyConverter {
             } else {
                 Currency.RUB
             }
-            
+
             try {
                 Money(BigDecimal(amountStr), currency)
             } catch (e: NumberFormatException) {

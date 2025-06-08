@@ -46,11 +46,7 @@ import org.koin.core.parameter.parametersOf
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FinancialStatisticsScreen(
-    startDate: Long,
-    endDate: Long,
-    onNavigateBack: () -> Unit
-) {
+fun FinancialStatisticsScreen(startDate: Long, endDate: Long, onNavigateBack: () -> Unit) {
     val viewModel: FinancialStatisticsViewModel = koinViewModel { parametersOf(startDate, endDate) }
     val state = viewModel.state.collectAsState().value
     val metrics = viewModel.metrics.collectAsState().value
@@ -113,24 +109,40 @@ fun FinancialStatisticsScreen(
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large)
+                    )
+                )
                 KeyMetricsCard(
                     income = state.income,
                     expense = state.expense,
                     savingsRate = metrics.savingsRate,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large)
+                    )
+                )
                 TransactionsStatisticsCard(
                     metrics = metrics,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large)
+                    )
+                )
                 ExpenseAnalysisCard(
                     metrics = metrics,
                     modifier = Modifier.fillMaxWidth()
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large)
+                    )
+                )
                 RecommendationsCard(
                     metrics = metrics,
                     modifier = Modifier.fillMaxWidth()

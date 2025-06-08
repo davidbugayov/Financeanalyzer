@@ -26,19 +26,19 @@ import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 
 @OptIn(ExperimentalLayoutApi::class)
 @Composable
-fun ColorPickerDialog(
-    initialColor: Int,
-    onColorSelected: (Int) -> Unit,
-    onDismiss: () -> Unit
-) {
+fun ColorPickerDialog(initialColor: Int, onColorSelected: (Int) -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(stringResource(R.string.select_color)) },
         text = {
             Column {
                 FlowRow(
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
-                    verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium))
+                    horizontalArrangement = Arrangement.spacedBy(
+                        dimensionResource(R.dimen.spacing_medium)
+                    ),
+                    verticalArrangement = Arrangement.spacedBy(
+                        dimensionResource(R.dimen.spacing_medium)
+                    )
                 ) {
                     ExpenseChartPalette.forEach { composeColor ->
                         val argbColor = composeColor.toArgb()

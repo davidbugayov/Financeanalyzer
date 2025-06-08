@@ -7,7 +7,7 @@ import timber.log.Timber
  * Класс для инициализации Timber
  */
 object TimberInitializer {
-    
+
     /**
      * Инициализирует Timber в зависимости от режима сборки
      */
@@ -20,7 +20,7 @@ object TimberInitializer {
             Timber.plant(CrashReportingTree())
         }
     }
-    
+
     /**
      * Timber Tree для релизных сборок с отправкой ошибок
      */

@@ -15,7 +15,8 @@ import kotlinx.coroutines.flow.asStateFlow
 class PreferencesManager(context: Context) {
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-        PREFERENCES_NAME, Context.MODE_PRIVATE
+        PREFERENCES_NAME,
+        Context.MODE_PRIVATE
     )
 
     // Flow для темы
@@ -78,7 +79,7 @@ class PreferencesManager(context: Context) {
     fun getBooleanPreference(key: String, defaultValue: Boolean): Boolean {
         return sharedPreferences.getBoolean(key, defaultValue)
     }
-    
+
     /**
      * Сохраняет boolean-значение в SharedPreferences
      * @param key Ключ, по которому будет храниться значение

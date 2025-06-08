@@ -38,21 +38,21 @@ abstract class CachePolicy<K, T> {
      * @return true, если кэш действителен и может быть использован
      */
     abstract fun isValid(key: K): Boolean
-    
+
     /**
      * Получает данные из кэша
      * @param key Ключ для доступа к данным
      * @return Данные из кэша или null, если кэш не содержит данных или недействителен
      */
     abstract fun get(key: K): T?
-    
+
     /**
      * Сохраняет данные в кэш
      * @param key Ключ для доступа к данным
      * @param data Данные для сохранения
      */
     abstract fun put(key: K, data: T)
-    
+
     /**
      * Инвалидирует (очищает) кэш
      */
@@ -68,7 +68,7 @@ abstract class CachePolicy<K, T> {
 class TTLCachePolicy<K, T>(private val ttlMillis: Long) : CachePolicy<K, T>() {
     private val cache = mutableMapOf<K, Pair<T, Long>>() // Данные и время последнего обновления
     private val lock = ReentrantReadWriteLock()
-    
+
     override fun isValid(key: K): Boolean {
         lock.readLock().lock()
         try {
@@ -78,7 +78,7 @@ class TTLCachePolicy<K, T>(private val ttlMillis: Long) : CachePolicy<K, T>() {
             lock.readLock().unlock()
         }
     }
-    
+
     override fun get(key: K): T? {
         lock.readLock().lock()
         try {
@@ -92,7 +92,7 @@ class TTLCachePolicy<K, T>(private val ttlMillis: Long) : CachePolicy<K, T>() {
             lock.readLock().unlock()
         }
     }
-    
+
     override fun put(key: K, data: T) {
         lock.writeLock().lock()
         try {
@@ -101,7 +101,7 @@ class TTLCachePolicy<K, T>(private val ttlMillis: Long) : CachePolicy<K, T>() {
             lock.writeLock().unlock()
         }
     }
-    
+
     override fun invalidate() {
         lock.writeLock().lock()
         try {
@@ -129,23 +129,26 @@ class TTLCachePolicy<K, T>(private val ttlMillis: Long) : CachePolicy<K, T>() {
 class TransactionRepositoryImpl(
     private val dao: TransactionDao
 ) : TransactionRepository, ITransactionRepository {
-    
+
     // Область корутин для репозитория
     private val repositoryScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-    
+
     // Константы времени жизни кэша
     private val CACHE_TTL = 5 * 60 * 1000L // 5 минут
-    
+
     // Кэши с использованием CachePolicy
     private val transactionCache = TTLCachePolicy<String, List<Transaction>>(CACHE_TTL)
     private val monthlyTransactionsCache = TTLCachePolicy<String, List<Transaction>>(CACHE_TTL)
     private val weeklyTransactionsCache = TTLCachePolicy<String, List<Transaction>>(CACHE_TTL)
-    
+
     // Ключ для всех транзакций
     private val ALL_TRANSACTIONS_KEY = "all_transactions"
-    
+
     // SharedFlow для уведомления об изменениях данных (например, для ViewModel)
-    private val _dataChangeEvents = MutableSharedFlow<DataChangeEvent>(replay = 0, extraBufferCapacity = 1)
+    private val _dataChangeEvents = MutableSharedFlow<DataChangeEvent>(
+        replay = 0,
+        extraBufferCapacity = 1
+    )
     override val dataChangeEvents: SharedFlow<DataChangeEvent> = _dataChangeEvents.asSharedFlow()
 
     /**
@@ -186,7 +189,9 @@ class TransactionRepositoryImpl(
      */
     override suspend fun notifyDataChanged(transactionId: String?) {
         withContext(Dispatchers.IO) {
-            Timber.d("Принудительная отправка события изменения данных из внешнего источника: transactionId=$transactionId")
+            Timber.d(
+                "Принудительная отправка события изменения данных из внешнего источника: transactionId=$transactionId"
+            )
             clearCaches() // Очищаем кэш перед уведомлением
             _dataChangeEvents.emit(DataChangeEvent.TransactionChanged(transactionId))
         }
@@ -199,21 +204,21 @@ class TransactionRepositoryImpl(
     override suspend fun getAllTransactions(): List<Transaction> = withContext(Dispatchers.IO) {
         try {
             Timber.d("Запрос ВСЕХ транзакций из базы данных")
-            
+
             // Проверяем кэш
             transactionCache.get(ALL_TRANSACTIONS_KEY)?.let { cachedData ->
                 Timber.d("Возвращаем кэшированные транзакции (${cachedData.size} шт.)")
                 return@withContext cachedData
             }
-            
+
             // Если кэша нет или он неактуален, загружаем из БД
             Timber.d("Загружаем все транзакции из базы данных")
             val transactionEntities = dao.getAllTransactions()
             val transactions = transactionEntities.map { mapEntityToDomain(it) }
-            
+
             // Обновляем кэш
             transactionCache.put(ALL_TRANSACTIONS_KEY, transactions)
-            
+
             Timber.d("Загружено ${transactions.size} транзакций из базы данных и обновлен кэш")
             return@withContext transactions
         } catch (e: Exception) {
@@ -228,44 +233,55 @@ class TransactionRepositoryImpl(
      * @param month Месяц (1-12).
      * @return Список транзакций за указанный месяц.
      */
-    override suspend fun getTransactionsByMonth(year: Int, month: Int): List<Transaction> = withContext(Dispatchers.IO) {
-        try {
-            Timber.d("Получение транзакций за месяц $year-${month.toString().padStart(2, '0')}")
-            val monthKey = "$year-${month.toString().padStart(2, '0')}"
-            
-            // Проверяем кэш
-            monthlyTransactionsCache.get(monthKey)?.let { transactions ->
-                Timber.d("Используем кэшированные транзакции за месяц $monthKey (размер=${transactions.size})")
+    override suspend fun getTransactionsByMonth(year: Int, month: Int): List<Transaction> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            try {
+                Timber.d("Получение транзакций за месяц $year-${month.toString().padStart(2, '0')}")
+                val monthKey = "$year-${month.toString().padStart(2, '0')}"
+
+                // Проверяем кэш
+                monthlyTransactionsCache.get(monthKey)?.let { transactions ->
+                    Timber.d(
+                        "Используем кэшированные транзакции за месяц $monthKey (размер=${transactions.size})"
+                    )
+                    return@withContext transactions
+                }
+
+                // Получаем диапазон дат для месяца
+                val calendar = Calendar.getInstance()
+                calendar.set(year, month - 1, 1, 0, 0, 0) // -1 т.к. Calendar.MONTH начинается с 0
+                calendar.set(Calendar.MILLISECOND, 0)
+                val startDate = calendar.time
+
+                calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
+                calendar.set(Calendar.MILLISECOND, 999)
+                val properEndDate = calendar.time
+
+                // Получаем транзакции за указанный период дат
+                Timber.d(
+                    "Загружаем транзакции за месяц $monthKey из базы данных (диапазон: $startDate - $properEndDate)"
+                )
+                val transactions = dao.getTransactionsByDateRange(startDate, properEndDate).map {
+                    mapEntityToDomain(
+                        it
+                    )
+                }
+
+                // Обновляем кэш
+                monthlyTransactionsCache.put(monthKey, transactions)
+
+                Timber.d("Загружено ${transactions.size} транзакций за месяц $monthKey")
                 return@withContext transactions
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при получении транзакций за месяц: ${e.message}")
+                emptyList()
             }
-            
-            // Получаем диапазон дат для месяца
-            val calendar = Calendar.getInstance()
-            calendar.set(year, month - 1, 1, 0, 0, 0) // -1 т.к. Calendar.MONTH начинается с 0
-            calendar.set(Calendar.MILLISECOND, 0)
-            val startDate = calendar.time
-            
-            calendar.set(Calendar.DAY_OF_MONTH, calendar.getActualMaximum(Calendar.DAY_OF_MONTH))
-            calendar.set(Calendar.HOUR_OF_DAY, 23)
-            calendar.set(Calendar.MINUTE, 59)
-            calendar.set(Calendar.SECOND, 59)
-            calendar.set(Calendar.MILLISECOND, 999)
-            val properEndDate = calendar.time
-            
-            // Получаем транзакции за указанный период дат
-            Timber.d("Загружаем транзакции за месяц $monthKey из базы данных (диапазон: $startDate - $properEndDate)")
-            val transactions = dao.getTransactionsByDateRange(startDate, properEndDate).map { mapEntityToDomain(it) }
-            
-            // Обновляем кэш
-            monthlyTransactionsCache.put(monthKey, transactions)
-            
-            Timber.d("Загружено ${transactions.size} транзакций за месяц $monthKey")
-            return@withContext transactions
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при получении транзакций за месяц: ${e.message}")
-            emptyList()
         }
-    }
 
     /**
      * Получает транзакции за указанную неделю
@@ -273,48 +289,58 @@ class TransactionRepositoryImpl(
      * @param week Неделя года (1-53)
      * @return Список транзакций за указанную неделю
      */
-    override suspend fun getTransactionsByWeek(year: Int, week: Int): List<Transaction> = withContext(Dispatchers.IO) {
-        val weekKey = "$year-W${week.toString().padStart(2, '0')}"
-        
-        // Проверяем кэш по неделям
-        weeklyTransactionsCache.get(weekKey)?.let { transactions ->
-            Timber.d("Используем кэшированные транзакции за неделю $weekKey (размер=${transactions.size})")
-            return@withContext transactions
+    override suspend fun getTransactionsByWeek(year: Int, week: Int): List<Transaction> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            val weekKey = "$year-W${week.toString().padStart(2, '0')}"
+
+            // Проверяем кэш по неделям
+            weeklyTransactionsCache.get(weekKey)?.let { transactions ->
+                Timber.d(
+                    "Используем кэшированные транзакции за неделю $weekKey (размер=${transactions.size})"
+                )
+                return@withContext transactions
+            }
+
+            // Если нет в кэше, загружаем из базы данных
+            try {
+                // Создаем граничные даты для запроса
+                val calendar = Calendar.getInstance()
+                calendar.clear()
+                calendar.set(Calendar.YEAR, year)
+                calendar.set(Calendar.WEEK_OF_YEAR, week)
+                calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                val startDate = calendar.time
+
+                calendar.add(Calendar.DAY_OF_WEEK, 6)
+                calendar.set(Calendar.HOUR_OF_DAY, 23)
+                calendar.set(Calendar.MINUTE, 59)
+                calendar.set(Calendar.SECOND, 59)
+                val properEndDate = calendar.time
+
+                // Запрашиваем транзакции за неделю
+                val transactions = dao.getTransactionsByDateRangePaginated(
+                    startDate,
+                    properEndDate,
+                    1000,
+                    0
+                )
+                    .map { mapEntityToDomain(it) }
+
+                // Обновляем кэш недели
+                weeklyTransactionsCache.put(weekKey, transactions)
+
+                Timber.d("Загружено ${transactions.size} транзакций за неделю $weekKey")
+                return@withContext transactions
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке транзакций за неделю $weekKey: ${e.message}")
+                throw e
+            }
         }
-        
-        // Если нет в кэше, загружаем из базы данных
-        try {
-            // Создаем граничные даты для запроса
-            val calendar = Calendar.getInstance()
-            calendar.clear()
-            calendar.set(Calendar.YEAR, year)
-            calendar.set(Calendar.WEEK_OF_YEAR, week)
-            calendar.set(Calendar.DAY_OF_WEEK, calendar.firstDayOfWeek)
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            val startDate = calendar.time
-            
-            calendar.add(Calendar.DAY_OF_WEEK, 6)
-            calendar.set(Calendar.HOUR_OF_DAY, 23)
-            calendar.set(Calendar.MINUTE, 59)
-            calendar.set(Calendar.SECOND, 59)
-            val properEndDate = calendar.time
-            
-            // Запрашиваем транзакции за неделю
-            val transactions = dao.getTransactionsByDateRangePaginated(startDate, properEndDate, 1000, 0)
-                .map { mapEntityToDomain(it) }
-            
-            // Обновляем кэш недели
-            weeklyTransactionsCache.put(weekKey, transactions)
-            
-            Timber.d("Загружено ${transactions.size} транзакций за неделю $weekKey")
-            return@withContext transactions
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при загрузке транзакций за неделю $weekKey: ${e.message}")
-            throw e
-        }
-    }
 
     /**
      * Получает транзакции за указанный период с пагинацией (метод из ITransactionRepository)
@@ -333,7 +359,7 @@ class TransactionRepositoryImpl(
         // Делегируем вызов методу getTransactionsByDateRangePaginated
         return@withContext getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
     }
-    
+
     /**
      * Получает транзакции за указанный период с поддержкой пагинации.
      * @param startDate Начальная дата периода.
@@ -354,36 +380,48 @@ class TransactionRepositoryImpl(
             val filteredTransactions = transactionCache.get(ALL_TRANSACTIONS_KEY)?.filter {
                 it.date >= startDate && it.date <= endDate
             } ?: emptyList()
-            
+
             // Применяем пагинацию к отфильтрованным транзакциям
             val endIndex = (offset + limit).coerceAtMost(filteredTransactions.size)
             if (offset < filteredTransactions.size) {
                 val result = filteredTransactions.subList(offset, endIndex)
-                Timber.d("Используем кэшированные транзакции для пагинации по диапазону дат (размер=${result.size})")
+                Timber.d(
+                    "Используем кэшированные транзакции для пагинации по диапазону дат (размер=${result.size})"
+                )
                 return@withContext result
             }
         }
-        
+
         // Если кэш не актуален или нужен доступ за его пределами, запрашиваем из БД
         try {
-            val transactions = dao.getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
+            val transactions = dao.getTransactionsByDateRangePaginated(
+                startDate,
+                endDate,
+                limit,
+                offset
+            )
                 .map { mapEntityToDomain(it) }
-            
-            Timber.d("Загружено ${transactions.size} транзакций из БД с диапазоном дат и пагинацией")
-            
-            // Если это первая страница (offset = 0) и результаты меньше лимита, 
+
+            Timber.d(
+                "Загружено ${transactions.size} транзакций из БД с диапазоном дат и пагинацией"
+            )
+
+            // Если это первая страница (offset = 0) и результаты меньше лимита,
             // вероятно это все транзакции за указанный диапазон, сохраняем их в кэш
             if (offset == 0 && transactions.size < limit) {
                 val dateRangeKey = "${formatDate(startDate)}_${formatDate(endDate)}"
                 Timber.d("Кэшируем весь результат для диапазона дат $dateRangeKey")
             }
-            
+
             // Обновляем кэш
             transactionCache.put(ALL_TRANSACTIONS_KEY, transactions)
-            
+
             return@withContext transactions
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при загрузке транзакций с пагинацией и диапазоном дат: ${e.message}")
+            Timber.e(
+                e,
+                "Ошибка при загрузке транзакций с пагинацией и диапазоном дат: ${e.message}"
+            )
             throw e
         }
     }
@@ -414,27 +452,25 @@ class TransactionRepositoryImpl(
      * @param endDate Конечная дата периода.
      * @return Количество транзакций в указанном диапазоне дат.
      */
-    override suspend fun getTransactionsCountByDateRange(
-        startDate: Date,
-        endDate: Date
-    ): Int = withContext(Dispatchers.IO) {
-        // Пытаемся использовать кэш, если он актуален
-        if (transactionCache.isValid(ALL_TRANSACTIONS_KEY)) {
-            val count = transactionCache.get(ALL_TRANSACTIONS_KEY)?.count { it.date >= startDate && it.date <= endDate } ?: 0
-            Timber.d("Используем кэшированные данные для подсчета: $count")
-            return@withContext count
+    override suspend fun getTransactionsCountByDateRange(startDate: Date, endDate: Date): Int =
+        withContext(Dispatchers.IO) {
+            // Пытаемся использовать кэш, если он актуален
+            if (transactionCache.isValid(ALL_TRANSACTIONS_KEY)) {
+                val count = transactionCache.get(ALL_TRANSACTIONS_KEY)?.count { it.date >= startDate && it.date <= endDate } ?: 0
+                Timber.d("Используем кэшированные данные для подсчета: $count")
+                return@withContext count
+            }
+
+            // Если кэш не актуален, запрашиваем из БД
+            try {
+                val count = dao.getTransactionsCountByDateRange(startDate, endDate)
+                Timber.d("Получено количество транзакций в диапазоне дат из БД: $count")
+                return@withContext count
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при получении количества транзакций в диапазоне дат: ${e.message}")
+                throw e
+            }
         }
-        
-        // Если кэш не актуален, запрашиваем из БД
-        try {
-            val count = dao.getTransactionsCountByDateRange(startDate, endDate)
-            Timber.d("Получено количество транзакций в диапазоне дат из БД: $count")
-            return@withContext count
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при получении количества транзакций в диапазоне дат: ${e.message}")
-            throw e
-        }
-    }
 
     /**
      * Загружает все транзакции (метод из ITransactionRepository)
@@ -444,88 +480,103 @@ class TransactionRepositoryImpl(
         // Делегируем вызов методу getAllTransactions
         return getAllTransactions()
     }
-    
+
     /**
      * Получает транзакцию по ID
      *
      * @param id ID транзакции
      * @return Transaction или null если не найдена
      */
-    override suspend fun getTransactionById(id: String): Transaction? = withContext(Dispatchers.IO) {
-        try {
-            // Try to find the transaction directly in the cache first
-            val cachedTransaction = transactionCache.get(ALL_TRANSACTIONS_KEY)?.find { it.id == id }
-            if (cachedTransaction != null) {
-                Timber.d("Transaction found in cache: ID=$id")
-                return@withContext cachedTransaction
-            }
+    override suspend fun getTransactionById(id: String): Transaction? =
+        withContext(Dispatchers.IO) {
+            try {
+                // Try to find the transaction directly in the cache first
+                val cachedTransaction = transactionCache.get(ALL_TRANSACTIONS_KEY)?.find { it.id == id }
+                if (cachedTransaction != null) {
+                    Timber.d("Transaction found in cache: ID=$id")
+                    return@withContext cachedTransaction
+                }
 
-            // If not found in cache, query the database directly by ID
-            Timber.d("Searching for transaction with ID=$id in the database")
-            val entity = dao.getTransactionByIdString(id) // Use direct DAO method
+                // If not found in cache, query the database directly by ID
+                Timber.d("Searching for transaction with ID=$id in the database")
+                val entity = dao.getTransactionByIdString(id) // Use direct DAO method
 
-            if (entity != null) {
-                Timber.d("Transaction found in database: ID=$id")
-                mapEntityToDomain(entity)
-            } else {
-                Timber.d("Transaction not found: ID=$id")
-                null
+                if (entity != null) {
+                    Timber.d("Transaction found in database: ID=$id")
+                    mapEntityToDomain(entity)
+                } else {
+                    Timber.d("Transaction not found: ID=$id")
+                    null
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Error getting transaction by ID '$id': ${e.message}")
+                null // Return null on error
             }
-        } catch (e: Exception) {
-            Timber.e(e, "Error getting transaction by ID '$id': ${e.message}")
-            null // Return null on error
         }
-    }
-    
+
     /**
      * Добавляет новую транзакцию.
      * Реализация для интерфейсов TransactionRepository и ITransactionRepository.
      * @param transaction Транзакция для добавления.
      * @return ID добавленной транзакции.
      */
-    override suspend fun addTransaction(transaction: Transaction): String = withContext(Dispatchers.IO) {
+    override suspend fun addTransaction(transaction: Transaction): String = withContext(
+        Dispatchers.IO
+    ) {
         try {
-            Timber.i("[РЕПОЗИТОРИЙ] Начало добавления транзакции: ID=${transaction.id}, Дата=${transaction.date}, Сумма=${transaction.amount}, Категория='${transaction.category}', Заголовок='${transaction.title}'")
+            Timber.i(
+                "[РЕПОЗИТОРИЙ] Начало добавления транзакции: ID=${transaction.id}, Дата=${transaction.date}, Сумма=${transaction.amount}, Категория='${transaction.category}', Заголовок='${transaction.title}'"
+            )
 
             Timber.d(
                 "[РЕПОЗИТОРИЙ-ОТЛАДКА] 🔍 Полные данные транзакции: ID=${transaction.id}, Дата=${transaction.date}, Сумма=${transaction.amount}, " +
-                        "Категория='${transaction.category}', Заголовок='${transaction.title}', Источник='${transaction.source}', " +
-                        "isExpense=${transaction.isExpense}, isTransfer=${transaction.isTransfer}"
+                    "Категория='${transaction.category}', Заголовок='${transaction.title}', Источник='${transaction.source}', " +
+                    "isExpense=${transaction.isExpense}, isTransfer=${transaction.isTransfer}"
             )
-            
+
             val entity = mapDomainToEntity(transaction)
-            Timber.d("[РЕПОЗИТОРИЙ] Сконвертирована в сущность: ID=${entity.id}, idString=${entity.idString}, Дата=${entity.date}, Сумма=${entity.amount}")
+            Timber.d(
+                "[РЕПОЗИТОРИЙ] Сконвертирована в сущность: ID=${entity.id}, idString=${entity.idString}, Дата=${entity.date}, Сумма=${entity.amount}"
+            )
 
             Timber.i("[РЕПОЗИТОРИЙ-ОТЛАДКА] ⚠️ ПЕРЕД вызовом dao.insertTransaction...")
             val id = dao.insertTransaction(entity)
-            Timber.i("[РЕПОЗИТОРИЙ-ОТЛАДКА] ✅ ПОСЛЕ вызова dao.insertTransaction, ID результата=$id")
-            
+            Timber.i(
+                "[РЕПОЗИТОРИЙ-ОТЛАДКА] ✅ ПОСЛЕ вызова dao.insertTransaction, ID результата=$id"
+            )
+
             invalidateMainCache() // Инвалидируем основной кэш вместо полной очистки
             Timber.d("[РЕПОЗИТОРИЙ] Кэш инвалидирован после добавления транзакции")
-            
+
             FinancialMetrics.getInstance().recalculateStats()
             Timber.d("[РЕПОЗИТОРИЙ] Финансовые метрики пересчитаны")
-            
+
             internalNotifyDataChanged(transaction.id) // Уведомляем об изменении
-            Timber.i("[РЕПОЗИТОРИЙ] Отправлено уведомление об изменении данных для транзакции: ID=${transaction.id}")
+            Timber.i(
+                "[РЕПОЗИТОРИЙ] Отправлено уведомление об изменении данных для транзакции: ID=${transaction.id}"
+            )
 
             Timber.i("[РЕПОЗИТОРИЙ-ОТЛАДКА] 🧪 Проверка наличия сохраненной транзакции в БД...")
             val savedTransaction = dao.getTransactionByIdString(transaction.id)
             if (savedTransaction != null) {
                 Timber.i("[РЕПОЗИТОРИЙ] Транзакция сохранена в базу данных: ID=${transaction.id}")
             } else {
-                Timber.e("[РЕПОЗИТОРИЙ] ❌ ОШИБКА: Транзакция НЕ найдена в базе после сохранения: ID=${transaction.id}")
+                Timber.e(
+                    "[РЕПОЗИТОРИЙ] ❌ ОШИБКА: Транзакция НЕ найдена в базе после сохранения: ID=${transaction.id}"
+                )
             }
 
             return@withContext transaction.id
         } catch (e: Exception) {
             Timber.e(e, "[РЕПОЗИТОРИЙ] ❌ Ошибка при добавлении транзакции: ${e.message}")
-            Timber.e("[РЕПОЗИТОРИЙ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}, title=${transaction.title}")
+            Timber.e(
+                "[РЕПОЗИТОРИЙ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}, title=${transaction.title}"
+            )
             Timber.e("[РЕПОЗИТОРИЙ-ОТЛАДКА] 🔍 Стек вызовов: ${e.stackTraceToString()}")
             throw e // Пробрасываем исключение для обработки выше
         }
     }
-    
+
     /**
      * Обновляет существующую транзакцию.
      * @param transaction Транзакция для обновления.
@@ -553,7 +604,7 @@ class TransactionRepositoryImpl(
 
             // Ищем существующую транзакцию
             val existingTransaction = dao.getTransactionByIdString(transaction.id)
-            
+
             if (existingTransaction == null) {
                 Timber.e("Не найдена транзакция с ID=${transaction.id} для обновления")
                 throw Exception("Транзакция с ID=${transaction.id} не найдена для обновления")
@@ -616,7 +667,7 @@ class TransactionRepositoryImpl(
             throw e // Пробрасываем исключение для обработки в UseCase
         }
     }
-    
+
     /**
      * Удаляет транзакцию.
      * @param transaction Транзакция для удаления.
@@ -661,7 +712,7 @@ class TransactionRepositoryImpl(
             Timber.d("Получение транзакций по диапазону дат java.util.Date")
             val transactions = dao.getTransactionsByDateRange(startDate, endDate)
                 .map { mapEntityToDomain(it) }
-            
+
             Timber.d("Загружено ${transactions.size} транзакций за период")
             return@withContext transactions
         } catch (e: Exception) {
@@ -669,19 +720,20 @@ class TransactionRepositoryImpl(
             emptyList()
         }
     }
-    
+
     /**
      * Получает транзакции за указанный период (метод из ITransactionRepository).
      * @param startDate Начальная дата периода.
      * @param endDate Конечная дата периода.
      * @return Flow со списком транзакций.
      */
-    override suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>> = flow {
-        // Используем реализованный метод getTransactionsByDateRange
-        val transactions = getTransactionsByDateRange(startDate, endDate)
-        emit(transactions)
-    }
-    
+    override suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>> =
+        flow {
+            // Используем реализованный метод getTransactionsByDateRange
+            val transactions = getTransactionsByDateRange(startDate, endDate)
+            emit(transactions)
+        }
+
     /**
      * Преобразует сущность в доменную модель.
      * @param entity Сущность транзакции.
@@ -703,7 +755,7 @@ class TransactionRepositoryImpl(
             walletIds = entity.walletIds
         )
     }
-    
+
     /**
      * Преобразует доменную модель в сущность.
      * @param domain Доменная модель транзакции.
@@ -711,7 +763,9 @@ class TransactionRepositoryImpl(
      */
     private fun mapDomainToEntity(domain: Transaction): TransactionEntity {
         Timber.d("МАППИНГ В СУЩНОСТЬ: Начало преобразования Transaction -> TransactionEntity")
-        Timber.d("Исходная транзакция: id=${domain.id}, сумма=${domain.amount}, категория=${domain.category}")
+        Timber.d(
+            "Исходная транзакция: id=${domain.id}, сумма=${domain.amount}, категория=${domain.category}"
+        )
 
         // Обработка ID: Transaction.id (String) -> TransactionEntity.id (Long) и TransactionEntity.idString (String)
         var longId = 0L
@@ -728,7 +782,10 @@ class TransactionRepositoryImpl(
                     Timber.d("ID '$domainId' не является числовым, используется entity.id=0L")
                 }
             } catch (e: NumberFormatException) {
-                Timber.e(e, "Ошибка: ID транзакции '$domainId' не является валидным числом! Используется entity.id=0L.")
+                Timber.e(
+                    e,
+                    "Ошибка: ID транзакции '$domainId' не является валидным числом! Используется entity.id=0L."
+                )
             }
         }
 
@@ -758,23 +815,30 @@ class TransactionRepositoryImpl(
      * @param offset Смещение (количество пропускаемых транзакций).
      * @return Список транзакций с учетом пагинации.
      */
-    override suspend fun getTransactionsPaginated(limit: Int, offset: Int): List<Transaction> = withContext(Dispatchers.IO) {
-        // Если кэш полностью загружен, используем его для пагинации
-        if (transactionCache.isValid(ALL_TRANSACTIONS_KEY)) {
-            val endIndex = (offset + limit).coerceAtMost(transactionCache.get(ALL_TRANSACTIONS_KEY)?.size ?: 0)
-            if (offset < endIndex) {
-                val result = transactionCache.get(ALL_TRANSACTIONS_KEY)?.subList(offset, endIndex) ?: emptyList()
-                Timber.d("Используем кэшированные транзакции для пагинации (размер=${result.size})")
-                return@withContext result
+    override suspend fun getTransactionsPaginated(limit: Int, offset: Int): List<Transaction> =
+        withContext(
+            Dispatchers.IO
+        ) {
+            // Если кэш полностью загружен, используем его для пагинации
+            if (transactionCache.isValid(ALL_TRANSACTIONS_KEY)) {
+                val endIndex = (offset + limit).coerceAtMost(
+                    transactionCache.get(ALL_TRANSACTIONS_KEY)?.size ?: 0
+                )
+                if (offset < endIndex) {
+                    val result = transactionCache.get(ALL_TRANSACTIONS_KEY)?.subList(offset, endIndex) ?: emptyList()
+                    Timber.d("Используем кэшированные транзакции для пагинации (размер=${result.size})")
+                    return@withContext result
+                }
             }
+
+            // Если кэш не актуален или нужны данные за его пределами, запрашиваем из БД
+            val result = dao.getTransactionsPaginated(limit, offset).map { mapEntityToDomain(it) }
+            Timber.d(
+                "Загружено ${result.size} транзакций из БД с пагинацией (лимит=$limit, смещение=$offset)"
+            )
+            return@withContext result
         }
-        
-        // Если кэш не актуален или нужны данные за его пределами, запрашиваем из БД
-        val result = dao.getTransactionsPaginated(limit, offset).map { mapEntityToDomain(it) }
-        Timber.d("Загружено ${result.size} транзакций из БД с пагинацией (лимит=$limit, смещение=$offset)")
-        return@withContext result
-    }
-    
+
     /**
      * Загружает транзакции с пагинацией (метод из ITransactionRepository)
      * @param limit Количество транзакций для загрузки
@@ -801,10 +865,15 @@ class TransactionRepositoryImpl(
             Timber.d("РЕПОЗИТОРИЙ: Загрузка списка транзакций по диапазону дат из DAO")
             val entities = dao.getTransactionsByDateRange(startDate, endDate)
             val transactions = entities.map { mapEntityToDomain(it) }
-            Timber.d("РЕПОЗИТОРИЙ: Загружено ${transactions.size} транзакций из DAO по диапазону дат")
+            Timber.d(
+                "РЕПОЗИТОРИЙ: Загружено ${transactions.size} транзакций из DAO по диапазону дат"
+            )
             return@withContext transactions
         } catch (e: Exception) {
-            Timber.e(e, "РЕПОЗИТОРИЙ: Ошибка при загрузке списка транзакций по диапазону дат: ${e.message}")
+            Timber.e(
+                e,
+                "РЕПОЗИТОРИЙ: Ошибка при загрузке списка транзакций по диапазону дат: ${e.message}"
+            )
             throw e // Перебрасываем исключение для обработки выше
         }
     }
@@ -817,23 +886,32 @@ class TransactionRepositoryImpl(
         endDate: kotlinx.datetime.LocalDate
     ): List<Transaction> = withContext(Dispatchers.IO) {
         try {
-            Timber.d("Получение транзакций по диапазону дат с использованием kotlinx.datetime.LocalDate")
-            
+            Timber.d(
+                "Получение транзакций по диапазону дат с использованием kotlinx.datetime.LocalDate"
+            )
+
             // Преобразуем kotlinx.datetime.LocalDate в java.util.Date для работы с DAO
             val startJavaLocalDate = startDate.toJavaLocalDate()
             val endJavaLocalDate = endDate.toJavaLocalDate().plusDays(1)
-            
-            val startDateUtilDate = Date.from(startJavaLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant())
-            val endDateUtilDate = Date.from(endJavaLocalDate.atStartOfDay(ZoneId.systemDefault()).minusNanos(1).toInstant())
-            
+
+            val startDateUtilDate = Date.from(
+                startJavaLocalDate.atStartOfDay(ZoneId.systemDefault()).toInstant()
+            )
+            val endDateUtilDate = Date.from(
+                endJavaLocalDate.atStartOfDay(ZoneId.systemDefault()).minusNanos(1).toInstant()
+            )
+
             // Используем существующий метод с java.util.Date
             val transactions = dao.getTransactionsByDateRange(startDateUtilDate, endDateUtilDate)
                 .map { mapEntityToDomain(it) }
-            
+
             Timber.d("Загружено ${transactions.size} транзакций за период с $startDate по $endDate")
             return@withContext transactions
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при получении транзакций по диапазону дат с kotlinx.datetime.LocalDate: ${e.message}")
+            Timber.e(
+                e,
+                "Ошибка при получении транзакций по диапазону дат с kotlinx.datetime.LocalDate: ${e.message}"
+            )
             emptyList()
         }
     }

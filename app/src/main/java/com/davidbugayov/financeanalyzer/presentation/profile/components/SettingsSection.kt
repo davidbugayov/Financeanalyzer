@@ -75,14 +75,14 @@ fun SettingsSection(
         )
         AnimatedVisibility(visible = true, enter = fadeIn()) {
             SettingsActionCard(
-                icon = when(themeMode) {
+                icon = when (themeMode) {
                     ThemeMode.LIGHT -> Icons.Default.LightMode
                     ThemeMode.DARK -> Icons.Default.DarkMode
                     ThemeMode.SYSTEM -> Icons.Default.Brightness6
                 },
                 iconBackground = MaterialTheme.colorScheme.primary,
                 title = stringResource(R.string.settings_theme_title),
-                subtitle = when(themeMode) {
+                subtitle = when (themeMode) {
                     ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
                     ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
                     ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
@@ -116,7 +116,11 @@ fun SettingsSection(
                 subtitle = if (!hasNotificationPermission) {
                     stringResource(R.string.notification_disabled_description)
                 } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
-                    stringResource(R.string.settings_reminder_time_format, transactionReminderTime.hours, transactionReminderTime.minutes)
+                    stringResource(
+                        R.string.settings_reminder_time_format,
+                        transactionReminderTime.hours,
+                        transactionReminderTime.minutes
+                    )
                 } else {
                     stringResource(R.string.off)
                 },

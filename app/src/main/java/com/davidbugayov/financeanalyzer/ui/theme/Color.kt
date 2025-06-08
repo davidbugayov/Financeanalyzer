@@ -75,17 +75,17 @@ val FabColorLight = md_theme_light_secondary // Используем secondary �
 val BalanceTextColorLight = Color(0xFF2196F3) // Яркий синий для текста баланса
 val SuccessColorLight = Color(0xFF388E3C) // Темно-зеленый для успеха
 val WarningColorLight = Color(0xFFFFA000) // Оранжевый для предупреждений
-val InfoColorLight = Color(0xFF1976D2)    // Синий для информации
+val InfoColorLight = Color(0xFF1976D2) // Синий для информации
 val TransferColorLight = Color(0xFF757575) // Серый для переводов (onSurfaceVariant)
 
 // Semantic Colors - Dark Theme
-val IncomeColorDark = Color(0xFF81C784)   // Светло-зеленый
-val ExpenseColorDark = Color(0xFFEF5350)  // Светло-красный
+val IncomeColorDark = Color(0xFF81C784) // Светло-зеленый
+val ExpenseColorDark = Color(0xFFEF5350) // Светло-красный
 val FabColorDark = md_theme_dark_secondary // Используем secondary для FAB
 val BalanceTextColorDark = Color(0xFF81CFEF) // Нежно-голубой
-val SuccessColorDark = Color(0xFF81C784)   // Светло-зеленый для успеха
+val SuccessColorDark = Color(0xFF81C784) // Светло-зеленый для успеха
 val WarningColorDark = Color(0xFFFFB74D) // Темно-оранжевый для предупреждений
-val InfoColorDark = Color(0xFF64B5F6)     // Темно-голубой для информации
+val InfoColorDark = Color(0xFF64B5F6) // Темно-голубой для информации
 val TransferColorDark = Color(0xFF4DB6AC) // Темный бирюзовый для переводов
 
 // Bank Colors (Consistent across themes)
@@ -155,7 +155,7 @@ val CategoryCharity = DefaultCategoryColor // Замена IncomeColorDark на 
 val CategoryCredit = Color(0xFF90A4AE) // Blue Grey Light - Оставить
 val CategoryTransfer = TransferColorLight // B0BEC5 (Blue Grey Lighter for light theme) - Оставить
 val CategoryOtherExpense = CashColor // Specific for expense 'other' - Оставить
-val CategoryOtherIncome = IncomeColorLight  // Замена CashColor на IncomeColorLight
+val CategoryOtherIncome = IncomeColorLight // Замена CashColor на IncomeColorLight
 
 // Income Specific Categories
 val CategorySalary = IncomeColorLight // 4CAF50 (Green) - Оставить
@@ -215,13 +215,21 @@ val ExpenseColorInt = ExpenseColorLight.toArgb()
 
 // Palettes (Can be expanded and refined)
 val IncomeChartPalette = listOf(
-    Color(0xFF4CAF50), Color(0xFF66BB6A), Color(0xFF81C784),
-    Color(0xFFA5D6A7), Color(0xFFC8E6C9), Color(0xFF00C853)
+    Color(0xFF4CAF50),
+    Color(0xFF66BB6A),
+    Color(0xFF81C784),
+    Color(0xFFA5D6A7),
+    Color(0xFFC8E6C9),
+    Color(0xFF00C853)
 )
 
 val ExpenseChartPalette = listOf(
-    Color(0xFFF44336), Color(0xFFEF5350), Color(0xFFE57373),
-    Color(0xFFEF9A9A), Color(0xFFFFCDD2), Color(0xFFD50000)
+    Color(0xFFF44336),
+    Color(0xFFEF5350),
+    Color(0xFFE57373),
+    Color(0xFFEF9A9A),
+    Color(0xFFFFCDD2),
+    Color(0xFFD50000)
 )
 
 // --- Мягкие цвета для HomeGroupSummary ---

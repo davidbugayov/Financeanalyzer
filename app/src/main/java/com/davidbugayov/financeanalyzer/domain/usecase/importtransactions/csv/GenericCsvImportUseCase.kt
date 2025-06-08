@@ -73,7 +73,14 @@ class GenericCsvImportUseCase(
         }
         val columns = firstLine.split(config.delimiter)
         val isValid = columns.isNotEmpty() && columns.size >= config.expectedMinColumnCount
-        Timber.d("[$bankName] ${context.getString(R.string.csv_format_check, firstLine, config.delimiter, isValid)}")
+        Timber.d(
+            "[$bankName] ${context.getString(
+                R.string.csv_format_check,
+                firstLine,
+                config.delimiter,
+                isValid
+            )}"
+        )
         return isValid
     }
 
@@ -97,24 +104,58 @@ class GenericCsvImportUseCase(
         Timber.d("[$bankName] ${context.getString(R.string.csv_parsing_line, line)}")
         val columns = line.split(config.delimiter).map { it.trim().removeSurrounding("\"") }
         if (columns.size < config.expectedMinColumnCount) {
-            Timber.w("[$bankName] ${context.getString(R.string.csv_not_enough_columns, config.expectedMinColumnCount, columns.size, line)}")
+            Timber.w(
+                "[$bankName] ${context.getString(
+                    R.string.csv_not_enough_columns,
+                    config.expectedMinColumnCount,
+                    columns.size,
+                    line
+                )}"
+            )
             return null
         }
         if (config.skipTransactionIfStatusInvalid && config.statusColumnIndex != null && config.validStatusValues?.isNotEmpty() == true) {
             val status = columns.getOrNull(config.statusColumnIndex)
-            if (status == null || config.validStatusValues.none { it.equals(status, ignoreCase = true) }) {
-                Timber.d("[$bankName] ${context.getString(R.string.csv_skip_invalid_status, status, config.validStatusValues, line)}")
+            if (status == null || config.validStatusValues.none {
+                it.equals(
+                        status,
+                        ignoreCase = true
+                    )
+            }
+            ) {
+                Timber.d(
+                    "[$bankName] ${context.getString(
+                        R.string.csv_skip_invalid_status,
+                        status,
+                        config.validStatusValues,
+                        line
+                    )}"
+                )
                 return null
             }
         }
         try {
             val dateString = columns.getOrNull(config.dateColumnIndex) ?: run {
-                Timber.e("[$bankName] ${context.getString(R.string.csv_date_not_found, config.dateColumnIndex, line)}")
+                Timber.e(
+                    "[$bankName] ${context.getString(
+                        R.string.csv_date_not_found,
+                        config.dateColumnIndex,
+                        line
+                    )}"
+                )
                 return null
             }
-            val description = columns.getOrNull(config.descriptionColumnIndex) ?: context.getString(R.string.csv_no_description)
+            val description = columns.getOrNull(config.descriptionColumnIndex) ?: context.getString(
+                R.string.csv_no_description
+            )
             var amountString = columns.getOrNull(config.amountColumnIndex) ?: run {
-                Timber.e("[$bankName] ${context.getString(R.string.csv_amount_not_found, config.amountColumnIndex, line)}")
+                Timber.e(
+                    "[$bankName] ${context.getString(
+                        R.string.csv_amount_not_found,
+                        config.amountColumnIndex,
+                        line
+                    )}"
+                )
                 return null
             }
             config.amountCharsToRemoveRegex?.let { regex ->
@@ -132,23 +173,47 @@ class GenericCsvImportUseCase(
             val transactionDate = try {
                 config.dateFormat.parse(dateString)
             } catch (e: Exception) {
-                Timber.e(e, "[$bankName] ${context.getString(R.string.csv_date_parse_error, dateString, config.dateFormat.toPattern(), line)}")
+                Timber.e(
+                    e,
+                    "[$bankName] ${context.getString(
+                        R.string.csv_date_parse_error,
+                        dateString,
+                        config.dateFormat.toPattern(),
+                        line
+                    )}"
+                )
                 return null
             }
             val amountValue = try {
                 amountString.toDoubleOrNull() ?: run {
-                    Timber.e("[$bankName] ${context.getString(R.string.csv_amount_parse_error, amountString, line)}")
+                    Timber.e(
+                        "[$bankName] ${context.getString(
+                            R.string.csv_amount_parse_error,
+                            amountString,
+                            line
+                        )}"
+                    )
                     return null
                 }
             } catch (e: NumberFormatException) {
-                Timber.e(e, "[$bankName] ${context.getString(R.string.csv_amount_parse_exception, amountString, e.message)}")
+                Timber.e(
+                    e,
+                    "[$bankName] ${context.getString(
+                        R.string.csv_amount_parse_exception,
+                        amountString,
+                        e.message
+                    )}"
+                )
                 return null
             }
             val isExpense = if (config.isExpenseColumnIndex != null) {
                 val expenseValue = columns.getOrNull(config.isExpenseColumnIndex)
                 expenseValue?.equals(config.isExpenseTrueValue, ignoreCase = true) == true
             } else {
-                columns.getOrNull(4)?.equals(context.getString(R.string.csv_expense_value), ignoreCase = true) ?: (amountValue < 0)
+                columns.getOrNull(4)?.equals(
+                    context.getString(R.string.csv_expense_value),
+                    ignoreCase = true
+                ) ?: (amountValue < 0)
             }
             val absAmount = kotlin.math.abs(amountValue)
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
@@ -166,7 +231,10 @@ class GenericCsvImportUseCase(
                 title = description
             )
         } catch (e: Exception) {
-            Timber.e(e, "[$bankName] ${context.getString(R.string.csv_parse_line_error, line, config)}")
+            Timber.e(
+                e,
+                "[$bankName] ${context.getString(R.string.csv_parse_line_error, line, config)}"
+            )
             return null
         }
     }
@@ -177,7 +245,9 @@ class GenericCsvImportUseCase(
     override fun shouldSkipLine(line: String): Boolean {
         if (super.shouldSkipLine(line)) return true
         if (line.split(config.delimiter).size < config.expectedMinColumnCount) {
-            Timber.d("[$bankName] ${context.getString(R.string.csv_skip_line_not_enough_columns, line)}")
+            Timber.d(
+                "[$bankName] ${context.getString(R.string.csv_skip_line_not_enough_columns, line)}"
+            )
             return true
         }
         return false

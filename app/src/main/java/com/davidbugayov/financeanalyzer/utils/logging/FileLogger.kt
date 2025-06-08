@@ -23,7 +23,7 @@ object FileLogger {
     private var logFile: File? = null
     private val executor = Executors.newSingleThreadExecutor()
     private var isInitialized = false
-    
+
     // Флаг для предотвращения рекурсии
     private val isLogging = AtomicBoolean(false)
 
@@ -50,7 +50,7 @@ object FileLogger {
      */
     fun init(context: Context) {
         if (isInitialized) return
-        
+
         try {
             // Создаем директорию и файл для логов
             val logsDir = File(context.getExternalFilesDir(null), "logs")
@@ -62,13 +62,13 @@ object FileLogger {
             val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.US)
             val fileName = "log_${dateFormat.format(Date())}.txt"
             logFile = File(logsDir, fileName)
-            
+
             isInitialized = true
-            
+
             // Информация о запуске логгера через Timber
             val initMessage = "FileLogger инициализирован. Лог файл: ${logFile?.absolutePath}"
             Timber.i(initMessage)
-            
+
             // Добавляем запись в буфер
             val entry = LogEntry(
                 timestamp = System.currentTimeMillis(),
@@ -78,7 +78,7 @@ object FileLogger {
             )
             logBuffer.add(entry)
             writeToFile(entry.toString())
-            
+
             // Добавляем обработчик логов в Timber после инициализации
             if (BuildConfig.DEBUG) {
                 Timber.plant(FileLoggingTree())
@@ -99,14 +99,14 @@ object FileLogger {
             isLogging.set(false)
             return
         }
-        
+
         try {
             logDirectly(priority, tag, message)
         } finally {
             isLogging.set(false)
         }
     }
-    
+
     /**
      * Записывает сообщение напрямую в файл и буфер, минуя Timber.
      * Безопасен от рекурсии.
@@ -116,7 +116,7 @@ object FileLogger {
             Timber.log(priority, message)
             return
         }
-        
+
         // Уровень логирования
         val level = when (priority) {
             Log.VERBOSE -> "V"
@@ -138,7 +138,7 @@ object FileLogger {
 
         // Добавляем запись в буфер
         logBuffer.add(entry)
-        
+
         // Если буфер слишком большой, удаляем старые записи
         while (logBuffer.size > maxBufferSize) {
             logBuffer.poll()
@@ -199,10 +199,10 @@ object FileLogger {
                 if (tag != null && tag.contains("FileLogger")) {
                     return
                 }
-                
+
                 // Логирование в файл
                 logDirectly(priority, tag ?: "NoTag", message)
-                
+
                 // Если есть исключение, логируем его стектрейс
                 if (t != null) {
                     val stackTrace = Log.getStackTraceString(t)

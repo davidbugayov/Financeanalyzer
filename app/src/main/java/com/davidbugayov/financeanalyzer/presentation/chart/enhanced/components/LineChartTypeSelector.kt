@@ -78,19 +78,17 @@ fun LineChartTypeSelector(
  * Кнопка для селектора типа графика
  */
 @Composable
-private fun SelectorButton(
-    text: String,
-    isSelected: Boolean,
-    color: Color,
-    onClick: () -> Unit
-) {
+private fun SelectorButton(text: String, isSelected: Boolean, color: Color, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(horizontal = SelectorButtonHorizontalPadding)
             .clip(RoundedCornerShape(SelectorButtonCornerRadius))
             .background(
-                color = if (isSelected) color.copy(alpha = 0.15f)
-                else MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
+                color = if (isSelected) {
+                    color.copy(alpha = 0.15f)
+                } else {
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                },
                 shape = RoundedCornerShape(SelectorButtonCornerRadius)
             )
             .clickable(onClick = onClick)

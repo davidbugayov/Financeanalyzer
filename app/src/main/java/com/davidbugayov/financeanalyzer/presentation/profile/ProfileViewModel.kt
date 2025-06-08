@@ -48,7 +48,7 @@ class ProfileViewModel(
     init {
         Timber.d("[ProfileViewModel] INIT")
         syncNotificationState()
-        
+
         loadFinancialAnalytics()
 
         _state.update { it.copy(themeMode = preferencesManager.getThemeMode()) }
@@ -70,22 +70,26 @@ class ProfileViewModel(
                 } ?: Timber.w("ExportTransactionsToCSV event received with null action")
             }
             is ProfileEvent.ResetExportState -> {
-                _state.update { it.copy(
-                    exportSuccess = null,
-                    exportError = null,
-                    exportedFilePath = null
-                ) }
+                _state.update {
+                    it.copy(
+                        exportSuccess = null,
+                        exportError = null,
+                        exportedFilePath = null
+                    )
+                }
             }
             is ProfileEvent.SetExportError -> {
-                _state.update { it.copy(
-                    exportError = event.message
-                ) }
+                _state.update {
+                    it.copy(
+                        exportError = event.message
+                    )
+                }
             }
             is ProfileEvent.ChangeTheme -> {
                 viewModelScope.launch {
                     preferencesManager.saveThemeMode(event.theme)
                     _state.update { it.copy(isEditingTheme = false) }
-                    
+
                     // Логируем изменение темы
                     AnalyticsUtils.logScreenView("theme_changed", event.theme.name)
                 }
@@ -124,7 +128,7 @@ class ProfileViewModel(
                 // через переданный колбэк onNavigateToLibraries
                 logLibrariesNavigation()
             }
-            
+
             // События настроек
             is ProfileEvent.ChangeLanguage -> {
                 _state.update { it.copy(selectedLanguage = event.language) }
@@ -138,10 +142,12 @@ class ProfileViewModel(
                 Timber.d("[ProfileViewModel] ChangeNotifications: enabled=${event.enabled}")
                 preferencesManager.setTransactionReminderEnabled(event.enabled)
                 notificationScheduler.updateTransactionReminder(event.enabled, null)
-                Timber.d("[ProfileViewModel] Calling syncNotificationState after ChangeNotifications")
+                Timber.d(
+                    "[ProfileViewModel] Calling syncNotificationState after ChangeNotifications"
+                )
                 syncNotificationState()
             }
-            
+
             // События безопасности
             is ProfileEvent.ChangeAppLock -> {
                 _state.update { it.copy(isAppLockEnabled = event.enabled) }
@@ -151,7 +157,7 @@ class ProfileViewModel(
                 _state.update { it.copy(isBiometricEnabled = event.enabled) }
                 // Здесь можно добавить сохранение настройки в DataStore
             }
-            
+
             // События аналитики
             is ProfileEvent.LoadFinancialAnalytics -> {
                 loadFinancialAnalytics()

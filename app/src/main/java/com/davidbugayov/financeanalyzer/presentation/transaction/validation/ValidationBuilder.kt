@@ -35,7 +35,8 @@ class ValidationBuilder {
      * Проверяет, есть ли ошибки валидации
      * @return true, если есть хотя бы одна ошибка
      */
-    fun hasErrors(): Boolean = hasAmountError || hasCategoryError || hasSourceError || hasWalletError
+    fun hasErrors(): Boolean =
+        hasAmountError || hasCategoryError || hasSourceError || hasWalletError
 
     /**
      * Строит результат валидации

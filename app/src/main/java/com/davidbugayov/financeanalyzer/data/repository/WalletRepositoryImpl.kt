@@ -57,7 +57,7 @@ class WalletRepositoryImpl(
 
     override suspend fun getWalletsByIds(ids: List<String>): List<Wallet> {
         if (ids.isEmpty()) return emptyList()
-        
+
         return walletPreferences.getWallets()
             .filter { ids.contains(it.id) }
     }
@@ -66,22 +66,22 @@ class WalletRepositoryImpl(
         try {
             // Сначала получаем все кошельки
             val allWallets = walletPreferences.getWallets()
-            
+
             // Проверяем, существует ли транзакция
             val transaction = getTransactionForWallets(transactionId)
-            
+
             if (transaction != null) {
                 // Если у транзакции есть walletIds, возвращаем кошельки по этим ID
                 if (transaction.walletIds != null && transaction.walletIds.isNotEmpty()) {
                     return allWallets.filter { wallet -> transaction.walletIds.contains(wallet.id) }
                 }
-                
+
                 // Для доходов без явного указания кошельков возвращаем все
                 if (!transaction.isExpense) {
                     return allWallets
                 }
             }
-            
+
             // Для расходных транзакций или если транзакция не найдена, возвращаем пустой список
             return emptyList()
         } catch (e: Exception) {
@@ -96,7 +96,7 @@ class WalletRepositoryImpl(
             Timber.d("TransactionRepository не установлен в WalletRepositoryImpl")
             return null
         }
-        
+
         try {
             // В реальной реализации здесь используем репозиторий для получения транзакции
             return transactionRepository.getTransactionById(transactionId)
@@ -105,5 +105,4 @@ class WalletRepositoryImpl(
             return null
         }
     }
-
 } 

@@ -81,7 +81,7 @@ fun TransactionHistoryScreen(
     navController: NavController
 ) {
     val state by viewModel.state.collectAsState()
-    
+
     // Локальное состояние для контекстного меню транзакций
     var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
@@ -125,7 +125,9 @@ fun TransactionHistoryScreen(
 
     // Отслеживаем изменения периода
     LaunchedEffect(state.periodType) {
-        Timber.d("Период изменился на: ${state.periodType}, загружено транзакций: ${state.transactions.size}")
+        Timber.d(
+            "Период изменился на: ${state.periodType}, загружено транзакций: ${state.transactions.size}"
+        )
     }
 
     // Получаем список всех категорий из CategoriesViewModel
@@ -222,7 +224,7 @@ fun TransactionHistoryScreen(
         } else {
             viewModel.categoriesViewModel.isDefaultIncomeCategory(category)
         }
-        
+
         DeleteCategoryConfirmDialog(
             category = category,
             onConfirm = {
@@ -359,7 +361,11 @@ fun TransactionHistoryScreen(
                 ) {
                     GroupingChips(
                         currentGrouping = state.groupingType,
-                        onGroupingSelected = { viewModel.onEvent(TransactionHistoryEvent.SetGroupingType(it)) }
+                        onGroupingSelected = {
+                            viewModel.onEvent(
+                                TransactionHistoryEvent.SetGroupingType(it)
+                            )
+                        }
                     )
                 }
 

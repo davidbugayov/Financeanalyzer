@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.data.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.davidbugayov.financeanalyzer.utils.GsonUtils
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
@@ -14,7 +13,10 @@ import timber.log.Timber
  */
 class CategoryUsagePreferences private constructor(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences(
+        PREFS_NAME,
+        Context.MODE_PRIVATE
+    )
     private val gson = Gson()
 
     companion object {

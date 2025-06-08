@@ -38,7 +38,14 @@ class AlfaBankExcelHandler(
 
     // Негативные ключевые слова для исключения ложных срабатываний
     private fun getNegativeKeywords(): List<String> = listOf(
-        "sberbank", "сбербанк", "сбер", "sber", "тинькофф", "tinkoff", "ozon", "озон"
+        "sberbank",
+        "сбербанк",
+        "сбер",
+        "sber",
+        "тинькофф",
+        "tinkoff",
+        "ozon",
+        "озон"
     )
 
     /**
@@ -48,7 +55,11 @@ class AlfaBankExcelHandler(
         if (!supportsFileType(fileType)) return false
 
         val hasPositiveKeyword = excelKeywords.any { fileName.lowercase().contains(it.lowercase()) }
-        val containsNegativeKeyword = getNegativeKeywords().any { fileName.lowercase().contains(it.lowercase()) }
+        val containsNegativeKeyword = getNegativeKeywords().any {
+            fileName.lowercase().contains(
+                it.lowercase()
+            )
+        }
 
         if (containsNegativeKeyword) {
             Timber.d("[$bankName Handler] Файл содержит ключевые слова других банков: $fileName")
@@ -63,10 +74,33 @@ class AlfaBankExcelHandler(
                 val bytesRead = bis.read(buffer, 0, buffer.size)
                 if (bytesRead > 0) {
                     val content = String(buffer, 0, bytesRead)
-                    val alfaBankIndicators = listOf("АЛЬФА-БАНК", "ALFA-BANK", "Альфа-Банк", "Альфа", "Alfa")
-                    val hasAlfaBankIndicator = alfaBankIndicators.any { content.contains(it, ignoreCase = true) }
-                    val otherBankIndicators = listOf("СБЕРБАНК", "SBERBANK", "Тинькофф", "ТИНЬКОФФ", "OZON", "ОЗОН")
-                    val hasOtherBankIndicator = otherBankIndicators.any { content.contains(it, ignoreCase = true) }
+                    val alfaBankIndicators = listOf(
+                        "АЛЬФА-БАНК",
+                        "ALFA-BANK",
+                        "Альфа-Банк",
+                        "Альфа",
+                        "Alfa"
+                    )
+                    val hasAlfaBankIndicator = alfaBankIndicators.any {
+                        content.contains(
+                            it,
+                            ignoreCase = true
+                        )
+                    }
+                    val otherBankIndicators = listOf(
+                        "СБЕРБАНК",
+                        "SBERBANK",
+                        "Тинькофф",
+                        "ТИНЬКОФФ",
+                        "OZON",
+                        "ОЗОН"
+                    )
+                    val hasOtherBankIndicator = otherBankIndicators.any {
+                        content.contains(
+                            it,
+                            ignoreCase = true
+                        )
+                    }
 
                     if (hasOtherBankIndicator) {
                         Timber.d("[$bankName Handler] Файл содержит указания на другой банк")
@@ -74,7 +108,9 @@ class AlfaBankExcelHandler(
                     }
 
                     if (hasAlfaBankIndicator) {
-                        Timber.d("[$bankName Handler] Найден индикатор Альфа-Банка в содержимом файла")
+                        Timber.d(
+                            "[$bankName Handler] Найден индикатор Альфа-Банка в содержимом файла"
+                        )
                         return true
                     }
                 }
@@ -96,12 +132,12 @@ class AlfaBankExcelHandler(
             // Конфигурация для Альфа-Банка
             val alfaBankConfig = ExcelParseConfig(
                 sheetSelector = SheetSelector.ByIndex(0),
-                headerRowCount = 2,  // Уменьшаем до 2, т.к. в логах видны строки заголовков
+                headerRowCount = 2, // Уменьшаем до 2, т.к. в логах видны строки заголовков
                 columnMapping = ExcelColumnMapping(
-                    dateColumnIndex = 0,        // Дата операции
+                    dateColumnIndex = 0, // Дата операции
                     descriptionColumnIndex = 3, // Код операции как описание
-                    amountColumnIndex = null,   // Отключаем поиск суммы в файле
-                    categoryColumnIndex = 4     // Категория операции
+                    amountColumnIndex = null, // Отключаем поиск суммы в файле
+                    categoryColumnIndex = 4 // Категория операции
                 ),
                 defaultCurrencyCode = "RUB",
                 dateFormatConfig = DateFormatConfig(
@@ -113,20 +149,28 @@ class AlfaBankExcelHandler(
                     currencySymbolsToRemove = listOf("₽", "руб", "RUB")
                 ),
                 skipEmptyRows = true,
-                expectedMinValuesPerRow = 1  // Требуем только дату
+                expectedMinValuesPerRow = 1 // Требуем только дату
             )
 
             // Запускаем с debug-конфигурацией для вывода подробной информации
             val debugEnabled = true
-            Timber.d("[$bankName Handler] Создание GenericExcelImportUseCase с конфигурацией: $alfaBankConfig")
-            return GenericExcelImportUseCase(context, transactionRepository, alfaBankConfig, transactionSource, debugEnabled)
+            Timber.d(
+                "[$bankName Handler] Создание GenericExcelImportUseCase с конфигурацией: $alfaBankConfig"
+            )
+            return GenericExcelImportUseCase(
+                context,
+                transactionRepository,
+                alfaBankConfig,
+                transactionSource,
+                debugEnabled
+            )
         }
         throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
     }
 
     private fun parseDate(dateStr: String): Date? {
         val simpleDateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
-        
+
         return try {
             simpleDateFormat.parse(dateStr)
         } catch (e: Exception) {

@@ -9,10 +9,7 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
 
 @Composable
-fun CancelConfirmationDialog(
-    onConfirm: () -> Unit,
-    onDismiss: () -> Unit
-) {
+fun CancelConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.cancel_transaction)) },

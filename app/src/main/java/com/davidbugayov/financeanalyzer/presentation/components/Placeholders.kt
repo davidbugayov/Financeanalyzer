@@ -24,9 +24,7 @@ import androidx.compose.ui.unit.dp
  * @param message Текст сообщения (необязательно)
  */
 @Composable
-fun CenteredLoadingIndicator(
-    message: String = "Загрузка данных..."
-) {
+fun CenteredLoadingIndicator(message: String = "Загрузка данных...") {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center
@@ -108,10 +106,7 @@ fun EmptyContent(
  * @param onRetry Обработчик повторной попытки
  */
 @Composable
-fun ErrorContent(
-    error: String,
-    onRetry: () -> Unit
-) {
+fun ErrorContent(error: String, onRetry: () -> Unit) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center

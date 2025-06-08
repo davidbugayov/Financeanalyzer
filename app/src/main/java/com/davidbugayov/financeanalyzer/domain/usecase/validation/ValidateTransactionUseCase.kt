@@ -21,7 +21,9 @@ class ValidateTransactionUseCase {
 
         val errorMsg = if (amountError) "Введите сумму транзакции" else null
 
-        Timber.d("Validation result: isValid=$isValid, amountError=$amountError, categoryError=$categoryError, sourceError=$sourceError, errorMsg=$errorMsg")
+        Timber.d(
+            "Validation result: isValid=$isValid, amountError=$amountError, categoryError=$categoryError, sourceError=$sourceError, errorMsg=$errorMsg"
+        )
 
         return Result(isValid, amountError, categoryError, sourceError, errorMsg)
     }

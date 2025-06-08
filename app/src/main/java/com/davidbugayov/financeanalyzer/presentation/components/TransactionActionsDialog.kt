@@ -49,40 +49,47 @@ fun TransactionActionsDialog(
         onDismissRequest = onDismiss,
         title = { Text("Действия с транзакцией") },
         containerColor = MaterialTheme.colorScheme.surface,
-        text = { 
+        text = {
             Column {
                 Text(
                     text = transaction.category,
                     style = MaterialTheme.typography.bodyLarge,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
-                    text = if (transaction.isExpense)
-                        "-${transaction.amount.abs().formatted(showCurrency = true, showSign = false)}"
-                    else
-                        "+${transaction.amount.formatted(showCurrency = true, showSign = false)}",
+                    text = if (transaction.isExpense) {
+                        "-${transaction.amount.abs().formatted(
+                            showCurrency = true,
+                            showSign = false
+                        )}"
+                    } else {
+                        "+${transaction.amount.formatted(showCurrency = true, showSign = false)}"
+                    },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (transaction.isExpense)
+                    color = if (transaction.isExpense) {
                         LocalExpenseColor.current
-                    else
+                    } else {
                         LocalIncomeColor.current
+                    }
                 )
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Text(
-                    text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(transaction.date),
+                    text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
+                        transaction.date
+                    ),
                     style = MaterialTheme.typography.bodyMedium
                 )
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
 
                 // Определяем цвет источника один раз
                 val effectiveSourceColor = rememberSourceColor(transaction, isDarkTheme)
-                
+
                 // Отображаем источник
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
@@ -94,19 +101,19 @@ fun TransactionActionsDialog(
                             )
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    
+
                     Text(
                         text = "Источник: ${transaction.source}",
                         style = MaterialTheme.typography.bodySmall,
                         color = effectiveSourceColor
                     )
                 }
-                
+
                 // Отображаем примечание, если оно есть
                 transaction.note?.let { note ->
                     if (note.isNotBlank()) {
                         Spacer(modifier = Modifier.height(12.dp))
-                        
+
                         Text(
                             text = "Примечание: $note",
                             style = MaterialTheme.typography.bodySmall,
@@ -118,7 +125,7 @@ fun TransactionActionsDialog(
         },
         confirmButton = {
             TextButton(
-                onClick = { 
+                onClick = {
                     onDelete(transaction)
                     onDismiss()
                 }
@@ -128,7 +135,7 @@ fun TransactionActionsDialog(
         },
         dismissButton = {
             TextButton(
-                onClick = { 
+                onClick = {
                     onEdit(transaction)
                     onDismiss()
                 }

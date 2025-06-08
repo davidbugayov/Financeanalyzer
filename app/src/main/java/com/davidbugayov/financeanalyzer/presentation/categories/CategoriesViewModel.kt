@@ -77,8 +77,13 @@ class CategoriesViewModel(
                     try {
                         Color(it.toColorInt())
                     } catch (e: IllegalArgumentException) {
-                        Timber.w(e, "Invalid color hex for expense category '${data.name}': $it. Generating new one.")
-                        val generated = CategoryProvider.generateCategoryColorFromPalette(isExpense = true)
+                        Timber.w(
+                            e,
+                            "Invalid color hex for expense category '${data.name}': $it. Generating new one."
+                        )
+                        val generated = CategoryProvider.generateCategoryColorFromPalette(
+                            isExpense = true
+                        )
                         val newColorHex = generated.toHexString()
                         val updated = data.copy(colorHex = newColorHex)
                         val updatedList = savedExpenseCategories.map { cat -> if (cat.name == data.name) updated else cat }
@@ -86,7 +91,9 @@ class CategoriesViewModel(
                         generated
                     }
                 } ?: run {
-                    val generated = CategoryProvider.generateCategoryColorFromPalette(isExpense = true)
+                    val generated = CategoryProvider.generateCategoryColorFromPalette(
+                        isExpense = true
+                    )
                     val colorHex = generated.toHexString()
                     val updated = data.copy(colorHex = colorHex)
                     val updatedList = savedExpenseCategories.map { cat -> if (cat.name == data.name) updated else cat }
@@ -109,8 +116,13 @@ class CategoriesViewModel(
                     try {
                         Color(it.toColorInt())
                     } catch (e: IllegalArgumentException) {
-                        Timber.w(e, "Invalid color hex for income category '${data.name}': $it. Generating new one.")
-                        val generated = CategoryProvider.generateCategoryColorFromPalette(isExpense = false)
+                        Timber.w(
+                            e,
+                            "Invalid color hex for income category '${data.name}': $it. Generating new one."
+                        )
+                        val generated = CategoryProvider.generateCategoryColorFromPalette(
+                            isExpense = false
+                        )
                         val newColorHex = generated.toHexString()
                         val updated = data.copy(colorHex = newColorHex)
                         val updatedList = savedIncomeCategories.map { cat -> if (cat.name == data.name) updated else cat }
@@ -118,7 +130,9 @@ class CategoriesViewModel(
                         generated
                     }
                 } ?: run {
-                    val generated = CategoryProvider.generateCategoryColorFromPalette(isExpense = false)
+                    val generated = CategoryProvider.generateCategoryColorFromPalette(
+                        isExpense = false
+                    )
                     val colorHex = generated.toHexString()
                     val updated = data.copy(colorHex = colorHex)
                     val updatedList = savedIncomeCategories.map { cat -> if (cat.name == data.name) updated else cat }
@@ -165,10 +179,12 @@ class CategoriesViewModel(
 
             Timber.d(
                 "[CategoriesVM] Итоговые категории расходов: %s",
-                _expenseCategories.value.joinToString { "${it.name}: ${it.color.toHexString()}" })
+                _expenseCategories.value.joinToString { "${it.name}: ${it.color.toHexString()}" }
+            )
             Timber.d(
                 "[CategoriesVM] Итоговые категории доходов: %s",
-                _incomeCategories.value.joinToString { "${it.name}: ${it.color.toHexString()}" })
+                _incomeCategories.value.joinToString { "${it.name}: ${it.color.toHexString()}" }
+            )
         }
     }
 
@@ -184,7 +200,16 @@ class CategoriesViewModel(
         viewModelScope.launch {
             if (isExpense) {
                 categoryPreferences.addExpenseCategory(customCategoryData)
-                val uiCategory = UiCategory(0, categoryName, true, true, 0, color = color, icon = icon, original = Category.expense(categoryName))
+                val uiCategory = UiCategory(
+                    0,
+                    categoryName,
+                    true,
+                    true,
+                    0,
+                    color = color,
+                    icon = icon,
+                    original = Category.expense(categoryName)
+                )
                 val currentCategories = _expenseCategories.value.toMutableList()
                 val otherIndex = currentCategories.indexOfFirst { it.name == "Другое" }
                 if (otherIndex != -1) {
@@ -193,9 +218,24 @@ class CategoriesViewModel(
                     currentCategories.add(uiCategory)
                 }
                 _expenseCategories.value = currentCategories.distinctBy { it.name }
+
+                // Логируем событие в аналитику
+                com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logCategoryAdded(
+                    category = categoryName,
+                    isExpense = true
+                )
             } else {
                 categoryPreferences.addIncomeCategory(customCategoryData)
-                val uiCategory = UiCategory(0, categoryName, false, true, 0, color = color, icon = icon, original = Category.income(categoryName))
+                val uiCategory = UiCategory(
+                    0,
+                    categoryName,
+                    false,
+                    true,
+                    0,
+                    color = color,
+                    icon = icon,
+                    original = Category.income(categoryName)
+                )
                 val currentCategories = _incomeCategories.value.toMutableList()
                 val otherIndex = currentCategories.indexOfFirst { it.name == "Другое" }
                 if (otherIndex != -1) {
@@ -204,6 +244,12 @@ class CategoriesViewModel(
                     currentCategories.add(uiCategory)
                 }
                 _incomeCategories.value = currentCategories.distinctBy { it.name }
+
+                // Логируем событие в аналитику
+                com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logCategoryAdded(
+                    category = categoryName,
+                    isExpense = false
+                )
             }
         }
     }
@@ -214,7 +260,9 @@ class CategoriesViewModel(
     fun removeCategory(categoryName: String, isExpense: Boolean) {
         viewModelScope.launch {
             if (isExpense) {
-                val isDefaultCategory = CategoryProvider.getDefaultExpenseCategories(getApplication<Application>().applicationContext)
+                val isDefaultCategory = CategoryProvider.getDefaultExpenseCategories(
+                    getApplication<Application>().applicationContext
+                )
                     .any { it.name == categoryName && it.name != "Другое" }
 
                 if (isDefaultCategory) {
@@ -223,8 +271,16 @@ class CategoriesViewModel(
                     categoryPreferences.removeExpenseCategory(categoryName)
                 }
                 _expenseCategories.value = _expenseCategories.value.filterNot { it.name == categoryName }
+
+                // Логируем событие в аналитику
+                com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logCategoryDeleted(
+                    category = categoryName,
+                    isExpense = true
+                )
             } else {
-                val isDefaultCategory = CategoryProvider.getDefaultIncomeCategories(getApplication<Application>().applicationContext)
+                val isDefaultCategory = CategoryProvider.getDefaultIncomeCategories(
+                    getApplication<Application>().applicationContext
+                )
                     .any { it.name == categoryName && it.name != "Другое" }
 
                 if (isDefaultCategory) {
@@ -233,6 +289,12 @@ class CategoriesViewModel(
                     categoryPreferences.removeIncomeCategory(categoryName)
                 }
                 _incomeCategories.value = _incomeCategories.value.filterNot { it.name == categoryName }
+
+                // Логируем событие в аналитику
+                com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logCategoryDeleted(
+                    category = categoryName,
+                    isExpense = false
+                )
             }
         }
     }
@@ -241,14 +303,18 @@ class CategoriesViewModel(
      * Проверяет, является ли категория расходов стандартной
      */
     fun isDefaultExpenseCategory(category: String): Boolean {
-        return CategoryProvider.getDefaultExpenseCategories(getApplication<Application>().applicationContext).any { it.name == category }
+        return CategoryProvider.getDefaultExpenseCategories(
+            getApplication<Application>().applicationContext
+        ).any { it.name == category }
     }
 
     /**
      * Проверяет, является ли категория доходов стандартной
      */
     fun isDefaultIncomeCategory(category: String): Boolean {
-        return CategoryProvider.getDefaultIncomeCategories(getApplication<Application>().applicationContext).any { it.name == category }
+        return CategoryProvider.getDefaultIncomeCategories(
+            getApplication<Application>().applicationContext
+        ).any { it.name == category }
     }
 
     /**

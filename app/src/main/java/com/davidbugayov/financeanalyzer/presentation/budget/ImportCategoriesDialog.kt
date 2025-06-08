@@ -46,7 +46,7 @@ fun ImportCategoriesDialog(
     preselectedCategories: List<String> = emptyList()
 ) {
     // Список выбранных категорий
-    val selectedCategories = remember { 
+    val selectedCategories = remember {
         mutableStateListOf<String>().apply {
             addAll(preselectedCategories)
         }
@@ -68,9 +68,9 @@ fun ImportCategoriesDialog(
                     text = subtitle,
                     style = MaterialTheme.typography.bodyLarge
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 LazyColumn(
                     modifier = Modifier.fillMaxWidth()
                 ) {
@@ -132,7 +132,7 @@ private fun CategoryCheckboxItem(
             checked = isChecked,
             onCheckedChange = onCheckedChange
         )
-        
+
         Box(
             modifier = Modifier
                 .fillMaxWidth()

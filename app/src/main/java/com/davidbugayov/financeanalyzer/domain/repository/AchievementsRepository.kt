@@ -30,7 +30,14 @@ class AchievementsRepository {
 
     fun unlockAchievement(id: String) {
         _achievements.value = _achievements.value.map {
-            if (it.id == id && !it.isUnlocked) it.copy(isUnlocked = true, dateUnlocked = System.currentTimeMillis()) else it
+            if (it.id == id && !it.isUnlocked) {
+                it.copy(
+                    isUnlocked = true,
+                    dateUnlocked = System.currentTimeMillis()
+                )
+            } else {
+                it
+            }
         }
     }
 } 

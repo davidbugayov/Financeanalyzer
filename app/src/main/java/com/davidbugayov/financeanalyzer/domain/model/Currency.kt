@@ -43,5 +43,5 @@ enum class Currency(
 enum class SymbolPosition {
 
     BEFORE, // Символ перед суммой (например, $100)
-    AFTER   // Символ после суммы (например, 100₽)
+    AFTER // Символ после суммы (например, 100₽)
 } 

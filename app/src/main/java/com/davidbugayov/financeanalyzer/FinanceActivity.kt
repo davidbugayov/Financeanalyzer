@@ -21,57 +21,57 @@ import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 
 class FinanceActivity : ComponentActivity() {
-    
+
     // Начальный экран для навигации
     private var startDestination = Screen.Home.route
-    
+
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
         super.onCreate(savedInstanceState)
-        
+
         // Обрабатываем deep links
         handleIntent(intent)
-        
+
         // Делаем контент приложения отображаться под системными панелями
         WindowCompat.setDecorFitsSystemWindows(window, false)
-        
+
         // Определяем, какую тему использует приложение
         val isDarkTheme = when (PreferencesManager(this).getThemeMode()) {
             ThemeMode.DARK -> true
             ThemeMode.LIGHT -> false
-            ThemeMode.SYSTEM -> resources.configuration.uiMode and 
-                                 android.content.res.Configuration.UI_MODE_NIGHT_MASK == 
-                                 android.content.res.Configuration.UI_MODE_NIGHT_YES
+            ThemeMode.SYSTEM -> resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
         }
 
-        // Устанавливаем цвет иконок в зависимости от темы: 
+        // Устанавливаем цвет иконок в зависимости от темы:
         // - светлые иконки на темном фоне (isDarkTheme = true)
         // - темные иконки на светлом фоне (isDarkTheme = false)
         WindowInsetsControllerCompat(window, window.decorView).apply {
             isAppearanceLightStatusBars = !isDarkTheme
             isAppearanceLightNavigationBars = !isDarkTheme
         }
-        
+
         // Настраиваем поведение сплеш-скрина
         var isReady = false
         splashScreen.setKeepOnScreenCondition { !isReady }
-        
+
         enableEdgeToEdge()
 
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
             // Логирование и оповещение об ошибке
             android.util.Log.e("FinanceActivity", "Unhandled exception", e)
-            
+
             // Перезапускаем приложение
             val intent = Intent(this, FinanceActivity::class.java)
-            intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK)
+            intent.addFlags(
+                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK
+            )
             startActivity(intent)
-            
+
             // Завершаем текущий процесс
             Process.killProcess(Process.myPid())
             System.exit(10)
         }
-        
+
         applyContent()
     }
 

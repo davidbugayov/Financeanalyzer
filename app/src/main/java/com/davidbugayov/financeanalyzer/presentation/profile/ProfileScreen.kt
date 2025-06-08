@@ -114,7 +114,9 @@ fun ProfileScreen(
             } catch (e: Exception) {
                 Timber.e(e, "Failed to start activity for intent: $intent")
                 scope.launch {
-                    snackbarHostState.showSnackbar("Не удалось выполнить действие: ${e.localizedMessage}")
+                    snackbarHostState.showSnackbar(
+                        "Не удалось выполнить действие: ${e.localizedMessage}"
+                    )
                 }
             }
         }
@@ -129,7 +131,9 @@ fun ProfileScreen(
         HandleExportMessages(state, snackbarHostState, viewModel)
 
         LaunchedEffect(state.isTransactionReminderEnabled) {
-            Timber.d("[UI] ProfileScreen: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}")
+            Timber.d(
+                "[UI] ProfileScreen: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}"
+            )
         }
 
         Scaffold(
@@ -162,7 +166,9 @@ fun ProfileScreen(
                         .clickable { onNavigateToChart() }
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                )
                 // Секция бюджета
                 ProfileActionCard(
                     icon = Icons.Default.AccountBalanceWallet,
@@ -170,9 +176,14 @@ fun ProfileScreen(
                     title = stringResource(R.string.budget),
                     subtitle = stringResource(R.string.profile_budget_subtitle),
                     onClick = onNavigateToBudget,
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding), vertical = 4.dp)
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.profile_section_padding),
+                        vertical = 4.dp
+                    )
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                )
                 // Секция экспорт и импорт
                 ProfileActionCard(
                     icon = Icons.Default.FileUpload,
@@ -180,9 +191,14 @@ fun ProfileScreen(
                     title = stringResource(R.string.export_import),
                     subtitle = stringResource(R.string.profile_export_import_subtitle),
                     onClick = { onNavigateToExportImport(Screen.ExportImport.route) },
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding), vertical = 4.dp)
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.profile_section_padding),
+                        vertical = 4.dp
+                    )
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                )
 
                 // Кнопка перехода на экран достижений
                 ProfileActionCard(
@@ -191,40 +207,61 @@ fun ProfileScreen(
                     title = stringResource(R.string.achievements),
                     subtitle = stringResource(R.string.profile_achievements_subtitle),
                     onClick = onNavigateToAchievements,
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding), vertical = 4.dp)
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.profile_section_padding),
+                        vertical = 4.dp
+                    )
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                )
 
                 // Секция настроек
                 SettingsSection(
                     onThemeClick = { viewModel.onEvent(ProfileEvent.ShowThemeDialog) },
                     onLanguageClick = { /* Открыть диалог выбора языка */ },
                     onCurrencyClick = { /* Открыть диалог выбора валюты */ },
-                    onTransactionReminderClick = { viewModel.onEvent(ProfileEvent.ShowNotificationSettingsDialog) },
+                    onTransactionReminderClick = {
+                        viewModel.onEvent(
+                            ProfileEvent.ShowNotificationSettingsDialog
+                        )
+                    },
                     themeMode = state.themeMode,
                     isTransactionReminderEnabled = state.isTransactionReminderEnabled,
                     transactionReminderTime = state.transactionReminderTime,
                     hasNotificationPermission = state.hasNotificationPermission,
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.profile_section_padding)
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                )
 
                 // Секция информации о приложении
                 AppInfoSection(
                     appVersion = appVersion,
                     buildVersion = buildVersion,
                     onNavigateToLibraries = onNavigateToLibraries,
-                    modifier = Modifier.padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.profile_section_padding)
+                    )
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)))
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing))
+                )
 
                 // Диалоги
                 ShowDialogs(state, viewModel)
-                
+
                 // Отступ внизу экрана для улучшения UX
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing) * 2))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.profile_section_spacing) * 2
+                    )
+                )
             }
         }
     }
@@ -273,10 +310,7 @@ private fun HandleExportMessages(
  * Отображение диалогов настройки темы и уведомлений.
  */
 @Composable
-private fun ShowDialogs(
-    state: ProfileState,
-    viewModel: ProfileViewModel
-) {
+private fun ShowDialogs(state: ProfileState, viewModel: ProfileViewModel) {
     // Диалог выбора темы
     if (state.isEditingTheme) {
         ThemeSelectionDialog(

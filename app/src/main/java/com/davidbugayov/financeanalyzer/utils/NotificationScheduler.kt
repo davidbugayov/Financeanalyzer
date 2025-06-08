@@ -33,7 +33,9 @@ class NotificationScheduler(
      */
     private fun createNotificationChannel() { // Убираем context из параметра
         val name = applicationContext.getString(R.string.transaction_reminder_channel_name)
-        val description = applicationContext.getString(R.string.transaction_reminder_channel_description)
+        val description = applicationContext.getString(
+            R.string.transaction_reminder_channel_description
+        )
         val importance = NotificationManager.IMPORTANCE_DEFAULT
 
         val channel =
@@ -54,7 +56,7 @@ class NotificationScheduler(
     internal fun scheduleTransactionReminder(hour: Int, minute: Int) { // Убираем context из параметра
         // Создаем канал уведомлений
         createNotificationChannel()
-        
+
         // Создаем Intent для BroadcastReceiver, который будет показывать уведомление
         val alarmIntent = Intent(applicationContext, TransactionReminderReceiver::class.java)
         val alarmPendingIntent = PendingIntent.getBroadcast(
@@ -63,23 +65,23 @@ class NotificationScheduler(
             alarmIntent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
+
         // Устанавливаем время для уведомления
         val calendar = Calendar.getInstance().apply {
             timeInMillis = System.currentTimeMillis()
             set(Calendar.HOUR_OF_DAY, hour)
             set(Calendar.MINUTE, minute)
             set(Calendar.SECOND, 0)
-            
+
             // Если указанное время уже прошло сегодня, планируем на завтра
             if (timeInMillis <= System.currentTimeMillis()) {
                 add(Calendar.DAY_OF_YEAR, 1)
             }
         }
-        
+
         // Получаем AlarmManager и планируем повторяющееся уведомление
         val alarmManager = applicationContext.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        
+
         try {
             alarmManager.setExactAndAllowWhileIdle(
                 AlarmManager.RTC_WAKEUP,

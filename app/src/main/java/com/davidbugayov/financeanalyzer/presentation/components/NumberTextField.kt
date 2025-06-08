@@ -28,11 +28,15 @@ fun NumberTextField(
         onValueChange = { newValue ->
             // Проверяем, является ли введенное значение допустимым числом
             val isValid = newValue.isEmpty() ||
-                    newValue.toDoubleOrNull() != null ||
-                    (newValue == "-" && allowNegative) ||
-                    (newValue.matches(Regex("-?\\d*\\.?\\d*")) && (allowNegative || !newValue.startsWith(
-                        "-"
-                    )))
+                newValue.toDoubleOrNull() != null ||
+                (newValue == "-" && allowNegative) ||
+                (
+                    newValue.matches(Regex("-?\\d*\\.?\\d*")) && (
+                        allowNegative || !newValue.startsWith(
+                            "-"
+                        )
+                        )
+                    )
 
             if (isValid) {
                 onValueChange(newValue)

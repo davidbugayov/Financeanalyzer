@@ -26,13 +26,17 @@ class UpdateWalletBalancesUseCase(
                 } else {
                     originalAmount
                 }
-                Timber.d("UpdateWalletBalancesUseCase: Откат для ${'$'}{originalWalletIds.size} оригинальных кошельков, сумма: ${'$'}originalAmountPerWallet")
+                Timber.d(
+                    "UpdateWalletBalancesUseCase: Откат для ${'$'}{originalWalletIds.size} оригинальных кошельков, сумма: ${'$'}originalAmountPerWallet"
+                )
                 val originalWallets = walletRepository.getWalletsByIds(originalWalletIds)
                 originalWallets.forEach { wallet ->
                     val updatedWallet = wallet.copy(
                         balance = wallet.balance.minus(originalAmountPerWallet)
                     )
-                    Timber.d("UpdateWalletBalancesUseCase: Откат для кошелька ${'$'}{wallet.name}: баланс ${'$'}{wallet.balance} -> ${'$'}{updatedWallet.balance}")
+                    Timber.d(
+                        "UpdateWalletBalancesUseCase: Откат для кошелька ${'$'}{wallet.name}: баланс ${'$'}{wallet.balance} -> ${'$'}{updatedWallet.balance}"
+                    )
                     walletRepository.updateWallet(updatedWallet)
                 }
             }
@@ -44,20 +48,27 @@ class UpdateWalletBalancesUseCase(
                 } else {
                     amountForWallets
                 }
-                Timber.d("UpdateWalletBalancesUseCase: Обновление для ${'$'}{walletIdsToUpdate.size} кошельков, сумма на кошелек: ${'$'}amountPerWallet")
+                Timber.d(
+                    "UpdateWalletBalancesUseCase: Обновление для ${'$'}{walletIdsToUpdate.size} кошельков, сумма на кошелек: ${'$'}amountPerWallet"
+                )
                 val walletsToUpdateList = walletRepository.getWalletsByIds(walletIdsToUpdate)
                 walletsToUpdateList.forEach { wallet ->
                     val updatedWallet = wallet.copy(
                         balance = wallet.balance.plus(amountPerWallet)
                     )
-                    Timber.d("UpdateWalletBalancesUseCase: Обновляем кошелек ${'$'}{wallet.name}: старый баланс=${'$'}{wallet.balance}, новый баланс=${'$'}{updatedWallet.balance}")
+                    Timber.d(
+                        "UpdateWalletBalancesUseCase: Обновляем кошелек ${'$'}{wallet.name}: старый баланс=${'$'}{wallet.balance}, новый баланс=${'$'}{updatedWallet.balance}"
+                    )
                     walletRepository.updateWallet(updatedWallet)
                 }
             }
             Timber.d("UpdateWalletBalancesUseCase: Балансы кошельков успешно обновлены")
             Result.Success(Unit)
         } catch (e: Exception) {
-            Timber.e(e, "UpdateWalletBalancesUseCase: Ошибка при обновлении баланса кошельков: ${e.message}")
+            Timber.e(
+                e,
+                "UpdateWalletBalancesUseCase: Ошибка при обновлении баланса кошельков: ${e.message}"
+            )
             Result.Error(Unknown(e.message, e))
         }
     }

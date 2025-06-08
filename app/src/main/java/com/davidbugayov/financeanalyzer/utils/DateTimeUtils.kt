@@ -4,7 +4,6 @@ import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.todayIn
-import kotlinx.datetime.DatePeriod
 
 /**
  * Утилитарный класс для работы с датами и временем
@@ -18,14 +17,14 @@ object DateTimeUtils {
         val today = Clock.System.todayIn(TimeZone.currentSystemDefault())
         return LocalDate(today.year, today.monthNumber, 1)
     }
-    
+
     /**
      * Возвращает дату окончания периода по умолчанию (текущая дата)
      */
     fun getDefaultEndDate(): LocalDate {
         return Clock.System.todayIn(TimeZone.currentSystemDefault())
     }
-    
+
     /**
      * Возвращает дату начала предыдущего месяца
      */
@@ -39,7 +38,7 @@ object DateTimeUtils {
         }
         return LocalDate(year, month, 1)
     }
-    
+
     /**
      * Возвращает дату начала текущей недели (понедельник)
      */
@@ -54,7 +53,7 @@ object DateTimeUtils {
             dayOfMonth = today.dayOfMonth - daysToSubtract
         )
     }
-    
+
     /**
      * Преобразует строку в дату в формате "dd.MM.yyyy"
      */
@@ -72,11 +71,14 @@ object DateTimeUtils {
         }
         return null
     }
-    
+
     /**
      * Форматирует дату в строку в формате "dd.MM.yyyy"
      */
     fun formatDate(date: LocalDate): String {
-        return "${date.dayOfMonth.toString().padStart(2, '0')}.${date.monthNumber.toString().padStart(2, '0')}.${date.year}"
+        return "${date.dayOfMonth.toString().padStart(2, '0')}.${date.monthNumber.toString().padStart(
+            2,
+            '0'
+        )}.${date.year}"
     }
 } 

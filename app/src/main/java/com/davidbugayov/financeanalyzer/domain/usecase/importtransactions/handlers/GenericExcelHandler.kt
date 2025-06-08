@@ -18,7 +18,12 @@ class GenericExcelHandler(
 
     // Ключевые слова для общих Excel-файлов
     override val excelKeywords: List<String> = listOf(
-        ".xlsx", ".xls", "excel_export", "workbook", "excel", "spreadsheet"
+        ".xlsx",
+        ".xls",
+        "excel_export",
+        "workbook",
+        "excel",
+        "spreadsheet"
     )
 
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
@@ -30,7 +35,9 @@ class GenericExcelHandler(
                 // имеют заголовок в 2 строки, можно указать headerRowCount = 2.
                 // Для примера, оставим полностью дефолтный конфиг.
             )
-            Timber.d("[$bankName Handler] Создание GenericExcelImportUseCase с дефолтной конфигурацией: $defaultConfig")
+            Timber.d(
+                "[$bankName Handler] Создание GenericExcelImportUseCase с дефолтной конфигурацией: $defaultConfig"
+            )
             return GenericExcelImportUseCase(context, transactionRepository, defaultConfig)
         }
         throw IllegalArgumentException("[$bankName Handler] не поддерживает тип файла: $fileType")
@@ -51,7 +58,9 @@ class GenericExcelHandler(
         // Поэтому, если super.canHandle() вернул false, мы тоже вернем false.
         // В будущем здесь можно добавить проверку "магических чисел" файла,
         // если будет реализовано чтение начальных байт из uri.
-        Timber.d("[$bankName Handler] Did not match file by name: $fileName. Content check for Excel is typically not done on string preview or simple URI read.")
+        Timber.d(
+            "[$bankName Handler] Did not match file by name: $fileName. Content check for Excel is typically not done on string preview or simple URI read."
+        )
         return false // Если дошли сюда, значит super.canHandle() был false.
     }
 } 

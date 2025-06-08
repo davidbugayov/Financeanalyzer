@@ -72,13 +72,13 @@ fun WalletTransactionsScreen(
         viewModel.onEvent(WalletTransactionsEvent.LoadWallet(walletId))
         viewModel.onEvent(WalletTransactionsEvent.LoadTransactions(walletId))
     }
-    
+
     // Получаем текущее состояние
     val state by viewModel.state.collectAsState()
-    
+
     // Состояние для диалога импорта категорий
     var showImportCategoriesDialog by remember { mutableStateOf(false) }
-    
+
     // Получаем доступ к CategoriesViewModel для импорта категорий
     val categoriesViewModel: CategoriesViewModel = koinViewModel()
     val expenseCategories by categoriesViewModel.expenseCategories.collectAsState()
@@ -88,11 +88,11 @@ fun WalletTransactionsScreen(
         state.wallet?.let { wallet ->
             // Настроим экран добавления транзакции с именем кошелька в качестве категории
             addTransactionViewModel.setupForExpenseAddition(
-                amount = "",  // Пустая строка для поля суммы
+                amount = "", // Пустая строка для поля суммы
                 walletCategory = wallet.name,
                 context = context
             )
-            
+
             // Переходим на экран добавления транзакции
             navController.navigate(Screen.AddTransaction.route)
         }
@@ -141,7 +141,7 @@ fun WalletTransactionsScreen(
             } else {
                 // Сохраняем кошелек в локальную переменную для умного приведения типов
                 val wallet = state.wallet!!
-                
+
                 // Wallet summary card
                 Card(
                     modifier = Modifier
@@ -188,7 +188,10 @@ fun WalletTransactionsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Бюджет: ${wallet.limit.format(showCurrency = true, useMinimalDecimals = true)}",
+                            text = "Бюджет: ${wallet.limit.format(
+                                showCurrency = true,
+                                useMinimalDecimals = true
+                            )}",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
@@ -202,7 +205,7 @@ fun WalletTransactionsScreen(
                             0f // Если лимит равен 0, прогресс тоже 0
                         }
                         val progressColor = if (progress > 1f) Color.Red else MaterialTheme.colorScheme.primary
-                        
+
                         LinearProgressIndicator(
                             progress = { if (progress > 1f) 1f else progress },
                             modifier = Modifier.fillMaxWidth(),
@@ -223,7 +226,10 @@ fun WalletTransactionsScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant
                                 )
                                 Text(
-                                    text = wallet.spent.format(showCurrency = true, useMinimalDecimals = true),
+                                    text = wallet.spent.format(
+                                        showCurrency = true,
+                                        useMinimalDecimals = true
+                                    ),
                                     style = MaterialTheme.typography.bodyLarge
                                 )
                             }
@@ -237,7 +243,10 @@ fun WalletTransactionsScreen(
                                 val remaining = wallet.limit.minus(wallet.spent)
                                 val remainingColor = if (remaining.isNegative()) Color.Red else MaterialTheme.colorScheme.onSurface
                                 Text(
-                                    text = remaining.format(showCurrency = true, useMinimalDecimals = true),
+                                    text = remaining.format(
+                                        showCurrency = true,
+                                        useMinimalDecimals = true
+                                    ),
                                     style = MaterialTheme.typography.bodyLarge,
                                     color = remainingColor
                                 )
@@ -261,13 +270,16 @@ fun WalletTransactionsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                             Text(
-                                text = wallet.balance.format(showCurrency = true, useMinimalDecimals = true),
+                                text = wallet.balance.format(
+                                    showCurrency = true,
+                                    useMinimalDecimals = true
+                                ),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
                         }
-                        
+
                         // Кнопка "Потратить из кошелька"
                         Spacer(modifier = Modifier.height(16.dp))
                         Button(
@@ -293,7 +305,7 @@ fun WalletTransactionsScreen(
                         }
                     }
                 }
-                
+
                 // Отображение связанных категорий
                 if (state.wallet?.linkedCategories?.isNotEmpty() == true) {
                     Column(
@@ -304,9 +316,9 @@ fun WalletTransactionsScreen(
                             style = MaterialTheme.typography.titleSmall,
                             fontWeight = FontWeight.Medium
                         )
-                        
+
                         Spacer(modifier = Modifier.height(4.dp))
-                        
+
                         val linkedCategories = state.wallet?.linkedCategories ?: emptyList()
                         Text(
                             text = linkedCategories.joinToString(", "),
@@ -314,20 +326,25 @@ fun WalletTransactionsScreen(
                             color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
                     }
-                    
+
                     HorizontalDivider(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         color = MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.5f)
                     )
                 }
-                
+
                 // Заголовок списка транзакций
                 Text(
                     text = "Транзакции",
                     style = MaterialTheme.typography.titleMedium,
-                    modifier = Modifier.padding(start = 16.dp, top = 24.dp, end = 16.dp, bottom = 8.dp)
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = 24.dp,
+                        end = 16.dp,
+                        bottom = 8.dp
+                    )
                 )
-                
+
                 // Если транзакций нет, показываем сообщение
                 if (state.transactions.isEmpty()) {
                     Box(
@@ -352,14 +369,14 @@ fun WalletTransactionsScreen(
                                 transaction = transaction,
                                 categoriesViewModel = categoriesViewModel,
                                 onClick = {},
-                                onTransactionLongClick = { /* TODO: Handle long click */ },
+                                onTransactionLongClick = { /* TODO: Handle long click */ }
                             )
                         }
                     }
                 }
             }
         }
-        
+
         // Диалог связывания категорий
         if (showImportCategoriesDialog) {
             ImportCategoriesDialog(
@@ -376,7 +393,7 @@ fun WalletTransactionsScreen(
                 preselectedCategories = state.wallet?.linkedCategories ?: emptyList()
             )
         }
-        
+
         // Отображение ошибки, если есть
         state.error?.let { error ->
             AlertDialog(

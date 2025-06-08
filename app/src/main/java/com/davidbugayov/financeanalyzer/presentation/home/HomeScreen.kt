@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.home
 
-import android.app.Activity
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -53,8 +52,6 @@ import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
-import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.delay
 import timber.log.Timber
 /**
  * Главный экран приложения.
@@ -62,10 +59,7 @@ import timber.log.Timber
  * Следует принципам MVI и Clean Architecture.
  */
 @Composable
-private fun HomeTopBar(
-    onGenerateTestData: () -> Unit,
-    onNavigateToProfile: () -> Unit
-) {
+private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -> Unit) {
     AppTopBar(
         title = stringResource(R.string.app_title),
         navigationIcon = {
@@ -215,12 +209,17 @@ fun HomeScreen(
     val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
     val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
 
-    val showAchievementFeedback = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>("show_achievement_feedback") == true
+    val showAchievementFeedback = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>(
+        "show_achievement_feedback"
+    ) == true
     if (showAchievementFeedback) {
         feedbackMessage = stringResource(R.string.achievement_first_steps_unlocked)
         feedbackType = FeedbackType.SUCCESS
         showFeedback = true
-        navController.currentBackStackEntry?.savedStateHandle?.set("show_achievement_feedback", false)
+        navController.currentBackStackEntry?.savedStateHandle?.set(
+            "show_achievement_feedback",
+            false
+        )
     }
 
     LaunchedEffect(Unit) {

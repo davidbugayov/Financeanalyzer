@@ -47,8 +47,10 @@ fun WalletSelectionSection(
     targetWalletName: String? = null
 ) {
     // Добавляем логирование состояния
-    Timber.d("WalletSelectionSection: isVisible=$isVisible, addToWallet=$addToWallet, selectedWallets=$selectedWallets, targetWallet=$targetWalletName")
-    
+    Timber.d(
+        "WalletSelectionSection: isVisible=$isVisible, addToWallet=$addToWallet, selectedWallets=$selectedWallets, targetWallet=$targetWalletName"
+    )
+
     if (isVisible) {
         Column(
             modifier = Modifier
@@ -56,7 +58,7 @@ fun WalletSelectionSection(
                 .padding(horizontal = 16.dp)
         ) {
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
@@ -65,22 +67,22 @@ fun WalletSelectionSection(
                     text = stringResource(R.string.add_to_wallets),
                     modifier = Modifier.weight(1f)
                 )
-                
+
                 Switch(
                     checked = addToWallet,
                     onCheckedChange = { onToggleAddToWallet() }
                 )
             }
-            
+
             if (addToWallet) {
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 SelectWalletsButton(
                     selectedWallets = selectedWallets,
                     onClick = onSelectWalletsClick,
                     targetWalletName = targetWalletName
                 )
-                
+
                 // Добавляем явный вывод о том, сколько кошельков выбрано
                 if (selectedWallets.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
@@ -95,7 +97,7 @@ fun WalletSelectionSection(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(16.dp))
         }
     }
@@ -117,7 +119,7 @@ private fun SelectWalletsButton(
     } else {
         stringResource(R.string.selected_wallets_count, selectedWallets.size)
     }
-    
+
     WalletSelectorButton(
         text = text,
         onClick = onClick,
@@ -129,11 +131,7 @@ private fun SelectWalletsButton(
  * Кнопка выбора кошельков
  */
 @Composable
-private fun WalletSelectorButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier
-) {
+private fun WalletSelectorButton(text: String, onClick: () -> Unit, modifier: Modifier) {
     Row(
         modifier = modifier
             .clip(RoundedCornerShape(8.dp))
@@ -155,9 +153,9 @@ private fun WalletSelectorButton(
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f, fill = false)
         )
-        
+
         Spacer(modifier = Modifier.width(4.dp))
-        
+
         Icon(
             imageVector = Icons.AutoMirrored.Filled.ArrowForward,
             contentDescription = stringResource(R.string.select_wallets_content_description),

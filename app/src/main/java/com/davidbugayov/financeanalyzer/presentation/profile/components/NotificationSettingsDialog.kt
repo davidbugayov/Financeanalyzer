@@ -49,17 +49,18 @@ import java.util.Locale
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationSettingsDialog(
-    onDismiss: () -> Unit,
-    viewModel: ProfileViewModel
-) {
+fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewModel) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val permissionManager = remember { PermissionManager(context) }
     var pendingEnableNotifications by remember { mutableStateOf(false) }
     var showTimePicker by remember { mutableStateOf(false) }
     var showPermissionDialog by remember { mutableStateOf(false) }
-    var hasNotificationPermission by remember { mutableStateOf(PermissionUtils.hasNotificationPermission(context)) }
+    var hasNotificationPermission by remember {
+        mutableStateOf(
+            PermissionUtils.hasNotificationPermission(context)
+        )
+    }
 
     LaunchedEffect(hasNotificationPermission) {
         if (hasNotificationPermission && pendingEnableNotifications) {
@@ -73,7 +74,9 @@ fun NotificationSettingsDialog(
     }
 
     LaunchedEffect(state.isTransactionReminderEnabled) {
-        Timber.d("[UI] NotificationSettingsDialog: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}")
+        Timber.d(
+            "[UI] NotificationSettingsDialog: isTransactionReminderEnabled=${state.isTransactionReminderEnabled}"
+        )
     }
 
     if (showTimePicker) {
@@ -81,7 +84,12 @@ fun NotificationSettingsDialog(
             initialHour = state.transactionReminderTime?.hours ?: 20,
             initialMinute = state.transactionReminderTime?.minutes ?: 0,
             onTimeSelected = { hour, minute ->
-                viewModel.onEvent(ProfileEvent.UpdateTransactionReminder(state.isTransactionReminderEnabled, Pair(hour, minute)))
+                viewModel.onEvent(
+                    ProfileEvent.UpdateTransactionReminder(
+                        state.isTransactionReminderEnabled,
+                        Pair(hour, minute)
+                    )
+                )
                 showTimePicker = false
             },
             onDismiss = { showTimePicker = false }
@@ -130,7 +138,9 @@ fun NotificationSettingsDialog(
                     )
                     Button(
                         onClick = {
-                            permissionManager.processEvent(PermissionManager.PermissionEvent.REQUEST_PERMISSION)
+                            permissionManager.processEvent(
+                                PermissionManager.PermissionEvent.REQUEST_PERMISSION
+                            )
                             showPermissionDialog = true
                         },
                         modifier = Modifier.align(Alignment.CenterHorizontally)
@@ -159,7 +169,9 @@ fun NotificationSettingsDialog(
                         checked = state.isTransactionReminderEnabled,
                         onCheckedChange = { checked ->
                             if (checked && !hasNotificationPermission && Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-                                permissionManager.processEvent(PermissionManager.PermissionEvent.REQUEST_PERMISSION)
+                                permissionManager.processEvent(
+                                    PermissionManager.PermissionEvent.REQUEST_PERMISSION
+                                )
                                 showPermissionDialog = true
                                 pendingEnableNotifications = true
                             } else {

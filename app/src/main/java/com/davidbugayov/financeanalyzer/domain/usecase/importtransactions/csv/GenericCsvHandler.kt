@@ -28,7 +28,9 @@ class GenericCsvHandler(
                 // или определить специфичные "общие" настройки, если это имеет смысл.
                 // Для примера, оставим как есть, т.е. запятая-разделитель, формат YYYY-MM-DD и т.д.
             )
-            Timber.Forest.d("[$bankName Handler] Creating GenericCsvImportUseCase with default config: $defaultConfig")
+            Timber.Forest.d(
+                "[$bankName Handler] Creating GenericCsvImportUseCase with default config: $defaultConfig"
+            )
             return GenericCsvImportUseCase(context, transactionRepository, defaultConfig)
         }
         throw IllegalArgumentException("[$bankName Handler] does not support file type: $fileType")
@@ -55,14 +57,19 @@ class GenericCsvHandler(
                         if (firstLine != null) {
                             // Проверяем на наличие общих CSV разделителей, таких как запятая или точка с запятой
                             if (firstLine.contains(',') || firstLine.contains(';')) {
-                                Timber.Forest.d("[$bankName Handler] Matched by CSV content (common delimiters) for file: $fileName")
+                                Timber.Forest.d(
+                                    "[$bankName Handler] Matched by CSV content (common delimiters) for file: $fileName"
+                                )
                                 return true
                             }
                         }
                     }
                 }
             } catch (e: Exception) {
-                Timber.Forest.e(e, "[$bankName Handler] Error reading content from URI for canHandle: $uri")
+                Timber.Forest.e(
+                    e,
+                    "[$bankName Handler] Error reading content from URI for canHandle: $uri"
+                )
                 return false
             }
         }

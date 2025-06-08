@@ -85,7 +85,7 @@ fun TransactionHeader(
                 colors = FilterChipDefaults.filterChipColors(
                     selectedContainerColor = expenseColor.copy(alpha = 0.2f),
                     selectedLabelColor = expenseColor
-                ),
+                )
             )
         }
     }

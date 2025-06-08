@@ -69,7 +69,7 @@ fun BankImportCard(
                         .fillMaxWidth()
                         .background(tintColor, RoundedCornerShape(4.dp))
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
             }
 

@@ -31,12 +31,16 @@ fun AddTransactionScreen(
     achievementsUiViewModel: AchievementsUiViewModel
 ) {
     val context = LocalContext.current
-    val viewModel: AddTransactionViewModel = koinViewModel(parameters = { parametersOf(achievementsUiViewModel) })
+    val viewModel: AddTransactionViewModel = koinViewModel(
+        parameters = { parametersOf(achievementsUiViewModel) }
+    )
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        Timber.d("AddTransactionScreen: Screen opened, onNavigateToImport is ${if (onNavigateToImport != null) "provided" else "null"}")
-        
+        Timber.d(
+            "AddTransactionScreen: Screen opened, onNavigateToImport is ${if (onNavigateToImport != null) "provided" else "null"}"
+        )
+
         AnalyticsUtils.logScreenView(
             screenName = "add_transaction",
             screenClass = "AddTransactionScreen"
@@ -55,7 +59,10 @@ fun AddTransactionScreen(
     LaunchedEffect(achievementUnlocked) {
         if (achievementUnlocked) {
             navController.previousBackStackEntry?.savedStateHandle?.set("show_rustore_review", true)
-            navController.previousBackStackEntry?.savedStateHandle?.set("show_achievement_feedback", true)
+            navController.previousBackStackEntry?.savedStateHandle?.set(
+                "show_achievement_feedback",
+                true
+            )
             viewModel.resetAchievementUnlockedFlag()
         }
     }

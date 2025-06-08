@@ -13,11 +13,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import java.math.BigDecimal
@@ -85,8 +83,14 @@ fun CategoryStatsCard(
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 val percentChangeInt = percentChange.setScale(0, java.math.RoundingMode.FLOOR).toInt()
                 val changeText = when {
-                    percentChangeInt > 0 -> stringResource(R.string.change_increase, percentChangeInt)
-                    percentChangeInt < 0 -> stringResource(R.string.change_decrease, kotlin.math.abs(percentChangeInt))
+                    percentChangeInt > 0 -> stringResource(
+                        R.string.change_increase,
+                        percentChangeInt
+                    )
+                    percentChangeInt < 0 -> stringResource(
+                        R.string.change_decrease,
+                        kotlin.math.abs(percentChangeInt)
+                    )
                     else -> stringResource(R.string.change_no_change)
                 }
                 val percentChangeColor = when {

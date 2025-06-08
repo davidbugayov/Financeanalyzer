@@ -13,7 +13,10 @@ import timber.log.Timber
  */
 class SourceUsagePreferences private constructor(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(PREFERENCES_NAME, Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences(
+        PREFERENCES_NAME,
+        Context.MODE_PRIVATE
+    )
     private val gson = Gson()
 
     companion object {
@@ -78,7 +81,11 @@ class SourceUsagePreferences private constructor(context: Context) {
         usage[sourceName] = currentCount + 1
 
         saveSourcesUsage(usage)
-        Timber.d("[SOURCE_USAGE] Увеличен счетчик использования источника '%s': %d", sourceName, currentCount + 1)
+        Timber.d(
+            "[SOURCE_USAGE] Увеличен счетчик использования источника '%s': %d",
+            sourceName,
+            currentCount + 1
+        )
     }
 
     /**

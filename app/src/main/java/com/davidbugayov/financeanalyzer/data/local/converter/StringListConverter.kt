@@ -9,7 +9,7 @@ import timber.log.Timber
  */
 class StringListConverter {
     private val SEPARATOR = ","
-    
+
     @TypeConverter
     fun fromStringList(list: List<String>?): String? {
         return list?.joinToString(SEPARATOR)

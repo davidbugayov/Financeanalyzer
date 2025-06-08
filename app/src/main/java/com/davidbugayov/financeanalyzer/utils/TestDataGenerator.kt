@@ -15,16 +15,25 @@ import kotlin.random.Random
  * В String не выносить!
  */
 object TestDataGenerator {
-    
+
     private val expenseCategories = listOf(
-        "Продукты", "Транспорт", "Развлечения", "Здоровье", 
-        "Одежда", "Рестораны", "Коммунальные платежи", "Другое"
+        "Продукты",
+        "Транспорт",
+        "Развлечения",
+        "Здоровье", "Одежда",
+        "Рестораны",
+        "Коммунальные платежи",
+        "Другое"
     )
-    
+
     private val incomeCategories = listOf(
-        "Зарплата", "Фриланс", "Подарки", "Инвестиции", "Другое"
+        "Зарплата",
+        "Фриланс",
+        "Подарки",
+        "Инвестиции",
+        "Другое"
     )
-    
+
     /**
      * Генерирует список тестовых транзакций
      * @param count Количество транзакций для генерации (по умолчанию 100)
@@ -36,26 +45,26 @@ object TestDataGenerator {
 
         // Получаем текущую дату
         val endDate = calendar.timeInMillis
-        
+
         // Устанавливаем начальную дату (1 месяц назад)
         calendar.add(Calendar.MONTH, -1)
         val startDate = calendar.timeInMillis
-        
+
         for (i in 0 until count) {
             // Генерируем случайную дату в диапазоне последнего месяца
             val randomDate = Random.nextLong(startDate, endDate)
             val date = Date(randomDate)
-            
+
             // Определяем, будет ли это расход или доход (70% расходов, 30% доходов)
             val isExpense = Random.nextDouble() < 0.7
-            
+
             // Выбираем случайную категорию
             val category = if (isExpense) {
                 expenseCategories.random()
             } else {
                 incomeCategories.random()
             }
-            
+
             // Генерируем случайную сумму
             val amount = if (isExpense) {
                 when (category) {
@@ -77,7 +86,7 @@ object TestDataGenerator {
                     else -> Random.nextDouble(1000.0, 5000.0)
                 }
             }
-            
+
             // Создаем транзакцию и добавляем в список
             val source = if (Random.nextBoolean()) "Сбер" else if (Random.nextBoolean()) "Т-Банк" else "Наличные"
             transactions.add(
@@ -94,7 +103,7 @@ object TestDataGenerator {
                 )
             )
         }
-        
+
         // Сортируем по дате (от новых к старым)
         return transactions.sortedByDescending { it.date }
     }

@@ -27,7 +27,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
 fun HomeTransactionsHeader(
     currentFilter: TransactionFilter,
     showGroupSummary: Boolean,
-    onToggleGroupSummary: (Boolean) -> Unit,
+    onToggleGroupSummary: (Boolean) -> Unit
 ) {
     Row(
         modifier = Modifier
@@ -45,10 +45,11 @@ fun HomeTransactionsHeader(
             onClick = { onToggleGroupSummary(!showGroupSummary) }
         ) {
             Text(
-                text = if (showGroupSummary)
+                text = if (showGroupSummary) {
                     stringResource(R.string.hide_summary)
-                else
-                    stringResource(R.string.show_summary),
+                } else {
+                    stringResource(R.string.show_summary)
+                },
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium
             )

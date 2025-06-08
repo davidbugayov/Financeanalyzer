@@ -66,7 +66,7 @@ fun TransactionGroupList(
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
-    
+
     // Используем mutableStateMapOf для хранения состояния раскрытия групп
     // По умолчанию все группы раскрыты, кроме последних двух
     val expandedGroups = remember(transactionGroups) {
@@ -76,24 +76,24 @@ fun TransactionGroupList(
             }
         }
     }
-    
+
     // Проверяем, нужно ли загружать больше данных
     val shouldLoadMore by remember {
         derivedStateOf {
             val lastVisibleItem = listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             val totalItemCount = listState.layoutInfo.totalItemsCount
-            
+
             hasMoreData && !isLoading && lastVisibleItem >= totalItemCount - 5
         }
     }
-    
+
     // Загружаем больше данных, если нужно
     LaunchedEffect(shouldLoadMore) {
         if (shouldLoadMore) {
             onLoadMore()
         }
     }
-    
+
     LazyColumn(
         state = listState,
         modifier = Modifier.fillMaxWidth()
@@ -132,7 +132,7 @@ fun TransactionGroupList(
                     }
                 )
             }
-            
+
             // Список транзакций в группе, показываем только если группа развернута
             if (isExpanded) {
                 items(
@@ -147,14 +147,16 @@ fun TransactionGroupList(
                         animationDelay = 0L,
                         animated = false
                     )
-                    
+
                     HorizontalDivider(
-                        modifier = Modifier.padding(horizontal = dimensionResource(id = R.dimen.spacing_normal)),
+                        modifier = Modifier.padding(
+                            horizontal = dimensionResource(id = R.dimen.spacing_normal)
+                        ),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
                     )
                 }
             }
-            
+
             // Разделитель между группами
             item(key = "spacer_${group.date}") {
                 Spacer(
@@ -164,7 +166,7 @@ fun TransactionGroupList(
                 )
             }
         }
-        
+
         // Индикатор загрузки внизу списка
         if (isLoading) {
             item(key = "loading_indicator") {

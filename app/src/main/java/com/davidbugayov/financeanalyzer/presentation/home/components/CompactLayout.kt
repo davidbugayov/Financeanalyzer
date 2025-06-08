@@ -56,7 +56,7 @@ private fun CompactBalanceAndFilters(
     HomeTransactionsHeader(
         currentFilter = state.currentFilter,
         showGroupSummary = showGroupSummary,
-        onToggleGroupSummary = onToggleGroupSummary,
+        onToggleGroupSummary = onToggleGroupSummary
     )
 }
 
@@ -156,7 +156,7 @@ private fun CompactTransactionList(
                 transaction = transaction,
                 categoriesViewModel = categoriesViewModel,
                 onClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick,
+                onTransactionLongClick = onTransactionLongClick
             )
         }
     }

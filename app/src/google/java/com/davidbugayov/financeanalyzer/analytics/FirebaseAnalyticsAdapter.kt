@@ -11,7 +11,7 @@ import timber.log.Timber
 class FirebaseAnalyticsAdapter(
     private val firebaseAnalytics: FirebaseAnalytics
 ) : IAnalytics {
-    
+
     override fun logEvent(eventName: String) {
         Timber.d("Logging Firebase event: $eventName")
         firebaseAnalytics.logEvent(eventName, null)

@@ -114,7 +114,10 @@ class GetProfileAnalyticsUseCase(
             // Замените GenericAppException на ваш конкретный подтип AppException, если есть
             Result.Error(
                 GenericAppException(
-                    context.getString(R.string.error_loading_profile_analytics_detail, e.localizedMessage ?: e.toString()),
+                    context.getString(
+                        R.string.error_loading_profile_analytics_detail,
+                        e.localizedMessage ?: e.toString()
+                    ),
                     e
                 )
             )

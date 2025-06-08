@@ -80,32 +80,40 @@ fun DrawScope.drawLineChart(
         Timber.d("drawLineChart: список точек пуст, не рисуем график")
         return
     }
-    
+
     // Логируем точки для отладки
     Timber.d("drawLineChart: рисуем график с ${points.size} точками, цвет: $lineColor")
-    Timber.d("drawLineChart: первая точка: дата=${points.first().date}, значение=${points.first().value.amount}")
-    Timber.d("drawLineChart: последняя точка: дата=${points.last().date}, значение=${points.last().value.amount}")
-    
+    Timber.d(
+        "drawLineChart: первая точка: дата=${points.first().date}, значение=${points.first().value.amount}"
+    )
+    Timber.d(
+        "drawLineChart: последняя точка: дата=${points.last().date}, значение=${points.last().value.amount}"
+    )
+
     // Логируем метки времени для сравнения
-    Timber.d("drawLineChart: startDate=$startDate, endDate=$endDate, minValue=$minValue, maxValue=$maxValue")
-    
+    Timber.d(
+        "drawLineChart: startDate=$startDate, endDate=$endDate, minValue=$minValue, maxValue=$maxValue"
+    )
+
     // Отладочная информация: показываем первую точку в виде координат для проверки масштабирования
     val firstPoint = points.first()
     val firstNormalizedX = (firstPoint.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
     val firstNormalizedY = 1f - (firstPoint.value.amount.toFloat() - minValue) / (maxValue - minValue)
     val firstX = firstNormalizedX * size.width * animatedProgress
     val firstY = firstNormalizedY * size.height
-    Timber.d("drawLineChart: первая точка ($firstNormalizedX, $firstNormalizedY) -> ($firstX, $firstY)")
-    
+    Timber.d(
+        "drawLineChart: первая точка ($firstNormalizedX, $firstNormalizedY) -> ($firstX, $firstY)"
+    )
+
     val width = size.width
     val height = size.height
-    
+
     // Используем размеры из ресурсов
     val lineStrokeWidth = 3.dp.toPx()
-    val pointRadius = 5.dp.toPx()  // Увеличен радиус точек
-    val selectedPointRadius = 10.dp.toPx()  // Увеличен радиус выбранной точки
+    val pointRadius = 5.dp.toPx() // Увеличен радиус точек
+    val selectedPointRadius = 10.dp.toPx() // Увеличен радиус выбранной точки
     val selectedPointStrokeWidth = 3.dp.toPx()
-    val glowRadius = 16.dp.toPx()  // Увеличен радиус свечения
+    val glowRadius = 16.dp.toPx() // Увеличен радиус свечения
 
     // Создаем путь для линии с использованием кривой Безье для плавности
     val linePath = Path()
@@ -139,17 +147,23 @@ fun DrawScope.drawLineChart(
                 val controlY1 = pointsY[i - 1]
                 val controlX2 = (pointsX[i - 1] + pointsX[i]) / 2f
                 val controlY2 = pointsY[i]
-                
+
                 // Добавляем кубическую кривую Безье для плавности
                 linePath.cubicTo(
-                    controlX1, controlY1,
-                    controlX2, controlY2,
-                    pointsX[i], pointsY[i]
+                    controlX1,
+                    controlY1,
+                    controlX2,
+                    controlY2,
+                    pointsX[i],
+                    pointsY[i]
                 )
                 fillPath.cubicTo(
-                    controlX1, controlY1,
-                    controlX2, controlY2,
-                    pointsX[i], pointsY[i]
+                    controlX1,
+                    controlY1,
+                    controlX2,
+                    controlY2,
+                    pointsX[i],
+                    pointsY[i]
                 )
             } else {
                 // Для последней точки используем простую линию
@@ -162,7 +176,7 @@ fun DrawScope.drawLineChart(
         fillPath.lineTo(pointsX[points.size - 1], height)
         fillPath.lineTo(pointsX[0], height)
         fillPath.close()
-        
+
         // Рисуем заполнение под линией с улучшенным градиентом
         drawPath(
             path = fillPath,
@@ -195,16 +209,18 @@ fun DrawScope.drawLineChart(
     points.forEachIndexed { index, point ->
         val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
         val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
-        
+
         val x = normalizedX * width * animatedProgress
         val y = normalizedY * height
-        
+
         // Логируем координаты отрисовки точки
-        Timber.d("drawLineChart [Point $index Draw]: Date=${point.date}, Drawing at Coords=($x, $y)")
-        
+        Timber.d(
+            "drawLineChart [Point $index Draw]: Date=${point.date}, Drawing at Coords=($x, $y)"
+        )
+
         // Проверяем, является ли текущая точка выбранной
         val isSelected = selectedPoint?.date?.time == point.date.time
-        
+
         if (isSelected) {
             // Рисуем эффект свечения для выделенной точки
             drawCircle(
@@ -212,7 +228,7 @@ fun DrawScope.drawLineChart(
                 radius = glowRadius,
                 center = Offset(x, y)
             )
-            
+
             // Рисуем дополнительное кольцо для усиления эффекта
             drawCircle(
                 color = lineColor.copy(alpha = 0.4f),
@@ -220,14 +236,14 @@ fun DrawScope.drawLineChart(
                 center = Offset(x, y),
                 style = Stroke(width = 2.dp.toPx())
             )
-            
+
             // Рисуем внешний круг для выделенной точки
             drawCircle(
                 color = lineColor,
                 radius = selectedPointRadius,
                 center = Offset(x, y)
             )
-            
+
             // Рисуем внутренний круг для выделенной точки
             drawCircle(
                 color = Color.White,
@@ -237,7 +253,7 @@ fun DrawScope.drawLineChart(
         } else {
             // Для одиночных точек и точек на графике рисуем увеличенный круг
             val actualPointRadius = if (points.size == 1) pointRadius * 1.5f else pointRadius
-            
+
             // Улучшенное отображение обычных точек
             // Рисуем небольшое свечение вокруг точки
             drawCircle(
@@ -245,7 +261,7 @@ fun DrawScope.drawLineChart(
                 radius = actualPointRadius + 3.dp.toPx(),
                 center = Offset(x, y)
             )
-            
+
             // Рисуем внешний круг с обводкой
             drawCircle(
                 color = lineColor.copy(alpha = 0.5f),
@@ -253,14 +269,14 @@ fun DrawScope.drawLineChart(
                 center = Offset(x, y),
                 style = Stroke(width = 1.dp.toPx())
             )
-            
+
             // Рисуем внешний круг для лучшей видимости
             drawCircle(
                 color = Color.White,
                 radius = actualPointRadius,
                 center = Offset(x, y)
             )
-            
+
             // Рисуем внутренний круг с цветом линии
             drawCircle(
                 color = lineColor,
@@ -268,7 +284,7 @@ fun DrawScope.drawLineChart(
                 center = Offset(x, y)
             )
         }
-        
+
         // Рисуем пунктирные линии от точки к осям
         val dashEffect = PathEffect.dashPathEffect(floatArrayOf(8f, 4f), 0f)
         val dashLineColor = lineColor.copy(alpha = 0.4f)
@@ -331,29 +347,35 @@ object LineChartUtils {
         var closestPoint: LineChartPoint? = null
         var minDistance = Float.MAX_VALUE
         Timber.d("findNearestPoint: Checking points against threshold: $threshold") // Лог порога
-        
+
         points.forEachIndexed { index, point -> // Добавляем index для лога
             val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
             val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
-            
+
             val x = normalizedX * chartWidth * animatedProgress
             val y = normalizedY * chartHeight
-            
+
             val distance = hypot(x - tapPosition.x, y - tapPosition.y)
-            
+
             // Логируем данные для каждой точки
 
             if (distance < threshold && distance < minDistance) {
-                Timber.d("findNearestPoint [Point $index]: Found closer point within threshold. Updating minDistance to $distance") // Лог обновления
+                Timber.d(
+                    "findNearestPoint [Point $index]: Found closer point within threshold. Updating minDistance to $distance"
+                ) // Лог обновления
                 minDistance = distance
                 closestPoint = point
             } else if (distance < threshold) {
-                 Timber.d("findNearestPoint [Point $index]: Point within threshold ($distance < $threshold) but not closer than current min ($minDistance)")
+                Timber.d(
+                    "findNearestPoint [Point $index]: Point within threshold ($distance < $threshold) but not closer than current min ($minDistance)"
+                )
             } else {
-                 Timber.d("findNearestPoint [Point $index]: Point outside threshold ($distance >= $threshold)")
+                Timber.d(
+                    "findNearestPoint [Point $index]: Point outside threshold ($distance >= $threshold)"
+                )
             }
         }
-        
+
         return closestPoint
     }
 } 

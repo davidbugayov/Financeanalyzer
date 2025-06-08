@@ -49,7 +49,9 @@ fun AmountField(
     var textFieldValueForDisplay by remember {
         val numericAmount = amount.toDoubleOrNull()
         val initialText = if (numericAmount != null) Money(numericAmount).format() else amount
-        mutableStateOf(TextFieldValue(text = initialText, selection = TextRange(initialText.length)))
+        mutableStateOf(
+            TextFieldValue(text = initialText, selection = TextRange(initialText.length))
+        )
     }
 
     var isFocused by remember { mutableStateOf(false) }
@@ -76,7 +78,10 @@ fun AmountField(
 
         // Обновляем textFieldValueForDisplay, только если текст действительно изменился
         if (textFieldValueForDisplay.text != textToShow) {
-            textFieldValueForDisplay = TextFieldValue(text = textToShow, selection = TextRange(textToShow.length))
+            textFieldValueForDisplay = TextFieldValue(
+                text = textToShow,
+                selection = TextRange(textToShow.length)
+            )
         }
     }
 
@@ -101,8 +106,14 @@ fun AmountField(
                 if (isFocused) {
                     // Важно сохранить позицию курсора относительно текста без пробелов
                     val originalSelection = newTextFieldValue.selection
-                    val newSelectionStart = originalSelection.start - newTextFieldValue.text.substring(0, originalSelection.start).count { it == ' ' }
-                    val newSelectionEnd = originalSelection.end - newTextFieldValue.text.substring(0, originalSelection.end).count { it == ' ' }
+                    val newSelectionStart = originalSelection.start - newTextFieldValue.text.substring(
+                        0,
+                        originalSelection.start
+                    ).count { it == ' ' }
+                    val newSelectionEnd = originalSelection.end - newTextFieldValue.text.substring(
+                        0,
+                        originalSelection.end
+                    ).count { it == ' ' }
 
                     textFieldValueForDisplay = TextFieldValue(
                         text = rawTextWithoutSpaces,
@@ -157,7 +168,10 @@ fun AmountField(
         )
     }
     Row(
-        horizontalArrangement = Arrangement.spacedBy(space = 6.dp, alignment = Alignment.CenterHorizontally),
+        horizontalArrangement = Arrangement.spacedBy(
+            space = 6.dp,
+            alignment = Alignment.CenterHorizontally
+        ),
         modifier = Modifier
             .fillMaxWidth()
             .padding(horizontal = 16.dp),
@@ -177,7 +191,7 @@ fun AmountField(
                     val newRawText = "$textWithPotentialSpace$op "
 
                     internalRawAmount = newRawText // Обновляем внутреннее "сырое" значение
-                    onAmountChange(newRawText)   // Сообщаем ViewModel
+                    onAmountChange(newRawText) // Сообщаем ViewModel
 
                     // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
                     // для отображения добавленного оператора.

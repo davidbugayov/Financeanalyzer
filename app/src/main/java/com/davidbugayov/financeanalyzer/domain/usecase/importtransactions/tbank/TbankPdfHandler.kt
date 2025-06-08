@@ -21,12 +21,24 @@ class TbankPdfHandler(
 
     // Ключевые слова для PDF-файлов Тинькофф
     override val pdfKeywords: List<String> = listOf(
-        "tinkoff", "тинькофф", "тбанк", "tbank", "движение средств", "справка о движении"
+        "tinkoff",
+        "тинькофф",
+        "тбанк",
+        "tbank",
+        "движение средств",
+        "справка о движении"
     )
 
     // Негативные ключевые слова для исключения ложных срабатываний
     private fun getNegativeKeywords(): List<String> = listOf(
-        "sberbank", "сбербанк", "сбер", "sber", "альфа", "альфабанк", "alfa", "ozon"
+        "sberbank",
+        "сбербанк",
+        "сбер",
+        "sber",
+        "альфа",
+        "альфабанк",
+        "alfa",
+        "ozon"
     )
 
     /**
@@ -35,7 +47,11 @@ class TbankPdfHandler(
     override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
         if (!supportsFileType(fileType)) return false
         val hasPositiveKeyword = pdfKeywords.any { fileName.lowercase().contains(it.lowercase()) }
-        val containsNegativeKeyword = getNegativeKeywords().any { fileName.lowercase().contains(it.lowercase()) }
+        val containsNegativeKeyword = getNegativeKeywords().any {
+            fileName.lowercase().contains(
+                it.lowercase()
+            )
+        }
         if (containsNegativeKeyword) {
             Timber.d("[$bankName Handler] Файл содержит ключевые слова других банков: $fileName")
             return false
@@ -48,10 +64,34 @@ class TbankPdfHandler(
                 val bytesRead = bis.read(buffer, 0, buffer.size)
                 if (bytesRead > 0) {
                     val content = String(buffer, 0, bytesRead)
-                    val tinkoffIndicators = listOf("TINKOFF", "ТИНЬКОФФ", "Тинькофф Банк", "Тинькофф", "ТБАНК", "TBANK")
-                    val hasTinkoffIndicator = tinkoffIndicators.any { content.contains(it, ignoreCase = true) }
-                    val otherBankIndicators = listOf("СБЕРБАНК", "SBERBANK", "СберБанк", "Альфа-Банк", "АЛЬФА-БАНК", "OZON")
-                    val hasOtherBankIndicator = otherBankIndicators.any { content.contains(it, ignoreCase = true) }
+                    val tinkoffIndicators = listOf(
+                        "TINKOFF",
+                        "ТИНЬКОФФ",
+                        "Тинькофф Банк",
+                        "Тинькофф",
+                        "ТБАНК",
+                        "TBANK"
+                    )
+                    val hasTinkoffIndicator = tinkoffIndicators.any {
+                        content.contains(
+                            it,
+                            ignoreCase = true
+                        )
+                    }
+                    val otherBankIndicators = listOf(
+                        "СБЕРБАНК",
+                        "SBERBANK",
+                        "СберБанк",
+                        "Альфа-Банк",
+                        "АЛЬФА-БАНК",
+                        "OZON"
+                    )
+                    val hasOtherBankIndicator = otherBankIndicators.any {
+                        content.contains(
+                            it,
+                            ignoreCase = true
+                        )
+                    }
                     if (hasOtherBankIndicator) {
                         Timber.d("[$bankName Handler] Файл содержит указания на другой банк")
                         return false

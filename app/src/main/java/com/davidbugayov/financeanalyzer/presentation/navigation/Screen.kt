@@ -16,7 +16,7 @@ sealed class Screen(val route: String) {
 
     /** Экран добавления новой транзакции */
     data object AddTransaction : Screen("add")
-    
+
     /** Экран редактирования существующей транзакции */
     data object EditTransaction : Screen("edit/{transactionId}") {
         fun createRoute(transactionId: String) = "edit/$transactionId"
@@ -29,10 +29,10 @@ sealed class Screen(val route: String) {
     data object FinancialStatistics : Screen("financial_statistics/{startDate}/{endDate}") {
         fun createRoute(startDate: Long, endDate: Long) = "financial_statistics/$startDate/$endDate"
     }
-    
+
     /** Экран профиля пользователя */
     data object Profile : Screen("profile")
-    
+
     /** Экран со списком используемых библиотек */
     data object Libraries : Screen("libraries")
 
@@ -41,7 +41,6 @@ sealed class Screen(val route: String) {
 
     /** Экран бюджета */
     data object Budget : Screen("budget")
-
 
     /** Экран транзакций кошелька */
     data object WalletTransactions : Screen("wallet/{walletId}") {

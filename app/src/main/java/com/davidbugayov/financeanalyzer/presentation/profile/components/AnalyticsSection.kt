@@ -90,7 +90,7 @@ fun AnalyticsSection(
     averageExpense: String,
     totalSourcesUsed: Int,
     dateRange: String = stringResource(R.string.all_time),
-    onSavingsRateClick: () -> Unit = {},
+    onSavingsRateClick: () -> Unit = {}
 ) {
     // Цвета для финансовых показателей
     val incomeColor = LocalIncomeColor.current
@@ -99,23 +99,25 @@ fun AnalyticsSection(
 
     // Расчет норм сбережений - используем переданное значение вместо расчета
     val calculatedSavingsRate = savingsRate
-    
+
     // Состояние анимации
     var showFinancialOverview by remember { mutableStateOf(false) }
     var showAdditionalStats by remember { mutableStateOf(false) }
-    
+
     // Запускаем анимацию с задержкой
     LaunchedEffect(Unit) {
         showFinancialOverview = true
         delay(300) // Небольшая задержка для каскадной анимации
         showAdditionalStats = true
     }
-    
+
     Card(
         modifier = modifier
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation)),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.card_elevation)
+        ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant)
     ) {
@@ -151,7 +153,7 @@ fun AnalyticsSection(
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
-            
+
             // Отображение диапазона дат
             if (dateRange.isNotEmpty()) {
                 Text(
@@ -161,14 +163,13 @@ fun AnalyticsSection(
                     modifier = Modifier.padding(top = dimensionResource(R.dimen.spacing_small))
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-            
+
             // Финансовый обзор с анимацией
             AnimatedVisibility(
                 visible = showFinancialOverview,
-                enter = fadeIn(animationSpec = tween(500)) + 
-                        expandVertically(animationSpec = tween(500))
+                enter = fadeIn(animationSpec = tween(500)) + expandVertically(animationSpec = tween(500))
             ) {
                 Column {
                     // Доходы и расходы
@@ -185,9 +186,9 @@ fun AnalyticsSection(
                             animationDelay = 0,
                             modifier = Modifier.weight(1f)
                         )
-                        
+
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-                        
+
                         // Расходы
                         AnimatedFinancialCard(
                             title = stringResource(R.string.expenses),
@@ -198,9 +199,9 @@ fun AnalyticsSection(
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    
+
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-                    
+
                     // Баланс и норма сбережений
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -215,22 +216,24 @@ fun AnalyticsSection(
                             animationDelay = 200,
                             modifier = Modifier.weight(1f)
                         )
-                        
+
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-                        
+
                         // Норма сбережений
                         val savingsRateColor = when {
                             calculatedSavingsRate >= 20 -> incomeColor // Зеленый
                             calculatedSavingsRate >= 10 -> LocalWarningColor.current // Желтый
-                            calculatedSavingsRate > 0 -> LocalInfoColor.current.copy(alpha = 0.8f)  // Оранжевый
+                            calculatedSavingsRate > 0 -> LocalInfoColor.current.copy(alpha = 0.8f) // Оранжевый
                             else -> expenseColor // Красный
                         }
-                        
+
                         AnimatedFinancialCard(
                             title = stringResource(R.string.savings_rate),
                             value = String.format(Locale.US, "%.1f%%", calculatedSavingsRate),
                             color = savingsRateColor,
-                            icon = rememberVectorPainter(if (calculatedSavingsRate > 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown),
+                            icon = rememberVectorPainter(
+                                if (calculatedSavingsRate > 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown
+                            ),
                             animationDelay = 300,
                             modifier = Modifier
                                 .weight(1f)
@@ -239,14 +242,13 @@ fun AnalyticsSection(
                     }
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-            
+
             // Дополнительная статистика с анимацией
             AnimatedVisibility(
                 visible = showAdditionalStats,
-                enter = fadeIn(animationSpec = tween(500)) + 
-                        expandVertically(animationSpec = tween(500))
+                enter = fadeIn(animationSpec = tween(500)) + expandVertically(animationSpec = tween(500))
             ) {
                 Column {
                     // Первый ряд с аналитикой - улучшенные карточки
@@ -261,9 +263,9 @@ fun AnalyticsSection(
                             animationDelay = 0,
                             modifier = Modifier.weight(1f)
                         )
-                        
+
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-                        
+
                         AnimatedAnalyticCard(
                             icon = Icons.Default.Category,
                             title = stringResource(R.string.expense_categories),
@@ -272,9 +274,9 @@ fun AnalyticsSection(
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    
+
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-                    
+
                     // Второй ряд с аналитикой - улучшенные карточки
                     Row(
                         modifier = Modifier.fillMaxWidth(),
@@ -287,9 +289,9 @@ fun AnalyticsSection(
                             animationDelay = 200,
                             modifier = Modifier.weight(1f)
                         )
-                        
+
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-                        
+
                         AnimatedAnalyticCard(
                             icon = Icons.AutoMirrored.Filled.ShowChart,
                             title = stringResource(R.string.average_expense),
@@ -298,9 +300,9 @@ fun AnalyticsSection(
                             modifier = Modifier.weight(1f)
                         )
                     }
-                    
+
                     Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_large)))
-                    
+
                     // Дополнительная информация - улучшенный дизайн
                     Row(
                         modifier = Modifier
@@ -316,20 +318,24 @@ fun AnalyticsSection(
                                 tint = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.size(dimensionResource(R.dimen.icon_size_20dp))
                             )
-                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_8dp)))
+                            Spacer(
+                                modifier = Modifier.width(dimensionResource(R.dimen.spacing_8dp))
+                            )
                             Text(
                                 text = stringResource(R.string.sources_used),
                                 style = MaterialTheme.typography.bodyMedium
                             )
                         }
-                        
+
                         Surface(
                             color = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
                             shape = RoundedCornerShape(dimensionResource(R.dimen.radius_12dp))
                         ) {
                             Text(
                                 text = totalSourcesUsed.toString(),
-                                style = MaterialTheme.typography.bodyMedium.copy(fontWeight = FontWeight.Bold),
+                                style = MaterialTheme.typography.bodyMedium.copy(
+                                    fontWeight = FontWeight.Bold
+                                ),
                                 color = MaterialTheme.colorScheme.primary,
                                 modifier = Modifier.padding(
                                     horizontal = dimensionResource(R.dimen.padding_horizontal_12dp),
@@ -365,7 +371,7 @@ private fun AnimatedFinancialCard(
         ),
         label = "scale"
     )
-    
+
     LaunchedEffect(Unit) {
         delay(animationDelay.toLong())
         visible = true
@@ -401,9 +407,9 @@ private fun AnimatedFinancialCard(
                         .size(dimensionResource(R.dimen.icon_size_24dp))
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-            
+
             // Значение - сначала, чтобы акцентировать
             Text(
                 text = value,
@@ -411,7 +417,7 @@ private fun AnimatedFinancialCard(
                 fontWeight = FontWeight.Bold,
                 color = color
             )
-            
+
             // Заголовок - после значения
             Text(
                 text = title,
@@ -442,7 +448,7 @@ private fun AnimatedAnalyticCard(
         ),
         label = "scale"
     )
-    
+
     LaunchedEffect(Unit) {
         delay(animationDelay.toLong())
         visible = true
@@ -479,9 +485,9 @@ private fun AnimatedAnalyticCard(
                         .size(dimensionResource(R.dimen.icon_size_24dp))
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-            
+
             // Значение - более акцентированное
             Text(
                 text = value,
@@ -489,7 +495,7 @@ private fun AnimatedAnalyticCard(
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colorScheme.onSurface
             )
-            
+
             // Заголовок
             Text(
                 text = title,

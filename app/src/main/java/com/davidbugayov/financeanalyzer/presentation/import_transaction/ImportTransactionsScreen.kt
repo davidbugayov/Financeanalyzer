@@ -86,12 +86,12 @@ fun ImportTransactionsScreen(
     var showBankInstructionDialog by remember { mutableStateOf(false) }
     var selectedBank by remember { mutableStateOf("") }
     var showPermissionSettingsDialog by remember { mutableStateOf(false) }
-    
+
     // Состояние для анимаций
     var showInstructions by remember { mutableStateOf(false) }
     var showBanksList by remember { mutableStateOf(false) }
     var showButton by remember { mutableStateOf(false) }
-    
+
     // Запускаем анимацию с задержкой для каскадного эффекта
     LaunchedEffect(Unit) {
         showInstructions = true
@@ -180,14 +180,13 @@ fun ImportTransactionsScreen(
                 // Инструкции по импорту с анимацией
                 AnimatedVisibility(
                     visible = showInstructions,
-                    enter = fadeIn(animationSpec = tween(700)) + 
-                            slideInVertically(
-                                initialOffsetY = { -50 },
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioLowBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
-                            )
+                    enter = fadeIn(animationSpec = tween(700)) + slideInVertically(
+                        initialOffsetY = { -50 },
+                        animationSpec = spring(
+                            dampingRatio = Spring.DampingRatioLowBouncy,
+                            stiffness = Spring.StiffnessLow
+                        )
+                    )
                 ) {
                     ImportInstructions()
                 }
@@ -196,13 +195,13 @@ fun ImportTransactionsScreen(
                 AnimatedVisibility(
                     visible = showBanksList,
                     enter = fadeIn(animationSpec = tween(700)) +
-                            slideInVertically(
-                                initialOffsetY = { 50 },
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioLowBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
+                        slideInVertically(
+                            initialOffsetY = { 50 },
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow
                             )
+                        )
                 ) {
                     BanksList(
                         onBankClick = { bank ->
@@ -216,12 +215,12 @@ fun ImportTransactionsScreen(
                 AnimatedVisibility(
                     visible = state.successCount > 0 || state.isLoading || state.error != null,
                     enter = fadeIn(animationSpec = tween(500)) +
-                            expandVertically(
-                                animationSpec = spring(
-                                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                                    stiffness = Spring.StiffnessLow
-                                )
-                            ),
+                        expandVertically(
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                                stiffness = Spring.StiffnessLow
+                            )
+                        ),
                     exit = fadeOut(animationSpec = tween(300))
                 ) {
                     ImportResultsSection(state)
@@ -264,20 +263,23 @@ fun ImportTransactionsScreen(
                             imageVector = Icons.Default.CloudUpload,
                             contentDescription = null,
                             tint = androidx.compose.ui.graphics.Color.White,
-                            modifier = Modifier.padding(end = dimensionResource(R.dimen.padding_medium))
+                            modifier = Modifier.padding(
+                                end = dimensionResource(R.dimen.padding_medium)
+                            )
                         )
                         Text(
-                            text = if (state.isLoading)
+                            text = if (state.isLoading) {
                                 stringResource(R.string.importing_file)
-                            else
-                                stringResource(R.string.choose_file_button),
+                            } else {
+                                stringResource(R.string.choose_file_button)
+                            },
                             style = MaterialTheme.typography.titleMedium,
                             color = androidx.compose.ui.graphics.Color.White
                         )
                     }
                 }
             }
-            
+
             // Диалог с инструкциями по получению выписки из банка
             if (showBankInstructionDialog) {
                 BankInstructionDialog(

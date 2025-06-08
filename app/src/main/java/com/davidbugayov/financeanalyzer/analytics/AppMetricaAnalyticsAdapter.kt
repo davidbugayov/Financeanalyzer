@@ -9,7 +9,7 @@ import timber.log.Timber
  * Используется во всех флейворах.
  */
 class AppMetricaAnalyticsAdapter : IAnalytics {
-    
+
     override fun logEvent(eventName: String) {
         Timber.d("Logging AppMetrica event: $eventName")
         AppMetrica.reportEvent(eventName)
@@ -18,14 +18,27 @@ class AppMetricaAnalyticsAdapter : IAnalytics {
     override fun logEvent(eventName: String, params: Bundle) {
         Timber.d("Logging AppMetrica event: $eventName with params: $params")
         val attributes = mutableMapOf<String, Any>()
-        
+
         // Преобразуем Bundle в Map для AppMetrica
         params.keySet().forEach { key ->
-            params.get(key)?.let { value ->
-                attributes[key] = value
+            when {
+                params.containsKey(key) -> {
+                    val value = when {
+                        params.getString(key) != null -> params.getString(key)
+                        params.getInt(key, Int.MIN_VALUE) != Int.MIN_VALUE -> params.getInt(key)
+                        params.getBoolean(key, false) || params.getBoolean(key, true) -> params.getBoolean(key)
+                        params.getFloat(key, Float.MIN_VALUE) != Float.MIN_VALUE -> params.getFloat(key)
+                        params.getDouble(key, Double.MIN_VALUE) != Double.MIN_VALUE -> params.getDouble(key)
+                        params.getLong(key, Long.MIN_VALUE) != Long.MIN_VALUE -> params.getLong(key)
+                        else -> null
+                    }
+                    value?.let {
+                        attributes[key] = it
+                    }
+                }
             }
         }
-        
+
         AppMetrica.reportEvent(eventName, attributes)
     }
 

@@ -36,8 +36,7 @@ fun AddButton(
         modifier = modifier
             .fillMaxWidth()
             .padding(
-                horizontal = dimensionResource(R.dimen.add_button_padding_horizontal), 
-                vertical = dimensionResource(R.dimen.add_button_padding_vertical)
+                horizontal = dimensionResource(R.dimen.add_button_padding_horizontal), vertical = dimensionResource(R.dimen.add_button_padding_vertical)
             )
             .height(dimensionResource(R.dimen.add_button_height)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.add_button_corner_radius)),

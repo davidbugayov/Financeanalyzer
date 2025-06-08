@@ -22,7 +22,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseChartPalette
 
@@ -46,7 +45,9 @@ fun SourceColorPickerDialog(
                 // Горизонтальный скроллируемый ряд цветов
                 LazyRow(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.source_color_picker_item_spacing))
+                    horizontalArrangement = Arrangement.spacedBy(
+                        dimensionResource(R.dimen.source_color_picker_item_spacing)
+                    )
                 ) {
                     items(ExpenseChartPalette) { composeColor ->
                         val argbColor = composeColor.toArgb()
@@ -68,11 +69,7 @@ fun SourceColorPickerDialog(
 }
 
 @Composable
-private fun ColorItem(
-    color: Int,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
+private fun ColorItem(color: Int, isSelected: Boolean, onClick: () -> Unit) {
     Box(
         modifier = Modifier
             .padding(dimensionResource(R.dimen.source_color_picker_item_padding))

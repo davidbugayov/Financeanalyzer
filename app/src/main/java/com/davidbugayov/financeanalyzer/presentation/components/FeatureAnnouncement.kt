@@ -60,12 +60,14 @@ fun FeatureAnnouncement(
     val preferencesManager = remember(context) { PreferencesManager(context) }
     var visible by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
-    
+
     // Проверяем, было ли объявление закрыто ранее
     LaunchedEffect(preferencesKey) {
         val isDismissed = preferencesManager.getBooleanPreference(preferencesKey, false)
         visible = !isDismissed
-        Timber.d("FeatureAnnouncement: key=$preferencesKey, isDismissed=$isDismissed, visible=$visible")
+        Timber.d(
+            "FeatureAnnouncement: key=$preferencesKey, isDismissed=$isDismissed, visible=$visible"
+        )
     }
 
     if (visible) {
@@ -100,7 +102,9 @@ fun FeatureAnnouncement(
                     )
                     IconButton(onClick = {
                         coroutineScope.launch {
-                            Timber.d("FeatureAnnouncement: closing by clicking X button, key=$preferencesKey")
+                            Timber.d(
+                                "FeatureAnnouncement: closing by clicking X button, key=$preferencesKey"
+                            )
                             preferencesManager.setBooleanPreference(preferencesKey, true)
                             visible = false
                         }
@@ -129,7 +133,9 @@ fun FeatureAnnouncement(
                     color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable(onClick = {
-                        Timber.d("FeatureAnnouncement: closing by clicking action text, key=$preferencesKey")
+                        Timber.d(
+                            "FeatureAnnouncement: closing by clicking action text, key=$preferencesKey"
+                        )
                         onActionClick()
                         // Закрываем объявление после клика
                         coroutineScope.launch {

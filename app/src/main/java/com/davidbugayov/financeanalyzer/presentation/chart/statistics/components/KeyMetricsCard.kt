@@ -38,8 +38,12 @@ fun KeyMetricsCard(
 ) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)),
+        shape = RoundedCornerShape(
+            dimensionResource(R.dimen.financial_statistics_card_corner_radius)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)
+        ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Column(
@@ -53,7 +57,11 @@ fun KeyMetricsCard(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+            Spacer(
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.financial_statistics_spacer_large)
+                )
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -87,7 +95,11 @@ fun KeyMetricsCard(
                 }
             }
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+            Spacer(
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.financial_statistics_spacer_large)
+                )
+            )
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -100,12 +112,28 @@ fun KeyMetricsCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
                 Text(
-                    text = if (savingsRate >= 20) stringResource(R.string.savings_status_done) else stringResource(R.string.savings_status_attention),
+                    text = if (savingsRate >= 20) {
+                        stringResource(R.string.savings_status_done)
+                    } else {
+                        stringResource(
+                            R.string.savings_status_attention
+                        )
+                    },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (savingsRate >= 20) colorResource(R.color.savings_rate_good) else colorResource(R.color.savings_rate_needs_attention)
+                    color = if (savingsRate >= 20) {
+                        colorResource(R.color.savings_rate_good)
+                    } else {
+                        colorResource(
+                            R.color.savings_rate_needs_attention
+                        )
+                    }
                 )
             }
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+            Spacer(
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.financial_statistics_spacer_medium)
+                )
+            )
             Box(modifier = Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Box(
@@ -113,13 +141,19 @@ fun KeyMetricsCard(
                             .weight(0.15f)
                             .height(8.dp)
                             .clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp))
-                            .background(colorResource(R.color.savings_rate_needs_attention).copy(alpha = 0.2f))
+                            .background(
+                                colorResource(R.color.savings_rate_needs_attention).copy(
+                                    alpha = 0.2f
+                                )
+                            )
                     )
                     Box(
                         modifier = Modifier
                             .weight(0.1f)
                             .height(8.dp)
-                            .background(colorResource(R.color.savings_rate_satisfactory).copy(alpha = 0.2f))
+                            .background(
+                                colorResource(R.color.savings_rate_satisfactory).copy(alpha = 0.2f)
+                            )
                     )
                     Box(
                         modifier = Modifier
@@ -132,7 +166,9 @@ fun KeyMetricsCard(
                             .weight(0.6f)
                             .height(8.dp)
                             .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
-                            .background(colorResource(R.color.savings_rate_excellent).copy(alpha = 0.2f))
+                            .background(
+                                colorResource(R.color.savings_rate_excellent).copy(alpha = 0.2f)
+                            )
                     )
                 }
                 val normalizedRate = (savingsRate / 100.0).coerceIn(0.0, 1.0)
@@ -179,7 +215,11 @@ fun KeyMetricsCard(
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
             }
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_small)))
+            Spacer(
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.financial_statistics_spacer_small)
+                )
+            )
         }
     }
 } 

@@ -101,18 +101,20 @@ fun CategorySelectionDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (localSelectedCategories.isEmpty())
+                        text = if (localSelectedCategories.isEmpty()) {
                             stringResource(R.string.all_categories)
-                        else if (localSelectedCategories.size == allCategories.size)
+                        } else if (localSelectedCategories.size == allCategories.size) {
                             stringResource(R.string.clear_selection)
-                        else
-                            stringResource(R.string.select_all_categories),
+                        } else {
+                            stringResource(R.string.select_all_categories)
+                        },
                         color = if (localSelectedCategories.isEmpty() ||
                             localSelectedCategories.size == allCategories.size
-                        )
+                        ) {
                             MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurface,
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -273,10 +275,11 @@ private fun CategoryGroupHeader(
 
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = if (isExpanded)
+                contentDescription = if (isExpanded) {
                     stringResource(R.string.collapse)
-                else
-                    stringResource(R.string.expand),
+                } else {
+                    stringResource(R.string.expand)
+                },
                 modifier = Modifier.rotate(rotation),
                 tint = color
             )
@@ -311,8 +314,11 @@ private fun CategoryCheckboxItem(
             .padding(vertical = dimensionResource(R.dimen.spacing_small))
             .clip(MaterialTheme.shapes.small)
             .background(
-                if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surface
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surface
+                }
             )
     ) {
         Row(
@@ -326,11 +332,14 @@ private fun CategoryCheckboxItem(
                 checked = isSelected,
                 onCheckedChange = onToggle
             )
-            
+
             Text(
                 text = category,
-                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                else color,
+                color = if (isSelected) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    color
+                },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = dimensionResource(R.dimen.spacing_small))

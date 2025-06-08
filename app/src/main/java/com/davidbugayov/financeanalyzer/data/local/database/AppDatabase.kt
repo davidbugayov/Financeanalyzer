@@ -45,7 +45,9 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Добавляем колонку currencyCode с значением по умолчанию RUB
-                db.execSQL("ALTER TABLE transactions ADD COLUMN currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}'")
+                db.execSQL(
+                    "ALTER TABLE transactions ADD COLUMN currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}'"
+                )
             }
         }
 
@@ -93,7 +95,9 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Добавляем колонку source с значением по умолчанию "Наличные"
-                db.execSQL("ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Наличные'")
+                db.execSQL(
+                    "ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Наличные'"
+                )
             }
         }
 
@@ -104,7 +108,9 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Добавляем колонку destination с значением по умолчанию "Наличные"
-                db.execSQL("ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'")
+                db.execSQL(
+                    "ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'"
+                )
             }
         }
 
@@ -216,11 +222,15 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Добавляем колонку sourceColor с NULL значением по умолчанию
                 db.execSQL("ALTER TABLE transactions ADD COLUMN sourceColor INTEGER")
-                
+
                 // Обновляем цвета для стандартных источников
                 db.execSQL("UPDATE transactions SET sourceColor = 0xFF21A038 WHERE source = 'Сбер'")
-                db.execSQL("UPDATE transactions SET sourceColor = 0xFFFFDD2D WHERE source = 'Т-Банк'")
-                db.execSQL("UPDATE transactions SET sourceColor = 0xFFEF3124 WHERE source = 'Альфа'")
+                db.execSQL(
+                    "UPDATE transactions SET sourceColor = 0xFFFFDD2D WHERE source = 'Т-Банк'"
+                )
+                db.execSQL(
+                    "UPDATE transactions SET sourceColor = 0xFFEF3124 WHERE source = 'Альфа'"
+                )
             }
         }
 
@@ -243,7 +253,8 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_11_12 = object : Migration(11, 12) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Создаем новую таблицу с правильной структурой
-                db.execSQL("""
+                db.execSQL(
+                    """
                     CREATE TABLE IF NOT EXISTS transactions_new (
                         id INTEGER PRIMARY KEY NOT NULL,
                         id_string TEXT NOT NULL,
@@ -256,17 +267,20 @@ abstract class AppDatabase : RoomDatabase() {
                         source TEXT NOT NULL DEFAULT 'Наличные',
                         sourceColor INTEGER NOT NULL DEFAULT 0
                     )
-                """)
-                
+                """
+                )
+
                 // Копируем данные из старой таблицы в новую
-                db.execSQL("""
+                db.execSQL(
+                    """
                     INSERT OR IGNORE INTO transactions_new (id, id_string, amount, currencyCode, category, isExpense, date, note, source, sourceColor)
                     SELECT id, CAST(id AS TEXT), amount, '${Currency.RUB.code}', category, isExpense, date, note, source, sourceColor FROM transactions
-                """)
-                
+                """
+                )
+
                 // Удаляем старую таблицу
                 db.execSQL("DROP TABLE IF EXISTS transactions")
-                
+
                 // Переименовываем новую таблицу
                 db.execSQL("ALTER TABLE transactions_new RENAME TO transactions")
             }
@@ -279,7 +293,9 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_12_13 = object : Migration(12, 13) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Добавляем колонку destination с значением по умолчанию "Наличные"
-                db.execSQL("ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'")
+                db.execSQL(
+                    "ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'"
+                )
             }
         }
 
@@ -290,7 +306,9 @@ abstract class AppDatabase : RoomDatabase() {
         private val MIGRATION_13_14 = object : Migration(13, 14) {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Add the isTransfer column with a default value of 0 (false)
-                db.execSQL("ALTER TABLE transactions ADD COLUMN isTransfer INTEGER NOT NULL DEFAULT 0")
+                db.execSQL(
+                    "ALTER TABLE transactions ADD COLUMN isTransfer INTEGER NOT NULL DEFAULT 0"
+                )
                 Timber.i("Ran migration from version 13 to 14, adding isTransfer column.")
             }
         }
@@ -334,9 +352,13 @@ abstract class AppDatabase : RoomDatabase() {
                 db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
 
                 // Создаем индекс для id_string
-                db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)")
+                db.execSQL(
+                    "CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)"
+                )
 
-                Timber.i("Выполнена миграция с версии 14 на 15, структура таблицы соответствует TransactionEntity")
+                Timber.i(
+                    "Выполнена миграция с версии 14 на 15, структура таблицы соответствует TransactionEntity"
+                )
             }
         }
 
@@ -364,14 +386,18 @@ abstract class AppDatabase : RoomDatabase() {
             override fun migrate(db: SupportSQLiteDatabase) {
                 // Добавляем колонку wallet_ids (для хранения списка ID кошельков)
                 db.execSQL("ALTER TABLE transactions ADD COLUMN wallet_ids TEXT DEFAULT NULL")
-                
+
                 // Добавляем колонку categoryId (для хранения ID категории/кошелька)
-                db.execSQL("ALTER TABLE transactions ADD COLUMN categoryId TEXT NOT NULL DEFAULT ''")
-                
+                db.execSQL(
+                    "ALTER TABLE transactions ADD COLUMN categoryId TEXT NOT NULL DEFAULT ''"
+                )
+
                 // Добавляем колонку title (для хранения заголовка транзакции)
                 db.execSQL("ALTER TABLE transactions ADD COLUMN title TEXT NOT NULL DEFAULT ''")
 
-                Timber.i("Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title")
+                Timber.i(
+                    "Выполнена миграция с версии 15 на 16, добавлены поля wallet_ids, categoryId и title"
+                )
             }
         }
 
@@ -427,7 +453,8 @@ abstract class AppDatabase : RoomDatabase() {
                         override fun onCreate(db: SupportSQLiteDatabase) {
                             super.onCreate(db)
                             // Создаем таблицу с правильной структурой при первом создании базы данных
-                            db.execSQL("""
+                            db.execSQL(
+                                """
                                 CREATE TABLE IF NOT EXISTS transactions (
                                     id INTEGER PRIMARY KEY NOT NULL,
                                     id_string TEXT NOT NULL,
@@ -443,10 +470,13 @@ abstract class AppDatabase : RoomDatabase() {
                                     title TEXT NOT NULL DEFAULT '',
                                     wallet_ids TEXT DEFAULT NULL
                                 )
-                            """)
-                            
+                            """
+                            )
+
                             // Создаем индекс для id_string
-                            db.execSQL("CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)")
+                            db.execSQL(
+                                "CREATE UNIQUE INDEX IF NOT EXISTS index_transactions_id_string ON transactions (id_string)"
+                            )
                         }
                     })
                     .build()

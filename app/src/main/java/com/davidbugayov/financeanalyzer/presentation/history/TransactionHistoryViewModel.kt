@@ -54,16 +54,16 @@ class TransactionHistoryViewModel constructor(
         val initialPeriod = PeriodType.ALL
         val startDate = Calendar.getInstance().apply { add(Calendar.YEAR, -5) }.time
         val endDate = Calendar.getInstance().time
-        
+
         // Сразу установим правильное начальное состояние
-        _state.update { 
+        _state.update {
             it.copy(
                 periodType = initialPeriod,
                 startDate = startDate,
                 endDate = endDate
-            ) 
+            )
         }
-        
+
         // Загружаем транзакции и категории
         loadTransactionsFirstPage()
         loadCategories()
@@ -91,15 +91,26 @@ class TransactionHistoryViewModel constructor(
             is TransactionHistoryEvent.SetPeriodType -> updatePeriodType(event.type)
             is TransactionHistoryEvent.SetCategories -> updateCategories(event.categories)
             is TransactionHistoryEvent.SetSources -> updateSources(event.sources)
-            is TransactionHistoryEvent.SetDateRange -> updateDateRange(event.startDate, event.endDate)
+            is TransactionHistoryEvent.SetDateRange -> updateDateRange(
+                event.startDate,
+                event.endDate
+            )
             is TransactionHistoryEvent.SetStartDate -> updateStartDate(event.date)
             is TransactionHistoryEvent.SetEndDate -> updateEndDate(event.date)
             is TransactionHistoryEvent.ReloadTransactions -> resetAndReloadTransactions()
             is TransactionHistoryEvent.LoadMoreTransactions -> loadMoreTransactions()
-            is TransactionHistoryEvent.ShowDeleteConfirmDialog -> showDeleteConfirmDialog(event.transaction)
+            is TransactionHistoryEvent.ShowDeleteConfirmDialog -> showDeleteConfirmDialog(
+                event.transaction
+            )
             is TransactionHistoryEvent.HideDeleteConfirmDialog -> hideDeleteConfirmDialog()
-            is TransactionHistoryEvent.DeleteCategory -> deleteCategory(event.category, event.isExpense)
-            is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> showDeleteCategoryConfirmDialog(event.category, event.isExpense)
+            is TransactionHistoryEvent.DeleteCategory -> deleteCategory(
+                event.category,
+                event.isExpense
+            )
+            is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> showDeleteCategoryConfirmDialog(
+                event.category,
+                event.isExpense
+            )
             is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> hideDeleteCategoryConfirmDialog()
             is TransactionHistoryEvent.DeleteSource -> deleteSource(event.source)
             is TransactionHistoryEvent.ShowDeleteSourceConfirmDialog -> showDeleteSourceConfirmDialog(
@@ -126,7 +137,16 @@ class TransactionHistoryViewModel constructor(
                     // Уведомление об удалении теперь происходит через SharedFlow репозитория
                     resetAndReloadTransactions()
                     updateWidgetsUseCase(application.applicationContext)
-                    Timber.d("Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel.")
+                    Timber.d(
+                        "Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel."
+                    )
+
+                    // Логируем событие в аналитику
+                    com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
+                        amount = transaction.amount.abs(),
+                        category = transaction.category,
+                        isExpense = transaction.isExpense
+                    )
                 }
                 is Result.Error -> {
                     Timber.e(result.exception, "Failed to delete transaction")
@@ -140,14 +160,14 @@ class TransactionHistoryViewModel constructor(
      * Сбрасывает состояние пагинации и загружает первую страницу транзакций
      */
     private fun resetAndReloadTransactions() {
-        _state.update { 
+        _state.update {
             it.copy(
                 currentPage = 0,
                 hasMoreData = true,
                 transactions = emptyList(),
                 filteredTransactions = emptyList(),
                 groupedTransactions = emptyMap()
-            ) 
+            )
         }
         loadTransactionsFirstPage()
     }
@@ -173,13 +193,13 @@ class TransactionHistoryViewModel constructor(
         viewModelScope.launch {
             // Устанавливаем флаг загрузки
             _state.update { it.copy(isLoading = true, error = null) }
-            
+
             try {
                 // Получаем текущие параметры
                 val currentState = _state.value
-                
+
                 Timber.d("Начинаем загрузку транзакций с периодом: ${currentState.periodType}")
-                
+
                 // Создаем вспомогательную корутину для получения общего количества транзакций
                 val totalCountDeferred = viewModelScope.async(Dispatchers.IO) {
                     try {
@@ -191,7 +211,7 @@ class TransactionHistoryViewModel constructor(
                         0 // По умолчанию считаем, что транзакций нет
                     }
                 }
-                
+
                 // Запускаем асинхронную загрузку транзакций
                 var transactions = withContext(Dispatchers.IO) {
                     try {
@@ -202,8 +222,13 @@ class TransactionHistoryViewModel constructor(
                                 repository.getAllTransactions()
                             }
                             PeriodType.CUSTOM, PeriodType.DAY, PeriodType.QUARTER, PeriodType.YEAR -> {
-                                Timber.d("Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}")
-                                getTransactionsForPeriodWithCacheUseCase(currentState.startDate, currentState.endDate)
+                                Timber.d(
+                                    "Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}"
+                                )
+                                getTransactionsForPeriodWithCacheUseCase(
+                                    currentState.startDate,
+                                    currentState.endDate
+                                )
                             }
                             PeriodType.MONTH -> {
                                 val calendar = Calendar.getInstance()
@@ -227,19 +252,19 @@ class TransactionHistoryViewModel constructor(
                         emptyList()
                     }
                 }
-                
+
                 // Получаем общее количество транзакций из отложенного вычисления
                 val totalCount = totalCountDeferred.await()
-                
+
                 Timber.d("Загружено ${transactions.size} транзакций из $totalCount всего")
-                
+
                 // Применяем фильтры по категориям и источникам, если они выбраны
                 if (currentState.selectedCategories.isNotEmpty() || currentState.selectedSources.isNotEmpty()) {
                     val before = transactions.size
                     transactions = filterTransactions(transactions, currentState)
-                    Timber.d("Применены фильтры: ${before} -> ${transactions.size} транзакций")
+                    Timber.d("Применены фильтры: $before -> ${transactions.size} транзакций")
                 }
-                
+
                 // Обновляем состояние с загруженными данными
                 _state.update {
                     it.copy(
@@ -251,14 +276,14 @@ class TransactionHistoryViewModel constructor(
                         error = null
                     )
                 }
-                
+
                 // Оптимизация: лёгкая задержка перед запуском обновления фильтрованных данных,
                 // чтобы UI успел отрисоваться после обновления состояния
                 delay(100)
-                
+
                 // Асинхронно обновляем отфильтрованные данные в отдельной корутине
                 updateFilteredAndGroupedTransactions()
-                
+
                 // Если у нас выбрана одна категория, загружаем статистику по ней
                 if (currentState.selectedCategories.size == 1) {
                     calculateCategoryStats(currentState.selectedCategories.first())
@@ -268,11 +293,11 @@ class TransactionHistoryViewModel constructor(
             } catch (e: Exception) {
                 // Логируем и устанавливаем ошибку в состояние
                 Timber.e(e, "Ошибка при загрузке транзакций: ${e.message}")
-                _state.update { 
+                _state.update {
                     it.copy(
                         isLoading = false,
                         error = e.message ?: "Ошибка при загрузке транзакций"
-                    ) 
+                    )
                 }
             }
         }
@@ -283,21 +308,21 @@ class TransactionHistoryViewModel constructor(
      */
     private fun loadMoreTransactions() {
         val currentState = _state.value
-        
+
         // Проверяем, можно ли загрузить больше данных
         if (!currentState.hasMoreData || currentState.isLoadingMore) {
             return
         }
-        
+
         // Устанавливаем флаг загрузки
         _state.update { it.copy(isLoadingMore = true) }
-        
+
         viewModelScope.launch {
             try {
                 val pageSize = currentState.pageSize
                 val currentPage = currentState.currentPage
                 val offset = currentPage * pageSize
-                
+
                 // Загружаем следующую страницу в IO потоке
                 var nextPageTransactions = withContext(Dispatchers.IO) {
                     try {
@@ -330,52 +355,51 @@ class TransactionHistoryViewModel constructor(
                         emptyList()
                     }
                 }
-                
+
                 // Если новых транзакций нет - больше нет данных
                 if (nextPageTransactions.isEmpty()) {
-                    _state.update { 
+                    _state.update {
                         it.copy(
                             hasMoreData = false,
                             isLoadingMore = false
-                        ) 
+                        )
                     }
                     return@launch
                 }
-                
+
                 Timber.d("Загружено ${nextPageTransactions.size} дополнительных транзакций")
-                
+
                 // Применяем фильтры по категориям и источникам, если они выбраны
                 if (currentState.selectedCategories.isNotEmpty() || currentState.selectedSources.isNotEmpty()) {
                     nextPageTransactions = filterTransactions(nextPageTransactions, currentState)
                 }
-                
+
                 // Оптимизация: добавляем задержку перед обновлением UI
                 // Это предотвращает заикание при прокрутке большого количества данных
                 delay(100)
-                
+
                 // Используем отдельную временную переменную для нового списка транзакций
                 // чтобы минимизировать время блокировки UI потока
                 val updatedTransactions = currentState.transactions + nextPageTransactions
-                
+
                 // Обновляем список транзакций одним атомарным обновлением
-                _state.update { 
+                _state.update {
                     it.copy(
                         transactions = updatedTransactions,
                         currentPage = currentPage + 1,
                         isLoadingMore = false
-                    ) 
+                    )
                 }
-                
+
                 // Обновляем отфильтрованные и сгруппированные транзакции
                 updateFilteredAndGroupedTransactions()
-                
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке дополнительных транзакций: ${e.message}")
-                _state.update { 
+                _state.update {
                     it.copy(
                         isLoadingMore = false,
                         error = e.message
-                    ) 
+                    )
                 }
             }
         }
@@ -392,7 +416,7 @@ class TransactionHistoryViewModel constructor(
                 val startDate = currentState.startDate
                 val endDate = currentState.endDate
                 val transactions = currentState.transactions
-                
+
                 val result = calculateCategoryStatsUseCase(
                     transactions = transactions,
                     categories = listOf(category),
@@ -400,9 +424,9 @@ class TransactionHistoryViewModel constructor(
                     startDate = startDate,
                     endDate = endDate
                 )
-                
+
                 _state.update { it.copy(categoryStats = result) }
-                
+
                 Timber.d("Статистика по категории $category рассчитана: $result")
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при расчете статистики по категории: ${e.message}")
@@ -418,7 +442,10 @@ class TransactionHistoryViewModel constructor(
     /**
      * Применяет фильтры по категориям и источникам к списку транзакций
      */
-    private fun filterTransactions(transactions: List<Transaction>, state: TransactionHistoryState): List<Transaction> {
+    private fun filterTransactions(
+        transactions: List<Transaction>,
+        state: TransactionHistoryState
+    ): List<Transaction> {
         return filterTransactionsUseCase(
             transactions = transactions,
             periodType = state.periodType,
@@ -437,15 +464,15 @@ class TransactionHistoryViewModel constructor(
         viewModelScope.launch(Dispatchers.Default) {
             val currentState = _state.value
             val transactions = currentState.transactions
-            
+
             // Проверяем, нужно ли выполнять фильтрацию
             if (transactions.isEmpty()) {
                 withContext(Dispatchers.Main) {
-                    _state.update { 
+                    _state.update {
                         it.copy(
                             filteredTransactions = emptyList(),
                             groupedTransactions = emptyMap()
-                        ) 
+                        )
                     }
                 }
                 return@launch
@@ -458,13 +485,12 @@ class TransactionHistoryViewModel constructor(
                     it.copy(filteredTransactions = transactions)
                 }
             }
-            
+
             Timber.d("Начало обработки ${transactions.size} транзакций")
-            
+
             // Фильтруем транзакции только если есть фильтры
-            val hasFilters = currentState.selectedCategories.isNotEmpty() || 
-                             currentState.selectedSources.isNotEmpty()
-            
+            val hasFilters = currentState.selectedCategories.isNotEmpty() || currentState.selectedSources.isNotEmpty()
+
             val filteredTransactions = if (hasFilters) {
                 // Применяем фильтрацию только если заданы фильтры
                 val before = transactions.size
@@ -475,31 +501,35 @@ class TransactionHistoryViewModel constructor(
                 // Если нет фильтров, используем исходный список
                 transactions
             }
-            
+
             // Вычисляем группы транзакций, если нужно
             val groupedTransactions = if (filteredTransactions.isNotEmpty()) {
                 val startTime = System.currentTimeMillis()
-                
+
                 // Используем более эффективный алгоритм группировки
                 val groups = groupTransactionsUseCase(
                     transactions = filteredTransactions,
                     groupingType = currentState.groupingType
                 )
-                
+
                 val endTime = System.currentTimeMillis()
-                Timber.d("Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс")
-                
+                Timber.d(
+                    "Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс"
+                )
+
                 groups
             } else {
                 emptyMap()
             }
-            
+
             // Обновляем состояние в основном потоке
             withContext(Dispatchers.Main) {
-                _state.update { it.copy(
-                    filteredTransactions = filteredTransactions,
-                    groupedTransactions = groupedTransactions
-                )}
+                _state.update {
+                    it.copy(
+                        filteredTransactions = filteredTransactions,
+                        groupedTransactions = groupedTransactions
+                    )
+                }
             }
         }
     }
@@ -509,19 +539,19 @@ class TransactionHistoryViewModel constructor(
      */
     private fun updatePeriodType(periodType: PeriodType) {
         Timber.d("Обновляем тип периода на: $periodType")
-        
+
         // Получаем текущее состояние
         val currentState = _state.value
-        
+
         // Используем общую логику для вычисления дат начала и конца периода
         val (startDate, endDate) = DateUtils.updatePeriodDates(
             periodType = periodType,
             currentStartDate = currentState.startDate,
             currentEndDate = currentState.endDate
         )
-        
+
         // Обновляем состояние
-        _state.update { 
+        _state.update {
             it.copy(
                 periodType = periodType,
                 startDate = startDate,
@@ -533,9 +563,9 @@ class TransactionHistoryViewModel constructor(
                 transactions = emptyList(),
                 filteredTransactions = emptyList(),
                 groupedTransactions = emptyMap()
-            ) 
+            )
         }
-        
+
         // Загружаем транзакции для нового периода
         Timber.d("Перезагружаем транзакции для периода $periodType")
         loadTransactionsFirstPage()
@@ -697,19 +727,21 @@ class TransactionHistoryViewModel constructor(
                 Timber.d("Начинаем проверку количества транзакций в базе данных")
                 val count = repository.getTransactionsCount()
                 Timber.d("Количество транзакций в базе данных: $count")
-                
+
                 // Проверяем доступность базы данных
                 val allTransactions = repository.getAllTransactions()
                 Timber.d("Всего транзакций при прямом запросе: ${allTransactions.size}")
-                
+
                 // Проверяем транзакции за последний месяц
                 val calendar = Calendar.getInstance()
                 val endDate = calendar.time
                 calendar.add(Calendar.MONTH, -1)
                 val startDate = calendar.time
-                val monthlyTransactions = repository.getTransactionsByDateRangeList(startDate, endDate)
+                val monthlyTransactions = repository.getTransactionsByDateRangeList(
+                    startDate,
+                    endDate
+                )
                 Timber.d("Транзакций за последний месяц: ${monthlyTransactions.size}")
-                
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при проверке количества транзакций: ${e.message}")
             }

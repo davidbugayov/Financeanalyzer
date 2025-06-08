@@ -26,17 +26,26 @@ class CalculateBalanceMetricsUseCase {
             income.minus(expense).amount
                 .divide(income.amount, 4, java.math.RoundingMode.HALF_EVEN)
                 .multiply(java.math.BigDecimal(100))
-        } else java.math.BigDecimal.ZERO
+        } else {
+            java.math.BigDecimal.ZERO
+        }
         val daysInPeriod = if (startDate != null && endDate != null) {
             ((endDate.time - startDate.time) / (1000 * 60 * 60 * 24) + 1).toInt().coerceAtLeast(1)
-        } else 1
-        val averageDailyExpense = if (daysInPeriod > 0)
-            expense / daysInPeriod.toBigDecimal() else Money.zero()
+        } else {
+            1
+        }
+        val averageDailyExpense = if (daysInPeriod > 0) {
+            expense / daysInPeriod.toBigDecimal()
+        } else {
+            Money.zero()
+        }
         val averageMonthlyExpense = averageDailyExpense * 30.toBigDecimal()
         val monthsOfSavings = if (!averageMonthlyExpense.isZero()) {
             income.minus(expense).amount
                 .divide(averageMonthlyExpense.amount, 4, java.math.RoundingMode.HALF_EVEN)
-        } else java.math.BigDecimal.ZERO
+        } else {
+            java.math.BigDecimal.ZERO
+        }
         return BalanceMetrics(
             income = income,
             expense = expense,

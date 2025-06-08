@@ -96,7 +96,7 @@ private fun ExpandedLeftPanel(
         HomeTransactionsHeader(
             currentFilter = state.currentFilter,
             showGroupSummary = showGroupSummary,
-            onToggleGroupSummary = onToggleGroupSummary,
+            onToggleGroupSummary = onToggleGroupSummary
         )
         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
             Spacer(modifier = Modifier.height(16.dp))
@@ -121,7 +121,11 @@ private fun ExpandedRightPanel(
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Timber.d("[UI] ExpandedRightPanel: isLoading=%s, filteredTransactions.isEmpty()=%s", state.isLoading, state.filteredTransactions.isEmpty())
+    Timber.d(
+        "[UI] ExpandedRightPanel: isLoading=%s, filteredTransactions.isEmpty()=%s",
+        state.isLoading,
+        state.filteredTransactions.isEmpty()
+    )
     Box(
         modifier = modifier
             .fillMaxSize()
@@ -233,7 +237,7 @@ private fun ExpandedTransactionList(
                 transaction = transaction,
                 categoriesViewModel = categoriesViewModel,
                 onClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick,
+                onTransactionLongClick = onTransactionLongClick
             )
         }
     }

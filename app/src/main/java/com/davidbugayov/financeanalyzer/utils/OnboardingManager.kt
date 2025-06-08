@@ -11,7 +11,8 @@ import androidx.core.content.edit
 class OnboardingManager(context: Context) {
 
     private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-        PREFERENCES_NAME, Context.MODE_PRIVATE
+        PREFERENCES_NAME,
+        Context.MODE_PRIVATE
     )
 
     /**
@@ -32,8 +33,7 @@ class OnboardingManager(context: Context) {
     }
 
     /**
-     * Сбрасывает состояние онбординга (используется для тестирования или если пользователь захочет 
-     * снова увидеть онбординг через настройки).
+     * Сбрасывает состояние онбординга (используется для тестирования или если пользователь захочет * снова увидеть онбординг через настройки).
      */
     fun resetOnboarding() {
         sharedPreferences.edit {

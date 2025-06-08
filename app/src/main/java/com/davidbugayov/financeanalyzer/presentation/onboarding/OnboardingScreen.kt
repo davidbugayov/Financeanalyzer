@@ -1,4 +1,5 @@
 @file:OptIn(androidx.compose.foundation.ExperimentalFoundationApi::class)
+
 package com.davidbugayov.financeanalyzer.presentation.onboarding
 
 import androidx.compose.animation.core.EaseInOut
@@ -85,7 +86,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
 
     val pagerState = rememberPagerState(pageCount = { pages.size })
     val coroutineScope = rememberCoroutineScope()
-    
+
     // Автоматическое переключение страниц каждые 4 секунды, если не на последней странице
     LaunchedEffect(pagerState.currentPage) {
         if (pagerState.currentPage < pages.size - 1) {
@@ -97,7 +98,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
             }
         }
     }
-    
+
     Box(
         modifier = Modifier
             .fillMaxSize()
@@ -126,7 +127,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     OnboardingPageContent(pages[position])
                 }
             }
-            
+
             // Навигация и индикатор страниц
             Column(
                 modifier = Modifier
@@ -146,7 +147,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                             animationSpec = tween(400, easing = EaseInOut),
                             label = "indicator"
                         )
-                        
+
                         Box(
                             modifier = Modifier
                                 .padding(horizontal = 2.dp)
@@ -154,17 +155,18 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                                 .height(10.dp)
                                 .clip(CircleShape)
                                 .background(
-                                    if (pagerState.currentPage == index)
+                                    if (pagerState.currentPage == index) {
                                         MaterialTheme.colorScheme.primary
-                                    else
+                                    } else {
                                         MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                    }
                                 )
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Кнопки навигации
                 Row(
                     modifier = Modifier
@@ -186,7 +188,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                     } else {
                         Spacer(modifier = Modifier.width(64.dp))
                     }
-                    
+
                     if (pagerState.currentPage < pages.size - 1) {
                         Button(
                             onClick = {
@@ -213,7 +215,7 @@ fun OnboardingScreen(onFinish: () -> Unit) {
                         }
                     }
                 }
-                
+
                 // Кнопка пропустить
                 if (pagerState.currentPage < pages.size - 1) {
                     TextButton(
@@ -250,7 +252,7 @@ private fun OnboardingPageContent(page: OnboardingPage) {
                 .padding(bottom = 24.dp),
             tint = MaterialTheme.colorScheme.primary
         )
-        
+
         Text(
             text = page.title,
             style = MaterialTheme.typography.headlineMedium,
@@ -258,7 +260,7 @@ private fun OnboardingPageContent(page: OnboardingPage) {
             textAlign = TextAlign.Center,
             modifier = Modifier.padding(bottom = 16.dp)
         )
-        
+
         Text(
             text = page.description,
             style = MaterialTheme.typography.bodyLarge,

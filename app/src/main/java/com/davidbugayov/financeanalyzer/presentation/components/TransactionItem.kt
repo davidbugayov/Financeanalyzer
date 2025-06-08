@@ -63,7 +63,11 @@ import java.util.Locale
 
 object Formatters {
 
-    fun formatAmount(money: Money, includeSign: Boolean = false, useMinimalDecimals: Boolean = false): String {
+    fun formatAmount(
+        money: Money,
+        includeSign: Boolean = false,
+        useMinimalDecimals: Boolean = false
+    ): String {
         return money.format(showSign = includeSign, useMinimalDecimals = useMinimalDecimals)
     }
 }
@@ -98,17 +102,26 @@ fun TransactionItem(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
 
-    val transferCategoryString = stringResource(id = R.string.category_transfer).lowercase(Locale.getDefault())
+    val transferCategoryString = stringResource(id = R.string.category_transfer).lowercase(
+        Locale.getDefault()
+    )
 
     val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
     val expenseColor = if (isDarkTheme) ExpenseColorDark else ExpenseColorLight
     val transferActualColor = if (isDarkTheme) TransferColorDark else TransferColorLight
 
     val transactionTypeColor =
-        remember(transaction.category, transaction.isExpense, transferActualColor, expenseColor, incomeColor, transferCategoryString) {
+        remember(
+            transaction.category,
+            transaction.isExpense,
+            transferActualColor,
+            expenseColor,
+            incomeColor,
+            transferCategoryString
+        ) {
             when {
                 transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                        transaction.category.equals("Перевод", ignoreCase = true) -> transferActualColor // Fallback for direct "Перевод" string
+                    transaction.category.equals("Перевод", ignoreCase = true) -> transferActualColor // Fallback for direct "Перевод" string
                 transaction.isExpense -> expenseColor
                 else -> incomeColor
             }
@@ -117,7 +130,12 @@ fun TransactionItem(
     val expenseCategories by categoriesViewModel.expenseCategories.collectAsState()
     val incomeCategories by categoriesViewModel.incomeCategories.collectAsState()
 
-    val uiCategory = remember(transaction.category, transaction.isExpense, expenseCategories, incomeCategories) {
+    val uiCategory = remember(
+        transaction.category,
+        transaction.isExpense,
+        expenseCategories,
+        incomeCategories
+    ) {
         val categories = if (transaction.isExpense) expenseCategories else incomeCategories
         categories.find { it.name.equals(transaction.category, ignoreCase = true) }
     }
@@ -128,7 +146,9 @@ fun TransactionItem(
     val sourceActualColor = remember(transaction.sourceColor, transaction.source, isDarkTheme) {
         val colorFromInt = if (transaction.sourceColor != 0) Color(transaction.sourceColor) else null
         // Fallback to a slightly transparent default color if no specific source color is found
-        colorFromInt ?: ColorUtils.getSourceColorByName(transaction.source) ?: DefaultCategoryColor.copy(alpha = 0.7f)
+        colorFromInt ?: ColorUtils.getSourceColorByName(transaction.source) ?: DefaultCategoryColor.copy(
+            alpha = 0.7f
+        )
     }
 
     val formattedDate = remember(transaction.date) {
@@ -143,11 +163,16 @@ fun TransactionItem(
         }
     }
 
-    val formattedAmount = remember(transaction.amount, transaction.isExpense, transaction.category, transferCategoryString) {
+    val formattedAmount = remember(
+        transaction.amount,
+        transaction.isExpense,
+        transaction.category,
+        transferCategoryString
+    ) {
         val moneyAmount = transaction.amount
 
         val isTransfer = transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-                transaction.category.equals("Перевод", ignoreCase = true)
+            transaction.category.equals("Перевод", ignoreCase = true)
 
         val prefix = when {
             isTransfer -> "" // Transfers usually don't need a +/- sign from this logic, Money.format handles it if needed
@@ -157,9 +182,17 @@ fun TransactionItem(
 
         if (isTransfer) {
             // For transfers, display absolute amount, sign logic might be inherent or not needed
-            Formatters.formatAmount(moneyAmount.abs(), includeSign = false, useMinimalDecimals = true)
+            Formatters.formatAmount(
+                moneyAmount.abs(),
+                includeSign = false,
+                useMinimalDecimals = true
+            )
         } else {
-            prefix + Formatters.formatAmount(moneyAmount.abs(), includeSign = false, useMinimalDecimals = true)
+            prefix + Formatters.formatAmount(
+                moneyAmount.abs(),
+                includeSign = false,
+                useMinimalDecimals = true
+            )
         }
     }
 
@@ -198,7 +231,7 @@ fun TransactionItem(
             .fillMaxWidth()
             .padding(
                 horizontal = dimensionResource(id = R.dimen.card_horizontal_padding), // e.g., 12dp or 16dp from dimens
-                vertical = dimensionResource(id = R.dimen.card_vertical_padding)   // e.g., 6dp or 8dp from dimens
+                vertical = dimensionResource(id = R.dimen.card_vertical_padding) // e.g., 6dp or 8dp from dimens
             )
             .graphicsLayer {
                 alpha = animatedAlpha
@@ -208,7 +241,9 @@ fun TransactionItem(
                 onClick = { onClick(transaction) },
                 onLongClick = { onTransactionLongClick(transaction) }
             ),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(id = R.dimen.card_elevation_default)), // e.g., 2dp or 4dp
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(id = R.dimen.card_elevation_default)
+        ), // e.g., 2dp or 4dp
         shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius_medium)), // e.g., 12dp
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant) // Slightly different surface for differentiation
     ) {
@@ -275,7 +310,9 @@ fun TransactionItem(
                         color = sourceActualColor, // Apply source color
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.line_chart_stroke_width)) // Placeholder, will be updated or requires user to add to dimens.xml
+                        modifier = Modifier.padding(
+                            top = dimensionResource(id = R.dimen.line_chart_stroke_width)
+                        ) // Placeholder, will be updated or requires user to add to dimens.xml
                     )
                 }
 
@@ -287,7 +324,9 @@ fun TransactionItem(
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
                         color = MaterialTheme.colorScheme.onSurfaceVariant, // Slightly muted color
-                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.spacing_small)) // Placeholder, will be updated or requires user to add to dimens.xml
+                        modifier = Modifier.padding(
+                            top = dimensionResource(id = R.dimen.spacing_small)
+                        ) // Placeholder, will be updated or requires user to add to dimens.xml
                     )
                 }
             }
@@ -334,4 +373,4 @@ fun TransactionItem(
 // And string resources:
 // <string name="unknown_source">Неизвестный источник</string>
 // <string name="expense_transaction">Расходная транзакция</string>
-// <string name="income_transaction">Доходная транзакция</string> 
+// <string name="income_transaction">Доходная транзакция</string>

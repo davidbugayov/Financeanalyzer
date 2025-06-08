@@ -129,11 +129,7 @@ fun WalletSelectorDialog(
  * Элемент списка кошельков с чекбоксом
  */
 @Composable
-private fun WalletItem(
-    wallet: Wallet,
-    isSelected: Boolean,
-    onCheckedChange: (Boolean) -> Unit
-) {
+private fun WalletItem(wallet: Wallet, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()

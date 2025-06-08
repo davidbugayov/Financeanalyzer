@@ -42,12 +42,12 @@ class ExportTransactionsToCSVUseCase(
                     applicationContext,
                     Manifest.permission.WRITE_EXTERNAL_STORAGE
                 ) == PackageManager.PERMISSION_GRANTED
-                
+
                 if (!hasWritePermission) {
                     throw SecurityException("Отсутствует разрешение на запись во внешнее хранилище")
                 }
             }
-            
+
             val result = withContext(Dispatchers.IO) {
                 // Получаем все транзакции
                 val transactions = transactionRepository.getAllTransactions()
@@ -60,11 +60,15 @@ class ExportTransactionsToCSVUseCase(
                 // Сохраняем в публичную директорию Downloads
                 val file = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                     // Для Android 10+ используем Downloads директорию через getExternalStoragePublicDirectory
-                    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    val downloadsDir = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS
+                    )
                     File(downloadsDir, fileName)
                 } else {
                     // Для Android 9 и ниже также используем публичную директорию Downloads
-                    val downloadsDir = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                    val downloadsDir = Environment.getExternalStoragePublicDirectory(
+                        Environment.DIRECTORY_DOWNLOADS
+                    )
                     File(downloadsDir, fileName)
                 }
 
@@ -85,7 +89,7 @@ class ExportTransactionsToCSVUseCase(
                         val formattedAmount = transaction.amount.toString()
                         val transactionType = if (transaction.isExpense) "Расход" else "Доход"
                         val sourceColor = transaction.sourceColor.toString()
-                        
+
                         // Формируем строку в правильном CSV формате
                         val csvLine = listOf(
                             cleanId,
@@ -97,9 +101,9 @@ class ExportTransactionsToCSVUseCase(
                             cleanSource,
                             sourceColor
                         ).joinToString(",")
-                        
+
                         writer.append(csvLine).append("\n")
-                        
+
                         // Логируем экспортируемую строку для отладки
                         Timber.d("ЭКСПОРТ: $csvLine")
                     }
@@ -113,36 +117,39 @@ class ExportTransactionsToCSVUseCase(
             emit(Result.failure(e))
         }
     }
-    
+
     /**
      * Очищает текст от системных сообщений IDE и других потенциально проблемных символов для CSV
      */
     private fun cleanText(text: String): String {
         if (text.isBlank()) return ""
-        
+
         // Проверяем на системные сообщения IDE
         if (text.contains("looks like you just edited", ignoreCase = true) ||
             text.contains("targetSdkVersion", ignoreCase = true) ||
             text.contains("Toggle info", ignoreCase = true) ||
             text.contains("⌘F1", ignoreCase = true) ||
-            text.contains("Android SDK", ignoreCase = true)) {
+            text.contains("Android SDK", ignoreCase = true)
+        ) {
             Timber.d("Обнаружено системное сообщение при экспорте, очищаем: ${text.take(50)}...")
             return ""
         }
-        
+
         // Экранируем запятые и кавычки для формата CSV
         val cleanedText = text.replace("\"", "\"\"")
-        return if (cleanedText.contains(",") || cleanedText.contains("\"") || cleanedText.contains("\n")) {
+        return if (cleanedText.contains(",") || cleanedText.contains("\"") || cleanedText.contains(
+                "\n"
+            )
+        ) {
             "\"$cleanedText\""
         } else {
             cleanedText
         }
     }
-    
+
     /**
      * Открывает диалог "Поделиться" для экспортированного CSV файла
-     * 
-     * @param filePath Путь к CSV файлу
+     * * @param filePath Путь к CSV файлу
      * @return Intent для показа диалога "Поделиться"
      */
     fun shareCSVFile(filePath: String): Intent {
@@ -152,7 +159,7 @@ class ExportTransactionsToCSVUseCase(
             applicationContext.packageName + ".fileprovider",
             file
         )
-        
+
         val shareIntent = Intent(Intent.ACTION_SEND).apply {
             type = "text/csv"
             putExtra(Intent.EXTRA_STREAM, fileUri)
@@ -160,15 +167,14 @@ class ExportTransactionsToCSVUseCase(
             putExtra(Intent.EXTRA_TEXT, "Мои транзакции из приложения 'Деньги под контролем'")
             flags = Intent.FLAG_GRANT_READ_URI_PERMISSION
         }
-        
+
         Timber.d("Запуск диалога Поделиться для файла: $filePath")
         return shareIntent
     }
-    
+
     /**
      * Открывает CSV файл с использованием Intent.ACTION_VIEW
-     * 
-     * @param filePath Путь к CSV файлу
+     * * @param filePath Путь к CSV файлу
      * @return Intent для открытия файла
      */
     fun openCSVFile(filePath: String): Intent {
@@ -185,13 +191,13 @@ class ExportTransactionsToCSVUseCase(
         val chooserTitle = applicationContext.getString(R.string.open_csv_with)
         return Intent.createChooser(openIntent, chooserTitle)
     }
-    
+
     /**
      * Возвращает enum класс для представления возможных действий с экспортированным файлом
      */
     enum class ExportAction {
-        SHARE,    // Поделиться файлом
-        OPEN,     // Открыть файл
+        SHARE, // Поделиться файлом
+        OPEN, // Открыть файл
         SAVE_ONLY // Только сохранить файл
     }
 } 

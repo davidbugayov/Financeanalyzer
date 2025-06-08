@@ -8,7 +8,7 @@ import timber.log.Timber
  * Имитирует API Firebase, но не выполняет реальных действий.
  */
 class FirebaseAnalyticsAdapter : IAnalytics {
-    
+
     override fun logEvent(eventName: String) {
         Timber.d("Stub Firebase event: $eventName")
     }

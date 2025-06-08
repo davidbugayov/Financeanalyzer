@@ -19,44 +19,47 @@ import timber.log.Timber
  * Основной класс приложения для Google flavor
  */
 class FinanceApp : Application() {
-    
+
     // AppMetrica API ключ
     private val APP_METRICA_API_KEY = "d4ec51de-47c3-4997-812f-97b9a6663dad"
-    
+
     // Составной адаптер для объединения всех систем аналитики
     private val compositeAnalytics = CompositeAnalytics()
-    
+
     private lateinit var firebaseAnalytics: FirebaseAnalytics
-    
+
     override fun onCreate() {
         super.onCreate()
-        
+
         // Настройка Timber для логирования
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        
+
         // Инициализация аналитики
         initAnalytics()
-        
+
         // Логируем основные данные устройства для диагностики
         logDeviceInfo()
+
+        // Логируем событие открытия приложения
+        AnalyticsUtils.logAppOpen()
     }
-    
+
     /**
      * Инициализирует аналитику
      */
     private fun initAnalytics() {
         // Инициализация AppMetrica
         initAppMetrica()
-        
+
         // Инициализация Firebase
         initFirebase()
-        
+
         // Устанавливаем составной адаптер аналитики в AnalyticsUtils
         AnalyticsUtils.init(compositeAnalytics)
     }
-    
+
     /**
      * Инициализирует Яндекс.AppMetrica
      */
@@ -68,22 +71,22 @@ class FinanceApp : Application() {
                 .withSessionTimeout(60)
                 .withCrashReporting(true)
                 .build()
-            
+
             // Активация SDK
             AppMetrica.activate(this, config)
-            
+
             // Включаем отправку статистики
             AppMetrica.enableActivityAutoTracking(this)
-            
+
             // Добавляем адаптер в составную аналитику
             compositeAnalytics.addAnalytics(AppMetricaAnalyticsAdapter())
-            
+
             Timber.d("AppMetrica успешно инициализирована")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка инициализации AppMetrica")
         }
     }
-    
+
     /**
      * Инициализирует Firebase аналитику и добавляет ее в CompositeAnalytics
      */
@@ -91,28 +94,31 @@ class FinanceApp : Application() {
         try {
             FirebaseApp.initializeApp(this)
             firebaseAnalytics = Firebase.analytics
-            
+
             // Создаем адаптер для Firebase Analytics
             val firebaseAdapter = FirebaseAnalyticsAdapter(firebaseAnalytics)
-            
+
             // Добавляем адаптер в составную аналитику
             compositeAnalytics.addAnalytics(firebaseAdapter)
-            
+
             // Устанавливаем базовые пользовательские свойства
             firebaseAdapter.setUserProperty("app_version", BuildConfig.VERSION_NAME)
-            firebaseAdapter.setUserProperty("build_type", if (BuildConfig.DEBUG) "debug" else "release")
+            firebaseAdapter.setUserProperty(
+                "build_type",
+                if (BuildConfig.DEBUG) "debug" else "release"
+            )
             firebaseAdapter.setUserProperty("device_model", android.os.Build.MODEL)
             firebaseAdapter.setUserProperty("android_version", android.os.Build.VERSION.RELEASE)
-            
+
             // Включаем Crashlytics только в релизных сборках
             FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
-            
+
             Timber.d("Firebase успешно инициализирован")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка инициализации Firebase")
         }
     }
-    
+
     /**
      * Логирует основную информацию об устройстве
      */

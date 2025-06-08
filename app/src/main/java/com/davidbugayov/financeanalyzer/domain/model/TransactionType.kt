@@ -6,7 +6,7 @@ package com.davidbugayov.financeanalyzer.domain.model
 enum class TransactionType {
     INCOME,
     EXPENSE;
-    
+
     companion object {
         /**
          * Преобразует флаг isExpense в TransactionType
@@ -15,7 +15,7 @@ enum class TransactionType {
             return if (isExpense) EXPENSE else INCOME
         }
     }
-    
+
     /**
      * Возвращает флаг isExpense на основе типа транзакции
      */

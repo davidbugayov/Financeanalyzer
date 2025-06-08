@@ -20,10 +20,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
-fun RecommendationsCard(
-    metrics: FinancialMetrics,
-    modifier: Modifier = Modifier
-) {
+fun RecommendationsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier) {
     val effectiveRecommendations = buildList {
         if (metrics.savingsRate < 10) {
             add(stringResource(R.string.recommendation_save_10_15))
@@ -33,7 +30,12 @@ fun RecommendationsCard(
             add(stringResource(R.string.recommendation_savings_excellent))
         }
         if (metrics.topExpenseCategory.isNotEmpty()) {
-            add(stringResource(R.string.recommendation_top_expense_category, metrics.topExpenseCategory))
+            add(
+                stringResource(
+                    R.string.recommendation_top_expense_category,
+                    metrics.topExpenseCategory
+                )
+            )
         }
         if (metrics.monthsOfSavings < 3) {
             add(stringResource(R.string.recommendation_months_of_savings_low))
@@ -50,8 +52,12 @@ fun RecommendationsCard(
     }
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)),
+        shape = RoundedCornerShape(
+            dimensionResource(R.dimen.financial_statistics_card_corner_radius)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)
+        ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Column(
@@ -65,14 +71,22 @@ fun RecommendationsCard(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+            Spacer(
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.financial_statistics_spacer_large)
+                )
+            )
 
             if (effectiveRecommendations.isNotEmpty()) {
                 effectiveRecommendations.forEach { recommendation ->
                     Text(
                         text = "• $recommendation",
                         style = MaterialTheme.typography.bodyMedium,
-                        modifier = Modifier.padding(vertical = dimensionResource(R.dimen.financial_statistics_metric_row_vertical))
+                        modifier = Modifier.padding(
+                            vertical = dimensionResource(
+                                R.dimen.financial_statistics_metric_row_vertical
+                            )
+                        )
                     )
                 }
             } else {

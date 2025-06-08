@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
 import java.time.LocalDate
 import java.util.Date
@@ -68,11 +67,8 @@ interface TransactionRepository {
      * @param endDate Конечная дата периода.
      * @return Список транзакций за указанный период.
      */
-    suspend fun getTransactionsByDateRange(
-        startDate: Date,
-        endDate: Date
-    ): List<Transaction>
-    
+    suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): List<Transaction>
+
     /**
      * Получает транзакции за указанный период с использованием LocalDate.
      * @param startDate Начальная дата периода.
@@ -90,10 +86,7 @@ interface TransactionRepository {
      * @param endDate Конечная дата периода.
      * @return Список транзакций.
      */
-    suspend fun getTransactionsByDateRangeList(
-        startDate: Date,
-        endDate: Date
-    ): List<Transaction>
+    suspend fun getTransactionsByDateRangeList(startDate: Date, endDate: Date): List<Transaction>
 
     /**
      * Получает транзакции за указанный месяц.

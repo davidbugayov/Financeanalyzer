@@ -63,13 +63,13 @@ fun AnimatedBottomNavigationBar(
     // Получаем отступы от системной навигации
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues()
     val density = LocalDensity.current
-    
+
     // IME Insets для корректной работы с клавиатурой
     val imeVisible = WindowInsets.ime.getBottom(density) > 0
-    
+
     // Не показываем навигацию, если клавиатура видима
     if (imeVisible) return
-    
+
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(animationSpec = tween(400, easing = EaseInOut)) + slideInVertically(
@@ -134,32 +134,32 @@ fun AnimatedBottomNavigationBar(
  * @param onClick обработчик нажатия
  */
 @Composable
-private fun NavButton(
-    icon: ImageVector,
-    text: String,
-    onClick: () -> Unit,
-) {
+private fun NavButton(icon: ImageVector, text: String, onClick: () -> Unit) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(horizontal = dimensionResource(R.dimen.spacing_xxsmall))
-            .widthIn(min = dimensionResource(R.dimen.main_nav_button_size) + dimensionResource(R.dimen.spacing_xxsmall))
+            .widthIn(
+                min = dimensionResource(R.dimen.main_nav_button_size) + dimensionResource(
+                    R.dimen.spacing_xxsmall
+                )
+            )
     ) {
-            FilledIconButton(
-                onClick = onClick,
-                modifier = Modifier.size(dimensionResource(R.dimen.main_nav_button_size)),
-                colors = IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary, // Используем основной цвет темы для фона кнопки
-                    contentColor = Color.White // Явно задаем белый цвет для иконки
-                )
-            ) {
-                Icon(
-                    imageVector = icon,
-                    contentDescription = text,
-                    modifier = Modifier.size(dimensionResource(R.dimen.main_nav_icon_size))
-                    // tint = Color.White - Уже управляется через contentColor в IconButtonDefaults
-                )
-            }
+        FilledIconButton(
+            onClick = onClick,
+            modifier = Modifier.size(dimensionResource(R.dimen.main_nav_button_size)),
+            colors = IconButtonDefaults.filledIconButtonColors(
+                containerColor = MaterialTheme.colorScheme.primary, // Используем основной цвет темы для фона кнопки
+                contentColor = Color.White // Явно задаем белый цвет для иконки
+            )
+        ) {
+            Icon(
+                imageVector = icon,
+                contentDescription = text,
+                modifier = Modifier.size(dimensionResource(R.dimen.main_nav_icon_size))
+                // tint = Color.White - Уже управляется через contentColor в IconButtonDefaults
+            )
+        }
 
         Text(
             text = text,

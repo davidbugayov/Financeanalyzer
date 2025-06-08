@@ -11,37 +11,26 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primary
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primaryContainer
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_secondary
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_secondaryContainer
-import com.davidbugayov.financeanalyzer.ui.theme.md_theme_dark_primary
-import com.davidbugayov.financeanalyzer.ui.theme.md_theme_dark_primaryContainer
 
 /**
  * Экран для отображения списка используемых библиотек.
@@ -49,9 +38,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.md_theme_dark_primaryContainer
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun LibrariesScreen(
-    onNavigateBack: () -> Unit
-) {
+fun LibrariesScreen(onNavigateBack: () -> Unit) {
     Scaffold(
         topBar = {
             AppTopBar(
@@ -75,7 +62,7 @@ fun LibrariesScreen(
                     modifier = Modifier.padding(bottom = dimensionResource(R.dimen.spacing_normal))
                 )
             }
-            
+
             items(getLibraries()) { library ->
                 LibraryItem(
                     name = library.name,
@@ -84,19 +71,19 @@ fun LibrariesScreen(
                     license = library.license,
                     index = getLibraries().indexOf(library)
                 )
-                
+
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
             }
-            
+
             item {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
-                
+
                 Text(
                     text = stringResource(R.string.licenses_note),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant
                 )
-                
+
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_xxlarge)))
             }
         }
@@ -139,7 +126,9 @@ private fun LibraryItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation).div(2)),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.card_elevation).div(2)
+        ),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surface
         )
@@ -160,7 +149,7 @@ private fun LibraryItem(
                     fontWeight = FontWeight.Bold,
                     color = textColor
                 )
-            
+
                 Text(
                     text = "Версия: $version",
                     style = MaterialTheme.typography.bodyMedium,
@@ -168,24 +157,24 @@ private fun LibraryItem(
                 )
             }
         }
-        
+
         // Основное содержимое карточки
         Column(
             modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal))
         ) {
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_small)))
-            
+
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodyMedium
             )
-            
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
-            
+
             HorizontalDivider()
-            
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-            
+
             Text(
                 text = stringResource(R.string.license_colon, license),
                 style = MaterialTheme.typography.bodyMedium,
@@ -276,7 +265,7 @@ private fun getLibraries(): List<Library> {
             license = "Apache License 2.0"
         )
     )
-} 
+}
 
 /**
  * Горизонтальный разделитель

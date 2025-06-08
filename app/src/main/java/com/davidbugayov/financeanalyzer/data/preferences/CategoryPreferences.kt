@@ -13,7 +13,10 @@ import timber.log.Timber
  */
 class CategoryPreferences private constructor(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val prefs: SharedPreferences = context.getSharedPreferences(
+        PREFS_NAME,
+        Context.MODE_PRIVATE
+    )
     private val gson = Gson()
     private val typeCustomCategoryList = object : com.google.gson.reflect.TypeToken<List<CustomCategoryData>>() {}.type
 
@@ -241,7 +244,7 @@ class CategoryPreferences private constructor(context: Context) {
         val incomeCategories = loadIncomeCategories()
 
         return expenseCategories.any { it.name == categoryName } ||
-                incomeCategories.any { it.name == categoryName }
+            incomeCategories.any { it.name == categoryName }
     }
 
     /**

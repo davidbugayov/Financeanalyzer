@@ -24,10 +24,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
  * @param onGroupingSelected Callback, вызываемый при выборе типа группировки
  */
 @Composable
-fun GroupingChips(
-    currentGrouping: GroupingType,
-    onGroupingSelected: (GroupingType) -> Unit
-) {
+fun GroupingChips(currentGrouping: GroupingType, onGroupingSelected: (GroupingType) -> Unit) {
     val selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
     val selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
     val unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
@@ -48,7 +45,7 @@ fun GroupingChips(
                 selectedLabelColor = selectedLabelColor,
                 containerColor = unselectedContainerColor,
                 labelColor = unselectedLabelColor
-            ),
+            )
         )
 
         FilterChip(
@@ -60,7 +57,7 @@ fun GroupingChips(
                 selectedLabelColor = selectedLabelColor,
                 containerColor = unselectedContainerColor,
                 labelColor = unselectedLabelColor
-            ),
+            )
         )
 
         FilterChip(
@@ -72,7 +69,7 @@ fun GroupingChips(
                 selectedLabelColor = selectedLabelColor,
                 containerColor = unselectedContainerColor,
                 labelColor = unselectedLabelColor
-            ),
+            )
         )
     }
 } 

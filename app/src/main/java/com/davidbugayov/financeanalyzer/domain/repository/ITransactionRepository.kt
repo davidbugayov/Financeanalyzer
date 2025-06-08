@@ -30,20 +30,20 @@ interface ITransactionRepository {
      * @return Общее количество транзакций в базе данных
      */
     suspend fun getTransactionsCount(): Int
-    
+
     /**
      * Добавляет новую транзакцию
      * @param transaction Транзакция для добавления
      * @return ID добавленной транзакции
      */
     suspend fun addTransaction(transaction: Transaction): String
-    
+
     /**
      * Удаляет транзакцию
      * @param transaction Транзакция для удаления
      */
     suspend fun deleteTransaction(transaction: Transaction)
-    
+
     /**
      * Обновляет существующую транзакцию
      * @param transaction Обновленная транзакция
@@ -66,7 +66,12 @@ interface ITransactionRepository {
      * @param offset Смещение (количество пропускаемых транзакций)
      * @return Список транзакций с учетом пагинации и диапазона дат
      */
-    suspend fun getTransactionsPaginated(startDate: Date, endDate: Date, limit: Int, offset: Int): List<Transaction>
+    suspend fun getTransactionsPaginated(
+        startDate: Date,
+        endDate: Date,
+        limit: Int,
+        offset: Int
+    ): List<Transaction>
 
     /**
      * Получает общее количество транзакций в указанном диапазоне дат

@@ -46,70 +46,157 @@ abstract class AbstractPdfImportUseCase(
                     PDDocument.load(stream).use { document ->
                         val stripper = PDFTextStripper()
                         val text = stripper.getText(document)
-                        Timber.i("$bankName extractTextFromPdf: Текст успешно извлечен. Длина: ${text.length}, Первые 100 символов: ${text.take(100)}")
+                        Timber.i(
+                            "$bankName extractTextFromPdf: Текст успешно извлечен. Длина: ${text.length}, Первые 100 символов: ${text.take(
+                                100
+                            )}"
+                        )
                         return@withContext text
                     }
                 }
             } else {
-                Timber.w("$bankName extractTextFromPdf: Не удалось открыть InputStream для PDF: $uri")
+                Timber.w(
+                    "$bankName extractTextFromPdf: Не удалось открыть InputStream для PDF: $uri"
+                )
                 return@withContext ""
             }
         } catch (e: Exception) {
             Timber.e(e, "$bankName extractTextFromPdf: Ошибка при извлечении текста из PDF.")
-            throw IOException(context.getString(R.string.import_error_pdf_extraction_exception, bankName, e.localizedMessage ?: ""), e)
+            throw IOException(
+                context.getString(
+                    R.string.import_error_pdf_extraction_exception,
+                    bankName,
+                    e.localizedMessage ?: ""
+                ),
+                e
+            )
         }
     }
 
     /**
      * Шаблонный метод импорта PDF-файлов (общий для всех PDF-банков)
      */
-    override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
+    override fun importTransactions(
+        uri: Uri,
+        progressCallback: ImportProgressCallback
+    ): Flow<ImportResult> = flow {
         val currentBankName = bankName
-        emit(ImportResult.Progress(0, 100, context.getString(R.string.import_progress_starting, currentBankName)))
+        emit(
+            ImportResult.Progress(
+                0,
+                100,
+                context.getString(R.string.import_progress_starting, currentBankName)
+            )
+        )
         Timber.i("$currentBankName importTransactions: Начало импорта из URI: $uri")
         try {
             val extractedText = extractTextFromPdf(uri)
             if (extractedText.isBlank()) {
                 Timber.e("$currentBankName importTransactions: Извлеченный текст из PDF пуст.")
-                emit(ImportResult.Error(message = context.getString(R.string.import_error_pdf_extraction_failed, currentBankName)))
+                emit(
+                    ImportResult.Error(
+                        message = context.getString(
+                            R.string.import_error_pdf_extraction_failed,
+                            currentBankName
+                        )
+                    )
+                )
                 return@flow
             }
-            emit(ImportResult.Progress(5, 100, context.getString(R.string.import_progress_text_extracted_validating)))
-            Timber.d("$currentBankName importTransactions: Извлеченный текст, первые 500 символов:\n${extractedText.take(500)}...")
+            emit(
+                ImportResult.Progress(
+                    5,
+                    100,
+                    context.getString(R.string.import_progress_text_extracted_validating)
+                )
+            )
+            Timber.d(
+                "$currentBankName importTransactions: Извлеченный текст, первые 500 символов:\n${extractedText.take(
+                    500
+                )}..."
+            )
 
             BufferedReader(StringReader(extractedText)).use { validationReader ->
                 if (!isValidFormat(validationReader)) {
-                    Timber.e("$currentBankName importTransactions: Файл не прошел валидацию как выписка $currentBankName.")
-                    emit(ImportResult.Error(message = context.getString(R.string.import_error_invalid_format, currentBankName)))
+                    Timber.e(
+                        "$currentBankName importTransactions: Файл не прошел валидацию как выписка $currentBankName."
+                    )
+                    emit(
+                        ImportResult.Error(
+                            message = context.getString(
+                                R.string.import_error_invalid_format,
+                                currentBankName
+                            )
+                        )
+                    )
                     return@flow
                 }
             }
             Timber.i("$currentBankName importTransactions: Формат файла успешно валидирован.")
-            emit(ImportResult.Progress(10, 100, context.getString(R.string.import_progress_format_validated_skipping_headers)))
+            emit(
+                ImportResult.Progress(
+                    10,
+                    100,
+                    context.getString(R.string.import_progress_format_validated_skipping_headers)
+                )
+            )
 
             BufferedReader(StringReader(extractedText)).use { contentReader ->
                 skipHeaders(contentReader)
-                Timber.i("$currentBankName importTransactions: Заголовки пропущены, начинаем обработку транзакций.")
-                emit(ImportResult.Progress(15, 100, context.getString(R.string.import_progress_processing_transactions)))
+                Timber.i(
+                    "$currentBankName importTransactions: Заголовки пропущены, начинаем обработку транзакций."
+                )
+                emit(
+                    ImportResult.Progress(
+                        15,
+                        100,
+                        context.getString(R.string.import_progress_processing_transactions)
+                    )
+                )
 
                 val transactions = parseTransactions(contentReader, progressCallback, extractedText)
                 if (transactions.isEmpty()) {
-                    Timber.w("$currentBankName importTransactions: Транзакции не найдены после обработки файла.")
-                    emit(ImportResult.Error(message = context.getString(R.string.import_error_no_transactions_found, currentBankName)))
+                    Timber.w(
+                        "$currentBankName importTransactions: Транзакции не найдены после обработки файла."
+                    )
+                    emit(
+                        ImportResult.Error(
+                            message = context.getString(
+                                R.string.import_error_no_transactions_found,
+                                currentBankName
+                            )
+                        )
+                    )
                     return@flow
                 }
-                emit(ImportResult.Progress(85, 100, context.getString(R.string.import_progress_saving_transactions, transactions.size)))
-                Timber.i("$currentBankName importTransactions: Найдено ${transactions.size} транзакций. Начинаем сохранение в базу данных")
+                emit(
+                    ImportResult.Progress(
+                        85,
+                        100,
+                        context.getString(
+                            R.string.import_progress_saving_transactions,
+                            transactions.size
+                        )
+                    )
+                )
+                Timber.i(
+                    "$currentBankName importTransactions: Найдено ${transactions.size} транзакций. Начинаем сохранение в базу данных"
+                )
                 var savedCount = 0
                 transactions.forEach { transaction ->
                     try {
                         transactionRepository.addTransaction(transaction)
                         savedCount++
                     } catch (e: Exception) {
-                        Timber.e(e, "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}")
+                        Timber.e(
+                            e,
+                            "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}"
+                        )
                     }
                 }
-                Timber.i("$currentBankName importTransactions: Импорт завершен. Сохранено: $savedCount из ${transactions.size}")
+                Timber.i(
+                    "$currentBankName importTransactions: Импорт завершен. Сохранено: $savedCount из ${transactions.size}"
+                )
                 emit(ImportResult.Success(savedCount, transactions.size - savedCount))
             }
         } catch (e: IOException) {
@@ -117,7 +204,11 @@ abstract class AbstractPdfImportUseCase(
             emit(
                 ImportResult.Error(
                     exception = e,
-                    message = context.getString(R.string.import_error_io_exception, currentBankName, e.localizedMessage ?: "")
+                    message = context.getString(
+                        R.string.import_error_io_exception,
+                        currentBankName,
+                        e.localizedMessage ?: ""
+                    )
                 )
             )
         } catch (e: Exception) {
@@ -125,7 +216,11 @@ abstract class AbstractPdfImportUseCase(
             emit(
                 ImportResult.Error(
                     exception = e,
-                    message = context.getString(R.string.import_error_unknown, currentBankName, e.localizedMessage ?: "")
+                    message = context.getString(
+                        R.string.import_error_unknown,
+                        currentBankName,
+                        e.localizedMessage ?: ""
+                    )
                 )
             )
         }

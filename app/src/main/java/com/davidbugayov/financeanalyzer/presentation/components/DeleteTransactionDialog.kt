@@ -46,7 +46,12 @@ fun DeleteTransactionDialog(
     val moneyFormatter = transaction.amount
 
     val isDarkTheme = isSystemInDarkTheme()
-    val effectiveSourceColor = remember(transaction.source, transaction.sourceColor, transaction.isExpense, isDarkTheme) {
+    val effectiveSourceColor = remember(
+        transaction.source,
+        transaction.sourceColor,
+        transaction.isExpense,
+        isDarkTheme
+    ) {
         val sourceColorInt = transaction.sourceColor
         val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
 
@@ -57,42 +62,44 @@ fun DeleteTransactionDialog(
             isDarkTheme = isDarkTheme
         )
     }
-    
+
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.delete_transaction)) },
         containerColor = MaterialTheme.colorScheme.surface,
-        text = { 
+        text = {
             Column {
                 Text(
                     text = transaction.category,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
-                    text = if (transaction.isExpense) 
-                        "-${moneyFormatter.abs().formatted(showCurrency = true)}" 
-                    else 
-                        "+${moneyFormatter.formatted(showCurrency = true)}",
+                    text = if (transaction.isExpense) {
+                        "-${moneyFormatter.abs().formatted(showCurrency = true)}"
+                    } else {
+                        "+${moneyFormatter.formatted(showCurrency = true)}"
+                    },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (transaction.isExpense) 
-                        MaterialTheme.colorScheme.error 
-                    else 
+                    color = if (transaction.isExpense) {
+                        MaterialTheme.colorScheme.error
+                    } else {
                         MaterialTheme.colorScheme.primary
+                    }
                 )
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Text(
                     text = "Дата: ${dateFormatter.format(transaction.date)}",
                     style = MaterialTheme.typography.bodyMedium
                 )
-                
+
                 Spacer(modifier = Modifier.height(12.dp))
-                
+
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
                         modifier = Modifier
@@ -100,14 +107,14 @@ fun DeleteTransactionDialog(
                             .background(effectiveSourceColor, CircleShape)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    
+
                     Text(
                         text = "Источник: ${transaction.source}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = effectiveSourceColor
                     )
                 }
-                
+
                 transaction.note?.let { note ->
                     if (note.isNotBlank()) {
                         Spacer(modifier = Modifier.height(12.dp))
@@ -117,9 +124,9 @@ fun DeleteTransactionDialog(
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
                     text = "Вы уверены, что хотите удалить эту транзакцию?",
                     style = MaterialTheme.typography.bodyMedium,

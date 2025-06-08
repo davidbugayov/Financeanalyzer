@@ -59,11 +59,7 @@ fun PermissionUtilsHomeFilterChips(
 private data class FilterChipData(val filter: TransactionFilter, val labelRes: Int)
 
 @Composable
-private fun FilterChipItem(
-    filterData: FilterChipData,
-    isSelected: Boolean,
-    onClick: () -> Unit
-) {
+private fun FilterChipItem(filterData: FilterChipData, isSelected: Boolean, onClick: () -> Unit) {
     val selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
     val selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
     val unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)

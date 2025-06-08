@@ -25,8 +25,6 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistics.FinancialS
 import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
-import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
-import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
@@ -59,9 +57,7 @@ fun NavGraph(
     }
 }
 
-fun NavGraphBuilder.mainGraph(
-    navController: NavHostController
-) {
+fun NavGraphBuilder.mainGraph(navController: NavHostController) {
     composable(
         route = Screen.Home.route,
         enterTransition = defaultEnterRight(),

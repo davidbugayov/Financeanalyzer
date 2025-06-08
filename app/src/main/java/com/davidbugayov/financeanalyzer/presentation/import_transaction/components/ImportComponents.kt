@@ -49,7 +49,9 @@ fun ImportInstructions() {
             containerColor = LocalFriendlyCardBackgroundColor.current
         ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.card_elevation)
+        )
     ) {
         Row(
             modifier = Modifier.padding(dimensionResource(R.dimen.padding_large)),
@@ -201,7 +203,9 @@ fun ImportResultsSection(state: ImportState) {
             containerColor = MaterialTheme.colorScheme.surfaceVariant
         ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.card_elevation))
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.card_elevation)
+        )
     ) {
         Column(
             modifier = Modifier
@@ -303,10 +307,7 @@ fun ImportResultsSection(state: ImportState) {
  * Диалог с инструкциями по получению выписки из банка
  */
 @Composable
-fun BankInstructionDialog(
-    bankName: String,
-    onDismiss: () -> Unit
-) {
+fun BankInstructionDialog(bankName: String, onDismiss: () -> Unit) {
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
@@ -323,7 +324,9 @@ fun BankInstructionDialog(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.dialog_elevation))
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.dialog_elevation)
+            )
         ) {
             Column(
                 modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding))
@@ -378,10 +381,7 @@ fun BankInstructionsContent(bankName: String) {
  * Диалог запроса разрешений
  */
 @Composable
-fun PermissionDialog(
-    onOpenSettings: () -> Unit,
-    onDismiss: () -> Unit
-) {
+fun PermissionDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit) {
     Dialog(
         onDismissRequest = onDismiss,
         properties = DialogProperties(
@@ -398,7 +398,9 @@ fun PermissionDialog(
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.surface
             ),
-            elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.dialog_elevation))
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.dialog_elevation)
+            )
         ) {
             Column(
                 modifier = Modifier.padding(dimensionResource(R.dimen.dialog_padding))

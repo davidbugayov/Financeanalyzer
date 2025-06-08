@@ -23,10 +23,7 @@ import androidx.compose.ui.unit.dp
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun HomeTopAppBar(
-    title: String,
-    onNavigateUp: () -> Unit
-) {
+fun HomeTopAppBar(title: String, onNavigateUp: () -> Unit) {
     TopAppBar(
         title = {
             Text(

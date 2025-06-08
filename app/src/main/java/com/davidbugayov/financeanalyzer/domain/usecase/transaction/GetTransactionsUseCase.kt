@@ -24,8 +24,7 @@ interface GetTransactionsUseCase {
 
     /**
      * Получает список всех транзакций.
-     * 
-     * @return Список всех транзакций
+     * * @return Список всех транзакций
      */
     suspend fun getAllTransactions(): List<Transaction>
 

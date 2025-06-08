@@ -31,10 +31,11 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 private fun BalanceCardTitle(balance: Money) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val titleColor = if (balance.amount.signum() >= 0)
+    val titleColor = if (balance.amount.signum() >= 0) {
         incomeColor.copy(alpha = 0.7f)
-    else
+    } else {
         expenseColor.copy(alpha = 0.7f)
+    }
     Text(
         text = stringResource(R.string.current_balance),
         style = MaterialTheme.typography.titleMedium,
@@ -58,10 +59,7 @@ private fun BalanceCardAmount(balance: Money) {
 }
 
 @Composable
-fun BalanceCard(
-    balance: Money,
-    modifier: Modifier = Modifier
-) {
+fun BalanceCard(balance: Money, modifier: Modifier = Modifier) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val cardColor = MaterialTheme.colorScheme.background

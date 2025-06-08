@@ -15,8 +15,5 @@ interface ImportTransactionsUseCase {
      * @param progressCallback Колбэк для отслеживания прогресса
      * @return Поток с информацией о ходе импорта и его результатах
      */
-    fun importTransactions(
-        uri: Uri,
-        progressCallback: ImportProgressCallback
-    ): Flow<ImportResult>
+    fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult>
 } 

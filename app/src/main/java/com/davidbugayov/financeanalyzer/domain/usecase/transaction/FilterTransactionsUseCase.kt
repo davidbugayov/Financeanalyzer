@@ -83,7 +83,11 @@ class FilterTransactionsUseCase {
      * @param endDate Конечная дата для фильтрации
      * @return Отфильтрованный по дате список транзакций
      */
-    fun filterByDateRange(transactions: List<Transaction>, startDate: Date, endDate: Date): List<Transaction> {
+    fun filterByDateRange(
+        transactions: List<Transaction>,
+        startDate: Date,
+        endDate: Date
+    ): List<Transaction> {
         return transactions.filter { transaction ->
             transaction.date >= startDate && transaction.date <= endDate
         }

@@ -28,7 +28,7 @@ data class Category(
                 isCustom = isCustom
             )
         }
-        
+
         /**
          * Создает категорию для доходов
          */
@@ -36,8 +36,7 @@ data class Category(
             return Category(
                 name = name,
                 isExpense = false,
-                count = count, 
-                isCustom = isCustom
+                count = count, isCustom = isCustom
             )
         }
     }

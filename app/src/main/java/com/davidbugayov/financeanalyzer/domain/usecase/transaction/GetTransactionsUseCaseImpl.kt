@@ -53,7 +53,7 @@ class GetTransactionsUseCaseImpl(
         calendar.time = endDate
         calendar.add(Calendar.DAY_OF_YEAR, -days) // Вычитаем указанное количество дней
         val startDate = calendar.time
-        
+
         return repository.getTransactionsByDateRangeList(startDate, endDate)
     }
 } 

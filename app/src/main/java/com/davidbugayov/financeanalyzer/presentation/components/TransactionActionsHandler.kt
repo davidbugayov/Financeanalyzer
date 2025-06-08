@@ -5,8 +5,7 @@ import androidx.compose.runtime.Composable
 /**
  * Компонент для обработки действий с транзакциями.
  * Содержит в себе все необходимые диалоги и логику для работы с ними.
- * 
- * @param transactionDialogState Состояние диалогов
+ * * @param transactionDialogState Состояние диалогов
  * @param onEvent Обработчик событий транзакций
  * @param onNavigateToEdit Функция навигации к экрану редактирования (если требуется)
  */
@@ -21,7 +20,9 @@ fun TransactionActionsHandler(
         DeleteTransactionDialog(
             transaction = transactionDialogState.transactionToDelete,
             onConfirm = {
-                onEvent(TransactionEvent.DeleteTransaction(transactionDialogState.transactionToDelete))
+                onEvent(
+                    TransactionEvent.DeleteTransaction(transactionDialogState.transactionToDelete)
+                )
                 onEvent(TransactionEvent.HideDeleteConfirmDialog)
             },
             onDismiss = {

@@ -70,18 +70,20 @@ fun SourceSelectionDialog(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = if (localSelectedSources.isEmpty())
+                        text = if (localSelectedSources.isEmpty()) {
                             stringResource(R.string.all_sources)
-                        else if (localSelectedSources.size == sourceNames.size)
+                        } else if (localSelectedSources.size == sourceNames.size) {
                             stringResource(R.string.clear_selection)
-                        else
-                            stringResource(R.string.select_all_sources),
+                        } else {
+                            stringResource(R.string.select_all_sources)
+                        },
                         color = if (localSelectedSources.isEmpty() ||
                             localSelectedSources.size == sourceNames.size
-                        )
+                        ) {
                             MaterialTheme.colorScheme.primary
-                        else
-                            MaterialTheme.colorScheme.onSurface,
+                        } else {
+                            MaterialTheme.colorScheme.onSurface
+                        },
                         modifier = Modifier.weight(1f)
                     )
 
@@ -108,7 +110,7 @@ fun SourceSelectionDialog(
                         ColorUtils.getEffectiveSourceColor(
                             sourceName = source.name,
                             sourceColorHex = null, // Так как source.color (Int) не был валидным HEX
-                            isExpense = false,    // Для диалога выбора источника не применимо
+                            isExpense = false, // Для диалога выбора источника не применимо
                             isDarkTheme = isDarkTheme
                         )
                     }
@@ -164,8 +166,11 @@ private fun SourceCheckboxItem(
             .padding(vertical = 2.dp)
             .clip(MaterialTheme.shapes.small)
             .background(
-                if (isSelected) MaterialTheme.colorScheme.primaryContainer
-                else MaterialTheme.colorScheme.surface
+                if (isSelected) {
+                    MaterialTheme.colorScheme.primaryContainer
+                } else {
+                    MaterialTheme.colorScheme.surface
+                }
             )
     ) {
         Row(
@@ -182,8 +187,11 @@ private fun SourceCheckboxItem(
 
             Text(
                 text = sourceName,
-                color = if (isSelected) MaterialTheme.colorScheme.onPrimaryContainer
-                else color,
+                color = if (isSelected) {
+                    MaterialTheme.colorScheme.onPrimaryContainer
+                } else {
+                    color
+                },
                 modifier = Modifier
                     .weight(1f)
                     .padding(start = 8.dp)

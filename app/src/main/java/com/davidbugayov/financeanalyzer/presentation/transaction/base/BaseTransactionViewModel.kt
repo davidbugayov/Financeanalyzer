@@ -65,6 +65,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
     // Вся обработка событий теперь только в наследниках
     abstract override fun onEvent(event: E, context: android.content.Context)
+
     /**
      * Метод для отправки транзакции, вызываемый из UI.
      * Реализуется в наследниках.
@@ -77,7 +78,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param amount Новая сумма дохода
      * @param originalTransaction Исходная транзакция до редактирования
      */
-    protected fun updateWalletsBalance(walletIds: List<String>, amount: Money, originalTransaction: com.davidbugayov.financeanalyzer.domain.model.Transaction?) {
+    protected fun updateWalletsBalance(
+        walletIds: List<String>,
+        amount: Money,
+        originalTransaction: com.davidbugayov.financeanalyzer.domain.model.Transaction?
+    ) {
         viewModelScope.launch {
             val result = updateWalletBalancesUseCase(
                 walletIdsToUpdate = walletIds,
@@ -89,7 +94,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             }
         }
     }
-    
+
     /**
      * Определяет список кошельков для сохранения в транзакции
      * @param isExpense Является ли транзакция расходом
@@ -106,11 +111,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             Timber.d("Сохраняем выбранные кошельки: ${selectedWallets.size} шт.")
             selectedWallets
         } else {
-            Timber.d("Не сохраняем кошельки: isExpense=$isExpense, addToWallet=$addToWallet, selectedWallets=${selectedWallets.size}")
+            Timber.d(
+                "Не сохраняем кошельки: isExpense=$isExpense, addToWallet=$addToWallet, selectedWallets=${selectedWallets.size}"
+            )
             null
         }
     }
-    
+
     /**
      * Загружает кошельки
      */
@@ -124,7 +131,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             }
         }
     }
-    
+
     /**
      * Обрабатывает событие переключения флага "Добавить в кошельки"
      * @param currentAddToWallet Текущее значение флага
@@ -134,11 +141,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         currentAddToWallet: Boolean
     ): Pair<Boolean, List<String>> {
         val newAddToWallet = !currentAddToWallet
-        
+
         return if (newAddToWallet) {
             // При включении автоматически выбираем все кошельки, если список пуст
             val allWalletIds = wallets.map { it.id }
-            Timber.d("Включение кошельков, автоматический выбор всех ${allWalletIds.size} кошельков")
+            Timber.d(
+                "Включение кошельков, автоматический выбор всех ${allWalletIds.size} кошельков"
+            )
             Pair(true, allWalletIds)
         } else {
             // При отключении очищаем список
@@ -146,7 +155,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             Pair(false, emptyList())
         }
     }
-    
+
     /**
      * Обрабатывает событие выбора кошелька
      * @param walletId ID кошелька
@@ -160,15 +169,17 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         currentSelectedWallets: List<String>
     ): List<String> {
         Timber.d("SelectWallet событие - walletId=$walletId, selected=$selected")
-        
+
         val updatedWallets = if (selected) {
             currentSelectedWallets + walletId
         } else {
             currentSelectedWallets - walletId
         }
-        
-        Timber.d("Обновление списка выбранных кошельков: было ${currentSelectedWallets.size}, стало ${updatedWallets.size}")
-        
+
+        Timber.d(
+            "Обновление списка выбранных кошельков: было ${currentSelectedWallets.size}, стало ${updatedWallets.size}"
+        )
+
         return updatedWallets
     }
 
@@ -326,7 +337,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 copyState(state, customSource = event.source)
             }
 
-            is BaseTransactionEvent.AddCustomSource -> { /* Обработка в наследнике */
+            is BaseTransactionEvent.AddCustomSource -> { // Обработка в наследнике
             }
 
             is BaseTransactionEvent.SetSourceColor -> _state.update { state ->
@@ -400,7 +411,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
             is BaseTransactionEvent.ShowDeleteCategoryConfirmDialog -> {
                 _state.update { state ->
-                    copyState(state, categoryToDelete = event.category, showDeleteCategoryConfirmDialog = true)
+                    copyState(
+                        state,
+                        categoryToDelete = event.category,
+                        showDeleteCategoryConfirmDialog = true
+                    )
                 }
             }
 
@@ -412,7 +427,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 val category = event.category
                 if (category.isNotBlank()) {
                     val isExpense = _state.value.isExpense
-                
+
                     // Не даем удалить "Другое" и "Переводы"
                     if (category != "Другое" && category != "Переводы") {
                         viewModelScope.launch {
@@ -423,13 +438,17 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                                 Timber.d("Deleting income category: $category")
                                 categoriesViewModel.deleteIncomeCategory(category)
                             }
-                        
+
                             // Если текущая выбранная категория - это удаляемая категория, сбрасываем ее
                             if (_state.value.category == category) {
                                 // Сбрасываем текущую категорию, чтобы пользователь выбрал новую
                                 _state.update { state ->
                                     val newState = if (isExpense) {
-                                        copyState(state, category = "", selectedExpenseCategory = "")
+                                        copyState(
+                                            state,
+                                            category = "",
+                                            selectedExpenseCategory = ""
+                                        )
                                     } else {
                                         copyState(state, category = "", selectedIncomeCategory = "")
                                     }
@@ -443,7 +462,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
                 // Скрываем диалог подтверждения удаления
                 _state.update { state ->
-                    copyState(state, showDeleteCategoryConfirmDialog = false, categoryToDelete = null)
+                    copyState(
+                        state,
+                        showDeleteCategoryConfirmDialog = false,
+                        categoryToDelete = null
+                    )
                 }
             }
 
@@ -452,19 +475,19 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 if (sourceName.isNotBlank()) {
                     // Получаем список защищенных источников
                     val protectedSources = listOf("Наличные", "Карта")
-                
+
                     if (!protectedSources.contains(sourceName)) {
                         Timber.d("Deleting source: $sourceName")
-                    
+
                         // Удаляем источник
                         viewModelScope.launch {
                             try {
                                 // Удаляем источник из предпочтений
                                 sourcePreferences.deleteSource(sourceName)
-                                
+
                                 // Перезагружаем список источников
                                 loadSources()
-                                
+
                                 // Если текущий источник - это удаляемый источник, сбрасываем его
                                 if (_state.value.source == sourceName) {
                                     val firstSource = _state.value.sources.firstOrNull()
@@ -492,7 +515,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
             is BaseTransactionEvent.ShowDeleteSourceConfirmDialog -> {
                 _state.update { state ->
-                    copyState(state, sourceToDelete = event.source, showDeleteSourceConfirmDialog = true)
+                    copyState(
+                        state,
+                        sourceToDelete = event.source,
+                        showDeleteSourceConfirmDialog = true
+                    )
                 }
             }
 
@@ -535,7 +562,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 ) {
                     copyState(current, category = current.selectedExpenseCategory)
                 } else {
-                    Timber.d("Setting default expense category: ${current.expenseCategories.first().name}")
+                    Timber.d(
+                        "Setting default expense category: ${current.expenseCategories.first().name}"
+                    )
                     copyState(
                         current,
                         category = current.expenseCategories.first().name,
@@ -548,7 +577,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 ) {
                     copyState(current, category = current.selectedIncomeCategory)
                 } else {
-                    Timber.d("Setting default income category: ${current.incomeCategories.first().name}")
+                    Timber.d(
+                        "Setting default income category: ${current.incomeCategories.first().name}"
+                    )
                     copyState(
                         current,
                         category = current.incomeCategories.first().name,
@@ -574,8 +605,14 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
                     Timber.d(
                         "[CATEGORY_SORT] Категории расходов отсортированы по использованию: %s",
-                        sortedCategories.joinToString(", ") { "${it.name}(${getCategoryUsage(it.name, true)})" })
-                    
+                        sortedCategories.joinToString(", ") {
+                            "${it.name}(${getCategoryUsage(
+                                it.name,
+                                true
+                            )})"
+                        }
+                    )
+
                     // Выбираем первую категорию, если категория еще не выбрана
                     val firstCategory = if (state.category.isBlank() && sortedCategories.isNotEmpty()) {
                         sortedCategories.first().name
@@ -627,7 +664,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
         }
-        
+
         viewModelScope.launch {
             categoriesViewModel.incomeCategories.collect { categories ->
                 _state.update { state ->
@@ -638,7 +675,13 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
                     Timber.d(
                         "[CATEGORY_SORT] Категории доходов отсортированы по использованию: %s",
-                        sortedCategories.joinToString(", ") { "${it.name}(${getCategoryUsage(it.name, false)})" })
+                        sortedCategories.joinToString(", ") {
+                            "${it.name}(${getCategoryUsage(
+                                it.name,
+                                false
+                            )})"
+                        }
+                    )
 
                     copyState(state, incomeCategories = sortedCategories)
                 }
@@ -730,14 +773,17 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     ): S
 
     // Utility methods
-    
+
     /**
      * Загружает список источников средств
      */
     protected fun loadSources() {
         viewModelScope.launch {
             try {
-                val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(sourcePreferences, resources)
+                val sources = com.davidbugayov.financeanalyzer.presentation.transaction.base.util.getInitialSources(
+                    sourcePreferences,
+                    resources
+                )
                 _state.update { state ->
                     copyState(state, sources = sources)
                 }
@@ -748,7 +794,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     // --- Универсальные методы для настройки и сброса состояния ---
-    open fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
+    open fun setupForExpenseAddition(
+        amount: String,
+        walletCategory: String,
+        context: android.content.Context
+    ) {
         _state.update { state ->
             copyState(
                 state,
@@ -770,22 +820,27 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun parseMoneyExpression(expr: String, currency: Currency = Currency.RUB): Money {
         var processedExpr = expr.replace(",", ".")
 
-        Timber.d("parseMoneyExpression: исходное выражение: '$expr', обработанное: '$processedExpr'")
+        Timber.d(
+            "parseMoneyExpression: исходное выражение: '$expr', обработанное: '$processedExpr'"
+        )
 
         // Удаляем "висячий" оператор в конце строки, если он есть
         if (processedExpr.isNotEmpty()) {
             val lastChar = processedExpr.last()
             if (lastChar == '+' || lastChar == '-' || lastChar == '*' || lastChar == '/' ||
-                lastChar == '×' || lastChar == '÷') {
+                lastChar == '×' || lastChar == '÷'
+            ) {
                 // Обрабатываем случай, когда оператор в конце
                 processedExpr = processedExpr.dropLast(1)
-                Timber.d("parseMoneyExpression: удален висячий оператор, новое выражение: '$processedExpr'")
+                Timber.d(
+                    "parseMoneyExpression: удален висячий оператор, новое выражение: '$processedExpr'"
+                )
             }
         }
 
         // Заменяем символы × и ÷ на * и / для корректного вычисления
         processedExpr = processedExpr.replace("×", "*").replace("÷", "/")
-        
+
         // Если после обработки строка пустая, или состоит только из точки (например, после "123." -> "123")
         // или некорректна, вернем 0
         if (processedExpr.isBlank() || processedExpr == ".") {
@@ -827,10 +882,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         viewModelScope.launch {
             if (isExpense) {
                 categoryUsagePreferences.incrementExpenseCategoryUsage(categoryName)
-                Timber.d("CATEGORY: Увеличен счетчик использования расходной категории: %s", categoryName)
+                Timber.d(
+                    "CATEGORY: Увеличен счетчик использования расходной категории: %s",
+                    categoryName
+                )
             } else {
                 categoryUsagePreferences.incrementIncomeCategoryUsage(categoryName)
-                Timber.d("CATEGORY: Увеличен счетчик использования доходной категории: %s", categoryName)
+                Timber.d(
+                    "CATEGORY: Увеличен счетчик использования доходной категории: %s",
+                    categoryName
+                )
             }
         }
     }
@@ -847,7 +908,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         } else {
             categoryUsagePreferences.loadIncomeCategoriesUsage()[categoryName] ?: 0
         }
-        Timber.d("CATEGORY: Получено количество использований категории %s: %d", categoryName, usage)
+        Timber.d(
+            "CATEGORY: Получено количество использований категории %s: %d",
+            categoryName,
+            usage
+        )
         return usage
     }
 

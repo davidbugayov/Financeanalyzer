@@ -9,7 +9,7 @@ import timber.log.Timber
  */
 class CompositeAnalytics : IAnalytics {
     private val analytics = mutableListOf<IAnalytics>()
-    
+
     /**
      * Добавляет систему аналитики
      */
@@ -17,7 +17,7 @@ class CompositeAnalytics : IAnalytics {
         this.analytics.add(analytics)
         Timber.d("Добавлена система аналитики: ${analytics.javaClass.simpleName}")
     }
-    
+
     /**
      * Удаляет систему аналитики
      */
@@ -25,7 +25,7 @@ class CompositeAnalytics : IAnalytics {
         this.analytics.remove(analytics)
         Timber.d("Удалена система аналитики: ${analytics.javaClass.simpleName}")
     }
-    
+
     override fun logEvent(eventName: String) {
         analytics.forEach { it.logEvent(eventName) }
     }

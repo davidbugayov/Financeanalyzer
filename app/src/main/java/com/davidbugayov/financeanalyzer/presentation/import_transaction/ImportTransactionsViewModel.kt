@@ -128,52 +128,82 @@ class ImportTransactionsViewModel(
                         }
                         is ImportResult.Success -> {
                             val successMessage = "Импорт успешно завершен. " +
-                                    "Импортировано: ${result.importedCount}, " +
-                                    "Пропущено: ${result.skippedCount}"
+                                "Импортировано: ${result.importedCount}, " +
+                                "Пропущено: ${result.skippedCount}"
 
-                            Timber.d("Импорт успешно завершен: импортировано ${result.importedCount}, пропущено ${result.skippedCount}")
+                            Timber.d(
+                                "Импорт успешно завершен: импортировано ${result.importedCount}, пропущено ${result.skippedCount}"
+                            )
 
                             // Добавляем диагностическое логирование для проверки, были ли транзакции действительно сохранены
-                            Timber.i("[VIEWMODEL] Импорт завершен успешно! Импортировано: ${result.importedCount}, Пропущено: ${result.skippedCount}")
+                            Timber.i(
+                                "[VIEWMODEL] Импорт завершен успешно! Импортировано: ${result.importedCount}, Пропущено: ${result.skippedCount}"
+                            )
 
                             // Запустим проверку наличия транзакций в базе через 1 секунду
                             viewModelScope.launch(Dispatchers.IO) {
-                                Timber.d("[VIEWMODEL] Планируем проверку наличия транзакций в базе через 1 секунду")
+                                Timber.d(
+                                    "[VIEWMODEL] Планируем проверку наличия транзакций в базе через 1 секунду"
+                                )
                                 kotlinx.coroutines.delay(1000)
                                 try {
                                     // Используем инъектированный transactionDao
                                     val count = transactionDao.getTransactionsCount()
-                                    Timber.i("[VIEWMODEL] ✅ Проверка после импорта: всего транзакций в базе данных: $count")
+                                    Timber.i(
+                                        "[VIEWMODEL] ✅ Проверка после импорта: всего транзакций в базе данных: $count"
+                                    )
 
                                     // Получим последние 5 транзакций для анализа
-                                    Timber.i("[VIEWMODEL-ОТЛАДКА] 🔍 Попытка получить последние транзакции из базы...")
+                                    Timber.i(
+                                        "[VIEWMODEL-ОТЛАДКА] 🔍 Попытка получить последние транзакции из базы..."
+                                    )
                                     try {
-                                        val latestTransactions = transactionDao.getTransactionsPaginated(5, 0)
+                                        val latestTransactions = transactionDao.getTransactionsPaginated(
+                                            5,
+                                            0
+                                        )
                                         if (latestTransactions.isNotEmpty()) {
-                                            Timber.i("[VIEWMODEL-ОТЛАДКА] ✅ Получено ${latestTransactions.size} последних транзакций:")
+                                            Timber.i(
+                                                "[VIEWMODEL-ОТЛАДКА] ✅ Получено ${latestTransactions.size} последних транзакций:"
+                                            )
                                             latestTransactions.forEachIndexed { index, tx ->
                                                 Timber.i(
                                                     "[VIEWMODEL-ОТЛАДКА] 📝 Транзакция #${index + 1}: ID=${tx.id}, idString=${tx.idString}, " +
-                                                            "Дата=${tx.date}, Сумма=${tx.amount}, Категория='${tx.category}'"
+                                                        "Дата=${tx.date}, Сумма=${tx.amount}, Категория='${tx.category}'"
                                                 )
                                             }
                                         } else {
-                                            Timber.e("[VIEWMODEL-ОТЛАДКА] ❌ В базе данных НЕТ транзакций!")
+                                            Timber.e(
+                                                "[VIEWMODEL-ОТЛАДКА] ❌ В базе данных НЕТ транзакций!"
+                                            )
                                         }
                                     } catch (e: Exception) {
-                                        Timber.e(e, "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при получении последних транзакций: ${e.message}")
+                                        Timber.e(
+                                            e,
+                                            "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при получении последних транзакций: ${e.message}"
+                                        )
                                     }
 
                                     // Еще одна проверка с другим методом
                                     try {
-                                        Timber.i("[VIEWMODEL-ОТЛАДКА] 🔍 Альтернативная проверка через getAllTransactions...")
+                                        Timber.i(
+                                            "[VIEWMODEL-ОТЛАДКА] 🔍 Альтернативная проверка через getAllTransactions..."
+                                        )
                                         val allTransactions = transactionDao.getAllTransactions()
-                                        Timber.i("[VIEWMODEL-ОТЛАДКА] 📊 Всего транзакций через getAllTransactions: ${allTransactions.size}")
+                                        Timber.i(
+                                            "[VIEWMODEL-ОТЛАДКА] 📊 Всего транзакций через getAllTransactions: ${allTransactions.size}"
+                                        )
                                     } catch (e: Exception) {
-                                        Timber.e(e, "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при вызове getAllTransactions: ${e.message}")
+                                        Timber.e(
+                                            e,
+                                            "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при вызове getAllTransactions: ${e.message}"
+                                        )
                                     }
                                 } catch (e: Exception) {
-                                    Timber.e(e, "[VIEWMODEL] ❌ Ошибка при проверке количества транзакций после импорта: ${e.message}")
+                                    Timber.e(
+                                        e,
+                                        "[VIEWMODEL] ❌ Ошибка при проверке количества транзакций после импорта: ${e.message}"
+                                    )
                                 }
                             }
 

@@ -78,7 +78,9 @@ fun AppInfoSection(
                 ) {
                     Text(
                         text = stringResource(R.string.app_info),
-                        style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
+                        style = MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = FontWeight.Bold
+                        ),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1
                     )

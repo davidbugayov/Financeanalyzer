@@ -100,14 +100,14 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
         val intent = Intent(context, FinanceActivity::class.java).apply {
             flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
         }
-        
+
         val pendingIntent = PendingIntent.getActivity(
             context,
             TRANSACTION_REMINDER_NOTIFICATION_ID,
             intent,
             PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         )
-        
+
         // Создаем уведомление
         val builder = NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
             .setSmallIcon(R.drawable.ic_rubble) // Убедитесь, что у вас есть такая иконка
@@ -116,7 +116,7 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
             .setPriority(NotificationCompat.PRIORITY_DEFAULT)
             .setContentIntent(pendingIntent)
             .setAutoCancel(true)
-        
+
         // Показываем уведомление
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager
         notificationManager.notify(TRANSACTION_REMINDER_NOTIFICATION_ID, builder.build())
@@ -132,9 +132,14 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
             // NotificationScheduler.scheduleTransactionReminder(context, hour, minute) // Old static-like call
             // Need to cast to NotificationScheduler to access internal fun, or make scheduleTransactionReminder part of INotificationScheduler
             if (notificationScheduler is NotificationScheduler) {
-                (notificationScheduler as NotificationScheduler).scheduleTransactionReminder(hour, minute)
+                (notificationScheduler as NotificationScheduler).scheduleTransactionReminder(
+                    hour,
+                    minute
+                )
             } else {
-                Timber.e("Cannot reschedule reminder: notificationScheduler is not an instance of NotificationScheduler")
+                Timber.e(
+                    "Cannot reschedule reminder: notificationScheduler is not an instance of NotificationScheduler"
+                )
             }
             Timber.d("Rescheduled reminder for tomorrow at %02d:%02d", hour, minute)
         } catch (e: SecurityException) {

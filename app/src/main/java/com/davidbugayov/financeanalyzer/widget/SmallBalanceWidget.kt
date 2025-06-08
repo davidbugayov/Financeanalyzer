@@ -58,12 +58,14 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
     ) {
         // Создаем RemoteViews для обновления виджета
         val views = RemoteViews(context.packageName, R.layout.small_balance_widget_layout)
-        
+
         // Создаем Intent для запуска главной активности приложения
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         if (launchAppIntent != null) {
-            launchAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
-            
+            launchAppIntent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            )
+
             // Создаем PendingIntent для запуска приложения
             val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
                 PendingIntent.getActivity(
@@ -80,7 +82,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                     PendingIntent.FLAG_UPDATE_CURRENT
                 )
             }
-            
+
             // Устанавливаем обработчик нажатия на весь виджет
             views.setOnClickPendingIntent(R.id.small_widget_container, pendingIntent)
         }
@@ -91,7 +93,7 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                 onSuccess = { transactions: List<Transaction> ->
                     // Рассчитываем баланс
                     val currency = if (transactions.isNotEmpty()) transactions.first().amount.currency else Money.zero().currency
-                    
+
                     val income = transactions
                         .filter { transaction -> !transaction.isExpense }
                         .fold(Money.zero(currency)) { acc, transaction -> acc + transaction.amount }
@@ -149,13 +151,13 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
         super.onDisabled(context)
         scope.cancel()
     }
-    
+
     /**
      * Вызывается при получении широковещательного сообщения
      */
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        
+
         // Если это запрос на обновление, обновляем данные виджета
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
             val appWidgetManager = AppWidgetManager.getInstance(context)

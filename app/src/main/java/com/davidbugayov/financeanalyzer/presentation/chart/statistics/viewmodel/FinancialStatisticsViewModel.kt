@@ -67,7 +67,11 @@ class FinancialStatisticsViewModel(
         viewModelScope.launch {
             _state.value = _state.value.copy(isLoading = true)
             val transactions = getTransactionsForPeriodUseCase(periodStartDate, periodEndDate)
-            val metrics = calculateBalanceMetricsUseCase(transactions, periodStartDate, periodEndDate)
+            val metrics = calculateBalanceMetricsUseCase(
+                transactions,
+                periodStartDate,
+                periodEndDate
+            )
             val income = metrics.income
             val expense = metrics.expense
             // Используем savingsRate, monthsOfSavings, averageDailyExpense и averageMonthlyExpense из use case
@@ -81,10 +85,16 @@ class FinancialStatisticsViewModel(
             val expenseTransactions = transactions.filter { it.isExpense }
             val incomeCount = incomeTransactions.size
             val expenseCount = expenseTransactions.size
-            val avgIncomePerTransaction = if (incomeCount > 0)
-                income / incomeCount.toBigDecimal() else Money.zero()
-            val avgExpensePerTransaction = if (expenseCount > 0)
-                expense / expenseCount.toBigDecimal() else Money.zero()
+            val avgIncomePerTransaction = if (incomeCount > 0) {
+                income / incomeCount.toBigDecimal()
+            } else {
+                Money.zero()
+            }
+            val avgExpensePerTransaction = if (expenseCount > 0) {
+                expense / expenseCount.toBigDecimal()
+            } else {
+                Money.zero()
+            }
             val maxIncome = incomeTransactions.maxByOrNull { it.amount.amount }?.amount ?: Money.zero()
             val maxExpense = expenseTransactions.maxByOrNull { it.amount.abs().amount }?.amount ?: Money.zero()
             val noCategory = resources.getString(R.string.no_category)
@@ -144,7 +154,16 @@ class FinancialStatisticsViewModel(
             )
             Timber.d(
                 "Transactions for stats: %s",
-                transactions.joinToString { String.format("%s %s %s %s", it.date, it.amount, it.category, if (it.isExpense) "EXP" else "INC") })
+                transactions.joinToString {
+                    String.format(
+                        "%s %s %s %s",
+                        it.date,
+                        it.amount,
+                        it.category,
+                        if (it.isExpense) "EXP" else "INC"
+                    )
+                }
+            )
             _state.value = _state.value.copy(
                 transactions = transactions,
                 income = income,
@@ -159,5 +178,4 @@ class FinancialStatisticsViewModel(
         val format = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
         return "${format.format(start)} - ${format.format(end)}"
     }
-
 } 

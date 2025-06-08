@@ -23,14 +23,15 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
-fun ExpenseAnalysisCard(
-    metrics: FinancialMetrics,
-    modifier: Modifier = Modifier
-) {
+fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)),
+        shape = RoundedCornerShape(
+            dimensionResource(R.dimen.financial_statistics_card_corner_radius)
+        ),
+        elevation = CardDefaults.cardElevation(
+            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation)
+        ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current)
     ) {
         Column(
@@ -44,7 +45,11 @@ fun ExpenseAnalysisCard(
                 fontWeight = FontWeight.Bold
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+            Spacer(
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.financial_statistics_spacer_large)
+                )
+            )
 
             // Ежедневные расходы
             MetricRow(
@@ -57,7 +62,11 @@ fun ExpenseAnalysisCard(
                 value = metrics.averageMonthlyExpense.format(true)
             )
 
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+            Spacer(
+                modifier = Modifier.height(
+                    dimensionResource(R.dimen.financial_statistics_spacer_medium)
+                )
+            )
 
             // Основная категория доходов
             if (metrics.topIncomeCategory.isNotEmpty()) {
@@ -66,23 +75,38 @@ fun ExpenseAnalysisCard(
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium)
+                    )
+                )
             }
             // Основная категория расходов
             if (metrics.topExpenseCategory.isNotEmpty()) {
                 Text(
-                    text = stringResource(R.string.main_expense_category, metrics.topExpenseCategory),
+                    text = stringResource(
+                        R.string.main_expense_category,
+                        metrics.topExpenseCategory
+                    ),
                     style = MaterialTheme.typography.bodyMedium,
                     fontWeight = FontWeight.Medium
                 )
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium)
+                    )
+                )
             }
             // Перечисление топ-3 категорий расходов
             metrics.topExpenseCategories.forEachIndexed { index, (category, amount) ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(vertical = dimensionResource(R.dimen.financial_statistics_metric_row_vertical)),
+                        .padding(
+                            vertical = dimensionResource(
+                                R.dimen.financial_statistics_metric_row_vertical
+                            )
+                        ),
                     horizontalArrangement = Arrangement.SpaceBetween,
                     verticalAlignment = Alignment.CenterVertically
                 ) {
@@ -100,9 +124,16 @@ fun ExpenseAnalysisCard(
             }
             // Самый частый день расходов
             if (metrics.mostFrequentExpenseDay.isNotEmpty()) {
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
+                Spacer(
+                    modifier = Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium)
+                    )
+                )
                 Text(
-                    text = stringResource(R.string.most_frequent_expense_day, metrics.mostFrequentExpenseDay),
+                    text = stringResource(
+                        R.string.most_frequent_expense_day,
+                        metrics.mostFrequentExpenseDay
+                    ),
                     style = MaterialTheme.typography.bodyMedium
                 )
             }

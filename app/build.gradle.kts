@@ -1,14 +1,13 @@
 import java.io.FileInputStream
 import java.util.Properties
-import com.android.build.api.variant.ApplicationAndroidComponentsExtension
-import org.gradle.configurationcache.extensions.capitalized
 
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
-    
+    alias(libs.plugins.ktlint)
+
     // Применяем Firebase плагины только для google flavor
     alias(libs.plugins.google.services) apply false
     alias(libs.plugins.firebase.crashlytics) apply false
@@ -79,14 +78,20 @@ android {
     signingConfigs {
         create("release") {
             val keystoreProperties = getKeystoreProperties()
-            storeFile = file(keystoreProperties.getProperty("keystore.file", "keystore/release.keystore"))
+            storeFile = file(
+                keystoreProperties.getProperty("keystore.file", "keystore/release.keystore")
+            )
             storePassword = keystoreProperties.getProperty("keystore.password", "")
             keyAlias = keystoreProperties.getProperty("keystore.key.alias", "")
             keyPassword = keystoreProperties.getProperty("keystore.key.password", "")
             storeType = "PKCS12"
 
             // Check that all required properties are present
-            val requiredProperties = listOf("keystore.password", "keystore.key.alias", "keystore.key.password")
+            val requiredProperties = listOf(
+                "keystore.password",
+                "keystore.key.alias",
+                "keystore.key.password"
+            )
             requiredProperties.forEach { prop ->
                 if (!keystoreProperties.containsKey(prop)) {
                     throw GradleException("Missing required keystore property: $prop")
@@ -213,10 +218,10 @@ dependencies {
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.splashscreen)
     implementation(libs.material)
-    
+
     // AppMetrica для всех флейворов
     implementation(libs.appmetrica.sdk)
-    
+
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
@@ -235,39 +240,39 @@ dependencies {
     // Accompanist
     implementation(libs.accompanist.pager)
     implementation(libs.accompanist.pager.indicators)
-    
+
     // Explicit dependency for Layout Inspector
     debugImplementation(libs.androidx.customview)
     debugImplementation(libs.androidx.customview.poolingcontainer)
-    
+
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
-    
+
     // Firebase - только для google flavor
     "googleImplementation"(platform(libs.firebase.bom))
     "googleImplementation"(libs.firebase.analytics.ktx)
     "googleImplementation"(libs.firebase.crashlytics.ktx)
     "googleImplementation"(libs.firebase.perf.ktx)
-    
+
     // RuStore SDK только для Google flavor
     "googleImplementation"(libs.rustore.review)
     "googleImplementation"(libs.rustore.appupdate)
 
     // Logging
     implementation(libs.timber)
-    
+
     // Room
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
-    
+
     // JSON
     implementation(libs.gson)
-    
+
     // PDF
     implementation(libs.pdfbox.android)
-    
+
     // Excel - Keep POI and related libraries from being minified
     implementation(libs.poi.core) {
         exclude(group = "stax", module = "stax-api")
@@ -315,4 +320,26 @@ composeCompiler {
 
     // Если вы используете enableComposeCompilerMetrics или enableComposeCompilerReports в BuildConfig (старый способ),
     // их можно удалить, так как эти настройки теперь здесь.
+}
+
+// Настройка ktlint
+ktlint {
+    android.set(true)
+    verbose.set(true)
+    outputToConsole.set(true)
+    enableExperimentalRules.set(true)
+    filter {
+        exclude { element -> element.file.path.contains("generated/") }
+        include("**/src/main/**/*.kt")
+        include("**/src/google/**/*.kt")
+        include("**/src/fdroid/**/*.kt")
+    }
+    disabledRules.set(
+        listOf(
+            "no-wildcard-imports",
+            "filename",
+            "import-ordering",
+            "experimental:trailing-comma"
+        )
+    )
 }

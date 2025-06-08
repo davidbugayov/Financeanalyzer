@@ -40,7 +40,10 @@ sealed class AppException(
         cause: Throwable? = null
     ) : AppException(message, cause) {
 
-        class ReadError(message: String? = null, cause: Throwable? = null) : FileSystem(message ?: "Ошибка чтения файла", cause)
+        class ReadError(message: String? = null, cause: Throwable? = null) : FileSystem(
+            message ?: "Ошибка чтения файла",
+            cause
+        )
     }
 
     /**

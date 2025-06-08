@@ -52,7 +52,12 @@ data class ExcelColumnMapping(
 
 data class DateFormatConfig(
     val primaryDateFormatString: String = "dd.MM.yyyy", // Common format DataFormatter might output for ru locale
-    val fallbackDateFormatStrings: List<String> = listOf("MM/dd/yyyy", "yyyy-MM-dd", "dd/MM/yyyy", "MM.dd.yyyy"),
+    val fallbackDateFormatStrings: List<String> = listOf(
+        "MM/dd/yyyy",
+        "yyyy-MM-dd",
+        "dd/MM/yyyy",
+        "MM.dd.yyyy"
+    ),
     val locale: Locale = Locale.getDefault()
 ) {
 
@@ -83,6 +88,7 @@ data class ExcelParseConfig(
     val skipEmptyRows: Boolean = true, // Rows where all mapped cells are empty
     val expectedMinValuesPerRow: Int = 2 // e.g., at least date and amount must be present
 )
+
 /**
  * Универсальный UseCase для импорта транзакций из Excel-файлов (XLS, XLSX).
  * Гибко настраивается через ExcelParseConfig для поддержки разных банков и форматов.
@@ -111,9 +117,11 @@ class GenericExcelImportUseCase(
         }
         val headerRow = headerCandidates.firstOrNull { row ->
             val text = (0 until row.lastCellNum).joinToString(" ") { row.getCell(it)?.toString()?.lowercase() ?: "" }
-            (text.contains("альфа") || text.contains("alfa")) && text.contains("дата") && text.contains("сумма")
-                    || (text.contains("дата") && text.contains("описание") && text.contains("сумма"))
-                    || (text.contains("дата операции") && text.contains("сумма"))
+            (text.contains("альфа") || text.contains("alfa")) && text.contains("дата") && text.contains(
+                "сумма"
+            ) ||
+                (text.contains("дата") && text.contains("описание") && text.contains("сумма")) ||
+                (text.contains("дата операции") && text.contains("сумма"))
         } ?: headerCandidates.firstOrNull { row ->
             val text = (0 until row.lastCellNum).joinToString(" ") { row.getCell(it)?.toString()?.lowercase() ?: "" }
             text.contains("дата") && text.contains("сумма")
@@ -128,7 +136,14 @@ class GenericExcelImportUseCase(
                 val cellVal = headerRow.getCell(i)?.toString()?.lowercase()?.trim() ?: continue
                 if (dateIdx == null && cellVal.contains("дата")) dateIdx = i
                 if (amountIdx == null && cellVal.contains("сумма")) amountIdx = i
-                if (descIdx == null && (cellVal.contains("описание") || cellVal.contains("примечание") || cellVal.contains("назначение"))) descIdx = i
+                if (descIdx == null && (
+                    cellVal.contains("описание") || cellVal.contains(
+                            "примечание"
+                        ) || cellVal.contains("назначение")
+                    )
+                ) {
+                    descIdx = i
+                }
                 if (catIdx == null && cellVal.contains("категория")) catIdx = i
             }
             // Если нашли дату и сумму — считаем, что это Альфа-Банк
@@ -145,7 +160,11 @@ class GenericExcelImportUseCase(
                     defaultCurrencyCode = "RUB",
                     dateFormatConfig = DateFormatConfig(
                         primaryDateFormatString = "dd.MM.yyyy",
-                        fallbackDateFormatStrings = listOf("dd.MM.yyyy HH:mm:ss", "yyyy-MM-dd", "MM/dd/yyyy"),
+                        fallbackDateFormatStrings = listOf(
+                            "dd.MM.yyyy HH:mm:ss",
+                            "yyyy-MM-dd",
+                            "MM/dd/yyyy"
+                        ),
                         locale = Locale.forLanguageTag("ru-RU")
                     ),
                     amountParseConfig = AmountParseConfig(
@@ -167,7 +186,12 @@ class GenericExcelImportUseCase(
      * Извлекает данные из Excel-файла и преобразует их в текстовый вид для дальнейшего парсинга.
      * Все параметры (какой лист, какие колонки, как парсить суммы и даты) задаются через config.
      */
-    private suspend fun extractDataFromExcel(uri: Uri, progressCallback: ImportProgressCallback): String = withContext(Dispatchers.IO) {
+    private suspend fun extractDataFromExcel(
+        uri: Uri,
+        progressCallback: ImportProgressCallback
+    ): String = withContext(
+        Dispatchers.IO
+    ) {
         Timber.d("[$bankName] Начало извлечения данных из Excel по URI: $uri с конфигом: $config")
         progressCallback.onProgress(5, 100, "Чтение Excel файла...")
         val stringBuilder = StringBuilder()
@@ -183,50 +207,70 @@ class GenericExcelImportUseCase(
                     inputStream.reset()
                     val isValidExcel = if (bytesRead >= 8) {
                         (buffer[0] == 0x50.toByte() && buffer[1] == 0x4B.toByte()) ||
-                                (buffer[0] == 0xD0.toByte() && buffer[1] == 0xCF.toByte() &&
-                                        buffer[2] == 0x11.toByte() && buffer[3] == 0xE0.toByte())
+                            (
+                                buffer[0] == 0xD0.toByte() && buffer[1] == 0xCF.toByte() &&
+                                    buffer[2] == 0x11.toByte() && buffer[3] == 0xE0.toByte()
+                                )
                     } else {
                         false
                     }
                     if (!isValidExcel) {
                         Timber.e("[$bankName] Файл не является корректным Excel-файлом: $uri")
-                        progressCallback.onProgress(100, 100, "Ошибка: Файл не является корректным Excel-файлом или поврежден.")
+                        progressCallback.onProgress(
+                            100,
+                            100,
+                            "Ошибка: Файл не является корректным Excel-файлом или поврежден."
+                        )
                         return@withContext ""
                     }
                     WorkbookFactory.create(inputStream).use { workbook ->
                         if (workbook.numberOfSheets == 0) {
                             Timber.w("[$bankName] В Excel-файле нет листов: $uri")
-                            progressCallback.onProgress(100, 100, "Ошибка: В Excel файле нет листов.")
+                            progressCallback.onProgress(
+                                100,
+                                100,
+                                "Ошибка: В Excel файле нет листов."
+                            )
                             return@withContext ""
                         }
                         // Выбор нужного листа по индексу или имени
                         var sheet: Sheet? = when (val selector = config.sheetSelector) {
-                            is SheetSelector.ByIndex -> workbook.getSheetAt(selector.index.coerceIn(0, workbook.numberOfSheets - 1))
+                            is SheetSelector.ByIndex -> workbook.getSheetAt(
+                                selector.index.coerceIn(0, workbook.numberOfSheets - 1)
+                            )
                             is SheetSelector.ByName -> workbook.getSheet(selector.name)
                         }
                         // --- ДОБАВЛЕНО: автоопределение Альфа-Банка ---
                         if (sheet == null) sheet = workbook.getSheetAt(0)
                         val alfaConfig = detectAlfaBankConfig(sheet!!)
                         if (alfaConfig != null) {
-                            Timber.d("[$bankName] Автоматически определена структура Альфа-Банка, применяем спец. конфиг: $alfaConfig")
+                            Timber.d(
+                                "[$bankName] Автоматически определена структура Альфа-Банка, применяем спец. конфиг: $alfaConfig"
+                            )
                             config = alfaConfig
                         }
                         // --- КОНЕЦ ДОБАВЛЕНИЯ ---
                         sheet = when (val selector = config.sheetSelector) {
-                            is SheetSelector.ByIndex -> workbook.getSheetAt(selector.index.coerceIn(0, workbook.numberOfSheets - 1))
+                            is SheetSelector.ByIndex -> workbook.getSheetAt(
+                                selector.index.coerceIn(0, workbook.numberOfSheets - 1)
+                            )
                             is SheetSelector.ByName -> workbook.getSheet(selector.name)
                         }
                         if (sheet == null) {
                             Timber.w(
                                 "[$bankName] Не найден лист по конфигу ${config.sheetSelector} в файле $uri. Доступные листы: ${
-                                    List(workbook.numberOfSheets) {
-                                        workbook.getSheetName(
-                                            it
-                                        )
-                                    }.joinToString()
+                                List(workbook.numberOfSheets) {
+                                    workbook.getSheetName(
+                                        it
+                                    )
+                                }.joinToString()
                                 }"
                             )
-                            progressCallback.onProgress(100, 100, "Ошибка: Лист не найден согласно конфигурации.")
+                            progressCallback.onProgress(
+                                100,
+                                100,
+                                "Ошибка: Лист не найден согласно конфигурации."
+                            )
                             return@withContext ""
                         }
                         Timber.d("[$bankName] Обработка листа: ${sheet.sheetName}")
@@ -236,8 +280,13 @@ class GenericExcelImportUseCase(
                         var actualDataRowsProcessed = 0
                         val maxColumnIndexNeeded = with(config.columnMapping) {
                             listOfNotNull(
-                                dateColumnIndex, descriptionColumnIndex, amountColumnIndex,
-                                currencyColumnIndex, categoryColumnIndex, noteColumnIndex, isExpenseColumnIndex
+                                dateColumnIndex,
+                                descriptionColumnIndex,
+                                amountColumnIndex,
+                                currencyColumnIndex,
+                                categoryColumnIndex,
+                                noteColumnIndex,
+                                isExpenseColumnIndex
                             ).maxOrNull() ?: 0
                         }
                         sheet.rowIterator().withIndex().forEach { (rowIndex, row) ->
@@ -247,7 +296,10 @@ class GenericExcelImportUseCase(
                             }
                             // --- ДОБАВЛЕНО: пропуск служебных строк Альфа-Банка ---
                             val firstCell = row.getCell(0)?.toString()?.lowercase()?.trim() ?: ""
-                            if (firstCell.contains("итого") || firstCell.contains("остаток") || firstCell.contains("оборот") || firstCell.contains("сумма")) {
+                            if (firstCell.contains("итого") || firstCell.contains("остаток") || firstCell.contains(
+                                    "оборот"
+                                ) || firstCell.contains("сумма")
+                            ) {
                                 Timber.d("[$bankName] Пропуск служебной строки: '$firstCell'")
                                 rowsProcessedForProgress++
                                 return@forEach
@@ -256,13 +308,23 @@ class GenericExcelImportUseCase(
                             val rowData = mutableListOf<String>()
                             var hasAnyValueInMappedColumns = false
                             for (i in 0..maxColumnIndexNeeded) {
-                                val cell: PoiCell? = row.getCell(i, PoiRow.MissingCellPolicy.RETURN_BLANK_AS_NULL)
-                                val cellValue = if (cell != null) dataFormatter.formatCellValue(cell).trim() else ""
+                                val cell: PoiCell? = row.getCell(
+                                    i,
+                                    PoiRow.MissingCellPolicy.RETURN_BLANK_AS_NULL
+                                )
+                                val cellValue = if (cell != null) {
+                                    dataFormatter.formatCellValue(
+                                        cell
+                                    ).trim()
+                                } else {
+                                    ""
+                                }
                                 rowData.add(cellValue)
                                 if (cellValue.isNotBlank()) {
                                     if (config.columnMapping.dateColumnIndex == i ||
                                         config.columnMapping.descriptionColumnIndex == i ||
-                                        config.columnMapping.amountColumnIndex == i) {
+                                        config.columnMapping.amountColumnIndex == i
+                                    ) {
                                         hasAnyValueInMappedColumns = true
                                     }
                                 }
@@ -271,18 +333,39 @@ class GenericExcelImportUseCase(
                                 Timber.d("[$bankName] Пропуск пустой строки ${rowIndex + 1}")
                                 rowsProcessedForProgress++
                             } else {
-                                stringBuilder.append(rowData.joinToString(separator = excelRowToStringDelimiter.toString()))
+                                stringBuilder.append(
+                                    rowData.joinToString(
+                                        separator = excelRowToStringDelimiter.toString()
+                                    )
+                                )
                                 stringBuilder.append("\n")
                                 actualDataRowsProcessed++
                                 rowsProcessedForProgress++
                             }
                             if (physicalRows > 0 && rowsProcessedForProgress % 20 == 0) {
-                                val progress = BigDecimal(rowsProcessedForProgress).divide(BigDecimal(physicalRows), 4, java.math.RoundingMode.HALF_EVEN).multiply(BigDecimal(80)).setScale(0, java.math.RoundingMode.FLOOR).toInt().coerceIn(0, 80) + 10
-                                progressCallback.onProgress(progress, 100, "Чтение строк: $rowsProcessedForProgress/$physicalRows")
+                                val progress = BigDecimal(rowsProcessedForProgress).divide(
+                                    BigDecimal(physicalRows),
+                                    4,
+                                    java.math.RoundingMode.HALF_EVEN
+                                ).multiply(BigDecimal(80)).setScale(0, java.math.RoundingMode.FLOOR).toInt().coerceIn(
+                                    0,
+                                    80
+                                ) + 10
+                                progressCallback.onProgress(
+                                    progress,
+                                    100,
+                                    "Чтение строк: $rowsProcessedForProgress/$physicalRows"
+                                )
                             }
                         }
-                        Timber.d("[$bankName] Excel data extraction successful. Data rows processed: $actualDataRowsProcessed. Config: $config")
-                        progressCallback.onProgress(90, 100, "Excel файл прочитан, подготовка данных...")
+                        Timber.d(
+                            "[$bankName] Excel data extraction successful. Data rows processed: $actualDataRowsProcessed. Config: $config"
+                        )
+                        progressCallback.onProgress(
+                            90,
+                            100,
+                            "Excel файл прочитан, подготовка данных..."
+                        )
                     }
                 } catch (e: org.apache.poi.EmptyFileException) {
                     Timber.e(e, "[$bankName] Ошибка: Excel файл пуст: $uri")
@@ -290,15 +373,27 @@ class GenericExcelImportUseCase(
                     return@withContext ""
                 } catch (e: org.apache.poi.openxml4j.exceptions.NotOfficeXmlFileException) {
                     Timber.e(e, "[$bankName] Ошибка: Файл не является XLSX-файлом: $uri")
-                    progressCallback.onProgress(100, 100, "Ошибка: Файл не является корректным Excel-файлом (XLSX).")
+                    progressCallback.onProgress(
+                        100,
+                        100,
+                        "Ошибка: Файл не является корректным Excel-файлом (XLSX)."
+                    )
                     return@withContext ""
                 } catch (e: org.apache.poi.poifs.filesystem.NotOLE2FileException) {
                     Timber.e(e, "[$bankName] Ошибка: Файл не является XLS-файлом: $uri")
-                    progressCallback.onProgress(100, 100, "Ошибка: Файл не является корректным Excel-файлом (XLS).")
+                    progressCallback.onProgress(
+                        100,
+                        100,
+                        "Ошибка: Файл не является корректным Excel-файлом (XLS)."
+                    )
                     return@withContext ""
                 } catch (e: org.apache.poi.openxml4j.exceptions.OLE2NotOfficeXmlFileException) {
                     Timber.e(e, "[$bankName] Ошибка: Файл не является XLSX-файлом (это XLS?): $uri")
-                    progressCallback.onProgress(100, 100, "Ошибка: Формат Excel-файла не соответствует расширению.")
+                    progressCallback.onProgress(
+                        100,
+                        100,
+                        "Ошибка: Формат Excel-файла не соответствует расширению."
+                    )
                     return@withContext ""
                 } catch (e: org.apache.poi.openxml4j.exceptions.InvalidFormatException) {
                     Timber.e(e, "[$bankName] Ошибка: Неверный формат Excel-файла: $uri")
@@ -322,12 +417,19 @@ class GenericExcelImportUseCase(
      * Основной метод импорта: извлекает данные из Excel, затем парсит их в транзакции.
      * Весь парсинг и логика обработки строк делегируется в parseLine и конфиг.
      */
-    override fun importTransactions(uri: Uri, progressCallback: ImportProgressCallback): Flow<ImportResult> = flow {
+    override fun importTransactions(
+        uri: Uri,
+        progressCallback: ImportProgressCallback
+    ): Flow<ImportResult> = flow {
         emit(ImportResult.progress(0, 100, "Начало импорта Excel файла..."))
         val extractedData = extractDataFromExcel(uri, progressCallback)
         if (extractedData.isBlank()) {
             Timber.w("[$bankName] Не удалось извлечь данные из Excel файла: $uri")
-            emit(ImportResult.error("Не удалось извлечь данные из Excel файла. Проверьте формат файла или логи для деталей."))
+            emit(
+                ImportResult.error(
+                    "Не удалось извлечь данные из Excel файла. Проверьте формат файла или логи для деталей."
+                )
+            )
             return@flow
         }
         try {
@@ -351,13 +453,20 @@ class GenericExcelImportUseCase(
         val firstLine = reader.readLine()
         reader.reset()
         if (firstLine == null) {
-            Timber.w("[$bankName] Извлеченные из Excel данные (текст) пусты (не найдено строк данных).")
+            Timber.w(
+                "[$bankName] Извлеченные из Excel данные (текст) пусты (не найдено строк данных)."
+            )
             return false
         }
         val columns = firstLine.split(excelRowToStringDelimiter)
-        val minExpectedColumns = listOfNotNull(config.columnMapping.dateColumnIndex, config.columnMapping.amountColumnIndex).size
+        val minExpectedColumns = listOfNotNull(
+            config.columnMapping.dateColumnIndex,
+            config.columnMapping.amountColumnIndex
+        ).size
         val isValid = columns.size >= minExpectedColumns && columns.size >= config.expectedMinValuesPerRow
-        Timber.d("[$bankName] Валидация текстового представления Excel (первая строка данных): $firstLine. IsValid: $isValid (cols: ${columns.size} >= $minExpectedColumns)")
+        Timber.d(
+            "[$bankName] Валидация текстового представления Excel (первая строка данных): $firstLine. IsValid: $isValid (cols: ${columns.size} >= $minExpectedColumns)"
+        )
         return isValid
     }
 
@@ -366,7 +475,9 @@ class GenericExcelImportUseCase(
      * поэтому здесь просто логируем вызов.
      */
     override fun skipHeaders(reader: BufferedReader) {
-        Timber.w("[$bankName] skipHeaders() вызван, но заголовки уже были пропущены при извлечении Excel. Debug: ${reader.readLine()}")
+        Timber.w(
+            "[$bankName] skipHeaders() вызван, но заголовки уже были пропущены при извлечении Excel. Debug: ${reader.readLine()}"
+        )
     }
 
     /**
@@ -399,7 +510,9 @@ class GenericExcelImportUseCase(
 
         // Проверка на минимальное количество заполненных значений
         if (populatedValues < config.expectedMinValuesPerRow) {
-            Timber.w("[$bankName] Недостаточно заполненных значений в строке (нужно ${config.expectedMinValuesPerRow}, найдено $populatedValues из ключевых). Строка: $line")
+            Timber.w(
+                "[$bankName] Недостаточно заполненных значений в строке (нужно ${config.expectedMinValuesPerRow}, найдено $populatedValues из ключевых). Строка: $line"
+            )
             return null
         }
 
@@ -410,7 +523,9 @@ class GenericExcelImportUseCase(
             }
 
             if (dateString == null && config.columnMapping.dateColumnIndex != null) {
-                Timber.w("[$bankName] Отсутствует дата в настроенном столбце ${config.columnMapping.dateColumnIndex}. Строка: $line")
+                Timber.w(
+                    "[$bankName] Отсутствует дата в настроенном столбце ${config.columnMapping.dateColumnIndex}. Строка: $line"
+                )
                 return null
             }
 
@@ -427,7 +542,9 @@ class GenericExcelImportUseCase(
             }
 
             if (amountString == null && config.columnMapping.amountColumnIndex != null) {
-                Timber.w("[$bankName] Отсутствует сумма в настроенном столбце ${config.columnMapping.amountColumnIndex}. Строка: $line")
+                Timber.w(
+                    "[$bankName] Отсутствует сумма в настроенном столбце ${config.columnMapping.amountColumnIndex}. Строка: $line"
+                )
                 return null
             }
 
@@ -487,18 +604,25 @@ class GenericExcelImportUseCase(
                     }
                 }
             } ?: run {
-                Timber.w("[$bankName] Не удалось распознать формат даты: '$dateString' из строки: $line")
+                Timber.w(
+                    "[$bankName] Не удалось распознать формат даты: '$dateString' из строки: $line"
+                )
                 return null
             }
 
             // --- Парсинг суммы ---
             val amountValue = try {
                 amountString.toDoubleOrNull() ?: run {
-                    Timber.w("[$bankName] Ошибка парсинга суммы: '$amountString' (после очистки) из строки: $line")
+                    Timber.w(
+                        "[$bankName] Ошибка парсинга суммы: '$amountString' (после очистки) из строки: $line"
+                    )
                     if (config.columnMapping.amountColumnIndex == null) 0.0 else return null
                 }
             } catch (e: NumberFormatException) {
-                Timber.e(e, "[$bankName] Ошибка преобразования суммы '$amountString' в число: ${e.message}")
+                Timber.e(
+                    e,
+                    "[$bankName] Ошибка преобразования суммы '$amountString' в число: ${e.message}"
+                )
                 if (config.columnMapping.amountColumnIndex == null) 0.0 else return null
             }
 
@@ -506,7 +630,11 @@ class GenericExcelImportUseCase(
             val isExpense: Boolean = when (config.amountParseConfig.howIsExpenseDetermined) {
                 ExpenseDetermination.FROM_AMOUNT_SIGN -> amountValue < 0
                 ExpenseDetermination.FROM_COLUMN_VALUE -> {
-                    val expVal = config.columnMapping.isExpenseColumnIndex?.let { columns.getOrNull(it) }
+                    val expVal = config.columnMapping.isExpenseColumnIndex?.let {
+                        columns.getOrNull(
+                            it
+                        )
+                    }
                     expVal?.equals(config.amountParseConfig.isExpenseTrueValue, ignoreCase = true) ?: (amountValue < 0)
                 }
             }
@@ -517,7 +645,9 @@ class GenericExcelImportUseCase(
             val currency = try {
                 Currency.fromCode(currencyString.uppercase(Locale.ROOT))
             } catch (_: Exception) {
-                Timber.w("[$bankName] Неизвестная валюта '$currencyString', используем дефолтную: ${config.defaultCurrencyCode}")
+                Timber.w(
+                    "[$bankName] Неизвестная валюта '$currencyString', используем дефолтную: ${config.defaultCurrencyCode}"
+                )
                 Currency.fromCode(config.defaultCurrencyCode)
             }
 
@@ -552,7 +682,10 @@ class GenericExcelImportUseCase(
 
             return transaction
         } catch (e: Exception) {
-            Timber.e(e, "[$bankName] Ошибка парсинга строки Excel: $line. Config: $config. Ошибка: ${e.message}")
+            Timber.e(
+                e,
+                "[$bankName] Ошибка парсинга строки Excel: $line. Config: $config. Ошибка: ${e.message}"
+            )
             return null
         }
     }
@@ -563,7 +696,9 @@ class GenericExcelImportUseCase(
     override fun shouldSkipLine(line: String): Boolean {
         if (super.shouldSkipLine(line)) return true
         if (line.replace(excelRowToStringDelimiter.toString(), "").isBlank()) {
-            Timber.d("[$bankName] Пропуск пустой строки Excel (только разделители или пробелы): $line")
+            Timber.d(
+                "[$bankName] Пропуск пустой строки Excel (только разделители или пробелы): $line"
+            )
             return true
         }
         return false

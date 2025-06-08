@@ -48,29 +48,29 @@ fun ThemeSelectionDialog(
                 ThemeOption(
                     text = stringResource(R.string.profile_theme_light),
                     selected = selectedTheme == ThemeMode.LIGHT,
-                    onClick = { 
+                    onClick = {
                         onThemeSelected(ThemeMode.LIGHT)
                         onDismiss()
                     }
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-                
+
                 ThemeOption(
                     text = stringResource(R.string.profile_theme_dark),
                     selected = selectedTheme == ThemeMode.DARK,
-                    onClick = { 
+                    onClick = {
                         onThemeSelected(ThemeMode.DARK)
                         onDismiss()
                     }
                 )
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
-                
+
                 ThemeOption(
                     text = stringResource(R.string.profile_theme_system),
                     selected = selectedTheme == ThemeMode.SYSTEM,
-                    onClick = { 
+                    onClick = {
                         onThemeSelected(ThemeMode.SYSTEM)
                         onDismiss()
                     }
@@ -92,11 +92,7 @@ fun ThemeSelectionDialog(
  * @param onClick Обработчик выбора темы.
  */
 @Composable
-private fun ThemeOption(
-    text: String,
-    selected: Boolean,
-    onClick: () -> Unit
-) {
+private fun ThemeOption(text: String, selected: Boolean, onClick: () -> Unit) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -114,7 +110,7 @@ private fun ThemeOption(
         )
 
         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
-        
+
         Text(
             text = text,
             style = MaterialTheme.typography.bodyLarge

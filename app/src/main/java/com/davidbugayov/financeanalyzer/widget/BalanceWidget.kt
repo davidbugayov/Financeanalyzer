@@ -58,7 +58,9 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
         // Создаем Intent для запуска главной активности приложения
         val launchAppIntent = context.packageManager.getLaunchIntentForPackage(context.packageName)
         if (launchAppIntent != null) {
-            launchAppIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP)
+            launchAppIntent.addFlags(
+                Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TOP
+            )
 
             // Создаем PendingIntent для запуска приложения
             val pendingIntent = PendingIntent.getActivity(
@@ -112,7 +114,10 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
                     withContext(Dispatchers.Main) {
                         views.setTextViewText(R.id.widget_balance, balance.formatForDisplay())
                         views.setTextViewText(R.id.widget_income, income.formatForDisplay())
-                        views.setTextViewText(R.id.widget_expense, negativeExpense.formatForDisplay())
+                        views.setTextViewText(
+                            R.id.widget_expense,
+                            negativeExpense.formatForDisplay()
+                        )
 
                         // Устанавливаем цвет в зависимости от значения баланса
                         val color = if (balance.isPositive()) {
@@ -138,13 +143,13 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
             )
         }
     }
-    
+
     /**
      * Вызывается при получении широковещательного сообщения
      */
     override fun onReceive(context: Context, intent: Intent) {
         super.onReceive(context, intent)
-        
+
         // Если это запрос на обновление, обновляем данные виджета
         if (intent.action == AppWidgetManager.ACTION_APPWIDGET_UPDATE) {
             val appWidgetManager = AppWidgetManager.getInstance(context)

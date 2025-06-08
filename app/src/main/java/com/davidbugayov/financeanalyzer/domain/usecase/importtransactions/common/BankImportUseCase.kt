@@ -102,17 +102,25 @@ abstract class BankImportUseCase(
                 if (lineNumber % 10 == 0) {
                     val progress = 10 + (lineNumber * 70 / estimatedLines).coerceAtMost(70)
                     emit(ImportResult.progress(progress, 100, "Обработка строки $lineNumber..."))
-                    progressCallback.onProgress(progress, 100, "Обработка строки $lineNumber из примерно $estimatedLines...")
+                    progressCallback.onProgress(
+                        progress,
+                        100,
+                        "Обработка строки $lineNumber из примерно $estimatedLines..."
+                    )
                 }
 
                 if (shouldSkipLine(line)) {
                     Timber.v("[ИМПОРТ] Пропуск строки $lineNumber для банка $bankName: '$line'")
                 } else {
                     try {
-                        Timber.d("[ИМПОРТ] Обработка строки $lineNumber для банка $bankName: '$line'")
+                        Timber.d(
+                            "[ИМПОРТ] Обработка строки $lineNumber для банка $bankName: '$line'"
+                        )
                         val transaction = parseLine(line)
                         if (transaction != null) {
-                            Timber.i("[ИМПОРТ] Создана транзакция из строки $lineNumber: ID=${transaction.id}, Сумма=${transaction.amount}, Дата=${transaction.date}, Категория='${transaction.category}'")
+                            Timber.i(
+                                "[ИМПОРТ] Создана транзакция из строки $lineNumber: ID=${transaction.id}, Сумма=${transaction.amount}, Дата=${transaction.date}, Категория='${transaction.category}'"
+                            )
                             importedTransactions.add(transaction)
                             importedCount++
                         } else {
@@ -120,7 +128,10 @@ abstract class BankImportUseCase(
                             skippedCount++
                         }
                     } catch (e: Exception) {
-                        Timber.e(e, "[ИМПОРТ] ❌ Ошибка парсинга строки $lineNumber для банка $bankName: '$line'")
+                        Timber.e(
+                            e,
+                            "[ИМПОРТ] ❌ Ошибка парсинга строки $lineNumber для банка $bankName: '$line'"
+                        )
                         skippedCount++
                     }
                 }
@@ -128,38 +139,68 @@ abstract class BankImportUseCase(
             }
 
             if (importedTransactions.isNotEmpty()) {
-                Timber.i("[ИМПОРТ] Подготовлено ${importedTransactions.size} транзакций для сохранения в базу данных (банк $bankName)")
+                Timber.i(
+                    "[ИМПОРТ] Подготовлено ${importedTransactions.size} транзакций для сохранения в базу данных (банк $bankName)"
+                )
                 emit(ImportResult.progress(90, 100, "Сохранение транзакций..."))
-                progressCallback.onProgress(90, 100, "Сохранение ${importedTransactions.size} транзакций...")
+                progressCallback.onProgress(
+                    90,
+                    100,
+                    "Сохранение ${importedTransactions.size} транзакций..."
+                )
                 try {
-                    Timber.d("[ИМПОРТ] Начало сохранения ${importedTransactions.size} транзакций в базу данных")
+                    Timber.d(
+                        "[ИМПОРТ] Начало сохранения ${importedTransactions.size} транзакций в базу данных"
+                    )
 
                     var savedCount = 0
                     importedTransactions.forEach { transaction ->
                         try {
-                            Timber.d("[ИМПОРТ] Сохранение транзакции: ID=${transaction.id}, Сумма=${transaction.amount}, Дата=${transaction.date}")
-                            Timber.i("[ИМПОРТ-ОТЛАДКА] ⚠️ ПЕРЕД вызовом transactionRepository.addTransaction для ID=${transaction.id}")
+                            Timber.d(
+                                "[ИМПОРТ] Сохранение транзакции: ID=${transaction.id}, Сумма=${transaction.amount}, Дата=${transaction.date}"
+                            )
+                            Timber.i(
+                                "[ИМПОРТ-ОТЛАДКА] ⚠️ ПЕРЕД вызовом transactionRepository.addTransaction для ID=${transaction.id}"
+                            )
                             val result = transactionRepository.addTransaction(transaction)
-                            Timber.i("[ИМПОРТ-ОТЛАДКА] ✅ ПОСЛЕ вызова transactionRepository.addTransaction для ID=${transaction.id}, результат=$result")
+                            Timber.i(
+                                "[ИМПОРТ-ОТЛАДКА] ✅ ПОСЛЕ вызова transactionRepository.addTransaction для ID=${transaction.id}, результат=$result"
+                            )
                             savedCount++
-                            Timber.d("[ИМПОРТ] Транзакция успешно сохранена (${savedCount}/${importedTransactions.size})")
+                            Timber.d(
+                                "[ИМПОРТ] Транзакция успешно сохранена ($savedCount/${importedTransactions.size})"
+                            )
                         } catch (ex: Exception) {
-                            Timber.e(ex, "[ИМПОРТ] ❌ Ошибка при сохранении транзакции ID=${transaction.id}: ${ex.message}")
-                            Timber.e("[ИМПОРТ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}, title=${transaction.title}")
+                            Timber.e(
+                                ex,
+                                "[ИМПОРТ] ❌ Ошибка при сохранении транзакции ID=${transaction.id}: ${ex.message}"
+                            )
+                            Timber.e(
+                                "[ИМПОРТ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}, title=${transaction.title}"
+                            )
                             Timber.e("[ИМПОРТ-ОТЛАДКА] 🔍 Стек вызовов: ${ex.stackTraceToString()}")
                         }
                     }
 
                     // Проверяем сколько транзакций было сохранено
-                    Timber.i("[ИМПОРТ] Успешно сохранено $savedCount из ${importedTransactions.size} транзакций для банка $bankName.")
+                    Timber.i(
+                        "[ИМПОРТ] Успешно сохранено $savedCount из ${importedTransactions.size} транзакций для банка $bankName."
+                    )
 
                     // Дополнительная проверка количества транзакций в базе данных
                     try {
-                        Timber.d("[ИМПОРТ-ПРОВЕРКА] Проверка общего количества транзакций в базе...")
+                        Timber.d(
+                            "[ИМПОРТ-ПРОВЕРКА] Проверка общего количества транзакций в базе..."
+                        )
                         val allTransactions = transactionRepository.getAllTransactions()
-                        Timber.i("[ИМПОРТ-ПРОВЕРКА] Общее количество транзакций в базе после импорта: ${allTransactions.size}")
+                        Timber.i(
+                            "[ИМПОРТ-ПРОВЕРКА] Общее количество транзакций в базе после импорта: ${allTransactions.size}"
+                        )
                     } catch (e: Exception) {
-                        Timber.e(e, "[ИМПОРТ-ПРОВЕРКА] Ошибка при проверке количества транзакций: ${e.message}")
+                        Timber.e(
+                            e,
+                            "[ИМПОРТ-ПРОВЕРКА] Ошибка при проверке количества транзакций: ${e.message}"
+                        )
                     }
 
                     emit(ImportResult.success(savedCount, skippedCount))
@@ -206,7 +247,10 @@ abstract class BankImportUseCase(
             // Теперь безопасно эмитируем все результаты из readerFlow
             emitAll(readerFlow)
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при открытии файла или обработке в importTransactions для банка $bankName из $uri: ${e.message}")
+            Timber.e(
+                e,
+                "Ошибка при открытии файла или обработке в importTransactions для банка $bankName из $uri: ${e.message}"
+            )
             emit(ImportResult.error("Ошибка импорта для $bankName: ${e.message}"))
         }
     }.flowOn(Dispatchers.IO) // Ensure all Flow operations happen in the IO context

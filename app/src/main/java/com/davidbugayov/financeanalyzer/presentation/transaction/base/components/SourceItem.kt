@@ -56,10 +56,11 @@ fun SourceItem(
                 .size(60.dp)
                 .clip(CircleShape)
                 .background(
-                    if (isError)
+                    if (isError) {
                         SourceItemErrorBackgroundColor
-                    else
+                    } else {
                         Color(source.color)
+                    }
                 )
                 .border(
                     width = when {

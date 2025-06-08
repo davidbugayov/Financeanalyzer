@@ -53,43 +53,40 @@ class HomeViewModel(
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
-    // --- Кэширование --- 
+    // --- Кэширование ---
     // Кэши для хранения результатов вычислений, чтобы избежать повторных затратных операций
     /**
      * Кэш для отфильтрованных транзакций и их статистики.
      * Ключ: комбинация фильтра и хэш списка исходных транзакций.
      * Значение: отфильтрованные транзакции, статистика (доход, расход, баланс), группы транзакций.
-     * 
-     * Это позволяет избежать повторных вычислений, если список транзакций и фильтр не изменились.
+     * * Это позволяет избежать повторных вычислений, если список транзакций и фильтр не изменились.
      */
     private val filteredTransactionsCache = mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<TransactionGroup>>>()
-    
+
     /**
      * Кэш для базовой статистики (доход, расход, баланс) по списку транзакций.
      * Ключ: список транзакций.
      * Значение: статистика (доход, расход, баланс).
-     * 
-     * Используется для быстрого доступа к статистике, если она уже была вычислена.
+     * * Используется для быстрого доступа к статистике, если она уже была вычислена.
      */
     private val statsCache = mutableMapOf<List<Transaction>, Triple<Money, Money, Money>>()
-    
+
     /**
      * Кэш для исходных транзакций, загруженных из репозитория для определенного периода.
      * Ключ: строка, представляющая период (например, "transactions_start_end").
      * Значение: список транзакций за этот период.
-     * 
-     * Позволяет избежать повторных запросов к репозиторию для одного и того же периода.
+     * * Позволяет избежать повторных запросов к репозиторию для одного и того же периода.
      */
     private val transactionCache = mutableMapOf<String, List<Transaction>>()
     // --- Конец Кэширования ---
-    
+
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
 
     init {
         Timber.d("HomeViewModel initialized")
         subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
-        
+
         // Наблюдаем за изменениями балансов
         viewModelScope.launch {
             financialMetrics.balance.collect { balance ->
@@ -97,13 +94,13 @@ class HomeViewModel(
                 _state.update { it.copy(balance = balance) }
             }
         }
-        
+
         viewModelScope.launch {
             financialMetrics.totalIncome.collect { income ->
                 _state.update { it.copy(income = income) }
             }
         }
-        
+
         viewModelScope.launch {
             financialMetrics.totalExpense.collect { expense ->
                 _state.update { it.copy(expense = expense) }
@@ -118,7 +115,7 @@ class HomeViewModel(
     fun onEvent(event: HomeEvent, context: Context? = null) {
         when (event) {
             is HomeEvent.SetFilter -> {
-                _state.update { 
+                _state.update {
                     it.copy(
                         currentFilter = event.filter,
                         isLoading = true, // Показываем индикатор загрузки
@@ -129,7 +126,7 @@ class HomeViewModel(
                         filteredIncome = Money.zero(),
                         filteredExpense = Money.zero(),
                         filteredBalance = Money.zero()
-                    ) 
+                    )
                 }
                 // Запускаем обновление отфильтрованных транзакций в фоне
                 // Эта функция позже установит isLoading = false
@@ -181,10 +178,22 @@ class HomeViewModel(
                         clearCaches()
                         getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                         _state.update { it.copy(transactionToDelete = null) }
+
+                        // Логируем событие в аналитику
+                        com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
+                            amount = transaction.amount.abs(),
+                            category = transaction.category,
+                            isExpense = transaction.isExpense
+                        )
+
                         context?.let { ctx ->
                             updateWidgetsUseCase(ctx)
-                            Timber.d("Виджеты обновлены после удаления транзакции из HomeViewModel.")
-                        } ?: Timber.w("Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.")
+                            Timber.d(
+                                "Виджеты обновлены после удаления транзакции из HomeViewModel."
+                            )
+                        } ?: Timber.w(
+                            "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления."
+                        )
                     },
                     onFailure = { exception ->
                         Timber.e(exception, "Failed to delete transaction")
@@ -236,7 +245,7 @@ class HomeViewModel(
      */
     private var lastBackgroundRefreshTime = 0L
     private var isBackgroundRefreshInProgress = false
-    
+
     fun initiateBackgroundDataRefresh() {
         // Защита от слишком частых вызовов
         val currentTime = System.currentTimeMillis()
@@ -244,16 +253,15 @@ class HomeViewModel(
             Timber.d("Пропускаем фоновое обновление - слишком частый вызов или обновление уже идет")
             return
         }
-    
+
         viewModelScope.launch {
             try {
                 isBackgroundRefreshInProgress = true
                 lastBackgroundRefreshTime = currentTime
-                
+
                 Timber.d("Инициирована фоновая загрузка метрик (без перезагрузки транзакций)")
 
                 financialMetrics.recalculateStats()
-
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при фоновом обновлении метрик")
             } finally {
@@ -261,7 +269,6 @@ class HomeViewModel(
             }
         }
     }
-
 
     private fun loadTransactions() {
         viewModelScope.launch {
@@ -308,22 +315,19 @@ class HomeViewModel(
                     }
                     return@launch
                 }
-                
+
                 // Группируем транзакции по категориям и суммируем значения
                 val categoryTotals = transactions
                     .filter { it.isExpense } // Считаем только расходы
                     .groupBy { it.category }
-                    .mapValues { (_, txs) -> 
-                        // Суммируем расходы по категории с использованием Money
-                        txs.fold(Money.zero()) { acc, transaction -> 
-                            acc + transaction.amount 
-                        }
+                    .mapValues { (_, txs) -> // Суммируем расходы по категории с использованием Money
+                        txs.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
                     }
                     .toList()
                     .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
                     .take(3) // Берем только топ-3 категории
                     .toMap()
-                
+
                 // Обновляем состояние в основном потоке
                 withContext(Dispatchers.Main) {
                     _state.update { it.copy(topCategories = categoryTotals) }
@@ -350,7 +354,10 @@ class HomeViewModel(
                         onSuccess = { /* Transaction saved successfully */ },
                         onFailure = { exception: Throwable ->
                             hasError = true
-                            Timber.e(exception, "Failed to save test transaction: ${transaction.category}")
+                            Timber.e(
+                                exception,
+                                "Failed to save test transaction: ${transaction.category}"
+                            )
                         }
                     )
                 }
@@ -359,7 +366,11 @@ class HomeViewModel(
                     getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                     Timber.d("Test data generation completed successfully")
                 } else {
-                    _state.update { it.copy(error = "Ошибка при сохранении некоторых тестовых транзакций") }
+                    _state.update {
+                        it.copy(
+                            error = "Ошибка при сохранении некоторых тестовых транзакций"
+                        )
+                    }
                 }
                 loadTransactions()
             } catch (e: Exception) {
@@ -452,7 +463,7 @@ class HomeViewModel(
         if (transactions.isEmpty()) {
             return emptyList()
         }
-        
+
         // Группируем транзакции по дате (без времени)
         val groupedTransactions = transactions.groupBy { transaction ->
             // Получаем только дату без времени
@@ -464,33 +475,33 @@ class HomeViewModel(
             calendar.set(Calendar.MILLISECOND, 0)
             calendar.time
         }
-        
+
         // Сортируем даты по убыванию (сначала новые)
         val sortedDates = groupedTransactions.keys.sortedByDescending { it }
-        
+
         // Создаем группы транзакций
         return sortedDates.map { date ->
             val transactionsForDate = groupedTransactions[date] ?: emptyList()
-            
+
             // Вычисляем сумму доходов и расходов для группы
             val income = transactionsForDate
                 .filter { !it.isExpense }
                 .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-                
+
             val expense = transactionsForDate
                 .filter { it.isExpense }
                 .fold(Money.zero()) { acc, transaction -> acc + transaction.amount.abs() }
-            
+
             // Сортируем транзакции внутри группы по времени (сначала новые)
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }
-            
+
             // Форматируем дату для отображения в UI
             val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
             val dateString = dateFormat.format(date)
-            
+
             // Вычисляем общий баланс (доходы - расходы)
             val balance = income - expense
-            
+
             TransactionGroup(
                 date = dateString,
                 transactions = sortedTransactions,

@@ -10,14 +10,14 @@ import timber.log.Timber
  * Модуль Koin для предоставления зависимостей аналитики для Google flavor
  */
 val analyticsModule = module {
-    
+
     // Предоставляем Firebase Analytics
     single { Firebase.analytics }
-    
+
     // Предоставляем композитную аналитику как реализацию IAnalytics
     single<IAnalytics> {
         val composite = CompositeAnalytics()
-        
+
         // Добавляем Firebase Analytics
         try {
             val firebaseAnalytics = get<FirebaseAnalytics>()
@@ -26,15 +26,15 @@ val analyticsModule = module {
         } catch (e: Exception) {
             Timber.e(e, "Ошибка инициализации Firebase Analytics")
         }
-        
+
         // Добавляем AppMetrica
         composite.addAnalytics(AppMetricaAnalyticsAdapter())
-        
+
         // Инициализируем глобальный AnalyticsUtils
         AnalyticsUtils.init(composite)
-        
+
         Timber.d("Google AnalyticsModule initialized")
-        
+
         composite
     }
 } 

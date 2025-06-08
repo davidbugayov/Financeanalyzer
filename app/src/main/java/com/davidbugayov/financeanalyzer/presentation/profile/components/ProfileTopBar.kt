@@ -12,9 +12,7 @@ import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
  * @param onNavigateBack Обработчик нажатия кнопки "Назад"
  */
 @Composable
-fun ProfileTopBar(
-    onNavigateBack: () -> Unit
-) {
+fun ProfileTopBar(onNavigateBack: () -> Unit) {
     AppTopBar(
         title = stringResource(R.string.profile_title),
         showBackButton = true,

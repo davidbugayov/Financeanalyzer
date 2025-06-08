@@ -86,7 +86,9 @@ fun BudgetScreen(
     onNavigateToTransactions: (String) -> Unit,
     viewModel: BudgetViewModel = koinViewModel(),
     achievementsUiViewModel: com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel = koinViewModel(),
-    addTransactionViewModel: AddTransactionViewModel = koinViewModel(parameters = { org.koin.core.parameter.parametersOf(achievementsUiViewModel) })
+    addTransactionViewModel: AddTransactionViewModel = koinViewModel(
+        parameters = { org.koin.core.parameter.parametersOf(achievementsUiViewModel) }
+    )
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -98,19 +100,19 @@ fun BudgetScreen(
                 viewModel.onEvent(BudgetEvent.LoadCategories)
             }
         }
-        
+
         // Добавляем слушателя
         navController.addOnDestinationChangedListener(listener)
-        
+
         // Загружаем данные при первом входе
         viewModel.onEvent(BudgetEvent.LoadCategories)
-        
+
         // Удаляем слушателя при выходе
         onDispose {
             navController.removeOnDestinationChangedListener(listener)
         }
     }
-    
+
     // Подписываемся на события изменения данных транзакций
     LaunchedEffect(Unit) {
         // Получаем репозиторий транзакций через addTransactionViewModel
@@ -118,7 +120,9 @@ fun BudgetScreen(
             // При изменении транзакций, обновляем данные
             when (event) {
                 is DataChangeEvent.TransactionChanged -> {
-                    Timber.d("BudgetScreen: получено событие изменения транзакции, обновляем данные")
+                    Timber.d(
+                        "BudgetScreen: получено событие изменения транзакции, обновляем данные"
+                    )
                     viewModel.onEvent(BudgetEvent.LoadCategories)
                 }
             }
@@ -213,7 +217,7 @@ fun BudgetScreen(
                             fontWeight = FontWeight.Bold,
                             modifier = Modifier.padding(bottom = 16.dp)
                         )
-                        
+
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.padding(bottom = 16.dp)
@@ -221,7 +225,10 @@ fun BudgetScreen(
                             Box(
                                 modifier = Modifier
                                     .size(24.dp)
-                                    .background(MaterialTheme.colorScheme.primary.copy(alpha = 0.15f), CircleShape),
+                                    .background(
+                                        MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                        CircleShape
+                                    ),
                                 contentAlignment = Alignment.Center
                             ) {
                                 Icon(
@@ -238,35 +245,50 @@ fun BudgetScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
                         }
-                        
+
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             BudgetInfoCard(
                                 title = "Общий лимит",
-                                value = state.totalLimit.format(showCurrency = true, useMinimalDecimals = true),
-                                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
+                                value = state.totalLimit.format(
+                                    showCurrency = true,
+                                    useMinimalDecimals = true
+                                ),
+                                containerColor = MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.9f
+                                ),
                                 contentColor = MaterialTheme.colorScheme.onPrimary,
                                 modifier = Modifier.weight(1f)
                             )
-                            
+
                             Spacer(modifier = Modifier.width(8.dp))
-                            
+
                             BudgetInfoCard(
                                 title = "Потрачено",
-                                value = state.totalSpent.format(showCurrency = true, useMinimalDecimals = true),
-                                containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
+                                value = state.totalSpent.format(
+                                    showCurrency = true,
+                                    useMinimalDecimals = true
+                                ),
+                                containerColor = MaterialTheme.colorScheme.secondary.copy(
+                                    alpha = 0.9f
+                                ),
                                 contentColor = Color.White,
                                 modifier = Modifier.weight(1f)
                             )
-                            
+
                             Spacer(modifier = Modifier.width(8.dp))
-                            
+
                             BudgetInfoCard(
                                 title = "Баланс",
-                                value = state.totalWalletBalance.format(showCurrency = true, useMinimalDecimals = true),
-                                containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.9f),
+                                value = state.totalWalletBalance.format(
+                                    showCurrency = true,
+                                    useMinimalDecimals = true
+                                ),
+                                containerColor = MaterialTheme.colorScheme.tertiary.copy(
+                                    alpha = 0.9f
+                                ),
                                 contentColor = Color.White,
                                 modifier = Modifier.weight(1f)
                             )
@@ -280,7 +302,9 @@ fun BudgetScreen(
                                 .padding(top = 16.dp),
                             shape = RoundedCornerShape(12.dp),
                             colors = ButtonDefaults.buttonColors(
-                                containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f)
+                                containerColor = MaterialTheme.colorScheme.primary.copy(
+                                    alpha = 0.1f
+                                )
                             )
                         ) {
                             Icon(
@@ -312,8 +336,8 @@ fun BudgetScreen(
                 LazyColumn(
                     modifier = Modifier
                         .weight(1f)
-                        // Убираем нижний отступ, так как FAB больше нет
-                        // .padding(bottom = 80.dp) 
+                    // Убираем нижний отступ, так как FAB больше нет
+                    // .padding(bottom = 80.dp)
                 ) {
                     items(state.categories) { category ->
                         WalletCard(
@@ -338,9 +362,9 @@ fun BudgetScreen(
                                 singleLine = true,
                                 modifier = Modifier.fillMaxWidth()
                             )
-                            
+
                             Spacer(modifier = Modifier.height(8.dp))
-                            
+
                             NumberTextField(
                                 value = categoryLimit,
                                 onValueChange = { categoryLimit = it },
@@ -562,7 +586,7 @@ fun BudgetScreen(
                                         viewModel.onEvent(
                                             BudgetEvent.TransferBetweenWallets(
                                                 selectedFromWallet!!.id, // Corrected: pass ID
-                                                selectedToWallet!!.id,   // Corrected: pass ID
+                                                selectedToWallet!!.id, // Corrected: pass ID
                                                 Money(amount)
                                             )
                                         )
@@ -605,18 +629,19 @@ fun BudgetScreen(
                                 text = "Установите продолжительность периода в днях",
                                 style = MaterialTheme.typography.bodyMedium
                             )
-                            
+
                             Spacer(modifier = Modifier.height(16.dp))
-                            
+
                             OutlinedTextField(
                                 value = periodDuration,
-                                onValueChange = { 
-                                    // Проверяем, что введено число
+                                onValueChange = { // Проверяем, что введено число
                                     if (it.isBlank() || it.all { c -> c.isDigit() }) {
                                         periodDuration = it
                                     }
                                 },
-                                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                                keyboardOptions = KeyboardOptions(
+                                    keyboardType = KeyboardType.Number
+                                ),
                                 label = { Text("Количество дней") },
                                 modifier = Modifier.fillMaxWidth()
                             )
@@ -700,9 +725,9 @@ fun BudgetScreen(
                                     color = MaterialTheme.colorScheme.onSurface
                                 )
                             }
-                            
+
                             Spacer(modifier = Modifier.height(16.dp))
-                            
+
                             // Пояснительный текст
                             Text(
                                 text = "Доход будет распределен между кошельками пропорционально их установленным лимитам.",
@@ -711,21 +736,25 @@ fun BudgetScreen(
                                 textAlign = TextAlign.Center,
                                 modifier = Modifier.padding(horizontal = 8.dp)
                             )
-                            
+
                             Spacer(modifier = Modifier.height(24.dp))
-                            
+
                             // Кнопки действий
                             Button(
                                 onClick = {
                                     showDistributeConfirmation = false
-                                    
+
                                     // Проверяем, есть ли кошельки для распределения
                                     val hasWallets = viewModel.state.value.categories.isNotEmpty()
                                     if (!hasWallets) {
-                                        viewModel.onEvent(BudgetEvent.SetError("Нет доступных кошельков для распределения"))
+                                        viewModel.onEvent(
+                                            BudgetEvent.SetError(
+                                                "Нет доступных кошельков для распределения"
+                                            )
+                                        )
                                         return@Button
                                     }
-                                    
+
                                     // Навигация на экран добавления транзакции
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
@@ -737,13 +766,13 @@ fun BudgetScreen(
                                     style = MaterialTheme.typography.titleMedium
                                 )
                             }
-                            
+
                             Spacer(modifier = Modifier.height(8.dp))
-                            
+
                             TextButton(
                                 onClick = {
                                     showDistributeConfirmation = false
-                                    
+
                                     navController.navigate(Screen.AddTransaction.route)
                                 },
                                 modifier = Modifier.fillMaxWidth()
@@ -762,7 +791,7 @@ fun BudgetScreen(
             // Диалог редактирования кошелька
             if (showEditWalletDialog && selectedWallet != null) {
                 val currentSelectedWallet = selectedWallet!! // Гарантированно не null
-                
+
                 val editDatePickerState = rememberDatePickerState(
                     initialSelectedDateMillis = currentSelectedWallet.periodStartDate,
                     selectableDates = object : SelectableDates {
@@ -771,7 +800,7 @@ fun BudgetScreen(
                         }
                     }
                 )
-                
+
                 EditWalletDialog(
                     walletName = editWalletName,
                     onNameChange = { editWalletName = it },
@@ -784,7 +813,7 @@ fun BudgetScreen(
                     onConfirm = {
                         val newLimit = editWalletLimit.toDoubleOrNull()
                         val newStartDate = editDatePickerState.selectedDateMillis ?: currentSelectedWallet.periodStartDate
-                        
+
                         if (editWalletName.isNotBlank() && newLimit != null) {
                             val updatedWallet = currentSelectedWallet.copy(
                                 name = editWalletName,
@@ -798,7 +827,7 @@ fun BudgetScreen(
                         }
                     }
                 )
-                
+
                 if (showDatePickerDialog) {
                     DatePickerDialog(
                         onDismissRequest = { showDatePickerDialog = false },
@@ -860,10 +889,7 @@ fun BudgetInfoCard(
 }
 
 @Composable
-fun WalletCard(
-    wallet: Wallet,
-    onClick: () -> Unit
-) {
+fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
     val isDarkTheme = isSystemInDarkTheme()
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
     val backgroundColor = remember(wallet.color, wallet.name, isDarkTheme) {
@@ -874,11 +900,15 @@ fun WalletCard(
     val contentColor = contentColorFor(backgroundColor)
 
     val percentUsed = if (wallet.limit.amount > BigDecimal.ZERO) {
-        (wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
-            .multiply(BigDecimal(100)))
+        (
+            wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
+                .multiply(BigDecimal(100))
+            )
             .setScale(0, RoundingMode.FLOOR)
             .toInt().coerceIn(0, 100)
-    } else 0
+    } else {
+        0
+    }
 
     val progressIndicatorColor = when {
         percentUsed > 90 -> MaterialTheme.colorScheme.error
@@ -948,12 +978,18 @@ fun WalletCard(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(
-                    text = "Потрачено: ${wallet.spent.format(showCurrency = true, useMinimalDecimals = true)}",
+                    text = "Потрачено: ${wallet.spent.format(
+                        showCurrency = true,
+                        useMinimalDecimals = true
+                    )}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = contentColor
                 )
                 Text(
-                    text = "Лимит: ${wallet.limit.format(showCurrency = true, useMinimalDecimals = true)}",
+                    text = "Лимит: ${wallet.limit.format(
+                        showCurrency = true,
+                        useMinimalDecimals = true
+                    )}",
                     style = MaterialTheme.typography.bodyMedium,
                     color = contentColor
                 )
@@ -989,7 +1025,10 @@ fun WalletCard(
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Кошелёк: ${wallet.balance.format(showCurrency = true, useMinimalDecimals = true)}",
+                    text = "Кошелёк: ${wallet.balance.format(
+                        showCurrency = true,
+                        useMinimalDecimals = true
+                    )}",
                     style = MaterialTheme.typography.titleMedium.copy(
                         textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline
                     ),
@@ -1025,18 +1064,18 @@ fun EditWalletDialog(
                     singleLine = true,
                     modifier = Modifier.fillMaxWidth()
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 NumberTextField(
                     value = limit,
                     onValueChange = onLimitChange,
                     label = { Text("Лимит расходов") },
                     modifier = Modifier.fillMaxWidth()
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Поле для выбора даты начала периода
                 OutlinedTextField(
                     value = selectedDateMillis?.let { dateFormatter.format(Date(it)) } ?: "Выберите дату",

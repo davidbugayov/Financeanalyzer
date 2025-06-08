@@ -19,12 +19,12 @@ class PermissionManager(context: Context) {
      */
     enum class NotificationPermissionState {
 
-        INITIAL,                // Начальное состояние, после установки
-        ONBOARDING_COMPLETED,   // Онбординг завершен
-        PERMISSION_REQUESTED,   // Запрос разрешения отправлен
-        PERMISSION_GRANTED,     // Разрешение предоставлено
-        PERMISSION_DENIED,      // Разрешение отклонено
-        PERMANENTLY_DENIED,     // Разрешение отклонено постоянно ("не спрашивать снова")
+        INITIAL, // Начальное состояние, после установки
+        ONBOARDING_COMPLETED, // Онбординг завершен
+        PERMISSION_REQUESTED, // Запрос разрешения отправлен
+        PERMISSION_GRANTED, // Разрешение предоставлено
+        PERMISSION_DENIED, // Разрешение отклонено
+        PERMANENTLY_DENIED // Разрешение отклонено постоянно ("не спрашивать снова")
     }
 
     /**
@@ -32,12 +32,12 @@ class PermissionManager(context: Context) {
      */
     enum class PermissionEvent {
 
-        FINISH_ONBOARDING,     // Завершение онбординга
-        REQUEST_PERMISSION,    // Запрос разрешения
-        GRANT_PERMISSION,      // Предоставление разрешения
-        DENY_PERMISSION,       // Отклонение разрешения
-        DISMISS_DIALOG,        // Закрытие диалога
-        OPEN_SETTINGS,         // Открытие настроек приложения
+        FINISH_ONBOARDING, // Завершение онбординга
+        REQUEST_PERMISSION, // Запрос разрешения
+        GRANT_PERMISSION, // Предоставление разрешения
+        DENY_PERMISSION, // Отклонение разрешения
+        DISMISS_DIALOG, // Закрытие диалога
+        OPEN_SETTINGS // Открытие настроек приложения
     }
 
     /**

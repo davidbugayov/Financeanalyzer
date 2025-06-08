@@ -11,22 +11,22 @@ sealed class TransactionEvent {
      * Показать диалог подтверждения удаления транзакции
      */
     data class ShowDeleteConfirmDialog(val transaction: Transaction) : TransactionEvent()
-    
+
     /**
      * Скрыть диалог подтверждения удаления транзакции
      */
     data object HideDeleteConfirmDialog : TransactionEvent()
-    
+
     /**
      * Показать диалог редактирования транзакции
      */
     data class ShowEditDialog(val transactionId: String) : TransactionEvent()
-    
+
     /**
      * Скрыть диалог редактирования транзакции
      */
     data object HideEditDialog : TransactionEvent()
-    
+
     /**
      * Удалить транзакцию
      */

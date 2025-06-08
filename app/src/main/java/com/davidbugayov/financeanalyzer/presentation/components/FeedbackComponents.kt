@@ -114,18 +114,30 @@ fun FeedbackMessage(
                     if (isFilePath) {
                         Text(
                             text = message,
-                            style = MaterialTheme.typography.bodySmall.copy(fontFamily = FontFamily.Monospace),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = FontFamily.Monospace
+                            ),
                             textAlign = TextAlign.Center,
                             modifier = Modifier
                                 .background(
-                                    if (isCopied) MaterialTheme.colorScheme.primary.copy(alpha = 0.18f)
-                                    else Color.Transparent,
+                                    if (isCopied) {
+                                        MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.18f
+                                        )
+                                    } else {
+                                        Color.Transparent
+                                    },
                                     shape = MaterialTheme.shapes.small
                                 )
                                 .clickable {
                                     val clipboard = android.content.Context.CLIPBOARD_SERVICE
-                                    val clip = android.content.ClipData.newPlainText("file path", message)
-                                    (context.getSystemService(clipboard) as? android.content.ClipboardManager)?.setPrimaryClip(clip)
+                                    val clip = android.content.ClipData.newPlainText(
+                                        "file path",
+                                        message
+                                    )
+                                    (context.getSystemService(clipboard) as? android.content.ClipboardManager)?.setPrimaryClip(
+                                        clip
+                                    )
                                     Toast.makeText(context, "Путь скопирован", Toast.LENGTH_SHORT).show()
                                     isCopied = true
                                 }
@@ -171,13 +183,13 @@ fun EnhancedEmptyContent() {
                 .padding(dimensionResource(R.dimen.spacing_normal)),
             tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f)
         )
-        
+
         Text(
             text = stringResource(id = R.string.empty_transactions),
             style = MaterialTheme.typography.titleMedium,
             textAlign = TextAlign.Center
         )
-        
+
         Text(
             text = stringResource(id = R.string.empty_transactions_description),
             style = MaterialTheme.typography.bodyMedium,

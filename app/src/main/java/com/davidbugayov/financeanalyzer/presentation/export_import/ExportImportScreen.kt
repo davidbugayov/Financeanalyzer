@@ -83,7 +83,10 @@ fun ExportImportScreen(
                 feedbackTypeState.value = FeedbackType.ERROR
                 showFeedbackState.value = true
             } catch (e: Exception) {
-                feedbackMessageState.value = context.getString(R.string.error_action_failed, e.localizedMessage ?: "")
+                feedbackMessageState.value = context.getString(
+                    R.string.error_action_failed,
+                    e.localizedMessage ?: ""
+                )
                 feedbackTypeState.value = FeedbackType.ERROR
                 showFeedbackState.value = true
             }
@@ -170,15 +173,21 @@ fun ExportImportScreen(
                             visible = showExportDialog.value,
                             onDismiss = { showExportDialog.value = false },
                             onShare = {
-                                viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV(ExportAction.SHARE))
+                                viewModel.onEvent(
+                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.SHARE)
+                                )
                                 showExportDialog.value = false
                             },
                             onOpen = {
-                                viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV(ExportAction.OPEN))
+                                viewModel.onEvent(
+                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.OPEN)
+                                )
                                 showExportDialog.value = false
                             },
                             onSave = {
-                                viewModel.onEvent(ProfileEvent.ExportTransactionsToCSV(ExportAction.SAVE_ONLY))
+                                viewModel.onEvent(
+                                    ProfileEvent.ExportTransactionsToCSV(ExportAction.SAVE_ONLY)
+                                )
                                 showExportDialog.value = false
                             }
                         )

@@ -22,20 +22,19 @@ fun EditTransactionScreen(
     onNavigateBack: () -> Unit,
     transactionId: String? = null
 ) {
-
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "edit_transaction",
             screenClass = "EditTransactionScreen"
         )
-        
+
         // Проверяем ID транзакции и загружаем её если ID валидный
         if (!transactionId.isNullOrBlank()) {
             Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: Загрузка транзакции с ID: $transactionId")
             viewModel.loadTransactionForEditById(transactionId)
         } else {
             Timber.e("ТРАНЗАКЦИЯ-ЭКРАН: Ошибка - пустой ID транзакции")
-            // Показываем сообщение об ошибке 
+            // Показываем сообщение об ошибке
             viewModel.setError("Не указан ID транзакции для редактирования")
         }
     }
@@ -43,7 +42,9 @@ fun EditTransactionScreen(
     // Логируем состояние для отладки
     val state by viewModel.state.collectAsState()
     LaunchedEffect(state.transactionToEdit) {
-        Timber.d("ТРАНЗАКЦИЯ-ЭКРАН: editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}, amount=${state.amount}")
+        Timber.d(
+            "ТРАНЗАКЦИЯ-ЭКРАН: editMode=${state.editMode}, transactionToEdit=${state.transactionToEdit?.id}, amount=${state.amount}"
+        )
     }
 
     BaseTransactionScreen(

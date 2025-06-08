@@ -12,7 +12,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 
 /**
@@ -23,10 +22,7 @@ import com.davidbugayov.financeanalyzer.R
  * @param onRetry Callback, вызываемый при нажатии на кнопку повтора
  */
 @Composable
-fun ErrorContent(
-    error: String?,
-    onRetry: () -> Unit
-) {
+fun ErrorContent(error: String?, onRetry: () -> Unit) {
     Column(
         modifier = Modifier
             .fillMaxSize()
