@@ -10,6 +10,7 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
 import androidx.compose.ui.platform.LocalContext
@@ -135,6 +136,13 @@ fun FinanceAnalyzerTheme(
             // window.navigationBarColor = colorScheme.background.toArgb() // Removed deprecated call
             WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
             WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
+        }
+        
+        // Принудительное пересоздание Activity при изменении темы
+        DisposableEffect(darkTheme) {
+            val activity = view.context as? Activity
+            activity?.recreate()
+            onDispose { }
         }
     }
 
