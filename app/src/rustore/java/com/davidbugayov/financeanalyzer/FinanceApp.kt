@@ -10,7 +10,6 @@ import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import com.google.firebase.ktx.Firebase
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
@@ -108,8 +107,7 @@ class FinanceApp : BaseFinanceApp() {
             firebaseAdapter.setUserProperty("android_version", android.os.Build.VERSION.RELEASE)
             firebaseAdapter.setUserProperty("store", "rustore")
 
-            // Включаем Crashlytics только в релизных сборках
-            FirebaseCrashlytics.getInstance().setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG)
+            // Crashlytics отключен для F-Droid совместимости
 
             Timber.d("Firebase успешно инициализирован")
         } catch (e: Exception) {

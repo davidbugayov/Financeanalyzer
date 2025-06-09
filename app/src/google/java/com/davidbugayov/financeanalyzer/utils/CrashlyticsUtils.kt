@@ -1,114 +1,66 @@
 package com.davidbugayov.financeanalyzer.utils
 
-import com.google.firebase.crashlytics.FirebaseCrashlytics
 import timber.log.Timber
 
 /**
  * Вспомогательные утилиты для работы с Firebase Crashlytics.
- * Реальная имплементация для Google flavor.
+ * Заглушка для F-Droid совместимости.
  */
 object CrashlyticsUtils {
 
     /**
-     * Возвращает экземпляр Crashlytics
-     */
-    private fun getCrashlyticsInstance(): FirebaseCrashlytics {
-        return FirebaseCrashlytics.getInstance()
-    }
-
-    /**
-     * Логирует нефатальное исключение в Crashlytics и Timber
+     * Логирует нефатальное исключение в Timber
      */
     fun logException(throwable: Throwable) {
         Timber.e(throwable, "Исключение")
-        try {
-            getCrashlyticsInstance().recordException(throwable)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при логировании исключения в Crashlytics")
-        }
     }
 
     /**
-     * Логирует произвольное сообщение в Crashlytics и Timber
+     * Логирует произвольное сообщение в Timber
      */
     fun log(message: String) {
-        Timber.d("Crashlytics log: $message")
-        try {
-            getCrashlyticsInstance().log(message)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при логировании сообщения в Crashlytics")
-        }
+        Timber.d("Log: $message")
     }
 
     /**
-     * Устанавливает пользовательский идентификатор для Crashlytics
+     * Заглушка для установки пользовательского идентификатора
      */
     fun setUserId(userId: String) {
-        Timber.d("Установка Crashlytics userId: $userId")
-        try {
-            getCrashlyticsInstance().setUserId(userId)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке userId в Crashlytics")
-        }
+        Timber.d("UserId: $userId")
     }
 
     /**
-     * Добавляет строковый ключ-значение в отчет о сбое
+     * Заглушка для строкового ключ-значения
      */
     fun setCustomKey(key: String, value: String) {
-        Timber.d("Установка Crashlytics key: $key = $value")
-        try {
-            getCrashlyticsInstance().setCustomKey(key, value)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке строкового ключа в Crashlytics")
-        }
+        Timber.d("Key: $key = $value")
     }
 
     /**
-     * Добавляет целочисленный ключ-значение в отчет о сбое
+     * Заглушка для целочисленного ключ-значения
      */
     fun setCustomKey(key: String, value: Int) {
-        Timber.d("Установка Crashlytics key: $key = $value")
-        try {
-            getCrashlyticsInstance().setCustomKey(key, value)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке целочисленного ключа в Crashlytics")
-        }
+        Timber.d("Key: $key = $value")
     }
 
     /**
-     * Добавляет булевский ключ-значение в отчет о сбое
+     * Заглушка для булевского ключ-значения
      */
     fun setCustomKey(key: String, value: Boolean) {
-        Timber.d("Установка Crashlytics key: $key = $value")
-        try {
-            getCrashlyticsInstance().setCustomKey(key, value)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке булевского ключа в Crashlytics")
-        }
+        Timber.d("Key: $key = $value")
     }
 
     /**
-     * Добавляет число с плавающей точкой ключ-значение в отчет о сбое
+     * Заглушка для числа с плавающей точкой ключ-значения
      */
     fun setCustomKey(key: String, value: Float) {
-        Timber.d("Установка Crashlytics key: $key = $value")
-        try {
-            getCrashlyticsInstance().setCustomKey(key, value)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке ключа с плавающей точкой в Crashlytics")
-        }
+        Timber.d("Key: $key = $value")
     }
 
     /**
-     * Добавляет число с плавающей точкой ключ-значение в отчет о сбое
+     * Заглушка для числа с плавающей точкой ключ-значения
      */
     fun setCustomKey(key: String, value: Double) {
-        Timber.d("Установка Crashlytics key: $key = $value")
-        try {
-            getCrashlyticsInstance().setCustomKey(key, value)
-        } catch (e: Exception) {
-            Timber.e(e, "Ошибка при установке ключа с плавающей точкой в Crashlytics")
-        }
+        Timber.d("Key: $key = $value")
     }
 }

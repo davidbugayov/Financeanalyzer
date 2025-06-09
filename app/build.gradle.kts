@@ -70,7 +70,12 @@ android {
             if (!isFDroidBuild) {
                 plugins.apply("com.google.gms.google-services")
                 // Применяем Firebase Crashlytics через строку, чтобы избежать прямой ссылки
-                plugins.apply("com.google.firebase.crashlytics")
+                try {
+                    Class.forName("com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin")
+                    plugins.apply("com.google.firebase.crashlytics")
+                } catch (e: Exception) {
+                    logger.warn("Firebase Crashlytics plugin not found, skipping")
+                }
             }
         }
         
@@ -89,7 +94,12 @@ android {
             if (!isFDroidBuild) {
                 plugins.apply("com.google.gms.google-services")
                 // Применяем Firebase Crashlytics через строку, чтобы избежать прямой ссылки
-                plugins.apply("com.google.firebase.crashlytics")
+                try {
+                    Class.forName("com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin")
+                    plugins.apply("com.google.firebase.crashlytics")
+                } catch (e: Exception) {
+                    logger.warn("Firebase Crashlytics plugin not found, skipping")
+                }
             }
         }
         

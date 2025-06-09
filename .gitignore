@@ -51,6 +51,12 @@ app/google-services.json
 build/
 build-cache/
 
+# Gradle wrapper files for F-Droid compatibility
+gradle/wrapper/gradle-wrapper.jar
+gradle/wrapper/gradle-wrapper.properties
+gradlew
+gradlew.bat
+
 # Proguard files
 proguard/
 
@@ -81,3 +87,7 @@ kotlin-compiler*
 *.kotlin_module
 *.kotlin_metadata
 *.kotlin_builtins
+
+# Binary files for F-Droid compatibility
+tools/pepk.jar
+tools/pepk_out.zip
