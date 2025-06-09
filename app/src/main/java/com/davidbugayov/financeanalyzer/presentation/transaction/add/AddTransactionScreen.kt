@@ -25,21 +25,13 @@ import timber.log.Timber
  */
 @Composable
 fun AddTransactionScreen(
-    onNavigateBack: () -> Unit,
-    onNavigateToImport: (() -> Unit)? = null,
-    navController: NavController,
-    achievementsUiViewModel: AchievementsUiViewModel,
+    viewModel: AddTransactionViewModel = koinViewModel()
 ) {
     val context = LocalContext.current
-    val viewModel: AddTransactionViewModel = koinViewModel(
-        parameters = { parametersOf(achievementsUiViewModel) },
-    )
     val state by viewModel.state.collectAsState()
 
     LaunchedEffect(Unit) {
-        Timber.d(
-            "AddTransactionScreen: Screen opened, onNavigateToImport is ${if (onNavigateToImport != null) "provided" else "null"}",
-        )
+        Timber.d("AddTransactionScreen: Screen opened")
 
         AnalyticsUtils.logScreenView(
             screenName = "add_transaction",
@@ -55,32 +47,14 @@ fun AddTransactionScreen(
         }
     }
 
-    val achievementUnlocked by viewModel.achievementUnlocked.collectAsState()
-    LaunchedEffect(achievementUnlocked) {
-        if (achievementUnlocked) {
-            navController.previousBackStackEntry?.savedStateHandle?.set("show_rustore_review", true)
-            navController.previousBackStackEntry?.savedStateHandle?.set(
-                "show_achievement_feedback",
-                true,
-            )
-            viewModel.resetAchievementUnlockedFlag()
-        }
-    }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            // No need to reset navigateBackCallback as it's not used in the new implementation
-        }
-    }
-
     BaseTransactionScreen(
         viewModel = viewModel,
-        onNavigateBack = onNavigateBack,
+        onNavigateBack = { viewModel.navigateBack() },
         screenTitle = stringResource(R.string.new_transaction_title),
         buttonText = stringResource(R.string.add_button_text),
         isEditMode = false,
         eventFactory = defaultTransactionEventFactory(false),
         submitEvent = BaseTransactionEvent.Submit,
-        onNavigateToImport = onNavigateToImport,
+        onNavigateToImport = null,
     )
 }
