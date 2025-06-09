@@ -1,0 +1,12 @@
+# Настройки для локальной разработки
+
+# Устанавливаем RuStore Debug как сборку по умолчанию
+# Для Android Studio
+android.injected.build.model.only.versioned=3
+android.injected.build.model.disable.src.download=true
+android.injected.testOnly=false
+android.defaults.buildfeatures.buildconfig=true
+
+# Настройки по умолчанию для сборки
+android.defaults.buildtype=debug
+android.defaults.dimension.store=rustore 

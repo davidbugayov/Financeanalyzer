@@ -12,7 +12,7 @@ import timber.log.Timber
 /**
  * Основной класс приложения для F-Droid flavor
  */
-class FinanceApp : Application() {
+class FinanceApp : BaseFinanceApp() {
 
     // AppMetrica API ключ
     private val APP_METRICA_API_KEY = "d4ec51de-47c3-4997-812f-97b9a6663dad"
@@ -20,19 +20,12 @@ class FinanceApp : Application() {
     // Составной адаптер для объединения всех систем аналитики
     private val compositeAnalytics = CompositeAnalytics()
 
-    override fun onCreate() {
-        super.onCreate()
-
-        // Настройка Timber для логирования
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-
+    /**
+     * Инициализирует компоненты, специфичные для F-Droid flavor
+     */
+    override fun initFlavor() {
         // Инициализация аналитики
         initAnalytics()
-
-        // Логируем основные данные устройства для диагностики
-        logDeviceInfo()
 
         // Логируем событие открытия приложения
         AnalyticsUtils.logAppOpen()

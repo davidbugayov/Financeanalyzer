@@ -1,0 +1,27 @@
+---
+Categories:
+  - Money
+License: GPL-3.0-only
+WebSite: https://github.com/davidbugayov/Financeanalyzer
+SourceCode: https://github.com/davidbugayov/Financeanalyzer
+IssueTracker: https://github.com/davidbugayov/Financeanalyzer/issues
+
+AutoName: Деньги под Контролем (F-Droid)
+
+RepoType: git
+Repo: https://github.com/davidbugayov/Financeanalyzer
+
+Builds:
+  - versionName: 2.17.0.fd
+    versionCode: 36
+    commit: v2.17.0
+    subdir: app
+    init: |
+      export FDROID_BUILD=1
+    gradle:
+      - fdroidRelease
+
+AutoUpdateMode: Version
+UpdateCheckMode: Tags
+CurrentVersion: 2.17.0.fd
+CurrentVersionCode: 36 

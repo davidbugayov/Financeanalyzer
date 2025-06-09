@@ -13,17 +13,20 @@ dependencyResolutionManagement {
         mavenCentral()
         
         // Репозиторий для RuStore SDK - используется только для rustore flavor
-        maven {
-            url = uri("https://artifactory-external.vkpartner.ru/artifactory/maven")
-            content {
-                // Включаем репозиторий только для RuStore зависимостей
-                // и только для rustore flavor
-                includeGroup("ru.rustore")
-                includeGroupByRegex("ru\\.rustore\\..*")
-                
-                // Исключаем использование для F-Droid и Google flavor
-                excludeGroupByRegex(".*fdroid.*")
-                excludeGroupByRegex(".*google.*")
+        // Исключаем для F-Droid сканера
+        if (System.getenv("FDROID_BUILD") != "1") {
+            maven {
+                url = uri("https://artifactory-external.vkpartner.ru/artifactory/maven")
+                content {
+                    // Включаем репозиторий только для RuStore зависимостей
+                    // и только для rustore flavor
+                    includeGroup("ru.rustore")
+                    includeGroupByRegex("ru\\.rustore\\..*")
+                    
+                    // Исключаем использование для F-Droid и Google flavor
+                    excludeGroupByRegex(".*fdroid.*")
+                    excludeGroupByRegex(".*google.*")
+                }
             }
         }
     }

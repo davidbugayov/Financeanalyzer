@@ -45,17 +45,22 @@ object RuStoreUtils {
      */
     fun checkForUpdates(context: Context) {
         try {
-            val appUpdateManager = RuStoreAppUpdateManagerFactory.create(context)
-            appUpdateManager.getAppUpdateInfo()
-                .addOnSuccessListener { appUpdateInfo ->
-                    if (appUpdateInfo.updateAvailable()) {
-                        Timber.d("RuStore update available")
-                        // Можно добавить логику для показа обновления
+            // Проверяем, установлен ли RuStore на устройстве
+            if (context.packageManager.getLaunchIntentForPackage("ru.vk.store") != null) {
+                val appUpdateManager = RuStoreAppUpdateManagerFactory.create(context)
+                appUpdateManager.getAppUpdateInfo()
+                    .addOnSuccessListener { appUpdateInfo ->
+                        if (appUpdateInfo.updateAvailable()) {
+                            Timber.d("RuStore update available")
+                            // Можно добавить логику для показа обновления
+                        }
                     }
-                }
-                .addOnFailureListener { e ->
-                    Timber.e(e, "Failed to check for RuStore updates")
-                }
+                    .addOnFailureListener { e ->
+                        Timber.e(e, "Failed to check for RuStore updates")
+                    }
+            } else {
+                Timber.d("RuStore app not installed, skipping update check")
+            }
         } catch (e: Exception) {
             Timber.e(e, "Error when trying to check for RuStore updates")
         }

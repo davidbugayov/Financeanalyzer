@@ -8,10 +8,13 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ktlint)
 
-    // Применяем Firebase плагины только для google flavor
+    // Применяем Firebase плагины только для google flavor и не для F-Droid сборок
     alias(libs.plugins.google.services) apply false
-    alias(libs.plugins.firebase.crashlytics) apply false
+    // Удаляем прямую ссылку на Firebase Crashlytics
 }
+
+// Проверяем, является ли текущая сборка F-Droid сборкой
+val isFDroidBuild = System.getenv("FDROID_BUILD") == "1"
 
 fun getKeystoreProperties(): Properties {
     val properties = Properties()
@@ -63,9 +66,12 @@ android {
             resValue("string", "app_name", "Деньги под Контролем")
             resValue("string", "app_store", "Google Play")
 
-            // Применяем плагины только для Google flavor
-            plugins.apply("com.google.gms.google-services")
-            plugins.apply("com.google.firebase.crashlytics")
+            // Применяем плагины только для Google flavor и не для F-Droid сборок
+            if (!isFDroidBuild) {
+                plugins.apply("com.google.gms.google-services")
+                // Применяем Firebase Crashlytics через строку, чтобы избежать прямой ссылки
+                plugins.apply("com.google.firebase.crashlytics")
+            }
         }
         
         create("rustore") {
@@ -79,9 +85,12 @@ android {
             resValue("string", "app_name", "Деньги под Контролем")
             resValue("string", "app_store", "RuStore")
             
-            // Применяем плагины Firebase для RuStore flavor
-            plugins.apply("com.google.gms.google-services")
-            plugins.apply("com.google.firebase.crashlytics")
+            // Применяем плагины Firebase для RuStore flavor и не для F-Droid сборок
+            if (!isFDroidBuild) {
+                plugins.apply("com.google.gms.google-services")
+                // Применяем Firebase Crashlytics через строку, чтобы избежать прямой ссылки
+                plugins.apply("com.google.firebase.crashlytics")
+            }
         }
         
         create("fdroid") {
@@ -276,23 +285,15 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
-    // Firebase - только для google и rustore flavor
+    // Firebase для Google и RuStore флейворов
     "googleImplementation"(platform(libs.firebase.bom))
     "googleImplementation"(libs.firebase.analytics.ktx)
-    "googleImplementation"(libs.firebase.crashlytics.ktx)
-    "googleImplementation"(libs.firebase.perf.ktx)
-    
-    // Firebase зависимости для RuStore
     "rustoreImplementation"(platform(libs.firebase.bom))
     "rustoreImplementation"(libs.firebase.analytics.ktx)
-    "rustoreImplementation"(libs.firebase.crashlytics.ktx)
-    "rustoreImplementation"(libs.firebase.perf.ktx)
     
-    // RuStore SDK для Google и RuStore флейворов
-    "googleImplementation"("ru.rustore.sdk:review:8.0.0")
-    "googleImplementation"("ru.rustore.sdk:appupdate:8.0.0")
-    "rustoreImplementation"("ru.rustore.sdk:review:8.0.0") 
-    "rustoreImplementation"("ru.rustore.sdk:appupdate:8.0.0")
+    // RuStore SDK только для RuStore флейвора
+    "rustoreImplementation"(libs.rustore.review) 
+    "rustoreImplementation"(libs.rustore.appupdate)
 
     // Logging
     implementation(libs.timber)
@@ -390,6 +391,10 @@ configurations.all {
         exclude(group = "com.google.android.gms")
         // AppMetrica разрешена в F-Droid сборке
         // exclude(group = "io.appmetrica") 
+        exclude(group = "ru.rustore")
+    }
+    // Исключаем RuStore зависимости из Google flavor
+    if (name.contains("google", ignoreCase = true)) {
         exclude(group = "ru.rustore")
     }
 }

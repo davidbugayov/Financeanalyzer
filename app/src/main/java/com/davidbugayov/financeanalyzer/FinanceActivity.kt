@@ -73,6 +73,9 @@ class FinanceActivity : ComponentActivity() {
         }
 
         applyContent()
+        
+        // Устанавливаем флаг готовности, чтобы скрыть сплеш-скрин
+        isReady = true
     }
 
     /**

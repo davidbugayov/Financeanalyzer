@@ -30,6 +30,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
@@ -46,8 +47,8 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLay
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
@@ -274,14 +275,14 @@ fun HomeScreen(
                     feedbackType = FeedbackType.SUCCESS
                     showFeedback = true
                 },
-                onNavigateToProfile = { /* Implementation needed */ },
+                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
             )
         },
         bottomBar = {
             HomeBottomBar(
-                onNavigateToChart = { /* Implementation needed */ },
-                onNavigateToHistory = { /* Implementation needed */ },
-                onNavigateToAdd = { /* Implementation needed */ },
+                onNavigateToChart = { navController.navigate(Screen.Chart.route) },
+                onNavigateToHistory = { navController.navigate(Screen.History.route) },
+                onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
             )
         },
     ) { paddingValues ->
@@ -302,7 +303,7 @@ fun HomeScreen(
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = { /* Implementation needed */ },
+                    onAddClick = { navController.navigate(Screen.AddTransaction.route) },
                 )
             }
             HomeFeedback(
@@ -341,7 +342,7 @@ fun HomeScreen(
                 showFeedback = true
             } else {
                 editViewModel.loadTransactionForEditById(transaction.id)
-                /* Implementation needed */
+                navController.navigate(Screen.EditTransaction.createRoute(transaction.id))
             }
             showActionsDialog = false
             selectedTransactionForActions = null

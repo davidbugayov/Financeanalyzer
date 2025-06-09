@@ -199,6 +199,19 @@ data class Money(
             "Money.format: amount=$amount, locale=$locale, groupingSeparator='${symbols.groupingSeparator}'",
         )
 
+        // Для нулевых значений возвращаем просто "0"
+        if (amount.compareTo(BigDecimal.ZERO) == 0) {
+            return if (showCurrency) {
+                if (currency.symbolPosition == SymbolPosition.BEFORE) {
+                    "${currency.symbol}0"
+                } else {
+                    "0 ${currency.symbol}"
+                }
+            } else {
+                "0"
+            }
+        }
+
         val strippedAmount = amount.stripTrailingZeros()
         val isWholeNumber = strippedAmount.scale() <= 0 || strippedAmount.remainder(BigDecimal.ONE).compareTo(
             BigDecimal.ZERO,

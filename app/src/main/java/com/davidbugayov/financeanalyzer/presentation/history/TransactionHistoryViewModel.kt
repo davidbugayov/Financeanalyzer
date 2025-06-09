@@ -38,7 +38,6 @@ class TransactionHistoryViewModel constructor(
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val repository: TransactionRepository,
-    private val analyticsUtils: AnalyticsUtils,
     val categoriesViewModel: CategoriesViewModel,
     private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
@@ -142,7 +141,7 @@ class TransactionHistoryViewModel constructor(
                     )
 
                     // Логируем событие в аналитику
-                    com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils.logTransactionDeleted(
+                    AnalyticsUtils.logTransactionDeleted(
                         amount = transaction.amount.abs(),
                         category = transaction.category,
                         isExpense = transaction.isExpense,

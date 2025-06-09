@@ -19,7 +19,7 @@ import timber.log.Timber
 /**
  * Основной класс приложения для RuStore flavor
  */
-class FinanceApp : Application() {
+class FinanceApp : BaseFinanceApp() {
 
     // AppMetrica API ключ
     private val appMetricaApiKey = "d4ec51de-47c3-4997-812f-97b9a6663dad"
@@ -29,19 +29,12 @@ class FinanceApp : Application() {
 
     private lateinit var firebaseAnalytics: FirebaseAnalytics
 
-    override fun onCreate() {
-        super.onCreate()
-
-        // Настройка Timber для логирования
-        if (BuildConfig.DEBUG) {
-            Timber.plant(Timber.DebugTree())
-        }
-
+    /**
+     * Инициализирует компоненты, специфичные для RuStore flavor
+     */
+    override fun initFlavor() {
         // Инициализация аналитики
         initAnalytics()
-
-        // Логируем основные данные устройства для диагностики
-        logDeviceInfo()
 
         // Логируем событие открытия приложения
         AnalyticsUtils.logAppOpen()

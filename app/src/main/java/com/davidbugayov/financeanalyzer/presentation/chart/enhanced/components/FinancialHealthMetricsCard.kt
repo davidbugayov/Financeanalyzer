@@ -236,7 +236,7 @@ private fun SavingsRateSection(savingsRate: Double) {
                 Text(
                     text = stringResource(
                         R.string.savings_rate_percent,
-                        savingsRate.toBigDecimal().setScale(0, java.math.RoundingMode.FLOOR).toPlainString(),
+                        savingsRate.toBigDecimal().setScale(0, java.math.RoundingMode.FLOOR).toInt(),
                     ),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,

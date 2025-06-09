@@ -1,0 +1,14 @@
+---
+# F-Droid build configuration
+builds:
+  - versionName: 'any'
+    versionCode: 'any'
+    commit: 'any'
+    subdir: 'app'
+    sudo:
+      - apt-get update
+      - apt-get install -y openjdk-17-jdk
+    init: |
+      export FDROID_BUILD=1
+    gradle:
+      - fdroidRelease
