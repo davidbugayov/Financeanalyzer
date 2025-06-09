@@ -80,13 +80,6 @@ val appModule = module {
     single { get<IAnalytics>() }
     single { OnboardingManager(androidContext()) }
 
-    // Repositories
-    single<TransactionRepositoryImpl> { TransactionRepositoryImpl(get()) }
-    single<TransactionRepository> { get<TransactionRepositoryImpl>() }
-    single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
-    single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
-    single<AchievementsRepository> { AchievementsRepository() }
-
     // Factories and managers
     single { ImportTransactionsManager(get()) }
     single { ImportFactory(androidContext(), get()) }
@@ -166,4 +159,4 @@ val statisticsModule = module {
 }
 
 // Все модули приложения
-val allModules = listOf(appModule, statisticsModule, analyticsModule)
+val allModules = listOf(appModule, statisticsModule, analyticsModule, repositoryModule)

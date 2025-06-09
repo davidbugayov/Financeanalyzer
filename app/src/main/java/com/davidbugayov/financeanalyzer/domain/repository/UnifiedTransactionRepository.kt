@@ -1,15 +1,18 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
+import com.davidbugayov.financeanalyzer.data.repository.BaseRepository
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.SharedFlow
-import java.time.LocalDate
+import kotlinx.datetime.LocalDate
 import java.util.Date
 
 /**
- * Репозиторий для работы с транзакциями.
- * Следует принципам Clean Architecture.
+ * Унифицированный репозиторий для работы с транзакциями.
+ * Объединяет функциональность ITransactionRepository и TransactionRepository.
+ * Следует принципам Clean Architecture и Interface Segregation Principle (ISP).
  */
-interface TransactionRepository {
+interface UnifiedTransactionRepository : BaseRepository<Transaction, String> {
 
     /**
      * Поток событий изменения данных в репозитории.
@@ -24,12 +27,6 @@ interface TransactionRepository {
      * @param transactionId ID измененной транзакции или null для массовых изменений.
      */
     suspend fun notifyDataChanged(transactionId: String? = null)
-
-    /**
-     * Получает все транзакции.
-     * @return Список всех транзакций.
-     */
-    suspend fun getAllTransactions(): List<Transaction>
 
     /**
      * Получает транзакции с пагинацией.
@@ -58,6 +55,14 @@ interface TransactionRepository {
      * Получает транзакции за указанный период.
      * @param startDate Начальная дата периода.
      * @param endDate Конечная дата периода.
+     * @return Flow со списком транзакций.
+     */
+    suspend fun getTransactions(startDate: Date, endDate: Date): Flow<List<Transaction>>
+
+    /**
+     * Получает транзакции за указанный период.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
      * @return Список транзакций за указанный период.
      */
     suspend fun getTransactionsByDateRange(startDate: Date, endDate: Date): List<Transaction>
@@ -69,8 +74,8 @@ interface TransactionRepository {
      * @return Список транзакций за указанный период.
      */
     suspend fun getTransactionsByDateRange(
-        startDate: kotlinx.datetime.LocalDate,
-        endDate: kotlinx.datetime.LocalDate,
+        startDate: LocalDate,
+        endDate: LocalDate,
     ): List<Transaction>
 
     /**
@@ -112,34 +117,53 @@ interface TransactionRepository {
     suspend fun getTransactionsCountByDateRange(startDate: Date, endDate: Date): Int
 
     /**
-     * Получает транзакцию по идентификатору.
-     * @param id Идентификатор транзакции.
-     * @return Транзакция или null, если транзакция не найдена.
+     * Загружает все транзакции
+     * @return Список транзакций
      */
-    suspend fun getTransactionById(id: String): Transaction?
+    suspend fun loadTransactions(): List<Transaction>
 
     /**
+     * Загружает транзакции с пагинацией
+     * @param limit Количество транзакций для загрузки
+     * @param offset Смещение (количество пропускаемых транзакций)
+     * @return Список транзакций с учетом пагинации
+     */
+    suspend fun loadTransactionsPaginated(limit: Int, offset: Int): List<Transaction>
+    
+    /**
      * Добавляет новую транзакцию.
+     * Переопределяет метод из BaseRepository для соответствия существующему API.
      * @param transaction Транзакция для добавления.
      * @return ID добавленной транзакции.
      */
     suspend fun addTransaction(transaction: Transaction): String
-
+    
     /**
      * Обновляет существующую транзакцию.
+     * Переопределяет метод из BaseRepository для соответствия существующему API.
      * @param transaction Транзакция для обновления.
      */
     suspend fun updateTransaction(transaction: Transaction)
-
+    
     /**
      * Удаляет транзакцию.
+     * Переопределяет метод из BaseRepository для соответствия существующему API.
      * @param transaction Транзакция для удаления.
      */
     suspend fun deleteTransaction(transaction: Transaction)
-
+    
     /**
      * Удаляет транзакцию по идентификатору.
+     * Переопределяет метод из BaseRepository для соответствия существующему API.
      * @param id Идентификатор транзакции для удаления.
      */
     suspend fun deleteTransaction(id: String)
-}
+    
+    /**
+     * Получает транзакцию по идентификатору.
+     * Переопределяет метод из BaseRepository для соответствия существующему API.
+     * @param id Идентификатор транзакции.
+     * @return Транзакция или null, если транзакция не найдена.
+     */
+    suspend fun getTransactionById(id: String): Transaction?
+} 
