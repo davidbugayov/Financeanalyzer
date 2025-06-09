@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
@@ -17,6 +19,8 @@ import androidx.core.view.WindowInsetsControllerCompat
 import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
+import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 
@@ -35,8 +39,11 @@ class FinanceActivity : ComponentActivity() {
         // Делаем контент приложения отображаться под системными панелями
         WindowCompat.setDecorFitsSystemWindows(window, false)
 
-        // Определяем, какую тему использует приложение
-        val isDarkTheme = when (PreferencesManager(this).getThemeMode()) {
+        // Определяем, какую тему использует приложение и инициализируем AppTheme
+        val themeMode = PreferencesManager(this).getThemeMode()
+        AppTheme.setTheme(themeMode)
+
+        val isDarkTheme = when (themeMode) {
             ThemeMode.DARK -> true
             ThemeMode.LIGHT -> false
             ThemeMode.SYSTEM -> resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
@@ -73,7 +80,7 @@ class FinanceActivity : ComponentActivity() {
         }
 
         applyContent()
-        
+
         // Устанавливаем флаг готовности, чтобы скрыть сплеш-скрин
         isReady = true
     }
@@ -93,19 +100,25 @@ class FinanceActivity : ComponentActivity() {
 
     private fun applyContent() {
         setContent {
-            FinanceAppContent()
+            financeAppContent(this)
         }
     }
 }
 
 @Composable
-fun FinanceAppContent() {
-    FinanceAnalyzerTheme {
-        Surface(
-            modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background,
-        ) {
-            MainScreen()
+fun financeAppContent(activity: ComponentActivity) {
+    // Получаем текущую тему из AppTheme и наблюдаем за изменениями
+    val themeMode by AppTheme.currentTheme.collectAsState()
+
+    // Используем AppThemeProvider для предоставления темы всему приложению
+    AppThemeProvider(themeMode = themeMode) {
+        FinanceAnalyzerTheme(themeMode = themeMode) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+            ) {
+                MainScreen()
+            }
         }
     }
 }

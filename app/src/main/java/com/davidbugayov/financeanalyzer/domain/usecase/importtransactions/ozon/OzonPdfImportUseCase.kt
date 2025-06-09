@@ -8,6 +8,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
+import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
 import kotlinx.coroutines.Dispatchers
@@ -67,11 +69,10 @@ class OzonPdfImportUseCase(
 
     override fun importTransactions(
         uri: Uri,
-        progressCallback:
-        com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback,
-    ): Flow<com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult> = flow {
+        progressCallback: ImportProgressCallback,
+    ): Flow<ImportResult> = flow {
         emit(
-            com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Progress(
+            ImportResult.Progress(
                 0,
                 100,
                 "Начало импорта из PDF для Ozon Банка",
@@ -85,7 +86,7 @@ class OzonPdfImportUseCase(
             if (text.isBlank()) {
                 Timber.w("Извлеченный текст из PDF пуст для Ozon Банка.")
                 emit(
-                    com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(
+                    ImportResult.Error(
                         message = "Не удалось извлечь текст из PDF файла.",
                     ),
                 )
@@ -94,7 +95,7 @@ class OzonPdfImportUseCase(
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при извлечении текста из PDF для Ozon Банка")
             emit(
-                com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(
+                ImportResult.Error(
                     exception = e,
                     message = e.localizedMessage ?: "Неизвестная ошибка",
                 ),
@@ -109,7 +110,7 @@ class OzonPdfImportUseCase(
             if (!isValidFormat(validationReader)) {
                 Timber.w("Файл не соответствует формату выписки Ozon Банка.")
                 emit(
-                    com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(
+                    ImportResult.Error(
                         message = "Файл не является выпиской Ozon Банка или его формат не поддерживается.",
                     ),
                 )
@@ -121,7 +122,7 @@ class OzonPdfImportUseCase(
 
         // 2. Пропуск заголовков с новым reader
         emit(
-            com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Progress(
+            ImportResult.Progress(
                 10,
                 100,
                 "Пропуск заголовков...",
@@ -147,7 +148,7 @@ class OzonPdfImportUseCase(
             System.gc()
 
             emit(
-                com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Progress(
+                ImportResult.Progress(
                     startProgress,
                     endProgress,
                     "Обработка транзакций...",
@@ -165,7 +166,7 @@ class OzonPdfImportUseCase(
                 if (linesProcessed % 10 == 0) {
                     val currentProgress = startProgress + (linesProcessed.coerceAtMost(1000) * (endProgress - startProgress) / 1000)
                     emit(
-                        com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Progress(
+                        ImportResult.Progress(
                             currentProgress,
                             endProgress,
                             "Обработано строк: $linesProcessed, найдено транзакций: $totalTransactionsFound",
@@ -186,7 +187,7 @@ class OzonPdfImportUseCase(
                         totalTransactionsSaved += savedCount
 
                         emit(
-                            com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Progress(
+                            ImportResult.Progress(
                                 (startProgress + endProgress) / 2,
                                 endProgress,
                                 "Сохранено $totalTransactionsSaved из $totalTransactionsFound транзакций",
@@ -207,7 +208,7 @@ class OzonPdfImportUseCase(
             }
 
             emit(
-                com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Progress(
+                ImportResult.Progress(
                     endProgress,
                     endProgress,
                     "Импорт завершен. Сохранено $totalTransactionsSaved из $totalTransactionsFound транзакций",
@@ -215,7 +216,7 @@ class OzonPdfImportUseCase(
             )
 
             emit(
-                com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Success(
+                ImportResult.Success(
                     totalTransactionsSaved,
                     totalTransactionsFound - totalTransactionsSaved,
                 ),
@@ -223,7 +224,7 @@ class OzonPdfImportUseCase(
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при обработке транзакций: ${e.message}")
             emit(
-                com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult.Error(
+                ImportResult.Error(
                     exception = e,
                     message = e.localizedMessage ?: "Ошибка при обработке транзакций",
                 ),

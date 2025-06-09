@@ -1,0 +1,4 @@
+- Fixed: Eliminated screen flickering when changing app theme
+- Improved: Optimized theme application mechanism across all app screens
+- Improved: Enhanced stability when switching between dark and light themes
+- Fixed: Proper theme application to all screens without activity recreation

@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer
 
-import android.app.Application
 import android.os.Build
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter

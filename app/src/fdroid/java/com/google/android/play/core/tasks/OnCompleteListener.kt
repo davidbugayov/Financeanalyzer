@@ -5,4 +5,4 @@ package com.google.android.play.core.tasks
  */
 interface OnCompleteListener<TResult> {
     fun onComplete(task: Task<TResult>)
-} 
+}

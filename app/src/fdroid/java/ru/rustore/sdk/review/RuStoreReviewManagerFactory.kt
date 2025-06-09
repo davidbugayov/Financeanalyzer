@@ -9,4 +9,4 @@ object RuStoreReviewManagerFactory {
     fun create(context: Context): RuStoreReviewManager {
         return RuStoreReviewManager()
     }
-} 
+}

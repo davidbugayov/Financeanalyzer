@@ -5,4 +5,4 @@ package ru.rustore.sdk.appupdate.model
  */
 class AppUpdateInfo {
     fun updateAvailable(): Boolean = false
-} 
+}

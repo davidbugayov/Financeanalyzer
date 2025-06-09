@@ -5,4 +5,4 @@ package com.google.android.play.core.tasks
  */
 interface OnFailureListener {
     fun onFailure(exception: Exception)
-} 
+}

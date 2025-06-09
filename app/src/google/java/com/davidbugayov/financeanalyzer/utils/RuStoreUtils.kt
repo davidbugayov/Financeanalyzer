@@ -20,4 +20,4 @@ object RuStoreUtils {
     fun checkForUpdates(context: Context) {
         Timber.d("RuStore updates not available in Google flavor")
     }
-} 
+}

@@ -10,9 +10,10 @@ import androidx.compose.material3.dynamicLightColorScheme
 import androidx.compose.material3.lightColorScheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.staticCompositionLocalOf
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
@@ -113,67 +114,71 @@ fun FinanceAnalyzerTheme(
     dynamicColor: Boolean = false,
     content: @Composable () -> Unit,
 ) {
-    val darkTheme = when (themeMode) {
+    // Определяем, использовать ли темную тему
+    val isDarkTheme = when (themeMode) {
         ThemeMode.LIGHT -> false
         ThemeMode.DARK -> true
         ThemeMode.SYSTEM -> isSystemInDarkTheme()
     }
 
+    // Получаем цветовую схему в зависимости от темы и поддержки динамических цветов
     val colorScheme = when {
         dynamicColor && Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
             val context = LocalContext.current
-            if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+            if (isDarkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
         }
-        darkTheme -> DarkColors
+        isDarkTheme -> DarkColors
         else -> LightColors
     }
 
+    // Устанавливаем цвет статус-бара и панели навигации
     val view = LocalView.current
     if (!view.isInEditMode) {
         SideEffect {
             val window = (view.context as Activity).window
-            // window.statusBarColor = colorScheme.background.toArgb() // Removed deprecated call
-            // window.navigationBarColor = colorScheme.background.toArgb() // Removed deprecated call
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = !darkTheme
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = !darkTheme
-        }
-        
-        // Принудительное пересоздание Activity при изменении темы
-        DisposableEffect(darkTheme) {
-            val activity = view.context as? Activity
-            activity?.recreate()
-            onDispose { }
+
+            // Настраиваем цвет иконок в зависимости от темы
+            val insetsController = WindowCompat.getInsetsController(window, view)
+            insetsController.isAppearanceLightStatusBars = !isDarkTheme
+            insetsController.isAppearanceLightNavigationBars = !isDarkTheme
+
+            // Обновляем декорации окна
+            WindowCompat.setDecorFitsSystemWindows(window, false)
+
+            // Устанавливаем прозрачные системные панели вместо использования устаревших методов
+            window.statusBarColor = Color.Transparent.toArgb()
+            window.navigationBarColor = Color.Transparent.toArgb()
         }
     }
 
-    val incomeColor = if (darkTheme) IncomeColorDark else IncomeColorLight
-    val expenseColor = if (darkTheme) ExpenseColorDark else ExpenseColorLight
-    val fabColor = if (darkTheme) FabColorDark else FabColorLight
-    val balanceTextColor = if (darkTheme) BalanceTextColorDark else BalanceTextColorLight
-    val successColor = if (darkTheme) SuccessColorDark else SuccessColorLight
-    val warningColor = if (darkTheme) WarningColorDark else WarningColorLight
-    val infoColor = if (darkTheme) InfoColorDark else InfoColorLight
-    val transferColor = if (darkTheme) TransferColorDark else TransferColorLight
+    val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
+    val expenseColor = if (isDarkTheme) ExpenseColorDark else ExpenseColorLight
+    val fabColor = if (isDarkTheme) FabColorDark else FabColorLight
+    val balanceTextColor = if (isDarkTheme) BalanceTextColorDark else BalanceTextColorLight
+    val successColor = if (isDarkTheme) SuccessColorDark else SuccessColorLight
+    val warningColor = if (isDarkTheme) WarningColorDark else WarningColorLight
+    val infoColor = if (isDarkTheme) InfoColorDark else InfoColorLight
+    val transferColor = if (isDarkTheme) TransferColorDark else TransferColorLight
 
-    val chartGridColor = if (darkTheme) ChartGridColorDark else ChartGridColorLight
-    val chartAxisTextColor = if (darkTheme) ChartAxisTextColorDark else ChartAxisTextColorLight
-    val chartBackgroundColor = if (darkTheme) ChartBackgroundColorDark else ChartBackgroundColorLight
-    val chartEmptyStateTextColor = if (darkTheme) ChartEmptyStateTextColorDark else ChartEmptyStateTextColorLight
+    val chartGridColor = if (isDarkTheme) ChartGridColorDark else ChartGridColorLight
+    val chartAxisTextColor = if (isDarkTheme) ChartAxisTextColorDark else ChartAxisTextColorLight
+    val chartBackgroundColor = if (isDarkTheme) ChartBackgroundColorDark else ChartBackgroundColorLight
+    val chartEmptyStateTextColor = if (isDarkTheme) ChartEmptyStateTextColorDark else ChartEmptyStateTextColorLight
 
-    val positiveBackgroundColor = if (darkTheme) PositiveBackgroundDark else PositiveBackgroundLight
-    val positiveTextColor = if (darkTheme) PositiveTextDark else PositiveTextLight
-    val negativeBackgroundColor = if (darkTheme) NegativeBackgroundDark else NegativeBackgroundLight
-    val negativeTextColor = if (darkTheme) NegativeTextDark else NegativeTextLight
-    val errorStateBackgroundColor = if (darkTheme) ErrorStateBackgroundDark else ErrorStateBackgroundLight
-    val errorStateContentColor = if (darkTheme) ErrorStateContentDark else ErrorStateContentLight
-    val friendlyCardBackgroundColor = if (darkTheme) FriendlyCardBackgroundDark else FriendlyCardBackgroundLight
+    val positiveBackgroundColor = if (isDarkTheme) PositiveBackgroundDark else PositiveBackgroundLight
+    val positiveTextColor = if (isDarkTheme) PositiveTextDark else PositiveTextLight
+    val negativeBackgroundColor = if (isDarkTheme) NegativeBackgroundDark else NegativeBackgroundLight
+    val negativeTextColor = if (isDarkTheme) NegativeTextDark else NegativeTextLight
+    val errorStateBackgroundColor = if (isDarkTheme) ErrorStateBackgroundDark else ErrorStateBackgroundLight
+    val errorStateContentColor = if (isDarkTheme) ErrorStateContentDark else ErrorStateContentLight
+    val friendlyCardBackgroundColor = if (isDarkTheme) FriendlyCardBackgroundDark else FriendlyCardBackgroundLight
 
-    val summaryCardBg = if (darkTheme) SummaryCardBackgroundDark else SummaryCardBackgroundLight
-    val summaryTextPrimary = if (darkTheme) SummaryTextPrimaryDark else SummaryTextPrimaryLight
-    val summaryTextSecondary = if (darkTheme) SummaryTextSecondaryDark else SummaryTextSecondaryLight
-    val summaryIncome = if (darkTheme) SummaryIncomeDark else SummaryIncomeLight
-    val summaryExpense = if (darkTheme) SummaryExpenseDark else SummaryExpenseLight
-    val summaryDivider = if (darkTheme) SummaryDividerDark else SummaryDividerLight
+    val summaryCardBg = if (isDarkTheme) SummaryCardBackgroundDark else SummaryCardBackgroundLight
+    val summaryTextPrimary = if (isDarkTheme) SummaryTextPrimaryDark else SummaryTextPrimaryLight
+    val summaryTextSecondary = if (isDarkTheme) SummaryTextSecondaryDark else SummaryTextSecondaryLight
+    val summaryIncome = if (isDarkTheme) SummaryIncomeDark else SummaryIncomeLight
+    val summaryExpense = if (isDarkTheme) SummaryExpenseDark else SummaryExpenseLight
+    val summaryDivider = if (isDarkTheme) SummaryDividerDark else SummaryDividerLight
 
     CompositionLocalProvider(
         LocalSummaryCardBackground provides summaryCardBg,

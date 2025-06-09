@@ -26,10 +26,10 @@ abstract class BaseFinanceApp : Application() {
 
         // Инициализация Koin
         initKoin()
-        
+
         // Логируем основные данные устройства для диагностики
         logDeviceInfo()
-        
+
         // Инициализируем специфичные для флейвора компоненты
         initFlavor()
     }
@@ -57,10 +57,10 @@ abstract class BaseFinanceApp : Application() {
         Timber.d("Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
         Timber.d("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
-    
+
     /**
      * Метод для инициализации специфичных для флейвора компонентов.
      * Должен быть реализован в конкретных классах для каждого флейвора.
      */
     protected abstract fun initFlavor()
-} 
+}

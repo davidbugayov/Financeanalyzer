@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer
 
-import android.app.Application
 import android.os.Build
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
@@ -37,7 +36,7 @@ class FinanceApp : BaseFinanceApp() {
 
         // Логируем событие открытия приложения
         AnalyticsUtils.logAppOpen()
-        
+
         // Инициализация RuStore
         initRuStore()
     }
@@ -48,7 +47,7 @@ class FinanceApp : BaseFinanceApp() {
     private fun initAnalytics() {
         // Инициализация AppMetrica
         initAppMetrica()
-        
+
         // Инициализация Firebase
         initFirebase()
 
@@ -82,7 +81,7 @@ class FinanceApp : BaseFinanceApp() {
             Timber.e(e, "Ошибка инициализации AppMetrica")
         }
     }
-    
+
     /**
      * Инициализирует Firebase аналитику и добавляет ее в CompositeAnalytics
      */
@@ -114,7 +113,7 @@ class FinanceApp : BaseFinanceApp() {
             Timber.e(e, "Ошибка инициализации Firebase")
         }
     }
-    
+
     /**
      * Инициализирует RuStore SDK
      */
@@ -131,4 +130,4 @@ class FinanceApp : BaseFinanceApp() {
         Timber.d("Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
         Timber.d("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
-} 
+}

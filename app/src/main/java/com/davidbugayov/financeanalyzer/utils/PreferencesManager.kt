@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -30,8 +31,15 @@ class PreferencesManager(context: Context) {
      * @param themeMode Режим темы для сохранения
      */
     fun saveThemeMode(themeMode: ThemeMode) {
-        sharedPreferences.edit { putString(KEY_THEME_MODE, themeMode.name) }
-        _themeModeFlow.value = themeMode // Обновляем Flow
+        // Проверяем, изменилась ли тема
+        val currentTheme = _themeModeFlow.value
+        if (currentTheme != themeMode) {
+            sharedPreferences.edit { putString(KEY_THEME_MODE, themeMode.name) }
+            _themeModeFlow.value = themeMode // Обновляем Flow
+
+            // Обновляем глобальную тему приложения
+            AppTheme.setTheme(themeMode)
+        }
     }
 
     /**

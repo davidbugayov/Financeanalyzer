@@ -31,4 +31,4 @@ class FirebaseAnalyticsAdapter(
         Timber.d("Setting Firebase user ID: $userId")
         firebaseAnalytics.setUserId(userId)
     }
-} 
+}

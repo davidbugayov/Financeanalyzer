@@ -31,46 +31,35 @@ class NoOpTask<T> : Task<T> {
     override fun getResult(p0: Class<out RuntimeException>?): T? = null
     override fun getException(): Exception? = Exception("Not implemented in F-Droid flavor")
 
-    override fun addOnSuccessListener(
-        p0: com.google.android.play.core.tasks.OnSuccessListener<in T>
-    ): Task<T> = this
+    override fun addOnSuccessListener(p0: com.google.android.play.core.tasks.OnSuccessListener<in T>): Task<T> = this
 
     override fun addOnSuccessListener(
         p0: Any,
-        p1: com.google.android.play.core.tasks.OnSuccessListener<in T>
+        p1: com.google.android.play.core.tasks.OnSuccessListener<in T>,
     ): Task<T> = this
 
     override fun addOnSuccessListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnSuccessListener<in T>
+        p1: com.google.android.play.core.tasks.OnSuccessListener<in T>,
     ): Task<T> = this
 
-    override fun addOnFailureListener(
-        p0: com.google.android.play.core.tasks.OnFailureListener
-    ): Task<T> = this
+    override fun addOnFailureListener(p0: com.google.android.play.core.tasks.OnFailureListener): Task<T> = this
 
-    override fun addOnFailureListener(
-        p0: Any,
-        p1: com.google.android.play.core.tasks.OnFailureListener
-    ): Task<T> = this
+    override fun addOnFailureListener(p0: Any, p1: com.google.android.play.core.tasks.OnFailureListener): Task<T> = this
 
     override fun addOnFailureListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnFailureListener
+        p1: com.google.android.play.core.tasks.OnFailureListener,
     ): Task<T> = this
 
-    override fun addOnCompleteListener(
-        p0: com.google.android.play.core.tasks.OnCompleteListener<T>
-    ): Task<T> = this
+    override fun addOnCompleteListener(p0: com.google.android.play.core.tasks.OnCompleteListener<T>): Task<T> = this
 
-    override fun addOnCompleteListener(
-        p0: Any,
-        p1: com.google.android.play.core.tasks.OnCompleteListener<T>
-    ): Task<T> = this
+    override fun addOnCompleteListener(p0: Any, p1: com.google.android.play.core.tasks.OnCompleteListener<T>): Task<T> =
+        this
 
     override fun addOnCompleteListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnCompleteListener<T>
+        p1: com.google.android.play.core.tasks.OnCompleteListener<T>,
     ): Task<T> = this
 }
 
@@ -85,45 +74,39 @@ class NoOpVoidTask : Task<Void> {
     override fun getResult(p0: Class<out RuntimeException>?): Void? = null
     override fun getException(): Exception? = Exception("Not implemented in F-Droid flavor")
 
-    override fun addOnSuccessListener(
-        p0: com.google.android.play.core.tasks.OnSuccessListener<in Void>
-    ): Task<Void> = this
+    override fun addOnSuccessListener(p0: com.google.android.play.core.tasks.OnSuccessListener<in Void>): Task<Void> =
+        this
 
     override fun addOnSuccessListener(
         p0: Any,
-        p1: com.google.android.play.core.tasks.OnSuccessListener<in Void>
+        p1: com.google.android.play.core.tasks.OnSuccessListener<in Void>,
     ): Task<Void> = this
 
     override fun addOnSuccessListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnSuccessListener<in Void>
+        p1: com.google.android.play.core.tasks.OnSuccessListener<in Void>,
     ): Task<Void> = this
 
-    override fun addOnFailureListener(
-        p0: com.google.android.play.core.tasks.OnFailureListener
-    ): Task<Void> = this
+    override fun addOnFailureListener(p0: com.google.android.play.core.tasks.OnFailureListener): Task<Void> = this
 
-    override fun addOnFailureListener(
-        p0: Any,
-        p1: com.google.android.play.core.tasks.OnFailureListener
-    ): Task<Void> = this
+    override fun addOnFailureListener(p0: Any, p1: com.google.android.play.core.tasks.OnFailureListener): Task<Void> =
+        this
 
     override fun addOnFailureListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnFailureListener
+        p1: com.google.android.play.core.tasks.OnFailureListener,
     ): Task<Void> = this
 
-    override fun addOnCompleteListener(
-        p0: com.google.android.play.core.tasks.OnCompleteListener<Void>
-    ): Task<Void> = this
+    override fun addOnCompleteListener(p0: com.google.android.play.core.tasks.OnCompleteListener<Void>): Task<Void> =
+        this
 
     override fun addOnCompleteListener(
         p0: Any,
-        p1: com.google.android.play.core.tasks.OnCompleteListener<Void>
+        p1: com.google.android.play.core.tasks.OnCompleteListener<Void>,
     ): Task<Void> = this
 
     override fun addOnCompleteListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnCompleteListener<Void>
+        p1: com.google.android.play.core.tasks.OnCompleteListener<Void>,
     ): Task<Void> = this
-} 
+}

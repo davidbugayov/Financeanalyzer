@@ -12,6 +12,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -87,8 +88,12 @@ class ProfileViewModel(
             }
             is ProfileEvent.ChangeTheme -> {
                 viewModelScope.launch {
+                    // Сохраняем тему в PreferencesManager
                     preferencesManager.saveThemeMode(event.theme)
                     _state.update { it.copy(isEditingTheme = false) }
+
+                    // Обновляем глобальную тему приложения
+                    AppTheme.setTheme(event.theme)
 
                     // Логируем изменение темы
                     AnalyticsUtils.logScreenView("theme_changed", event.theme.name)

@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer
 
-import android.app.Application
 import android.os.Build
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
@@ -15,7 +14,7 @@ import timber.log.Timber
 class FinanceApp : BaseFinanceApp() {
 
     // AppMetrica API ключ
-    private val APP_METRICA_API_KEY = "d4ec51de-47c3-4997-812f-97b9a6663dad"
+    private val appMetricaApiKey = "d4ec51de-47c3-4997-812f-97b9a6663dad"
 
     // Составной адаптер для объединения всех систем аналитики
     private val compositeAnalytics = CompositeAnalytics()
@@ -50,7 +49,7 @@ class FinanceApp : BaseFinanceApp() {
     private fun initAppMetrica() {
         try {
             // Настройка AppMetrica
-            val config = AppMetricaConfig.newConfigBuilder(APP_METRICA_API_KEY)
+            val config = AppMetricaConfig.newConfigBuilder(appMetricaApiKey)
                 .withLogs()
                 .withSessionTimeout(60)
                 .withCrashReporting(true)

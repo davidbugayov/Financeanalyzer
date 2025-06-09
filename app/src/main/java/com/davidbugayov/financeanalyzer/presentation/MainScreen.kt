@@ -2,20 +2,22 @@ package com.davidbugayov.financeanalyzer.presentation
 
 import android.annotation.SuppressLint
 import android.app.Activity
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
 import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.navigation.NavGraph
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.ui.theme.LocalAppTheme
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.delay
@@ -30,6 +32,20 @@ import kotlinx.coroutines.launch
 fun MainScreen() {
     val navController = rememberNavController()
 
+    // Получаем текущую тему из LocalAppTheme
+    val themeMode = LocalAppTheme.current
+
+    // Определяем, использовать ли темную тему
+    val isDarkTheme = when (themeMode) {
+        ThemeMode.LIGHT -> false
+        ThemeMode.DARK -> true
+        ThemeMode.SYSTEM -> isSystemInDarkTheme()
+    }
+
+    // Применяем настройки системных панелей в соответствии с темой
+    val view = LocalView.current
+    applyThemeAndSystemBars(themeMode, isDarkTheme, view)
+
     // Настраиваем основную тему приложения
     Box(modifier = Modifier.fillMaxSize()) {
         // Отображаем навигационный граф
@@ -41,7 +57,7 @@ fun MainScreen() {
 }
 
 @Composable
-private fun ApplyThemeAndSystemBars(themeMode: ThemeMode, isDarkTheme: Boolean, view: android.view.View) {
+private fun applyThemeAndSystemBars(themeMode: ThemeMode, isDarkTheme: Boolean, view: android.view.View) {
     LaunchedEffect(themeMode) {
         val window = (view.context as? Activity)?.window
         if (window != null) {
@@ -54,7 +70,7 @@ private fun ApplyThemeAndSystemBars(themeMode: ThemeMode, isDarkTheme: Boolean, 
 }
 
 @Composable
-private fun BackgroundInit(homeViewModel: HomeViewModel) {
+private fun backgroundInit(homeViewModel: HomeViewModel) {
     LaunchedEffect(Unit) {
         MainScope().launch(Dispatchers.Default) {
             delay(500)

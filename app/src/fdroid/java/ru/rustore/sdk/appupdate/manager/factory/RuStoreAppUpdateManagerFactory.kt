@@ -41,44 +41,43 @@ class NoOpAppUpdateInfoTask : Task<AppUpdateInfo> {
     override fun getException(): Exception? = Exception("Not implemented in F-Droid flavor")
 
     override fun addOnSuccessListener(
-        p0: com.google.android.play.core.tasks.OnSuccessListener<in AppUpdateInfo>
+        p0: com.google.android.play.core.tasks.OnSuccessListener<in AppUpdateInfo>,
     ): Task<AppUpdateInfo> = this
 
     override fun addOnSuccessListener(
         p0: Any,
-        p1: com.google.android.play.core.tasks.OnSuccessListener<in AppUpdateInfo>
+        p1: com.google.android.play.core.tasks.OnSuccessListener<in AppUpdateInfo>,
     ): Task<AppUpdateInfo> = this
 
     override fun addOnSuccessListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnSuccessListener<in AppUpdateInfo>
+        p1: com.google.android.play.core.tasks.OnSuccessListener<in AppUpdateInfo>,
     ): Task<AppUpdateInfo> = this
 
-    override fun addOnFailureListener(
-        p0: com.google.android.play.core.tasks.OnFailureListener
-    ): Task<AppUpdateInfo> = this
+    override fun addOnFailureListener(p0: com.google.android.play.core.tasks.OnFailureListener): Task<AppUpdateInfo> =
+        this
 
     override fun addOnFailureListener(
         p0: Any,
-        p1: com.google.android.play.core.tasks.OnFailureListener
+        p1: com.google.android.play.core.tasks.OnFailureListener,
     ): Task<AppUpdateInfo> = this
 
     override fun addOnFailureListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnFailureListener
+        p1: com.google.android.play.core.tasks.OnFailureListener,
     ): Task<AppUpdateInfo> = this
 
     override fun addOnCompleteListener(
-        p0: com.google.android.play.core.tasks.OnCompleteListener<AppUpdateInfo>
+        p0: com.google.android.play.core.tasks.OnCompleteListener<AppUpdateInfo>,
     ): Task<AppUpdateInfo> = this
 
     override fun addOnCompleteListener(
         p0: Any,
-        p1: com.google.android.play.core.tasks.OnCompleteListener<AppUpdateInfo>
+        p1: com.google.android.play.core.tasks.OnCompleteListener<AppUpdateInfo>,
     ): Task<AppUpdateInfo> = this
 
     override fun addOnCompleteListener(
         p0: java.util.concurrent.Executor,
-        p1: com.google.android.play.core.tasks.OnCompleteListener<AppUpdateInfo>
+        p1: com.google.android.play.core.tasks.OnCompleteListener<AppUpdateInfo>,
     ): Task<AppUpdateInfo> = this
-} 
+}
