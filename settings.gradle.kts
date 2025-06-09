@@ -43,7 +43,3 @@ enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 // Set project name
 rootProject.name = "FinanceAnalyzer"
 include(":app")
-
-// Устанавливаем RuStore Debug как сборку по умолчанию
-gradle.startParameter.projectProperties["android.defaultBuildType"] = "debug"
-gradle.startParameter.projectProperties["android.defaultFlavor"] = "rustore"
