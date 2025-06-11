@@ -25,7 +25,6 @@ import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import java.math.BigDecimal
-import com.davidbugayov.financeanalyzer.navigation.AppNavigation
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -36,7 +35,6 @@ class EditTransactionViewModel(
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val application: Application,
     updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
-    private val appNavigation: AppNavigation,
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
@@ -776,10 +774,5 @@ class EditTransactionViewModel(
                 isLoading = false,
             )
         }
-    }
-
-    // Метод для навигации назад
-    fun navigateBack() {
-        appNavigation.navigateBack()
     }
 }

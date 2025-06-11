@@ -16,22 +16,14 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import androidx.navigation.compose.rememberNavController
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.navigation.SetupNavigation
-import com.davidbugayov.financeanalyzer.presentation.main.MainScreen
+import com.davidbugayov.financeanalyzer.presentation.MainScreen
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
-import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
-import org.koin.androidx.compose.get
 
-/**
- * Основная активность приложения, которая отвечает за всю логику навигации и интерфейса.
- */
 class FinanceActivity : ComponentActivity() {
 
     // Начальный экран для навигации
@@ -108,35 +100,25 @@ class FinanceActivity : ComponentActivity() {
 
     private fun applyContent() {
         setContent {
-            FinanceAnalyzerTheme {
-                Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = MaterialTheme.colorScheme.background
-                ) {
-                    FinanceContent()
-                }
-            }
+            financeAppContent(this)
         }
     }
 }
 
-/**
- * Основной контент приложения.
- * Настраивает навигацию и отображает MainScreen.
- */
 @Composable
-fun FinanceContent(
-    navigationManager: NavigationManager = get(),
-    onboardingManager: OnboardingManager = get()
-) {
-    val navController = rememberNavController()
-    
-    // Настраиваем навигационную ловушку
-    SetupNavigation(
-        navController = navController,
-        navigationManager = navigationManager
-    )
-    
-    // Отображаем основной экран приложения
-    MainScreen(navController = navController)
+fun financeAppContent(activity: ComponentActivity) {
+    // Получаем текущую тему из AppTheme и наблюдаем за изменениями
+    val themeMode by AppTheme.currentTheme.collectAsState()
+
+    // Используем AppThemeProvider для предоставления темы всему приложению
+    AppThemeProvider(themeMode = themeMode) {
+        FinanceAnalyzerTheme(themeMode = themeMode) {
+            Surface(
+                modifier = Modifier.fillMaxSize(),
+                color = MaterialTheme.colorScheme.background,
+            ) {
+                MainScreen()
+            }
+        }
+    }
 }

@@ -1,21 +1,17 @@
 package com.davidbugayov.financeanalyzer.di
 
-import android.content.Context
-import androidx.room.Room
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
-import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
-import com.davidbugayov.financeanalyzer.data.repository.TransactionMapper
 import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
-import com.davidbugayov.financeanalyzer.data.repository.UnifiedTransactionRepositoryImpl
+import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
@@ -62,21 +58,13 @@ import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
-import java.io.File
 
 /**
  * Единый DI-модуль приложения. Все зависимости, ViewModel, use-case, менеджеры и утилиты.
  */
 val appModule = module {
     // Database
-    single {
-        Room.databaseBuilder(
-            androidContext(),
-            AppDatabase::class.java, "finance_database"
-        )
-            .fallbackToDestructiveMigration()
-            .build()
-    }
+    single { AppDatabase.getInstance(androidContext()) }
     single { get<AppDatabase>().transactionDao() }
 
     // Preferences
@@ -136,11 +124,10 @@ val appModule = module {
             updateWalletBalancesUseCase = get(),
             achievementsRepository = get(),
             achievementsUiViewModel = achievementsUiViewModel,
-            appNavigation = get(),
         )
     }
     viewModel { ProfileViewModel(get(), get(), get(), get(), androidContext()) }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get()) }
     viewModel {
         EditTransactionViewModel(
             getTransactionByIdUseCase = get(),
@@ -151,7 +138,6 @@ val appModule = module {
             updateWidgetsUseCase = get(),
             application = androidApplication(),
             updateWalletBalancesUseCase = get(),
-            appNavigation = get(),
         )
     }
     viewModel {
@@ -160,29 +146,8 @@ val appModule = module {
     viewModel { BudgetViewModel(get(), get()) }
     viewModel { WalletTransactionsViewModel(get(), get()) }
     viewModel { ImportTransactionsViewModel(get(), androidApplication()) }
-    viewModel { OnboardingViewModel(get(), get()) }
+    viewModel { OnboardingViewModel(get()) }
     viewModel { AchievementsViewModel(get()) }
-
-    // Mapper
-    single { TransactionMapper() }
-
-    // Репозитории
-    single<TransactionRepository> { TransactionRepositoryImpl(get<TransactionDao>()) }
-    single<UnifiedTransactionRepository> {
-        UnifiedTransactionRepositoryImpl(
-            get<TransactionDao>(),
-            get<TransactionMapper>()
-        )
-    }
-
-    // Директория для файлов приложения
-    single { 
-        File(androidContext().filesDir, "finance_analyzer").apply {
-            if (!exists()) {
-                mkdirs()
-            }
-        }
-    }
 }
 
 // Для параметризованных ViewModel (пример: статистика за период)
@@ -194,6 +159,4 @@ val statisticsModule = module {
 }
 
 // Все модули приложения
-val allModules = listOf(appModule, statisticsModule, analyticsModule, repositoryModule, navigationModule)
-
-fun provideAppContext(context: Context): Context = context
+val allModules = listOf(appModule, statisticsModule, analyticsModule, repositoryModule)

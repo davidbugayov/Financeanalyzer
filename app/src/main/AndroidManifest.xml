@@ -50,19 +50,13 @@
         </provider>
 
         <activity
-            android:name=".MainActivity"
+            android:name=".FinanceActivity"
             android:exported="true"
             android:theme="@style/Theme.FinanceAnalyzer.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-        </activity>
-        
-        <activity
-            android:name=".FinanceActivity"
-            android:exported="false"
-            android:theme="@style/Theme.FinanceAnalyzer">
             
             <!-- Обработка deep links для ярлыков -->
             <intent-filter>

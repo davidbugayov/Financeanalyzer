@@ -1,42 +1,30 @@
 package com.davidbugayov.financeanalyzer.presentation.onboarding
 
 import androidx.lifecycle.ViewModel
-import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.navigation.AppNavigation
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
-import kotlinx.coroutines.launch
 
 /**
  * ViewModel для экрана онбординга.
- * Управляет состоянием онбординга и навигацией после его завершения.
+ * Управляет состоянием онбординга, проверяет был ли он показан ранее
+ * и отмечает его как завершенный при необходимости.
  */
 class OnboardingViewModel(
     private val onboardingManager: OnboardingManager,
-    private val appNavigation: AppNavigation
 ) : ViewModel() {
-    
+
     /**
-     * Завершает онбординг и переходит на главный экран.
-     */
-    fun completeOnboarding() {
-        viewModelScope.launch {
-            onboardingManager.setOnboardingCompleted()
-            appNavigation.navigateToHome()
-        }
-    }
-    
-    /**
-     * Проверяет, завершен ли онбординг.
-     * @return true, если онбординг уже пройден
+     * Проверяет, нужно ли показывать онбординг пользователю.
+     * @return true, если онбординг уже был завершен ранее
      */
     fun isOnboardingCompleted(): Boolean {
         return onboardingManager.isOnboardingCompleted()
     }
-    
+
     /**
-     * Сбрасывает статус онбординга (для тестирования или повторного прохождения).
+     * Отмечает онбординг как завершенный.
+     * Вызывается при завершении онбординга пользователем.
      */
-    fun resetOnboarding() {
-        onboardingManager.resetOnboarding()
+    fun completeOnboarding() {
+        onboardingManager.setOnboardingCompleted()
     }
 }

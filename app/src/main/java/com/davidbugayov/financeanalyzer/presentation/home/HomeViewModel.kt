@@ -13,7 +13,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactio
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.navigation.AppNavigation
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
@@ -49,7 +48,6 @@ class HomeViewModel(
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
     private val repository: TransactionRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
-    private val appNavigation: AppNavigation,
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(HomeState())
@@ -565,44 +563,5 @@ class HomeViewModel(
         }
         val startDate = startCalendar.time
         return Pair(startDate, endDate)
-    }
-
-    /**
-     * Навигационные методы
-     */
-    fun navigateToAddTransaction() {
-        appNavigation.navigateToAddTransaction()
-    }
-
-    fun navigateToEditTransaction(transactionId: String) {
-        appNavigation.navigateToEditTransaction(transactionId)
-    }
-
-    fun navigateToTransactionHistory() {
-        appNavigation.navigateToTransactionHistory()
-    }
-
-    fun navigateToAnalytics() {
-        appNavigation.navigateToAnalytics()
-    }
-
-    fun navigateToBudget() {
-        appNavigation.navigateToBudget()
-    }
-
-    fun navigateToSettings() {
-        appNavigation.navigateToSettings()
-    }
-
-    fun navigateToChart() {
-        appNavigation.navigateToAnalytics()
-    }
-
-    fun navigateToHistory() {
-        appNavigation.navigateToTransactionHistory()
-    }
-
-    fun navigateToProfile() {
-        appNavigation.navigateToProfile()
     }
 }

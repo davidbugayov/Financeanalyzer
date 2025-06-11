@@ -2,39 +2,47 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
 import android.content.SharedPreferences
+import androidx.core.content.edit
 
 /**
- * Менеджер для управления статусом онбординга.
- * Сохраняет и проверяет, был ли пройден онбординг пользователем.
+ * Класс для управления состоянием онбординга.
+ * Отвечает за хранение информации о том, был ли показан онбординг пользователю.
  */
 class OnboardingManager(context: Context) {
 
-    private val prefs: SharedPreferences = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+    private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
+        PREFERENCES_NAME,
+        Context.MODE_PRIVATE,
+    )
 
     /**
-     * Проверяет, был ли пройден онбординг.
-     * @return true, если онбординг завершен, иначе false
+     * Проверяет, был ли уже показан онбординг пользователю.
+     * @return true, если онбординг уже был показан
      */
     fun isOnboardingCompleted(): Boolean {
-        return prefs.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+        return sharedPreferences.getBoolean(KEY_ONBOARDING_COMPLETED, false)
     }
 
     /**
-     * Устанавливает статус онбординга как завершенный.
+     * Отмечает онбординг как завершенный.
      */
     fun setOnboardingCompleted() {
-        prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, true).apply()
+        sharedPreferences.edit {
+            putBoolean(KEY_ONBOARDING_COMPLETED, true)
+        }
     }
 
     /**
-     * Сбрасывает статус онбординга (для тестирования или повторного прохождения).
+     * Сбрасывает состояние онбординга (используется для тестирования или если пользователь захочет * снова увидеть онбординг через настройки).
      */
     fun resetOnboarding() {
-        prefs.edit().putBoolean(KEY_ONBOARDING_COMPLETED, false).apply()
+        sharedPreferences.edit {
+            putBoolean(KEY_ONBOARDING_COMPLETED, false)
+        }
     }
 
     companion object {
-        private const val PREFS_NAME = "onboarding_prefs"
+        private const val PREFERENCES_NAME = "onboarding_preferences"
         private const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"
     }
 }
