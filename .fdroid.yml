@@ -12,3 +12,6 @@ builds:
       export FDROID_BUILD=1
     gradle:
       - fdroidRelease
+    output: 'app/build/outputs/apk/fdroid/release/*.apk'
+    srclibs:
+      - kotlinc@v1.9.10
