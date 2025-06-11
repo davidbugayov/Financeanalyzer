@@ -184,7 +184,6 @@ private fun HomeFeedback(
 
 @Composable
 fun HomeScreen(
-    navController: NavController = rememberNavController(),
     viewModel: HomeViewModel = koinViewModel(),
     categoriesViewModel: CategoriesViewModel = koinViewModel(),
     editViewModel: EditTransactionViewModel = koinViewModel(),
@@ -198,26 +197,13 @@ fun HomeScreen(
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
     var feedbackType by remember { mutableStateOf(FeedbackType.INFO) }
-    var selectedTransactionForActions by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
+    var selectedTransaction by remember { mutableStateOf<Transaction?>(null) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
 
     val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
     val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
     val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
-
-    val showAchievementFeedback = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>(
-        "show_achievement_feedback",
-    ) == true
-    if (showAchievementFeedback) {
-        feedbackMessage = stringResource(R.string.achievement_first_steps_unlocked)
-        feedbackType = FeedbackType.SUCCESS
-        showFeedback = true
-        navController.currentBackStackEntry?.savedStateHandle?.set(
-            "show_achievement_feedback",
-            false,
-        )
-    }
 
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
@@ -247,13 +233,13 @@ fun HomeScreen(
     }
     val onTransactionClick = remember<(Transaction) -> Unit> {
         { transaction ->
-            selectedTransactionForActions = transaction
+            selectedTransaction = transaction
             showActionsDialog = true
         }
     }
     val onTransactionLongClick = remember<(Transaction) -> Unit> {
         { transaction ->
-            selectedTransactionForActions = transaction
+            selectedTransaction = transaction
             showActionsDialog = true
         }
     }
@@ -275,14 +261,14 @@ fun HomeScreen(
                     feedbackType = FeedbackType.SUCCESS
                     showFeedback = true
                 },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                onNavigateToProfile = { viewModel.navigateToProfile() },
             )
         },
         bottomBar = {
             HomeBottomBar(
-                onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
+                onNavigateToChart = { viewModel.navigateToChart() },
+                onNavigateToHistory = { viewModel.navigateToHistory() },
+                onNavigateToAdd = { viewModel.navigateToAddTransaction() },
             )
         },
     ) { paddingValues ->
@@ -303,7 +289,7 @@ fun HomeScreen(
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = { navController.navigate(Screen.AddTransaction.route) },
+                    onAddClick = { viewModel.navigateToAddTransaction() },
                 )
             }
             HomeFeedback(
@@ -324,15 +310,15 @@ fun HomeScreen(
 
     HomeDialogs(
         showActionsDialog = showActionsDialog,
-        selectedTransaction = selectedTransactionForActions,
+        selectedTransaction = selectedTransaction,
         onDismissActionsDialog = {
             showActionsDialog = false
-            selectedTransactionForActions = null
+            selectedTransaction = null
         },
         onDeleteTransaction = { transaction ->
             viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
             showActionsDialog = false
-            selectedTransactionForActions = null
+            selectedTransaction = null
         },
         onEditTransaction = { transaction ->
             if (transaction.id.isBlank()) {
@@ -342,10 +328,10 @@ fun HomeScreen(
                 showFeedback = true
             } else {
                 editViewModel.loadTransactionForEditById(transaction.id)
-                navController.navigate(Screen.EditTransaction.createRoute(transaction.id))
+                viewModel.navigateToEditTransaction(transaction.id)
             }
             showActionsDialog = false
-            selectedTransactionForActions = null
+            selectedTransaction = null
         },
         transactionToDelete = state.transactionToDelete,
         onConfirmDelete = {
@@ -361,15 +347,4 @@ fun HomeScreen(
             viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
         },
     )
-
-    val achievementsUiState by achievementsUiViewModel.uiState.collectAsState()
-    achievementsUiState.current?.let { achievement ->
-        FeedbackMessage(
-            title = stringResource(R.string.achievement_first_steps_unlocked),
-            message = achievement.title,
-            type = FeedbackType.SUCCESS,
-            visible = true,
-            onDismiss = { achievementsUiViewModel.onAchievementShown() },
-        )
-    }
 }

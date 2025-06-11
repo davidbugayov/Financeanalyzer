@@ -31,6 +31,7 @@ import timber.log.Timber
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import java.math.BigDecimal
+import com.davidbugayov.financeanalyzer.navigation.AppNavigation
 
 /**
  * ViewModel для экрана добавления транзакции.
@@ -46,6 +47,7 @@ class AddTransactionViewModel(
     updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     private val achievementsRepository: AchievementsRepository = AchievementsRepository(),
     private val achievementsUiViewModel: AchievementsUiViewModel,
+    private val appNavigation: AppNavigation,
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
@@ -636,5 +638,9 @@ class AddTransactionViewModel(
      */
     fun resetAchievementUnlockedFlag() {
         _achievementUnlocked.value = false
+    }
+
+    fun navigateBack() {
+        appNavigation.navigateBack()
     }
 }
