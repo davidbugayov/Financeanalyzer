@@ -1,5 +1,5 @@
 ---
-# F-Droid build configuration
+#  F-Droid build configuration
 builds:
   - versionName: 'any'
     versionCode: 'any'
