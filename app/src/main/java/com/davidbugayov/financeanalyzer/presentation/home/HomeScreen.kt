@@ -26,14 +26,11 @@ import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -47,7 +44,6 @@ import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLay
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
@@ -184,11 +180,9 @@ private fun HomeFeedback(
 
 @Composable
 fun HomeScreen(
-    navController: NavController = rememberNavController(),
     viewModel: HomeViewModel = koinViewModel(),
     categoriesViewModel: CategoriesViewModel = koinViewModel(),
     editViewModel: EditTransactionViewModel = koinViewModel(),
-    achievementsUiViewModel: AchievementsUiViewModel = koinViewModel(),
     updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject(),
 ) {
     val state by viewModel.state.collectAsState()
@@ -205,19 +199,6 @@ fun HomeScreen(
     val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
     val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
     val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
-
-    val showAchievementFeedback = navController.currentBackStackEntry?.savedStateHandle?.get<Boolean>(
-        "show_achievement_feedback",
-    ) == true
-    if (showAchievementFeedback) {
-        feedbackMessage = stringResource(R.string.achievement_first_steps_unlocked)
-        feedbackType = FeedbackType.SUCCESS
-        showFeedback = true
-        navController.currentBackStackEntry?.savedStateHandle?.set(
-            "show_achievement_feedback",
-            false,
-        )
-    }
 
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
@@ -275,14 +256,14 @@ fun HomeScreen(
                     feedbackType = FeedbackType.SUCCESS
                     showFeedback = true
                 },
-                onNavigateToProfile = { navController.navigate(Screen.Profile.route) },
+                onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
             )
         },
         bottomBar = {
             HomeBottomBar(
-                onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-                onNavigateToHistory = { navController.navigate(Screen.History.route) },
-                onNavigateToAdd = { navController.navigate(Screen.AddTransaction.route) },
+                onNavigateToChart = { viewModel.onEvent(HomeEvent.NavigateToChart) },
+                onNavigateToHistory = { viewModel.onEvent(HomeEvent.NavigateToHistory) },
+                onNavigateToAdd = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
             )
         },
     ) { paddingValues ->
@@ -303,7 +284,7 @@ fun HomeScreen(
                     onFilterSelected = onFilterSelected,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = { navController.navigate(Screen.AddTransaction.route) },
+                    onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
                 )
             }
             HomeFeedback(
@@ -342,7 +323,7 @@ fun HomeScreen(
                 showFeedback = true
             } else {
                 editViewModel.loadTransactionForEditById(transaction.id)
-                navController.navigate(Screen.EditTransaction.createRoute(transaction.id))
+                viewModel.onEvent(HomeEvent.EditTransaction(transaction))
             }
             showActionsDialog = false
             selectedTransactionForActions = null
@@ -361,15 +342,4 @@ fun HomeScreen(
             viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
         },
     )
-
-    val achievementsUiState by achievementsUiViewModel.uiState.collectAsState()
-    achievementsUiState.current?.let { achievement ->
-        FeedbackMessage(
-            title = stringResource(R.string.achievement_first_steps_unlocked),
-            message = achievement.title,
-            type = FeedbackType.SUCCESS,
-            visible = true,
-            onDismiss = { achievementsUiViewModel.onAchievementShown() },
-        )
-    }
 }

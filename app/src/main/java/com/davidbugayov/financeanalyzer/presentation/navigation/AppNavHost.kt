@@ -8,6 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
@@ -15,46 +16,55 @@ import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.EnhancedFinanceChartScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.FinancialStatisticsScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
-import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
+import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
-import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 
 @Composable
-fun NavGraph(navController: NavHostController = rememberNavController(), startDestination: String = Screen.Home.route) {
+fun AppNavHost(
+    navController: NavHostController,
+    navigationManager: NavigationManager,
+) {
+    LaunchedEffect("navigation") {
+        navigationManager.commands.onEach { command ->
+            when (command) {
+                is NavigationManager.Command.Navigate -> navController.navigate(
+                    command.destination,
+                ) { launchSingleTop = true }
+                is NavigationManager.Command.NavigateUp -> navController.navigateUp()
+                is NavigationManager.Command.PopUpTo -> navController.popBackStack(
+                    command.destination,
+                    command.inclusive,
+                )
+            }
+        }.launchIn(this)
+    }
+
     NavHost(
         navController = navController,
-        startDestination = startDestination,
+        startDestination = Screen.Home.route,
     ) {
-        mainGraph(navController)
-        transactionGraph(navController)
-        profileGraph(navController)
-        statisticsGraph(navController)
-
-        composable(Screen.Home.route) {
-            HomeScreenWrapper(
-                navController = navController,
-            )
-        }
+        mainGraph(navigationManager)
+        transactionGraph(navigationManager)
+        profileGraph(navigationManager)
     }
 }
 
-fun NavGraphBuilder.mainGraph(navController: NavHostController) {
+private fun NavGraphBuilder.mainGraph(navigationManager: NavigationManager) {
     composable(
         route = Screen.Home.route,
         enterTransition = defaultEnterRight(),
@@ -62,9 +72,7 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         popEnterTransition = defaultEnterRight(),
         popExitTransition = defaultExitLeft(),
     ) {
-        HomeScreenWrapper(
-            navController = navController,
-        )
+        HomeScreen()
     }
     composable(
         route = Screen.History.route,
@@ -73,24 +81,7 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         popEnterTransition = defaultEnterLeft(),
         popExitTransition = defaultExitRight(),
     ) {
-        TransactionHistoryScreen(
-            viewModel = koinViewModel<TransactionHistoryViewModel>(),
-            editTransactionViewModel = koinViewModel<EditTransactionViewModel>(),
-            onNavigateBack = { navController.navigateUp() },
-            navController = navController,
-        )
-    }
-    composable(
-        route = Screen.Chart.route,
-        enterTransition = defaultEnterLeft(),
-        exitTransition = defaultExitRight(),
-        popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight(),
-    ) {
-        EnhancedFinanceChartScreen(
-            navController = navController,
-            onNavigateBack = { navController.popBackStack() },
-        )
+        TransactionHistoryScreen()
     }
     composable(
         route = Screen.Budget.route,
@@ -99,13 +90,26 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         popEnterTransition = defaultEnterLeft(),
         popExitTransition = defaultExitRight(),
     ) {
-        BudgetScreen(
-            navController = navController,
-            onNavigateBack = { navController.navigateUp() },
-            onNavigateToTransactions = { walletId ->
-                navController.navigate(Screen.WalletTransactions.createRoute(walletId))
+        BudgetScreen()
+    }
+    composable(
+        route = Screen.FinancialStatistics.route,
+        arguments = listOf(
+            navArgument("startDate") {
+                type = NavType.LongType
+                defaultValue = -1L
             },
-        )
+            navArgument("endDate") {
+                type = NavType.LongType
+                defaultValue = -1L
+            }
+        ),
+        enterTransition = defaultEnterLeft(),
+        exitTransition = defaultExitRight(),
+        popEnterTransition = defaultEnterLeft(),
+        popExitTransition = defaultExitRight(),
+    ) {
+        FinancialStatisticsScreen(onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) })
     }
     composable(
         route = Screen.WalletTransactions.route,
@@ -116,28 +120,26 @@ fun NavGraphBuilder.mainGraph(navController: NavHostController) {
         popExitTransition = defaultExitRight(),
     ) { backStackEntry ->
         val walletId = backStackEntry.arguments?.getString("walletId") ?: return@composable
-        WalletTransactionsScreen(
-            walletId = walletId,
-            onNavigateBack = { navController.navigateUp() },
-            navController = navController,
-        )
+        WalletTransactionsScreen(walletId = walletId)
     }
 }
 
-fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
+private fun NavGraphBuilder.transactionGraph(navigationManager: NavigationManager) {
     composable(
-        route = Screen.AddTransaction.route,
+        route = Screen.AddTransaction.routeWithArgs,
+        arguments = listOf(
+            navArgument(Screen.AddTransaction.categoryArg) {
+                type = NavType.StringType
+                nullable = true
+            },
+        ),
         enterTransition = defaultEnterUp(),
         exitTransition = defaultExitDown(),
         popEnterTransition = defaultEnterUp(),
         popExitTransition = defaultExitDown(),
-    ) {
-        AddTransactionScreen(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateToImport = { navController.navigate(Screen.ImportTransactions.route) },
-            navController = navController,
-            achievementsUiViewModel = koinViewModel(),
-        )
+    ) { backStackEntry ->
+        val category = backStackEntry.arguments?.getString(Screen.AddTransaction.categoryArg)
+        AddTransactionScreen(category = category)
     }
     composable(
         route = Screen.EditTransaction.route,
@@ -147,15 +149,9 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         popEnterTransition = defaultEnterUp(),
         popExitTransition = defaultExitDown(),
     ) { backStackEntry ->
-        val transactionId = backStackEntry.arguments?.getString("transactionId")
-        if (transactionId.isNullOrBlank()) {
-            Timber.e("transactionId is null or blank, не открываем экран редактирования")
-            return@composable
-        }
+        val id = backStackEntry.arguments?.getString("transactionId") ?: "0"
         EditTransactionScreen(
-            viewModel = koinViewModel<EditTransactionViewModel>(),
-            onNavigateBack = { navController.navigateUp() },
-            transactionId = transactionId,
+            transactionId = id,
         )
     }
     composable(
@@ -166,7 +162,8 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         popExitTransition = defaultExitRight(),
     ) {
         ImportTransactionsScreen(
-            onNavigateBack = { navController.popBackStack() },
+            onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
+            viewModel = koinViewModel(),
         )
     }
     composable(
@@ -181,12 +178,12 @@ fun NavGraphBuilder.transactionGraph(navController: NavHostController) {
         val achievements = achievementsViewModel.achievements.collectAsState().value
         AchievementsScreen(
             achievements = achievements,
-            onBack = { navController.popBackStack() },
+            onBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
         )
     }
 }
 
-fun NavGraphBuilder.profileGraph(navController: NavHostController) {
+private fun NavGraphBuilder.profileGraph(navigationManager: NavigationManager) {
     composable(
         route = Screen.Profile.route,
         enterTransition = defaultEnterLeft(),
@@ -194,14 +191,7 @@ fun NavGraphBuilder.profileGraph(navController: NavHostController) {
         popEnterTransition = defaultEnterLeft(),
         popExitTransition = defaultExitRight(),
     ) {
-        ProfileScreen(
-            onNavigateBack = { navController.popBackStack() },
-            onNavigateToLibraries = { navController.navigate(Screen.Libraries.route) },
-            onNavigateToChart = { navController.navigate(Screen.Chart.route) },
-            onNavigateToBudget = { navController.navigate(Screen.Budget.route) },
-            onNavigateToExportImport = { navController.navigate(Screen.ExportImport.route) },
-            onNavigateToAchievements = { navController.navigate(Screen.Achievements.route) },
-        )
+        ProfileScreen()
     }
     composable(
         route = Screen.Libraries.route,
@@ -211,7 +201,7 @@ fun NavGraphBuilder.profileGraph(navController: NavHostController) {
         popExitTransition = defaultExitRight(),
     ) {
         LibrariesScreen(
-            onNavigateBack = { navController.navigateUp() },
+            onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
         )
     }
     composable(
@@ -222,31 +212,13 @@ fun NavGraphBuilder.profileGraph(navController: NavHostController) {
         popExitTransition = defaultExitRight(),
     ) {
         ExportImportScreen(
-            onNavigateBack = { navController.popBackStack() },
-            onImportClick = { navController.navigate(Screen.ImportTransactions.route) },
-            viewModel = koinViewModel<ProfileViewModel>(),
-        )
-    }
-}
-
-fun NavGraphBuilder.statisticsGraph(navController: NavHostController) {
-    composable(
-        route = Screen.FinancialStatistics.route,
-        arguments = listOf(
-            navArgument("startDate") { type = NavType.LongType },
-            navArgument("endDate") { type = NavType.LongType },
-        ),
-        enterTransition = defaultEnterLeft(),
-        exitTransition = defaultExitRight(),
-        popEnterTransition = defaultEnterLeft(),
-        popExitTransition = defaultExitRight(),
-    ) { backStackEntry ->
-        val startDate = backStackEntry.arguments?.getLong("startDate") ?: 0L
-        val endDate = backStackEntry.arguments?.getLong("endDate") ?: 0L
-        FinancialStatisticsScreen(
-            startDate = startDate,
-            endDate = endDate,
-            onNavigateBack = { navController.popBackStack() },
+            onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
+            onImportClick = {
+                navigationManager.navigate(
+                    NavigationManager.Command.Navigate(Screen.ImportTransactions.route),
+                )
+            },
+            viewModel = koinViewModel(),
         )
     }
 }

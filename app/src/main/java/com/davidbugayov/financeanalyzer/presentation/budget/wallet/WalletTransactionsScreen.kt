@@ -45,14 +45,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavController
-import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import org.koin.androidx.compose.koinViewModel
 import kotlin.experimental.ExperimentalTypeInference
@@ -61,10 +58,8 @@ import kotlin.experimental.ExperimentalTypeInference
 @Composable
 fun WalletTransactionsScreen(
     walletId: String,
-    onNavigateBack: () -> Unit,
     viewModel: WalletTransactionsViewModel = koinViewModel(),
     addTransactionViewModel: AddTransactionViewModel = koinViewModel(),
-    navController: NavController = rememberNavController(),
 ) {
     val context = LocalContext.current
     // Загружаем данные для выбранного кошелька
@@ -86,15 +81,7 @@ fun WalletTransactionsScreen(
     // Обработчик нажатия на кнопку "Потратить"
     val navigateToAddTransaction: () -> Unit = {
         state.wallet?.let { wallet ->
-            // Настроим экран добавления транзакции с именем кошелька в качестве категории
-            addTransactionViewModel.setupForExpenseAddition(
-                amount = "", // Пустая строка для поля суммы
-                walletCategory = wallet.name,
-                context = context,
-            )
-
-            // Переходим на экран добавления транзакции
-            navController.navigate(Screen.AddTransaction.route)
+            viewModel.onNavigateToAddTransaction(wallet.name)
         }
     }
 
@@ -103,7 +90,7 @@ fun WalletTransactionsScreen(
             AppTopBar(
                 title = state.wallet?.name ?: "Кошелек",
                 showBackButton = true,
-                onBackClick = onNavigateBack,
+                onBackClick = viewModel::onNavigateBack,
                 actions = {
                     IconButton(
                         onClick = { showImportCategoriesDialog = true },

@@ -9,4 +9,4 @@ sealed class DataChangeEvent {
      * @param transactionId ID измененной транзакции или null для массовых изменений
      */
     data class TransactionChanged(val transactionId: String?) : DataChangeEvent()
-} 
+}

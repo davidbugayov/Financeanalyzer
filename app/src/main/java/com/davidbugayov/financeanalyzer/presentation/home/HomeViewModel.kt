@@ -16,6 +16,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseC
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.Dispatchers
@@ -48,6 +50,7 @@ class HomeViewModel(
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
     private val repository: TransactionRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
+    private val navigationManager: NavigationManager,
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(HomeState())
@@ -152,6 +155,25 @@ class HomeViewModel(
 
             is HomeEvent.DeleteTransaction -> {
                 deleteTransaction(event.transaction, context)
+            }
+            is HomeEvent.NavigateToChart -> {
+                navigationManager.navigate(
+                    NavigationManager.Command.Navigate(
+                        Screen.FinancialStatistics.createRoute(null, null),
+                    ),
+                )
+            }
+            is HomeEvent.NavigateToProfile -> {
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.Profile.route))
+            }
+            is HomeEvent.NavigateToHistory -> {
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.History.route))
+            }
+            is HomeEvent.NavigateToAddTransaction -> {
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.route))
+            }
+            is HomeEvent.EditTransaction -> {
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(event.transaction.id)))
             }
             // Commenting out this block as NotificationScheduler.updateTransactionReminder is not static
             // and HomeViewModel should likely not be managing this directly.
@@ -563,5 +585,23 @@ class HomeViewModel(
         }
         val startDate = startCalendar.time
         return Pair(startDate, endDate)
+    }
+
+    fun onAddTransactionClicked() {
+        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.route))
+    }
+
+    fun onTransactionClicked(transactionId: String) {
+        navigationManager.navigate(
+            NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(transactionId)),
+        )
+    }
+
+    fun onNavigateToProfile() {
+        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.Profile.route))
+    }
+
+    fun onNavigateToHistory() {
+        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.History.route))
     }
 }

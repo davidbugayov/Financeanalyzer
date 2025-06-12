@@ -6,6 +6,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsState
+import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,10 +22,19 @@ import timber.log.Timber
 class WalletTransactionsViewModel(
     private val walletRepository: WalletRepository,
     private val transactionRepository: TransactionRepository,
+    private val navigationManager: NavigationManager,
 ) : ViewModel(), KoinComponent {
 
     private val _state = MutableStateFlow(WalletTransactionsState())
     val state: StateFlow<WalletTransactionsState> = _state.asStateFlow()
+
+    fun onNavigateBack() {
+        navigationManager.navigate(NavigationManager.Command.NavigateUp)
+    }
+
+    fun onNavigateToAddTransaction(category: String) {
+        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(category)))
+    }
 
     fun onEvent(event: WalletTransactionsEvent) {
         when (event) {

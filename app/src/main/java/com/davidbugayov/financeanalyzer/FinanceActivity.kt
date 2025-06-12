@@ -16,15 +16,20 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
-import com.davidbugayov.financeanalyzer.presentation.MainScreen
+import androidx.navigation.compose.rememberNavController
+import com.davidbugayov.financeanalyzer.presentation.navigation.AppNavHost
+import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import org.koin.android.ext.android.inject
 
 class FinanceActivity : ComponentActivity() {
+
+    private val navigationManager: NavigationManager by inject()
 
     // Начальный экран для навигации
     private var startDestination = Screen.Home.route
@@ -100,13 +105,13 @@ class FinanceActivity : ComponentActivity() {
 
     private fun applyContent() {
         setContent {
-            financeAppContent(this)
+            financeAppContent(this, navigationManager)
         }
     }
 }
 
 @Composable
-fun financeAppContent(activity: ComponentActivity) {
+fun financeAppContent(activity: ComponentActivity, navigationManager: NavigationManager) {
     // Получаем текущую тему из AppTheme и наблюдаем за изменениями
     val themeMode by AppTheme.currentTheme.collectAsState()
 
@@ -117,7 +122,8 @@ fun financeAppContent(activity: ComponentActivity) {
                 modifier = Modifier.fillMaxSize(),
                 color = MaterialTheme.colorScheme.background,
             ) {
-                MainScreen()
+                val navController = rememberNavController()
+                AppNavHost(navController = navController, navigationManager = navigationManager)
             }
         }
     }

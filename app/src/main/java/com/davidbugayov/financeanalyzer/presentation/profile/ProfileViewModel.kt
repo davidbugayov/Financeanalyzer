@@ -12,9 +12,10 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
-import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,22 +23,19 @@ import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.onEach
+import kotlinx.coroutines.flow.launchIn
 import timber.log.Timber
 
-/**
- * ViewModel для экрана профиля.
- * Управляет состоянием профиля и обрабатывает события.
- */
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
     private val getProfileAnalyticsUseCase: GetProfileAnalyticsUseCase,
     private val preferencesManager: PreferencesManager,
     private val notificationScheduler: INotificationScheduler,
     private val appContext: Context,
+    private val navigationManager: NavigationManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())
@@ -60,9 +58,6 @@ class ProfileViewModel(
             .launchIn(viewModelScope)
     }
 
-    /**
-     * Обработка событий профиля.
-     */
     fun onEvent(event: ProfileEvent) {
         when (event) {
             is ProfileEvent.ExportTransactionsToCSV -> {
@@ -129,12 +124,8 @@ class ProfileViewModel(
                 _state.update { it.copy(isEditingNotifications = false) }
             }
             is ProfileEvent.NavigateToLibraries -> {
-                // Это событие будет обрабатываться в ProfileScreen
-                // через переданный колбэк onNavigateToLibraries
-                logLibrariesNavigation()
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.Libraries.route))
             }
-
-            // События настроек
             is ProfileEvent.ChangeLanguage -> {
                 _state.update { it.copy(selectedLanguage = event.language) }
                 // Здесь можно добавить сохранение настройки в DataStore
@@ -152,38 +143,47 @@ class ProfileViewModel(
                 )
                 syncNotificationState()
             }
-
-            // События безопасности
             is ProfileEvent.ChangeAppLock -> {
                 _state.update { it.copy(isAppLockEnabled = event.enabled) }
-                // Здесь можно добавить сохранение настройки в DataStore
             }
             is ProfileEvent.ChangeBiometric -> {
                 _state.update { it.copy(isBiometricEnabled = event.enabled) }
-                // Здесь можно добавить сохранение настройки в DataStore
             }
-
-            // События аналитики
             is ProfileEvent.LoadFinancialAnalytics -> {
                 loadFinancialAnalytics()
+            }
+            is ProfileEvent.NavigateToFinancialStatistics -> {
+                navigationManager.navigate(
+                    NavigationManager.Command.Navigate(
+                        Screen.FinancialStatistics.createRoute(null, null),
+                    ),
+                )
+            }
+            is ProfileEvent.NavigateToBudget -> {
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.Budget.route))
+            }
+            is ProfileEvent.NavigateToExportImport -> {
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.ExportImport.route))
+            }
+            is ProfileEvent.NavigateToAchievements -> {
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.Achievements.route))
+            }
+            is ProfileEvent.NavigateBack -> {
+                navigationManager.navigate(NavigationManager.Command.NavigateUp)
+            }
+            is ProfileEvent.Logout -> {
+                // TODO: Logout
             }
         }
     }
 
-    /**
-     * Логирование перехода к экрану библиотек.
-     */
     private fun logLibrariesNavigation() {
-        // Здесь можно добавить логирование аналитики
         AnalyticsUtils.logScreenView(
             screenName = "libraries",
             screenClass = "LibrariesScreen",
         )
     }
 
-    /**
-     * Экспорт транзакций в CSV файл.
-     */
     private fun exportTransactionsToCSV(action: ExportAction) {
         viewModelScope.launch {
             exportTransactionsToCSVUseCase().collect { result ->
@@ -217,10 +217,6 @@ class ProfileViewModel(
         }
     }
 
-    /**
-     * Загружает финансовую аналитику из базы данных.
-     * Рассчитывает общий доход, расходы, баланс и норму сбережений.
-     */
     private fun loadFinancialAnalytics() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
@@ -250,7 +246,7 @@ class ProfileViewModel(
                     _state.update { currentState ->
                         currentState.copy(
                             isLoading = false,
-                            error = result.exception.message ?: "Error loading analytics",
+                            error = result.exception.message ?: "Неизвестная ошибка",
                         )
                     }
                 }
@@ -258,24 +254,16 @@ class ProfileViewModel(
         }
     }
 
-    fun syncNotificationState() {
-        viewModelScope.launch {
-            val remindersEnabled = preferencesManager.isTransactionReminderEnabled()
-            val reminderTimePair = preferencesManager.getReminderTime()
-            val permission = PermissionUtils.hasNotificationPermission(appContext)
-            Timber.d(
-                "[ProfileViewModel] syncNotificationState: remindersEnabled=%b, reminderTime=%s, hasPermission=%b",
-                remindersEnabled,
-                reminderTimePair,
-                permission,
+    private fun syncNotificationState() {
+        val isEnabled = preferencesManager.isTransactionReminderEnabled()
+        val timePair = preferencesManager.getReminderTime()
+        val time = Time(timePair.first, timePair.second)
+        _state.update {
+            it.copy(
+                isTransactionReminderEnabled = isEnabled,
+                transactionReminderTime = time,
             )
-            _state.update {
-                it.copy(
-                    isTransactionReminderEnabled = remindersEnabled,
-                    transactionReminderTime = Time(reminderTimePair.first, reminderTimePair.second),
-                    hasNotificationPermission = permission,
-                )
-            }
         }
+        Timber.d("[ProfileViewModel] syncNotificationState: isEnabled=$isEnabled, time=$time")
     }
 }

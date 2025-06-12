@@ -13,9 +13,7 @@ import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
-import timber.log.Timber
 import java.time.ZoneOffset
-import java.time.temporal.ChronoUnit
 import java.util.Date
 import java.util.Calendar
 
@@ -29,10 +27,10 @@ class UnifiedTransactionRepositoryImpl(
 ) : UnifiedTransactionRepository {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
-    
+
     // Кэш для хранения транзакций
     private val transactionsCache = mutableMapOf<String, Transaction>()
-    
+
     // Поток событий изменения данных
     private val _dataChangeEvents = MutableSharedFlow<DataChangeEvent>()
     override val dataChangeEvents: SharedFlow<DataChangeEvent> = _dataChangeEvents
@@ -65,7 +63,7 @@ class UnifiedTransactionRepositoryImpl(
         startDate: Date,
         endDate: Date,
         limit: Int,
-        offset: Int
+        offset: Int,
     ): List<Transaction> {
         val entities = transactionDao.getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
         return entities.map { transactionMapper.mapFromEntity(it) }
@@ -95,12 +93,13 @@ class UnifiedTransactionRepositoryImpl(
      */
     override suspend fun getTransactionsByDateRange(
         startDate: LocalDate,
-        endDate: LocalDate
+        endDate: LocalDate,
     ): List<Transaction> {
         // Преобразование LocalDate в java.util.Date
         val startJavaDate = Date(startDate.toJavaLocalDate().atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
-        val endJavaDate = Date(endDate.toJavaLocalDate().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() - 1)
-        
+        val endJavaDate =
+            Date(endDate.toJavaLocalDate().plusDays(1).atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli() - 1)
+
         return getTransactionsByDateRange(startJavaDate, endJavaDate)
     }
 
@@ -125,12 +124,12 @@ class UnifiedTransactionRepositoryImpl(
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
         val startDate = calendar.time
-        
+
         // Создаем конечную дату для указанного месяца
         calendar.add(Calendar.MONTH, 1)
         calendar.add(Calendar.MILLISECOND, -1)
         val endDate = calendar.time
-        
+
         return getTransactionsByDateRange(startDate, endDate)
     }
 
@@ -149,7 +148,7 @@ class UnifiedTransactionRepositoryImpl(
         calendar.set(Calendar.SECOND, 0)
         calendar.set(Calendar.MILLISECOND, 0)
         val startDate = calendar.time
-        
+
         // Последний день недели
         calendar.add(Calendar.DAY_OF_WEEK, 6)
         calendar.set(Calendar.HOUR_OF_DAY, 23)
@@ -157,7 +156,7 @@ class UnifiedTransactionRepositoryImpl(
         calendar.set(Calendar.SECOND, 59)
         calendar.set(Calendar.MILLISECOND, 999)
         val endDate = calendar.time
-        
+
         return getTransactionsByDateRange(startDate, endDate)
     }
 
@@ -197,15 +196,15 @@ class UnifiedTransactionRepositoryImpl(
     override suspend fun addTransaction(transaction: Transaction): String {
         val entity = transactionMapper.mapToEntity(transaction)
         transactionDao.insertTransaction(entity)
-        
+
         // Обновляем кэш
         transactionsCache[transaction.id] = transaction
-        
+
         // Уведомляем об изменении данных
         coroutineScope.launch {
             notifyDataChanged(transaction.id)
         }
-        
+
         return transaction.id
     }
 
@@ -215,10 +214,10 @@ class UnifiedTransactionRepositoryImpl(
     override suspend fun updateTransaction(transaction: Transaction) {
         val entity = transactionMapper.mapToEntity(transaction)
         transactionDao.updateTransaction(entity)
-        
+
         // Обновляем кэш
         transactionsCache[transaction.id] = transaction
-        
+
         // Уведомляем об изменении данных
         coroutineScope.launch {
             notifyDataChanged(transaction.id)
@@ -231,10 +230,10 @@ class UnifiedTransactionRepositoryImpl(
     override suspend fun deleteTransaction(transaction: Transaction) {
         val entity = transactionMapper.mapToEntity(transaction)
         transactionDao.deleteTransaction(entity)
-        
+
         // Удаляем из кэша
         transactionsCache.remove(transaction.id)
-        
+
         // Уведомляем об изменении данных
         coroutineScope.launch {
             notifyDataChanged(transaction.id)
@@ -246,10 +245,10 @@ class UnifiedTransactionRepositoryImpl(
      */
     override suspend fun deleteTransaction(id: String) {
         transactionDao.deleteTransactionById(id)
-        
+
         // Удаляем из кэша
         transactionsCache.remove(id)
-        
+
         // Уведомляем об изменении данных
         coroutineScope.launch {
             notifyDataChanged(id)
@@ -262,14 +261,14 @@ class UnifiedTransactionRepositoryImpl(
     override suspend fun getTransactionById(id: String): Transaction? {
         // Проверяем кэш
         transactionsCache[id]?.let { return it }
-        
+
         // Если в кэше нет, загружаем из базы
         val entity = transactionDao.getTransactionByIdString(id) ?: return null
         val transaction = transactionMapper.mapFromEntity(entity)
-        
+
         // Сохраняем в кэш
         transactionsCache[id] = transaction
-        
+
         return transaction
     }
 
@@ -313,4 +312,4 @@ class UnifiedTransactionRepositoryImpl(
         deleteTransaction(transaction)
         return true
     }
-} 
+}

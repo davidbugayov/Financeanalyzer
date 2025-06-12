@@ -2,14 +2,13 @@ package com.davidbugayov.financeanalyzer.data.repository
 
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import java.util.UUID
 
 /**
  * Маппер для преобразования между доменной моделью Transaction и Entity-моделью TransactionEntity.
  * Отвечает за преобразование данных между слоями.
  */
 class TransactionMapper {
-    
+
     /**
      * Преобразует Entity в доменную модель
      * @param entity Entity-модель из базы данных
@@ -28,10 +27,10 @@ class TransactionMapper {
             categoryId = entity.categoryId,
             title = entity.title,
             isTransfer = entity.isTransfer,
-            walletIds = entity.walletIds
+            walletIds = entity.walletIds,
         )
     }
-    
+
     /**
      * Преобразует доменную модель в Entity
      * @param domainModel Доменная модель Transaction
@@ -50,10 +49,10 @@ class TransactionMapper {
             categoryId = domainModel.categoryId,
             title = domainModel.title,
             isTransfer = domainModel.isTransfer,
-            walletIds = domainModel.walletIds
+            walletIds = domainModel.walletIds,
         )
     }
-    
+
     /**
      * Преобразует список Entity в список доменных моделей
      * @param entities Список Entity-моделей
@@ -62,7 +61,7 @@ class TransactionMapper {
     fun mapFromEntityList(entities: List<TransactionEntity>): List<Transaction> {
         return entities.map { mapFromEntity(it) }
     }
-    
+
     /**
      * Преобразует список доменных моделей в список Entity
      * @param domainModels Список доменных моделей
@@ -71,4 +70,4 @@ class TransactionMapper {
     fun mapToEntityList(domainModels: List<Transaction>): List<TransactionEntity> {
         return domainModels.map { mapToEntity(it) }
     }
-} 
+}

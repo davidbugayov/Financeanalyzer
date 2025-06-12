@@ -18,6 +18,8 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -42,6 +44,7 @@ class TransactionHistoryViewModel constructor(
     private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val application: Application,
+    private val navigationManager: NavigationManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
@@ -742,5 +745,15 @@ class TransactionHistoryViewModel constructor(
                 Timber.e(e, "Ошибка при проверке количества транзакций: ${e.message}")
             }
         }
+    }
+
+    fun onNavigateBack() {
+        navigationManager.navigate(NavigationManager.Command.NavigateUp)
+    }
+
+    fun onEditTransaction(transactionId: String) {
+        navigationManager.navigate(
+            NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(transactionId)),
+        )
     }
 }

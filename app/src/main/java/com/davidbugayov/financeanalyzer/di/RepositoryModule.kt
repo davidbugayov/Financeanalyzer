@@ -18,17 +18,17 @@ import org.koin.dsl.module
 val repositoryModule = module {
     // Маппер для преобразования моделей
     single { TransactionMapper() }
-    
+
     // Репозитории
     single { TransactionRepositoryImpl(get()) }
     single<TransactionRepository> { get<TransactionRepositoryImpl>() }
     single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
-    
+
     // Унифицированный репозиторий транзакций
     single { UnifiedTransactionRepositoryImpl(get(), get()) }
     single<UnifiedTransactionRepository> { get<UnifiedTransactionRepositoryImpl>() }
-    
+
     // Другие репозитории
     single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
     single { AchievementsRepository() }
-} 
+}

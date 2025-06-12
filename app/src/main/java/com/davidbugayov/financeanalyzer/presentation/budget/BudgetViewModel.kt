@@ -8,6 +8,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
+import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -20,6 +22,7 @@ import java.util.UUID
 class BudgetViewModel(
     private val walletRepository: WalletRepository,
     private val transactionRepository: TransactionRepository,
+    private val navigationManager: NavigationManager,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BudgetState())
@@ -32,6 +35,24 @@ class BudgetViewModel(
         // Загружаем категории бюджета
         loadBudgetCategories()
         calculateTotals()
+        subscribeToTransactionChanges()
+    }
+
+    fun onNavigateBack() {
+        navigationManager.navigate(NavigationManager.Command.NavigateUp)
+    }
+
+    fun onNavigateToTransactions(walletId: String) {
+        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.WalletTransactions.createRoute(walletId)))
+    }
+
+    private fun subscribeToTransactionChanges() {
+        viewModelScope.launch {
+            transactionRepository.dataChangeEvents.collect {
+                Timber.d("BudgetViewModel: получено событие изменения транзакции, обновляем данные")
+                onEvent(BudgetEvent.LoadCategories)
+            }
+        }
     }
 
     fun onEvent(event: BudgetEvent) {

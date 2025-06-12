@@ -45,8 +45,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -61,14 +59,11 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
@@ -81,9 +76,6 @@ import java.util.Locale
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetScreen(
-    navController: NavController,
-    onNavigateBack: () -> Unit,
-    onNavigateToTransactions: (String) -> Unit,
     viewModel: BudgetViewModel = koinViewModel(),
     achievementsUiViewModel: com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel =
         koinViewModel(),
@@ -92,43 +84,6 @@ fun BudgetScreen(
     ),
 ) {
     val state by viewModel.state.collectAsState()
-
-    // Обновляем данные при возвращении на экран
-    DisposableEffect(navController) {
-        val listener = NavController.OnDestinationChangedListener { _, destination, _ ->
-            // Если текущий экран - BudgetScreen, загружаем данные
-            if (destination.route == Screen.Budget.route) {
-                viewModel.onEvent(BudgetEvent.LoadCategories)
-            }
-        }
-
-        // Добавляем слушателя
-        navController.addOnDestinationChangedListener(listener)
-
-        // Загружаем данные при первом входе
-        viewModel.onEvent(BudgetEvent.LoadCategories)
-
-        // Удаляем слушателя при выходе
-        onDispose {
-            navController.removeOnDestinationChangedListener(listener)
-        }
-    }
-
-    // Подписываемся на события изменения данных транзакций
-    LaunchedEffect(Unit) {
-        // Получаем репозиторий транзакций через addTransactionViewModel
-        addTransactionViewModel.getTransactionRepository().dataChangeEvents.collect { event ->
-            // При изменении транзакций, обновляем данные
-            when (event) {
-                is DataChangeEvent.TransactionChanged -> {
-                    Timber.d(
-                        "BudgetScreen: получено событие изменения транзакции, обновляем данные",
-                    )
-                    viewModel.onEvent(BudgetEvent.LoadCategories)
-                }
-            }
-        }
-    }
 
     // Состояние диалогов
     var showAddCategoryDialog by remember { mutableStateOf(false) }
@@ -166,7 +121,7 @@ fun BudgetScreen(
             AppTopBar(
                 title = "Бюджет",
                 showBackButton = true,
-                onBackClick = onNavigateBack,
+                onBackClick = viewModel::onNavigateBack,
                 actions = {
                     IconButton(onClick = {
                         tempIncomeAmount = "" // Сбрасываем временную сумму
@@ -343,7 +298,16 @@ fun BudgetScreen(
                     items(state.categories) { category ->
                         WalletCard(
                             wallet = category,
-                            onClick = { onNavigateToTransactions(category.id) },
+                            onClick = {
+                                if (category.id.isNotEmpty()) {
+                                    viewModel.onNavigateToTransactions(category.id)
+                                } else {
+                                    Timber.w(
+                                        "ID кошелька пуст, навигация невозможна: %s",
+                                        category,
+                                    )
+                                }
+                            },
                         )
                     }
                 }
@@ -757,7 +721,7 @@ fun BudgetScreen(
                                     }
 
                                     // Навигация на экран добавления транзакции
-                                    navController.navigate(Screen.AddTransaction.route)
+                                    viewModel.onNavigateToTransactions(state.categories.first().id)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                                 shape = RoundedCornerShape(12.dp),
@@ -774,7 +738,7 @@ fun BudgetScreen(
                                 onClick = {
                                     showDistributeConfirmation = false
 
-                                    navController.navigate(Screen.AddTransaction.route)
+                                    viewModel.onNavigateToTransactions(state.categories.first().id)
                                 },
                                 modifier = Modifier.fillMaxWidth(),
                             ) {

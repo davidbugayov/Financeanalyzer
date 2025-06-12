@@ -15,30 +15,30 @@ interface BaseRepository<T, ID> {
      * @return сущность или null, если не найдена
      */
     suspend fun getById(id: ID): T?
-    
+
     /**
      * Получает поток всех сущностей
      * @return Flow со списком всех сущностей
      */
     fun getAll(): Flow<List<T>>
-    
+
     /**
      * Добавляет новую сущность
      * @param item сущность для добавления
      * @return идентификатор добавленной сущности
      */
     suspend fun add(item: T): ID
-    
+
     /**
      * Обновляет существующую сущность
      * @param item сущность для обновления
      */
     suspend fun update(item: T)
-    
+
     /**
      * Удаляет сущность по идентификатору
      * @param id идентификатор сущности для удаления
      * @return true если сущность была удалена, false если сущность не найдена
      */
     suspend fun delete(id: ID): Boolean
-} 
+}

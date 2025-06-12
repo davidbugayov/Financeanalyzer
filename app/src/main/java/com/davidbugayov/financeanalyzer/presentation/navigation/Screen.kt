@@ -15,19 +15,30 @@ sealed class Screen(val route: String) {
     data object History : Screen("history")
 
     /** Экран добавления новой транзакции */
-    data object AddTransaction : Screen("add")
+    data object AddTransaction : Screen("add") {
+        const val routeWithArgs: String = "add?category={category}"
+        const val categoryArg: String = "category"
+        fun createRoute(category: String? = null): String {
+            return if (category != null) {
+                "add?category=$category"
+            } else {
+                "add"
+            }
+        }
+    }
 
     /** Экран редактирования существующей транзакции */
     data object EditTransaction : Screen("edit/{transactionId}") {
         fun createRoute(transactionId: String) = "edit/$transactionId"
     }
 
-    /** Экран с графиками и статистикой */
-    data object Chart : Screen("chart")
-
     /** Экран с подробной финансовой статистикой */
-    data object FinancialStatistics : Screen("financial_statistics/{startDate}/{endDate}") {
-        fun createRoute(startDate: Long, endDate: Long) = "financial_statistics/$startDate/$endDate"
+    data object FinancialStatistics : Screen("financial_statistics?startDate={startDate}&endDate={endDate}") {
+        fun createRoute(startDate: Long?, endDate: Long?): String {
+            val start = startDate ?: System.currentTimeMillis()
+            val end = endDate ?: System.currentTimeMillis()
+            return "financial_statistics?startDate=$start&endDate=$end"
+        }
     }
 
     /** Экран профиля пользователя */

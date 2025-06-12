@@ -90,6 +90,7 @@
     <string name="select_start_date">Выберите начальную дату</string>
     <string name="select_end_date">Выберите конечную дату</string>
     <string name="apply">Применить</string>
+    <string name="title_activity_transaction_history">История транзакций</string>
     
     <!-- Экран добавления транзакции -->
     <string name="add_transaction">Добавить транзакцию</string>

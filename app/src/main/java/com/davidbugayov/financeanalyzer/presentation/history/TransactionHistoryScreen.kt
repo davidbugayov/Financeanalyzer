@@ -6,14 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.AccountBalance
-import androidx.compose.material.icons.filled.FilterAlt
-import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -30,7 +23,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
@@ -56,11 +48,11 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelec
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import timber.log.Timber
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -75,10 +67,8 @@ fun TransactionHistoryState.toTransactionDialogState(): TransactionDialogState {
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun TransactionHistoryScreen(
-    viewModel: TransactionHistoryViewModel,
-    editTransactionViewModel: EditTransactionViewModel,
-    onNavigateBack: () -> Unit,
-    navController: NavController,
+    viewModel: TransactionHistoryViewModel = koinViewModel(),
+    editTransactionViewModel: EditTransactionViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -103,7 +93,7 @@ fun TransactionHistoryScreen(
             }
             is TransactionEvent.ShowEditDialog -> {
                 // Навигация на экран редактирования
-                navController.navigate(Screen.EditTransaction.createRoute(event.transactionId))
+                viewModel.onEditTransaction(event.transactionId)
             }
 
             is TransactionEvent.HideEditDialog -> {
@@ -245,7 +235,7 @@ fun TransactionHistoryScreen(
             // Загружаем транзакцию в ViewModel для редактирования
             editTransactionViewModel.loadTransactionForEditById(transactionId)
             // Переходим на экран редактирования
-            navController.navigate(Screen.EditTransaction.createRoute(transactionId))
+            viewModel.onEditTransaction(transactionId)
             Timber.d("Navigating to edit transaction with ID: $transactionId")
         },
     )
@@ -306,44 +296,12 @@ fun TransactionHistoryScreen(
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.transaction_history),
-                navigationIcon = {
-                    IconButton(onClick = onNavigateBack) {
-                        Icon(
-                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                            contentDescription = stringResource(R.string.back),
-                        )
-                    }
-                },
-                actions = {
-                    IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FilterAlt,
-                            contentDescription = stringResource(R.string.select_period),
-                        )
-                    }
-                    IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.FilterList,
-                            contentDescription = stringResource(R.string.filter_by_category),
-                        )
-                    }
-                    IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) },
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.AccountBalance,
-                            contentDescription = stringResource(R.string.filter_by_source),
-                        )
-                    }
-                },
-                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
+                title = stringResource(R.string.title_activity_transaction_history),
+                showBackButton = true,
+                onBackClick = viewModel::onNavigateBack,
             )
         },
+        modifier = Modifier.fillMaxSize(),
     ) { paddingValues ->
         Box(
             modifier = Modifier

@@ -129,7 +129,7 @@ interface UnifiedTransactionRepository : BaseRepository<Transaction, String> {
      * @return Список транзакций с учетом пагинации
      */
     suspend fun loadTransactionsPaginated(limit: Int, offset: Int): List<Transaction>
-    
+
     /**
      * Добавляет новую транзакцию.
      * Переопределяет метод из BaseRepository для соответствия существующему API.
@@ -137,28 +137,28 @@ interface UnifiedTransactionRepository : BaseRepository<Transaction, String> {
      * @return ID добавленной транзакции.
      */
     suspend fun addTransaction(transaction: Transaction): String
-    
+
     /**
      * Обновляет существующую транзакцию.
      * Переопределяет метод из BaseRepository для соответствия существующему API.
      * @param transaction Транзакция для обновления.
      */
     suspend fun updateTransaction(transaction: Transaction)
-    
+
     /**
      * Удаляет транзакцию.
      * Переопределяет метод из BaseRepository для соответствия существующему API.
      * @param transaction Транзакция для удаления.
      */
     suspend fun deleteTransaction(transaction: Transaction)
-    
+
     /**
      * Удаляет транзакцию по идентификатору.
      * Переопределяет метод из BaseRepository для соответствия существующему API.
      * @param id Идентификатор транзакции для удаления.
      */
     suspend fun deleteTransaction(id: String)
-    
+
     /**
      * Получает транзакцию по идентификатору.
      * Переопределяет метод из BaseRepository для соответствия существующему API.
@@ -166,4 +166,4 @@ interface UnifiedTransactionRepository : BaseRepository<Transaction, String> {
      * @return Транзакция или null, если транзакция не найдена.
      */
     suspend fun getTransactionById(id: String): Transaction?
-} 
+}

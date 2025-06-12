@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransa
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
+import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -35,6 +36,7 @@ class EditTransactionViewModel(
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val application: Application,
     updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
+    private val navigationManager: NavigationManager,
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
     categoriesViewModel,
     sourcePreferences,
@@ -60,6 +62,10 @@ class EditTransactionViewModel(
         // Load wallets from repository using base class method
         loadWallets()
         loadSources()
+    }
+
+    fun onNavigateBack() {
+        navigationManager.navigate(NavigationManager.Command.NavigateUp)
     }
 
     // Override loadWallets to update our local wallets state

@@ -48,7 +48,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.components.AnalyticsSection
 import com.davidbugayov.financeanalyzer.presentation.profile.components.AppInfoSection
 import com.davidbugayov.financeanalyzer.presentation.profile.components.NotificationSettingsDialog
@@ -76,21 +75,13 @@ import timber.log.Timber
  */
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit,
-    onNavigateToLibraries: () -> Unit,
-    onNavigateToChart: () -> Unit,
-    onNavigateToBudget: () -> Unit,
-    onNavigateToExportImport: (String) -> Unit,
-    onNavigateToAchievements: () -> Unit,
+    viewModel: ProfileViewModel = koinViewModel()
 ) {
-    // Получаем текущее состояние из ViewModel
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
 
-    // Получаем информацию о версии приложения
     val packageInfo = remember {
         context.packageManager.getPackageInfo(context.packageName, 0)
     }
@@ -98,7 +89,6 @@ fun ProfileScreen(
     val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
     val buildVersion = remember { BuildConfig.VERSION_CODE.toString() }
 
-    // Логируем открытие экрана профиля
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(
             screenName = "profile",
@@ -106,7 +96,6 @@ fun ProfileScreen(
         )
     }
 
-    // Добавить этот LaunchedEffect для обработки intentCommands
     LaunchedEffect(Unit) {
         viewModel.intentCommands.collectLatest { intent ->
             try {
@@ -122,12 +111,9 @@ fun ProfileScreen(
         }
     }
 
-    // Устанавливаем темные иконки в статус-баре
     SetupStatusBarAppearance(state.themeMode, context)
 
-    // Обновляем UI при изменении темы
     FinanceAnalyzerTheme(themeMode = state.themeMode) {
-        // Показываем сообщения о результате экспорта
         HandleExportMessages(state, snackbarHostState, viewModel)
 
         LaunchedEffect(state.isTransactionReminderEnabled) {
@@ -138,7 +124,7 @@ fun ProfileScreen(
 
         Scaffold(
             topBar = {
-                ProfileTopBar(onNavigateBack = onNavigateBack)
+                ProfileTopBar(onNavigateBack = { viewModel.onEvent(ProfileEvent.NavigateBack) })
             },
             snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { paddingValues ->
@@ -148,7 +134,6 @@ fun ProfileScreen(
                     .padding(paddingValues)
                     .verticalScroll(rememberScrollState()),
             ) {
-                // Секция финансовой аналитики
                 AnalyticsSection(
                     totalIncome = state.totalIncome,
                     totalExpense = state.totalExpense,
@@ -160,22 +145,21 @@ fun ProfileScreen(
                     averageExpense = state.averageExpense,
                     totalSourcesUsed = state.totalSourcesUsed,
                     dateRange = state.dateRange,
-                    onSavingsRateClick = onNavigateToChart,
+                    onSavingsRateClick = { viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics) },
                     modifier = Modifier
                         .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
-                        .clickable { onNavigateToChart() },
+                        .clickable { viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics) },
                 )
 
                 Spacer(
                     modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
-                // Секция бюджета
                 ProfileActionCard(
                     icon = Icons.Default.AccountBalanceWallet,
                     iconBackground = MaterialTheme.colorScheme.primary,
                     title = stringResource(R.string.budget),
                     subtitle = stringResource(R.string.profile_budget_subtitle),
-                    onClick = onNavigateToBudget,
+                    onClick = { viewModel.onEvent(ProfileEvent.NavigateToBudget) },
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
                         vertical = 4.dp,
@@ -184,13 +168,12 @@ fun ProfileScreen(
                 Spacer(
                     modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
-                // Секция экспорт и импорт
                 ProfileActionCard(
                     icon = Icons.Default.FileUpload,
                     iconBackground = MaterialTheme.colorScheme.primary,
                     title = stringResource(R.string.export_import),
                     subtitle = stringResource(R.string.profile_export_import_subtitle),
-                    onClick = { onNavigateToExportImport(Screen.ExportImport.route) },
+                    onClick = { viewModel.onEvent(ProfileEvent.NavigateToExportImport) },
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
                         vertical = 4.dp,
@@ -200,13 +183,12 @@ fun ProfileScreen(
                     modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
-                // Кнопка перехода на экран достижений
                 ProfileActionCard(
                     icon = Icons.Default.Star,
                     iconBackground = MaterialTheme.colorScheme.primary,
                     title = stringResource(R.string.achievements),
                     subtitle = stringResource(R.string.profile_achievements_subtitle),
-                    onClick = onNavigateToAchievements,
+                    onClick = { viewModel.onEvent(ProfileEvent.NavigateToAchievements) },
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
                         vertical = 4.dp,
@@ -216,7 +198,6 @@ fun ProfileScreen(
                     modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
-                // Секция настроек
                 SettingsSection(
                     onThemeClick = { viewModel.onEvent(ProfileEvent.ShowThemeDialog) },
                     onLanguageClick = { /* Открыть диалог выбора языка */ },
@@ -239,11 +220,10 @@ fun ProfileScreen(
                     modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
-                // Секция информации о приложении
                 AppInfoSection(
                     appVersion = appVersion,
                     buildVersion = buildVersion,
-                    onNavigateToLibraries = onNavigateToLibraries,
+                    onNavigateToLibraries = { viewModel.onEvent(ProfileEvent.NavigateToLibraries) },
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
                     ),
@@ -253,10 +233,8 @@ fun ProfileScreen(
                     modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
-                // Диалоги
                 ShowDialogs(state, viewModel)
 
-                // Отступ внизу экрана для улучшения UX
                 Spacer(
                     modifier = Modifier.height(
                         dimensionResource(R.dimen.profile_section_spacing) * 2,
@@ -311,7 +289,6 @@ private fun HandleExportMessages(
  */
 @Composable
 private fun ShowDialogs(state: ProfileState, viewModel: ProfileViewModel) {
-    // Диалог выбора темы
     if (state.isEditingTheme) {
         ThemeSelectionDialog(
             selectedTheme = state.themeMode,
@@ -322,7 +299,6 @@ private fun ShowDialogs(state: ProfileState, viewModel: ProfileViewModel) {
         )
     }
 
-    // Диалог настроек уведомлений
     if (state.isEditingNotifications) {
         NotificationSettingsDialog(
             onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) },
@@ -381,4 +357,19 @@ fun ProfileActionCard(
             }
         }
     }
+}
+
+@Composable
+private fun SettingsSection(
+    onThemeClick: () -> Unit,
+    onLanguageClick: () -> Unit,
+    onCurrencyClick: () -> Unit,
+    onTransactionReminderClick: () -> Unit,
+    themeMode: ThemeMode,
+    isTransactionReminderEnabled: Boolean,
+    transactionReminderTime: String,
+    hasNotificationPermission: Boolean,
+    modifier: Modifier = Modifier,
+) {
+    // ... existing code ...
 }

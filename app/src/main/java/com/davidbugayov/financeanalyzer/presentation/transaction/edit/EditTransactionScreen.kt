@@ -19,7 +19,6 @@ import timber.log.Timber
 @Composable
 fun EditTransactionScreen(
     viewModel: EditTransactionViewModel = koinViewModel(),
-    onNavigateBack: () -> Unit,
     transactionId: String? = null,
 ) {
     LaunchedEffect(Unit) {
@@ -49,7 +48,7 @@ fun EditTransactionScreen(
 
     BaseTransactionScreen(
         viewModel = viewModel,
-        onNavigateBack = onNavigateBack,
+        onNavigateBack = viewModel::onNavigateBack,
         screenTitle = stringResource(R.string.edit_transaction_title),
         buttonText = stringResource(R.string.save_button_text),
         isEditMode = true,

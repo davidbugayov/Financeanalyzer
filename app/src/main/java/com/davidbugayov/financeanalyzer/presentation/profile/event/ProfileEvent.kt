@@ -97,4 +97,34 @@ sealed class ProfileEvent {
      * Событие навигации к экрану библиотек.
      */
     data object NavigateToLibraries : ProfileEvent()
+
+    /**
+     * Событие навигации к экрану финансовой статистики.
+     */
+    data object NavigateToFinancialStatistics : ProfileEvent()
+
+    /**
+     * Событие навигации к экрану бюджета.
+     */
+    data object NavigateToBudget : ProfileEvent()
+
+    /**
+     * Событие навигации к экрану экспорта/импорта.
+     */
+    data object NavigateToExportImport : ProfileEvent()
+
+    /**
+     * Событие навигации к экрану достижений.
+     */
+    data object NavigateToAchievements : ProfileEvent()
+
+    /**
+     * Событие навигации назад.
+     */
+    data object NavigateBack : ProfileEvent()
+
+    /**
+     * Событие выхода из приложения.
+     */
+    data object Logout : ProfileEvent()
 }

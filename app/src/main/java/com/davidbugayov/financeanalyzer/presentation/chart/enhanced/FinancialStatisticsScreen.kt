@@ -53,7 +53,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
-import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.BudgetTip
@@ -69,22 +68,19 @@ import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel.En
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.math.BigDecimal
 import java.text.SimpleDateFormat
-import java.util.Date
 import java.util.Locale
+import java.math.BigDecimal
 
 /**
  * Улучшенный экран с финансовыми графиками.
  * Поддерживает свайп между разными типами визуализации и обновленный дизайн.
  *
- * @param navController NavController для навигации
  * @param viewModel ViewModel для управления состоянием экрана
  * @param onNavigateBack Колбэк для навигации назад
  * @param onNavigateToTransactions Опциональный колбэк для навигации к списку транзакций с фильтрами
@@ -94,10 +90,8 @@ import java.util.Locale
     androidx.compose.foundation.ExperimentalFoundationApi::class,
 )
 @Composable
-fun EnhancedFinanceChartScreen(
-    navController: NavController,
+fun FinancialStatisticsScreen(
     onNavigateBack: () -> Unit,
-    onNavigateToTransactions: ((String, Date, Date) -> Unit)? = null,
 ) {
     // Используем новую ViewModel
     val viewModel: EnhancedFinanceChartViewModel = viewModel()
@@ -134,7 +128,7 @@ fun EnhancedFinanceChartScreen(
                     }
                 }
                 is EnhancedFinanceChartEffect.NavigateToAddTransaction -> {
-                    onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
+                    // onNavigateToTransactions?.invoke("", state.startDate, state.endDate)
                 }
             }
         }
@@ -239,7 +233,7 @@ fun EnhancedFinanceChartScreen(
                         viewModel = viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
+                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding))
                     )
 
                     // Табы для переключения между типами графиков
@@ -364,11 +358,7 @@ fun EnhancedFinanceChartScreen(
                                                 if (item != null) {
                                                     selectedCategory = item.original?.name
                                                     item.original?.name?.let { categoryName ->
-                                                        onNavigateToTransactions?.invoke(
-                                                            categoryName,
-                                                            state.startDate,
-                                                            state.endDate,
-                                                        )
+                                                        // onNavigateToTransactions?.invoke(categoryName, state.startDate, state.endDate)
                                                     }
                                                 } else {
                                                     selectedCategory = null
@@ -443,12 +433,7 @@ fun EnhancedFinanceChartScreen(
                                             )
                                             .clickable {
                                                 // Переход на экран подробной статистики через navController
-                                                navController.navigate(
-                                                    Screen.FinancialStatistics.createRoute(
-                                                        state.startDate.time,
-                                                        state.endDate.time,
-                                                    ),
-                                                )
+                                                // navController.navigate(Screen.FinancialStatistics.createRoute(state.startDate.time, state.endDate.time))
                                             },
                                         shape = RoundedCornerShape(16.dp),
                                         elevation = CardDefaults.cardElevation(
@@ -559,10 +544,10 @@ fun EnhancedFinanceChartScreen(
                         }
                     }
 
-                    // Карточка с метриками финансового здоровья
+                    // Вторая карточка - метрики финансового здоровья
                     FinancialHealthMetricsCard(
                         savingsRate = state.savingsRate,
-                        averageDailyExpense = state.averageDailyExpense,
+                        averageDailyExpense = state.averageDailyExpense ?: Money.zero(),
                         monthsOfSavings = state.monthsOfSavings,
                         modifier = Modifier
                             .fillMaxWidth()

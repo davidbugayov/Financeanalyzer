@@ -17,4 +17,9 @@ sealed class HomeEvent {
     data object HideDeleteConfirmDialog : HomeEvent()
     data class DeleteTransaction(val transaction: Transaction) : HomeEvent()
     data class ChangeNotifications(val enabled: Boolean) : HomeEvent()
+    data object NavigateToChart : HomeEvent()
+    data object NavigateToProfile : HomeEvent()
+    data object NavigateToHistory : HomeEvent()
+    data object NavigateToAddTransaction : HomeEvent()
+    data class EditTransaction(val transaction: Transaction) : HomeEvent()
 }

@@ -1,13 +1,11 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.add
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavController
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionScreen
@@ -21,14 +19,11 @@ import timber.log.Timber
 /**
  * Экран добавления новой транзакции
  * Использует BaseTransactionScreen для отображения UI
- * @param navController контроллер навигации для передачи флага достижения
  */
 @Composable
 fun AddTransactionScreen(
-    onNavigateBack: () -> Unit,
-    onNavigateToImport: (() -> Unit)? = null,
-    navController: NavController,
-    achievementsUiViewModel: AchievementsUiViewModel,
+    achievementsUiViewModel: AchievementsUiViewModel = koinViewModel(),
+    category: String? = null,
 ) {
     val context = LocalContext.current
     val viewModel: AddTransactionViewModel = koinViewModel(
@@ -36,9 +31,15 @@ fun AddTransactionScreen(
     )
     val state by viewModel.state.collectAsState()
 
+    LaunchedEffect(key1 = category) {
+        category?.let {
+            viewModel.setCategory(it)
+        }
+    }
+
     LaunchedEffect(Unit) {
         Timber.d(
-            "AddTransactionScreen: Screen opened, onNavigateToImport is ${if (onNavigateToImport != null) "provided" else "null"}",
+            "AddTransactionScreen: Screen opened",
         )
 
         AnalyticsUtils.logScreenView(
@@ -55,32 +56,24 @@ fun AddTransactionScreen(
         }
     }
 
+    /*
     val achievementUnlocked by viewModel.achievementUnlocked.collectAsState()
     LaunchedEffect(achievementUnlocked) {
         if (achievementUnlocked) {
-            navController.previousBackStackEntry?.savedStateHandle?.set("show_rustore_review", true)
-            navController.previousBackStackEntry?.savedStateHandle?.set(
-                "show_achievement_feedback",
-                true,
-            )
+            // This needs to be handled via NavigationManager result API
             viewModel.resetAchievementUnlockedFlag()
         }
     }
-
-    DisposableEffect(Unit) {
-        onDispose {
-            // No need to reset navigateBackCallback as it's not used in the new implementation
-        }
-    }
+     */
 
     BaseTransactionScreen(
         viewModel = viewModel,
-        onNavigateBack = onNavigateBack,
+        onNavigateBack = viewModel::onNavigateBack,
         screenTitle = stringResource(R.string.new_transaction_title),
         buttonText = stringResource(R.string.add_button_text),
         isEditMode = false,
         eventFactory = defaultTransactionEventFactory(false),
         submitEvent = BaseTransactionEvent.Submit,
-        onNavigateToImport = onNavigateToImport,
+        onNavigateToImport = viewModel::onNavigateToImport,
     )
 }
