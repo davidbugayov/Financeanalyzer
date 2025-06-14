@@ -6,17 +6,13 @@ import com.davidbugayov.financeanalyzer.domain.model.AppException.GenericAppExce
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalyticsData
 import com.davidbugayov.financeanalyzer.domain.model.Result
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.percentageOf
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Locale
-import java.util.Date
 
 class GetProfileAnalyticsUseCase(
     private val context: Context,

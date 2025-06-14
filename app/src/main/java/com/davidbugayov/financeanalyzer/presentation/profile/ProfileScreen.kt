@@ -75,7 +75,7 @@ import timber.log.Timber
  */
 @Composable
 fun ProfileScreen(
-    viewModel: ProfileViewModel = koinViewModel()
+    viewModel: ProfileViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current

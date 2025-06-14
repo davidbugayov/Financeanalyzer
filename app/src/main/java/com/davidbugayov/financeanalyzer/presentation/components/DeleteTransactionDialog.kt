@@ -20,7 +20,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -67,7 +66,7 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
             Column {
                 Text(
                     text = "Сумма: ${transaction.amount}\n" +
-                            "Категория: ${transaction.category}",
+                        "Категория: ${transaction.category}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
@@ -77,7 +76,7 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
                     text = if (transaction.isExpense) {
                         "-${moneyFormatter.abs()}"
                     } else {
-                        "+${moneyFormatter}"
+                        "+$moneyFormatter"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (transaction.isExpense) {

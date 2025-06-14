@@ -2,10 +2,8 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.formatted
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

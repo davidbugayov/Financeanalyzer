@@ -11,6 +11,9 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Result
+import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
@@ -81,7 +84,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun updateWalletsBalance(
         walletIds: List<String>,
         amount: Money,
-        originalTransaction: com.davidbugayov.financeanalyzer.domain.model.Transaction?,
+        originalTransaction: Transaction?,
     ) {
         viewModelScope.launch {
             val result = updateWalletBalancesUseCase(
@@ -89,7 +92,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 amountForWallets = amount,
                 originalTransaction = originalTransaction,
             )
-            if (result is com.davidbugayov.financeanalyzer.domain.model.Result.Error) {
+            if (result is Result.Error) {
                 Timber.e(result.exception, "Ошибка при обновлении баланса кошельков через UseCase")
             }
         }
@@ -756,7 +759,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         showDeleteCategoryConfirmDialog: Boolean = state.showDeleteCategoryConfirmDialog,
         showDeleteSourceConfirmDialog: Boolean = state.showDeleteSourceConfirmDialog,
         editMode: Boolean = state.editMode,
-        transactionToEdit: com.davidbugayov.financeanalyzer.domain.model.Transaction? = state.transactionToEdit,
+        transactionToEdit: Transaction? = state.transactionToEdit,
         addToWallet: Boolean = state.addToWallet,
         selectedWallets: List<String> = state.selectedWallets,
         showWalletSelector: Boolean = state.showWalletSelector,

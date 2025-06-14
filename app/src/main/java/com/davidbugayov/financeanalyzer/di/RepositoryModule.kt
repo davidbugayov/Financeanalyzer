@@ -21,7 +21,7 @@ val repositoryModule = module {
     // Унифицированный репозиторий транзакций
     single { UnifiedTransactionRepositoryImpl(get(), get()) }
     single<UnifiedTransactionRepository> { get<UnifiedTransactionRepositoryImpl>() }
-    
+
     // Предоставляем UnifiedTransactionRepository как реализацию TransactionRepository и ITransactionRepository
     // для обратной совместимости
     single<TransactionRepository> { get<UnifiedTransactionRepositoryImpl>() }

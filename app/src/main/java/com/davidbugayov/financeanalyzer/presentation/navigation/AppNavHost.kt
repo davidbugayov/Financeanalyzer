@@ -32,7 +32,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransa
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
 
 @Composable
 fun AppNavHost(
@@ -102,7 +101,7 @@ private fun NavGraphBuilder.mainGraph(navigationManager: NavigationManager) {
             navArgument("endDate") {
                 type = NavType.LongType
                 defaultValue = -1L
-            }
+            },
         ),
         enterTransition = defaultEnterLeft(),
         exitTransition = defaultExitRight(),

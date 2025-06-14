@@ -23,16 +23,16 @@ fun getInitialSources(sourcePreferences: SourcePreferences, resources: Resources
             val colorObject = ColorUtils.getSourceColorByName(name.lowercase()) ?: CashColor
             Source(name = name, color = colorObject.toArgb())
         }
-        
+
         // Сохраняем дефолтные источники в формате CustomSourceData
         val customSourceData = defaultSources.map { source ->
             SourcePreferences.CustomSourceData(
                 name = source.name,
-                colorHex = ColorUtils.colorToHex(source.color)
+                colorHex = ColorUtils.colorToHex(source.color),
             )
         }
         sourcePreferences.saveCustomSources(customSourceData)
-        
+
         defaultSources
     }
 }
@@ -43,15 +43,15 @@ fun addCustomSource(
     newSource: Source,
 ): List<Source> {
     val updatedSources = (currentSources + newSource).distinctBy { it.name }
-    
+
     // Преобразуем Source в CustomSourceData перед сохранением
     val customSourceData = updatedSources.map { source ->
         SourcePreferences.CustomSourceData(
             name = source.name,
-            colorHex = ColorUtils.colorToHex(source.color)
+            colorHex = ColorUtils.colorToHex(source.color),
         )
     }
     sourcePreferences.saveCustomSources(customSourceData)
-    
+
     return updatedSources
 }

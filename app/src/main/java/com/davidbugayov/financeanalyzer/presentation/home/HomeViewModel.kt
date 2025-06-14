@@ -173,7 +173,9 @@ class HomeViewModel(
                 navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.route))
             }
             is HomeEvent.EditTransaction -> {
-                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(event.transaction.id)))
+                navigationManager.navigate(
+                    NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(event.transaction.id)),
+                )
             }
             // Commenting out this block as NotificationScheduler.updateTransactionReminder is not static
             // and HomeViewModel should likely not be managing this directly.

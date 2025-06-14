@@ -1,8 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 
-import com.davidbugayov.financeanalyzer.domain.model.CategoryStatistics
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.percentageDifference
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import java.math.BigDecimal
@@ -24,7 +22,7 @@ class CalculateCategoryStatsUseCase(private val transactionRepository: Transacti
         currentStartDate: Date,
         currentEndDate: Date,
         previousStartDate: Date,
-        previousEndDate: Date
+        previousEndDate: Date,
     ): Triple<Money, Money, BigDecimal?> {
         val currentTransactions = transactionRepository.getTransactionsByDateRange(currentStartDate, currentEndDate)
             .filter { it.categoryId == categoryId }

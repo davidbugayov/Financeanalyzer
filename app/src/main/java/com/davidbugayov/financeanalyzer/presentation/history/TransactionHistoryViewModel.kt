@@ -424,12 +424,14 @@ class TransactionHistoryViewModel constructor(
                     currentStartDate = startDate,
                     currentEndDate = endDate,
                     previousStartDate = Date(startDate.time - (endDate.time - startDate.time)),
-                    previousEndDate = startDate
+                    previousEndDate = startDate,
                 )
 
                 _state.update { it.copy(categoryStats = Triple(currentTotal, previousTotal, percentageChange)) }
 
-                Timber.d("Статистика по категории $category рассчитана: $currentTotal, $previousTotal, $percentageChange")
+                Timber.d(
+                    "Статистика по категории $category рассчитана: $currentTotal, $previousTotal, $percentageChange",
+                )
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при расчете статистики по категории: ${e.message}")
                 _state.update { it.copy(categoryStats = null) }

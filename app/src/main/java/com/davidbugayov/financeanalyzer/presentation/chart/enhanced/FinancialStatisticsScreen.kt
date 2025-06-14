@@ -233,7 +233,7 @@ fun FinancialStatisticsScreen(
                         viewModel = viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding))
+                            .padding(dimensionResource(R.dimen.finance_chart_screen_padding)),
                     )
 
                     // Табы для переключения между типами графиков

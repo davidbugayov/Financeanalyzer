@@ -282,16 +282,24 @@ dependencies {
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
-    // Firebase для Google и RuStore флейворов
-    "googleImplementation"(platform(libs.firebase.bom))
-    "googleImplementation"(libs.firebase.analytics.ktx)
-    "googleImplementation"(libs.firebase.crashlytics.ktx)
-    "googleImplementation"(libs.firebase.perf.ktx)
+    // Firebase
+    // Используем Firebase BOM (Bill of Materials) для управления версиями
+    val firebaseBom = platform(libs.firebase.bom)
+    implementation(firebaseBom)
+    "googleImplementation"(firebaseBom)
+    "rustoreImplementation"(firebaseBom)
 
-    "rustoreImplementation"(platform(libs.firebase.bom))
-    "rustoreImplementation"(libs.firebase.analytics.ktx)
-    "rustoreImplementation"(libs.firebase.crashlytics.ktx)
-    "rustoreImplementation"(libs.firebase.perf.ktx)
+    // Firebase Analytics (если используется)
+    "googleImplementation"(libs.firebase.analytics)
+    "rustoreImplementation"(libs.firebase.analytics)
+
+    // Firebase Crashlytics
+    "googleImplementation"(libs.firebase.crashlytics)
+    "rustoreImplementation"(libs.firebase.crashlytics)
+
+    // Firebase Performance
+    "googleImplementation"(libs.firebase.perf)
+    "rustoreImplementation"(libs.firebase.perf)
 
     // RuStore SDK только для RuStore флейвора
     "rustoreImplementation"(libs.rustore.review)

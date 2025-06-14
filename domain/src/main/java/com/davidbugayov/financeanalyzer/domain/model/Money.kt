@@ -39,7 +39,18 @@ enum class Currency(
     JPY("¥", "JPY", 0, '.', SymbolPosition.BEFORE),
     CNY("¥", "CNY", 2, '.', SymbolPosition.BEFORE),
     KZT("₸", "KZT", 2, ',', SymbolPosition.AFTER),
-    BYN("Br", "BYN", 2, ',', SymbolPosition.AFTER),
+    BYN("Br", "BYN", 2, ',', SymbolPosition.AFTER);
+    
+    companion object {
+        /**
+         * Получает валюту по коду
+         * @param code Код валюты
+         * @return Валюта или RUB, если валюта не найдена
+         */
+        fun fromCode(code: String): Currency {
+            return values().find { it.code == code } ?: RUB
+        }
+    }
 }
 
 /**
