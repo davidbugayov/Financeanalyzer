@@ -236,6 +236,9 @@ dependencies {
     // Modules
     implementation(project(":domain"))
     implementation(project(":data"))
+    implementation(project(":core"))
+    implementation(project(":navigation"))
+    implementation(project(":utils"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)

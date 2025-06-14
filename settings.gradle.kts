@@ -52,3 +52,6 @@ rootProject.name = "FinanceAnalyzer"
 include(":app")
 include(":data")
 include(":domain")
+include(":core")
+include(":navigation")
+include(":utils")
