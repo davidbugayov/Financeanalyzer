@@ -12,7 +12,9 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.fold
+import com.davidbugayov.financeanalyzer.domain.model.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
+import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob

@@ -21,6 +21,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -52,21 +53,22 @@ fun TransactionActionsDialog(
         text = {
             Column {
                 Text(
-                    text = transaction.category,
-                    style = MaterialTheme.typography.bodyLarge,
-                    fontWeight = FontWeight.Bold,
+                    text = "Сумма: ${transaction.amount}",
+                    style = MaterialTheme.typography.bodyLarge
+                )
+                Spacer(modifier = Modifier.height(4.dp))
+                Text(
+                    text = "Категория: ${transaction.category}",
+                    style = MaterialTheme.typography.bodyMedium
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = if (transaction.isExpense) {
-                        "-${transaction.amount.abs().formatted(
-                            showCurrency = true,
-                            showSign = false,
-                        )}"
+                        "-${transaction.amount.abs()}"
                     } else {
-                        "+${transaction.amount.formatted(showCurrency = true, showSign = false)}"
+                        "+${transaction.amount}"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (transaction.isExpense) {

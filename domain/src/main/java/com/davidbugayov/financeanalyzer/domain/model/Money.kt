@@ -4,6 +4,7 @@ import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols
+import java.text.NumberFormat
 import java.util.Locale
 import timber.log.Timber
 
@@ -327,4 +328,116 @@ data class Money(
     override fun toString(): String {
         return format()
     }
+}
+
+/**
+ * Функция-расширение для форматирования денежной суммы для отображения в UI.
+ *
+ * @param showCurrency Показывать ли символ валюты.
+ * @param showSign Показывать ли знак "+" для положительных значений.
+ * @param useMinimalDecimals Если true и сумма целая, не показывать десятичные знаки.
+ * @return Отформатированная строка.
+ */
+fun Money.formatForDisplay(showCurrency: Boolean = true, showSign: Boolean = false, useMinimalDecimals: Boolean = true): String {
+    return this.format(showCurrency, showSign, useMinimalDecimals)
+}
+
+/**
+ * Функция-расширение для форматирования денежной суммы.
+ *
+ * @return Отформатированная строка.
+ */
+val Money.formatted: String
+    get() = this.format()
+
+/**
+ * Рассчитывает процентное соотношение одной денежной суммы от другой.
+ *
+ * @param total Общая сумма, от которой считается процент.
+ * @return Процентное соотношение (от 0.0 до 100.0).
+ * @throws IllegalArgumentException если валюты не совпадают или total равен нулю.
+ */
+fun Money.percentageOf(total: Money): Double {
+    require(currency == total.currency) { "Cannot calculate percentage of money with different currencies" }
+    require(!total.isZero()) { "Cannot calculate percentage of zero total" }
+    return amount.divide(total.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toDouble()
+}
+
+/**
+ * Рассчитывает процентную разницу между двумя денежными суммами.
+ *
+ * @param other Сумма, с которой сравнивается текущая.
+ * @return Процентная разница.
+ * @throws IllegalArgumentException если валюты не совпадают или other равен нулю.
+ */
+fun Money.percentageDifference(other: Money): Double {
+    require(currency == other.currency) { "Cannot calculate percentage difference of money with different currencies" }
+    require(!other.isZero()) { "Cannot calculate percentage difference from zero" }
+    return (amount.subtract(other.amount)).divide(other.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toDouble()
+}
+
+/**
+ * Функции-расширения для работы с денежными значениями
+ */
+
+/**
+ * Форматирует BigDecimal как денежную сумму
+ */
+val BigDecimal.formatted: String
+    get() = formatForDisplay()
+
+/**
+ * Форматирует BigDecimal как денежную сумму с дополнительными опциями
+ * 
+ * @param showCurrency показывать ли символ валюты
+ * @param showSign показывать ли знак + для положительных чисел
+ * @return отформатированная строка
+ */
+fun BigDecimal.formatted(showCurrency: Boolean = false, showSign: Boolean = false): String {
+    return formatForDisplay(showCurrency, showSign)
+}
+
+/**
+ * Форматирует BigDecimal как денежную сумму с дополнительными опциями
+ * 
+ * @param showCurrency показывать ли символ валюты
+ * @param showSign показывать ли знак + для положительных чисел
+ * @return отформатированная строка
+ */
+fun BigDecimal.formatForDisplay(showCurrency: Boolean = false, showSign: Boolean = false): String {
+    val formatter = if (showCurrency) {
+        NumberFormat.getCurrencyInstance(Locale.getDefault())
+    } else {
+        DecimalFormat("#,##0.00")
+    }
+    
+    val formattedValue = formatter.format(this)
+    
+    return if (showSign && this >= BigDecimal.ZERO) {
+        "+$formattedValue"
+    } else {
+        formattedValue
+    }
+}
+
+/**
+ * Вычисляет процентное соотношение между двумя суммами
+ * 
+ * @param total общая сумма
+ * @return процент от общей суммы
+ */
+fun BigDecimal.percentageOf(total: BigDecimal): Float {
+    if (total == BigDecimal.ZERO) return 0f
+    return (this.toFloat() / total.toFloat()) * 100f
+}
+
+/**
+ * Вычисляет процентную разницу между двумя суммами
+ * 
+ * @param previous предыдущая сумма
+ * @return процентная разница
+ */
+fun BigDecimal.percentageDifference(previous: BigDecimal): Float {
+    if (previous == BigDecimal.ZERO) return if (this > BigDecimal.ZERO) 100f else 0f
+    return ((this.toFloat() - previous.toFloat()) / previous.toFloat()) * 100f
 }

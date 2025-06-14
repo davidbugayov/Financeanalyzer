@@ -7,13 +7,9 @@ plugins {
     alias(libs.plugins.ksp)
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ktlint)
-
-    // Применяем Firebase плагины для всех сборок
-    if (System.getenv("FDROID_BUILD") != "1") {
-        alias(libs.plugins.google.services)
-        alias(libs.plugins.firebase.crashlytics)
-        alias(libs.plugins.firebase.perf)
-    }
+    alias(libs.plugins.google.services)
+    alias(libs.plugins.firebase.crashlytics)
+    alias(libs.plugins.firebase.perf)
 }
 
 // Функция для определения, является ли текущая сборка F-Droid

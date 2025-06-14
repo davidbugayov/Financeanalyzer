@@ -66,18 +66,18 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
         text = {
             Column {
                 Text(
-                    text = transaction.category,
-                    style = MaterialTheme.typography.titleMedium,
-                    fontWeight = FontWeight.Bold,
+                    text = "Сумма: ${transaction.amount}\n" +
+                            "Категория: ${transaction.category}",
+                    style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
                     text = if (transaction.isExpense) {
-                        "-${moneyFormatter.abs().formatted(showCurrency = true)}"
+                        "-${moneyFormatter.abs()}"
                     } else {
-                        "+${moneyFormatter.formatted(showCurrency = true)}"
+                        "+${moneyFormatter}"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (transaction.isExpense) {

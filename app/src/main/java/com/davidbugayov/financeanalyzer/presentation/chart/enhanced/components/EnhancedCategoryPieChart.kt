@@ -50,8 +50,12 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.domain.model.CategoryAmount
+import com.davidbugayov.financeanalyzer.domain.model.ChartColors
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -62,6 +66,12 @@ import kotlin.math.abs
 import kotlin.math.atan2
 import kotlin.math.max
 import kotlin.math.min
+import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.res.painterResource
 
 /**
  * Улучшенная круговая диаграмма категорий, которая показывает распределение категорий * с интерактивной легендой и компактным размером для лучшей наглядности
@@ -131,7 +141,7 @@ fun EnhancedCategoryPieChart(
     val isIncome = filteredData.firstOrNull()?.original?.isExpense == false
 
     // Используем белый цвет фона для карточки
-    val cardColor = MaterialTheme.colorScheme.surface // Use theme surface color instead of hardcoded white
+            val cardColor = MaterialTheme.colorScheme.surface // Use theme surface color instead of hardcoded white
 
     // Увеличиваем карточку для отображения всех категорий
     Card(

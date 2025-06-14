@@ -2,7 +2,10 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.formatted
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -66,8 +69,11 @@ class FinancialMetrics private constructor() : KoinComponent {
                 _balance.value = balance
 
                 // Логгируем результаты для диагностики
+                val formattedExpenses = totalExpense.value.formatted
+                val formattedIncome = totalIncome.value.formatted
+                val formattedBalance = balance.formatted
                 Timber.d(
-                    "Метрики обновлены: доход=${income.formatted()}, расход=${expense.formatted()}, баланс=${balance.formatted()}",
+                    "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance",
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при пересчёте метрик")

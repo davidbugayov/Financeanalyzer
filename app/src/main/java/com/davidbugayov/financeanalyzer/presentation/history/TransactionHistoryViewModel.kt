@@ -419,17 +419,17 @@ class TransactionHistoryViewModel constructor(
                 val endDate = currentState.endDate
                 val transactions = currentState.transactions
 
-                val result = calculateCategoryStatsUseCase(
-                    transactions = transactions,
-                    categories = listOf(category),
-                    periodType = periodType,
-                    startDate = startDate,
-                    endDate = endDate,
+                val (currentTotal, previousTotal, percentageChange) = calculateCategoryStatsUseCase(
+                    categoryId = category,
+                    currentStartDate = startDate,
+                    currentEndDate = endDate,
+                    previousStartDate = Date(startDate.time - (endDate.time - startDate.time)),
+                    previousEndDate = startDate
                 )
 
-                _state.update { it.copy(categoryStats = result) }
+                _state.update { it.copy(categoryStats = Triple(currentTotal, previousTotal, percentageChange)) }
 
-                Timber.d("Статистика по категории $category рассчитана: $result")
+                Timber.d("Статистика по категории $category рассчитана: $currentTotal, $previousTotal, $percentageChange")
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при расчете статистики по категории: ${e.message}")
                 _state.update { it.copy(categoryStats = null) }
