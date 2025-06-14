@@ -55,3 +55,13 @@ include(":domain")
 include(":core")
 include(":navigation")
 include(":utils")
+include(":ui")
+
+// Feature modules
+include(":feature")
+include(":feature:home")
+include(":feature:profile")
+include(":feature:history")
+include(":feature:statistics")
+include(":feature:transaction")
+include(":feature:widget")

@@ -239,6 +239,16 @@ dependencies {
     implementation(project(":core"))
     implementation(project(":navigation"))
     implementation(project(":utils"))
+    implementation(project(":ui"))
+    
+    // Feature modules
+    implementation(project(":feature"))
+    implementation(project(":feature:home"))
+    implementation(project(":feature:profile"))
+    implementation(project(":feature:history"))
+    implementation(project(":feature:statistics"))
+    implementation(project(":feature:transaction"))
+    implementation(project(":feature:widget"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
