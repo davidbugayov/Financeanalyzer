@@ -1,7 +1,5 @@
 package com.davidbugayov.financeanalyzer.data.repository
 
-import kotlinx.coroutines.flow.Flow
-
 /**
  * Базовый интерфейс для всех репозиториев
  * Следует принципу Interface Segregation Principle (ISP)
@@ -9,18 +7,6 @@ import kotlinx.coroutines.flow.Flow
  * @param ID тип идентификатора сущности
  */
 interface BaseRepository<T, ID> {
-    /**
-     * Получает сущность по идентификатору
-     * @param id идентификатор сущности
-     * @return сущность или null, если не найдена
-     */
-    suspend fun getById(id: ID): T?
-
-    /**
-     * Получает поток всех сущностей
-     * @return Flow со списком всех сущностей
-     */
-    fun getAll(): Flow<List<T>>
 
     /**
      * Добавляет новую сущность

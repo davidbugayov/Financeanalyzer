@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.data.repository.TransactionMapper
-import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.UnifiedTransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
@@ -19,14 +18,14 @@ val repositoryModule = module {
     // Маппер для преобразования моделей
     single { TransactionMapper() }
 
-    // Репозитории
-    single { TransactionRepositoryImpl(get()) }
-    single<TransactionRepository> { get<TransactionRepositoryImpl>() }
-    single<ITransactionRepository> { get<TransactionRepositoryImpl>() }
-
     // Унифицированный репозиторий транзакций
     single { UnifiedTransactionRepositoryImpl(get(), get()) }
     single<UnifiedTransactionRepository> { get<UnifiedTransactionRepositoryImpl>() }
+    
+    // Предоставляем UnifiedTransactionRepository как реализацию TransactionRepository и ITransactionRepository
+    // для обратной совместимости
+    single<TransactionRepository> { get<UnifiedTransactionRepositoryImpl>() }
+    single<ITransactionRepository> { get<UnifiedTransactionRepositoryImpl>() }
 
     // Другие репозитории
     single<WalletRepository> { WalletRepositoryImpl(get(), get()) }

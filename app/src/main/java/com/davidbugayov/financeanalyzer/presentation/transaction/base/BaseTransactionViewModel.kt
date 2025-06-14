@@ -929,7 +929,8 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @return Количество использований источника
      */
     fun getSourceUsage(sourceName: String): Int {
-        val usage = sourceUsagePreferences.getSourceUsage(sourceName)
+        val usageMap = sourceUsagePreferences.getSourceUsage()
+        val usage = usageMap[sourceName] ?: 0
         Timber.d("SOURCE: Получено количество использований источника %s: %d", sourceName, usage)
         return usage
     }

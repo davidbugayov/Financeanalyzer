@@ -5,7 +5,6 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
-import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import com.google.firebase.analytics.ktx.analytics
@@ -36,9 +35,6 @@ class FinanceApp : BaseFinanceApp() {
 
         // Логируем событие открытия приложения
         AnalyticsUtils.logAppOpen()
-
-        // Инициализация RuStore
-        initRuStore()
     }
 
     /**
@@ -102,8 +98,8 @@ class FinanceApp : BaseFinanceApp() {
                 "build_type",
                 if (BuildConfig.DEBUG) "debug" else "release",
             )
-            firebaseAdapter.setUserProperty("device_model", android.os.Build.MODEL)
-            firebaseAdapter.setUserProperty("android_version", android.os.Build.VERSION.RELEASE)
+            firebaseAdapter.setUserProperty("device_model", Build.MODEL)
+            firebaseAdapter.setUserProperty("android_version", Build.VERSION.RELEASE)
             firebaseAdapter.setUserProperty("store", "rustore")
 
             // Crashlytics отключен для F-Droid совместимости
@@ -112,22 +108,5 @@ class FinanceApp : BaseFinanceApp() {
         } catch (e: Exception) {
             Timber.e(e, "Ошибка инициализации Firebase")
         }
-    }
-
-    /**
-     * Инициализирует RuStore SDK
-     */
-    private fun initRuStore() {
-        // Проверяем наличие обновлений в RuStore
-        RuStoreUtils.checkForUpdates(this)
-    }
-
-    /**
-     * Логирует основную информацию об устройстве
-     */
-    private fun logDeviceInfo() {
-        Timber.d("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
-        Timber.d("Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
-        Timber.d("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
 }

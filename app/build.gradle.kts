@@ -8,13 +8,18 @@ plugins {
     alias(libs.plugins.compose.compiler)
     alias(libs.plugins.ktlint)
 
-    // Применяем Firebase плагины только для google flavor и не для F-Droid сборок
-    alias(libs.plugins.google.services) apply false
-    // Удаляем прямую ссылку на Firebase Crashlytics
+    // Применяем Firebase плагины для всех сборок
+    if (System.getenv("FDROID_BUILD") != "1") {
+        alias(libs.plugins.google.services)
+        alias(libs.plugins.firebase.crashlytics)
+        alias(libs.plugins.firebase.perf)
+    }
 }
 
-// Проверяем, является ли текущая сборка F-Droid сборкой
-val isFDroidBuild = System.getenv("FDROID_BUILD") == "1"
+// Функция для определения, является ли текущая сборка F-Droid
+fun isNotFDroidBuild(): Boolean {
+    return System.getenv("FDROID_BUILD") != "1"
+}
 
 fun getKeystoreProperties(): Properties {
     val properties = Properties()
@@ -27,12 +32,12 @@ fun getKeystoreProperties(): Properties {
 
 android {
     namespace = "com.davidbugayov.financeanalyzer"
-    compileSdk = 36
+    compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
         applicationId = "com.davidbugayov.financeanalyzer"
-        minSdk = 26
-        targetSdk = 35
+        minSdk = libs.versions.minSdk.get().toInt()
+        targetSdk = libs.versions.compileSdk.get().toInt()
         versionCode = 36
         versionName = "2.17.0"
 
@@ -44,6 +49,11 @@ android {
         // Добавляем глобальные флаги для Firebase и RuStore
         buildConfigField("boolean", "USE_FIREBASE", "true")
         buildConfigField("boolean", "USE_RUSTORE", "true")
+        buildConfigField(
+            "boolean",
+            "IS_RUSTORE_FLAVOR",
+            "false",
+        ) // По умолчанию false, переопределим для rustore flavor
 
         // Enable R8 support
         proguardFiles(
@@ -65,18 +75,6 @@ android {
             versionNameSuffix = ".gp"
             resValue("string", "app_name", "Деньги под Контролем")
             resValue("string", "app_store", "Google Play")
-
-            // Применяем плагины только для Google flavor и не для F-Droid сборок
-            if (!isFDroidBuild) {
-                plugins.apply("com.google.gms.google-services")
-                // Применяем Firebase Crashlytics через строку, чтобы избежать прямой ссылки
-                try {
-                    Class.forName("com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin")
-                    plugins.apply("com.google.firebase.crashlytics")
-                } catch (e: Exception) {
-                    logger.warn("Firebase Crashlytics plugin not found, skipping")
-                }
-            }
         }
 
         create("rustore") {
@@ -84,23 +82,12 @@ android {
             // RuStore версия использует Firebase и RuStore SDK
             buildConfigField("boolean", "USE_FIREBASE", "true")
             buildConfigField("boolean", "USE_RUSTORE", "true")
+            buildConfigField("boolean", "IS_RUSTORE_FLAVOR", "true") // Переопределяем для rustore flavor
 
             // Суффиксы для RuStore
             versionNameSuffix = ".rs"
             resValue("string", "app_name", "Деньги под Контролем")
             resValue("string", "app_store", "RuStore")
-
-            // Применяем плагины Firebase для RuStore flavor и не для F-Droid сборок
-            if (!isFDroidBuild) {
-                plugins.apply("com.google.gms.google-services")
-                // Применяем Firebase Crashlytics через строку, чтобы избежать прямой ссылки
-                try {
-                    Class.forName("com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsPlugin")
-                    plugins.apply("com.google.firebase.crashlytics")
-                } catch (e: Exception) {
-                    logger.warn("Firebase Crashlytics plugin not found, skipping")
-                }
-            }
         }
 
         create("fdroid") {
@@ -192,8 +179,8 @@ android {
 
     // Compilation optimizations to speed up build
     compileOptions {
-        sourceCompatibility = JavaVersion.VERSION_17
-        targetCompatibility = JavaVersion.VERSION_17
+        sourceCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
+        targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
         isCoreLibraryDesugaringEnabled = false
     }
 
@@ -205,7 +192,7 @@ android {
     }
 
     kotlinOptions {
-        jvmTarget = "17"
+        jvmTarget = libs.versions.javaVersion.get()
         // Enable compiler optimizations
         freeCompilerArgs += listOf(
             "-opt-in=kotlin.RequiresOptIn",
@@ -250,6 +237,10 @@ android {
 }
 
 dependencies {
+    // Modules
+    implementation(project(":domain"))
+    implementation(project(":data"))
+
     // Kotlin
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.coroutines.core)
@@ -298,8 +289,13 @@ dependencies {
     // Firebase для Google и RuStore флейворов
     "googleImplementation"(platform(libs.firebase.bom))
     "googleImplementation"(libs.firebase.analytics.ktx)
+    "googleImplementation"(libs.firebase.crashlytics.ktx)
+    "googleImplementation"(libs.firebase.perf.ktx)
+
     "rustoreImplementation"(platform(libs.firebase.bom))
     "rustoreImplementation"(libs.firebase.analytics.ktx)
+    "rustoreImplementation"(libs.firebase.crashlytics.ktx)
+    "rustoreImplementation"(libs.firebase.perf.ktx)
 
     // RuStore SDK только для RuStore флейвора
     "rustoreImplementation"(libs.rustore.review)
@@ -387,7 +383,8 @@ tasks.whenTaskAdded {
     if (name.contains("fdroid", ignoreCase = true) &&
         (
             name.contains("ProcessGoogleServices", ignoreCase = true) ||
-                name.contains("FirebaseCrashlytics", ignoreCase = true)
+                name.contains("FirebaseCrashlytics", ignoreCase = true) ||
+                name.contains("FirebasePerformance", ignoreCase = true)
             )
     ) {
         enabled = false

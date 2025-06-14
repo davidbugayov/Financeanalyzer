@@ -82,4 +82,4 @@ interface ITransactionRepository {
      * @return Транзакция или null, если транзакция не найдена
      */
     suspend fun getTransactionById(id: String): Transaction?
-}
+} 

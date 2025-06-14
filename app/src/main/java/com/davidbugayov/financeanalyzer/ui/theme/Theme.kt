@@ -145,8 +145,10 @@ fun FinanceAnalyzerTheme(
             // Обновляем декорации окна
             WindowCompat.setDecorFitsSystemWindows(window, false)
 
-            // Устанавливаем прозрачные системные панели вместо использования устаревших методов
+            // Устанавливаем прозрачные системные панели
+            @Suppress("DEPRECATION")
             window.statusBarColor = Color.Transparent.toArgb()
+            @Suppress("DEPRECATION")
             window.navigationBarColor = Color.Transparent.toArgb()
         }
     }

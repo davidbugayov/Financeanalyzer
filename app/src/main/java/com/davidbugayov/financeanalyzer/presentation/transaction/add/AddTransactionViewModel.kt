@@ -4,8 +4,10 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -18,15 +20,17 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTr
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
+import java.math.BigDecimal
+import java.util.Date
+import java.util.UUID
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.math.BigDecimal
-import java.util.Date
-import java.util.UUID
-import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
+
+// Проверка на RuStore flavor через константу из BuildConfig
+private val isRustoreFlavor = BuildConfig.IS_RUSTORE_FLAVOR
 
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
@@ -46,8 +50,6 @@ class AddTransactionViewModel(
 ) {
 
     override val _state = MutableStateFlow(AddTransactionState())
-
-    private var blockAutoSubmit = false
 
     private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
     override val wallets: List<Wallet>
@@ -173,6 +175,11 @@ class AddTransactionViewModel(
                     incrementCategoryUsage(transactionToSave.category, transactionToSave.isExpense)
                     incrementSourceUsage(transactionToSave.source)
                     updateWidgetsUseCase(context)
+
+                    // Запрашиваем отзыв после успешного добавления транзакции (только для RuStore)
+                    if (isRustoreFlavor) {
+                        com.davidbugayov.financeanalyzer.utils.RuStoreUtils.requestReview(context)
+                    }
 
                     _state.update {
                         it.copy(

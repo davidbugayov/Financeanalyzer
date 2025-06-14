@@ -22,6 +22,7 @@ class WalletPreferences private constructor(context: Context) {
     private val gson = Gson()
 
     companion object {
+
         private const val PREFERENCES_NAME = "wallet_prefs"
         private const val KEY_WALLETS = "wallets"
 

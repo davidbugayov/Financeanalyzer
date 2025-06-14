@@ -13,7 +13,9 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 fun getInitialSources(sourcePreferences: SourcePreferences, resources: Resources): List<Source> {
     val savedSources = sourcePreferences.getCustomSources()
     return if (savedSources.isNotEmpty()) {
-        savedSources
+        savedSources.map { customSource ->
+            Source(name = customSource.name, color = ColorUtils.parseHexColor(customSource.colorHex))
+        }
     } else {
         val defaultSourceNames = resources.getStringArray(R.array.default_source_names).toList()
 
@@ -21,7 +23,16 @@ fun getInitialSources(sourcePreferences: SourcePreferences, resources: Resources
             val colorObject = ColorUtils.getSourceColorByName(name.lowercase()) ?: CashColor
             Source(name = name, color = colorObject.toArgb())
         }
-        sourcePreferences.saveCustomSources(defaultSources)
+        
+        // Сохраняем дефолтные источники в формате CustomSourceData
+        val customSourceData = defaultSources.map { source ->
+            SourcePreferences.CustomSourceData(
+                name = source.name,
+                colorHex = ColorUtils.colorToHex(source.color)
+            )
+        }
+        sourcePreferences.saveCustomSources(customSourceData)
+        
         defaultSources
     }
 }
@@ -32,6 +43,15 @@ fun addCustomSource(
     newSource: Source,
 ): List<Source> {
     val updatedSources = (currentSources + newSource).distinctBy { it.name }
-    sourcePreferences.saveCustomSources(updatedSources)
+    
+    // Преобразуем Source в CustomSourceData перед сохранением
+    val customSourceData = updatedSources.map { source ->
+        SourcePreferences.CustomSourceData(
+            name = source.name,
+            colorHex = ColorUtils.colorToHex(source.color)
+        )
+    }
+    sourcePreferences.saveCustomSources(customSourceData)
+    
     return updatedSources
 }

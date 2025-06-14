@@ -72,8 +72,9 @@ class WalletRepositoryImpl(
 
             if (transaction != null) {
                 // Если у транзакции есть walletIds, возвращаем кошельки по этим ID
-                if (transaction.walletIds != null && transaction.walletIds.isNotEmpty()) {
-                    return allWallets.filter { wallet -> transaction.walletIds.contains(wallet.id) }
+                val walletIds = transaction.walletIds
+                if (walletIds != null && walletIds.isNotEmpty()) {
+                    return allWallets.filter { wallet -> walletIds.contains(wallet.id) }
                 }
 
                 // Для доходов без явного указания кошельков возвращаем все
@@ -105,4 +106,4 @@ class WalletRepositoryImpl(
             return null
         }
     }
-}
+} 

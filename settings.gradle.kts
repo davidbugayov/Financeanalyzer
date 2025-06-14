@@ -7,11 +7,14 @@ pluginManagement {
 }
 
 dependencyResolutionManagement {
+    @Suppress("UnstableApiUsage")
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+
+    @Suppress("UnstableApiUsage")
     repositories {
         google()
         mavenCentral()
-        
+
         // Репозиторий для RuStore SDK - используется только для rustore flavor
         // Исключаем для F-Droid сканера
         if (System.getenv("FDROID_BUILD") != "1") {
@@ -22,7 +25,7 @@ dependencyResolutionManagement {
                     // и только для rustore flavor
                     includeGroup("ru.rustore")
                     includeGroupByRegex("ru\\.rustore\\..*")
-                    
+
                     // Исключаем использование для F-Droid и Google flavor
                     excludeGroupByRegex(".*fdroid.*")
                     excludeGroupByRegex(".*google.*")
@@ -41,8 +44,11 @@ buildCache {
 }
 
 // Enable modern Gradle features
+@Suppress("UnstableApiUsage")
 enableFeaturePreview("TYPESAFE_PROJECT_ACCESSORS")
 
 // Set project name
 rootProject.name = "FinanceAnalyzer"
 include(":app")
+include(":data")
+include(":domain")

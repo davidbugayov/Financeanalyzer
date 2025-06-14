@@ -121,4 +121,4 @@ class CategoryUsagePreferences private constructor(context: Context) {
         usageMap[category] = currentCount + 1
         saveIncomeCategoriesUsage(usageMap)
     }
-}
+} 

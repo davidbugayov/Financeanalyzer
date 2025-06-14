@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.data.preferences
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.davidbugayov.financeanalyzer.utils.GsonUtils
+import com.davidbugayov.financeanalyzer.data.utils.GsonUtils
 import com.google.gson.Gson
 import timber.log.Timber
 
@@ -248,15 +248,40 @@ class CategoryPreferences private constructor(context: Context) {
     }
 
     /**
-     * Добавляет новую категорию в соответствующий список (расходы или доходы)
+     * Обновляет существующую категорию расходов
      *
-     * @param categoryData Данные категории для добавления
+     * @param oldName Старое имя категории
+     * @param newCategory Новые данные категории
+     * @return true, если категория была обновлена
      */
-    fun addCategory(categoryData: CustomCategoryData) {
-        if (categoryData.isExpense) {
-            addExpenseCategory(categoryData)
-        } else {
-            addIncomeCategory(categoryData)
+    fun updateExpenseCategory(oldName: String, newCategory: CustomCategoryData): Boolean {
+        val categories = loadExpenseCategories().toMutableList()
+        val index = categories.indexOfFirst { it.name == oldName }
+        
+        if (index >= 0) {
+            categories[index] = newCategory
+            saveExpenseCategories(categories)
+            return true
         }
+        return false
     }
-}
+
+    /**
+     * Обновляет существующую категорию доходов
+     *
+     * @param oldName Старое имя категории
+     * @param newCategory Новые данные категории
+     * @return true, если категория была обновлена
+     */
+    fun updateIncomeCategory(oldName: String, newCategory: CustomCategoryData): Boolean {
+        val categories = loadIncomeCategories().toMutableList()
+        val index = categories.indexOfFirst { it.name == oldName }
+        
+        if (index >= 0) {
+            categories[index] = newCategory
+            saveIncomeCategories(categories)
+            return true
+        }
+        return false
+    }
+} 

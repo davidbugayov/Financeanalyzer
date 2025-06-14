@@ -6,7 +6,6 @@ import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreference
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
-import com.davidbugayov.financeanalyzer.data.repository.TransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -73,7 +72,6 @@ val appModule = module {
     single { OnboardingManager(androidContext()) }
 
     // Repositories
-    single<TransactionRepository> { TransactionRepositoryImpl(get()) }
     single<WalletRepository> { WalletRepositoryImpl(get()) }
 
     // Utils

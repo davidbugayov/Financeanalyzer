@@ -50,6 +50,10 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+
+// Проверка на RuStore flavor через константу из BuildConfig
+private val isRustoreFlavor = BuildConfig.IS_RUSTORE_FLAVOR
+
 /**
  * Главный экран приложения.
  * Отображает текущий баланс и последние транзакции.
@@ -206,6 +210,11 @@ fun HomeScreen(
             screenClass = "HomeScreen",
         )
         updateWidgetsUseCase(context)
+
+        // Проверяем наличие обновлений при отображении главного экрана
+        if (isRustoreFlavor) {
+            com.davidbugayov.financeanalyzer.utils.RuStoreUtils.checkForUpdates(context)
+        }
     }
     LaunchedEffect(Unit) {
         val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)

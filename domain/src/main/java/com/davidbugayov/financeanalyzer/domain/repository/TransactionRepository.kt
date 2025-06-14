@@ -1,9 +1,8 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import kotlinx.coroutines.flow.SharedFlow
-import java.time.LocalDate
 import java.util.Date
+import kotlinx.coroutines.flow.SharedFlow
 
 /**
  * Репозиторий для работы с транзакциями.
@@ -17,13 +16,6 @@ interface TransactionRepository {
      * удаление или обновление транзакций.
      */
     val dataChangeEvents: SharedFlow<DataChangeEvent>
-
-    /**
-     * Принудительно отправляет событие изменения данных.
-     * Используется для принудительного обновления UI, например после изменения транзакции.
-     * @param transactionId ID измененной транзакции или null для массовых изменений.
-     */
-    suspend fun notifyDataChanged(transactionId: String? = null)
 
     /**
      * Получает все транзакции.
@@ -102,14 +94,6 @@ interface TransactionRepository {
      * @return Общее количество транзакций в базе данных.
      */
     suspend fun getTransactionsCount(): Int
-
-    /**
-     * Получает общее количество транзакций в указанном диапазоне дат.
-     * @param startDate Начальная дата периода.
-     * @param endDate Конечная дата периода.
-     * @return Количество транзакций в указанном диапазоне дат.
-     */
-    suspend fun getTransactionsCountByDateRange(startDate: Date, endDate: Date): Int
 
     /**
      * Получает транзакцию по идентификатору.

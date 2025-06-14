@@ -26,6 +26,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.android.inject
+import timber.log.Timber
 
 class FinanceActivity : ComponentActivity() {
 
@@ -70,7 +71,7 @@ class FinanceActivity : ComponentActivity() {
 
         Thread.setDefaultUncaughtExceptionHandler { _, e ->
             // Логирование и оповещение об ошибке
-            android.util.Log.e("FinanceActivity", "Unhandled exception", e)
+            Timber.tag("FinanceActivity").e(e, "Unhandled exception")
 
             // Перезапускаем приложение
             val intent = Intent(this, FinanceActivity::class.java)
@@ -105,13 +106,13 @@ class FinanceActivity : ComponentActivity() {
 
     private fun applyContent() {
         setContent {
-            financeAppContent(this, navigationManager)
+            FinanceAppContent(navigationManager)
         }
     }
 }
 
 @Composable
-fun financeAppContent(activity: ComponentActivity, navigationManager: NavigationManager) {
+fun FinanceAppContent(navigationManager: NavigationManager) {
     // Получаем текущую тему из AppTheme и наблюдаем за изменениями
     val themeMode by AppTheme.currentTheme.collectAsState()
 

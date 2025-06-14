@@ -3,6 +3,8 @@ package com.davidbugayov.financeanalyzer.data.repository
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
+import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -24,7 +26,7 @@ import java.util.Calendar
 class UnifiedTransactionRepositoryImpl(
     private val transactionDao: TransactionDao,
     private val transactionMapper: TransactionMapper,
-) : UnifiedTransactionRepository {
+) : UnifiedTransactionRepository, TransactionRepository, ITransactionRepository {
 
     private val coroutineScope = CoroutineScope(Dispatchers.IO)
 
@@ -45,7 +47,7 @@ class UnifiedTransactionRepositoryImpl(
     /**
      * Получает все транзакции.
      */
-    suspend fun getAllTransactions(): List<Transaction> {
+    override suspend fun getAllTransactions(): List<Transaction> {
         return loadTransactions()
     }
 
@@ -54,6 +56,13 @@ class UnifiedTransactionRepositoryImpl(
      */
     override suspend fun getTransactionsPaginated(limit: Int, offset: Int): List<Transaction> {
         return loadTransactionsPaginated(limit, offset)
+    }
+
+    /**
+     * Получает транзакции за указанный период с пагинацией из ITransactionRepository.
+     */
+    override suspend fun getTransactionsPaginated(startDate: Date, endDate: Date, limit: Int, offset: Int): List<Transaction> {
+        return getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
     }
 
     /**
@@ -273,14 +282,14 @@ class UnifiedTransactionRepositoryImpl(
     }
 
     /**
-     * Получает сущность по идентификатору (из BaseRepository).
+     * Получает сущность по идентификатору.
      */
     override suspend fun getById(id: String): Transaction? {
         return getTransactionById(id)
     }
 
     /**
-     * Получает поток всех сущностей (из BaseRepository).
+     * Получает поток всех сущностей.
      */
     override fun getAll(): Flow<List<Transaction>> {
         // Создаем Flow, который будет возвращать все транзакции
@@ -291,25 +300,25 @@ class UnifiedTransactionRepositoryImpl(
     }
 
     /**
-     * Добавляет новую сущность (из BaseRepository).
+     * Добавляет новую сущность.
      */
     override suspend fun add(item: Transaction): String {
         return addTransaction(item)
     }
 
     /**
-     * Обновляет существующую сущность (из BaseRepository).
+     * Обновляет существующую сущность.
      */
     override suspend fun update(item: Transaction) {
         updateTransaction(item)
     }
 
     /**
-     * Удаляет сущность по идентификатору (из BaseRepository).
+     * Удаляет сущность по идентификатору.
      */
     override suspend fun delete(id: String): Boolean {
         val transaction = getTransactionById(id) ?: return false
         deleteTransaction(transaction)
         return true
     }
-}
+} 

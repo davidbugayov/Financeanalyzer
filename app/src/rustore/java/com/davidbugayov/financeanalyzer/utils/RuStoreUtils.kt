@@ -1,74 +1,107 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
-import timber.log.Timber
-import ru.rustore.sdk.review.RuStoreReviewManagerFactory
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import ru.rustore.sdk.appupdate.manager.factory.RuStoreAppUpdateManagerFactory
-import ru.rustore.sdk.appupdate.model.AppUpdateInfo
 import ru.rustore.sdk.appupdate.model.UpdateAvailability
+import ru.rustore.sdk.review.RuStoreReviewManagerFactory
+import timber.log.Timber
 
 /**
- * Утилиты для работы с RuStore SDK
+ * Утилитный класс для работы с RuStore API
  */
 object RuStoreUtils {
+
+    private var lastReviewRequestTime: Long = 0
+    private const val REVIEW_REQUEST_INTERVAL = 7 * 24 * 60 * 60 * 1000L // 7 дней в миллисекундах
+
     /**
-     * Запускает диалог отзыва в RuStore, если это возможно
+     * Запрашивает отзыв пользователя через RuStore API
+     * Показывает диалог отзыва только раз в 7 дней
+     *
+     * @param context Контекст приложения
      */
     fun requestReview(context: Context) {
+        val currentTime = System.currentTimeMillis()
+
+        // Проверяем, прошло ли достаточно времени с последнего запроса отзыва
+        if (currentTime - lastReviewRequestTime < REVIEW_REQUEST_INTERVAL) {
+            Timber.d("Слишком рано для запроса отзыва. Пропускаем.")
+            return
+        }
+
         try {
-            if (context.packageManager.getLaunchIntentForPackage("ru.vk.store") != null) {
-                val reviewManager = RuStoreReviewManagerFactory.create(context)
-                reviewManager.requestReviewFlow()
-                    .addOnSuccessListener { reviewInfo ->
-                        reviewManager.launchReviewFlow(reviewInfo)
-                            .addOnSuccessListener {
-                                Timber.d("RuStore review launched successfully")
-                            }
-                            .addOnFailureListener { e ->
-                                Timber.e(e, "Failed to launch RuStore review")
-                            }
-                    }
-                    .addOnFailureListener { e ->
-                        Timber.e(e, "Failed to request RuStore review")
-                    }
-            } else {
-                Timber.d("RuStore app not installed")
+            val reviewManager = RuStoreReviewManagerFactory.create(context)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    reviewManager.requestReviewFlow()
+                        .addOnSuccessListener { reviewInfo ->
+                            // Показываем диалог отзыва
+                            reviewManager.launchReviewFlow(reviewInfo)
+                                .addOnSuccessListener {
+                                    Timber.d("Диалог отзыва успешно показан")
+                                    lastReviewRequestTime = currentTime
+                                }
+                                .addOnFailureListener { e ->
+                                    Timber.e(e, "Ошибка при показе диалога отзыва")
+                                }
+                        }
+                        .addOnFailureListener { e ->
+                            Timber.e(e, "Ошибка при запросе диалога отзыва")
+                        }
+                } catch (e: Exception) {
+                    Timber.e(e, "Исключение при запросе отзыва")
+                }
             }
         } catch (e: Exception) {
-            Timber.e(e, "Error when trying to launch RuStore review")
+            Timber.e(e, "Ошибка при инициализации RuStore Review API")
         }
     }
 
     /**
-     * Проверяет наличие обновлений в RuStore
+     * Проверяет наличие обновлений приложения через RuStore API
+     *
+     * @param context Контекст приложения
      */
     fun checkForUpdates(context: Context) {
         try {
             // Проверяем, установлен ли RuStore на устройстве
-            if (context.packageManager.getLaunchIntentForPackage("ru.vk.store") != null) {
-                val appUpdateManager = RuStoreAppUpdateManagerFactory.create(context)
-                appUpdateManager.getAppUpdateInfo()
-                    .addOnSuccessListener { appUpdateInfo ->
-                        if (appUpdateInfo.updateAvailable()) {
-                            Timber.d("RuStore update available")
-                            // Можно добавить логику для показа обновления
+            val appUpdateManager = RuStoreAppUpdateManagerFactory.create(context)
+
+            CoroutineScope(Dispatchers.Main).launch {
+                try {
+                    // Запрашиваем информацию об обновлении
+                    appUpdateManager.getAppUpdateInfo()
+                        .addOnSuccessListener { appUpdateInfo ->
+                            Timber.d("Проверка обновлений в RuStore завершена")
+                            // Если доступно обновление, показываем диалог
+                            if (appUpdateInfo.updateAvailability == UpdateAvailability.UPDATE_AVAILABLE) {
+                                Timber.d("Доступно обновление в RuStore")
+                                // Создаем пустые опции обновления
+                                val appUpdateOptions = ru.rustore.sdk.appupdate.model.AppUpdateOptions.Builder().build()
+                                appUpdateManager.startUpdateFlow(appUpdateInfo, appUpdateOptions)
+                                    .addOnSuccessListener {
+                                        Timber.d("Процесс обновления запущен успешно")
+                                    }
+                                    .addOnFailureListener { e ->
+                                        Timber.e(e, "Ошибка при запуске процесса обновления")
+                                    }
+                            } else {
+                                Timber.d("Обновлений не найдено или они не доступны для установки")
+                            }
                         }
-                    }
-                    .addOnFailureListener { e ->
-                        Timber.e(e, "Failed to check for RuStore updates")
-                    }
-            } else {
-                Timber.d("RuStore app not installed, skipping update check")
+                        .addOnFailureListener { e ->
+                            Timber.e(e, "Ошибка при проверке обновлений")
+                        }
+                } catch (e: Exception) {
+                    Timber.e(e, "Исключение при проверке обновлений")
+                }
             }
         } catch (e: Exception) {
-            Timber.e(e, "Error when trying to check for RuStore updates")
+            Timber.e(e, "Ошибка при инициализации RuStore AppUpdate API")
         }
-    }
-
-    /**
-     * Метод расширения для проверки наличия обновления
-     */
-    private fun AppUpdateInfo.updateAvailable(): Boolean {
-        return updateAvailability == UpdateAvailability.UPDATE_AVAILABLE
     }
 }

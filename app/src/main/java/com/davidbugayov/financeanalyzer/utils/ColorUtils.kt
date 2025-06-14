@@ -81,6 +81,30 @@ object ColorUtils {
     }
 
     /**
+     * Преобразует целочисленное представление цвета в HEX-строку.
+     * @param colorInt Целочисленное представление цвета (ARGB)
+     * @return HEX-строка цвета в формате "#RRGGBB"
+     */
+    fun colorToHex(colorInt: Int): String {
+        return String.format("#%06X", 0xFFFFFF and colorInt)
+    }
+
+    /**
+     * Преобразует HEX-строку в целочисленное представление цвета.
+     * @param hexColor HEX-строка цвета в формате "#RRGGBB" или "RRGGBB"
+     * @return Целочисленное представление цвета (ARGB)
+     */
+    fun parseHexColor(hexColor: String): Int {
+        val cleanHex = if (hexColor.startsWith("#")) hexColor else "#$hexColor"
+        return try {
+            cleanHex.toColorInt()
+        } catch (e: IllegalArgumentException) {
+            // Возвращаем черный цвет по умолчанию в случае ошибки
+            0xFF000000.toInt()
+        }
+    }
+
+    /**
      * Эта функция больше не нужна для получения Compose Color из XML.
      * Цвета должны быть определены в ui.theme.Color.kt
      * Оставлена для возможного редкого использования, если нужно получить Int цвет из XML.
