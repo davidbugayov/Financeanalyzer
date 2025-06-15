@@ -216,9 +216,6 @@ class ProfileViewModel(
                             ExportAction.SAVE_ONLY -> {
                                 // Ничего не делаем, файл уже сохранен
                             }
-                            else -> {
-                                // Обработка других возможных действий
-                            }
                         }
                     }
                     is Result.Error -> {
@@ -226,16 +223,6 @@ class ProfileViewModel(
                         _state.update { currentState ->
                             currentState.copy(
                                 exportError = exception.message ?: "Unknown export error",
-                                exportSuccess = null,
-                                exportedFilePath = null,
-                            )
-                        }
-                    }
-                    else -> {
-                        // Обработка других возможных результатов
-                        _state.update { currentState ->
-                            currentState.copy(
-                                exportError = "Unexpected result type",
                                 exportSuccess = null,
                                 exportedFilePath = null,
                             )
@@ -308,15 +295,6 @@ class ProfileViewModel(
                             currentState.copy(
                                 isLoading = false,
                                 error = exception.message ?: "Неизвестная ошибка",
-                            )
-                        }
-                    }
-                    else -> {
-                        // Обработка других возможных результатов
-                        _state.update { currentState ->
-                            currentState.copy(
-                                isLoading = false,
-                                error = "Unexpected result type",
                             )
                         }
                     }
