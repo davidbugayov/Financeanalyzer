@@ -84,4 +84,4 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
-} 
+}
