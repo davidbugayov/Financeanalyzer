@@ -8,4 +8,7 @@
     <string name="date_after_maximum">Дата позже максимальной</string>
     <string name="invalid_date">Недопустимая дата</string>
     <string name="current_balance">Текущий баланс</string>
+    <string name="no_transactions">Нет транзакций</string>
+    <string name="error_occurred">Произошла ошибка</string>
+    <string name="retry">Повторить</string>
 </resources> 
