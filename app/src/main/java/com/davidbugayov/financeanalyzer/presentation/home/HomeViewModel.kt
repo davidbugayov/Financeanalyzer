@@ -300,7 +300,7 @@ class HomeViewModel(
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
-                val metrics = calculateBalanceMetricsUseCase(transactions)
+                val metrics = calculateBalanceMetricsUseCase(transactions, startDate, endDate)
                 _state.update {
                     it.copy(
                         transactions = transactions,
@@ -468,7 +468,10 @@ class HomeViewModel(
         }
 
         // Используем CalculateBalanceMetricsUseCase для расчёта
-        val metrics = calculateBalanceMetricsUseCase(transactions)
+        // Находим минимальную и максимальную даты в транзакциях
+        val startDate = transactions.minByOrNull { it.date }?.date ?: java.util.Date()
+        val endDate = transactions.maxByOrNull { it.date }?.date ?: java.util.Date()
+        val metrics = calculateBalanceMetricsUseCase(transactions, startDate, endDate)
         val income = metrics.income
         val expense = metrics.expense
         val balance = income - expense
@@ -483,7 +486,9 @@ class HomeViewModel(
      * @param transactions Список транзакций
      * @return Список групп транзакций, сгруппированных по дате
      */
-    private fun groupTransactionsByDate(transactions: List<Transaction>): List<com.davidbugayov.financeanalyzer.domain.model.TransactionGroup> {
+    private fun groupTransactionsByDate(
+        transactions: List<Transaction>,
+    ): List<com.davidbugayov.financeanalyzer.domain.model.TransactionGroup> {
         if (transactions.isEmpty()) {
             return emptyList()
         }

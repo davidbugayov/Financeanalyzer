@@ -8,5 +8,5 @@ data class BalanceMetrics(
     val balance: Money,
     val savingsRate: Double = 0.0,
     val monthsOfSavings: Double = 0.0,
-    val averageDailyExpense: Money = Money(BigDecimal.ZERO)
+    val averageDailyExpense: Money = Money(BigDecimal.ZERO),
 ) 

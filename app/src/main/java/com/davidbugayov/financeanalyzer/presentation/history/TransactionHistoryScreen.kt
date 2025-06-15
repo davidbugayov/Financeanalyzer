@@ -24,7 +24,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
@@ -51,9 +50,10 @@ import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import kotlin.math.absoluteValue
 import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -387,8 +387,28 @@ fun TransactionHistoryScreen(
                             // Для баланса: доходы - расходы
                             val balance = income - expense
 
+                            // Определяем формат даты в зависимости от типа группировки
+                            val dateFormat = when {
+                                // Формат "DD MMMM YYYY" (например, "1 января 2024")
+                                period.matches(Regex("\\d{1,2} [а-яА-Я]+ \\d{4}")) ->
+                                    SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
+
+                                // Формат "DD.MM - DD.MM YYYY" (например, "01.01 - 07.01 2024")
+                                period.contains("-") -> {
+                                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                                }
+
+                                // Формат "MMMM YYYY" (например, "Январь 2024")
+                                else -> SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru"))
+                            }
+
                             TransactionGroup(
-                                date = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault()).parse(period) ?: java.util.Date(),
+                                date = try {
+                                    dateFormat.parse(period) ?: java.util.Date()
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Ошибка при парсинге даты: $period")
+                                    java.util.Date()
+                                },
                                 transactions = transactions,
                                 balance = balance,
                             )

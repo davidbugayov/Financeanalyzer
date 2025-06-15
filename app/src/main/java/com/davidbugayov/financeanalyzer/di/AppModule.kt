@@ -102,7 +102,7 @@ val appModule = module {
     factory {
         GetProfileAnalyticsUseCase(
             transactionRepository = get(),
-            walletRepository = get()
+            walletRepository = get(),
         )
     }
     single<ImportTransactionsUseCase> {
@@ -132,7 +132,6 @@ val appModule = module {
             getProfileAnalyticsUseCase = get(),
             preferencesManager = get(),
             notificationScheduler = get(),
-            appContext = androidContext(),
             navigationManager = get(),
         )
     }

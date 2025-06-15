@@ -105,7 +105,7 @@ fun TransactionGroupList(
             val isExpanded = expandedGroups[formattedDate] == true
 
             // Заголовок группы
-            item(key = "header_${formattedDate}") {
+            item(key = "header_$formattedDate") {
                 ExpandableGroupHeader(
                     date = formattedDate,
                     balance = group.balance,
@@ -161,7 +161,7 @@ fun TransactionGroupList(
             }
 
             // Разделитель между группами
-            item(key = "spacer_${formattedDate}") {
+            item(key = "spacer_$formattedDate") {
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()

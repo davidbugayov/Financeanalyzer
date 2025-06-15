@@ -3,26 +3,53 @@ package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 import com.davidbugayov.financeanalyzer.domain.model.BalanceMetrics
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionType
-import javax.inject.Inject
+import java.math.BigDecimal
+import java.util.Date
 
-class CalculateBalanceMetricsUseCase @Inject constructor() {
+class CalculateBalanceMetricsUseCase {
 
-    operator fun invoke(transactions: List<Transaction>): BalanceMetrics {
+    operator fun invoke(transactions: List<Transaction>, startDate: Date? = null, endDate: Date? = null): BalanceMetrics {
         val income = transactions
-            .filter { it.type == TransactionType.INCOME }
-            .sumOf { it.amount.value }
-        
+            .filter { !it.isExpense }
+            .sumOf { it.amount.amount }
+
         val expense = transactions
-            .filter { it.type == TransactionType.EXPENSE }
-            .sumOf { it.amount.value }
-        
+            .filter { it.isExpense }
+            .sumOf { it.amount.amount }
+
         val balance = income - expense
-        
+
+        // Дополнительные метрики, которые могут использовать даты
+        val savingsRate = if (income > BigDecimal.ZERO) {
+            (income - expense).divide(income, 4, java.math.RoundingMode.HALF_UP).toDouble()
+        } else {
+            0.0
+        }
+
+        val averageDailyExpense = if (startDate != null && endDate != null) {
+            val daysBetween = ((endDate.time - startDate.time) / (1000 * 60 * 60 * 24)).coerceAtLeast(1)
+            Money(expense.divide(BigDecimal(daysBetween), 2, java.math.RoundingMode.HALF_UP))
+        } else {
+            Money(BigDecimal.ZERO)
+        }
+
+        val monthsOfSavings = if (averageDailyExpense.amount > BigDecimal.ZERO) {
+            balance.divide(
+                averageDailyExpense.amount.multiply(BigDecimal(30)),
+                2,
+                java.math.RoundingMode.HALF_UP,
+            ).toDouble()
+        } else {
+            0.0
+        }
+
         return BalanceMetrics(
             income = Money(income),
             expense = Money(expense),
-            balance = Money(balance)
+            balance = Money(balance),
+            savingsRate = savingsRate,
+            monthsOfSavings = monthsOfSavings,
+            averageDailyExpense = averageDailyExpense,
         )
     }
 } 

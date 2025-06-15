@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.profile
 
-import android.content.Context
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
@@ -28,13 +27,15 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import timber.log.Timber
+import android.net.Uri
+import java.io.File
+import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalytics
 
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
     private val getProfileAnalyticsUseCase: GetProfileAnalyticsUseCase,
     private val preferencesManager: PreferencesManager,
     private val notificationScheduler: INotificationScheduler,
-    private val appContext: Context,
     private val navigationManager: NavigationManager,
 ) : ViewModel() {
 
@@ -186,32 +187,68 @@ class ProfileViewModel(
 
     private fun exportTransactionsToCSV(action: ExportAction) {
         viewModelScope.launch {
-            exportTransactionsToCSVUseCase().collect { result ->
-                if (result.isSuccess) {
-                    val filePath = result.getOrNull() ?: return@collect
-                    _state.update { currentState ->
-                        currentState.copy(
-                            exportSuccess = "Export successful: $filePath",
-                            exportedFilePath = filePath,
-                            exportError = null,
-                        )
+            try {
+                val result = exportTransactionsToCSVUseCase()
+                when (result) {
+                    is Result.Success<File> -> {
+                        val filePath = result.data
+                        _state.update { currentState ->
+                            currentState.copy(
+                                exportSuccess = "Export successful: $filePath",
+                                exportedFilePath = filePath.toString(),
+                                exportError = null,
+                            )
+                        }
+
+                        when (action) {
+                            ExportAction.SHARE -> {
+                                val shareResult = exportTransactionsToCSVUseCase.shareCSVFile(filePath)
+                                if (shareResult is Result.Success<Uri>) {
+                                    // Обработка успешного шаринга
+                                }
+                            }
+                            ExportAction.OPEN -> {
+                                val openResult = exportTransactionsToCSVUseCase.openCSVFile(filePath)
+                                if (openResult is Result.Success<Uri>) {
+                                    // Обработка успешного открытия
+                                }
+                            }
+                            ExportAction.SAVE_ONLY -> {
+                                // Ничего не делаем, файл уже сохранен
+                            }
+                            else -> {
+                                // Обработка других возможных действий
+                            }
+                        }
                     }
-                    val intentToLaunch: Intent? = when (action) {
-                        ExportAction.SHARE -> exportTransactionsToCSVUseCase.shareCSVFile(filePath)
-                        ExportAction.OPEN -> exportTransactionsToCSVUseCase.openCSVFile(filePath)
-                        ExportAction.SAVE_ONLY -> null
+                    is Result.Error -> {
+                        val exception = (result as Result.Error).exception
+                        _state.update { currentState ->
+                            currentState.copy(
+                                exportError = exception.message ?: "Unknown export error",
+                                exportSuccess = null,
+                                exportedFilePath = null,
+                            )
+                        }
                     }
-                    intentToLaunch?.let {
-                        _intentCommands.emit(it)
+                    else -> {
+                        // Обработка других возможных результатов
+                        _state.update { currentState ->
+                            currentState.copy(
+                                exportError = "Unexpected result type",
+                                exportSuccess = null,
+                                exportedFilePath = null,
+                            )
+                        }
                     }
-                } else {
-                    _state.update { currentState ->
-                        currentState.copy(
-                            exportError = result.exceptionOrNull()?.message ?: "Unknown export error",
-                            exportSuccess = null,
-                            exportedFilePath = null,
-                        )
-                    }
+                }
+            } catch (e: Exception) {
+                _state.update { currentState ->
+                    currentState.copy(
+                        exportError = e.message ?: "Unknown export error",
+                        exportSuccess = null,
+                        exportedFilePath = null,
+                    )
                 }
             }
         }
@@ -221,34 +258,76 @@ class ProfileViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
 
-            when (val result = getProfileAnalyticsUseCase.execute()) {
-                is Result.Success -> {
-                    val analytics = result.data
-                    _state.update { currentState ->
-                        currentState.copy(
-                            isLoading = false,
-                            totalIncome = analytics.totalIncome,
-                            totalExpense = analytics.totalExpense,
-                            balance = analytics.balance,
-                            savingsRate = analytics.savingsRate,
-                            totalTransactions = analytics.totalTransactions,
-                            totalExpenseCategories = analytics.totalExpenseCategories,
-                            totalIncomeCategories = analytics.totalIncomeCategories,
-                            averageExpense = analytics.averageExpense,
-                            totalSourcesUsed = analytics.totalSourcesUsed,
-                            dateRange = analytics.dateRange,
-                            error = null,
-                        )
+            try {
+                val result = getProfileAnalyticsUseCase()
+                when (result) {
+                    is Result.Success<ProfileAnalytics> -> {
+                        val analytics = result.data
+
+                        // Форматируем dateRange в строку
+                        val dateRangeStr = try {
+                            if (analytics.dateRange != null) {
+                                val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                                val first = analytics.dateRange!!.first
+                                val second = analytics.dateRange!!.second
+                                val startStr = dateFormat.format(first)
+                                val endStr = dateFormat.format(second)
+                                "$startStr - $endStr"
+                            } else {
+                                "Все время"
+                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Ошибка при форматировании dateRange")
+                            "Все время"
+                        }
+
+                        // Форматируем averageExpense в строку
+                        val averageExpenseStr = "${analytics.averageExpense.amount} ₽"
+
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isLoading = false,
+                                totalIncome = analytics.totalIncome,
+                                totalExpense = analytics.totalExpense,
+                                balance = analytics.balance,
+                                savingsRate = analytics.savingsRate,
+                                totalTransactions = analytics.totalTransactions,
+                                totalExpenseCategories = analytics.totalExpenseCategories,
+                                totalIncomeCategories = analytics.totalIncomeCategories,
+                                averageExpense = averageExpenseStr,
+                                totalSourcesUsed = analytics.totalSourcesUsed,
+                                dateRange = dateRangeStr,
+                                error = null,
+                            )
+                        }
+                    }
+                    is Result.Error -> {
+                        val exception = (result as Result.Error).exception
+                        Timber.e(exception, "Ошибка при загрузке финансовой аналитики")
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isLoading = false,
+                                error = exception.message ?: "Неизвестная ошибка",
+                            )
+                        }
+                    }
+                    else -> {
+                        // Обработка других возможных результатов
+                        _state.update { currentState ->
+                            currentState.copy(
+                                isLoading = false,
+                                error = "Unexpected result type",
+                            )
+                        }
                     }
                 }
-                is Result.Error -> {
-                    Timber.e(result.exception, "Ошибка при загрузке финансовой аналитики")
-                    _state.update { currentState ->
-                        currentState.copy(
-                            isLoading = false,
-                            error = result.exception.message ?: "Неизвестная ошибка",
-                        )
-                    }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при загрузке финансовой аналитики")
+                _state.update { currentState ->
+                    currentState.copy(
+                        isLoading = false,
+                        error = e.message ?: "Неизвестная ошибка",
+                    )
                 }
             }
         }

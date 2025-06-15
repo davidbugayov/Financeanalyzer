@@ -3,22 +3,20 @@ package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 import com.davidbugayov.financeanalyzer.domain.model.CategoryWithAmount
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionType
-import javax.inject.Inject
 
-class GetCategoriesWithAmountUseCase @Inject constructor() {
+class GetCategoriesWithAmountUseCase {
 
-    operator fun invoke(transactions: List<Transaction>, type: TransactionType): List<CategoryWithAmount> {
+    operator fun invoke(transactions: List<Transaction>, isExpense: Boolean): List<CategoryWithAmount> {
         return transactions
-            .filter { it.type == type && it.category != null }
-            .groupBy { it.category!! }
+            .filter { it.isExpense == isExpense && it.category.isNotBlank() }
+            .groupBy { it.category }
             .map { (category, txs) ->
-                val amount = txs.sumOf { it.amount.value }
+                val amount = txs.sumOf { it.amount.amount }
                 CategoryWithAmount(
                     category = category,
-                    amount = Money(amount)
+                    amount = Money(amount),
                 )
             }
-            .sortedByDescending { it.amount.value }
+            .sortedByDescending { it.amount.amount }
     }
 } 

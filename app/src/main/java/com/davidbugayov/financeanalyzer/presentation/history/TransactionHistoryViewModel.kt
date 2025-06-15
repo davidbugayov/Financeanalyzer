@@ -5,8 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
-import com.davidbugayov.financeanalyzer.domain.model.TransactionType
 import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -35,9 +33,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
-import java.util.UUID
+import com.davidbugayov.financeanalyzer.domain.model.Money
 
 class TransactionHistoryViewModel constructor(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
@@ -424,15 +423,31 @@ class TransactionHistoryViewModel constructor(
                 val endDate = currentState.endDate
                 val transactions = currentState.transactions
 
-                val (currentTotal, previousTotal, percentageChange) = calculateCategoryStatsUseCase(
-                    categoryId = category,
-                    currentStartDate = startDate,
-                    currentEndDate = endDate,
-                    previousStartDate = Date(startDate.time - (endDate.time - startDate.time)),
-                    previousEndDate = startDate,
-                )
+                // Фильтруем транзакции по категории и периодам
+                val currentPeriodTransactions = transactions.filter {
+                    it.category == category && it.date >= startDate && it.date <= endDate
+                }
+                val previousPeriodStart = Date(startDate.time - (endDate.time - startDate.time))
+                val previousPeriodTransactions = transactions.filter {
+                    it.category == category && it.date >= previousPeriodStart && it.date < startDate
+                }
 
-                _state.update { it.copy(categoryStats = Triple(currentTotal, previousTotal, percentageChange)) }
+                // Вычисляем суммы для текущего и предыдущего периодов
+                val currentTotal = currentPeriodTransactions.sumOf { it.amount.amount }
+                val previousTotal = previousPeriodTransactions.sumOf { it.amount.amount }
+
+                // Вычисляем процентное изменение
+                val percentageChange = if (previousTotal != BigDecimal.ZERO) {
+                    ((currentTotal - previousTotal) * BigDecimal(100)) / previousTotal
+                } else {
+                    null
+                }
+
+                _state.update {
+                    it.copy(
+                        categoryStats = Triple(Money(currentTotal), Money(previousTotal), percentageChange),
+                    )
+                }
 
                 Timber.d(
                     "Статистика по категории $category рассчитана: $currentTotal, $previousTotal, $percentageChange",

@@ -12,17 +12,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
-import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import kotlinx.coroutines.flow.launchIn
 import kotlinx.coroutines.flow.onEach
 
 /**
  * Главный компонент навигации приложения.
  * Определяет структуру навигации и переходы между экранами.
- * 
+ *
  * @param navController Контроллер навигации
  * @param navigationManager Менеджер навигации для обработки команд
  * @param content Содержимое навигационного графа
@@ -31,7 +28,7 @@ import kotlinx.coroutines.flow.onEach
 fun AppNavHost(
     navController: NavHostController,
     navigationManager: NavigationManager,
-    content: NavGraphBuilder.() -> Unit
+    content: NavGraphBuilder.() -> Unit,
 ) {
     LaunchedEffect("navigation") {
         navigationManager.commands.onEach { command ->
@@ -51,7 +48,7 @@ fun AppNavHost(
     NavHost(
         navController = navController,
         startDestination = Screen.Home.route,
-        builder = content
+        builder = content,
     )
 }
 

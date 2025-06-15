@@ -5,22 +5,21 @@ import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.util.Result
-import kotlinx.coroutines.flow.first
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
-import javax.inject.Inject
 
-class ExportTransactionsToCSVUseCase @Inject constructor(
+class ExportTransactionsToCSVUseCase(
     private val transactionRepository: TransactionRepository,
-    private val context: Context
+    private val context: Context,
 ) {
 
     suspend operator fun invoke(): Result<File> {
         return try {
-            val transactions = transactionRepository.getAllTransactions().first()
+            // Используем пустой список для отладки
+            val transactions = transactionRepository.getAllTransactions()
             val csvFile = createCSVFile(transactions)
             Result.Success(csvFile)
         } catch (e: Exception) {
@@ -32,31 +31,34 @@ class ExportTransactionsToCSVUseCase @Inject constructor(
         val timestamp = SimpleDateFormat("yyyyMMdd_HHmmss", Locale.getDefault()).format(Date())
         val fileName = "transactions_$timestamp.csv"
         val file = File(context.cacheDir, fileName)
-        
+
         FileWriter(file).use { writer ->
             // Write CSV header
-            writer.append("ID,Date,Amount,Type,Category,Description,Wallet\n")
-            
+            writer.append("ID,Date,Amount,Type,Category,Description,Source\n")
+
             // Write transaction data
-            transactions.forEach { transaction ->
+            for (transaction in transactions) {
                 writer.append(transaction.id).append(",")
                 writer.append(transaction.date.toString()).append(",")
-                writer.append(transaction.amount.value.toString()).append(",")
-                writer.append(transaction.type.name).append(",")
-                writer.append(transaction.category?.name ?: "").append(",")
-                writer.append(transaction.description ?: "").append(",")
-                writer.append(transaction.walletId)
+                writer.append(transaction.amount.amount.toString()).append(",")
+                writer.append(if (transaction.isExpense) "EXPENSE" else "INCOME").append(",")
+                writer.append(transaction.category).append(",")
+                writer.append(transaction.note ?: "").append(",")
+                writer.append(transaction.source)
                 writer.append("\n")
             }
         }
-        
+
         return file
     }
-    
+
     enum class ExportAction {
-        SHARE, OPEN, SAVE
+        SHARE,
+        OPEN,
+        SAVE,
+        SAVE_ONLY,
     }
-    
+
     suspend fun shareCSVFile(file: File): Result<Uri> {
         return try {
             // Implementation depends on Android-specific code for sharing files
@@ -66,7 +68,7 @@ class ExportTransactionsToCSVUseCase @Inject constructor(
             Result.Error(e)
         }
     }
-    
+
     suspend fun openCSVFile(file: File): Result<Uri> {
         return try {
             // Implementation depends on Android-specific code for opening files
@@ -75,4 +77,4 @@ class ExportTransactionsToCSVUseCase @Inject constructor(
             Result.Error(e)
         }
     }
-} 
+}

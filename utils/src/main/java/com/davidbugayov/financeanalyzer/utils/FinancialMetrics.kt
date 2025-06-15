@@ -53,16 +53,16 @@ class FinancialMetrics private constructor() : KoinComponent {
         scope.launch {
             try {
                 val visibleTransactions = repository.loadTransactions()
-                
+
                 // Расчет доходов и расходов
                 val income = visibleTransactions
                     .filter { !it.isExpense }
                     .fold(Money.zero()) { acc, t -> acc + t.amount }
-                
+
                 val expense = visibleTransactions
                     .filter { it.isExpense }
                     .fold(Money.zero()) { acc, t -> acc + t.amount.abs() }
-                
+
                 val balance = income - expense
 
                 // Обновляем значения в состоянии
