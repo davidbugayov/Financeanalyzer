@@ -88,22 +88,21 @@ val appModule = module {
     single { UpdateTransactionUseCase(get()) }
     single { FilterTransactionsUseCase() }
     single { GroupTransactionsUseCase() }
-    single { CalculateCategoryStatsUseCase(get()) }
-    single { ExportTransactionsToCSVUseCase(get(), get()) }
+    single { CalculateCategoryStatsUseCase() }
+    single { ExportTransactionsToCSVUseCase(get(), androidContext()) }
     single { ValidateTransactionUseCase() }
     single { GetTransactionByIdUseCase(get()) }
     single { CalculateBalanceMetricsUseCase() }
     single { GetTransactionsForPeriodWithCacheUseCase(get()) }
     single { GetTransactionsForPeriodUseCase(get()) }
     single { UpdateWidgetsUseCase() }
-    single { GetCategoriesWithAmountUseCase(get()) }
+    single { GetCategoriesWithAmountUseCase() }
     single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
     factory { UpdateWalletBalancesUseCase(get()) }
     factory {
         GetProfileAnalyticsUseCase(
-            context = androidContext(),
             transactionRepository = get(),
-            calculateBalanceMetricsUseCase = get(),
+            walletRepository = get()
         )
     }
     single<ImportTransactionsUseCase> {

@@ -300,7 +300,7 @@ class HomeViewModel(
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
-                val metrics = calculateBalanceMetricsUseCase(transactions, startDate, endDate)
+                val metrics = calculateBalanceMetricsUseCase(transactions)
                 _state.update {
                     it.copy(
                         transactions = transactions,

@@ -105,15 +105,13 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 )
 
                 val metrics = calculateBalanceMetricsUseCase(
-                    filteredTransactions,
-                    _state.value.startDate,
-                    _state.value.endDate,
+                    filteredTransactions
                 )
                 val income = metrics.income
                 val expense = metrics.expense
-                val savingsRate = metrics.savingsRate
-                val averageDailyExpense = metrics.averageDailyExpense
-                val monthsOfSavings = metrics.monthsOfSavings
+                val savingsRate = 0.0
+                val averageDailyExpense = Money.zero()
+                val monthsOfSavings = 0.0
 
                 Timber.d(
                     "[DEBUG] Сумма доходов: $income, сумма расходов: $expense, баланс: ${income - expense}",

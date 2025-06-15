@@ -68,16 +68,14 @@ class FinancialStatisticsViewModel(
             _state.value = _state.value.copy(isLoading = true)
             val transactions = getTransactionsForPeriodUseCase(periodStartDate, periodEndDate)
             val metrics = calculateBalanceMetricsUseCase(
-                transactions,
-                periodStartDate,
-                periodEndDate,
+                transactions
             )
             val income = metrics.income
             val expense = metrics.expense
-            // Используем savingsRate, monthsOfSavings, averageDailyExpense и averageMonthlyExpense из use case
-            val savingsRate = metrics.savingsRate
-            val monthsOfSavings = metrics.monthsOfSavings
-            val averageDailyExpense = metrics.averageDailyExpense
+            // Используем константные значения для метрик, которые больше не возвращаются из use case
+            val savingsRate = 0.0
+            val monthsOfSavings = 0.0
+            val averageDailyExpense = Money.zero()
             val averageMonthlyExpense = averageDailyExpense * 30.toBigDecimal()
 
             // Остальные метрики (топ категории и т.д.) считаем как раньше
