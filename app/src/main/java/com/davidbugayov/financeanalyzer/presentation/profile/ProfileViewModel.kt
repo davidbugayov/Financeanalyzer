@@ -216,6 +216,7 @@ class ProfileViewModel(
                             ExportAction.SAVE_ONLY -> {
                                 // Ничего не делаем, файл уже сохранен
                             }
+                            else -> { /* Обработка других возможных действий */ }
                         }
                     }
                     is Result.Error -> {
@@ -228,6 +229,7 @@ class ProfileViewModel(
                             )
                         }
                     }
+                    else -> { /* Обработка других возможных результатов */ }
                 }
             } catch (e: Exception) {
                 _state.update { currentState ->
@@ -298,6 +300,7 @@ class ProfileViewModel(
                             )
                         }
                     }
+                    else -> { /* Обработка других возможных результатов */ }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при загрузке финансовой аналитики")
