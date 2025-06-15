@@ -203,13 +203,13 @@ class ProfileViewModel(
                         when (action) {
                             ExportAction.SHARE -> {
                                 val shareResult = exportTransactionsToCSVUseCase.shareCSVFile(filePath)
-                                if (shareResult is Result.Success<Uri>) {
+                                if (shareResult.isSuccess) {
                                     // Обработка успешного шаринга
                                 }
                             }
                             ExportAction.OPEN -> {
                                 val openResult = exportTransactionsToCSVUseCase.openCSVFile(filePath)
-                                if (openResult is Result.Success<Uri>) {
+                                if (openResult.isSuccess) {
                                     // Обработка успешного открытия
                                 }
                             }
@@ -220,7 +220,7 @@ class ProfileViewModel(
                         }
                     }
                     is Result.Error -> {
-                        val exception = (result as Result.Error).exception
+                        val exception = result.exception
                         _state.update { currentState ->
                             currentState.copy(
                                 exportError = exception.message ?: "Unknown export error",
@@ -291,7 +291,7 @@ class ProfileViewModel(
                         }
                     }
                     is Result.Error -> {
-                        val exception = (result as Result.Error).exception
+                        val exception = result.exception
                         Timber.e(exception, "Ошибка при загрузке финансовой аналитики")
                         _state.update { currentState ->
                             currentState.copy(
