@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.ui.theme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.staticCompositionLocalOf
-import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 
@@ -42,4 +41,4 @@ fun AppThemeProvider(themeMode: ThemeMode, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalAppTheme provides themeMode) {
         content()
     }
-}
+} 

@@ -17,7 +17,13 @@ import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalView
 import androidx.core.view.WindowCompat
-import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+
+/**
+ * Enum для выбора темы приложения
+ */
+enum class ThemeMode {
+    LIGHT, DARK, SYSTEM
+}
 
 // Цвета для светлой темы (используются стандартные Material Design слоты)
 private val LightColors = lightColorScheme(
@@ -216,4 +222,4 @@ fun FinanceAnalyzerTheme(
             content = content,
         )
     }
-}
+} 
