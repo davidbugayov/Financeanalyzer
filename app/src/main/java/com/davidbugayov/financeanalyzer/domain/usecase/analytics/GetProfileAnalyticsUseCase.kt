@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.model.AppProfileAnalytics
 import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalytics
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -13,7 +14,7 @@ class GetProfileAnalyticsUseCase(
     private val walletRepository: WalletRepository,
 ) {
 
-    suspend operator fun invoke(): Result<ProfileAnalytics> {
+    suspend operator fun invoke(): Result<AppProfileAnalytics> {
         return try {
             // Получаем данные из репозиториев
             val transactions = transactionRepository.getAllTransactions()
@@ -58,7 +59,8 @@ class GetProfileAnalyticsUseCase(
             calendar.add(Calendar.YEAR, -1)
             val yearAgoDate = calendar.time
 
-            val analytics = ProfileAnalytics(
+            // Создаем доменную модель ProfileAnalytics
+            val domainAnalytics = ProfileAnalytics(
                 totalIncome = totalIncome,
                 totalExpense = totalExpense,
                 balance = balance,
@@ -72,7 +74,10 @@ class GetProfileAnalyticsUseCase(
                 totalWallets = wallets,
             )
 
-            Result.Success(analytics)
+            // Конвертируем в AppProfileAnalytics для совместимости
+            val appAnalytics = AppProfileAnalytics.fromDomainModel(domainAnalytics)
+
+            Result.Success(appAnalytics)
         } catch (e: Exception) {
             Result.Error(e)
         }

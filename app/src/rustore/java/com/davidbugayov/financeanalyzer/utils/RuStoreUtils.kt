@@ -14,8 +14,12 @@ import timber.log.Timber
  */
 object RuStoreUtils {
 
-    private var lastReviewRequestTime: Long = 0
+    private const val PREFS_NAME = "rustore_utils_prefs"
+    private const val KEY_LAST_REVIEW_TIME = "last_review_request_time"
+    private const val KEY_LAST_UPDATE_CHECK_TIME = "last_update_check_time"
+    
     private const val REVIEW_REQUEST_INTERVAL = 7 * 24 * 60 * 60 * 1000L // 7 дней в миллисекундах
+    private const val UPDATE_CHECK_INTERVAL = 7 * 24 * 60 * 60 * 1000L // 7 дней в миллисекундах
 
     /**
      * Запрашивает отзыв пользователя через RuStore API
@@ -24,6 +28,8 @@ object RuStoreUtils {
      * @param context Контекст приложения
      */
     fun requestReview(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val lastReviewRequestTime = prefs.getLong(KEY_LAST_REVIEW_TIME, 0)
         val currentTime = System.currentTimeMillis()
 
         // Проверяем, прошло ли достаточно времени с последнего запроса отзыва
@@ -43,7 +49,7 @@ object RuStoreUtils {
                             reviewManager.launchReviewFlow(reviewInfo)
                                 .addOnSuccessListener {
                                     Timber.d("Диалог отзыва успешно показан")
-                                    lastReviewRequestTime = currentTime
+                                    prefs.edit().putLong(KEY_LAST_REVIEW_TIME, currentTime).apply()
                                 }
                                 .addOnFailureListener { e ->
                                     Timber.e(e, "Ошибка при показе диалога отзыва")
@@ -63,10 +69,21 @@ object RuStoreUtils {
 
     /**
      * Проверяет наличие обновлений приложения через RuStore API
+     * Проверка выполняется не чаще раза в 7 дней
      *
      * @param context Контекст приложения
      */
     fun checkForUpdates(context: Context) {
+        val prefs = context.getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE)
+        val lastUpdateCheckTime = prefs.getLong(KEY_LAST_UPDATE_CHECK_TIME, 0)
+        val currentTime = System.currentTimeMillis()
+
+        // Проверяем, прошло ли достаточно времени с последней проверки обновлений
+        if (currentTime - lastUpdateCheckTime < UPDATE_CHECK_INTERVAL) {
+            Timber.d("Слишком рано для проверки обновлений. Пропускаем.")
+            return
+        }
+
         try {
             // Проверяем, установлен ли RuStore на устройстве
             val appUpdateManager = RuStoreAppUpdateManagerFactory.create(context)
@@ -77,6 +94,8 @@ object RuStoreUtils {
                     appUpdateManager.getAppUpdateInfo()
                         .addOnSuccessListener { appUpdateInfo ->
                             Timber.d("Проверка обновлений в RuStore завершена")
+                            prefs.edit().putLong(KEY_LAST_UPDATE_CHECK_TIME, currentTime).apply()
+                            
                             // Если доступно обновление, показываем диалог
                             if (appUpdateInfo.updateAvailability == UpdateAvailability.UPDATE_AVAILABLE) {
                                 Timber.d("Доступно обновление в RuStore")

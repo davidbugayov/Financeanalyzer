@@ -29,7 +29,7 @@ import kotlinx.coroutines.flow.launchIn
 import timber.log.Timber
 import android.net.Uri
 import java.io.File
-import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalytics
+import com.davidbugayov.financeanalyzer.domain.model.AppProfileAnalytics
 
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
@@ -250,7 +250,7 @@ class ProfileViewModel(
             try {
                 val result = getProfileAnalyticsUseCase()
                 when (result) {
-                    is Result.Success<ProfileAnalytics> -> {
+                    is Result.Success<AppProfileAnalytics> -> {
                         val analytics = result.data
 
                         // Форматируем dateRange в строку
