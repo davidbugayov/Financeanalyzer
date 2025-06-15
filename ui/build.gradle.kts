@@ -50,7 +50,7 @@ android {
 dependencies {
     // Модули проекта
     implementation(project(":domain"))
-    
+
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
@@ -64,4 +64,4 @@ dependencies {
 
     // Минимальные зависимости AndroidX
     implementation(libs.androidx.core.ktx)
-} 
+}
