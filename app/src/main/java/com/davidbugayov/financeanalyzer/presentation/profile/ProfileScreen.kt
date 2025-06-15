@@ -56,7 +56,7 @@ import com.davidbugayov.financeanalyzer.presentation.profile.components.Settings
 import com.davidbugayov.financeanalyzer.presentation.profile.components.ThemeSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
-import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
+import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import kotlinx.coroutines.flow.collectLatest

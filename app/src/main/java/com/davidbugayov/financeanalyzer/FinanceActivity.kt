@@ -20,11 +20,11 @@ import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.presentation.navigation.AppNavHost
 import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
-import com.davidbugayov.financeanalyzer.presentation.profile.model.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
