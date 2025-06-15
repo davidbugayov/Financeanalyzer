@@ -23,4 +23,4 @@ enum class TransactionType {
     fun isExpense(): Boolean {
         return this == EXPENSE
     }
-}
+} 

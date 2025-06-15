@@ -51,6 +51,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHi
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import kotlin.math.absoluteValue
 import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
 
@@ -376,20 +377,18 @@ fun TransactionHistoryScreen(
                             // Для доходов
                             val income = transactions
                                 .filter { !it.isExpense }
-                                .map { it.amount }
-                                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                                .sumOf { it.amount.amount.toDouble() }
 
                             // Для расходов берем абсолютное значение (без минуса)
                             val expense = transactions
                                 .filter { it.isExpense }
-                                .map { it.amount.abs() }
-                                .reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                                .sumOf { it.amount.amount.abs().toDouble() }
 
                             // Для баланса: доходы - расходы
-                            val balance = income.minus(expense)
+                            val balance = income - expense
 
                             TransactionGroup(
-                                date = period,
+                                date = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault()).parse(period) ?: java.util.Date(),
                                 transactions = transactions,
                                 balance = balance,
                             )

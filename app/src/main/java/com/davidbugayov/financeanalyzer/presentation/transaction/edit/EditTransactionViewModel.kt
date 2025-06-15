@@ -274,9 +274,10 @@ class EditTransactionViewModel(
 
                 if (result is DomainResult.Success) {
                     // Обновляем балансы кошельков, если это доход и выбраны кошельки
-                    if (!transactionToSave.isExpense && transactionToSave.walletIds != null && transactionToSave.walletIds.isNotEmpty()) {
+                    val walletIdsList = transactionToSave.walletIds?.toList() ?: emptyList()
+                    if (!transactionToSave.isExpense && walletIdsList.isNotEmpty()) {
                         updateWalletsBalance(
-                            transactionToSave.walletIds,
+                            walletIdsList,
                             transactionToSave.amount,
                             originalTransaction,
                         )

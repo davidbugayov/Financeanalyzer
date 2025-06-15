@@ -319,7 +319,7 @@ fun TransactionItem(
                 // Note (formerly Description)
                 if (!transaction.note.isNullOrBlank()) {
                     Text(
-                        text = transaction.note, // Use !! as we've checked for isNullOrBlank
+                        text = transaction.note ?: "", // Use safe call with default empty string
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,

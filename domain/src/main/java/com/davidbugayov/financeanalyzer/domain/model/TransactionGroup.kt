@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
+import java.util.Date
+
 /**
  * Группа транзакций для отображения в списке.
  * Используется для группировки транзакций по дате.
@@ -11,9 +13,9 @@ package com.davidbugayov.financeanalyzer.domain.model
  * @property total Общая сумма транзакций в группе
  */
 data class TransactionGroup(
-    val date: String,
+    val date: Date,
     val transactions: List<Transaction>,
-    val balance: Money,
-    val name: String = date,
-    val total: Money = balance,
+    val balance: Double = 0.0,
+    val name: String = date.toString(),
+    val total: Double = balance
 ) 

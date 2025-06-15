@@ -240,7 +240,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":utils"))
     implementation(project(":ui"))
-    
+
     // Feature modules
     implementation(project(":feature"))
     implementation(project(":feature:home"))

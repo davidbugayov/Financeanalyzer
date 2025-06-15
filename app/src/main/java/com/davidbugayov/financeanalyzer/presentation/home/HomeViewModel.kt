@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.domain.model.fold
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
@@ -59,13 +58,13 @@ class HomeViewModel(
     // --- Кэширование ---
     // Кэши для хранения результатов вычислений, чтобы избежать повторных затратных операций
     /**
-     * Кэш для отфильтрованных транзакций и их статистики.
-     * Ключ: комбинация фильтра и хэш списка исходных транзакций.
-     * Значение: отфильтрованные транзакции, статистика (доход, расход, баланс), группы транзакций.
-     * * Это позволяет избежать повторных вычислений, если список транзакций и фильтр не изменились.
+     * Кэш для отфильтрованных транзакций.
+     * Ключ: пара (фильтр, список всех транзакций).
+     * Значение: тройка (отфильтрованные транзакции, статистика, группы транзакций).
+     * * Позволяет избежать повторной фильтрации и группировки, если фильтр не изменился.
      */
     private val filteredTransactionsCache =
-        mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<TransactionGroup>>>()
+        mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<com.davidbugayov.financeanalyzer.domain.model.TransactionGroup>>>()
 
     /**
      * Кэш для базовой статистики (доход, расход, баланс) по списку транзакций.
@@ -484,7 +483,7 @@ class HomeViewModel(
      * @param transactions Список транзакций
      * @return Список групп транзакций, сгруппированных по дате
      */
-    private fun groupTransactionsByDate(transactions: List<Transaction>): List<TransactionGroup> {
+    private fun groupTransactionsByDate(transactions: List<Transaction>): List<com.davidbugayov.financeanalyzer.domain.model.TransactionGroup> {
         if (transactions.isEmpty()) {
             return emptyList()
         }
@@ -526,13 +525,12 @@ class HomeViewModel(
 
             // Вычисляем общий баланс (доходы - расходы)
             val balance = income - expense
+            val balanceDouble = balance.amount.toDouble()
 
-            TransactionGroup(
-                date = dateString,
+            com.davidbugayov.financeanalyzer.domain.model.TransactionGroup(
+                date = date,
                 transactions = sortedTransactions,
-                balance = balance,
-                name = dateString,
-                total = balance,
+                balance = balanceDouble,
             )
         }
     }

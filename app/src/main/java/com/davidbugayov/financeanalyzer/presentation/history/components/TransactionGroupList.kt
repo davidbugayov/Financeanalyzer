@@ -33,7 +33,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -41,6 +40,8 @@ import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import kotlinx.coroutines.launch
+import java.text.SimpleDateFormat
+import java.util.Locale
 
 /**
  * Компонент для отображения сгруппированных транзакций с поддержкой пагинации.
@@ -66,13 +67,14 @@ fun TransactionGroupList(
 ) {
     val listState = rememberLazyListState()
     val coroutineScope = rememberCoroutineScope()
+    val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
 
     // Используем mutableStateMapOf для хранения состояния раскрытия групп
     // По умолчанию все группы раскрыты, кроме последних двух
     val expandedGroups = remember(transactionGroups) {
         mutableStateMapOf<String, Boolean>().apply {
             transactionGroups.forEachIndexed { index, group ->
-                this[group.date] = index < 2 // Автоматически раскрываем только первые 2 группы
+                this[dateFormat.format(group.date)] = index < 2 // Автоматически раскрываем только первые 2 группы
             }
         }
     }
@@ -99,26 +101,27 @@ fun TransactionGroupList(
         modifier = Modifier.fillMaxWidth(),
     ) {
         transactionGroups.forEach { group ->
-            val isExpanded = expandedGroups[group.date] == true
+            val formattedDate = dateFormat.format(group.date)
+            val isExpanded = expandedGroups[formattedDate] == true
 
             // Заголовок группы
-            item(key = "header_${group.date}") {
+            item(key = "header_${formattedDate}") {
                 ExpandableGroupHeader(
-                    date = group.date,
+                    date = formattedDate,
                     balance = group.balance,
                     isExpanded = isExpanded,
                     onToggle = { expanded ->
-                        expandedGroups[group.date] = expanded
+                        expandedGroups[formattedDate] = expanded
                         // Прокручиваем к заголовку, если группа свернута
                         if (!expanded) {
                             coroutineScope.launch {
                                 // Находим индекс текущего заголовка и прокручиваем к нему
-                                val headerIndex = transactionGroups.indexOfFirst { it.date == group.date }
+                                val headerIndex = transactionGroups.indexOfFirst { dateFormat.format(it.date) == formattedDate }
                                 if (headerIndex >= 0) {
                                     var currentItemIndex = 0
                                     for (i in 0 until headerIndex) {
                                         currentItemIndex++ // For the header
-                                        if (expandedGroups[transactionGroups[i].date] == true) {
+                                        if (expandedGroups[dateFormat.format(transactionGroups[i].date)] == true) {
                                             currentItemIndex += transactionGroups[i].transactions.size // For transactions in this group
                                         }
                                         currentItemIndex++ // For the spacer
@@ -158,7 +161,7 @@ fun TransactionGroupList(
             }
 
             // Разделитель между группами
-            item(key = "spacer_${group.date}") {
+            item(key = "spacer_${formattedDate}") {
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -190,12 +193,12 @@ fun TransactionGroupList(
  * Заголовок для группы транзакций с возможностью сворачивания/разворачивания
  */
 @Composable
-private fun ExpandableGroupHeader(date: String, balance: Money, isExpanded: Boolean, onToggle: (Boolean) -> Unit) {
+private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boolean, onToggle: (Boolean) -> Unit) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val balanceTextColor = if (balance.isPositive()) incomeColor else expenseColor
+    val balanceTextColor = if (balance >= 0) incomeColor else expenseColor
     // Определяем цвет фона карты в зависимости от знака баланса
-    val cardBackgroundColor = if (balance.isPositive()) {
+    val cardBackgroundColor = if (balance >= 0) {
         LocalIncomeColor.current.copy(alpha = 0.1f) // Светлый оттенок для дохода
     } else {
         LocalExpenseColor.current.copy(alpha = 0.1f) // Светлый оттенок для расхода
@@ -231,7 +234,7 @@ private fun ExpandableGroupHeader(date: String, balance: Money, isExpanded: Bool
             )
 
             Text(
-                text = balance.format(showSign = true, useMinimalDecimals = true),
+                text = String.format("%.2f", balance),
                 style = MaterialTheme.typography.bodyLarge,
                 color = balanceTextColor,
                 fontWeight = FontWeight.Bold,

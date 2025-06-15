@@ -20,7 +20,7 @@ class UpdateWalletBalancesUseCase(
             // Логика отката изменений для оригинальной транзакции
             if (originalTransaction?.walletIds?.isNotEmpty() == true) {
                 val originalAmount = originalTransaction.amount
-                val originalWalletIds = originalTransaction.walletIds
+                val originalWalletIds = originalTransaction.walletIds ?: emptyList()
                 val originalAmountPerWallet = if (originalWalletIds.size > 1) {
                     originalAmount.div(originalWalletIds.size)
                 } else {

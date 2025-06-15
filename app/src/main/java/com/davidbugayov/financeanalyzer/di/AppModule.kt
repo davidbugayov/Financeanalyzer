@@ -158,7 +158,7 @@ val appModule = module {
     viewModel { WalletTransactionsViewModel(get(), get(), get()) }
     viewModel { ImportTransactionsViewModel(get(), androidApplication()) }
     viewModel { OnboardingViewModel(get()) }
-    viewModel { AchievementsViewModel(get()) }
+    viewModel { AchievementsViewModel() }
 }
 
 val allModules = listOf(appModule, repositoryModule)

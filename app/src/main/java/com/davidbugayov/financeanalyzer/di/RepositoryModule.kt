@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.data.repository.TransactionMapper
 import com.davidbugayov.financeanalyzer.data.repository.UnifiedTransactionRepositoryImpl
 import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
-import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
@@ -29,5 +28,4 @@ val repositoryModule = module {
 
     // Другие репозитории
     single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
-    single { AchievementsRepository() }
 }
