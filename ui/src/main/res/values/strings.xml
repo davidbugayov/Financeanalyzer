@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="delete_transaction">Удалить транзакцию</string>
+    <string name="delete">Удалить</string>
+    <string name="cancel">Отмена</string>
+    <string name="confirm">Подтвердить</string>
+    <string name="date_before_minimum">Дата раньше минимальной</string>
+    <string name="date_after_maximum">Дата позже максимальной</string>
+    <string name="invalid_date">Недопустимая дата</string>
+    <string name="current_balance">Текущий баланс</string>
+</resources> 

@@ -48,6 +48,9 @@ android {
 }
 
 dependencies {
+    // Модули проекта
+    implementation(project(":domain"))
+    
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
