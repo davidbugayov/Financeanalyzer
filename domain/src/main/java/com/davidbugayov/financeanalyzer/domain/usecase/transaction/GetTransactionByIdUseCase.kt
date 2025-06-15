@@ -21,4 +21,4 @@ class GetTransactionByIdUseCase(
             Result.error(AppException.mapException(e))
         }
     }
-}
+} 

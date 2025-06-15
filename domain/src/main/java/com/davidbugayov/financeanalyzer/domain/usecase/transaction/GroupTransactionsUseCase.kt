@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
+import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
@@ -153,4 +153,4 @@ class GroupTransactionsUseCase {
             else -> 0
         }
     }
-}
+} 

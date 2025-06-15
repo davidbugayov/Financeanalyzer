@@ -27,7 +27,7 @@ class UpdateWalletBalancesUseCase(
                     originalAmount
                 }
                 Timber.d(
-                    "UpdateWalletBalancesUseCase: Откат для ${'$'}{originalWalletIds.size} оригинальных кошельков, сумма: ${'$'}originalAmountPerWallet",
+                    "UpdateWalletBalancesUseCase: Откат для ${originalWalletIds.size} оригинальных кошельков, сумма: $originalAmountPerWallet",
                 )
                 val originalWallets = walletRepository.getWalletsByIds(originalWalletIds)
                 originalWallets.forEach { wallet ->
@@ -35,7 +35,7 @@ class UpdateWalletBalancesUseCase(
                         balance = wallet.balance.minus(originalAmountPerWallet),
                     )
                     Timber.d(
-                        "UpdateWalletBalancesUseCase: Откат для кошелька ${'$'}{wallet.name}: баланс ${'$'}{wallet.balance} -> ${'$'}{updatedWallet.balance}",
+                        "UpdateWalletBalancesUseCase: Откат для кошелька ${wallet.name}: баланс ${wallet.balance} -> ${updatedWallet.balance}",
                     )
                     walletRepository.updateWallet(updatedWallet)
                 }
@@ -49,7 +49,7 @@ class UpdateWalletBalancesUseCase(
                     amountForWallets
                 }
                 Timber.d(
-                    "UpdateWalletBalancesUseCase: Обновление для ${'$'}{walletIdsToUpdate.size} кошельков, сумма на кошелек: ${'$'}amountPerWallet",
+                    "UpdateWalletBalancesUseCase: Обновление для ${walletIdsToUpdate.size} кошельков, сумма на кошелек: $amountPerWallet",
                 )
                 val walletsToUpdateList = walletRepository.getWalletsByIds(walletIdsToUpdate)
                 walletsToUpdateList.forEach { wallet ->
@@ -57,7 +57,7 @@ class UpdateWalletBalancesUseCase(
                         balance = wallet.balance.plus(amountPerWallet),
                     )
                     Timber.d(
-                        "UpdateWalletBalancesUseCase: Обновляем кошелек ${'$'}{wallet.name}: старый баланс=${'$'}{wallet.balance}, новый баланс=${'$'}{updatedWallet.balance}",
+                        "UpdateWalletBalancesUseCase: Обновляем кошелек ${wallet.name}: старый баланс=${wallet.balance}, новый баланс=${updatedWallet.balance}",
                     )
                     walletRepository.updateWallet(updatedWallet)
                 }
@@ -72,4 +72,4 @@ class UpdateWalletBalancesUseCase(
             Result.Error(Unknown(e.message, e))
         }
     }
-}
+} 

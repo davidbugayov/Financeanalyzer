@@ -8,10 +8,10 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent

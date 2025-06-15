@@ -27,4 +27,4 @@ class AddTransactionUseCase(
             repository.addTransaction(transaction)
         }
     }
-}
+} 

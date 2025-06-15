@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType
 import java.util.Calendar
 import java.util.Date
 
@@ -122,4 +122,4 @@ class FilterTransactionsUseCase {
             transactions
         }
     }
-}
+} 

@@ -35,4 +35,4 @@ interface GetTransactionsUseCase {
      * @return Список транзакций за указанный период
      */
     suspend fun getRecentTransactions(days: Int): List<Transaction>
-}
+} 

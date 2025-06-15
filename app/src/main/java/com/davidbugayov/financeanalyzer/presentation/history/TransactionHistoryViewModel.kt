@@ -5,13 +5,17 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.domain.model.TransactionType
+import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
+import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
@@ -33,6 +37,7 @@ import kotlinx.coroutines.withContext
 import timber.log.Timber
 import java.util.Calendar
 import java.util.Date
+import java.util.UUID
 
 class TransactionHistoryViewModel constructor(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
@@ -449,12 +454,38 @@ class TransactionHistoryViewModel constructor(
     private fun filterTransactions(transactions: List<Transaction>, state: TransactionHistoryState): List<Transaction> {
         return filterTransactionsUseCase(
             transactions = transactions,
-            periodType = state.periodType,
+            periodType = toDomainPeriodType(state.periodType),
             startDate = state.startDate,
             endDate = state.endDate,
             categories = state.selectedCategories,
             sources = state.selectedSources,
         )
+    }
+
+    /**
+     * Преобразует PeriodType из presentation в PeriodType из domain
+     */
+    private fun toDomainPeriodType(periodType: PeriodType): DomainPeriodType {
+        return when (periodType) {
+            PeriodType.DAY -> DomainPeriodType.DAY
+            PeriodType.WEEK -> DomainPeriodType.WEEK
+            PeriodType.MONTH -> DomainPeriodType.MONTH
+            PeriodType.QUARTER -> DomainPeriodType.QUARTER
+            PeriodType.YEAR -> DomainPeriodType.YEAR
+            PeriodType.ALL -> DomainPeriodType.ALL
+            PeriodType.CUSTOM -> DomainPeriodType.CUSTOM
+        }
+    }
+
+    /**
+     * Преобразует GroupingType из presentation в GroupingType из domain
+     */
+    private fun toDomainGroupingType(groupingType: GroupingType): DomainGroupingType {
+        return when (groupingType) {
+            GroupingType.DAY -> DomainGroupingType.DAY
+            GroupingType.WEEK -> DomainGroupingType.WEEK
+            GroupingType.MONTH -> DomainGroupingType.MONTH
+        }
     }
 
     /**
@@ -510,7 +541,7 @@ class TransactionHistoryViewModel constructor(
                 // Используем более эффективный алгоритм группировки
                 val groups = groupTransactionsUseCase(
                     transactions = filteredTransactions,
-                    groupingType = currentState.groupingType,
+                    groupingType = toDomainGroupingType(currentState.groupingType),
                 )
 
                 val endTime = System.currentTimeMillis()

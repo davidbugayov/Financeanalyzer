@@ -27,4 +27,4 @@ class LoadTransactionsUseCase(
             repository.loadTransactions()
         }
     }
-}
+} 

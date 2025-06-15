@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.widgets
+package com.davidbugayov.financeanalyzer.usecase.widgets
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
@@ -37,4 +37,4 @@ class UpdateWidgetsUseCase {
             context.sendBroadcast(intent)
         }
     }
-}
+} 

@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.domain.usecase
+package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -24,4 +24,4 @@ class UpdateTransactionUseCase(
             repository.updateTransaction(transaction)
         }
     }
-}
+} 

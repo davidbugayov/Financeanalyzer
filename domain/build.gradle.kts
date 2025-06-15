@@ -39,6 +39,7 @@ dependencies {
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.coroutines.android)
     implementation(libs.kotlinx.datetime)
+    implementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8")
 
     // Koin
     implementation(libs.koin.android)

@@ -11,7 +11,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanc
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState

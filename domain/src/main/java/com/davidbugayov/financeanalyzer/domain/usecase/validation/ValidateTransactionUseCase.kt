@@ -27,4 +27,4 @@ class ValidateTransactionUseCase {
 
         return Result(isValid, amountError, categoryError, sourceError, errorMsg)
     }
-}
+} 

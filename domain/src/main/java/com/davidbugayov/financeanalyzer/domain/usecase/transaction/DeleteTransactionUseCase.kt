@@ -22,4 +22,4 @@ class DeleteTransactionUseCase(private val repository: ITransactionRepository) {
             repository.deleteTransaction(transaction)
         }
     }
-}
+} 

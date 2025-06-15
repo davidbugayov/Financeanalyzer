@@ -28,4 +28,4 @@ class GetTransactionsForPeriodUseCase(
         val end = calendarEnd.time
         return allTransactions.filter { it.date >= start && it.date <= end }
     }
-}
+} 

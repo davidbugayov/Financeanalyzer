@@ -8,7 +8,7 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
 import com.davidbugayov.financeanalyzer.data.repository.WalletRepositoryImpl
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.UpdateTransactionUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetCategoriesWithAmountUseCase
@@ -29,7 +29,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransact
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
