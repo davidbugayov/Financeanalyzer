@@ -185,6 +185,7 @@ class ProfileViewModel(
         )
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun exportTransactionsToCSV(action: ExportAction) {
         viewModelScope.launch {
             try {
@@ -243,6 +244,7 @@ class ProfileViewModel(
         }
     }
 
+    @Suppress("UNCHECKED_CAST")
     private fun loadFinancialAnalytics() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true, error = null) }
