@@ -35,6 +35,9 @@ android {
 }
 
 dependencies {
+    // Modules
+    implementation(project(":core"))
+    
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.coroutines.core)
     implementation(libs.kotlin.coroutines.android)

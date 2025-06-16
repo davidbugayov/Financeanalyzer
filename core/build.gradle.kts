@@ -50,9 +50,6 @@ android {
 }
 
 dependencies {
-    // Modules
-    implementation(project(":domain"))
-
     // Kotlin
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.coroutines.core)
