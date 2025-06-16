@@ -113,13 +113,20 @@ object RuStoreUtils {
                             }
                         }
                         .addOnFailureListener { e ->
+                            // Сохраняем время последней проверки даже при ошибке,
+                            // чтобы не пытаться проверять снова слишком часто
+                            prefs.edit().putLong(KEY_LAST_UPDATE_CHECK_TIME, currentTime).apply()
                             Timber.e(e, "Ошибка при проверке обновлений")
                         }
                 } catch (e: Exception) {
+                    // Сохраняем время последней проверки даже при ошибке
+                    prefs.edit().putLong(KEY_LAST_UPDATE_CHECK_TIME, currentTime).apply()
                     Timber.e(e, "Исключение при проверке обновлений")
                 }
             }
         } catch (e: Exception) {
+            // Сохраняем время последней проверки даже при ошибке
+            prefs.edit().putLong(KEY_LAST_UPDATE_CHECK_TIME, currentTime).apply()
             Timber.e(e, "Ошибка при инициализации RuStore AppUpdate API")
         }
     }

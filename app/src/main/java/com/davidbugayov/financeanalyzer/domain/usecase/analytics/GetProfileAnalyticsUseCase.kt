@@ -1,11 +1,11 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.analytics
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalytics
 import com.davidbugayov.financeanalyzer.domain.model.mapException
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.util.Result
 import java.util.Date
 import java.util.Calendar
 import timber.log.Timber
@@ -15,7 +15,7 @@ class GetProfileAnalyticsUseCase(
     private val walletRepository: WalletRepository,
 ) {
 
-    suspend operator fun invoke(): Result<ProfileAnalytics> {
+    suspend operator fun invoke(): CoreResult<ProfileAnalytics> {
         return try {
             // Получаем данные из репозиториев
             val transactions = transactionRepository.getAllTransactions()
@@ -75,10 +75,10 @@ class GetProfileAnalyticsUseCase(
                 totalWallets = wallets,
             )
 
-            Result.Success(profileAnalytics)
+            CoreResult.Success(profileAnalytics)
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при получении аналитики профиля")
-            Result.Error(mapException(e))
+            CoreResult.Error(mapException(e))
         }
     }
 }

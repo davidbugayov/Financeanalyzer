@@ -1,4 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.history
+import com.davidbugayov.financeanalyzer.core.util.Result
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
@@ -19,6 +20,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.utils.DateUtils
@@ -35,8 +37,6 @@ import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.util.Result
 
 class TransactionHistoryViewModel constructor(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
@@ -156,7 +156,8 @@ class TransactionHistoryViewModel constructor(
                 }
                 is Result.Error -> {
                     Timber.e(result.exception, "Failed to delete transaction")
-                    _state.update { it.copy(error = result.exception.message) }
+                    val errorMessage = result.exception?.message ?: "Unknown error"
+                    _state.update { it.copy(error = errorMessage) }
                 }
             }
         }

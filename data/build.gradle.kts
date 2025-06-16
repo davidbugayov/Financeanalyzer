@@ -27,17 +27,18 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
 
     kotlinOptions {
-        jvmTarget = libs.versions.javaVersion.get()
+        jvmTarget = "17"
     }
 }
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":core"))
 
     implementation(libs.kotlin.stdlib)
     implementation(libs.kotlin.coroutines.core)

@@ -1,4 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import android.app.Application
 import android.content.res.Resources
@@ -6,12 +7,11 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
-import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -29,7 +29,6 @@ import net.objecthunter.exp4j.ExpressionBuilder
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Date
-import com.davidbugayov.financeanalyzer.domain.util.Result
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: CategoriesViewModel,
@@ -92,7 +91,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 amountForWallets = amount,
                 originalTransaction = originalTransaction,
             )
-            if (result is Result.Error) {
+            if (result is CoreResult.Error) {
                 Timber.e(result.exception, "Ошибка при обновлении баланса кошельков через UseCase")
             }
         }

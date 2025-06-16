@@ -18,7 +18,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
@@ -50,7 +51,7 @@ private fun BalanceCardAmount(balance: Money) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     Text(
-        text = balance.format(true),
+        text = balance.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
         style = MaterialTheme.typography.headlineMedium,
         fontSize = 24.sp,
         fontWeight = FontWeight.Bold,

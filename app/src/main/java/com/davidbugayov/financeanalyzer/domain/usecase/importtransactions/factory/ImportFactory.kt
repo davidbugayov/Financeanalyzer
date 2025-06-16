@@ -13,8 +13,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon.OzonPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank.SberbankPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.tbank.TbankPdfHandler
-import com.davidbugayov.financeanalyzer.domain.util.Result
-import com.davidbugayov.financeanalyzer.domain.util.safeCallSync
+import com.davidbugayov.financeanalyzer.core.util.Result
+import com.davidbugayov.financeanalyzer.core.util.safeCallSync
 import timber.log.Timber
 
 /**

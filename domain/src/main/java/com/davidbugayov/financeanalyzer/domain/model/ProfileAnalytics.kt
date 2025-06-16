@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
+import com.davidbugayov.financeanalyzer.core.model.Money
 import java.util.Date
 
 data class ProfileAnalytics(
@@ -14,4 +15,4 @@ data class ProfileAnalytics(
     val totalSourcesUsed: Int = 0,
     val dateRange: Pair<Date, Date>? = null,
     val totalWallets: Int = 0
-) 
+)

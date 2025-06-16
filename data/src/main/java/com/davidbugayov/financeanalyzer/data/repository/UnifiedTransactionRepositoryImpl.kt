@@ -321,4 +321,26 @@ class UnifiedTransactionRepositoryImpl(
         deleteTransaction(transaction)
         return true
     }
+
+    /**
+     * Получает транзакции за указанный период.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Список транзакций за указанный период.
+     */
+    override suspend fun getTransactionsForPeriod(startDate: Date, endDate: Date): List<Transaction> {
+        return getTransactionsByDateRange(startDate, endDate)
+    }
+    
+    /**
+     * Получает транзакции за указанный период с пагинацией.
+     */
+    override suspend fun getTransactionsByPeriodPaginated(
+        startDate: Date,
+        endDate: Date,
+        limit: Int,
+        offset: Int
+    ): List<Transaction> {
+        return getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
+    }
 } 

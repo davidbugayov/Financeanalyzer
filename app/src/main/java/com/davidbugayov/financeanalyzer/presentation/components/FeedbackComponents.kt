@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.components
-
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn

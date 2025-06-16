@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
-
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+import com.davidbugayov.financeanalyzer.core.model.Money
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -59,7 +60,6 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -208,7 +208,7 @@ fun BudgetScreen(
                         ) {
                             BudgetInfoCard(
                                 title = "Общий лимит",
-                                value = state.totalLimit.format(
+                                value = state.totalLimit.formatForDisplay(
                                     showCurrency = true,
                                     useMinimalDecimals = true,
                                 ),
@@ -223,7 +223,7 @@ fun BudgetScreen(
 
                             BudgetInfoCard(
                                 title = "Потрачено",
-                                value = state.totalSpent.format(
+                                value = state.totalSpent.formatForDisplay(
                                     showCurrency = true,
                                     useMinimalDecimals = true,
                                 ),
@@ -238,7 +238,7 @@ fun BudgetScreen(
 
                             BudgetInfoCard(
                                 title = "Баланс",
-                                value = state.totalWalletBalance.format(
+                                value = state.totalWalletBalance.formatForDisplay(
                                     showCurrency = true,
                                     useMinimalDecimals = true,
                                 ),
@@ -433,7 +433,10 @@ fun BudgetScreen(
                             )
 
                             Text(
-                                text = "Баланс кошелька: ${selectedWallet!!.balance} ₽",
+                                text = "Баланс кошелька: ${selectedWallet!!.balance.formatForDisplay(
+                                    showCurrency = true,
+                                    useMinimalDecimals = true,
+                                )}",
                                 style = MaterialTheme.typography.bodyMedium,
                             )
 
@@ -495,7 +498,10 @@ fun BudgetScreen(
                             )
 
                             Text(
-                                text = "Баланс: ${selectedFromWallet!!.balance} ₽",
+                                text = "Баланс: ${selectedFromWallet!!.balance.formatForDisplay(
+                                    showCurrency = true,
+                                    useMinimalDecimals = true,
+                                )}",
                                 style = MaterialTheme.typography.bodySmall,
                             )
 
@@ -943,7 +949,7 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = "Потрачено: ${wallet.spent.format(
+                    text = "Потрачено: ${wallet.spent.formatForDisplay(
                         showCurrency = true,
                         useMinimalDecimals = true,
                     )}",
@@ -951,7 +957,7 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
                     color = contentColor,
                 )
                 Text(
-                    text = "Лимит: ${wallet.limit.format(
+                    text = "Лимит: ${wallet.limit.formatForDisplay(
                         showCurrency = true,
                         useMinimalDecimals = true,
                     )}",
@@ -990,7 +996,7 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
                 )
                 Spacer(modifier = Modifier.width(4.dp))
                 Text(
-                    text = "Кошелёк: ${wallet.balance.format(
+                    text = "Кошелёк: ${wallet.balance.formatForDisplay(
                         showCurrency = true,
                         useMinimalDecimals = true,
                     )}",

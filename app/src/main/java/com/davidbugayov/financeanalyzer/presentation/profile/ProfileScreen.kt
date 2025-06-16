@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.profile
-
 import android.app.Activity
 import android.content.Context
 import androidx.compose.foundation.background

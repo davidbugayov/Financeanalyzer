@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.profile.model
-
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 
 /**

@@ -41,7 +41,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel.EnhancedFinanceChartViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
@@ -259,7 +260,7 @@ fun EnhancedSummaryCard(
 
                 // Баланс - крупная сумма с минимальными отступами
                 Text(
-                    text = balance.format(true),
+                    text = balance.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                     style = MaterialTheme.typography.headlineLarge.copy(
                         fontWeight = FontWeight.Bold,
                         fontSize = dimensionResource(
@@ -305,7 +306,7 @@ fun EnhancedSummaryCard(
                                     ),
                             )
                             Text(
-                                text = income.format(true),
+                                text = income.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = dimensionResource(
@@ -349,7 +350,7 @@ fun EnhancedSummaryCard(
                                     ),
                             )
                             Text(
-                                text = expense.format(true),
+                                text = expense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                                 style = MaterialTheme.typography.titleMedium.copy(
                                     fontWeight = FontWeight.Bold,
                                     fontSize = dimensionResource(

@@ -24,20 +24,13 @@ android {
             )
         }
     }
-
     compileOptions {
-        sourceCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
-        targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
     }
-
     kotlinOptions {
-        jvmTarget = libs.versions.javaVersion.get()
-        freeCompilerArgs += listOf(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all",
-        )
+        jvmTarget = "17"
     }
-
     buildFeatures {
         compose = true
     }
@@ -48,8 +41,10 @@ android {
 }
 
 dependencies {
-    // Модули проекта
     implementation(project(":domain"))
+    implementation(project(":core"))
+
+    implementation(libs.androidx.core.ktx)
 
     // Compose
     implementation(platform(libs.compose.bom))
@@ -58,10 +53,14 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
-    implementation(libs.compose.foundation)
     implementation(libs.compose.runtime)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
 
-    // Минимальные зависимости AndroidX
-    implementation(libs.androidx.core.ktx)
+    // Koin
+    implementation(libs.koin.android)
+
+    // Timber
+    implementation(libs.timber)
 }

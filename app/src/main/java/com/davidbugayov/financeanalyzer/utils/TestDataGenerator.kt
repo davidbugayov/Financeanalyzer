@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import androidx.compose.ui.graphics.toArgb
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt

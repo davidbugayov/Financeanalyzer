@@ -10,7 +10,8 @@ import androidx.compose.runtime.collectAsState
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialStatisticsScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialStatisticsScreen as EnhancedFinancialStatisticsScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.FinancialStatisticsScreen as DetailedFinancialStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
@@ -59,12 +60,25 @@ fun AppNavHostImpl(
                 }
             }
 
-            FinancialStatisticsScreen(
-                startDate = Date(startDate),
-                endDate = Date(endDate),
-                periodType = periodType,
-                onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
-            )
+            if (periodTypeStr == "DETAILED") {
+                // Используем экран подробной статистики
+                DetailedFinancialStatisticsScreen(
+                    startDate = startDate,
+                    endDate = endDate,
+                    onNavigateBack = {
+                        // Используем PopUpTo вместо NavigateUp для корректного возврата
+                        navigationManager.navigate(NavigationManager.Command.NavigateUp)
+                    },
+                )
+            } else {
+                // Используем улучшенный экран статистики
+                EnhancedFinancialStatisticsScreen(
+                    startDate = Date(startDate),
+                    endDate = Date(endDate),
+                    periodType = periodType,
+                    onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
+                )
+            }
         },
         onWalletTransactionsScreen = { walletId ->
             WalletTransactionsScreen(walletId = walletId)

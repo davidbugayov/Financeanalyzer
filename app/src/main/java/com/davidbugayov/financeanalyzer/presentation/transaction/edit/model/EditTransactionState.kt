@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.edit.model
-
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction

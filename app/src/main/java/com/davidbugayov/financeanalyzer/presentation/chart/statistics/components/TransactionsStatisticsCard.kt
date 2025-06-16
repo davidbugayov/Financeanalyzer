@@ -16,9 +16,9 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialMetrics
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.model.FinancialMetrics
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.model.setScale
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
-import java.util.Locale
 
 @Composable
 fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier) {
@@ -38,7 +38,7 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
                 .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
-                text = stringResource(R.string.transaction_statistics),
+                text = stringResource(R.string.transactions_statistics),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
@@ -49,20 +49,22 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
                 ),
             )
 
-            // Количество транзакций
+            // Общее количество транзакций
             MetricRow(
                 title = stringResource(R.string.total_transactions),
-                value = "${metrics.totalTransactions}",
+                value = metrics.totalTransactions.toString(),
             )
 
+            // Количество транзакций доходов
             MetricRow(
-                title = stringResource(R.string.income_transactions),
-                value = "${metrics.incomeTransactionsCount}",
+                title = stringResource(R.string.income_transactions_count),
+                value = metrics.incomeTransactionsCount.toString(),
             )
 
+            // Количество транзакций расходов
             MetricRow(
-                title = stringResource(R.string.expense_transactions),
-                value = "${metrics.expenseTransactionsCount}",
+                title = stringResource(R.string.expense_transactions_count),
+                value = metrics.expenseTransactionsCount.toString(),
             )
 
             Spacer(
@@ -71,12 +73,13 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
                 ),
             )
 
-            // Средние значения
+            // Средний доход на транзакцию
             MetricRow(
                 title = stringResource(R.string.avg_income_per_transaction),
                 value = metrics.averageIncomePerTransaction.format(true),
             )
 
+            // Средний расход на транзакцию
             MetricRow(
                 title = stringResource(R.string.avg_expense_per_transaction),
                 value = metrics.averageExpensePerTransaction.format(true),
@@ -88,12 +91,13 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
                 ),
             )
 
-            // Максимальные значения
+            // Максимальный доход
             MetricRow(
                 title = stringResource(R.string.max_income),
                 value = metrics.maxIncome.format(true),
             )
 
+            // Максимальный расход
             MetricRow(
                 title = stringResource(R.string.max_expense),
                 value = metrics.maxExpense.format(true),
@@ -105,17 +109,16 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
                 ),
             )
 
-            // Дополнительные метрики
+            // Норма сбережений
             MetricRow(
-                title = stringResource(R.string.savings_rate_label),
-                value = "${metrics.savingsRate.toBigDecimal().setScale(
-                    0,
-                    java.math.RoundingMode.FLOOR,
-                ).toPlainString()}%",
+                title = stringResource(R.string.savings_rate),
+                value = "${metrics.savingsRate.setScale(1)}%",
             )
+
+            // Количество месяцев, на которые хватит сбережений
             MetricRow(
-                title = stringResource(R.string.months_of_savings_label),
-                value = String.format(Locale.US, "%.1f", metrics.monthsOfSavings),
+                title = stringResource(R.string.months_of_savings),
+                value = stringResource(R.string.months_count, metrics.monthsOfSavings),
             )
         }
     }

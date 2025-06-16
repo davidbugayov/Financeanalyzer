@@ -26,11 +26,11 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
-fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Double, modifier: Modifier = Modifier) {
+fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: Modifier = Modifier) {
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(
@@ -166,7 +166,7 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Double, modifier:
                             ),
                     )
                 }
-                val normalizedRate = (savingsRate / 100.0).coerceIn(0.0, 1.0)
+                val normalizedRate = (savingsRate / 100f).coerceIn(0f, 1f)
                 val progressColor = when {
                     savingsRate >= 30 -> colorResource(R.color.savings_rate_excellent)
                     savingsRate >= 15 -> colorResource(R.color.savings_rate_good)
@@ -174,7 +174,7 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Double, modifier:
                     else -> colorResource(R.color.savings_rate_needs_attention)
                 }
                 LinearProgressIndicator(
-                    progress = { normalizedRate.toFloat() },
+                    progress = { normalizedRate },
                     modifier = Modifier
                         .fillMaxWidth()
                         .height(8.dp)

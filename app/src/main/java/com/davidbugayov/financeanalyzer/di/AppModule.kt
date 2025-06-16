@@ -43,6 +43,7 @@ import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewMo
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialStatisticsViewModel
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
@@ -157,6 +158,16 @@ val appModule = module {
     viewModel { ImportTransactionsViewModel(get(), androidApplication()) }
     viewModel { OnboardingViewModel(get()) }
     viewModel { AchievementsViewModel() }
+
+    // ViewModel для экрана подробной финансовой статистики
+    viewModel { parameters ->
+        FinancialStatisticsViewModel(
+            startDate = parameters.get(),
+            endDate = parameters.get(),
+            transactionRepository = get(),
+            calculateCategoryStatsUseCase = get(),
+        )
+    }
 }
 
 val allModules = listOf(appModule, repositoryModule)

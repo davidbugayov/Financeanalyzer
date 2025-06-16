@@ -43,6 +43,7 @@ android {
 dependencies {
     // Modules
     implementation(project(":domain"))
+    implementation(project(":core"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
@@ -52,6 +53,8 @@ dependencies {
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
+    implementation(libs.material)
+    testImplementation(libs.junit)
 
     // Koin
     implementation(libs.koin.android)

@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
+import com.davidbugayov.financeanalyzer.core.model.Money
 import java.util.Date
 import java.util.UUID
 
@@ -20,4 +21,4 @@ data class Transaction(
     val title: String = "",
     val isTransfer: Boolean = false,
     val walletIds: List<String>? = null,
-) 
+)

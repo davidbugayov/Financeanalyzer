@@ -1,8 +1,8 @@
 package com.davidbugayov.financeanalyzer.data.local.converter
 
 import androidx.room.TypeConverter
-import com.davidbugayov.financeanalyzer.domain.model.Currency
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.core.model.Money
 import java.math.BigDecimal
 import timber.log.Timber
 

@@ -61,6 +61,18 @@ sealed class Screen(val route: String) {
         }
     }
 
+    /** Экран с детальной финансовой статистикой (подробный анализ) */
+    data object DetailedFinancialStatistics : Screen(
+        "detailed_financial_statistics?$START_DATE_ARG={$START_DATE_ARG}&$END_DATE_ARG={$END_DATE_ARG}",
+    ) {
+
+        fun createRoute(startDate: Long?, endDate: Long?): String {
+            val start = startDate ?: System.currentTimeMillis()
+            val end = endDate ?: System.currentTimeMillis()
+            return "detailed_financial_statistics?$START_DATE_ARG=$start&$END_DATE_ARG=$end"
+        }
+    }
+
     /** Экран профиля пользователя */
     data object Profile : Screen("profile")
 

@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
+import com.davidbugayov.financeanalyzer.core.util.safeCall
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import com.davidbugayov.financeanalyzer.domain.util.Result
-import com.davidbugayov.financeanalyzer.domain.util.safeCall
 
 /**
  * Use case для загрузки транзакций из репозитория.
@@ -22,7 +22,7 @@ class LoadTransactionsUseCase(
      *
      * @return Result с списком транзакций в случае успеха или ошибкой в случае неудачи
      */
-    suspend operator fun invoke(): Result<List<Transaction>> {
+    suspend operator fun invoke(): CoreResult<List<Transaction>> {
         return safeCall {
             repository.loadTransactions()
         }

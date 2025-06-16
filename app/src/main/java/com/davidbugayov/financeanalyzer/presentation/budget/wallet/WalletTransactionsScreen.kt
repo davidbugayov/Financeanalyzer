@@ -45,6 +45,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
@@ -175,7 +176,7 @@ fun WalletTransactionsScreen(
                         Spacer(modifier = Modifier.height(8.dp))
 
                         Text(
-                            text = "Бюджет: ${wallet.limit.format(
+                            text = "Бюджет: ${wallet.limit.formatForDisplay(
                                 showCurrency = true,
                                 useMinimalDecimals = true,
                             )}",
@@ -213,7 +214,7 @@ fun WalletTransactionsScreen(
                                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                                 )
                                 Text(
-                                    text = wallet.spent.format(
+                                    text = wallet.spent.formatForDisplay(
                                         showCurrency = true,
                                         useMinimalDecimals = true,
                                     ),
@@ -230,7 +231,7 @@ fun WalletTransactionsScreen(
                                 val remaining = wallet.limit.minus(wallet.spent)
                                 val remainingColor = if (remaining.isNegative()) Color.Red else MaterialTheme.colorScheme.onSurface
                                 Text(
-                                    text = remaining.format(
+                                    text = remaining.formatForDisplay(
                                         showCurrency = true,
                                         useMinimalDecimals = true,
                                     ),
@@ -257,7 +258,7 @@ fun WalletTransactionsScreen(
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
                             Text(
-                                text = wallet.balance.format(
+                                text = wallet.balance.formatForDisplay(
                                     showCurrency = true,
                                     useMinimalDecimals = true,
                                 ),

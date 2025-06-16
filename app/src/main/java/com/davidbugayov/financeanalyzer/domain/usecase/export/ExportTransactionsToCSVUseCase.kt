@@ -1,11 +1,11 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.export
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.mapException
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.util.Result
 import java.io.File
 import java.io.FileWriter
 import java.text.SimpleDateFormat
@@ -17,14 +17,14 @@ class ExportTransactionsToCSVUseCase(
     private val context: Context,
 ) {
 
-    suspend operator fun invoke(): Result<File> {
+    suspend operator fun invoke(): CoreResult<File> {
         return try {
             // Используем пустой список для отладки
             val transactions = transactionRepository.getAllTransactions()
             val csvFile = createCSVFile(transactions)
-            Result.Success(csvFile)
+            CoreResult.Success(csvFile)
         } catch (e: Exception) {
-            Result.Error(mapException(e))
+            CoreResult.Error(mapException(e))
         }
     }
 
@@ -60,22 +60,22 @@ class ExportTransactionsToCSVUseCase(
         SAVE_ONLY,
     }
 
-    suspend fun shareCSVFile(file: File): Result<Uri> {
+    suspend fun shareCSVFile(file: File): CoreResult<Uri> {
         return try {
             // Implementation depends on Android-specific code for sharing files
             // This would typically use FileProvider to get a content URI
-            Result.Success(Uri.fromFile(file))
+            CoreResult.Success(Uri.fromFile(file))
         } catch (e: Exception) {
-            Result.Error(mapException(e))
+            CoreResult.Error(mapException(e))
         }
     }
 
-    suspend fun openCSVFile(file: File): Result<Uri> {
+    suspend fun openCSVFile(file: File): CoreResult<Uri> {
         return try {
             // Implementation depends on Android-specific code for opening files
-            Result.Success(Uri.fromFile(file))
+            CoreResult.Success(Uri.fromFile(file))
         } catch (e: Exception) {
-            Result.Error(mapException(e))
+            CoreResult.Error(mapException(e))
         }
     }
 }

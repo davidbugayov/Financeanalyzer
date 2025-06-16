@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.budget.model
-
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.domain.model.Money
 
 /**
  * События для экрана бюджета

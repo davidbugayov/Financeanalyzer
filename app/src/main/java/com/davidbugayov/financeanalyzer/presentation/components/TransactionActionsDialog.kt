@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -51,7 +52,7 @@ fun TransactionActionsDialog(
         text = {
             Column {
                 Text(
-                    text = "Сумма: ${transaction.amount}",
+                    text = "Сумма: ${transaction.amount.formatForDisplay(useMinimalDecimals = true)}",
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
@@ -64,9 +65,9 @@ fun TransactionActionsDialog(
 
                 Text(
                     text = if (transaction.isExpense) {
-                        "-${transaction.amount.abs()}"
+                        "-${transaction.amount.abs().formatForDisplay(useMinimalDecimals = true)}"
                     } else {
-                        "+${transaction.amount}"
+                        "+${transaction.amount.formatForDisplay(useMinimalDecimals = true)}"
                     },
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (transaction.isExpense) {

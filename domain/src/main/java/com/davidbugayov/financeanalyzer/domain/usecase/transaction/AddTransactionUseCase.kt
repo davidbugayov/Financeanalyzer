@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
+import com.davidbugayov.financeanalyzer.core.util.safeCall
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import com.davidbugayov.financeanalyzer.domain.util.safeCall
-import com.davidbugayov.financeanalyzer.domain.util.Result
 import timber.log.Timber
 
 /**
@@ -19,7 +19,7 @@ class AddTransactionUseCase(
      * @param transaction Транзакция для добавления
      * @return Результат операции
      */
-    suspend operator fun invoke(transaction: Transaction): Result<Unit> {
+    suspend operator fun invoke(transaction: Transaction): CoreResult<Unit> {
         return safeCall {
             Timber.d(
                 "Добавление транзакции: сумма=${transaction.amount}, категория=${transaction.category}",

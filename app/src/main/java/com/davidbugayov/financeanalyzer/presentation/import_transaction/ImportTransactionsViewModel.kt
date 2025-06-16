@@ -5,8 +5,8 @@ import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
@@ -14,6 +14,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
@@ -28,7 +29,6 @@ class ImportTransactionsViewModel(
     private val importTransactionsUseCase: ImportTransactionsUseCase,
     application: Application,
 ) : AndroidViewModel(application), KoinComponent {
-
     // Инъекция TransactionDao через Koin
     private val transactionDao: TransactionDao by inject()
 
@@ -54,7 +54,6 @@ class ImportTransactionsViewModel(
 
     /**
      * Запускает импорт транзакций из указанного файла.
-     *
      * @param uri URI файла для импорта
      */
     private fun startImport(uri: Uri) {
@@ -64,7 +63,6 @@ class ImportTransactionsViewModel(
         }
 
         Timber.d("Начинаем импорт файла с URI: $uri, схема: ${uri.scheme}, путь: ${uri.path}")
-
         // Проверяем доступность файла
         try {
             getApplication<Application>().contentResolver.openInputStream(uri)?.use { stream ->
@@ -78,7 +76,6 @@ class ImportTransactionsViewModel(
         try {
             val mimeType = getApplication<Application>().contentResolver.getType(uri)
             Timber.d("MIME-тип файла: $mimeType")
-
             getApplication<Application>().contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
                     val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
@@ -101,7 +98,6 @@ class ImportTransactionsViewModel(
             successCount = 0,
             skippedCount = 0,
         )
-
         // Для обратной совместимости
         _uiState.value = ImportUiState.Loading("Начало импорта...")
 
@@ -117,29 +113,34 @@ class ImportTransactionsViewModel(
                     _uiState.value = ImportUiState.Loading(message, progress)
                 }.collect { result ->
                     when (result) {
-                        is ImportResult.Progress -> {
-                            val progress = if (result.total > 0) (result.current * 100 / result.total) else 0
-                            Timber.d("Получен прогресс: $progress% - ${result.message}")
-                            _state.value = _state.value.copy(
-                                progress = progress,
-                                progressMessage = result.message,
-                            )
-                            _uiState.value = ImportUiState.Loading(result.message, progress)
-                        }
-                        is ImportResult.Success -> {
+                        is CoreResult.Success<*> -> {
+                            // Безопасное преобразование без проверки типа
+                            @Suppress("USELESS_IS_CHECK")
+                            val data = result.data
+
+                            // Извлекаем значения из данных
+                            val (importedCount, skippedCount) = try {
+                                // Попытка безопасного преобразования
+                                @Suppress("UNCHECKED_CAST", "USELESS_IS_CHECK")
+                                val pair = data as? Pair<*, *>
+                                val imported = (pair?.first as? Number)?.toInt() ?: 0
+                                val skipped = (pair?.second as? Number)?.toInt() ?: 0
+                                Pair(imported, skipped)
+                            } catch (e: ClassCastException) {
+                                Timber.w("Ошибка преобразования данных: ${e.message}")
+                                Pair(0, 0)
+                            }
+
                             val successMessage = "Импорт успешно завершен. " +
-                                "Импортировано: ${result.importedCount}, " +
-                                "Пропущено: ${result.skippedCount}"
-
+                                "Импортировано: $importedCount, " +
+                                "Пропущено: $skippedCount"
                             Timber.d(
-                                "Импорт успешно завершен: импортировано ${result.importedCount}, пропущено ${result.skippedCount}",
+                                "Импорт успешно завершен: импортировано $importedCount, пропущено $skippedCount",
                             )
-
                             // Добавляем диагностическое логирование для проверки, были ли транзакции действительно сохранены
                             Timber.i(
-                                "[VIEWMODEL] Импорт завершен успешно! Импортировано: ${result.importedCount}, Пропущено: ${result.skippedCount}",
+                                "[VIEWMODEL] Импорт завершен успешно! Импортировано: $importedCount, Пропущено: $skippedCount",
                             )
-
                             // Запустим проверку наличия транзакций в базе через 1 секунду
                             viewModelScope.launch(Dispatchers.IO) {
                                 Timber.d(
@@ -152,7 +153,6 @@ class ImportTransactionsViewModel(
                                     Timber.i(
                                         "[VIEWMODEL] ✅ Проверка после импорта: всего транзакций в базе данных: $count",
                                     )
-
                                     // Получим последние 5 транзакций для анализа
                                     Timber.i(
                                         "[VIEWMODEL-ОТЛАДКА] 🔍 Попытка получить последние транзакции из базы...",
@@ -183,7 +183,6 @@ class ImportTransactionsViewModel(
                                             "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при получении последних транзакций: ${e.message}",
                                         )
                                     }
-
                                     // Еще одна проверка с другим методом
                                     try {
                                         Timber.i(
@@ -195,7 +194,6 @@ class ImportTransactionsViewModel(
                                         )
                                     } catch (e: Exception) {
                                         Timber.e(
-                                            e,
                                             "[VIEWMODEL-ОТЛАДКА] ❌ Ошибка при вызове getAllTransactions: ${e.message}",
                                         )
                                     }
@@ -206,43 +204,39 @@ class ImportTransactionsViewModel(
                                     )
                                 }
                             }
-
                             _state.value = _state.value.copy(
                                 isLoading = false,
-                                successCount = result.importedCount,
-                                skippedCount = result.skippedCount,
+                                successCount = importedCount,
+                                skippedCount = skippedCount,
                                 successMessage = successMessage,
                                 error = null,
                             )
-
                             _uiState.value = ImportUiState.Success(
                                 message = successMessage,
-                                importedCount = result.importedCount,
-                                skippedCount = result.skippedCount,
+                                importedCount = importedCount,
+                                skippedCount = skippedCount,
                             )
                         }
-                        is ImportResult.Error -> {
-                            val errorMessage = result.exception?.message ?: result.message
-
+                        is CoreResult.Error -> {
+                            val errorMessage = result.exception.message ?: "Неизвестная ошибка"
                             Timber.e(result.exception, "❌ Ошибка импорта: $errorMessage")
-
                             _state.value = _state.value.copy(
                                 isLoading = false,
                                 error = errorMessage,
                             )
-
                             _uiState.value = ImportUiState.Error(errorMessage)
+                        }
+                        else -> {
+                            Timber.w("Получен неизвестный тип результата: $result")
                         }
                     }
                 }
             } catch (e: Exception) {
                 Timber.e(e, "❌ Необработанное исключение при импорте: ${e.message}")
-
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = e.message ?: "Неизвестная ошибка",
                 )
-
                 _uiState.value = ImportUiState.Error(e.message ?: "Неизвестная ошибка")
             }
         }
@@ -271,7 +265,6 @@ class ImportTransactionsViewModel(
  * Состояния UI для экрана импорта (для обратной совместимости).
  */
 sealed class ImportUiState {
-
     /**
      * Начальное состояние, до начала импорта.
      */
@@ -279,7 +272,6 @@ sealed class ImportUiState {
 
     /**
      * Состояние загрузки/импорта.
-     *
      * @param message Информационное сообщение
      * @param progress Прогресс импорта (0-100)
      */
@@ -287,7 +279,6 @@ sealed class ImportUiState {
 
     /**
      * Состояние успешного завершения импорта.
-     *
      * @param message Сообщение об успешном завершении
      * @param importedCount Количество импортированных транзакций
      * @param skippedCount Количество пропущенных транзакций
@@ -300,7 +291,6 @@ sealed class ImportUiState {
 
     /**
      * Состояние ошибки.
-     *
      * @param message Сообщение об ошибке
      */
     data class Error(val message: String) : ImportUiState()

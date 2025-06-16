@@ -53,7 +53,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
@@ -180,7 +181,7 @@ fun AnalyticsSection(
                         // Доход
                         AnimatedFinancialCard(
                             title = stringResource(R.string.income),
-                            value = totalIncome.format(),
+                            value = totalIncome.formatForDisplay(useMinimalDecimals = true),
                             color = incomeColor,
                             icon = rememberVectorPainter(Icons.AutoMirrored.Filled.TrendingUp),
                             animationDelay = 0,
@@ -192,7 +193,7 @@ fun AnalyticsSection(
                         // Расходы
                         AnimatedFinancialCard(
                             title = stringResource(R.string.expenses),
-                            value = totalExpense.format(),
+                            value = totalExpense.formatForDisplay(useMinimalDecimals = true),
                             color = expenseColor,
                             icon = rememberVectorPainter(Icons.AutoMirrored.Filled.TrendingDown),
                             animationDelay = 100,
@@ -210,7 +211,7 @@ fun AnalyticsSection(
                         // Баланс
                         AnimatedFinancialCard(
                             title = stringResource(R.string.balance),
-                            value = balance.format(),
+                            value = balance.formatForDisplay(useMinimalDecimals = true),
                             color = balanceColor,
                             icon = painterResource(R.drawable.ic_rubble),
                             animationDelay = 200,

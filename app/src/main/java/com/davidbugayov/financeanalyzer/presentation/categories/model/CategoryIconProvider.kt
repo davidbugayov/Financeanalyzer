@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.categories.model
 
 // import androidx.compose.material.icons.outlined.* // Outlined пока не используем активно, чтобы не раздувать список
+import com.davidbugayov.financeanalyzer.core.model.Money
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Chat
 import androidx.compose.material.icons.automirrored.filled.Comment

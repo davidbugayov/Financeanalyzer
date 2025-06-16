@@ -38,4 +38,4 @@ sealed class Result<out T> {
             Error(AppException.mapException(e))
         }
     }
-} 
+}

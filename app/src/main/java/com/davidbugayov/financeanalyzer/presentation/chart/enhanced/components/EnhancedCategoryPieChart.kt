@@ -1,5 +1,8 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components
 
+import com.davidbugayov.financeanalyzer.core.model.Currency
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+import com.davidbugayov.financeanalyzer.core.model.Money
 import android.graphics.Paint
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.FastOutSlowInEasing
@@ -51,8 +54,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -107,7 +108,7 @@ fun EnhancedCategoryPieChart(
 
     // Calculate total amount from the filtered data
     val totalMoney = remember(filteredData) {
-        val currency = filteredData.firstOrNull()?.money?.currency ?: com.davidbugayov.financeanalyzer.domain.model.Currency.RUB
+        val currency = filteredData.firstOrNull()?.money?.currency ?: Currency.RUB
         val sum = filteredData.sumOf { it.money.amount }
         Money(sum.setScale(currency.decimalPlaces, java.math.RoundingMode.HALF_EVEN), currency)
     }
@@ -348,7 +349,7 @@ fun EnhancedCategoryPieChart(
                         // Сумма
                         val money = item.money
                         Text(
-                            text = money.formatForDisplay(),
+                            text = money.formatForDisplay(useMinimalDecimals = true),
                             style = MaterialTheme.typography.bodySmall.copy(
                                 fontWeight = FontWeight.SemiBold,
                             ),
@@ -456,7 +457,7 @@ private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedI
         val amountY = center.y - amountPaint.descent() * DonutTextConstants.AMOUNT_Y_OFFSET_SELECTED
 
         canvas.nativeCanvas.drawText(
-            itemMoney.formatForDisplay(),
+            itemMoney.formatForDisplay(useMinimalDecimals = true),
             center.x,
             amountY,
             amountPaint,
@@ -532,7 +533,7 @@ private fun DrawScope.drawTotalAmountText(
         val amountY = center.y - amountPaint.descent() * DonutTextConstants.AMOUNT_Y_OFFSET_NORMAL
 
         canvas.nativeCanvas.drawText(
-            totalMoney.formatForDisplay(),
+            totalMoney.formatForDisplay(useMinimalDecimals = true),
             center.x,
             amountY,
             amountPaint,

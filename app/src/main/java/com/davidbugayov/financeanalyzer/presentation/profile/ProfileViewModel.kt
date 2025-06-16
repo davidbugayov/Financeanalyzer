@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.presentation.profile
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.util.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import timber.log.Timber
 import java.io.File
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
@@ -189,7 +190,7 @@ class ProfileViewModel(
             try {
                 val result = exportTransactionsToCSVUseCase()
                 when (result) {
-                    is Result.Success<File> -> {
+                    is CoreResult.Success<File> -> {
                         val filePath = result.data
                         _state.update { currentState ->
                             currentState.copy(
@@ -202,13 +203,13 @@ class ProfileViewModel(
                         when (action) {
                             ExportAction.SHARE -> {
                                 val shareResult = exportTransactionsToCSVUseCase.shareCSVFile(filePath)
-                                if (shareResult is Result.Success) {
+                                if (shareResult is CoreResult.Success) {
                                     // Обработка успешного шаринга
                                 }
                             }
                             ExportAction.OPEN -> {
                                 val openResult = exportTransactionsToCSVUseCase.openCSVFile(filePath)
-                                if (openResult is Result.Success) {
+                                if (openResult is CoreResult.Success) {
                                     // Обработка успешного открытия
                                 }
                             }
@@ -220,7 +221,7 @@ class ProfileViewModel(
                             }
                         }
                     }
-                    is Result.Error -> {
+                    is CoreResult.Error -> {
                         val exception = result.exception
                         _state.update { currentState ->
                             currentState.copy(
@@ -254,7 +255,7 @@ class ProfileViewModel(
                 val result = getProfileAnalyticsUseCase()
                 Timber.d("[ProfileViewModel] Got result from getProfileAnalyticsUseCase: $result")
 
-                if (result is Result.Success) {
+                if (result is CoreResult.Success) {
                     // Безопасное приведение типа
                     val analytics = result.data
 
@@ -282,7 +283,7 @@ class ProfileViewModel(
                     }
 
                     // Форматируем averageExpense в строку
-                    val averageExpenseStr = "${analytics.averageExpense.amount} ₽"
+                    val averageExpenseStr = analytics.averageExpense.formatForDisplay(useMinimalDecimals = true)
 
                     Timber.d(
                         "[ProfileViewModel] Formatted values: dateRange=$dateRangeStr, averageExpense=$averageExpenseStr",
@@ -308,7 +309,7 @@ class ProfileViewModel(
                     Timber.d(
                         "[ProfileViewModel] State updated with analytics data. New state: income=${newState.totalIncome.amount}, expense=${newState.totalExpense.amount}, balance=${newState.balance.amount}",
                     )
-                } else if (result is Result.Error) {
+                } else if (result is CoreResult.Error) {
                     val exception = result.exception
                     Timber.e(exception, "[ProfileViewModel] Ошибка при загрузке финансовой аналитики")
                     _state.update { currentState ->

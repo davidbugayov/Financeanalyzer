@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
+import com.davidbugayov.financeanalyzer.core.model.Money
 import java.math.BigDecimal
 
 data class BalanceMetrics(

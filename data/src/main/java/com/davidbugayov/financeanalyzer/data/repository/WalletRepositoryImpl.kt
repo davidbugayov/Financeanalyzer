@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.data.repository
 
 import com.davidbugayov.financeanalyzer.data.preferences.WalletPreferences
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -106,4 +106,4 @@ class WalletRepositoryImpl(
             return null
         }
     }
-} 
+}

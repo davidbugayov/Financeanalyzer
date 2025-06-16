@@ -7,12 +7,12 @@ import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import androidx.room.migration.Migration
 import androidx.sqlite.db.SupportSQLiteDatabase
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.data.local.converter.DateConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.MoneyConverter
 import com.davidbugayov.financeanalyzer.data.local.converter.StringListConverter
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
-import com.davidbugayov.financeanalyzer.domain.model.Currency
 import timber.log.Timber
 
 /**
@@ -485,4 +485,4 @@ abstract class AppDatabase : RoomDatabase() {
             }
         }
     }
-} 
+}

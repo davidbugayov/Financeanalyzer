@@ -39,6 +39,29 @@ interface TransactionRepository {
      * @param offset Смещение (количество пропускаемых транзакций).
      * @return Список транзакций с учетом пагинации и диапазона дат.
      */
+    suspend fun getTransactionsByPeriodPaginated(
+        startDate: Date,
+        endDate: Date,
+        limit: Int,
+        offset: Int
+    ): List<Transaction>
+
+    /**
+     * Получает транзакции за указанный период.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @return Список транзакций за указанный период.
+     */
+    suspend fun getTransactionsForPeriod(startDate: Date, endDate: Date): List<Transaction>
+
+    /**
+     * Получает транзакции за указанный период с пагинацией.
+     * @param startDate Начальная дата периода.
+     * @param endDate Конечная дата периода.
+     * @param limit Количество транзакций для загрузки.
+     * @param offset Смещение (количество пропускаемых транзакций).
+     * @return Список транзакций с учетом пагинации и диапазона дат.
+     */
     suspend fun getTransactionsByDateRangePaginated(
         startDate: Date,
         endDate: Date,

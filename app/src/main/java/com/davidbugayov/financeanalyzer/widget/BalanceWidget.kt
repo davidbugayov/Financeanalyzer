@@ -1,5 +1,5 @@
 package com.davidbugayov.financeanalyzer.widget
-
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -8,9 +8,8 @@ import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.formatForDisplay
-import com.davidbugayov.financeanalyzer.domain.model.fold
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -107,11 +106,11 @@ class BalanceWidget : AppWidgetProvider(), KoinComponent {
 
                     // Обновляем UI виджета
                     withContext(Dispatchers.Main) {
-                        views.setTextViewText(R.id.widget_balance, balance.formatForDisplay())
-                        views.setTextViewText(R.id.widget_income, income.formatForDisplay())
+                        views.setTextViewText(R.id.widget_balance, balance.formatForDisplay(useMinimalDecimals = true))
+                        views.setTextViewText(R.id.widget_income, income.formatForDisplay(useMinimalDecimals = true))
                         views.setTextViewText(
                             R.id.widget_expense,
-                            negativeExpense.formatForDisplay(),
+                            negativeExpense.formatForDisplay(useMinimalDecimals = true),
                         )
 
                         // Устанавливаем цвет в зависимости от значения баланса

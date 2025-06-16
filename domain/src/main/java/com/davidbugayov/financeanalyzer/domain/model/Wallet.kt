@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.model
 
+import com.davidbugayov.financeanalyzer.core.model.Money
+
 /**
  * Модель кошелька
  *
@@ -23,4 +25,4 @@ data class Wallet(
     val periodStartDate: Long = System.currentTimeMillis(),
     val linkedCategories: List<String> = emptyList(),
     val color: Int? = null,
-) 
+)

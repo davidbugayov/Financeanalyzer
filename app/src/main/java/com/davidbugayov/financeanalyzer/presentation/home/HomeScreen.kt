@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.home
-
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -212,8 +211,12 @@ fun HomeScreen(
         updateWidgetsUseCase(context)
 
         // Проверяем наличие обновлений при отображении главного экрана
-        if (isRustoreFlavor) {
+        try {
+            // Проверка обновлений в RuStore будет выполняться только если это rustore flavor
+            // Для других flavor это будет заглушка, которая не вызывает ошибок
             com.davidbugayov.financeanalyzer.utils.RuStoreUtils.checkForUpdates(context)
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при проверке обновлений")
         }
     }
     LaunchedEffect(Unit) {

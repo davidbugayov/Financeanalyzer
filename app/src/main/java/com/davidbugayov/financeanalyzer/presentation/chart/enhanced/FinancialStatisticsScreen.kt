@@ -1,5 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced
-
+import com.davidbugayov.financeanalyzer.core.model.Money
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -54,7 +54,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.BudgetTip
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedCategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.components.EnhancedLineChart

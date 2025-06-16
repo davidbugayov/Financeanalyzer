@@ -1,9 +1,8 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel
-
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
@@ -315,9 +314,10 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
      */
     fun navigateToDetailedStatistics() {
         val currentState = _state.value
+        // Используем новый экран DetailedFinancialStatistics вместо параметра DETAILED
         navigationManager.navigate(
             NavigationManager.Command.Navigate(
-                Screen.FinancialStatistics.createRoute(
+                Screen.DetailedFinancialStatistics.createRoute(
                     currentState.startDate.time,
                     currentState.endDate.time,
                 ),

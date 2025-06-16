@@ -1,10 +1,12 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.edit
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+import com.davidbugayov.financeanalyzer.core.model.Money
 import android.app.Application
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -18,7 +20,6 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.Base
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.domain.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
@@ -106,7 +107,7 @@ class EditTransactionViewModel(
                 val result = getTransactionByIdUseCase(id)
                 Timber.d("ТРАНЗАКЦИЯ: Результат getTransactionByIdUseCase: %s", result)
 
-                if (result is Result.Success) {
+                if (result is CoreResult.Success) {
                     val transaction = result.data
                     Timber.d(
                         "ТРАНЗАКЦИЯ: Успешно получена транзакция: сумма=%s, категория=%s",
@@ -127,7 +128,7 @@ class EditTransactionViewModel(
                         _state.value.transactionToEdit?.id,
                         _state.value.editMode,
                     )
-                } else if (result is Result.Error) {
+                } else if (result is CoreResult.Error) {
                     Timber.e("ТРАНЗАКЦИЯ: Ошибка в useCase: %s", result.exception.message)
                     _state.update {
                         it.copy(
@@ -272,7 +273,7 @@ class EditTransactionViewModel(
                 val originalTransaction = currentState.transactionToEdit
                 val result = updateTransactionUseCase(transactionToSave)
 
-                if (result is Result.Success) {
+                if (result is CoreResult.Success) {
                     // Обновляем балансы кошельков, если это доход и выбраны кошельки
                     val walletIdsList = transactionToSave.walletIds?.toList() ?: emptyList()
                     if (!transactionToSave.isExpense && walletIdsList.isNotEmpty()) {
@@ -321,7 +322,7 @@ class EditTransactionViewModel(
                     }
                     updateWidgetsUseCase(application.applicationContext)
                     Timber.d("ТРАНЗАКЦИЯ: Успешно обновлена, ID=%s", transactionToSave.id)
-                } else if (result is Result.Error) {
+                } else if (result is CoreResult.Error) {
                     Timber.e(
                         result.exception,
                         "ТРАНЗАКЦИЯ: Ошибка при обновлении: %s",
@@ -358,9 +359,8 @@ class EditTransactionViewModel(
         loadSources()
         // Форматируем сумму с использованием Money.format(), без символа валюты
         val moneyObject = transaction.amount.abs() // Получаем объект Money с абсолютной суммой
-        val formattedAmount = moneyObject.format(
+        val formattedAmount = moneyObject.formatForDisplay(
             showCurrency = false,
-            showSign = false,
             useMinimalDecimals = true,
         )
         Timber.d(

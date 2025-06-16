@@ -51,7 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 
 /**
  * Карточка с метриками финансового здоровья.
@@ -171,19 +172,19 @@ private fun ExpensesSection(averageDailyExpense: Money) {
         ) {
             MetricItem(
                 title = stringResource(R.string.daily_expenses_title),
-                value = averageDailyExpense.format(true),
+                value = averageDailyExpense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                 modifier = Modifier.weight(1f),
             )
 
             MetricItem(
                 title = stringResource(R.string.monthly_expenses_title),
-                value = monthlyExpense.format(true),
+                value = monthlyExpense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                 modifier = Modifier.weight(1f),
             )
 
             MetricItem(
                 title = stringResource(R.string.yearly_expenses_title),
-                value = yearlyExpense.format(true),
+                value = yearlyExpense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                 modifier = Modifier.weight(1f),
             )
         }
@@ -339,7 +340,7 @@ private fun FinancialCushionSection(monthsOfSavings: Double, averageDailyExpense
                     Text(
                         text = stringResource(
                             R.string.financial_cushion_expenses,
-                            monthlyExpense.format(true),
+                            monthlyExpense.formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                         ),
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,

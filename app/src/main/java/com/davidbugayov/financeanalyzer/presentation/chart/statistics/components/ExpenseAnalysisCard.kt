@@ -19,7 +19,7 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialMetrics
+import com.davidbugayov.financeanalyzer.presentation.chart.statistics.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
@@ -98,7 +98,7 @@ fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
                 )
             }
             // Перечисление топ-3 категорий расходов
-            metrics.topExpenseCategories.forEachIndexed { index, (category, amount) ->
+            metrics.topExpenseCategories.forEach { (category, amount) ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -111,7 +111,7 @@ fun ExpenseAnalysisCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = "${index + 1}. $category",
+                        text = category,
                         style = MaterialTheme.typography.bodyMedium,
                     )
 

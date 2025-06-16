@@ -1,12 +1,13 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.add
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import android.app.Application
 import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.BuildConfig
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.util.Result
 
 // Проверка на RuStore flavor через константу из BuildConfig
 private val isRustoreFlavor = BuildConfig.IS_RUSTORE_FLAVOR
@@ -166,7 +166,7 @@ class AddTransactionViewModel(
 
             try {
                 val result = addTransactionUseCase(transactionToSave)
-                if (result is Result.Success) {
+                if (result is CoreResult.Success) {
                     updateWalletBalancesUseCase(
                         transactionToSave.walletIds ?: emptyList(),
                         transactionToSave.amount,
@@ -188,7 +188,7 @@ class AddTransactionViewModel(
                         )
                     }
                     navigationManager.navigate(NavigationManager.Command.NavigateUp)
-                } else if (result is Result.Error) {
+                } else if (result is CoreResult.Error) {
                     _state.update {
                         it.copy(
                             isLoading = false,

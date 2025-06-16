@@ -45,7 +45,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
@@ -63,8 +64,8 @@ import java.util.Locale
 
 object Formatters {
 
-    fun formatAmount(money: Money, includeSign: Boolean = false, useMinimalDecimals: Boolean = false): String {
-        return money.format(showSign = includeSign, useMinimalDecimals = useMinimalDecimals)
+    fun formatAmount(money: Money, includeSign: Boolean = false, useMinimalDecimals: Boolean = false, showCurrency: Boolean = true): String {
+        return money.formatForDisplay(showCurrency = showCurrency, useMinimalDecimals = useMinimalDecimals)
     }
 }
 

@@ -44,15 +44,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BankInstructionDialog
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BanksList
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportInstructions
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResultsSection
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.PermissionDialog
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
@@ -61,7 +58,6 @@ import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-
 /**
  * Экран импорта транзакций.
  * Использует паттерн MVI (Model-View-Intent) для взаимодействия с ViewModel.
@@ -78,15 +74,12 @@ fun ImportTransactionsScreen(
 ) {
     val context = LocalContext.current
     val themeMode by preferencesManager.themeModeFlow.collectAsState()
-
     // Получаем состояние из ViewModel в соответствии с MVI
     val state by viewModel.state.collectAsState()
-
     // Состояние для диалогов
     var showBankInstructionDialog by remember { mutableStateOf(false) }
     var selectedBank by remember { mutableStateOf("") }
     var showPermissionSettingsDialog by remember { mutableStateOf(false) }
-
     // Состояние для анимаций
     var showInstructions by remember { mutableStateOf(false) }
     var showBanksList by remember { mutableStateOf(false) }
@@ -97,32 +90,28 @@ fun ImportTransactionsScreen(
         showInstructions = true
         delay(200)
         showBanksList = true
-        delay(200)
         showButton = true
-    }
-
-    // Функция для обработки выбранного URI по MVI паттерну
-    fun processUri(selectedUri: Uri?) {
-        if (selectedUri != null) {
-            viewModel.handleIntent(ImportTransactionsIntent.StartImport(selectedUri))
-        }
     }
 
     // На Android 15 используем GetContent напрямую
     val getContentLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
     ) { selectedUri ->
-        processUri(selectedUri)
+        if (selectedUri != null) {
+            viewModel.handleIntent(ImportTransactionsIntent.StartImport(selectedUri))
+        }
     }
 
     // На Android < 15 используем стандартные разрешения и открытие документа
     val filePickerLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.OpenDocument(),
     ) { selectedUri ->
-        processUri(selectedUri)
+        if (selectedUri != null) {
+            viewModel.handleIntent(ImportTransactionsIntent.StartImport(selectedUri))
+        }
     }
 
-    rememberLauncherForActivityResult(
+    val permissionLauncher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.RequestPermission(),
     ) { isGranted ->
         if (isGranted) {
@@ -136,7 +125,6 @@ fun ImportTransactionsScreen(
         } else {
             val activity = context as? Activity
             val permission = PermissionUtils.getReadStoragePermission()
-
             if (activity != null) {
                 if (!activity.shouldShowRequestPermissionRationale(permission)) {
                     showPermissionSettingsDialog = true
@@ -164,7 +152,6 @@ fun ImportTransactionsScreen(
                     title = stringResource(R.string.import_transactions_title),
                     showBackButton = true,
                     onBackClick = onNavigateBack,
-                    titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
                 )
             },
         ) { paddingValues ->
@@ -172,21 +159,22 @@ fun ImportTransactionsScreen(
                 modifier = Modifier
                     .fillMaxSize()
                     .padding(paddingValues)
-                    .padding(dimensionResource(R.dimen.padding_large))
+                    .padding(16.dp)
                     .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.space_medium)),
+                verticalArrangement = Arrangement.spacedBy(16.dp),
             ) {
                 // Инструкции по импорту с анимацией
                 AnimatedVisibility(
                     visible = showInstructions,
-                    enter = fadeIn(animationSpec = tween(700)) + slideInVertically(
-                        initialOffsetY = { -50 },
-                        animationSpec = spring(
-                            dampingRatio = Spring.DampingRatioLowBouncy,
-                            stiffness = Spring.StiffnessLow,
+                    enter = fadeIn(animationSpec = tween(700)) +
+                        slideInVertically(
+                            initialOffsetY = { -50 },
+                            animationSpec = spring(
+                                dampingRatio = Spring.DampingRatioLowBouncy,
+                                stiffness = Spring.StiffnessLow,
+                            ),
                         ),
-                    ),
                 ) {
                     ImportInstructions()
                 }
@@ -211,31 +199,31 @@ fun ImportTransactionsScreen(
                     )
                 }
 
-                // Оставляем только ImportResultsSection для показа результатов импорта
+                // Секция с результатами импорта
                 AnimatedVisibility(
                     visible = state.successCount > 0 || state.isLoading || state.error != null,
                     enter = fadeIn(animationSpec = tween(500)) +
                         expandVertically(
                             animationSpec = spring(
                                 dampingRatio = Spring.DampingRatioMediumBouncy,
-                                stiffness = Spring.StiffnessLow,
                             ),
                         ),
                     exit = fadeOut(animationSpec = tween(300)),
                 ) {
-                    ImportResultsSection(state)
+                    ImportResultsSection(
+                        state = state,
+                        onDismiss = { viewModel.handleIntent(ImportTransactionsIntent.ResetState) },
+                    )
                 }
 
                 // Кнопка выбора файла
-                Column(
-                    modifier = Modifier.fillMaxWidth(),
-                ) {
-                    // Кнопка выбора файла
-                    Button(
-                        onClick = {
-                            if (Build.VERSION.SDK_INT >= 35) {
-                                getContentLauncher.launch("*/*")
-                            } else {
+                Button(
+                    onClick = {
+                        if (Build.VERSION.SDK_INT >= 35) {
+                            getContentLauncher.launch("*/*")
+                        } else {
+                            // Проверяем разрешение на чтение файлов
+                            if (PermissionUtils.hasReadExternalStoragePermission(context)) {
                                 filePickerLauncher.launch(
                                     arrayOf(
                                         "text/csv",
@@ -243,52 +231,103 @@ fun ImportTransactionsScreen(
                                         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
                                     ),
                                 )
-                            }
-                        },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(dimensionResource(R.dimen.button_height)),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_button)),
-                        colors = ButtonDefaults.buttonColors(
-                            containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = androidx.compose.ui.graphics.Color.White,
-                        ),
-                        elevation = ButtonDefaults.buttonElevation(
-                            defaultElevation = dimensionResource(R.dimen.button_elevation),
-                        ),
-                        // Добавляем возможность отключения кнопки во время импорта
-                        enabled = !state.isLoading,
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.CloudUpload,
-                            contentDescription = null,
-                            tint = androidx.compose.ui.graphics.Color.White,
-                            modifier = Modifier.padding(
-                                end = dimensionResource(R.dimen.padding_medium),
-                            ),
-                        )
-                        Text(
-                            text = if (state.isLoading) {
-                                stringResource(R.string.importing_file)
                             } else {
-                                stringResource(R.string.choose_file_button)
-                            },
-                            style = MaterialTheme.typography.titleMedium,
-                            color = androidx.compose.ui.graphics.Color.White,
-                        )
-                    }
+                                // Запрашиваем разрешение
+                                permissionLauncher.launch(PermissionUtils.getReadStoragePermission())
+                            }
+                        }
+                    },
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .height(56.dp),
+                    shape = RoundedCornerShape(8.dp),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White,
+                    ),
+                    enabled = !state.isLoading,
+                ) {
+                    Icon(
+                        imageVector = Icons.Default.CloudUpload,
+                        contentDescription = null,
+                        modifier = Modifier.padding(end = 8.dp),
+                    )
+                    Text(
+                        text = if (state.isLoading) {
+                            stringResource(R.string.importing_file)
+                        } else {
+                            stringResource(R.string.choose_file_button)
+                        },
+                    )
                 }
             }
+        }
 
-            // Диалог с инструкциями по получению выписки из банка
-            if (showBankInstructionDialog) {
-                BankInstructionDialog(
-                    bankName = selectedBank,
-                    onDismiss = { showBankInstructionDialog = false },
-                )
-            }
+        // Диалог с инструкциями по получению выписки из банка
+        if (showBankInstructionDialog) {
+            BankInstructionDialog(
+                bankName = selectedBank,
+                onDismiss = { showBankInstructionDialog = false },
+            )
         }
     }
+}
+
+@Composable
+fun ImportInstructions() {
+    // Implementation for import instructions
+    Text(
+        text = "Выберите файл выписки из банка для импорта транзакций.",
+        style = MaterialTheme.typography.bodyLarge,
+    )
+}
+
+@Composable
+fun BanksList(onBankClick: (String) -> Unit) {
+    // Implementation for banks list
+    Text(
+        text = "Поддерживаемые банки: Сбербанк, Тинькофф, Альфа-Банк, Озон",
+        style = MaterialTheme.typography.bodyMedium,
+    )
+}
+
+@Composable
+fun PermissionDialog(onOpenSettings: () -> Unit, onDismiss: () -> Unit) {
+    // Implementation for permission dialog
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Требуется разрешение") },
+        text = {
+            Text(
+                "Для импорта файлов необходимо разрешение на доступ к файлам. Пожалуйста, предоставьте разрешение в настройках приложения.",
+            )
+        },
+        confirmButton = {
+            Button(onClick = onOpenSettings) {
+                Text("Настройки")
+            }
+        },
+        dismissButton = {
+            Button(onClick = onDismiss) {
+                Text("Отмена")
+            }
+        },
+    )
+}
+
+@Composable
+fun BankInstructionDialog(bankName: String, onDismiss: () -> Unit) {
+    // Implementation for bank instruction dialog
+    androidx.compose.material3.AlertDialog(
+        onDismissRequest = onDismiss,
+        title = { Text("Инструкция для $bankName") },
+        text = { Text("Как получить выписку из $bankName для импорта...") },
+        confirmButton = {
+            Button(onClick = onDismiss) {
+                Text("Понятно")
+            }
+        },
+    )
 }
 
 fun openApplicationSettings(context: Context) {
@@ -300,6 +339,5 @@ fun openApplicationSettings(context: Context) {
         context.startActivity(intent)
     } catch (e: Exception) {
         Timber.e(e, "Failed to open application settings")
-        // Опционально: показать Toast или Snackbar об ошибке
     }
 }

@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistics
-
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -79,7 +78,7 @@ fun FinancialStatisticsScreen(startDate: Long, endDate: Long, onNavigateBack: ()
     Scaffold(
         topBar = {
             AppTopBar(
-                title = stringResource(R.string.financial_statistics_title),
+                title = stringResource(R.string.detailed_financial_statistics),
                 showBackButton = true,
                 onBackClick = onNavigateBack,
             )

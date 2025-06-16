@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.core.util
 
 import com.davidbugayov.financeanalyzer.core.model.AppException
 import timber.log.Timber
-import java.io.IOException
 
 /**
  * Преобразует Result в другой тип
@@ -23,4 +22,4 @@ fun <T, R> Result<T>.map(transform: (T) -> R): Result<R> = when (this) {
 inline fun <T, R> Result<T>.fold(onSuccess: (T) -> R, onFailure: (AppException) -> R): R = when (this) {
     is Result.Success -> onSuccess(data)
     is Result.Error -> onFailure(exception)
-} 
+}

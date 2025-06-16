@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
-
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border

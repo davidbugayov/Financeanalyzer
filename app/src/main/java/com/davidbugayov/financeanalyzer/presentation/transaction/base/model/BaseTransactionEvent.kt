@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.model
-
 import androidx.compose.ui.graphics.vector.ImageVector
 import java.util.Date
 

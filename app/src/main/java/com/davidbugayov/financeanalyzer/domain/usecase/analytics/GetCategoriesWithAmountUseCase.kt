@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.CategoryWithAmount
-import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 
 class GetCategoriesWithAmountUseCase {

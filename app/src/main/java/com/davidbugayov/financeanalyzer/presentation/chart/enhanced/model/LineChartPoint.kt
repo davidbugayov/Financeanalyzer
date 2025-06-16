@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.enhanced.model
 
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import java.util.Date
 
 /**

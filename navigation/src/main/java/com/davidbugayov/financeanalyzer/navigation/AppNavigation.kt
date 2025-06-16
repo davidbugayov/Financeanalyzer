@@ -75,10 +75,10 @@ class AppNavigation {
                     defaultValue = null
                 },
             ),
-            enterTransition = defaultEnterLeft(),
-            exitTransition = defaultExitRight(),
-            popEnterTransition = defaultEnterLeft(),
-            popExitTransition = defaultExitRight(),
+            enterTransition = defaultEnterUp(),
+            exitTransition = defaultExitDown(),
+            popEnterTransition = defaultEnterUp(),
+            popExitTransition = defaultExitDown(),
         ) { backStackEntry ->
             val startDate = backStackEntry.arguments?.getLong(Screen.START_DATE_ARG) ?: -1L
             val endDate = backStackEntry.arguments?.getLong(Screen.END_DATE_ARG) ?: -1L
@@ -100,6 +100,35 @@ class AppNavigation {
         ) { backStackEntry ->
             val walletId = backStackEntry.arguments?.getString(Screen.WALLET_ID_ARG) ?: return@composable
             onWalletTransactionsScreen(walletId)
+        }
+
+        // Добавляем экран подробной финансовой статистики с анимацией слева направо
+        composable(
+            route = Screen.DetailedFinancialStatistics.route,
+            arguments = listOf(
+                navArgument(Screen.START_DATE_ARG) {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                },
+                navArgument(Screen.END_DATE_ARG) {
+                    type = NavType.LongType
+                    defaultValue = -1L
+                },
+            ),
+            enterTransition = defaultEnterLeft(),
+            exitTransition = defaultExitRight(),
+            popEnterTransition = defaultEnterLeft(),
+            popExitTransition = defaultExitRight(),
+        ) { backStackEntry ->
+            val startDate = backStackEntry.arguments?.getLong(Screen.START_DATE_ARG) ?: -1L
+            val endDate = backStackEntry.arguments?.getLong(Screen.END_DATE_ARG) ?: -1L
+
+            // Если даты не указаны или указаны дефолтные значения, используем текущее время
+            val finalStartDate = if (startDate == -1L) System.currentTimeMillis() else startDate
+            val finalEndDate = if (endDate == -1L) System.currentTimeMillis() else endDate
+
+            // Вызываем тот же обработчик, но с параметром DETAILED
+            onFinancialStatisticsScreen(finalStartDate, finalEndDate, "DETAILED")
         }
     }
 

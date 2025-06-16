@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.components
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth

@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base.components
-
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
@@ -29,7 +28,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 
 /**
  * Поле ввода суммы транзакции с поддержкой арифметических выражений
@@ -70,7 +69,7 @@ fun AmountField(
             // Не в фокусе, пытаемся отформатировать "сырое" значение
             val numericValue = internalRawAmount.toDoubleOrNull()
             if (numericValue != null) {
-                Money(numericValue).format(showCurrency = false) // Форматируем, если это число, БЕЗ СИМВОЛА ВАЛЮТЫ
+                Money(numericValue).format() // Форматируем, если это число
             } else {
                 internalRawAmount // Иначе (например, выражение "100+5") показываем как есть
             }

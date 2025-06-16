@@ -2,8 +2,9 @@ package com.davidbugayov.financeanalyzer.data.local.entity
 
 import androidx.room.ColumnInfo
 import androidx.room.Entity
+import androidx.room.Index
 import androidx.room.PrimaryKey
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import java.util.Date
 
 /**
@@ -13,7 +14,7 @@ import java.util.Date
 @Entity(
     tableName = "transactions",
     // Используем id как основной ключ, а id_string как индексированное поле для поиска по строке
-    indices = [androidx.room.Index(value = ["id_string"], unique = true)],
+    indices = [Index(value = ["id_string"], unique = true)],
 )
 data class TransactionEntity(
     @PrimaryKey(autoGenerate = true) val id: Long = 0,

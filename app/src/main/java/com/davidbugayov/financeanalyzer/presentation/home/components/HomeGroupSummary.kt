@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.home.components
 
+import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -26,7 +27,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryCardBackground
@@ -167,7 +168,7 @@ private fun SummaryTotals(
             color = textSecondary,
         )
         Text(
-            text = "+" + totalIncome.abs().format(showCurrency = false),
+            text = "+" + totalIncome.abs().formatForDisplay(showCurrency = false),
             fontSize = 14.sp,
             color = incomeColor,
             fontWeight = FontWeight.Bold,
@@ -186,7 +187,7 @@ private fun SummaryTotals(
             color = textSecondary,
         )
         Text(
-            text = "-" + totalExpense.abs().format(showCurrency = false),
+            text = "-" + totalExpense.abs().formatForDisplay(showCurrency = false),
             fontSize = 14.sp,
             color = expenseColor,
             fontWeight = FontWeight.Bold,
@@ -205,7 +206,7 @@ private fun SummaryTotals(
             color = textSecondary,
         )
         Text(
-            text = balance.format(showCurrency = false),
+            text = balance.formatForDisplay(showCurrency = false),
             fontSize = 14.sp,
             color = balanceColor,
             fontWeight = FontWeight.Bold,
@@ -271,9 +272,9 @@ private fun SummaryCategoryList(
                 )
                 Text(
                     text = if (categorySummary.isExpense) {
-                        "-" + categorySummary.amount.abs().format(showCurrency = false)
+                        "-" + categorySummary.amount.abs().formatForDisplay(showCurrency = false)
                     } else {
-                        "+" + categorySummary.amount.abs().format(showCurrency = false)
+                        "+" + categorySummary.amount.abs().formatForDisplay(showCurrency = false)
                     },
                     fontSize = 13.sp,
                     color = if (categorySummary.isExpense) expenseColor else incomeColor,

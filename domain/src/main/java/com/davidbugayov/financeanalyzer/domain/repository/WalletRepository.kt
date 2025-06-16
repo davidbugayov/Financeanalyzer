@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.repository
 
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 
 /**
@@ -76,4 +76,4 @@ interface WalletRepository {
      * @return Список кошельков, связанных с данной транзакцией
      */
     suspend fun getWalletsForTransaction(transactionId: String): List<Wallet>
-} 
+}

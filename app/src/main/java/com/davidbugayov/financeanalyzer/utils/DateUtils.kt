@@ -27,6 +27,18 @@ object DateUtils {
     }
 
     /**
+     * Форматирует диапазон дат в виде строки
+     *
+     * @param startDate начальная дата диапазона
+     * @param endDate конечная дата диапазона
+     * @param pattern шаблон форматирования для отдельных дат
+     * @return отформатированная строка с диапазоном дат
+     */
+    fun formatDateRange(startDate: Date, endDate: Date, pattern: String = "dd.MM.yyyy"): String {
+        return "${formatDate(startDate, pattern)} - ${formatDate(endDate, pattern)}"
+    }
+
+    /**
      * Возвращает даты начала и конца периода в зависимости от типа периода
      */
     fun getPeriodDates(periodType: PeriodType): Pair<Date, Date> {

@@ -3,7 +3,8 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.model.Currency
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
@@ -698,7 +699,7 @@ class OzonPdfImportUseCase(
 
                 // Создаем объект Transaction с правильными параметрами согласно определению модели
                 return Transaction(
-                    amount = com.davidbugayov.financeanalyzer.domain.model.Money(
+                    amount = Money(
                         finalAmount,
                         Currency.valueOf(currencyStr.uppercase(Locale.ROOT)),
                     ),
@@ -835,7 +836,7 @@ class OzonPdfImportUseCase(
         )
 
         return Transaction(
-            amount = com.davidbugayov.financeanalyzer.domain.model.Money(
+            amount = Money(
                 state.amount!!,
                 Currency.valueOf(state.currency),
             ),

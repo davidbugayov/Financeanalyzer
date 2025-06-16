@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.edit
-
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState

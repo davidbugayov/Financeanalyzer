@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.wallet
 
-import com.davidbugayov.financeanalyzer.domain.model.AppException.Unknown
-import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.core.model.AppException
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.util.Result
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import timber.log.Timber
 
@@ -20,7 +20,7 @@ class UpdateWalletBalancesUseCase(
             // Логика отката изменений для оригинальной транзакции
             if (originalTransaction?.walletIds?.isNotEmpty() == true) {
                 val originalAmount = originalTransaction.amount
-                val originalWalletIds = originalTransaction.walletIds ?: emptyList()
+                val originalWalletIds = originalTransaction.walletIds
                 val originalAmountPerWallet = if (originalWalletIds.size > 1) {
                     originalAmount.div(originalWalletIds.size)
                 } else {
@@ -63,13 +63,13 @@ class UpdateWalletBalancesUseCase(
                 }
             }
             Timber.d("UpdateWalletBalancesUseCase: Балансы кошельков успешно обновлены")
-            Result.Success(Unit)
+            Result.success(Unit)
         } catch (e: Exception) {
             Timber.e(
                 e,
                 "UpdateWalletBalancesUseCase: Ошибка при обновлении баланса кошельков: ${e.message}",
             )
-            Result.Error(Unknown(e.message, e))
+            Result.error(AppException.Unknown(e.message, e))
         }
     }
 }
