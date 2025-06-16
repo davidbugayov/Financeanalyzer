@@ -8,8 +8,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
-import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

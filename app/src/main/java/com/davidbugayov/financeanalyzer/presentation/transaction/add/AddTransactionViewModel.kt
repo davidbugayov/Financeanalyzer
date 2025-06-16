@@ -7,7 +7,6 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -15,7 +14,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactio
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
@@ -28,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.util.Result
 
 // Проверка на RuStore flavor через константу из BuildConfig
 private val isRustoreFlavor = BuildConfig.IS_RUSTORE_FLAVOR
@@ -166,7 +166,7 @@ class AddTransactionViewModel(
 
             try {
                 val result = addTransactionUseCase(transactionToSave)
-                if (result is DomainResult.Success) {
+                if (result is Result.Success) {
                     updateWalletBalancesUseCase(
                         transactionToSave.walletIds ?: emptyList(),
                         transactionToSave.amount,
@@ -188,7 +188,7 @@ class AddTransactionViewModel(
                         )
                     }
                     navigationManager.navigate(NavigationManager.Command.NavigateUp)
-                } else if (result is DomainResult.Error) {
+                } else if (result is Result.Error) {
                     _state.update {
                         it.copy(
                             isLoading = false,

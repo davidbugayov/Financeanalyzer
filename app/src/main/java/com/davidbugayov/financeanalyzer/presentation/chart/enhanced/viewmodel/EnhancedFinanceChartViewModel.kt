@@ -12,6 +12,8 @@ import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartState
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -30,6 +32,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
     private val categoriesViewModel: CategoriesViewModel by inject()
+    private val navigationManager: NavigationManager by inject()
     private val _state = MutableStateFlow(EnhancedFinanceChartState())
     val state: StateFlow<EnhancedFinanceChartState> = _state.asStateFlow()
 
@@ -305,5 +308,20 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
         } else {
             emptyList()
         }
+    }
+
+    /**
+     * Переход на экран подробной финансовой статистики
+     */
+    fun navigateToDetailedStatistics() {
+        val currentState = _state.value
+        navigationManager.navigate(
+            NavigationManager.Command.Navigate(
+                Screen.FinancialStatistics.createRoute(
+                    currentState.startDate.time,
+                    currentState.endDate.time,
+                ),
+            ),
+        )
     }
 }

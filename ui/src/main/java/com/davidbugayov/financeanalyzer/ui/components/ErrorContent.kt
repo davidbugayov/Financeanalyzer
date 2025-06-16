@@ -42,4 +42,4 @@ fun ErrorContent(error: String?, onRetry: () -> Unit) {
             Text(stringResource(R.string.retry))
         }
     }
-} 
+}

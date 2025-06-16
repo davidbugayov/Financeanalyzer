@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.facto
 // Removed SberbankHandler, TinkoffCsvHandler, AlfaBankCsvHandler
 import android.content.Context
 import android.net.Uri
-import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.alfabank.AlfaBankExcelHandler
@@ -14,6 +13,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon.OzonPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank.SberbankPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.tbank.TbankPdfHandler
+import com.davidbugayov.financeanalyzer.domain.util.Result
 import com.davidbugayov.financeanalyzer.domain.util.safeCallSync
 import timber.log.Timber
 

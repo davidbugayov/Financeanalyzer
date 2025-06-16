@@ -16,28 +16,48 @@ sealed class Screen(val route: String) {
 
     /** Экран добавления новой транзакции */
     data object AddTransaction : Screen("add") {
-        const val routeWithArgs: String = "add?category={category}"
-        const val categoryArg: String = "category"
+        // Константы для аргументов
+        const val CATEGORY_ARG = "category"
+
+        const val routeWithArgs: String = "add?$CATEGORY_ARG={$CATEGORY_ARG}"
+
         fun createRoute(category: String? = null): String {
             return if (category != null) {
-                "add?category=$category"
+                "add?$CATEGORY_ARG=$category"
             } else {
                 "add"
             }
         }
     }
 
+    // Общие константы для аргументов навигации
+    companion object {
+        const val TRANSACTION_ID_ARG = "transactionId"
+        const val WALLET_ID_ARG = "walletId"
+        const val START_DATE_ARG = "startDate"
+        const val END_DATE_ARG = "endDate"
+        const val PERIOD_TYPE_ARG = "periodType"
+    }
+
     /** Экран редактирования существующей транзакции */
-    data object EditTransaction : Screen("edit/{transactionId}") {
+    data object EditTransaction : Screen("edit/{$TRANSACTION_ID_ARG}") {
+
         fun createRoute(transactionId: String) = "edit/$transactionId"
     }
 
     /** Экран с подробной финансовой статистикой */
-    data object FinancialStatistics : Screen("financial_statistics?startDate={startDate}&endDate={endDate}") {
-        fun createRoute(startDate: Long?, endDate: Long?): String {
+    data object FinancialStatistics : Screen(
+        "financial_statistics?$START_DATE_ARG={$START_DATE_ARG}&$END_DATE_ARG={$END_DATE_ARG}&$PERIOD_TYPE_ARG={$PERIOD_TYPE_ARG}",
+    ) {
+
+        fun createRoute(startDate: Long?, endDate: Long?, periodType: String? = null): String {
             val start = startDate ?: System.currentTimeMillis()
             val end = endDate ?: System.currentTimeMillis()
-            return "financial_statistics?startDate=$start&endDate=$end"
+            return if (periodType != null) {
+                "financial_statistics?$START_DATE_ARG=$start&$END_DATE_ARG=$end&$PERIOD_TYPE_ARG=$periodType"
+            } else {
+                "financial_statistics?$START_DATE_ARG=$start&$END_DATE_ARG=$end"
+            }
         }
     }
 
@@ -54,7 +74,8 @@ sealed class Screen(val route: String) {
     data object Budget : Screen("budget")
 
     /** Экран транзакций кошелька */
-    data object WalletTransactions : Screen("wallet/{walletId}") {
+    data object WalletTransactions : Screen("wallet/{$WALLET_ID_ARG}") {
+
         fun createRoute(walletId: String) = "wallet/$walletId"
     }
 
@@ -63,4 +84,4 @@ sealed class Screen(val route: String) {
 
     /** Экран достижений */
     data object Achievements : Screen("achievements")
-} 
+}

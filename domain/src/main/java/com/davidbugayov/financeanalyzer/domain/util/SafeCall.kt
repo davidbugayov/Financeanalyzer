@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.domain.util
 
 import com.davidbugayov.financeanalyzer.domain.model.AppException
-import com.davidbugayov.financeanalyzer.domain.model.Result
 
 suspend fun <T> safeCall(block: suspend () -> T): Result<T> {
     return try {
@@ -31,4 +30,4 @@ fun <T> safeCallSync(block: () -> T): Result<T> {
     } catch (e: Exception) {
         Result.Error(mapException(e))
     }
-} 
+}

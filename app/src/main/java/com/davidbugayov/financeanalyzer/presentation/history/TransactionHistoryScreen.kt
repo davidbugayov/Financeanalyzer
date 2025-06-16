@@ -45,7 +45,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourc
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils

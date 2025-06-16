@@ -17,7 +17,7 @@ object RuStoreUtils {
     private const val PREFS_NAME = "rustore_utils_prefs"
     private const val KEY_LAST_REVIEW_TIME = "last_review_request_time"
     private const val KEY_LAST_UPDATE_CHECK_TIME = "last_update_check_time"
-    
+
     private const val REVIEW_REQUEST_INTERVAL = 7 * 24 * 60 * 60 * 1000L // 7 дней в миллисекундах
     private const val UPDATE_CHECK_INTERVAL = 7 * 24 * 60 * 60 * 1000L // 7 дней в миллисекундах
 
@@ -95,7 +95,7 @@ object RuStoreUtils {
                         .addOnSuccessListener { appUpdateInfo ->
                             Timber.d("Проверка обновлений в RuStore завершена")
                             prefs.edit().putLong(KEY_LAST_UPDATE_CHECK_TIME, currentTime).apply()
-                            
+
                             // Если доступно обновление, показываем диалог
                             if (appUpdateInfo.updateAvailability == UpdateAvailability.UPDATE_AVAILABLE) {
                                 Timber.d("Доступно обновление в RuStore")

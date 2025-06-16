@@ -2,7 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.event
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.util.Date
 
 /**

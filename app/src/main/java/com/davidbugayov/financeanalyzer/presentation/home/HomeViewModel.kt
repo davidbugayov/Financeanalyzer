@@ -15,8 +15,8 @@ import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import kotlinx.coroutines.Dispatchers
@@ -156,9 +156,21 @@ class HomeViewModel(
                 deleteTransaction(event.transaction, context)
             }
             is HomeEvent.NavigateToChart -> {
+                // Получаем даты для текущего выбранного фильтра
+                val (startDate, endDate) = getPeriodDates(state.value.currentFilter)
+
+                // Преобразуем TransactionFilter в PeriodType
+                val periodType = when (state.value.currentFilter) {
+                    TransactionFilter.TODAY -> "DAY"
+                    TransactionFilter.WEEK -> "WEEK"
+                    TransactionFilter.MONTH -> "MONTH"
+                    TransactionFilter.ALL -> "ALL"
+                }
+
+                // Передаем даты и тип периода в параметрах навигации
                 navigationManager.navigate(
                     NavigationManager.Command.Navigate(
-                        Screen.FinancialStatistics.createRoute(null, null),
+                        Screen.FinancialStatistics.createRoute(startDate.time, endDate.time, periodType),
                     ),
                 )
             }

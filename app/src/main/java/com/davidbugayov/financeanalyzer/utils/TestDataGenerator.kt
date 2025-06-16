@@ -5,7 +5,6 @@ import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorInt
 import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorInt
-import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
 import kotlin.random.Random
@@ -93,7 +92,9 @@ object TestDataGenerator {
             transactions.add(
                 Transaction(
                     id = i.toString(),
-                    amount = Money(BigDecimal.valueOf(amount)), // Используем BigDecimal без округления
+                    amount = Money(
+                        amount,
+                    ), // Используем конструктор Money с Double, который правильно масштабирует значение
                     category = category,
                     isExpense = isExpense,
                     date = date,

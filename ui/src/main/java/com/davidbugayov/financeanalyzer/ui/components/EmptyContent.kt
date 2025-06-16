@@ -25,4 +25,4 @@ fun EmptyContent() {
             color = Color.Gray,
         )
     }
-} 
+}

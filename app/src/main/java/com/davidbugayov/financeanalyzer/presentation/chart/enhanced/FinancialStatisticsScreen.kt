@@ -74,6 +74,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
 import java.math.BigDecimal
 
@@ -92,6 +93,9 @@ import java.math.BigDecimal
 @Composable
 fun FinancialStatisticsScreen(
     onNavigateBack: () -> Unit,
+    periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType? = null,
+    startDate: Date? = null,
+    endDate: Date? = null,
 ) {
     // Используем новую ViewModel
     val viewModel: EnhancedFinanceChartViewModel = viewModel()
@@ -105,9 +109,20 @@ fun FinancialStatisticsScreen(
     val pagerState = rememberPagerState(pageCount = { 3 }, initialPage = 0)
     var lineChartDisplayMode by remember { mutableStateOf(LineChartDisplayMode.BOTH) }
 
-    // Логируем открытие экрана и загружаем данные
+    // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
-        viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData)
+        // Если передан период с главного экрана, используем его
+        if (periodType != null && startDate != null && endDate != null) {
+            viewModel.handleIntent(
+                EnhancedFinanceChartIntent.ChangePeriod(
+                    periodType = periodType,
+                    startDate = startDate,
+                    endDate = endDate,
+                ),
+            )
+        } else {
+            viewModel.handleIntent(EnhancedFinanceChartIntent.LoadData)
+        }
     }
 
     // Следим за изменениями периода
@@ -432,8 +447,8 @@ fun FinancialStatisticsScreen(
                                                 ),
                                             )
                                             .clickable {
-                                                // Переход на экран подробной статистики через navController
-                                                // navController.navigate(Screen.FinancialStatistics.createRoute(state.startDate.time, state.endDate.time))
+                                                // Переход на экран подробной статистики
+                                                viewModel.navigateToDetailedStatistics()
                                             },
                                         shape = RoundedCornerShape(16.dp),
                                         elevation = CardDefaults.cardElevation(

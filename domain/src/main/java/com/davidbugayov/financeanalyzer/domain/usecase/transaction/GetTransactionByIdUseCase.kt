@@ -1,8 +1,8 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
 import com.davidbugayov.financeanalyzer.domain.model.AppException
-import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.util.Result
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 
 class GetTransactionByIdUseCase(
@@ -21,4 +21,4 @@ class GetTransactionByIdUseCase(
             Result.error(AppException.mapException(e))
         }
     }
-} 
+}

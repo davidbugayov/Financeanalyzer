@@ -38,7 +38,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
-import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel

@@ -37,4 +37,4 @@ class UpdateWidgetsUseCase {
             context.sendBroadcast(intent)
         }
     }
-} 
+}

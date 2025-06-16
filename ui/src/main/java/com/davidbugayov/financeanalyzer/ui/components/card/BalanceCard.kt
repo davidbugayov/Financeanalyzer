@@ -31,7 +31,7 @@ import com.davidbugayov.financeanalyzer.ui.R
 private fun BalanceCardTitle(
     balance: Money,
     incomeColor: androidx.compose.ui.graphics.Color,
-    expenseColor: androidx.compose.ui.graphics.Color
+    expenseColor: androidx.compose.ui.graphics.Color,
 ) {
     val titleColor = if (balance.amount.signum() >= 0) {
         incomeColor.copy(alpha = 0.7f)
@@ -51,7 +51,7 @@ private fun BalanceCardTitle(
 private fun BalanceCardAmount(
     balance: Money,
     incomeColor: androidx.compose.ui.graphics.Color,
-    expenseColor: androidx.compose.ui.graphics.Color
+    expenseColor: androidx.compose.ui.graphics.Color,
 ) {
     Text(
         text = balance.format(true),
@@ -75,7 +75,7 @@ fun BalanceCard(
     balance: Money,
     incomeColor: androidx.compose.ui.graphics.Color,
     expenseColor: androidx.compose.ui.graphics.Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val cardColor = MaterialTheme.colorScheme.background
     val balanceTextColor = if (balance.amount.signum() >= 0) incomeColor else expenseColor
@@ -96,4 +96,4 @@ fun BalanceCard(
             BalanceCardAmount(balance, incomeColor, expenseColor)
         }
     }
-} 
+}

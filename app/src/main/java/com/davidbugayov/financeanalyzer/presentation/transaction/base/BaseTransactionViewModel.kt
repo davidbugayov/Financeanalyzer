@@ -11,7 +11,6 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Currency
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
@@ -30,6 +29,7 @@ import net.objecthunter.exp4j.ExpressionBuilder
 import timber.log.Timber
 import java.math.BigDecimal
 import java.util.Date
+import com.davidbugayov.financeanalyzer.domain.util.Result
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: CategoriesViewModel,
@@ -81,12 +81,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param amount Новая сумма дохода
      * @param originalTransaction Исходная транзакция до редактирования
      */
-    protected fun updateWalletsBalance(
+    protected suspend fun updateWalletsBalance(
         walletIds: List<String>,
         amount: Money,
         originalTransaction: Transaction?,
     ) {
-        viewModelScope.launch {
+        if (walletIds.isNotEmpty()) {
             val result = updateWalletBalancesUseCase(
                 walletIdsToUpdate = walletIds,
                 amountForWallets = amount,

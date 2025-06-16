@@ -8,4 +8,4 @@ data class CategoryStats(
     val percentage: BigDecimal,
     val count: Int,
     val isExpense: Boolean,
-) 
+)

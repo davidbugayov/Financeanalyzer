@@ -22,7 +22,9 @@ import androidx.core.view.WindowCompat
  * Enum для выбора темы приложения
  */
 enum class ThemeMode {
-    LIGHT, DARK, SYSTEM
+    LIGHT,
+    DARK,
+    SYSTEM,
 }
 
 // Цвета для светлой темы (используются стандартные Material Design слоты)
@@ -222,4 +224,4 @@ fun FinanceAnalyzerTheme(
             content = content,
         )
     }
-} 
+}

@@ -101,4 +101,4 @@ class FinancialMetrics private constructor() : KoinComponent {
     fun init(context: Context) {
         initialize(context)
     }
-} 
+}

@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.profile
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.Result
+import com.davidbugayov.financeanalyzer.domain.util.Result
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
@@ -11,8 +11,8 @@ import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -27,9 +27,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.launchIn
 import timber.log.Timber
-import android.net.Uri
 import java.io.File
-import com.davidbugayov.financeanalyzer.domain.model.AppProfileAnalytics
 
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
@@ -204,20 +202,22 @@ class ProfileViewModel(
                         when (action) {
                             ExportAction.SHARE -> {
                                 val shareResult = exportTransactionsToCSVUseCase.shareCSVFile(filePath)
-                                if (shareResult.isSuccess) {
+                                if (shareResult is Result.Success) {
                                     // Обработка успешного шаринга
                                 }
                             }
                             ExportAction.OPEN -> {
                                 val openResult = exportTransactionsToCSVUseCase.openCSVFile(filePath)
-                                if (openResult.isSuccess) {
+                                if (openResult is Result.Success) {
                                     // Обработка успешного открытия
                                 }
                             }
                             ExportAction.SAVE_ONLY -> {
                                 // Ничего не делаем, файл уже сохранен
                             }
-                            else -> { /* Обработка других возможных действий */ }
+                            else -> {
+                                // Обработка других возможных действий
+                            }
                         }
                     }
                     is Result.Error -> {
@@ -230,7 +230,6 @@ class ProfileViewModel(
                             )
                         }
                     }
-                    else -> { /* Обработка других возможных результатов */ }
                 }
             } catch (e: Exception) {
                 _state.update { currentState ->
@@ -247,65 +246,88 @@ class ProfileViewModel(
     @Suppress("UNCHECKED_CAST", "USELESS_IS_CHECK")
     private fun loadFinancialAnalytics() {
         viewModelScope.launch {
+            Timber.d("[ProfileViewModel] Starting loadFinancialAnalytics")
             _state.update { it.copy(isLoading = true, error = null) }
 
             try {
+                Timber.d("[ProfileViewModel] Calling getProfileAnalyticsUseCase")
                 val result = getProfileAnalyticsUseCase()
-                when (result) {
-                    is Result.Success<AppProfileAnalytics> -> {
-                        val analytics = result.data
+                Timber.d("[ProfileViewModel] Got result from getProfileAnalyticsUseCase: $result")
 
-                        // Форматируем dateRange в строку
-                        val dateRangeStr = try {
-                            if (analytics.dateRange != null) {
-                                val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
-                                val first = analytics.dateRange!!.first
-                                val second = analytics.dateRange!!.second
-                                val startStr = dateFormat.format(first)
-                                val endStr = dateFormat.format(second)
-                                "$startStr - $endStr"
-                            } else {
-                                "Все время"
-                            }
-                        } catch (e: Exception) {
-                            Timber.e(e, "Ошибка при форматировании dateRange")
+                if (result is Result.Success) {
+                    // Безопасное приведение типа
+                    val analytics = result.data
+
+                    Timber.d(
+                        "[ProfileViewModel] Success! Analytics data: income=${analytics.totalIncome.amount}, expense=${analytics.totalExpense.amount}, balance=${analytics.balance.amount}, savingsRate=${analytics.savingsRate}",
+                    )
+                    Timber.d(
+                        "[ProfileViewModel] More analytics: transactions=${analytics.totalTransactions}, expenseCategories=${analytics.totalExpenseCategories}, incomeCategories=${analytics.totalIncomeCategories}",
+                    )
+
+                    // Форматируем dateRange в строку
+                    val dateRangeStr = try {
+                        val dateRange = analytics.dateRange
+                        if (dateRange != null) {
+                            val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                            val startStr = dateFormat.format(dateRange.first)
+                            val endStr = dateFormat.format(dateRange.second)
+                            "$startStr - $endStr"
+                        } else {
                             "Все время"
                         }
-
-                        // Форматируем averageExpense в строку
-                        val averageExpenseStr = "${analytics.averageExpense.amount} ₽"
-
-                        _state.update { currentState ->
-                            currentState.copy(
-                                isLoading = false,
-                                totalIncome = analytics.totalIncome,
-                                totalExpense = analytics.totalExpense,
-                                balance = analytics.balance,
-                                savingsRate = analytics.savingsRate,
-                                totalTransactions = analytics.totalTransactions,
-                                totalExpenseCategories = analytics.totalExpenseCategories,
-                                totalIncomeCategories = analytics.totalIncomeCategories,
-                                averageExpense = averageExpenseStr,
-                                totalSourcesUsed = analytics.totalSourcesUsed,
-                                dateRange = dateRangeStr,
-                                error = null,
-                            )
-                        }
+                    } catch (e: Exception) {
+                        Timber.e(e, "Ошибка при форматировании dateRange")
+                        "Все время"
                     }
-                    is Result.Error -> {
-                        val exception = result.exception
-                        Timber.e(exception, "Ошибка при загрузке финансовой аналитики")
-                        _state.update { currentState ->
-                            currentState.copy(
-                                isLoading = false,
-                                error = exception.message ?: "Неизвестная ошибка",
-                            )
-                        }
+
+                    // Форматируем averageExpense в строку
+                    val averageExpenseStr = "${analytics.averageExpense.amount} ₽"
+
+                    Timber.d(
+                        "[ProfileViewModel] Formatted values: dateRange=$dateRangeStr, averageExpense=$averageExpenseStr",
+                    )
+
+                    val newState = _state.value.copy(
+                        isLoading = false,
+                        totalIncome = analytics.totalIncome,
+                        totalExpense = analytics.totalExpense,
+                        balance = analytics.balance,
+                        savingsRate = analytics.savingsRate,
+                        totalTransactions = analytics.totalTransactions,
+                        totalExpenseCategories = analytics.totalExpenseCategories,
+                        totalIncomeCategories = analytics.totalIncomeCategories,
+                        averageExpense = averageExpenseStr,
+                        totalSourcesUsed = analytics.totalSourcesUsed,
+                        dateRange = dateRangeStr,
+                        error = null,
+                    )
+
+                    _state.update { newState }
+
+                    Timber.d(
+                        "[ProfileViewModel] State updated with analytics data. New state: income=${newState.totalIncome.amount}, expense=${newState.totalExpense.amount}, balance=${newState.balance.amount}",
+                    )
+                } else if (result is Result.Error) {
+                    val exception = result.exception
+                    Timber.e(exception, "[ProfileViewModel] Ошибка при загрузке финансовой аналитики")
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isLoading = false,
+                            error = exception.message ?: "Неизвестная ошибка",
+                        )
                     }
-                    else -> { /* Обработка других возможных результатов */ }
+                } else {
+                    Timber.w("[ProfileViewModel] Unexpected result type: $result")
+                    _state.update { currentState ->
+                        currentState.copy(
+                            isLoading = false,
+                            error = "Неизвестный тип результата",
+                        )
+                    }
                 }
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке финансовой аналитики")
+                Timber.e(e, "[ProfileViewModel] Exception in loadFinancialAnalytics")
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,

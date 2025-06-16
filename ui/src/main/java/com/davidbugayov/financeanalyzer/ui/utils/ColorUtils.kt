@@ -31,7 +31,7 @@ object ColorUtils {
                 // Log error or handle invalid hex
             }
         }
-        
+
         // В крайнем случае, цвет по умолчанию в зависимости от типа транзакции и темы
         return when {
             isExpense && isDarkTheme -> Color(0xFFE57373) // ExpenseColorDark
@@ -64,4 +64,4 @@ object ColorUtils {
             0xFF000000.toInt()
         }
     }
-} 
+}

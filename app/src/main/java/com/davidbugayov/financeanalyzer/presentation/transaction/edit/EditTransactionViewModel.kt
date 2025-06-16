@@ -17,14 +17,14 @@ import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransa
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
-import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.domain.util.Result
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import java.util.Date
-import com.davidbugayov.financeanalyzer.domain.model.Result as DomainResult
 import java.math.BigDecimal
 
 class EditTransactionViewModel(
@@ -106,7 +106,7 @@ class EditTransactionViewModel(
                 val result = getTransactionByIdUseCase(id)
                 Timber.d("ТРАНЗАКЦИЯ: Результат getTransactionByIdUseCase: %s", result)
 
-                if (result is DomainResult.Success) {
+                if (result is Result.Success) {
                     val transaction = result.data
                     Timber.d(
                         "ТРАНЗАКЦИЯ: Успешно получена транзакция: сумма=%s, категория=%s",
@@ -127,7 +127,7 @@ class EditTransactionViewModel(
                         _state.value.transactionToEdit?.id,
                         _state.value.editMode,
                     )
-                } else if (result is DomainResult.Error) {
+                } else if (result is Result.Error) {
                     Timber.e("ТРАНЗАКЦИЯ: Ошибка в useCase: %s", result.exception.message)
                     _state.update {
                         it.copy(
@@ -272,7 +272,7 @@ class EditTransactionViewModel(
                 val originalTransaction = currentState.transactionToEdit
                 val result = updateTransactionUseCase(transactionToSave)
 
-                if (result is DomainResult.Success) {
+                if (result is Result.Success) {
                     // Обновляем балансы кошельков, если это доход и выбраны кошельки
                     val walletIdsList = transactionToSave.walletIds?.toList() ?: emptyList()
                     if (!transactionToSave.isExpense && walletIdsList.isNotEmpty()) {
@@ -321,7 +321,7 @@ class EditTransactionViewModel(
                     }
                     updateWidgetsUseCase(application.applicationContext)
                     Timber.d("ТРАНЗАКЦИЯ: Успешно обновлена, ID=%s", transactionToSave.id)
-                } else if (result is DomainResult.Error) {
+                } else if (result is Result.Error) {
                     Timber.e(
                         result.exception,
                         "ТРАНЗАКЦИЯ: Ошибка при обновлении: %s",

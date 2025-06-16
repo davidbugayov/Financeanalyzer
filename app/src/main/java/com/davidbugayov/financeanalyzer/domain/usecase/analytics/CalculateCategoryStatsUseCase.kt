@@ -43,4 +43,4 @@ class CalculateCategoryStatsUseCase {
 
         return Triple(stats, Money(totalIncome), Money(totalExpense))
     }
-} 
+}

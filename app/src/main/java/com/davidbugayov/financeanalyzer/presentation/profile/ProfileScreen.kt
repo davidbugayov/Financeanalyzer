@@ -96,6 +96,15 @@ fun ProfileScreen(
         )
     }
 
+    LaunchedEffect(state) {
+        Timber.d(
+            "[ProfileScreen] Current state: income=${state.totalIncome.amount}, expense=${state.totalExpense.amount}, balance=${state.balance.amount}",
+        )
+        Timber.d(
+            "[ProfileScreen] More state: transactions=${state.totalTransactions}, expenseCategories=${state.totalExpenseCategories}, incomeCategories=${state.totalIncomeCategories}",
+        )
+    }
+
     LaunchedEffect(Unit) {
         viewModel.intentCommands.collectLatest { intent ->
             try {

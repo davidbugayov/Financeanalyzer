@@ -46,7 +46,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.viewmodel.En
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor

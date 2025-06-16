@@ -1,6 +1,6 @@
 package com.davidbugayov.financeanalyzer.utils
 
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date

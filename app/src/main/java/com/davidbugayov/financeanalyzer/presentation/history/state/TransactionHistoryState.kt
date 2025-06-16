@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.history.state
 import com.davidbugayov.financeanalyzer.domain.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import java.util.Calendar
 import java.util.Date

@@ -2,8 +2,8 @@ package com.davidbugayov.financeanalyzer.domain.usecase.wallet
 
 import com.davidbugayov.financeanalyzer.domain.model.AppException.Unknown
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.util.Result
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import timber.log.Timber
 
@@ -72,4 +72,4 @@ class UpdateWalletBalancesUseCase(
             Result.Error(Unknown(e.message, e))
         }
     }
-} 
+}

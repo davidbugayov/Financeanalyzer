@@ -1,4 +1,7 @@
-package com.davidbugayov.financeanalyzer.domain.model
+package com.davidbugayov.financeanalyzer.domain.util
+
+import com.davidbugayov.financeanalyzer.domain.model.AppException
+import com.davidbugayov.financeanalyzer.domain.model.mapException
 
 /**
  * Sealed класс для представления результата операции
@@ -36,4 +39,4 @@ sealed class Result<out T> {
             Error(mapException(e))
         }
     }
-} 
+}

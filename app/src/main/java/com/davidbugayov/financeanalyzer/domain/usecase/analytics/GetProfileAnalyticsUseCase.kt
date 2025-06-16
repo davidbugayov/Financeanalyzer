@@ -1,20 +1,21 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.analytics
 
 import com.davidbugayov.financeanalyzer.domain.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.AppProfileAnalytics
 import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalytics
+import com.davidbugayov.financeanalyzer.domain.model.mapException
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.util.Result
 import java.util.Date
 import java.util.Calendar
+import timber.log.Timber
 
 class GetProfileAnalyticsUseCase(
     private val transactionRepository: TransactionRepository,
     private val walletRepository: WalletRepository,
 ) {
 
-    suspend operator fun invoke(): Result<AppProfileAnalytics> {
+    suspend operator fun invoke(): Result<ProfileAnalytics> {
         return try {
             // Получаем данные из репозиториев
             val transactions = transactionRepository.getAllTransactions()
@@ -60,7 +61,7 @@ class GetProfileAnalyticsUseCase(
             val yearAgoDate = calendar.time
 
             // Создаем доменную модель ProfileAnalytics
-            val domainAnalytics = ProfileAnalytics(
+            val profileAnalytics = ProfileAnalytics(
                 totalIncome = totalIncome,
                 totalExpense = totalExpense,
                 balance = balance,
@@ -74,12 +75,10 @@ class GetProfileAnalyticsUseCase(
                 totalWallets = wallets,
             )
 
-            // Конвертируем в AppProfileAnalytics для совместимости
-            val appAnalytics = AppProfileAnalytics.fromDomainModel(domainAnalytics)
-
-            Result.Success(appAnalytics)
+            Result.Success(profileAnalytics)
         } catch (e: Exception) {
-            Result.Error(e)
+            Timber.e(e, "Ошибка при получении аналитики профиля")
+            Result.Error(mapException(e))
         }
     }
 }

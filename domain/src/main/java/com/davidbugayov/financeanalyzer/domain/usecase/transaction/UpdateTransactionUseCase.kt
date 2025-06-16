@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.transaction
 
-import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.util.safeCall
+import com.davidbugayov.financeanalyzer.domain.util.Result
 import timber.log.Timber
 
 /**
@@ -24,4 +24,4 @@ class UpdateTransactionUseCase(
             repository.updateTransaction(transaction)
         }
     }
-} 
+}

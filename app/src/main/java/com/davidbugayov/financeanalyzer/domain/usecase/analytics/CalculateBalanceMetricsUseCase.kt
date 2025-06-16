@@ -43,13 +43,18 @@ class CalculateBalanceMetricsUseCase {
             0.0
         }
 
+        // Создаем Money объекты с правильным масштабированием
+        val incomeWithScale = income.setScale(2, java.math.RoundingMode.HALF_UP)
+        val expenseWithScale = expense.setScale(2, java.math.RoundingMode.HALF_UP)
+        val balanceWithScale = balance.setScale(2, java.math.RoundingMode.HALF_UP)
+
         return BalanceMetrics(
-            income = Money(income),
-            expense = Money(expense),
-            balance = Money(balance),
+            income = Money(incomeWithScale),
+            expense = Money(expenseWithScale),
+            balance = Money(balanceWithScale),
             savingsRate = savingsRate,
             monthsOfSavings = monthsOfSavings,
             averageDailyExpense = averageDailyExpense,
         )
     }
-} 
+}

@@ -52,6 +52,69 @@ fun AppNavHost(
     )
 }
 
+/**
+ * Расширение для AppNavHost, которое создает все графы навигации приложения.
+ *
+ * @param navController Контроллер навигации
+ * @param navigationManager Менеджер навигации для обработки команд
+ * @param appNavigation Класс с определениями графов навигации
+ * @param onHomeScreen Функция для отображения экрана Home
+ * @param onHistoryScreen Функция для отображения экрана History
+ * @param onBudgetScreen Функция для отображения экрана Budget
+ * @param onFinancialStatisticsScreen Функция для отображения экрана FinancialStatistics
+ * @param onWalletTransactionsScreen Функция для отображения экрана WalletTransactions
+ * @param onAddTransactionScreen Функция для отображения экрана AddTransaction
+ * @param onEditTransactionScreen Функция для отображения экрана EditTransaction
+ * @param onImportTransactionsScreen Функция для отображения экрана ImportTransactions
+ * @param onAchievementsScreen Функция для отображения экрана Achievements
+ * @param onProfileScreen Функция для отображения экрана Profile
+ * @param onLibrariesScreen Функция для отображения экрана Libraries
+ * @param onExportImportScreen Функция для отображения экрана ExportImport
+ */
+@Composable
+fun AppNavHost(
+    navController: NavHostController,
+    navigationManager: NavigationManager,
+    appNavigation: AppNavigation,
+    onHomeScreen: @Composable () -> Unit,
+    onHistoryScreen: @Composable () -> Unit,
+    onBudgetScreen: @Composable () -> Unit,
+    onFinancialStatisticsScreen: @Composable (startDate: Long, endDate: Long, periodType: String?) -> Unit,
+    onWalletTransactionsScreen: @Composable (walletId: String) -> Unit,
+    onAddTransactionScreen: @Composable (category: String?) -> Unit,
+    onEditTransactionScreen: @Composable (transactionId: String) -> Unit,
+    onImportTransactionsScreen: @Composable () -> Unit,
+    onAchievementsScreen: @Composable () -> Unit,
+    onProfileScreen: @Composable () -> Unit,
+    onLibrariesScreen: @Composable () -> Unit,
+    onExportImportScreen: @Composable () -> Unit,
+) {
+    AppNavHost(navController, navigationManager) {
+        with(appNavigation) {
+            mainGraph(
+                onHomeScreen,
+                onHistoryScreen,
+                onBudgetScreen,
+                onFinancialStatisticsScreen,
+                onWalletTransactionsScreen,
+            )
+
+            transactionGraph(
+                onAddTransactionScreen,
+                onEditTransactionScreen,
+                onImportTransactionsScreen,
+                onAchievementsScreen,
+            )
+
+            profileGraph(
+                onProfileScreen,
+                onLibrariesScreen,
+                onExportImportScreen,
+            )
+        }
+    }
+}
+
 // --- Транзишены для читаемости ---
 fun defaultEnterLeft(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
     slideIntoContainer(
@@ -93,4 +156,4 @@ fun defaultExitDown(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> E
         towards = AnimatedContentTransitionScope.SlideDirection.Down,
         animationSpec = tween(400, easing = EaseInOut),
     ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-} 
+}

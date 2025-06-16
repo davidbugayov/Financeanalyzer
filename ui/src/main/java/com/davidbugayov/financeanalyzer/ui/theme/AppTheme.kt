@@ -41,4 +41,4 @@ fun AppThemeProvider(themeMode: ThemeMode, content: @Composable () -> Unit) {
     CompositionLocalProvider(LocalAppTheme provides themeMode) {
         content()
     }
-} 
+}

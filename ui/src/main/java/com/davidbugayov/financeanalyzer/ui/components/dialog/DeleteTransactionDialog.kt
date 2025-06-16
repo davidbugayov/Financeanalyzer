@@ -143,4 +143,4 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
             }
         },
     )
-} 
+}

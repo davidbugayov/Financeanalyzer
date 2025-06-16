@@ -3,7 +3,6 @@ package com.davidbugayov.financeanalyzer.presentation.history
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.domain.model.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
@@ -17,11 +16,11 @@ import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
-import com.davidbugayov.financeanalyzer.presentation.history.model.PeriodType
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.presentation.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.presentation.navigation.Screen
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -37,6 +36,7 @@ import java.math.BigDecimal
 import java.util.Calendar
 import java.util.Date
 import com.davidbugayov.financeanalyzer.domain.model.Money
+import com.davidbugayov.financeanalyzer.domain.util.Result
 
 class TransactionHistoryViewModel constructor(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,

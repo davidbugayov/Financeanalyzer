@@ -78,4 +78,4 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
-} 
+}

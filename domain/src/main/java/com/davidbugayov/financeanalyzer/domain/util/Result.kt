@@ -1,13 +1,42 @@
 package com.davidbugayov.financeanalyzer.domain.util
 
+import com.davidbugayov.financeanalyzer.domain.model.AppException
+import com.davidbugayov.financeanalyzer.domain.model.mapException
+
 /**
- * Класс для представления результата операции
+ * Sealed класс для представления результата операции
  */
 sealed class Result<out T> {
+
+    /**
+     * Успешный результат операции
+     */
     data class Success<T>(val data: T) : Result<T>()
-    data class Error(val exception: Exception) : Result<Nothing>()
 
-    val isSuccess: Boolean get() = this is Success
+    /**
+     * Ошибка операции
+     */
+    data class Error(val exception: AppException) : Result<Nothing>()
 
-    fun exceptionOrNull(): Exception? = if (this is Error) exception else null
-} 
+    companion object {
+
+        /**
+         * Создает успешный результат
+         */
+        fun <T> success(data: T): Result<T> = Success(data)
+
+        /**
+         * Создает результат с ошибкой
+         */
+        fun error(exception: AppException): Result<Nothing> = Error(exception)
+
+        /**
+         * Создает результат из блока кода
+         */
+        inline fun <T> of(block: () -> T): Result<T> = try {
+            Success(block())
+        } catch (e: Exception) {
+            Error(mapException(e))
+        }
+    }
+}

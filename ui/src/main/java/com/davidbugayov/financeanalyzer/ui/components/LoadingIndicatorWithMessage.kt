@@ -45,4 +45,4 @@ fun CenteredLoadingIndicator(message: String, modifier: Modifier = Modifier) {
             )
         }
     }
-} 
+}

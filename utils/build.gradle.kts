@@ -65,4 +65,4 @@ dependencies {
 
     // Exp4j для математических выражений
     implementation(libs.exp4j)
-} 
+}

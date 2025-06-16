@@ -19,4 +19,4 @@ class GetCategoriesWithAmountUseCase {
             }
             .sortedByDescending { it.amount.amount }
     }
-} 
+}

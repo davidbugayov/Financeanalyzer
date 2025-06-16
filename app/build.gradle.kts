@@ -545,3 +545,13 @@ tasks.register("prepareAllReleases") {
         println("==========================================")
     }
 }
+
+tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
+    kotlinOptions {
+        // Add any Kotlin compiler options here
+        freeCompilerArgs += listOf(
+            "-Xskip-prerelease-check",
+            "-Xallow-unstable-dependencies",
+        )
+    }
+}

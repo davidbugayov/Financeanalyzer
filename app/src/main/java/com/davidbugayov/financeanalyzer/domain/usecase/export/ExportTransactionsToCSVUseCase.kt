@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.domain.usecase.export
 import android.content.Context
 import android.net.Uri
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.mapException
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.util.Result
 import java.io.File
@@ -23,7 +24,7 @@ class ExportTransactionsToCSVUseCase(
             val csvFile = createCSVFile(transactions)
             Result.Success(csvFile)
         } catch (e: Exception) {
-            Result.Error(e)
+            Result.Error(mapException(e))
         }
     }
 
@@ -65,7 +66,7 @@ class ExportTransactionsToCSVUseCase(
             // This would typically use FileProvider to get a content URI
             Result.Success(Uri.fromFile(file))
         } catch (e: Exception) {
-            Result.Error(e)
+            Result.Error(mapException(e))
         }
     }
 
@@ -74,7 +75,7 @@ class ExportTransactionsToCSVUseCase(
             // Implementation depends on Android-specific code for opening files
             Result.Success(Uri.fromFile(file))
         } catch (e: Exception) {
-            Result.Error(e)
+            Result.Error(mapException(e))
         }
     }
 }
