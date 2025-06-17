@@ -213,6 +213,19 @@
     <string name="chart_debug_info">Отладочная информация: %1$s</string>
     <string name="chart_legend_title">Легенда</string>
 
+  <!-- Import errors -->
+  <string name="import_error_unsupported_format">Неподдерживаемый формат файла. Пожалуйста, выберите CSV-файл или выписку из поддерживаемого банка.</string>
+  <string name="import_error_unknown_format">Формат файла не распознан. Поддерживаются только CSV-файлы и выписки из банков.</string>
+  <string name="import_error_file_read">Не удалось прочитать файл. Проверьте, что файл не поврежден.</string>
+  <string name="import_error_no_transactions">В файле не найдено транзакций для импорта. Проверьте формат файла.</string>
+  <string name="import_error_date_format">Не удалось распознать даты в файле. Проверьте формат файла и убедитесь, что он соответствует формату выписки из банка.</string>
+  <string name="import_error_csv_format">Неверный формат CSV-файла. Проверьте структуру файла и убедитесь, что он содержит необходимые колонки (дата, сумма, описание).</string>
+  <string name="import_error_statistics_file">Файл содержит статистические данные, а не транзакции. Пожалуйста, выберите файл с транзакциями для импорта.</string>
+
+  <!-- Import success messages -->
+  <string name="import_success_message">Импорт успешно завершен. Импортировано: %1$d, Пропущено: %2$d</string>
+  <string name="import_progress_completed">Импорт завершен</string>
+
     <!-- Enhanced Line Chart strings -->
     <string name="enhanced_line_chart_title">Улучшенная линейная диаграмма</string>
     <string name="enhanced_line_chart_income">Доходы</string>
@@ -539,11 +552,11 @@
 
     <!-- CSV Format -->
     <string name="csv_instructions_title">Формат CSV-файла для импорта:</string>
-    <string name="csv_format_instructions">1. Первая строка должна содержать заголовки столбцов\n2. Обязательные поля: дата, сумма, категория\n3. Дополнительные поля: примечание, источник\n4. Даты должны быть в формате ДД.ММ.ГГГГ</string>
+  <string name="csv_format_instructions">1. Первая строка может содержать заголовки столбцов\n2. Структура CSV файла должна содержать следующие столбцы:\n   - Столбец 1: ID или номер операции\n   - Столбец 2: Дата в формате yyyy-MM-dd_HH-mm-ss\n   - Столбец 3: Описание или категория\n   - Столбец 4: Сумма (с обозначением валюты)\n   - Столбец 5: Тип операции (Доход/Расход)\n   - Столбец 6: Примечание (опционально)\n   - Столбец 7: Источник средств (опционально)</string>
     <string name="csv_example_title">Пример содержимого файла:</string>
-    <string name="csv_example">Дата,Сумма,Категория,Примечание\n01.01.2023,1000,Продукты,Покупка в магазине\n02.01.2023,-500,Транспорт,Такси\n03.01.2023,5000,Зарплата,Аванс\n04.01.2023,-2500,Развлечения,Кино</string>
+  <string name="csv_example">5,2025-03-26_06-37-11,Зарплата,50 545 ₽,Доход,Примечание к транзакции,Наличные\n48,2025-03-26_05-42-11,Продукты,3 149 ₽,Расход,Примечание к транзакции,Наличные</string>
     <string name="csv_note_title">Примечание:</string>
-    <string name="csv_note">Положительные суммы будут импортированы как доходы, отрицательные - как расходы.</string>
+  <string name="csv_note">Убедитесь, что формат даты соответствует указанному шаблону yyyy-MM-dd_HH-mm-ss. Разделитель столбцов - запятая.</string>
 
     <!-- Budget screen strings -->
     <string name="budget_transactions">Транзакции</string>
@@ -1034,4 +1047,15 @@
     <string name="no_recommendations">Нет рекомендаций на данный момент</string>
     <string name="savings_rate_label">Норма сбережений</string>
     <string name="months_of_savings_label">Месяцев сбережений</string>
+
+  <!-- Import Results strings -->
+  <string name="import_results">Результаты импорта</string>
+  <string name="import_completed">Импорт завершён</string>
+  <string name="import_summary">Импорт успешно завершен. Импортировано: %1$d, Пропущено: %2$d</string>
+  <string name="progress_percentage">%d%%</string>
+
+  <!-- Permission Dialog strings -->
+  <string name="permission_settings_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
+  <string name="permission_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Это позволит выбрать файл для импорта транзакций.</string>
+  <string name="grant_permission">Разрешить</string>
 </resources>

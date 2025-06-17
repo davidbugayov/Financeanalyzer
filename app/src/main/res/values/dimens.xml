@@ -228,7 +228,7 @@
     <dimen name="chart_spacing_medium">12dp</dimen>
     <dimen name="chart_spacing_large">16dp</dimen>
     <dimen name="chart_selection_threshold">24dp</dimen>
-    
+
     <!-- Type selector dimensions -->
     <dimen name="chart_type_selector_padding">8dp</dimen>
     <dimen name="chart_type_selector_spacing">8dp</dimen>
@@ -250,7 +250,7 @@
     <dimen name="enhanced_pie_chart_sector_outer_stroke_width">1.5dp</dimen>
     <dimen name="enhanced_pie_chart_sector_inner_stroke_width">1dp</dimen>
     <dimen name="enhanced_pie_chart_animation_duration">800</dimen>
-    
+
     <!-- Enhanced Summary Card dimensions -->
     <dimen name="enhanced_summary_card_corner_radius">20dp</dimen>
     <dimen name="enhanced_summary_card_elevation">12dp</dimen>
@@ -350,7 +350,7 @@
 
     <!-- DatePickerDialog dimensions -->
     <dimen name="date_picker_snackbar_corner_radius">12dp</dimen>
-    
+
     <!-- SourceColorPickerDialog dimensions -->
     <dimen name="source_color_picker_padding">8dp</dimen>
     <dimen name="source_color_picker_item_spacing">12dp</dimen>
@@ -381,5 +381,15 @@
 
     <!-- General Spacing -->
     <dimen name="spacing_xsmall">4dp</dimen>
+
+    <!-- Import components dimensions -->
+    <dimen name="import_progress_indicator_height">8dp</dimen>
+    <dimen name="import_icon_size">36dp</dimen>
+    <dimen name="import_icon_size_large">64dp</dimen>
+    <dimen name="import_card_spacing">16dp</dimen>
+    <dimen name="import_bank_icon_size">40dp</dimen>
+    <dimen name="import_bank_icon_inner_size">24dp</dimen>
+    <dimen name="import_dialog_width">90%</dimen>
+    <dimen name="import_dialog_content_padding">24dp</dimen>
 
 </resources>

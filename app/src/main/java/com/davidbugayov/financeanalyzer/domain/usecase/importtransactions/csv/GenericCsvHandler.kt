@@ -6,9 +6,9 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractBankHandler
-import timber.log.Timber
 import java.io.BufferedReader
 import java.io.InputStreamReader
+import timber.log.Timber
 
 class GenericCsvHandler(
     transactionRepository: TransactionRepository,
@@ -23,13 +23,19 @@ class GenericCsvHandler(
 
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
+            // Пытаемся определить формат файла по имени
             val defaultConfig = CsvParseConfig(
-                // Здесь можно оставить значения по умолчанию из CsvParseConfig,
-                // или определить специфичные "общие" настройки, если это имеет смысл.
-                // Для примера, оставим как есть, т.е. запятая-разделитель, формат YYYY-MM-DD и т.д.
+                // Более гибкая конфигурация для парсинга различных форматов CSV
+                dateColumnIndex = 1, // Дата во втором столбце (индекс 1), а первый столбец - ID
+                dateFormatString = "yyyy-MM-dd_HH-mm-ss", // Формат даты с временем
+                descriptionColumnIndex = 2, // Описание в третьем столбце
+                amountColumnIndex = 3, // Сумма в четвертом столбце
+                expectedMinColumnCount = 4, // Минимум 4 столбца для валидной строки
+                hasHeader = true, // Предполагаем, что есть заголовок
+                isExpenseColumnIndex = 4, // Индекс колонки с типом транзакции (Доход/Расход)
             )
             Timber.Forest.d(
-                "[$bankName Handler] Creating GenericCsvImportUseCase with default config: $defaultConfig",
+                "[$bankName Handler] Creating GenericCsvImportUseCase with config: $defaultConfig",
             )
             return GenericCsvImportUseCase(context, transactionRepository, defaultConfig)
         }

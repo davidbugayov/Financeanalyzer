@@ -8,10 +8,11 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
-import timber.log.Timber
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
+import java.util.Date
 import java.util.Locale
+import timber.log.Timber
 
 /**
  * Конфигурация для парсинга CSV-файлов.
@@ -102,7 +103,25 @@ class GenericCsvImportUseCase(
      */
     override fun parseLine(line: String): Transaction? {
         Timber.d("[$bankName] ${context.getString(R.string.csv_parsing_line, line)}")
-        val columns = line.split(config.delimiter).map { it.trim().removeSurrounding("\"") }
+
+        // Определяем разделитель, если строка не соответствует ожидаемому формату
+        val actualDelimiter = if (line.contains(config.delimiter)) {
+            config.delimiter
+        } else if (line.contains(',')) {
+            ','
+        } else if (line.contains(';')) {
+            ';'
+        } else if (line.contains('\t')) {
+            '\t'
+        } else {
+            config.delimiter // Используем настроенный разделитель по умолчанию
+        }
+
+        val columns = line.split(actualDelimiter).map { it.trim().removeSurrounding("\"") }
+
+        // Логируем информацию о разделителе и количестве колонок
+        Timber.d("[$bankName] Использован разделитель: '$actualDelimiter', найдено колонок: ${columns.size}")
+
         if (columns.size < config.expectedMinColumnCount) {
             Timber.w(
                 "[$bankName] ${context.getString(
@@ -135,11 +154,32 @@ class GenericCsvImportUseCase(
             }
         }
         try {
-            val dateString = columns.getOrNull(config.dateColumnIndex) ?: run {
+            // Пытаемся найти колонку с датой
+            var dateColumnIndex = config.dateColumnIndex
+            var dateString = columns.getOrNull(dateColumnIndex)
+
+            // Если дата не найдена или не похожа на дату, пробуем найти колонку с датой
+            if (dateString == null || !isLikelyDate(dateString)) {
+                Timber.w("[$bankName] Дата не найдена в колонке $dateColumnIndex или не похожа на дату: '$dateString'")
+
+                // Пробуем найти колонку, которая выглядит как дата
+                for (i in columns.indices) {
+                    val value = columns[i]
+                    if (isLikelyDate(value)) {
+                        dateColumnIndex = i
+                        dateString = value
+                        Timber.d("[$bankName] Найдена колонка с датой: $dateColumnIndex, значение: '$dateString'")
+                        break
+                    }
+                }
+            }
+
+            // Если дата всё равно не найдена, возвращаем null
+            if (dateString == null || !isLikelyDate(dateString)) {
                 Timber.e(
                     "[$bankName] ${context.getString(
                         R.string.csv_date_not_found,
-                        config.dateColumnIndex,
+                        dateColumnIndex,
                         line,
                     )}",
                 )
@@ -158,20 +198,63 @@ class GenericCsvImportUseCase(
                 )
                 return null
             }
+
+            // Очистка суммы от нецифровых символов, кроме разделителей
             config.amountCharsToRemoveRegex?.let { regex ->
                 amountString = regex.replace(amountString, "")
             } ?: run {
+                // Сначала сохраняем знак, если он есть
+                val isNegative = amountString.contains("-")
+
+                // Очищаем от всех символов, кроме цифр и разделителей
                 amountString = amountString.replace("[^0-9.,\\-\\s]".toRegex(), "")
+
+                // Удаляем пробелы
+                amountString = amountString.replace("\\s".toRegex(), "")
+
+                // Если была отрицательная сумма, но знак потерялся, восстанавливаем
+                if (isNegative && !amountString.contains("-")) {
+                    amountString = "-$amountString"
+                }
             }
-            amountString = amountString.replace("\\s".toRegex(), "")
+
+            // Обработка разделителей
             if (config.amountDecimalSeparator != '.') {
                 amountString = amountString.replace(config.amountDecimalSeparator, '.')
             }
+
+            // Определение валюты
             val currencyString = config.currencyColumnIndex?.let { index ->
                 columns.getOrNull(index)?.takeIf { it.isNotBlank() }
             } ?: config.defaultCurrencyCode
+
+            Timber.d("[$bankName] Обработанная строка суммы: '$amountString', валюта: '$currencyString'")
             val transactionDate = try {
-                config.dateFormat.parse(dateString)
+                // Пробуем парсить дату с использованием нескольких распространенных форматов
+                val dateFormats = listOf(
+                    config.dateFormat, // Сначала пробуем формат из конфига
+                    SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", config.locale),
+                    SimpleDateFormat("yyyy-MM-dd", config.locale),
+                    SimpleDateFormat("dd.MM.yyyy", config.locale),
+                    SimpleDateFormat("dd.MM.yyyy HH:mm:ss", config.locale),
+                    SimpleDateFormat("yyyy/MM/dd", config.locale),
+                    SimpleDateFormat("MM/dd/yyyy", config.locale),
+                )
+
+                var parsedDate: Date? = null
+                for (format in dateFormats) {
+                    try {
+                        parsedDate = format.parse(dateString)
+                        if (parsedDate != null) {
+                            Timber.d("[$bankName] Успешно распарсили дату '$dateString' с форматом '${format.toPattern()}'")
+                            break
+                        }
+                    } catch (e: Exception) {
+                        // Просто пробуем следующий формат
+                    }
+                }
+
+                parsedDate ?: throw Exception("Не удалось распарсить дату ни одним из доступных форматов")
             } catch (e: Exception) {
                 Timber.e(
                     e,
@@ -251,6 +334,23 @@ class GenericCsvImportUseCase(
             return true
         }
         return false
+    }
+
+    /**
+     * Проверяет, похожа ли строка на дату
+     */
+    private fun isLikelyDate(value: String): Boolean {
+        // Проверяем наличие типичных разделителей дат
+        val hasDateSeparators = value.contains("-") || value.contains("/") || value.contains(".")
+
+        // Проверяем, содержит ли строка цифры (должно быть не менее 4 цифр для года)
+        val digitCount = value.count { it.isDigit() }
+
+        // Проверяем, не является ли строка просто числом (ID, сумма и т.д.)
+        val isJustNumber = value.trim().all { it.isDigit() || it == '.' || it == ',' || it == '-' }
+
+        // Строка похожа на дату, если в ней есть разделители дат, достаточно цифр и она не просто число
+        return hasDateSeparators && digitCount >= 4 && !isJustNumber
     }
 
     // importTransactions(uri, progressCallback) не переопределяем — базовая реализация BankImportUseCase подходит для CSV

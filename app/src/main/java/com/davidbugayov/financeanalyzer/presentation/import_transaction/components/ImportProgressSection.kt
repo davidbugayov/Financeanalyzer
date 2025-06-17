@@ -1,0 +1,157 @@
+package com.davidbugayov.financeanalyzer.presentation.import_transaction.components
+
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Sync
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.Icon
+import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.res.dimensionResource
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
+import com.davidbugayov.financeanalyzer.R
+
+/**
+ * Компонент для отображения прогресса импорта
+ */
+@Composable
+fun ImportProgressSection(
+    progress: Int,
+    message: String,
+    modifier: Modifier = Modifier,
+) {
+    // Создаем бесконечную анимацию вращения
+    val infiniteTransition = rememberInfiniteTransition(label = "rotate")
+    val rotation = infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(2000, easing = LinearEasing),
+            repeatMode = RepeatMode.Restart,
+        ),
+        label = "rotation",
+    )
+
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(bottom = dimensionResource(R.dimen.space_medium)),
+    ) {
+        Text(
+            text = stringResource(R.string.import_results),
+            style = MaterialTheme.typography.titleLarge,
+            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(R.dimen.space_medium)),
+            textAlign = TextAlign.Center,
+        )
+
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            colors = CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
+            elevation = CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.card_elevation),
+            ),
+        ) {
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.space_medium)),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                Text(
+                    text = stringResource(R.string.importing_file),
+                    style = MaterialTheme.typography.titleMedium,
+                    color = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.space_medium)),
+                )
+
+                // Прогресс-бар в красивой карточке
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.primaryContainer,
+                    ),
+                    shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
+                ) {
+                    Column(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(dimensionResource(R.dimen.space_medium)),
+                        horizontalAlignment = Alignment.CenterHorizontally,
+                    ) {
+                        LinearProgressIndicator(
+                            progress = { progress / 100f },
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .height(dimensionResource(R.dimen.import_progress_indicator_height)),
+                            color = MaterialTheme.colorScheme.primary,
+                            trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f),
+                        )
+
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
+
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.Center,
+                            verticalAlignment = Alignment.CenterVertically,
+                        ) {
+                            // Вращающаяся иконка синхронизации
+                            Icon(
+                                imageVector = Icons.Rounded.Sync,
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onPrimaryContainer,
+                                modifier = Modifier
+                                    .size(dimensionResource(R.dimen.import_icon_size))
+                                    .graphicsLayer {
+                                        rotationZ = rotation.value
+                                    },
+                            )
+
+                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.space_medium)))
+
+                            Text(
+                                text = stringResource(R.string.progress_percentage, progress),
+                                style = MaterialTheme.typography.titleLarge,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                            )
+                        }
+                    }
+                }
+
+                Text(
+                    text = message,
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.space_medium)),
+                    textAlign = TextAlign.Center,
+                )
+            }
+        }
+    }
+}

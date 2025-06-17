@@ -44,20 +44,6 @@ object PermissionUtils {
         }
     }
 
-    /**
-     * Создает и возвращает лаунчер для запроса разрешений на уведомления
-     *
-     * @param onPermissionResult Функция обратного вызова, которая будет вызвана с результатом запроса
-     * @return Composable функция, которая возвращает лаунчер для запроса разрешений
-     */
-    @Composable
-    fun rememberNotificationPermissionLauncher(onPermissionResult: (Boolean) -> Unit): ActivityResultLauncher<String> {
-        val launcher = rememberLauncherForActivityResult(
-            ActivityResultContracts.RequestPermission(),
-            onPermissionResult,
-        )
-        return remember { launcher }
-    }
 
     /**
      * Открывает системные настройки уведомлений для приложения.
@@ -89,10 +75,29 @@ object PermissionUtils {
      * @return true, если разрешение предоставлено
      */
     fun hasReadExternalStoragePermission(context: Context): Boolean {
-        return ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.READ_EXTERNAL_STORAGE,
-        ) == PackageManager.PERMISSION_GRANTED
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                // Android 14+ (API 34)
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED,
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                // Android 13 (API 33)
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_MEDIA_IMAGES,
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+            else -> {
+                // Android 12 и ниже
+                ContextCompat.checkSelfPermission(
+                    context,
+                    Manifest.permission.READ_EXTERNAL_STORAGE,
+                ) == PackageManager.PERMISSION_GRANTED
+            }
+        }
     }
 
     /**
@@ -101,7 +106,20 @@ object PermissionUtils {
      * @return Строка с необходимым разрешением
      */
     fun getReadStoragePermission(): String {
-        return Manifest.permission.READ_EXTERNAL_STORAGE
+        return when {
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE -> {
+                // Android 14+ (API 34)
+                Manifest.permission.READ_MEDIA_VISUAL_USER_SELECTED
+            }
+            Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU -> {
+                // Android 13 (API 33)
+                Manifest.permission.READ_MEDIA_IMAGES
+            }
+            else -> {
+                // Android 12 и ниже
+                Manifest.permission.READ_EXTERNAL_STORAGE
+            }
+        }
     }
 
     /**

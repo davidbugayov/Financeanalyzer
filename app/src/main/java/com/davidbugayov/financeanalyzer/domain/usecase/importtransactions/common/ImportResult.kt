@@ -1,5 +1,7 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 
+import androidx.lifecycle.MutableLiveData
+
 /**
  * Класс, представляющий результат операции импорта транзакций.
  * Может содержать информацию об успехе, прогрессе или ошибке.
@@ -45,6 +47,12 @@ sealed class ImportResult {
     companion object {
 
         /**
+         * LiveData для прямой передачи результата импорта.
+         * Используется для обхода проблем с реактивностью Flow.
+         */
+        val directResultLiveData = MutableLiveData<Success?>()
+
+        /**
          * Создает объект ошибки с указанным сообщением.
          *
          * @param message Сообщение об ошибке
@@ -73,7 +81,10 @@ sealed class ImportResult {
          * @return Объект успеха
          */
         fun success(importedCount: Int, skippedCount: Int, message: String = ""): Success {
-            return Success(importedCount, skippedCount, message)
+            val result = Success(importedCount, skippedCount, message)
+            // Отправляем результат через LiveData для гарантированного обновления UI
+            directResultLiveData.postValue(result)
+            return result
         }
 
         /**

@@ -8,6 +8,12 @@
         android:maxSdkVersion="28" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"
         android:maxSdkVersion="32" />
+  <!-- Разрешения для Android 13+ -->
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_VIDEO"/>
+  <uses-permission android:name="android.permission.READ_MEDIA_AUDIO"/>
+  <!-- Разрешение для Android 14+ -->
+  <uses-permission android:name="android.permission.READ_MEDIA_VISUAL_USER_SELECTED"/>
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
     <uses-permission android:name="android.permission.USE_EXACT_ALARM" />
@@ -57,8 +63,8 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
-            
-            <!-- Обработка deep links для ярлыков -->
+
+          <!-- Обработка deep links для ярлыков -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
@@ -70,8 +76,8 @@
                 android:name="android.app.shortcuts"
                 android:resource="@xml/shortcuts" />
         </activity>
-        
-        <!-- Объявление виджета баланса -->
+
+      <!-- Объявление виджета баланса -->
         <receiver
             android:name=".widget.BalanceWidget"
             android:exported="false">
@@ -82,8 +88,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/balance_widget_info" />
         </receiver>
-        
-        <!-- Маленький виджет баланса -->
+
+      <!-- Маленький виджет баланса -->
         <receiver
             android:name=".widget.SmallBalanceWidget"
             android:exported="false">
@@ -94,8 +100,8 @@
                 android:name="android.appwidget.provider"
                 android:resource="@xml/small_balance_widget_info" />
         </receiver>
-        
-        <!-- BroadcastReceiver для уведомлений о транзакциях -->
+
+      <!-- BroadcastReceiver для уведомлений о транзакциях -->
         <receiver
             android:name=".utils.TransactionReminderReceiver"
             android:exported="false">

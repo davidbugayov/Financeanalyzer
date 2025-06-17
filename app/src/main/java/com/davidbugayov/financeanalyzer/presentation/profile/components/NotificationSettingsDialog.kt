@@ -39,8 +39,8 @@ import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
-import timber.log.Timber
 import java.util.Locale
+import timber.log.Timber
 
 /**
  * Диалог настройки уведомлений о транзакциях.
@@ -96,16 +96,18 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
         )
     }
 
-    PermissionDialogs(
-        show = showPermissionDialog,
-        onDismiss = { showPermissionDialog = false },
-        onPermissionGranted = {
-            showPermissionDialog = false
-            hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
-            viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
-        },
-        onPermissionDenied = { showPermissionDialog = false },
-    )
+    if (showPermissionDialog) {
+        PermissionDialogs.RationalePermissionDialog(
+            titleResId = R.string.permission_required_title,
+            messageResId = R.string.notification_permission_required,
+            onConfirm = {
+                showPermissionDialog = false
+                hasNotificationPermission = PermissionUtils.hasNotificationPermission(context)
+                viewModel.onEvent(ProfileEvent.ChangeNotifications(true))
+            },
+            onDismiss = { showPermissionDialog = false },
+        )
+    }
 
     Dialog(
         onDismissRequest = onDismiss,

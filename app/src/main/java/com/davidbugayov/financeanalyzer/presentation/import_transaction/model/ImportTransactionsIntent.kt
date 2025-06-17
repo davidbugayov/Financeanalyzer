@@ -3,23 +3,23 @@ package com.davidbugayov.financeanalyzer.presentation.import_transaction.model
 import android.net.Uri
 
 /**
- * Набор интентов для экрана ImportTransactions.
- * Следует принципам MVI и Clean Architecture.
+ * Намерения пользователя для экрана импорта транзакций.
+ * Используется в рамках паттерна MVI (Model-View-Intent).
  */
 sealed class ImportTransactionsIntent {
     /**
-     * Интент для начала импорта транзакций из выбранного файла.
-     * @param uri URI выбранного файла для импорта
+     * Намерение начать импорт транзакций из указанного файла.
+     * @param uri URI файла для импорта
      */
     data class StartImport(val uri: Uri) : ImportTransactionsIntent()
 
     /**
-     * Интент для обновления логов импорта.
+     * Намерение обновить логи импорта.
      */
-    data object RefreshLogs : ImportTransactionsIntent()
+    object RefreshLogs : ImportTransactionsIntent()
 
     /**
-     * Интент для сброса состояния импорта.
+     * Намерение сбросить состояние импорта.
      */
-    data object ResetState : ImportTransactionsIntent()
+    object ResetState : ImportTransactionsIntent()
 }
