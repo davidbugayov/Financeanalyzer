@@ -25,6 +25,7 @@ import timber.log.Timber
  * Управляет процессом импорта и состоянием UI.
  * Использует паттерн MVI (Model-View-Intent).
  */
+@Suppress("USELESS_IS_CHECK")
 class ImportTransactionsViewModel(
     private val importTransactionsUseCase: ImportTransactionsUseCase,
     application: Application,
@@ -114,21 +115,19 @@ class ImportTransactionsViewModel(
                 }.collect { result ->
                     when (result) {
                         is CoreResult.Success<*> -> {
-                            // Безопасное преобразование без проверки типа
-                            @Suppress("USELESS_IS_CHECK")
+                            // Безопасное извлечение данных без проверки типа
                             val data = result.data
-
-                            // Извлекаем значения из данных
-                            val (importedCount, skippedCount) = try {
-                                // Попытка безопасного преобразования
-                                @Suppress("UNCHECKED_CAST", "USELESS_IS_CHECK")
-                                val pair = data as? Pair<*, *>
-                                val imported = (pair?.first as? Number)?.toInt() ?: 0
-                                val skipped = (pair?.second as? Number)?.toInt() ?: 0
-                                Pair(imported, skipped)
-                            } catch (e: ClassCastException) {
-                                Timber.w("Ошибка преобразования данных: ${e.message}")
-                                Pair(0, 0)
+                            
+                            // Извлекаем значения из данных напрямую
+                            var importedCount = 0
+                            var skippedCount = 0
+                            
+                            // Попытка безопасного извлечения значений
+                            if (data is Pair<*, *>) {
+                                importedCount = (data.first as? Number)?.toInt() ?: 0
+                                skippedCount = (data.second as? Number)?.toInt() ?: 0
+                            } else {
+                                Timber.w("Данные не являются Pair: ${data?.javaClass?.simpleName}")
                             }
 
                             val successMessage = "Импорт успешно завершен. " +
