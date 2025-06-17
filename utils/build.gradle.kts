@@ -3,6 +3,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
+    alias(libs.plugins.compose.compiler)
 }
 
 android {
@@ -38,12 +39,23 @@ android {
             "-Xcontext-receivers",
         )
     }
+
+    buildFeatures {
+        compose = true
+    }
+
+    @Suppress("UnstableApiUsage")
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
+    }
 }
 
 dependencies {
     // Modules
     implementation(project(":domain"))
     implementation(project(":core"))
+    implementation(project(":navigation"))
+    implementation(project(":ui"))
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
@@ -55,6 +67,16 @@ dependencies {
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
     testImplementation(libs.junit)
+
+    // Compose
+    implementation(platform(libs.compose.bom))
+    implementation(libs.compose.ui)
+    implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
+    implementation(libs.compose.material3)
+    implementation(libs.compose.foundation)
+    implementation(libs.compose.runtime)
+    debugImplementation(libs.compose.ui.tooling)
 
     // Koin
     implementation(libs.koin.android)

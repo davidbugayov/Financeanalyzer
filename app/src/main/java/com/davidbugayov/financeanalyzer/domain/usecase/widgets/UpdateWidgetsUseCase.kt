@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.usecase.widgets
+package com.davidbugayov.financeanalyzer.domain.usecase.widgets
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName

@@ -46,7 +46,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
@@ -57,14 +57,14 @@ import com.davidbugayov.financeanalyzer.ui.theme.IncomeColorLight
 import com.davidbugayov.financeanalyzer.ui.theme.TransferColorDark
 import com.davidbugayov.financeanalyzer.ui.theme.TransferColorLight
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import kotlinx.coroutines.delay
 import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Locale
+import kotlinx.coroutines.delay
 
 object Formatters {
 
-    fun formatAmount(money: Money, includeSign: Boolean = false, useMinimalDecimals: Boolean = false, showCurrency: Boolean = true): String {
+    fun formatAmount(money: Money, useMinimalDecimals: Boolean = false, showCurrency: Boolean = true): String {
         return money.formatForDisplay(showCurrency = showCurrency, useMinimalDecimals = useMinimalDecimals)
     }
 }
@@ -181,13 +181,11 @@ fun TransactionItem(
             // For transfers, display absolute amount, sign logic might be inherent or not needed
             Formatters.formatAmount(
                 moneyAmount.abs(),
-                includeSign = false,
                 useMinimalDecimals = true,
             )
         } else {
             prefix + Formatters.formatAmount(
                 moneyAmount.abs(),
-                includeSign = false,
                 useMinimalDecimals = true,
             )
         }

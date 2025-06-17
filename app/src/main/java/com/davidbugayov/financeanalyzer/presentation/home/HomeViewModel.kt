@@ -10,14 +10,16 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanc
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
-import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.navigation.Screen
+
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
+import java.util.Calendar
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,7 +29,6 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
-import java.util.Calendar
 
 /**
  * ViewModel для главного экрана.
@@ -187,16 +188,7 @@ class HomeViewModel(
                     NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(event.transaction.id)),
                 )
             }
-            // Commenting out this block as NotificationScheduler.updateTransactionReminder is not static
-            // and HomeViewModel should likely not be managing this directly.
-            // is HomeEvent.ChangeNotifications -> {
-            //     if (event.enabled && context != null) {
-            //         NotificationScheduler.updateTransactionReminder(context, true)
-            //     }
-            // }
-            else -> {
-                Timber.w("Unhandled HomeEvent: $event")
-            }
+            else -> {}
         }
     }
 
@@ -278,33 +270,6 @@ class HomeViewModel(
      * Инициирует фоновую загрузку данных
      * Обновляет данные в фоне, не блокируя UI
      */
-    private var lastBackgroundRefreshTime = 0L
-    private var isBackgroundRefreshInProgress = false
-
-    fun initiateBackgroundDataRefresh() {
-        // Защита от слишком частых вызовов
-        val currentTime = System.currentTimeMillis()
-        if (currentTime - lastBackgroundRefreshTime < 1000 || isBackgroundRefreshInProgress) {
-            Timber.d("Пропускаем фоновое обновление - слишком частый вызов или обновление уже идет")
-            return
-        }
-
-        viewModelScope.launch {
-            try {
-                isBackgroundRefreshInProgress = true
-                lastBackgroundRefreshTime = currentTime
-
-                Timber.d("Инициирована фоновая загрузка метрик (без перезагрузки транзакций)")
-
-                financialMetrics.recalculateStats()
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при фоновом обновлении метрик")
-            } finally {
-                isBackgroundRefreshInProgress = false
-            }
-        }
-    }
-
     private fun loadTransactions() {
         viewModelScope.launch {
             _state.update { it.copy(isLoading = true) }
@@ -537,7 +502,7 @@ class HomeViewModel(
 
             // Форматируем дату для отображения в UI
             val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
-            val dateString = dateFormat.format(date)
+            dateFormat.format(date)
 
             // Вычисляем общий баланс (доходы - расходы)
             val balance = income - expense
@@ -601,23 +566,5 @@ class HomeViewModel(
         }
         val startDate = startCalendar.time
         return Pair(startDate, endDate)
-    }
-
-    fun onAddTransactionClicked() {
-        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.route))
-    }
-
-    fun onTransactionClicked(transactionId: String) {
-        navigationManager.navigate(
-            NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(transactionId)),
-        )
-    }
-
-    fun onNavigateToProfile() {
-        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.Profile.route))
-    }
-
-    fun onNavigateToHistory() {
-        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.History.route))
     }
 }

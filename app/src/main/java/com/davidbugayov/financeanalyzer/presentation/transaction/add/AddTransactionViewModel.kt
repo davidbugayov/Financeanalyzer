@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.add
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import android.app.Application
 import android.content.Context
@@ -7,15 +6,16 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
-import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
@@ -187,7 +187,6 @@ class AddTransactionViewModel(
                             isSuccess = true,
                         )
                     }
-                    navigationManager.navigate(NavigationManager.Command.NavigateUp)
                 } else if (result is CoreResult.Error) {
                     _state.update {
                         it.copy(

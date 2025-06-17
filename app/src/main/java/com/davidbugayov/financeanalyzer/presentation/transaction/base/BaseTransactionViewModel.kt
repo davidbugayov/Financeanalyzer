@@ -1,5 +1,4 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.base
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import android.app.Application
 import android.content.res.Resources
@@ -9,6 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.data.preferences.SourceUsagePreferences
@@ -19,6 +19,8 @@ import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalanc
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
+import java.math.BigDecimal
+import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -27,8 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.objecthunter.exp4j.ExpressionBuilder
 import timber.log.Timber
-import java.math.BigDecimal
-import java.util.Date
 
 abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransactionEvent>(
     protected val categoriesViewModel: CategoriesViewModel,
@@ -523,6 +523,55 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
 
+            is BaseTransactionEvent.ToggleTransactionType -> {
+                Timber.d(
+                    "ТРАНЗАКЦИЯ: Переключение типа транзакции с %b на %b",
+                    _state.value.isExpense,
+                    !_state.value.isExpense,
+                )
+
+                _state.update {
+                    copyState(
+                        it,
+                        isExpense = !it.isExpense,
+                        category = "", // Сбрасываем категорию при смене типа
+                    )
+                }
+
+                // Устанавливаем категорию по умолчанию для нового типа транзакции
+                val isExpense = _state.value.isExpense
+                val categories = if (isExpense) {
+                    _state.value.expenseCategories
+                } else {
+                    _state.value.incomeCategories
+                }
+
+                if (categories.isNotEmpty()) {
+                    val defaultCategory = categories.first().name
+                    _state.update {
+                        copyState(it, category = defaultCategory)
+                    }
+                }
+
+                Timber.d(
+                    "ТРАНЗАКЦИЯ: После переключения типа - isExpense=%b, category=%s",
+                    _state.value.isExpense,
+                    _state.value.category,
+                )
+            }
+
+            is BaseTransactionEvent.ResetFieldsForNewTransaction -> {
+                Timber.d("ТРАНЗАКЦИЯ: Сброс полей суммы и примечания")
+                _state.update { state ->
+                    copyState(
+                        state,
+                        amount = "",
+                        amountError = false,
+                        note = "", // Сбрасываем также поле примечания
+                    )
+                }
+            }
+
             is BaseTransactionEvent.HideDeleteSourceConfirmDialog -> _state.update { state ->
                 copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
             }
@@ -793,31 +842,26 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         }
     }
 
-    // --- Универсальные методы для настройки и сброса состояния ---
-    open fun setupForExpenseAddition(amount: String, walletCategory: String, context: android.content.Context) {
-        _state.update { state ->
-            copyState(
-                state,
-                amount = amount,
-                category = walletCategory,
-                targetWalletId = state.targetWalletId,
-                selectedWallets = state.selectedWallets,
-                addToWallet = state.addToWallet,
-            )
-        }
-        handleBaseEvent(BaseTransactionEvent.ForceSetExpenseType, context)
-    }
-
     /**
      * Универсальный парсер арифметических выражений для суммы, возвращает Money
      * @param expr строка с выражением
      * @param currency валюта (по умолчанию RUB)
      */
     protected fun parseMoneyExpression(expr: String, currency: Currency = Currency.RUB): Money {
-        var processedExpr = expr.replace(",", ".")
+        // Если входная строка пустая, сразу возвращаем 0
+        if (expr.isBlank()) {
+            Timber.d("parseMoneyExpression: исходное выражение пустое, возвращаем 0")
+            return Money(BigDecimal.ZERO, currency)
+        }
+
+        // Удаляем все пробелы из строки
+        var processedExpr = expr.replace(" ", "")
+
+        // Заменяем запятые на точки для корректной обработки десятичных чисел
+        processedExpr = processedExpr.replace(",", ".")
 
         Timber.d(
-            "parseMoneyExpression: исходное выражение: '$expr', обработанное: '$processedExpr'",
+            "parseMoneyExpression: исходное выражение: '$expr', после удаления пробелов и замены запятых: '$processedExpr'",
         )
 
         // Удаляем "висячий" оператор в конце строки, если он есть
@@ -844,16 +888,53 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             return Money(BigDecimal.ZERO, currency)
         }
 
-        return try {
-            val resNum = ExpressionBuilder(processedExpr).build().evaluate()
-            val result = Money(BigDecimal.valueOf(resNum), currency)
-            Timber.d("parseMoneyExpression: успешно вычислено, результат: $result")
-            result
-        } catch (e: Exception) {
-            // Если даже после очистки выражение некорректно, возвращаем 0
-            Timber.e(e, "parseMoneyExpression: ошибка вычисления выражения '$processedExpr'")
-            Money(BigDecimal.ZERO, currency)
+        // Проверяем, содержит ли строка только числа и десятичную точку (без операторов)
+        val isSimpleNumber = processedExpr.matches(Regex("^-?\\d+(\\.\\d+)?$"))
+        if (isSimpleNumber) {
+            try {
+                val simpleNumber = BigDecimal(processedExpr)
+                val result = Money(simpleNumber, currency)
+                Timber.d("parseMoneyExpression: обработано как простое число: $result")
+                return result
+            } catch (e: NumberFormatException) {
+                Timber.e(e, "parseMoneyExpression: ошибка при парсинге простого числа: '$processedExpr'")
+                // Если не удалось обработать как простое число, вернем 0
+                return Money(BigDecimal.ZERO, currency)
+            }
         }
+
+        // Проверяем, содержит ли строка операторы и является математическим выражением
+        val containsPlus = processedExpr.contains('+')
+        val containsMinus =
+            processedExpr.indexOf('-', 1) != -1 // Исключаем первый символ (может быть отрицательное число)
+        val containsMultiply = processedExpr.contains('*')
+        val containsDivide = processedExpr.contains('/')
+        val containsOperators = containsPlus || containsMinus || containsMultiply || containsDivide
+
+        if (containsOperators) {
+            try {
+                // Дополнительная проверка на валидность выражения
+                // Удаляем все недопустимые символы, кроме цифр, точек и операторов
+                val cleanedExpr = processedExpr.replace(Regex("[^0-9.+\\-*/]"), "")
+
+                if (cleanedExpr != processedExpr) {
+                    Timber.d("parseMoneyExpression: выражение содержало недопустимые символы, очищено: '$cleanedExpr'")
+                    processedExpr = cleanedExpr
+                }
+
+                val resNum = ExpressionBuilder(processedExpr).build().evaluate()
+                val result = Money(BigDecimal.valueOf(resNum), currency)
+                Timber.d("parseMoneyExpression: успешно вычислено как выражение, результат: $result")
+                return result
+            } catch (e: Exception) {
+                Timber.e(e, "parseMoneyExpression: ошибка вычисления выражения '$processedExpr', возвращаем 0")
+                return Money(BigDecimal.ZERO, currency)
+            }
+        }
+
+        // Если не удалось распознать ни как число, ни как выражение, возвращаем 0
+        Timber.e("parseMoneyExpression: не удалось распознать ни как число, ни как выражение: '$processedExpr', возвращаем 0")
+        return Money(BigDecimal.ZERO, currency)
     }
 
     /**

@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.utils
 
 import android.Manifest
+import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -158,7 +159,7 @@ object PermissionUtils {
      */
     fun shouldShowSettingsDialog(context: Context): Boolean {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            val activity = context as? android.app.Activity ?: return false
+            val activity = context as? Activity ?: return false
             val hasPermission = hasNotificationPermission(context)
             val shouldShowRationale = ActivityCompat.shouldShowRequestPermissionRationale(
                 activity,

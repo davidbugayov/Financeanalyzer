@@ -4,7 +4,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.net.Uri
-import android.os.Build
 import android.provider.Settings
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -43,9 +42,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
@@ -58,6 +57,7 @@ import kotlinx.coroutines.delay
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+
 /**
  * Экран импорта транзакций.
  * Использует паттерн MVI (Model-View-Intent) для взаимодействия с ViewModel.
@@ -94,7 +94,7 @@ fun ImportTransactionsScreen(
     }
 
     // На Android 15 используем GetContent напрямую
-    val getContentLauncher = rememberLauncherForActivityResult(
+    rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
     ) { selectedUri ->
         if (selectedUri != null) {
@@ -219,22 +219,18 @@ fun ImportTransactionsScreen(
                 // Кнопка выбора файла
                 Button(
                     onClick = {
-                        if (Build.VERSION.SDK_INT >= 35) {
-                            getContentLauncher.launch("*/*")
+                        // Проверяем разрешение на чтение файлов
+                        if (PermissionUtils.hasReadExternalStoragePermission(context)) {
+                            filePickerLauncher.launch(
+                                arrayOf(
+                                    "text/csv",
+                                    "application/pdf",
+                                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                                ),
+                            )
                         } else {
-                            // Проверяем разрешение на чтение файлов
-                            if (PermissionUtils.hasReadExternalStoragePermission(context)) {
-                                filePickerLauncher.launch(
-                                    arrayOf(
-                                        "text/csv",
-                                        "application/pdf",
-                                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                                    ),
-                                )
-                            } else {
-                                // Запрашиваем разрешение
-                                permissionLauncher.launch(PermissionUtils.getReadStoragePermission())
-                            }
+                            // Запрашиваем разрешение
+                            permissionLauncher.launch(PermissionUtils.getReadStoragePermission())
                         }
                     },
                     modifier = Modifier
@@ -284,11 +280,31 @@ fun ImportInstructions() {
 
 @Composable
 fun BanksList(onBankClick: (String) -> Unit) {
-    // Implementation for banks list
-    Text(
-        text = "Поддерживаемые банки: Сбербанк, Тинькофф, Альфа-Банк, Озон",
-        style = MaterialTheme.typography.bodyMedium,
-    )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(8.dp),
+    ) {
+        Text(
+            text = "Поддерживаемые банки:",
+            style = MaterialTheme.typography.bodyMedium,
+        )
+
+        // List of supported banks
+        val banks = listOf("Сбербанк", "Тинькофф", "Альфа-Банк", "Озон")
+
+        banks.forEach { bank ->
+            Button(
+                onClick = { onBankClick(bank) },
+                modifier = Modifier.fillMaxWidth(),
+                colors = ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.secondaryContainer,
+                    contentColor = MaterialTheme.colorScheme.onSecondaryContainer,
+                ),
+            ) {
+                Text(bank)
+            }
+        }
+    }
 }
 
 @Composable
@@ -337,7 +353,7 @@ fun openApplicationSettings(context: Context) {
     }
     try {
         context.startActivity(intent)
-    } catch (e: Exception) {
-        Timber.e(e, "Failed to open application settings")
+    } catch (exception: Exception) {
+        Timber.e(exception, "Failed to open application settings")
     }
 }

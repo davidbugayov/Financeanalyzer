@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
-import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
-import com.davidbugayov.financeanalyzer.core.model.Money
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -60,28 +59,25 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
-import org.koin.androidx.compose.koinViewModel
-import timber.log.Timber
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import org.koin.androidx.compose.koinViewModel
+import timber.log.Timber
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun BudgetScreen(
     viewModel: BudgetViewModel = koinViewModel(),
-    achievementsUiViewModel: com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel =
-        koinViewModel(),
-    addTransactionViewModel: AddTransactionViewModel = koinViewModel(
-        parameters = { org.koin.core.parameter.parametersOf(achievementsUiViewModel) },
-    ),
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -865,7 +861,7 @@ fun WalletCard(wallet: Wallet, onClick: () -> Unit) {
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
     val backgroundColor = remember(wallet.color, wallet.name, isDarkTheme) {
         wallet.color?.takeIf { it != 0 }?.let { Color(it) }
-            ?: com.davidbugayov.financeanalyzer.utils.ColorUtils.getSourceColorByName(wallet.name)
+            ?: ColorUtils.getSourceColorByName(wallet.name)
             ?: surfaceVariantColor
     }
     val contentColor = contentColorFor(backgroundColor)

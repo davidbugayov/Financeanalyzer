@@ -50,7 +50,7 @@ sealed class BaseTransactionEvent {
     data object SubmitEdit : BaseTransactionEvent()
     data object ForceSetIncomeType : BaseTransactionEvent()
     data object ForceSetExpenseType : BaseTransactionEvent()
-    data object ResetAmountOnly : BaseTransactionEvent()
+    data object ResetFieldsForNewTransaction : BaseTransactionEvent()
     data object PreventAutoSubmit : BaseTransactionEvent()
     data class SetExpenseCategory(val category: String) : BaseTransactionEvent()
     data class SetIncomeCategory(val category: String) : BaseTransactionEvent()

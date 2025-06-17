@@ -1,6 +1,8 @@
 package com.davidbugayov.financeanalyzer.utils
 
+import android.content.Context
 import androidx.compose.ui.graphics.Color
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
 import com.davidbugayov.financeanalyzer.ui.theme.BankAlfa
 import com.davidbugayov.financeanalyzer.ui.theme.BankGazprom
@@ -98,7 +100,7 @@ object ColorUtils {
         val cleanHex = if (hexColor.startsWith("#")) hexColor else "#$hexColor"
         return try {
             cleanHex.toColorInt()
-        } catch (e: IllegalArgumentException) {
+        } catch (_: IllegalArgumentException) {
             // Возвращаем черный цвет по умолчанию в случае ошибки
             0xFF000000.toInt()
         }
@@ -110,7 +112,7 @@ object ColorUtils {
      * Оставлена для возможного редкого использования, если нужно получить Int цвет из XML.
      */
     @Deprecated("Prefer defining colors in ui.theme.Color.kt for Compose.")
-    fun getIntColorFromXml(context: android.content.Context, resId: Int): Int {
-        return androidx.core.content.ContextCompat.getColor(context, resId)
+    fun getIntColorFromXml(context: Context, resId: Int): Int {
+        return ContextCompat.getColor(context, resId)
     }
 }

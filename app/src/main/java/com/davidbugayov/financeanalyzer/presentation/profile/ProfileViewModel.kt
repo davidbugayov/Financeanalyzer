@@ -1,34 +1,34 @@
 package com.davidbugayov.financeanalyzer.presentation.profile
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import java.io.File
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.flow.onEach
-import kotlinx.coroutines.flow.launchIn
 import timber.log.Timber
-import java.io.File
-import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
 
 class ProfileViewModel(
     private val exportTransactionsToCSVUseCase: ExportTransactionsToCSVUseCase,
@@ -172,16 +172,9 @@ class ProfileViewModel(
                 navigationManager.navigate(NavigationManager.Command.NavigateUp)
             }
             is ProfileEvent.Logout -> {
-                // TODO: Logout
+                // TODO: Implement logout functionality
             }
         }
-    }
-
-    private fun logLibrariesNavigation() {
-        AnalyticsUtils.logScreenView(
-            screenName = "libraries",
-            screenClass = "LibrariesScreen",
-        )
     }
 
     @Suppress("UNCHECKED_CAST", "USELESS_IS_CHECK")
@@ -204,13 +197,13 @@ class ProfileViewModel(
                             ExportAction.SHARE -> {
                                 val shareResult = exportTransactionsToCSVUseCase.shareCSVFile(filePath)
                                 if (shareResult is CoreResult.Success) {
-                                    // Обработка успешного шаринга
+                                    Timber.d("[ProfileViewModel] File shared successfully")
                                 }
                             }
                             ExportAction.OPEN -> {
                                 val openResult = exportTransactionsToCSVUseCase.openCSVFile(filePath)
                                 if (openResult is CoreResult.Success) {
-                                    // Обработка успешного открытия
+                                    Timber.d("[ProfileViewModel] File opened successfully")
                                 }
                             }
                             ExportAction.SAVE_ONLY -> {
@@ -232,10 +225,10 @@ class ProfileViewModel(
                         }
                     }
                 }
-            } catch (e: Exception) {
+            } catch (exception: Exception) {
                 _state.update { currentState ->
                     currentState.copy(
-                        exportError = e.message ?: "Unknown export error",
+                        exportError = exception.message ?: "Unknown export error",
                         exportSuccess = null,
                         exportedFilePath = null,
                     )
@@ -277,8 +270,8 @@ class ProfileViewModel(
                         } else {
                             "Все время"
                         }
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при форматировании dateRange")
+                    } catch (exception: Exception) {
+                        Timber.e(exception, "Ошибка при форматировании dateRange")
                         "Все время"
                     }
 
@@ -327,12 +320,12 @@ class ProfileViewModel(
                         )
                     }
                 }
-            } catch (e: Exception) {
-                Timber.e(e, "[ProfileViewModel] Exception in loadFinancialAnalytics")
+            } catch (_: Exception) {
+                Timber.e("[ProfileViewModel] Exception in loadFinancialAnalytics")
                 _state.update { currentState ->
                     currentState.copy(
                         isLoading = false,
-                        error = e.message ?: "Неизвестная ошибка",
+                        error = "Неизвестная ошибка",
                     )
                 }
             }

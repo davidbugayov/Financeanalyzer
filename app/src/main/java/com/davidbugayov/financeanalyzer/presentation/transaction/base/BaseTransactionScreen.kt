@@ -610,7 +610,7 @@ fun <E> BaseTransactionScreen(
                                 context,
                             )
                             viewModel.onEvent(
-                                eventFactory(BaseTransactionEvent.ResetAmountOnly),
+                                eventFactory(BaseTransactionEvent.ResetFieldsForNewTransaction),
                                 context,
                             )
                         },

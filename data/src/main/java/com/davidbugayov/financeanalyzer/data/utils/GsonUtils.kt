@@ -22,7 +22,7 @@ object GsonUtils {
     fun fromJsonToStringList(gson: Gson, json: String): List<String> {
         return try {
             gson.fromJson<ArrayList<String>>(json, getStringListType())
-        } catch (e: Exception) {
+        } catch (_: Exception) {
             emptyList()
         }
     }
@@ -33,4 +33,4 @@ object GsonUtils {
     fun toJsonFromStringList(gson: Gson, list: List<String>): String {
         return gson.toJson(list, getStringListType())
     }
-} 
+}

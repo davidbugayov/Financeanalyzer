@@ -45,24 +45,22 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
-import org.koin.androidx.compose.koinViewModel
 import kotlin.experimental.ExperimentalTypeInference
+import org.koin.androidx.compose.koinViewModel
 
 @OptIn(ExperimentalTypeInference::class)
 @Composable
 fun WalletTransactionsScreen(
     walletId: String,
     viewModel: WalletTransactionsViewModel = koinViewModel(),
-    addTransactionViewModel: AddTransactionViewModel = koinViewModel(),
 ) {
-    val context = LocalContext.current
+    LocalContext.current
     // Загружаем данные для выбранного кошелька
     LaunchedEffect(walletId) {
         viewModel.onEvent(WalletTransactionsEvent.LoadWallet(walletId))

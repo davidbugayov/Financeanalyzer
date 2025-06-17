@@ -1,29 +1,31 @@
 package com.davidbugayov.financeanalyzer.presentation.history
-import com.davidbugayov.financeanalyzer.core.util.Result
 
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
 import com.davidbugayov.financeanalyzer.domain.model.filter.GroupingType as DomainGroupingType
+import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as DomainPeriodType
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
-import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
-import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.utils.DateUtils
+import java.math.BigDecimal
+import java.util.Calendar
+import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -34,14 +36,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.math.BigDecimal
-import java.util.Calendar
-import java.util.Date
 
-class TransactionHistoryViewModel constructor(
+class TransactionHistoryViewModel(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
-    private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val repository: TransactionRepository,
     val categoriesViewModel: CategoriesViewModel,
@@ -156,7 +154,7 @@ class TransactionHistoryViewModel constructor(
                 }
                 is Result.Error -> {
                     Timber.e(result.exception, "Failed to delete transaction")
-                    val errorMessage = result.exception?.message ?: "Unknown error"
+                    val errorMessage = result.exception.message ?: "Unknown error"
                     _state.update { it.copy(error = errorMessage) }
                 }
             }
@@ -213,8 +211,8 @@ class TransactionHistoryViewModel constructor(
                         val count = repository.getTransactionsCount()
                         Timber.d("Общее количество транзакций: $count")
                         count
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при получении количества транзакций: ${e.message}")
+                    } catch (exception: Exception) {
+                        Timber.e(exception, "Ошибка при получении количества транзакций: ${exception.message}")
                         0 // По умолчанию считаем, что транзакций нет
                     }
                 }
@@ -419,7 +417,7 @@ class TransactionHistoryViewModel constructor(
         viewModelScope.launch {
             try {
                 val currentState = _state.value
-                val periodType = currentState.periodType
+                currentState.periodType
                 val startDate = currentState.startDate
                 val endDate = currentState.endDate
                 val transactions = currentState.transactions

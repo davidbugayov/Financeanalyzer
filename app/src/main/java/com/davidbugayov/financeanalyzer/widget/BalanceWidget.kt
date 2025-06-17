@@ -1,5 +1,5 @@
 package com.davidbugayov.financeanalyzer.widget
-import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
@@ -10,6 +10,7 @@ import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.fold
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers

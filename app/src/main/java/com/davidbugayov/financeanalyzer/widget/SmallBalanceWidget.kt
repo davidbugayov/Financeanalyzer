@@ -1,16 +1,16 @@
 package com.davidbugayov.financeanalyzer.widget
-import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
+
 import android.app.PendingIntent
 import android.appwidget.AppWidgetManager
 import android.appwidget.AppWidgetProvider
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import android.os.Build
 import android.widget.RemoteViews
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.fold
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.LoadTransactionsUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -59,21 +59,13 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
             )
 
             // Создаем PendingIntent для запуска приложения
-            val pendingIntent = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            val pendingIntent =
                 PendingIntent.getActivity(
                     context,
                     1, // Используем другой requestCode, чтобы не конфликтовать с основным виджетом
                     launchAppIntent,
                     PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
                 )
-            } else {
-                PendingIntent.getActivity(
-                    context,
-                    1,
-                    launchAppIntent,
-                    PendingIntent.FLAG_UPDATE_CURRENT,
-                )
-            }
 
             // Устанавливаем обработчик нажатия на весь виджет
             views.setOnClickPendingIntent(R.id.small_widget_container, pendingIntent)

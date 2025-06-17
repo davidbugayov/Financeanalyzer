@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.core.extensions
+package com.davidbugayov.financeanalyzer.core.util
 
 import com.davidbugayov.financeanalyzer.core.model.Money
 import java.math.BigDecimal

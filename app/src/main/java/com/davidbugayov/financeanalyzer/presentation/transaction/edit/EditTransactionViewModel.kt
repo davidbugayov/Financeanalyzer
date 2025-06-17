@@ -1,32 +1,32 @@
 package com.davidbugayov.financeanalyzer.presentation.transaction.edit
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
-import com.davidbugayov.financeanalyzer.core.extensions.formatForDisplay
-import com.davidbugayov.financeanalyzer.core.model.Money
 import android.app.Application
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionByIdUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
-import com.davidbugayov.financeanalyzer.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.model.EditTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.validation.ValidationBuilder
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import java.math.BigDecimal
+import java.util.Date
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.Date
-import java.math.BigDecimal
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -534,12 +534,12 @@ class EditTransactionViewModel(
         }
 
         // Используем уже распарсенную сумму (parsedMoney)
-        if (parsedMoney.amount <= java.math.BigDecimal.ZERO) {
+        if (parsedMoney.amount <= BigDecimal.ZERO) {
             _state.update { it.copy(amountError = true) } // Ошибка, если после парсинга сумма <= 0
             Timber.e(
                 "ТРАНЗАКЦИЯ: prepareTransactionForEdit - Ошибка - некорректная сумма после парсинга: %s. Условие (parsedMoney.amount <= 0): %b",
                 parsedMoney.amount,
-                parsedMoney.amount <= java.math.BigDecimal.ZERO,
+                parsedMoney.amount <= BigDecimal.ZERO,
             )
             return null
         }
@@ -584,8 +584,8 @@ class EditTransactionViewModel(
                 submit()
             }
 
-            is BaseTransactionEvent.ResetAmountOnly -> {
-                _state.update { it.copy(amount = "", amountError = false) }
+            is BaseTransactionEvent.ResetFieldsForNewTransaction -> {
+                _state.update { it.copy(amount = "", amountError = false, note = "") }
             }
 
             is BaseTransactionEvent.PreventAutoSubmit -> {
