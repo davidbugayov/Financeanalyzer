@@ -5,9 +5,7 @@ import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
 import java.util.Locale
-import java.time.LocalDate
 import timber.log.Timber
-import java.util.concurrent.TimeUnit
 
 /**
  * Утилитарный класс для работы с датами
@@ -36,13 +34,6 @@ object DateUtils {
      */
     fun formatDateRange(startDate: Date, endDate: Date, pattern: String = "dd.MM.yyyy"): String {
         return "${formatDate(startDate, pattern)} - ${formatDate(endDate, pattern)}"
-    }
-
-    /**
-     * Возвращает даты начала и конца периода в зависимости от типа периода
-     */
-    fun getPeriodDates(periodType: PeriodType): Pair<Date, Date> {
-        return calculateDatesForPeriod(periodType)
     }
 
     /**
@@ -126,56 +117,6 @@ object DateUtils {
     }
 
     /**
-     * Возвращает текущую дату
-     */
-    fun getTodayDate(): LocalDate {
-        return LocalDate.now()
-    }
-
-    /**
-     * Возвращает дату начала текущего года
-     */
-    fun getYearStartDate(): LocalDate {
-        return LocalDate.now().withDayOfYear(1)
-    }
-
-    /**
-     * Возвращает дату начала текущего месяца
-     */
-    fun getMonthStartDate(): LocalDate {
-        return LocalDate.now().withDayOfMonth(1)
-    }
-
-    /**
-     * Возвращает дату начала предыдущего месяца
-     */
-    fun getPreviousMonthStartDate(): LocalDate {
-        return LocalDate.now().minusMonths(1).withDayOfMonth(1)
-    }
-
-    /**
-     * Возвращает дату начала текущей недели (понедельник)
-     */
-    fun getWeekStartDate(): LocalDate {
-        val today = LocalDate.now()
-        val dayOfWeek = today.dayOfWeek.value
-        return today.minusDays((dayOfWeek - 1).toLong())
-    }
-
-    /**
-     * Обрезает дату до дня и возвращает объект Date, содержащий только день
-     */
-    fun truncateToDay(date: Date): Date {
-        val calendar = Calendar.getInstance()
-        calendar.time = date
-        calendar.set(Calendar.HOUR_OF_DAY, 0)
-        calendar.set(Calendar.MINUTE, 0)
-        calendar.set(Calendar.SECOND, 0)
-        calendar.set(Calendar.MILLISECOND, 0)
-        return calendar.time
-    }
-
-    /**
      * Обновляет тип периода и возвращает рассчитанные даты начала и конца.
      * Единая логика работы с периодами для всего приложения.
      * * @param periodType Тип периода (день, неделя, месяц и т.д.)
@@ -201,15 +142,4 @@ object DateUtils {
         }
     }
 
-    /**
-     * Вычисляет разницу между датами в днях
-     *
-     * @param date1 первая дата
-     * @param date2 вторая дата
-     * @return разница в днях
-     */
-    fun getDaysBetween(date1: Date, date2: Date): Int {
-        val diffInMillis = Math.abs(date2.time - date1.time)
-        return (diffInMillis / TimeUnit.DAYS.toMillis(1)).toInt()
-    }
 }

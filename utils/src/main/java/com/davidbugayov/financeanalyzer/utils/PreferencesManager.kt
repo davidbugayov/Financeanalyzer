@@ -3,8 +3,8 @@ package com.davidbugayov.financeanalyzer.utils
 import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
-import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
+import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow

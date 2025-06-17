@@ -32,15 +32,6 @@ class OnboardingManager(context: Context) {
         }
     }
 
-    /**
-     * Сбрасывает состояние онбординга (используется для тестирования или если пользователь захочет * снова увидеть онбординг через настройки).
-     */
-    fun resetOnboarding() {
-        sharedPreferences.edit {
-            putBoolean(KEY_ONBOARDING_COMPLETED, false)
-        }
-    }
-
     companion object {
         private const val PREFERENCES_NAME = "onboarding_preferences"
         private const val KEY_ONBOARDING_COMPLETED = "onboarding_completed"

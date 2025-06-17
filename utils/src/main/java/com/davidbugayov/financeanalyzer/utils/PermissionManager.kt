@@ -112,13 +112,4 @@ class PermissionManager(context: Context) {
             putInt("notification_permission_state", state.ordinal)
         }
     }
-
-    // --- Новый функционал для однократного показа диалога разрешения ---
-    fun markPermissionDialogShown() {
-        sharedPreferences.edit { putBoolean("was_permission_dialog_shown", true) }
-    }
-
-    fun wasPermissionDialogShown(): Boolean {
-        return sharedPreferences.getBoolean("was_permission_dialog_shown", false)
-    }
 }
