@@ -216,7 +216,7 @@ abstract class AbstractPdfImportUseCase(
                     message = context.getString(
                         R.string.import_error_unknown,
                         currentBankName,
-                        e.localizedMessage ?: "",
+                        e.localizedMessage ?: "Неизвестная ошибка",
                     ),
                 ),
             )
