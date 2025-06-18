@@ -30,7 +30,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 
 /**
@@ -41,6 +43,7 @@ fun ImportProgressSection(
     progress: Int,
     message: String,
     modifier: Modifier = Modifier,
+    fileName: String = "",
 ) {
     // Создаем бесконечную анимацию вращения
     val infiniteTransition = rememberInfiniteTransition(label = "rotate")
@@ -84,6 +87,18 @@ fun ImportProgressSection(
                     .padding(dimensionResource(R.dimen.space_medium)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Отображение имени файла, если оно есть
+                if (fileName.isNotBlank()) {
+                    Text(
+                        text = fileName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(bottom = 8.dp),
+                        textAlign = TextAlign.Center,
+                    )
+                }
+                
                 Text(
                     text = stringResource(R.string.importing_file),
                     style = MaterialTheme.typography.titleMedium,

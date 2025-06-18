@@ -917,17 +917,19 @@
     <string name="bank_ozon">Ozon</string>
     <string name="bank_csv">CSV</string>
 
-    <string name="import_progress_starting">Начало импорта %1$s</string>
-    <string name="import_error_pdf_extraction_failed">Не удалось извлечь текст из PDF или файл пуст для %1$s.</string>
-    <string name="import_progress_text_extracted_validating">Текст извлечен, проверка формата…</string>
-    <string name="import_error_invalid_format">Файл не является выпиской %1$s или формат не поддерживается.</string>
-    <string name="import_progress_format_validated_skipping_headers">Формат проверен, пропуск заголовков…</string>
-    <string name="import_progress_processing_transactions">Обработка транзакций…</string>
-    <string name="import_error_no_transactions_found">Не найдено ни одной транзакции в файле для %1$s.</string>
-    <string name="import_progress_saving_transactions">Сохранение %1$d транзакций…</string>
+    <string name="import_progress_starting">Начало импорта файла %1$s</string>
+    <string name="import_error_pdf_extraction_failed">Не удалось извлечь текст из PDF или файл пуст: %1$s</string>
+    <string name="import_progress_text_extracted_validating">Текст извлечен из %1$s, проверка формата…</string>
+    <string name="import_error_invalid_format">Файл %1$s не является поддерживаемой выпиской или формат не поддерживается.</string>
+    <string name="import_progress_format_validated_skipping_headers">Формат файла %1$s проверен, пропуск заголовков…</string>
+    <string name="import_progress_processing_transactions">Обработка транзакций из файла %1$s…</string>
+    <string name="import_error_no_transactions_found">Не найдено ни одной транзакции в файле %1$s</string>
+    <string name="import_progress_saving_transactions">Сохранение %1$d транзакций из файла %2$s…</string>
     <string name="import_error_io_exception">Ошибка чтения файла %1$s: %2$s</string>
-    <string name="import_error_unknown">Неизвестная ошибка при импорте %1$s: %2$s</string>
-    <string name="import_error_pdf_extraction_exception">Ошибка при извлечении текста из PDF для %1$s: %2$s</string>
+    <string name="import_error_unknown">Неизвестная ошибка при импорте файла %1$s: %2$s</string>
+    <string name="import_error_pdf_extraction_exception">Ошибка при извлечении текста из PDF файла %1$s: %2$s</string>
+    <string name="import_success_message">Импортировано %1$d транзакций, пропущено %2$d из файла %3$s</string>
+    <string name="import_progress_completed">Импорт файла %1$s завершен</string>
 
     <string name="bank_sberbank_pdf">Сбербанк (PDF)</string>
     <string name="transaction_source_sber">Сбер</string>

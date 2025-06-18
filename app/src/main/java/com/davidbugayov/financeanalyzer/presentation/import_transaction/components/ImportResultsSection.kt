@@ -20,6 +20,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSuccessColor
@@ -30,7 +31,8 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalSuccessColor
 data class ImportResults(
     val importedCount: Int = 0,
     val skippedCount: Int = 0,
-    val errorMessage: String? = null
+    val errorMessage: String? = null,
+    val fileName: String = "" // Имя импортируемого файла
 )
 
 /**
@@ -105,6 +107,18 @@ fun ImportResultsSection(
                         LocalSuccessColor.current
                     }
                 )
+
+                // Отображение имени файла, если оно есть
+                if (importResults.fileName.isNotBlank()) {
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                    Text(
+                        text = importResults.fileName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        textAlign = TextAlign.Center,
+                    )
+                }
 
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
 

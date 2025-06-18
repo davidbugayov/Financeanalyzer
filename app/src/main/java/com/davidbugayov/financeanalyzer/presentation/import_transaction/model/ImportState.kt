@@ -12,4 +12,5 @@ data class ImportState(
     val skippedCount: Int = 0,
     val successMessage: String = "",
     val error: String? = null,
+    val fileName: String = "", // Имя импортируемого файла
 )

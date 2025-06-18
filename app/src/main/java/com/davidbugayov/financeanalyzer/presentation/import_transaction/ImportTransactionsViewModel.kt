@@ -79,7 +79,7 @@ class ImportTransactionsViewModel(
      */
     private fun setSuccessState(importedCount: Int, skippedCount: Int) {
         val context = getApplication<Application>().applicationContext
-        val successMessage = context.getString(R.string.import_success_message, importedCount, skippedCount)
+        val successMessage = context.getString(R.string.import_success_message, importedCount, skippedCount, _state.value.fileName)
 
         Timber.d("Устанавливаем состояние успеха: importedCount=$importedCount, skippedCount=$skippedCount")
         Timber.d("Текущее состояние перед обновлением: isLoading=${_state.value.isLoading}, error=${_state.value.error}, successCount=${_state.value.successCount}")
@@ -88,11 +88,12 @@ class ImportTransactionsViewModel(
         val newState = ImportState(
             isLoading = false,
             progress = 100,
-            progressMessage = context.getString(R.string.import_progress_completed),
+            progressMessage = context.getString(R.string.import_progress_completed, _state.value.fileName),
             successCount = importedCount,
             skippedCount = skippedCount,
             successMessage = successMessage,
             error = null,  // Гарантируем, что ошибка сброшена
+            fileName = _state.value.fileName // Сохраняем имя файла
         )
 
         // Устанавливаем новое состояние
@@ -123,13 +124,14 @@ class ImportTransactionsViewModel(
         Timber.d("Начинаем импорт файла с URI: $uri")
 
         // Получаем MIME-тип и имя файла для диагностики
+        var fileName = "Файл"
         try {
             val mimeType = getApplication<Application>().contentResolver.getType(uri)
             getApplication<Application>().contentResolver.query(uri, null, null, null, null)?.use { cursor ->
                 if (cursor.moveToFirst()) {
                     val displayNameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME)
                     if (displayNameIndex != -1) {
-                        val fileName = cursor.getString(displayNameIndex)
+                        fileName = cursor.getString(displayNameIndex)
                         Timber.d("Импорт файла: $fileName, тип: $mimeType")
                     }
                 }
@@ -140,7 +142,7 @@ class ImportTransactionsViewModel(
 
         // Обновляем состояние, показывая процесс загрузки
         val context = getApplication<Application>().applicationContext
-        val startMessage = context.getString(R.string.import_progress_starting)
+        val startMessage = context.getString(R.string.import_progress_starting, fileName)
         _state.value = _state.value.copy(
             isLoading = true,
             progress = 0,
@@ -148,6 +150,7 @@ class ImportTransactionsViewModel(
             error = null,
             successCount = 0,
             skippedCount = 0,
+            fileName = fileName
         )
         // Для обратной совместимости
         _uiState.value = ImportUiState.Loading(startMessage)
@@ -206,6 +209,7 @@ class ImportTransactionsViewModel(
                                 error = userFriendlyMessage,
                                 progress = 0,
                                 progressMessage = "",
+                                fileName = _state.value.fileName // Сохраняем имя файла
                             )
                             _uiState.value = ImportUiState.Error(userFriendlyMessage)
                         }
@@ -231,6 +235,7 @@ class ImportTransactionsViewModel(
                                     error = errorMessage,
                                     progress = 0,
                                     progressMessage = "",
+                                    fileName = _state.value.fileName // Сохраняем имя файла
                                 )
                                 _uiState.value = ImportUiState.Error(errorMessage)
                             }
@@ -242,6 +247,7 @@ class ImportTransactionsViewModel(
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = e.message ?: "Неизвестная ошибка",
+                    fileName = _state.value.fileName // Сохраняем имя файла
                 )
                 _uiState.value = ImportUiState.Error(e.message ?: "Неизвестная ошибка")
             }
@@ -273,6 +279,7 @@ class ImportTransactionsViewModel(
             skippedCount = 0,
             successMessage = "",
             error = null,
+            fileName = "" // Сбрасываем имя файла
         )
 
         // Сбрасываем состояние для обратной совместимости
