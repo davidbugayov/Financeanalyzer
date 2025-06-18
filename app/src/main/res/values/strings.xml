@@ -222,9 +222,6 @@
   <string name="import_error_csv_format">Неверный формат CSV-файла. Проверьте структуру файла и убедитесь, что он содержит необходимые колонки (дата, сумма, описание).</string>
   <string name="import_error_statistics_file">Файл содержит статистические данные, а не транзакции. Пожалуйста, выберите файл с транзакциями для импорта.</string>
 
-  <!-- Import success messages -->
-  <string name="import_success_message">Импорт успешно завершен. Импортировано: %1$d, Пропущено: %2$d</string>
-  <string name="import_progress_completed">Импорт завершен</string>
 
     <!-- Enhanced Line Chart strings -->
     <string name="enhanced_line_chart_title">Улучшенная линейная диаграмма</string>

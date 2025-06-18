@@ -117,6 +117,24 @@ class OzonPdfImportUseCase(
                 )
                 return@flow
             }
+        } catch (e: StatisticsFileException) {
+            // Специальная обработка для файлов статистики
+            Timber.w("Обнаружен файл статистики: ${e.message}")
+            emit(
+                ImportResult.Error(
+                    message = context.getString(R.string.import_error_statistics_file),
+                ),
+            )
+            return@flow
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при проверке формата файла: ${e.message}")
+            emit(
+                ImportResult.Error(
+                    exception = e,
+                    message = "Ошибка при проверке формата файла: ${e.message ?: "Неизвестная ошибка"}",
+                ),
+            )
+            return@flow
         } finally {
             validationReader?.close()
         }
@@ -318,6 +336,16 @@ class OzonPdfImportUseCase(
                 hasTableMarker,
             )
 
+            // Проверка на статистический файл (справка о движении средств без таблицы транзакций)
+            val isStatisticsFile = hasBankIndicator && hasStatementTitle && !hasTableMarker &&
+                textSample.contains("движени", ignoreCase = true) && 
+                textSample.contains("средств", ignoreCase = true)
+            
+            if (isStatisticsFile) {
+                Timber.w("Ozon isValidFormat: Обнаружен файл со статистикой движения средств, а не с транзакциями")
+                throw StatisticsFileException("Файл содержит статистические данные о движении средств, а не транзакции.")
+            }
+
             val isValid = hasBankIndicator && hasStatementTitle && hasTableMarker
             Timber.i(
                 "Ozon isValidFormat: Результат валидации: %s. Банк: %s, Заголовок: %s, Маркер таблицы: %s",
@@ -327,6 +355,10 @@ class OzonPdfImportUseCase(
                 hasTableMarker,
             )
             return isValid
+        } catch (e: StatisticsFileException) {
+            // Пробрасываем специальную ошибку дальше
+            Timber.w("Ozon isValidFormat: ${e.message}")
+            throw e
         } catch (e: Exception) {
             Timber.e(e, "Ozon isValidFormat: Ошибка в процессе валидации формата")
             return false
@@ -849,4 +881,9 @@ class OzonPdfImportUseCase(
             note = "Импортировано автоматически из Справки о движении средств (документ ${state.documentNumber})",
         )
     }
+
+    /**
+     * Специальное исключение для случаев, когда файл содержит статистические данные, а не транзакции
+     */
+    class StatisticsFileException(message: String) : Exception(message)
 }
