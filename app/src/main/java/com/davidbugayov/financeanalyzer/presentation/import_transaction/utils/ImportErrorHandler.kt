@@ -18,25 +18,48 @@ class ImportErrorHandler(private val context: Context) {
      * @return Сообщение для пользователя
      */
     fun getUserFriendlyErrorMessage(originalMessage: String): String {
+        // Подробное логирование для отладки
+        Timber.d("Обработка ошибки импорта: '$originalMessage'")
+        
         // Определяем тип ошибки по содержимому сообщения
-        return when {
-            originalMessage.contains("unsupported", ignoreCase = true) ->
+        val userFriendlyMessage = when {
+            originalMessage.contains("unsupported", ignoreCase = true) -> {
+                Timber.d("Определен тип ошибки: неподдерживаемый формат")
                 context.getString(R.string.import_error_unsupported_format)
-            originalMessage.contains("format", ignoreCase = true) ->
+            }
+            originalMessage.contains("format", ignoreCase = true) -> {
+                Timber.d("Определен тип ошибки: неизвестный формат")
                 context.getString(R.string.import_error_unknown_format)
+            }
             originalMessage.contains("read", ignoreCase = true) ||
-                originalMessage.contains("open", ignoreCase = true) ->
+                originalMessage.contains("open", ignoreCase = true) -> {
+                Timber.d("Определен тип ошибки: ошибка чтения файла")
                 context.getString(R.string.import_error_file_read)
+            }
             originalMessage.contains("no transaction", ignoreCase = true) ||
-                originalMessage.contains("empty", ignoreCase = true) ->
+                originalMessage.contains("empty", ignoreCase = true) -> {
+                Timber.d("Определен тип ошибки: нет транзакций")
                 context.getString(R.string.import_error_no_transactions)
-            originalMessage.contains("date", ignoreCase = true) ->
+            }
+            originalMessage.contains("date", ignoreCase = true) -> {
+                Timber.d("Определен тип ошибки: неверный формат даты")
                 context.getString(R.string.import_error_date_format)
-            originalMessage.contains("csv", ignoreCase = true) ->
+            }
+            originalMessage.contains("csv", ignoreCase = true) -> {
+                Timber.d("Определен тип ошибки: проблема с форматом CSV")
                 context.getString(R.string.import_error_csv_format)
-            originalMessage.contains("statistics", ignoreCase = true) ->
+            }
+            originalMessage.contains("statistics", ignoreCase = true) -> {
+                Timber.d("Определен тип ошибки: файл со статистикой")
                 context.getString(R.string.import_error_statistics_file)
-            else -> context.getString(R.string.import_error_unknown, "", originalMessage)
+            }
+            else -> {
+                Timber.d("Неизвестный тип ошибки, возвращаем общее сообщение")
+                context.getString(R.string.import_error_unknown, "", originalMessage)
+            }
         }
+        
+        Timber.i("Ошибка импорта преобразована: '$originalMessage' -> '$userFriendlyMessage'")
+        return userFriendlyMessage
     }
 }
