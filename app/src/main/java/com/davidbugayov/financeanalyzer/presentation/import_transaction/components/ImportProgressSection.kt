@@ -62,16 +62,6 @@ fun ImportProgressSection(
             .fillMaxWidth()
             .padding(bottom = dimensionResource(R.dimen.space_medium)),
     ) {
-        Text(
-            text = stringResource(R.string.import_results),
-            style = MaterialTheme.typography.titleLarge,
-            color = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.7f),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(bottom = dimensionResource(R.dimen.space_medium)),
-            textAlign = TextAlign.Center,
-        )
-
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
