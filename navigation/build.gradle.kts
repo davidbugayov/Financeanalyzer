@@ -47,6 +47,18 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
     }
+    
+    // Исключаем тестовые классы из релизной сборки
+    packagingOptions {
+        resources {
+            excludes += listOf(
+                "**/*Test.class",
+                "**/*Tests.class",
+                "**/test/**",
+                "**/androidTest/**"
+            )
+        }
+    }
 }
 
 dependencies {
