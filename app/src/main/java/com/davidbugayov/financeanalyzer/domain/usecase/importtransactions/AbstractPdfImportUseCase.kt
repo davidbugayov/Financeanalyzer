@@ -39,9 +39,22 @@ abstract class AbstractPdfImportUseCase(
      */
     private fun formatErrorMessage(resourceId: Int, bankName: String, errorMessage: String?): String {
         return try {
-            context.getString(resourceId, bankName, errorMessage ?: "Неизвестная ошибка")
+            // Список ресурсов строк, которые принимают два параметра
+            val twoParamResources = listOf(
+                R.string.import_error_unknown,
+                R.string.import_error_io_exception,
+                R.string.import_error_pdf_extraction_exception
+            )
+            
+            if (resourceId in twoParamResources) {
+                // Обработка строк, которые используют два параметра
+                context.getString(resourceId, bankName, errorMessage ?: "Неизвестная ошибка")
+            } else {
+                // Для строк с одним параметром
+                context.getString(resourceId, bankName)
+            }
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при форматировании сообщения об ошибке")
+            Timber.e(e, "Ошибка при форматировании сообщения об ошибке: $resourceId, $bankName, $errorMessage")
             "Ошибка при импорте файла $bankName: ${errorMessage ?: "Неизвестная ошибка"}"
         }
     }
@@ -117,7 +130,7 @@ abstract class AbstractPdfImportUseCase(
                 ImportResult.Progress(
                     5,
                     100,
-                    context.getString(R.string.import_progress_text_extracted_validating),
+                    context.getString(R.string.import_progress_text_extracted_validating, currentBankName),
                 ),
             )
             Timber.d(
@@ -148,7 +161,7 @@ abstract class AbstractPdfImportUseCase(
                 ImportResult.Progress(
                     10,
                     100,
-                    context.getString(R.string.import_progress_format_validated_skipping_headers),
+                    context.getString(R.string.import_progress_format_validated_skipping_headers, currentBankName),
                 ),
             )
 
@@ -161,7 +174,7 @@ abstract class AbstractPdfImportUseCase(
                     ImportResult.Progress(
                         15,
                         100,
-                        context.getString(R.string.import_progress_processing_transactions),
+                        context.getString(R.string.import_progress_processing_transactions, currentBankName),
                     ),
                 )
 
@@ -188,6 +201,7 @@ abstract class AbstractPdfImportUseCase(
                         context.getString(
                             R.string.import_progress_saving_transactions,
                             transactions.size,
+                            currentBankName
                         ),
                     ),
                 )
