@@ -35,6 +35,18 @@ abstract class AbstractPdfImportUseCase(
     open val dataStartRegex: Regex = Regex("^\\d{2}\\.\\d{2}\\.\\d{4}")
 
     /**
+     * Безопасно форматирует сообщение об ошибке
+     */
+    private fun formatErrorMessage(resourceId: Int, bankName: String, errorMessage: String?): String {
+        return try {
+            context.getString(resourceId, bankName, errorMessage ?: "Неизвестная ошибка")
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при форматировании сообщения об ошибке")
+            "Ошибка при импорте файла $bankName: ${errorMessage ?: "Неизвестная ошибка"}"
+        }
+    }
+
+    /**
      * Извлекает текст из PDF-файла по URI
      */
     protected open suspend fun extractTextFromPdf(uri: Uri): String = withContext(Dispatchers.IO) {
@@ -63,10 +75,10 @@ abstract class AbstractPdfImportUseCase(
         } catch (e: Exception) {
             Timber.e(e, "$bankName extractTextFromPdf: Ошибка при извлечении текста из PDF.")
             throw IOException(
-                context.getString(
+                formatErrorMessage(
                     R.string.import_error_pdf_extraction_exception,
                     bankName,
-                    e.localizedMessage ?: "",
+                    e.localizedMessage,
                 ),
                 e,
             )
@@ -92,9 +104,10 @@ abstract class AbstractPdfImportUseCase(
                 Timber.e("$currentBankName importTransactions: Извлеченный текст из PDF пуст.")
                 emit(
                     ImportResult.Error(
-                        message = context.getString(
+                        message = formatErrorMessage(
                             R.string.import_error_pdf_extraction_failed,
                             currentBankName,
+                            null,
                         ),
                     ),
                 )
@@ -120,9 +133,10 @@ abstract class AbstractPdfImportUseCase(
                     )
                     emit(
                         ImportResult.Error(
-                            message = context.getString(
+                            message = formatErrorMessage(
                                 R.string.import_error_invalid_format,
                                 currentBankName,
+                                null,
                             ),
                         ),
                     )
@@ -158,9 +172,10 @@ abstract class AbstractPdfImportUseCase(
                     )
                     emit(
                         ImportResult.Error(
-                            message = context.getString(
+                            message = formatErrorMessage(
                                 R.string.import_error_no_transactions_found,
                                 currentBankName,
+                                null,
                             ),
                         ),
                     )
@@ -201,10 +216,10 @@ abstract class AbstractPdfImportUseCase(
             emit(
                 ImportResult.Error(
                     exception = e,
-                    message = context.getString(
+                    message = formatErrorMessage(
                         R.string.import_error_io_exception,
                         currentBankName,
-                        e.localizedMessage ?: "",
+                        e.localizedMessage,
                     ),
                 ),
             )
@@ -213,10 +228,10 @@ abstract class AbstractPdfImportUseCase(
             emit(
                 ImportResult.Error(
                     exception = e,
-                    message = context.getString(
+                    message = formatErrorMessage(
                         R.string.import_error_unknown,
                         currentBankName,
-                        e.localizedMessage ?: "Неизвестная ошибка",
+                        e.localizedMessage,
                     ),
                 ),
             )
