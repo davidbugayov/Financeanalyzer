@@ -174,9 +174,21 @@ class ImportTransactionsViewModel(
                             var importedCount = 0
                             var skippedCount = 0
 
-                            if (data is Pair<*, *>) {
-                                importedCount = (data.first as? Number)?.toInt() ?: 0
-                                skippedCount = (data.second as? Number)?.toInt() ?: 0
+                            // Проверяем тип данных для извлечения значений
+                            when (data) {
+                                is Pair<*, *> -> {
+                                    val first = data.first
+                                    val second = data.second
+                                    if (first is Number) {
+                                        importedCount = first.toInt()
+                                    }
+                                    if (second is Number) {
+                                        skippedCount = second.toInt()
+                                    }
+                                }
+                                else -> {
+                                    Timber.d("Неизвестный тип данных в CoreResult.Success: ${data?.javaClass?.name}")
+                                }
                             }
 
                             Timber.i("Импорт завершен успешно! Импортировано: $importedCount, Пропущено: $skippedCount")
@@ -241,19 +253,25 @@ class ImportTransactionsViewModel(
                             )
                             _uiState.value = ImportUiState.Error(userFriendlyMessage)
                         }
-                        else -> {
-                            // Обработка других неизвестных типов результата
-                            val context = getApplication<Application>().applicationContext
-                            val errorMessage = context.getString(R.string.import_error_unsupported_format)
-                            Timber.w("Получен неизвестный тип результата: $result")
-                            _state.value = _state.value.copy(
-                                isLoading = false,
-                                error = errorMessage,
-                                progress = 0,
-                                progressMessage = "",
-                                fileName = _state.value.fileName // Сохраняем имя файла
-                            )
-                            _uiState.value = ImportUiState.Error(errorMessage)
+                        is ImportResult.Success -> {
+                            // Обработка успешного результата из ImportResult.Success
+                            val importedCount = result.importedCount
+                            val skippedCount = result.skippedCount
+                            
+                            Timber.i("Импорт завершен успешно через ImportResult.Success! Импортировано: $importedCount, Пропущено: $skippedCount")
+                            
+                            // Устанавливаем состояние успешного импорта
+                            setSuccessState(importedCount, skippedCount)
+                            
+                            // Проверка наличия транзакций в базе
+                            viewModelScope.launch(Dispatchers.IO) {
+                                try {
+                                    val count = transactionDao.getTransactionsCount()
+                                    Timber.i("Проверка после импорта: всего транзакций в базе данных: $count")
+                                } catch (e: Exception) {
+                                    Timber.e(e, "Ошибка при проверке количества транзакций после импорта")
+                                }
+                            }
                         }
                     }
                 }

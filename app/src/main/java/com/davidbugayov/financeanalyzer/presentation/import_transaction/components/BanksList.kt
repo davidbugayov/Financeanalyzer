@@ -40,13 +40,6 @@ fun BanksList(onBankClick: (String) -> Unit = {}) {
             .fillMaxWidth()
             .padding(vertical = dimensionResource(R.dimen.space_medium)),
     ) {
-        Text(
-            text = stringResource(R.string.supported_banks_title),
-            style = MaterialTheme.typography.titleMedium,
-            fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = dimensionResource(R.dimen.space_medium)),
-        )
-
         // Сбербанк
         BankItem(
             name = stringResource(R.string.bank_sberbank),
