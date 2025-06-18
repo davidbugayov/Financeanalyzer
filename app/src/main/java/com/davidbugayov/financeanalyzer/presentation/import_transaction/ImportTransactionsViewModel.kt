@@ -224,21 +224,36 @@ class ImportTransactionsViewModel(
                             )
                             _uiState.value = ImportUiState.Loading(result.message, progress)
                         }
+                        is ImportResult.Error -> {
+                            // Обработка ошибки из ImportResult.Error
+                            val originalMessage = result.message ?: result.exception?.message ?: "Неизвестная ошибка"
+                            val context = getApplication<Application>().applicationContext
+                            val errorHandler = ImportErrorHandler(context)
+                            val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
+                            
+                            Timber.e(result.exception, "Ошибка импорта (ImportResult.Error): $originalMessage")
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                error = userFriendlyMessage,
+                                progress = 0,
+                                progressMessage = "",
+                                fileName = _state.value.fileName // Сохраняем имя файла
+                            )
+                            _uiState.value = ImportUiState.Error(userFriendlyMessage)
+                        }
                         else -> {
-                            // Только если это не прогресс, устанавливаем ошибку
-                            if (result !is ImportResult.Progress) {
-                                val context = getApplication<Application>().applicationContext
-                                val errorMessage = context.getString(R.string.import_error_unsupported_format)
-                                Timber.w("Получен неизвестный тип результата: $result")
-                                _state.value = _state.value.copy(
-                                    isLoading = false,
-                                    error = errorMessage,
-                                    progress = 0,
-                                    progressMessage = "",
-                                    fileName = _state.value.fileName // Сохраняем имя файла
-                                )
-                                _uiState.value = ImportUiState.Error(errorMessage)
-                            }
+                            // Обработка других неизвестных типов результата
+                            val context = getApplication<Application>().applicationContext
+                            val errorMessage = context.getString(R.string.import_error_unsupported_format)
+                            Timber.w("Получен неизвестный тип результата: $result")
+                            _state.value = _state.value.copy(
+                                isLoading = false,
+                                error = errorMessage,
+                                progress = 0,
+                                progressMessage = "",
+                                fileName = _state.value.fileName // Сохраняем имя файла
+                            )
+                            _uiState.value = ImportUiState.Error(errorMessage)
                         }
                     }
                 }

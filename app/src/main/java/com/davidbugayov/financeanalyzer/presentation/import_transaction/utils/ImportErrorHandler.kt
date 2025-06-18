@@ -23,6 +23,13 @@ class ImportErrorHandler(private val context: Context) {
         
         // Определяем тип ошибки по содержимому сообщения
         val userFriendlyMessage = when {
+            originalMessage.contains("statistics", ignoreCase = true) || 
+            originalMessage.contains("статистич", ignoreCase = true) ||
+            (originalMessage.contains("движени", ignoreCase = true) && 
+             originalMessage.contains("средств", ignoreCase = true)) -> {
+                Timber.d("Определен тип ошибки: файл со статистикой")
+                context.getString(R.string.import_error_statistics_file)
+            }
             originalMessage.contains("unsupported", ignoreCase = true) -> {
                 Timber.d("Определен тип ошибки: неподдерживаемый формат")
                 context.getString(R.string.import_error_unsupported_format)
@@ -48,10 +55,6 @@ class ImportErrorHandler(private val context: Context) {
             originalMessage.contains("csv", ignoreCase = true) -> {
                 Timber.d("Определен тип ошибки: проблема с форматом CSV")
                 context.getString(R.string.import_error_csv_format)
-            }
-            originalMessage.contains("statistics", ignoreCase = true) -> {
-                Timber.d("Определен тип ошибки: файл со статистикой")
-                context.getString(R.string.import_error_statistics_file)
             }
             else -> {
                 Timber.d("Неизвестный тип ошибки, возвращаем общее сообщение")
