@@ -35,17 +35,17 @@
     <color name="divider_dark">#BDBDBD</color>
 
     <!-- Bank colors -->
-    <color name="bank_sberbank">#1A9F29</color>
+  <color name="bank_sberbank">#1AB239</color>
     <color name="bank_tinkoff">#FFDD2D</color>
     <color name="bank_alfabank">#EF3124</color>
-    <color name="bank_ozon">#0066C0</color>
-    <color name="bank_csv">#607D8B</color>
-    
-    <!-- Income/Expense colors -->
-    <color name="income">#4CAF50</color>
+  <color name="bank_ozon">#1A6DFF</color>
+  <color name="bank_csv">#455A64</color>
+
+  <!-- Income/Expense colors -->
+  <color name="income">#00C853</color>
     <color name="expense">#F44336</color>
     <color name="expense_dark">#D32F2F</color>
-    <color name="income_primary">#FF4CAF50</color>
+  <color name="income_primary">#FF00C853</color>
     <color name="income_secondary">#FF8BC34A</color>
     <color name="expense_primary">#FFF44336</color>
     <color name="expense_secondary">#FFFF5722</color>
@@ -54,13 +54,13 @@
     <color name="chart_grid">#E0E0E0</color>
     <color name="chart_line">#2196F3</color>
     <color name="chart_bar">#03A9F4</color>
-    <color name="chart_income">#4CAF50</color>
+  <color name="chart_income">#00C853</color>
     <color name="chart_expense">#F44336</color>
     <color name="chart_text">#757575</color>
     <color name="chart_text_dark">#424242</color>
     <color name="chart_background">#FFFFFF</color>
     <color name="chart_selected_point">#3F51B5</color>
-    <color name="chart_income_line">#4CAF50</color>
+  <color name="chart_income_line">#00C853</color>
     <color name="chart_expense_line">#F44336</color>
     <color name="chart_grid_line">#DDDDDD</color>
     <color name="chart_axis_text">#757575</color>
@@ -73,37 +73,37 @@
     <color name="chart_label_background">#E6FFFFFF</color>
     <color name="chart_selector_selected">#2196F3</color>
     <color name="chart_selector_unselected">#E0E0E0</color>
-    
+
     <!-- Enhanced chart colors -->
-    <color name="enhanced_line_chart_income">#4CAF50</color>
+  <color name="enhanced_line_chart_income">#00C853</color>
     <color name="enhanced_line_chart_expense">#F44336</color>
     <color name="enhanced_line_chart_grid">#EEEEEE</color>
     <color name="enhanced_line_chart_axis_text">#757575</color>
     <color name="enhanced_line_chart_point">#FFFFFF</color>
-    <color name="enhanced_line_chart_point_stroke_income">#388E3C</color>
+  <color name="enhanced_line_chart_point_stroke_income">#00A030</color>
     <color name="enhanced_line_chart_point_stroke_expense">#D32F2F</color>
     <color name="enhanced_line_chart_selected_point">#FFFFFF</color>
     <color name="enhanced_line_chart_selected_point_stroke">#3F51B5</color>
     <color name="enhanced_line_chart_label_background">#F5F5F5</color>
     <color name="enhanced_line_chart_label_text">#424242</color>
     <color name="enhanced_line_chart_no_data">#9E9E9E</color>
-    
+
     <!-- Chart selector colors -->
     <color name="chart_selector_selected_text">#FFFFFF</color>
     <color name="chart_selector_unselected_text">#757575</color>
-    <color name="chart_selector_income_bg">#4CAF50</color>
+  <color name="chart_selector_income_bg">#00C853</color>
     <color name="chart_selector_expense_bg">#F44336</color>
     <color name="chart_selector_both_bg">#2196F3</color>
     <color name="chart_selector_unselected_bg">#F0F0F0</color>
-    
-    <!-- Pie chart colors -->
+
+  <!-- Pie chart colors -->
     <color name="pie_chart_empty_color">#EEEEEE</color>
     <color name="pie_chart_income_text">#1B5E20</color>
     <color name="pie_chart_expense_text">#B71C1C</color>
     <color name="pie_chart_selected_stroke">#2196F3</color>
     <color name="pie_chart_selection_stroke">#2196F3</color>
     <color name="pie_chart_background">#F5F5F5</color>
-    <color name="pie_chart_category_1">#4CAF50</color>
+  <color name="pie_chart_category_1">#00C853</color>
     <color name="pie_chart_category_2">#2196F3</color>
     <color name="pie_chart_category_3">#FFC107</color>
     <color name="pie_chart_category_4">#9C27B0</color>
@@ -112,8 +112,8 @@
     <color name="pie_chart_category_7">#E91E63</color>
     <color name="pie_chart_category_8">#00BCD4</color>
     <color name="pie_chart_other">#607D8B</color>
-    
-    <!-- Category colors -->
+
+  <!-- Category colors -->
     <color name="category_food">#FFF44336</color>
     <color name="category_transport">#FF2196F3</color>
     <color name="category_entertainment">#FFFF9800</color>
@@ -149,16 +149,16 @@
     <color name="savings_rate_good">#66BB6A</color>
     <color name="savings_rate_satisfactory">#FFA726</color>
     <color name="savings_rate_needs_attention">#EF5350</color>
-    
-    <color name="financial_cushion_excellent">#00C853</color>
+
+  <color name="financial_cushion_excellent">#00C853</color>
     <color name="financial_cushion_good">#66BB6A</color>
     <color name="financial_cushion_insufficient">#FFA726</color>
-    
-    <color name="trend_positive">#00C853</color>
+
+  <color name="trend_positive">#00C853</color>
     <color name="trend_negative">#EF5350</color>
     <color name="trend_neutral">#FFA726</color>
-    
-    <color name="qualification_badge_background_alpha">#26FFFFFF</color>
+
+  <color name="qualification_badge_background_alpha">#26FFFFFF</color>
 
     <!-- Financial Statistics Screen custom progress colors -->
     <color name="financial_statistics_progress_excellent">#00C853</color>

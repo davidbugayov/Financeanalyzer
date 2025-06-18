@@ -44,6 +44,7 @@ fun ImportProgressSection(
     message: String,
     modifier: Modifier = Modifier,
     fileName: String = "",
+    bankName: String? = null,
 ) {
     // Создаем бесконечную анимацию вращения
     val infiniteTransition = rememberInfiniteTransition(label = "rotate")
@@ -60,7 +61,7 @@ fun ImportProgressSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.space_medium)),
+            .padding(bottom = dimensionResource(R.dimen.space_small)),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -74,26 +75,56 @@ fun ImportProgressSection(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.space_medium)),
+                    .padding(dimensionResource(R.dimen.space_small)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                // Отображение имени файла, если оно есть
-                if (fileName.isNotBlank()) {
+                // Отображаем банк и имя файла в одной строке, если есть банк
+                if (bankName != null && bankName.isNotBlank()) {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = bankName,
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontWeight = FontWeight.Medium,
+                            color = MaterialTheme.colorScheme.primary,
+                            textAlign = TextAlign.Center,
+                        )
+
+                        // Если есть имя файла, показываем его рядом с банком
+                        if (fileName.isNotBlank()) {
+                            Text(
+                                text = " - ",
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                            )
+                            Text(
+                                text = fileName,
+                                style = MaterialTheme.typography.bodyMedium,
+                                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                textAlign = TextAlign.Center,
+                            )
+                        }
+                    }
+                    Spacer(modifier = Modifier.height(4.dp))
+                } else if (fileName.isNotBlank()) {
+                    // Если нет банка, но есть имя файла
                     Text(
                         text = fileName,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Medium,
+                        style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
-                        modifier = Modifier.padding(bottom = 8.dp),
+                        modifier = Modifier.padding(bottom = 4.dp),
                         textAlign = TextAlign.Center,
                     )
                 }
-                
+
                 Text(
                     text = stringResource(R.string.importing_file),
                     style = MaterialTheme.typography.titleMedium,
                     color = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.space_medium)),
+                    modifier = Modifier.padding(bottom = dimensionResource(R.dimen.space_small)),
                 )
 
                 // Прогресс-бар в красивой карточке
@@ -107,7 +138,7 @@ fun ImportProgressSection(
                     Column(
                         modifier = Modifier
                             .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.space_medium)),
+                            .padding(dimensionResource(R.dimen.space_small)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         LinearProgressIndicator(
@@ -119,7 +150,7 @@ fun ImportProgressSection(
                             trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f),
                         )
 
-                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
+                        Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
 
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -138,7 +169,7 @@ fun ImportProgressSection(
                                     },
                             )
 
-                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.space_medium)))
+                            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.space_small)))
 
                             Text(
                                 text = stringResource(R.string.progress_percentage, progress),
@@ -153,7 +184,7 @@ fun ImportProgressSection(
                     text = message,
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.padding(top = dimensionResource(R.dimen.space_medium)),
+                    modifier = Modifier.padding(top = dimensionResource(R.dimen.space_small)),
                     textAlign = TextAlign.Center,
                 )
             }

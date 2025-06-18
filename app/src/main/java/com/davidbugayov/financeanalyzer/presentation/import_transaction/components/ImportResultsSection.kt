@@ -32,7 +32,8 @@ data class ImportResults(
     val importedCount: Int = 0,
     val skippedCount: Int = 0,
     val errorMessage: String? = null,
-    val fileName: String = "" // Имя импортируемого файла
+    val fileName: String = "", // Имя импортируемого файла
+    val bankName: String? = null, // Название банка
 )
 
 /**
@@ -48,7 +49,7 @@ fun ImportResultsSection(
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.space_medium))
+            .padding(bottom = dimensionResource(R.dimen.space_small)),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -62,8 +63,8 @@ fun ImportResultsSection(
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.space_medium)),
-                horizontalAlignment = Alignment.CenterHorizontally
+                    .padding(dimensionResource(R.dimen.space_small)),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Иконка успеха или ошибки
                 Icon(
@@ -78,39 +79,51 @@ fun ImportResultsSection(
                     } else {
                         LocalSuccessColor.current
                     },
-                    modifier = Modifier.size(dimensionResource(R.dimen.import_icon_size_large))
+                    modifier = Modifier.size(dimensionResource(R.dimen.import_icon_size_large)),
                 )
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
 
                 // Заголовок результата
                 Text(
                     text = if (importResults.errorMessage != null) {
                         stringResource(R.string.import_error)
                     } else {
-                        stringResource(R.string.import_success)
+                        stringResource(R.string.import_completed)
                     },
                     style = MaterialTheme.typography.titleLarge,
                     color = if (importResults.errorMessage != null) {
                         MaterialTheme.colorScheme.error
                     } else {
                         LocalSuccessColor.current
-                    }
+                    },
                 )
+
+                // Отображение названия банка, если оно есть
+                if (!importResults.bankName.isNullOrBlank()) {
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                    Text(
+                        text = importResults.bankName,
+                        style = MaterialTheme.typography.bodyLarge,
+                        fontWeight = FontWeight.Medium,
+                        color = MaterialTheme.colorScheme.primary,
+                        textAlign = TextAlign.Center,
+                    )
+                }
 
                 // Отображение имени файла, если оно есть
                 if (importResults.fileName.isNotBlank()) {
-                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
+                    Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_tiny)))
                     Text(
                         text = importResults.fileName,
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontWeight = FontWeight.Medium,
+                        style = MaterialTheme.typography.bodyMedium,
+                        fontWeight = FontWeight.Normal,
                         color = MaterialTheme.colorScheme.onSurfaceVariant,
                         textAlign = TextAlign.Center,
                     )
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
 
                 // Текст с деталями
                 if (importResults.errorMessage != null) {
@@ -126,8 +139,8 @@ fun ImportResultsSection(
                             text = importResults.errorMessage,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onErrorContainer,
-                            modifier = Modifier.padding(dimensionResource(R.dimen.space_medium)),
-                            textAlign = TextAlign.Center
+                            modifier = Modifier.padding(dimensionResource(R.dimen.space_small)),
+                            textAlign = TextAlign.Center,
                         )
                     }
                 } else {
@@ -142,8 +155,8 @@ fun ImportResultsSection(
                         Column(
                             modifier = Modifier
                                 .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.space_medium)),
-                            horizontalAlignment = Alignment.CenterHorizontally
+                                .padding(dimensionResource(R.dimen.space_small)),
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
                                 text = stringResource(
@@ -159,7 +172,7 @@ fun ImportResultsSection(
                     }
                 }
 
-                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_large)))
+                Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_small)))
 
                 // Удалена кнопка "Готово" по запросу пользователя
             }

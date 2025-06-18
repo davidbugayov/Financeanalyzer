@@ -229,6 +229,20 @@ android {
         // Пример установки уровня серьезности для проверки
         // warning.add("ObsoleteLintCustomCheck")
     }
+
+    // Исключаем тестовые классы из релизной сборки
+    packagingOptions {
+        resources {
+            excludes += listOf(
+                "**/*Test.class",
+                "**/*Tests.class",
+                "**/test/**",
+                "**/androidTest/**",
+                "**/*.navigation.test*",
+            )
+        }
+    }
+
     buildToolsVersion = "36.0.0"
 }
 

@@ -26,11 +26,13 @@ sealed class ImportResult {
      * @param importedCount Количество успешно импортированных транзакций
      * @param skippedCount Количество пропущенных транзакций
      * @param message Дополнительное сообщение
+     * @param bankName Название банка, из которого импортированы транзакции
      */
     data class Success(
         val importedCount: Int,
         val skippedCount: Int,
         val message: String = "",
+        val bankName: String? = null,
     ) : ImportResult()
 
     /**
@@ -78,10 +80,11 @@ sealed class ImportResult {
          * @param importedCount Количество успешно импортированных транзакций
          * @param skippedCount Количество пропущенных транзакций
          * @param message Дополнительное сообщение
+         * @param bankName Название банка
          * @return Объект успеха
          */
-        fun success(importedCount: Int, skippedCount: Int, message: String = ""): Success {
-            val result = Success(importedCount, skippedCount, message)
+        fun success(importedCount: Int, skippedCount: Int, message: String = "", bankName: String? = null): Success {
+            val result = Success(importedCount, skippedCount, message, bankName)
             // Отправляем результат через LiveData для гарантированного обновления UI
             directResultLiveData.postValue(result)
             return result

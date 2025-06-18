@@ -9,14 +9,14 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.tom_roush.pdfbox.pdmodel.PDDocument
 import com.tom_roush.pdfbox.text.PDFTextStripper
+import java.io.BufferedReader
+import java.io.IOException
+import java.io.StringReader
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.IOException
-import java.io.StringReader
 
 abstract class AbstractPdfImportUseCase(
     context: Context,
@@ -43,9 +43,9 @@ abstract class AbstractPdfImportUseCase(
             val twoParamResources = listOf(
                 R.string.import_error_unknown,
                 R.string.import_error_io_exception,
-                R.string.import_error_pdf_extraction_exception
+                R.string.import_error_pdf_extraction_exception,
             )
-            
+
             if (resourceId in twoParamResources) {
                 // Обработка строк, которые используют два параметра
                 context.getString(resourceId, bankName, errorMessage ?: "Неизвестная ошибка")
@@ -223,7 +223,7 @@ abstract class AbstractPdfImportUseCase(
                 Timber.i(
                     "$currentBankName importTransactions: Импорт завершен. Сохранено: $savedCount из ${transactions.size}",
                 )
-                emit(ImportResult.Success(savedCount, transactions.size - savedCount))
+                emit(ImportResult.Success(savedCount, transactions.size - savedCount, bankName = currentBankName))
             }
         } catch (e: IOException) {
             Timber.e(e, "$currentBankName importTransactions: Ошибка ввода-вывода.")

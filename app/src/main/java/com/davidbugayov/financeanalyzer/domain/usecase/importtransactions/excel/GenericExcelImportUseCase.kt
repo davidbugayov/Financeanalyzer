@@ -11,22 +11,22 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.catego
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportProgressCallback
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
+import java.io.BufferedReader
+import java.io.StringReader
+import java.math.BigDecimal
+import java.text.SimpleDateFormat
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
+import org.apache.poi.ss.usermodel.Cell as PoiCell
 import org.apache.poi.ss.usermodel.DataFormatter
+import org.apache.poi.ss.usermodel.Row as PoiRow
 import org.apache.poi.ss.usermodel.Sheet
 import org.apache.poi.ss.usermodel.WorkbookFactory
 import timber.log.Timber
-import java.io.BufferedReader
-import java.io.StringReader
-import java.text.SimpleDateFormat
-import java.util.Locale
-import org.apache.poi.ss.usermodel.Cell as PoiCell
-import org.apache.poi.ss.usermodel.Row as PoiRow
-import java.math.BigDecimal
 
 // --- Configuration Data Classes Start ---
 
@@ -102,7 +102,11 @@ class GenericExcelImportUseCase(
     private val debugEnabled: Boolean = false, // Включение режима отладки с подробным логированием
 ) : BankImportUseCase(transactionRepository, context) {
 
-    override val bankName: String = "Generic Excel (POI)"
+    // Переменная для хранения обнаруженного типа банка
+    private var detectedBankName: String = "Generic Excel (POI)"
+
+    override val bankName: String
+        get() = detectedBankName
 
     // Разделитель для преобразования строки Excel в текстовую строку
     private val excelRowToStringDelimiter = '\t'
@@ -148,6 +152,9 @@ class GenericExcelImportUseCase(
             }
             // Если нашли дату и сумму — считаем, что это Альфа-Банк
             if (dateIdx != null && amountIdx != null) {
+                // Устанавливаем название банка
+                detectedBankName = "Альфа-Банк"
+
                 return ExcelParseConfig(
                     sheetSelector = SheetSelector.ByName(sheet.sheetName),
                     headerRowCount = headerRow.rowNum + 1,
@@ -664,7 +671,7 @@ class GenericExcelImportUseCase(
                 date = transactionDate,
                 isExpense = isExpense,
                 note = note,
-                source = transactionSource ?: bankName,
+                source = transactionSource ?: detectedBankName,
                 sourceColor = 0, // Можно сделать настраиваемым через config
                 categoryId = "",
                 title = "", // Описание не дублируется, если нужно — можно подставить note

@@ -184,7 +184,6 @@ class TransactionHistoryViewModel(
         viewModelScope.launch {
             Timber.d("Subscribing to repository data changes in HistoryViewModel")
             repository.dataChangeEvents.collect {
-                Timber.d("Получено событие изменения данных из репозитория в HistoryViewModel")
                 // Сбрасываем и перезагружаем данные
                 resetAndReloadTransactions()
             }

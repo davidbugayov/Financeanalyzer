@@ -6,8 +6,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handlers.AbstractPdfBankHandler
-import timber.log.Timber
 import java.io.BufferedInputStream
+import timber.log.Timber
 
 /**
  * Хендлер для PDF-выписок Тинькофф Банка
@@ -27,6 +27,8 @@ class TbankPdfHandler(
         "tbank",
         "движение средств",
         "справка о движении",
+        "номер договора",
+        "номер лицевого счета",
     )
 
     // Негативные ключевые слова для исключения ложных срабатываний
@@ -59,7 +61,7 @@ class TbankPdfHandler(
         // Дополнительная проверка по содержимому файла
         try {
             context.contentResolver.openInputStream(uri)?.use { inputStream ->
-                val buffer = ByteArray(2048)
+                val buffer = ByteArray(4096) // Увеличиваем размер буфера для лучшего обнаружения
                 val bis = BufferedInputStream(inputStream)
                 val bytesRead = bis.read(buffer, 0, buffer.size)
                 if (bytesRead > 0) {
@@ -71,6 +73,9 @@ class TbankPdfHandler(
                         "Тинькофф",
                         "ТБАНК",
                         "TBANK",
+                        "Номер договора",
+                        "Номер лицевого счета",
+                        "Движение средств за период",
                     )
                     val hasTinkoffIndicator = tinkoffIndicators.any {
                         content.contains(
@@ -78,6 +83,12 @@ class TbankPdfHandler(
                             ignoreCase = true,
                         )
                     }
+
+                    // Проверка на наличие табличного формата
+                    val hasTableFormat = content.contains("Дата и время") &&
+                        content.contains("Сумма в валюте") &&
+                        content.contains("Описание операции")
+
                     val otherBankIndicators = listOf(
                         "СБЕРБАНК",
                         "SBERBANK",
@@ -96,8 +107,8 @@ class TbankPdfHandler(
                         Timber.d("[$bankName Handler] Файл содержит указания на другой банк")
                         return false
                     }
-                    if (hasTinkoffIndicator) {
-                        Timber.d("[$bankName Handler] Найден индикатор Тинькофф в содержимом файла")
+                    if (hasTinkoffIndicator || hasTableFormat) {
+                        Timber.d("[$bankName Handler] Найден индикатор Тинькофф в содержимом файла. Табличный формат: $hasTableFormat")
                         return true
                     }
                 }

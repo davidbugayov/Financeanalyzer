@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.import_transaction.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
@@ -25,9 +26,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 
 /**
@@ -43,35 +46,35 @@ fun BanksList(onBankClick: (String) -> Unit = {}) {
         // Сбербанк
         BankItem(
             name = stringResource(R.string.bank_sberbank),
-            color = Color(0xFF1A9F29),
+            color = colorResource(id = R.color.bank_sberbank),
             onClick = { onBankClick("Сбербанк") },
         )
 
         // Тинькофф
         BankItem(
             name = stringResource(R.string.bank_tinkoff),
-            color = Color(0xFFFFDD2D),
+            color = colorResource(id = R.color.bank_tinkoff),
             onClick = { onBankClick("Тинькофф") },
         )
 
         // Альфа-Банк
         BankItem(
             name = stringResource(R.string.bank_alfabank),
-            color = Color(0xFFEF3124),
+            color = colorResource(id = R.color.bank_alfabank),
             onClick = { onBankClick("Альфа-Банк") },
         )
 
         // Озон
         BankItem(
             name = stringResource(R.string.bank_ozon),
-            color = Color(0xFF005BFF),
+            color = colorResource(id = R.color.bank_ozon),
             onClick = { onBankClick("Озон") },
         )
 
         // CSV
         BankItem(
             name = stringResource(R.string.bank_csv),
-            color = Color(0xFF607D8B),
+            color = colorResource(id = R.color.bank_csv),
             isCSV = true,
             onClick = { onBankClick("CSV") },
         )
@@ -91,23 +94,25 @@ private fun BankItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.space_small))
+            .padding(bottom = 16.dp)
             .clickable(onClick = onClick),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
         ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        border = BorderStroke(width = 1.5.dp, color = color.copy(alpha = 0.6f)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.space_medium)),
+                .padding(vertical = 18.dp, horizontal = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Цветной круг с иконкой
             Box(
                 modifier = Modifier
-                    .size(dimensionResource(R.dimen.import_bank_icon_size))
+                    .size(52.dp)
                     .clip(CircleShape)
                     .background(color),
                 contentAlignment = Alignment.Center,
@@ -116,17 +121,17 @@ private fun BankItem(
                     imageVector = if (isCSV) Icons.Default.Description else Icons.Default.AccountBalance,
                     contentDescription = null,
                     tint = Color.White,
-                    modifier = Modifier.size(dimensionResource(R.dimen.import_bank_icon_inner_size)),
+                    modifier = Modifier.size(30.dp),
                 )
             }
 
-            Spacer(modifier = Modifier.width(dimensionResource(R.dimen.space_medium)))
+            Spacer(modifier = Modifier.width(18.dp))
 
             Text(
                 text = name,
-                style = MaterialTheme.typography.bodyLarge,
-                fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }

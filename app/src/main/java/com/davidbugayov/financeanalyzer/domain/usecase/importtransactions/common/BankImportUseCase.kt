@@ -238,13 +238,13 @@ abstract class BankImportUseCase(
                     }
 
                     // Гарантированно эмитируем результат успеха с количеством сохраненных транзакций
-                    Timber.i("[ИМПОРТ-ФИНАЛ] ✅ Эмитируем финальный результат: успешно импортировано $savedCount, пропущено $skippedCount")
+                    Timber.i("[ИМПОРТ-ФИНАЛ] ✅ Эмитируем финальный результат: успешно импортировано $savedCount, пропущено $skippedCount, банк: $bankName")
 
                     // Эмитируем результат дважды для гарантии обработки
-                    emit(ImportResult.success(savedCount, skippedCount))
+                    emit(ImportResult.success(savedCount, skippedCount, bankName = bankName))
                     kotlinx.coroutines.delay(300) // Небольшая задержка
                     Timber.i("[ИМПОРТ-ФИНАЛ] ✅✅ Эмитируем повторный финальный результат для гарантии")
-                    emit(ImportResult.success(savedCount, skippedCount))
+                    emit(ImportResult.success(savedCount, skippedCount, bankName = bankName))
                 } catch (e: Exception) {
                     Timber.e(e, "[ИМПОРТ] ❌ Ошибка при сохранении транзакций: ${e.message}")
                     emit(ImportResult.error("Ошибка при сохранении транзакций: ${e.message}"))

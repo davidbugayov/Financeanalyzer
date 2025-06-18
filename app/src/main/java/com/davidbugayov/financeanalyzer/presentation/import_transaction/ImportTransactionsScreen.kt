@@ -260,7 +260,7 @@ fun ImportTransactionsScreen(
                     modifier = Modifier
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
-                    .verticalScroll(rememberScrollState()),
+                        .verticalScroll(rememberScrollState()),
                 horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
@@ -393,6 +393,8 @@ fun ImportTransactionsScreen(
                                             progress = state.progress,
                                             message = state.progressMessage,
                                             modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
+                                            fileName = state.fileName,
+                                            bankName = state.bankName,
                                         )
                                     }
                                     // Если есть успешно импортированные транзакции, показываем результаты успеха
@@ -403,6 +405,8 @@ fun ImportTransactionsScreen(
                                                 importedCount = state.successCount,
                                                 skippedCount = state.skippedCount,
                                                 errorMessage = null, // Игнорируем ошибку, если есть успешно импортированные транзакции
+                                                fileName = state.fileName,
+                                                bankName = state.bankName,
                                             ),
                                             modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
                                         )
@@ -414,6 +418,8 @@ fun ImportTransactionsScreen(
                                                 importedCount = 0,
                                                 skippedCount = 0,
                                                 errorMessage = state.error,
+                                                fileName = state.fileName,
+                                                bankName = state.bankName,
                                             ),
                                             modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
                                         )

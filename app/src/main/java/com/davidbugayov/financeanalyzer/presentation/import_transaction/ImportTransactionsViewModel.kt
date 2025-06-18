@@ -4,6 +4,8 @@ import android.app.Application
 import android.net.Uri
 import android.provider.OpenableColumns
 import androidx.lifecycle.AndroidViewModel
+import androidx.lifecycle.LiveData
+import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.R
@@ -14,6 +16,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.utils.ImportErrorHandler
+import java.io.BufferedInputStream
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,6 +35,7 @@ class ImportTransactionsViewModel(
     private val importTransactionsUseCase: ImportTransactionsUseCase,
     application: Application,
 ) : AndroidViewModel(application), KoinComponent {
+
     // Инъекция TransactionDao через Koin
     private val transactionDao: TransactionDao by inject()
 
@@ -40,13 +44,14 @@ class ImportTransactionsViewModel(
     val state: StateFlow<ImportState> = _state.asStateFlow()
 
     // Для обратной совместимости с предыдущим подходом
-    private val _uiState = MutableStateFlow<ImportUiState>(ImportUiState.Initial)
+    private val _uiState = MutableLiveData<ImportUiState>(ImportUiState.Initial)
+    val uiState: LiveData<ImportUiState> = _uiState
 
     // Наблюдатель за прямыми результатами импорта
     private val directResultObserver = Observer<ImportResult.Success?> { result ->
         result?.let {
             Timber.i("Получен прямой результат импорта: importedCount=${it.importedCount}, skippedCount=${it.skippedCount}")
-            setSuccessState(it.importedCount, it.skippedCount)
+            setSuccessState(it.importedCount, it.skippedCount, it.bankName)
         }
     }
 
@@ -77,23 +82,32 @@ class ImportTransactionsViewModel(
     /**
      * Устанавливает состояние успешного импорта с указанным количеством транзакций.
      */
-    private fun setSuccessState(importedCount: Int, skippedCount: Int) {
+    private fun setSuccessState(importedCount: Int, skippedCount: Int, bankNameFromResult: String? = null) {
         val context = getApplication<Application>().applicationContext
-        val successMessage = context.getString(R.string.import_success_message, importedCount, skippedCount, _state.value.fileName)
 
-        Timber.d("Устанавливаем состояние успеха: importedCount=$importedCount, skippedCount=$skippedCount")
-        Timber.d("Текущее состояние перед обновлением: isLoading=${_state.value.isLoading}, error=${_state.value.error}, successCount=${_state.value.successCount}")
+        // Проверяем для определения фактически использованного обработчика
+        val actualBankName = bankNameFromResult ?: when {
+            // Если файл - справка о движении, это скорее всего Тинькофф
+            _state.value.fileName.contains("Справка_о_движении", ignoreCase = true) -> "Тинькофф"
+            else -> _state.value.bankName
+        }
+
+        val bankInfo = actualBankName ?: _state.value.fileName
+        val successMessage = context.getString(R.string.import_success_message, importedCount, skippedCount, bankInfo)
+
+        Timber.i("Импорт завершен: импортировано=$importedCount, пропущено=$skippedCount, банк=$actualBankName")
 
         // Создаем новый объект состояния
         val newState = ImportState(
             isLoading = false,
             progress = 100,
-            progressMessage = context.getString(R.string.import_progress_completed, _state.value.fileName),
+            progressMessage = context.getString(R.string.import_progress_completed, bankInfo),
             successCount = importedCount,
             skippedCount = skippedCount,
             successMessage = successMessage,
             error = null,  // Гарантируем, что ошибка сброшена
-            fileName = _state.value.fileName // Сохраняем имя файла
+            fileName = _state.value.fileName, // Сохраняем имя файла
+            bankName = actualBankName, // Используем скорректированное название банка
         )
 
         // Устанавливаем новое состояние
@@ -104,8 +118,7 @@ class ImportTransactionsViewModel(
             skippedCount = skippedCount,
         )
 
-        // Проверяем, что состояние действительно обновилось
-        Timber.d("Состояние после обновления: isLoading=${_state.value.isLoading}, error=${_state.value.error}, successCount=${_state.value.successCount}")
+        // Состояние успешно обновлено
     }
 
     /**
@@ -140,9 +153,93 @@ class ImportTransactionsViewModel(
             Timber.e(e, "Ошибка при получении информации о файле")
         }
 
+        // Определяем тип банка по имени файла или расширению
+        var bankName = determineBankName(fileName)
+
+        // Проверяем содержимое PDF-файла для более точного определения банка
+        if (fileName.endsWith(".pdf", ignoreCase = true)) {
+            try {
+                getApplication<Application>().contentResolver.openInputStream(uri)?.use { inputStream ->
+                    val buffer = ByteArray(8192) // Увеличиваем размер буфера для лучшего обнаружения
+                    val bis = BufferedInputStream(inputStream)
+                    val bytesRead = bis.read(buffer, 0, buffer.size)
+                    if (bytesRead > 0) {
+                        val content = String(buffer, 0, bytesRead)
+
+                        // Специальная обработка для файлов "Справка о движении средств"
+                        if (fileName.contains("Справка_о_движении", ignoreCase = true) ||
+                            content.contains("Справка о движении средств", ignoreCase = true)) {
+
+                            // Проверка на Тинькофф
+                            if (content.contains("ТБАНК", ignoreCase = true) ||
+                                content.contains("TBANK", ignoreCase = true) ||
+                                content.contains("Тинькофф", ignoreCase = true) ||
+                                content.contains("Tinkoff", ignoreCase = true)) {
+                                bankName = "Тинькофф"
+                            }
+                            // Проверка на Сбербанк
+                            else if (content.contains("Сбербанк", ignoreCase = true) ||
+                                content.contains("Sberbank", ignoreCase = true) ||
+                                content.contains("ПАО СБЕРБАНК", ignoreCase = true)) {
+                                bankName = "Сбербанк"
+                            }
+                        }
+                        // Специальная обработка для выписок по счету дебетовой карты
+                        else if (fileName.contains("Выписка по счёту", ignoreCase = true) ||
+                            content.contains("Выписка по счёту", ignoreCase = true)) {
+
+                            // Проверка на Сбербанк
+                            if (content.contains("СберБанк", ignoreCase = true) ||
+                                content.contains("Сбербанк", ignoreCase = true) ||
+                                content.contains("Sberbank", ignoreCase = true) ||
+                                content.contains("www.sberbank.ru", ignoreCase = true)) {
+                                bankName = "Сбербанк"
+                            }
+                        } else {
+                            // Общая проверка для других файлов
+                            if (content.contains("ТБАНК", ignoreCase = true) ||
+                                content.contains("TBANK", ignoreCase = true) ||
+                                content.contains("Тинькофф", ignoreCase = true) ||
+                                content.contains("Tinkoff", ignoreCase = true)) {
+                                bankName = "Тинькофф"
+                            }
+                            // Проверка на Сбербанк
+                            else if (content.contains("Сбербанк", ignoreCase = true) ||
+                                content.contains("СберБанк", ignoreCase = true) ||
+                                content.contains("Sberbank", ignoreCase = true) ||
+                                content.contains("www.sberbank.ru", ignoreCase = true)) {
+                                bankName = "Сбербанк"
+                            }
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при чтении содержимого файла для определения банка")
+            }
+        }
+
+        // Дополнительная проверка для файлов справки о движении средств
+        if (fileName.contains("Справка_о_движении", ignoreCase = true)) {
+            if (bankName == null || bankName == "PDF-выписка") {
+                // Если банк не определен, но файл похож на выписку Тинькофф
+                bankName = "Тинькофф"
+            }
+        }
+
+        // Дополнительная проверка для выписок по счету дебетовой карты
+        if (fileName.contains("Выписка по счёту", ignoreCase = true) ||
+            fileName.contains("Выписка по счету", ignoreCase = true)) {
+            if (bankName == null || bankName == "PDF-выписка") {
+                // Если банк не определен, но файл похож на выписку Сбербанка
+                bankName = "Сбербанк"
+            }
+        }
+
+        Timber.i("Определен банк для импорта: $bankName")
+
         // Обновляем состояние, показывая процесс загрузки
         val context = getApplication<Application>().applicationContext
-        val startMessage = context.getString(R.string.import_progress_starting, fileName)
+        val startMessage = context.getString(R.string.import_progress_starting, bankName ?: fileName)
         _state.value = _state.value.copy(
             isLoading = true,
             progress = 0,
@@ -150,10 +247,12 @@ class ImportTransactionsViewModel(
             error = null,
             successCount = 0,
             skippedCount = 0,
-            fileName = fileName
+            fileName = fileName,
+            bankName = bankName,
         )
+
         // Для обратной совместимости
-        _uiState.value = ImportUiState.Loading(startMessage)
+        _uiState.postValue(ImportUiState.Loading(startMessage))
 
         viewModelScope.launch(Dispatchers.IO) {
             try {
@@ -165,7 +264,7 @@ class ImportTransactionsViewModel(
                         progressMessage = message,
                         error = null, // Важно: убираем ошибку во время прогресса
                     )
-                    _uiState.value = ImportUiState.Loading(message, progress)
+                    _uiState.postValue(ImportUiState.Loading(message, progress))
                 }.collect { result ->
                     when (result) {
                         is CoreResult.Success<*> -> {
@@ -193,8 +292,10 @@ class ImportTransactionsViewModel(
 
                             Timber.i("Импорт завершен успешно! Импортировано: $importedCount, Пропущено: $skippedCount")
 
-                            // Устанавливаем состояние успешного импорта
-                            setSuccessState(importedCount, skippedCount)
+                            // Устанавливаем состояние успешного импорта через главный поток
+                            viewModelScope.launch(Dispatchers.Main) {
+                                setSuccessState(importedCount, skippedCount, bankName)
+                            }
 
                             // Проверка наличия транзакций в базе
                             viewModelScope.launch(Dispatchers.IO) {
@@ -221,9 +322,9 @@ class ImportTransactionsViewModel(
                                 error = userFriendlyMessage,
                                 progress = 0,
                                 progressMessage = "",
-                                fileName = _state.value.fileName // Сохраняем имя файла
+                                fileName = _state.value.fileName, // Сохраняем имя файла
                             )
-                            _uiState.value = ImportUiState.Error(userFriendlyMessage)
+                            _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
                         }
                         is ImportResult.Progress -> {
                             // Обрабатываем прогресс, но не устанавливаем ошибку
@@ -234,7 +335,7 @@ class ImportTransactionsViewModel(
                                 progressMessage = result.message,
                                 error = null, // Важно: убираем ошибку во время прогресса
                             )
-                            _uiState.value = ImportUiState.Loading(result.message, progress)
+                            _uiState.postValue(ImportUiState.Loading(result.message, progress))
                         }
                         is ImportResult.Error -> {
                             // Обработка ошибки из ImportResult.Error
@@ -242,27 +343,30 @@ class ImportTransactionsViewModel(
                             val context = getApplication<Application>().applicationContext
                             val errorHandler = ImportErrorHandler(context)
                             val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
-                            
+
                             Timber.e(result.exception, "Ошибка импорта (ImportResult.Error): $originalMessage")
                             _state.value = _state.value.copy(
                                 isLoading = false,
                                 error = userFriendlyMessage,
                                 progress = 0,
                                 progressMessage = "",
-                                fileName = _state.value.fileName // Сохраняем имя файла
+                                fileName = _state.value.fileName, // Сохраняем имя файла
                             )
-                            _uiState.value = ImportUiState.Error(userFriendlyMessage)
+                            _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
                         }
                         is ImportResult.Success -> {
                             // Обработка успешного результата из ImportResult.Success
                             val importedCount = result.importedCount
                             val skippedCount = result.skippedCount
-                            
-                            Timber.i("Импорт завершен успешно через ImportResult.Success! Импортировано: $importedCount, Пропущено: $skippedCount")
-                            
-                            // Устанавливаем состояние успешного импорта
-                            setSuccessState(importedCount, skippedCount)
-                            
+                            val bankName = result.bankName
+
+                            Timber.i("Импорт завершен успешно через ImportResult.Success! Импортировано: $importedCount, Пропущено: $skippedCount, Банк: $bankName")
+
+                            // Устанавливаем состояние успешного импорта через главный поток
+                            viewModelScope.launch(Dispatchers.Main) {
+                                setSuccessState(importedCount, skippedCount, bankName)
+                            }
+
                             // Проверка наличия транзакций в базе
                             viewModelScope.launch(Dispatchers.IO) {
                                 try {
@@ -280,9 +384,9 @@ class ImportTransactionsViewModel(
                 _state.value = _state.value.copy(
                     isLoading = false,
                     error = e.message ?: "Неизвестная ошибка",
-                    fileName = _state.value.fileName // Сохраняем имя файла
+                    fileName = _state.value.fileName, // Сохраняем имя файла
                 )
-                _uiState.value = ImportUiState.Error(e.message ?: "Неизвестная ошибка")
+                _uiState.postValue(ImportUiState.Error(e.message ?: "Неизвестная ошибка"))
             }
         }
     }
@@ -312,7 +416,8 @@ class ImportTransactionsViewModel(
             skippedCount = 0,
             successMessage = "",
             error = null,
-            fileName = "" // Сбрасываем имя файла
+            fileName = "", // Сбрасываем имя файла
+            bankName = null, // Сбрасываем название банка
         )
 
         // Сбрасываем состояние для обратной совместимости
@@ -320,6 +425,77 @@ class ImportTransactionsViewModel(
 
         // Убедимся, что прямой результат тоже сброшен
         ImportResult.directResultLiveData.postValue(null)
+    }
+
+    /**
+     * Определяет название банка по имени файла
+     */
+    private fun determineBankName(fileName: String): String? {
+        val lowerFileName = fileName.lowercase()
+
+        return when {
+            // Сбербанк - различные варианты
+            lowerFileName.contains("sber") ||
+                lowerFileName.contains("сбер") ||
+                lowerFileName.contains("выписка по счёту дебетовой карты") ||
+                lowerFileName.contains("выписка по счету дебетовой карты") ||
+                lowerFileName.contains("справка_о_движении") -> {
+                "Сбербанк"
+            }
+
+            // Тинькофф - различные варианты
+            lowerFileName.contains("tinkoff") ||
+                lowerFileName.contains("тиньк") ||
+                lowerFileName.contains("тинь") ||
+                lowerFileName.contains("tbank") -> {
+                "Тинькофф"
+            }
+
+            // Альфа-банк - различные варианты
+            lowerFileName.contains("alfa") ||
+                lowerFileName.contains("альфа") ||
+                lowerFileName.contains("alpha") -> {
+                "Альфа-Банк"
+            }
+
+            // ВТБ
+            lowerFileName.contains("vtb") ||
+                lowerFileName.contains("втб") -> {
+                "ВТБ"
+            }
+
+            // Райффайзен
+            lowerFileName.contains("raif") ||
+                lowerFileName.contains("райф") -> {
+                "Райффайзен"
+            }
+
+            // Газпромбанк
+            lowerFileName.contains("gazprom") ||
+                lowerFileName.contains("газпром") -> {
+                "Газпромбанк"
+            }
+
+            // Озон Банк
+            lowerFileName.contains("ozon") ||
+                lowerFileName.contains("озон") -> {
+                "Озон Банк"
+            }
+
+            // Определение по типу файла
+            lowerFileName.endsWith(".pdf") -> {
+                "PDF-выписка"
+            }
+            lowerFileName.endsWith(".csv") -> {
+                "CSV-выписка"
+            }
+            lowerFileName.endsWith(".xlsx") || lowerFileName.endsWith(".xls") -> {
+                "Excel-выписка"
+            }
+            else -> {
+                null
+            }
+        }
     }
 }
 

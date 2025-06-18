@@ -13,4 +13,5 @@ data class ImportState(
     val successMessage: String = "",
     val error: String? = null,
     val fileName: String = "", // Имя импортируемого файла
+    val bankName: String? = null, // Название банка
 )

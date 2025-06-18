@@ -251,13 +251,12 @@ class HomeViewModel(
         viewModelScope.launch {
             Timber.d("Subscribing to repository data changes")
             repository.dataChangeEvents.collect { event ->
-                Timber.d("Получено событие изменения данных из репозитория")
                 // Очищаем кэши синхронно
                 filteredTransactionsCache.clear()
                 statsCache.clear()
                 transactionCache.clear()
                 getTransactionsForPeriodWithCacheUseCase.clearCache() // <--- ВАЖНО! Очищаем кэш use case
-                Timber.d("Все кэши очищены (sync)")
+
                 // Показываем индикатор загрузки
                 _state.update { it.copy(isLoading = true) }
                 // Перезагружаем данные
@@ -421,7 +420,6 @@ class HomeViewModel(
             filteredTransactionsCache.clear()
             statsCache.clear()
             transactionCache.clear()
-            Timber.d("Все кэши очищены")
         }
     }
 
