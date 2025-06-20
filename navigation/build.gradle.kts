@@ -49,13 +49,13 @@ android {
     }
     
     // Исключаем тестовые классы из релизной сборки
-    packagingOptions {
+    packaging {
         resources {
             excludes += listOf(
                 "**/*Test.class",
                 "**/*Tests.class",
                 "**/test/**",
-                "**/androidTest/**"
+                "**/androidTest/**",
             )
         }
     }
