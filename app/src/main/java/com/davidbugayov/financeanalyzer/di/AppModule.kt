@@ -30,6 +30,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransac
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.feature.di.transactionModule
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel
@@ -170,4 +171,4 @@ val appModule = module {
     }
 }
 
-val allModules = listOf(appModule, repositoryModule)
+val allModules = listOf(appModule, repositoryModule, transactionModule)

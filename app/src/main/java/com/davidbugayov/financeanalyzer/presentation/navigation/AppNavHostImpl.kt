@@ -1,18 +1,17 @@
 package com.davidbugayov.financeanalyzer.presentation.navigation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
+import com.davidbugayov.financeanalyzer.feature.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.navigation.AppNavHost
 import com.davidbugayov.financeanalyzer.navigation.AppNavigation
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
-import androidx.compose.runtime.collectAsState
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialStatisticsScreen as EnhancedFinancialStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.statistics.FinancialStatisticsScreen as DetailedFinancialStatisticsScreen
-import com.davidbugayov.financeanalyzer.presentation.export_import.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
@@ -20,8 +19,8 @@ import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
 import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
-import org.koin.androidx.compose.koinViewModel
 import java.util.Date
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Реализация AppNavHost для приложения.

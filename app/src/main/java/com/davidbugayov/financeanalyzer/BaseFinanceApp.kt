@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer
 import android.app.Application
 import android.os.Build
 import com.davidbugayov.financeanalyzer.di.allModules
+import com.davidbugayov.financeanalyzer.feature.di.TransactionModuleInitializer
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
@@ -27,6 +28,9 @@ abstract class BaseFinanceApp : Application() {
         // Инициализация Koin
         initKoin()
 
+        // Инициализация модулей
+        initModules()
+
         // Логируем основные данные устройства для диагностики
         logDeviceInfo()
 
@@ -47,6 +51,15 @@ abstract class BaseFinanceApp : Application() {
             modules(allModules)
         }
         Timber.d("Koin успешно инициализирован")
+    }
+
+    /**
+     * Инициализирует дополнительные модули
+     */
+    private fun initModules() {
+        // Инициализация модуля транзакций
+        TransactionModuleInitializer.initialize()
+        Timber.d("Модули успешно инициализированы")
     }
 
     /**

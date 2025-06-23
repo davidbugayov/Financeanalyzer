@@ -22,6 +22,7 @@ androidxLifecycle = "2.9.1"
 androidxActivity = "1.10.1"
 androidxNavigation = "2.9.0"
 androidxSplashscreen = "1.0.1"
+androidxAppcompat = "1.7.0"
 material = "1.12.0"
 customView = "1.2.0"
 customViewPoolingContainer = "1.1.0"
@@ -55,6 +56,10 @@ pdfbox = "2.0.27.0"
 # Excel parsing libraries
 poi = "5.3.0"
 
+# Apache Commons
+apacheCommonsCsv = "1.10.0"
+commonsIo = "2.15.1"
+
 # RuStore SDK версия (только для Google flavor)
 rustore = "8.0.0"
 
@@ -71,9 +76,11 @@ androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = 
 androidx-lifecycle-runtime-ktx = { group = "androidx.lifecycle", name = "lifecycle-runtime-ktx", version.ref = "androidxLifecycle" }
 androidx-lifecycle-runtime-compose = { group = "androidx.lifecycle", name = "lifecycle-runtime-compose", version.ref = "androidxLifecycle" }
 androidx-lifecycle-compose = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-compose", version.ref = "androidxLifecycle" }
+androidx-lifecycle-viewmodel-ktx = { group = "androidx.lifecycle", name = "lifecycle-viewmodel-ktx", version.ref = "androidxLifecycle" }
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "androidxActivity" }
 androidx-navigation-compose = { group = "androidx.navigation", name = "navigation-compose", version.ref = "androidxNavigation" }
 androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", version.ref = "androidxSplashscreen" }
+androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "androidxAppcompat" }
 androidx-customview = { group = "androidx.customview", name = "customview", version.ref = "customView" }
 androidx-customview-poolingcontainer = { group = "androidx.customview", name = "customview-poolingcontainer", version.ref = "customViewPoolingContainer" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
@@ -124,6 +131,10 @@ pdfbox-android = { group = "com.tom-roush", name = "pdfbox-android", version.ref
 # Excel libraries
 poi-core = { group = "org.apache.poi", name = "poi", version.ref = "poi" }
 poi-ooxml = { group = "org.apache.poi", name = "poi-ooxml", version.ref = "poi" }
+
+# Apache Commons
+apache-commons-csv = { group = "org.apache.commons", name = "commons-csv", version.ref = "apacheCommonsCsv" }
+commons-io = { group = "commons-io", name = "commons-io", version.ref = "commonsIo" }
 
 # Testing
 junit = { group = "junit", name = "junit", version.ref = "junit" }

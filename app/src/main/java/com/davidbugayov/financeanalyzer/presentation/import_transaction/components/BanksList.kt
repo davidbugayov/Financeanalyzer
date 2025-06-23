@@ -99,7 +99,7 @@ private fun BankItem(
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
         ),
-        elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
+        elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(width = 1.5.dp, color = color.copy(alpha = 0.6f)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
     ) {
