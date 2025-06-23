@@ -33,6 +33,8 @@ fun Money.format(showCurrency: Boolean = true, useMinimalDecimals: Boolean = fal
 
     // Use space as grouping separator instead of comma
     symbols.groupingSeparator = ' '
+    // Use comma as decimal separator instead of period
+    symbols.decimalSeparator = ','
 
     // Check if the amount is a whole number or zero
     val isWholeNumber = amount.remainder(BigDecimal.ONE).compareTo(BigDecimal.ZERO) == 0
