@@ -10,8 +10,8 @@ import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetScreen
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.enhanced.FinancialStatisticsScreen as EnhancedFinancialStatisticsScreen
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.FinancialStatisticsScreen as DetailedFinancialStatisticsScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.statistic.FinancialStatisticsScreen as EnhancedFinancialStatisticsScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.FinancialDetailStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
@@ -61,7 +61,7 @@ fun AppNavHostImpl(
 
             if (periodTypeStr == "DETAILED") {
                 // Используем экран подробной статистики
-                DetailedFinancialStatisticsScreen(
+                FinancialDetailStatisticsScreen(
                     startDate = startDate,
                     endDate = endDate,
                     onNavigateBack = {

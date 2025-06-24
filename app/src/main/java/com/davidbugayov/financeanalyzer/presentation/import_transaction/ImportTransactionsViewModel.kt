@@ -266,8 +266,9 @@ class ImportTransactionsViewModel(
                     )
                     _uiState.postValue(ImportUiState.Loading(message, progress))
                 }.collect { result ->
-                    when (result) {
-                        is CoreResult.Success<*> -> {
+                    // Handle different result types based on their actual class
+                    when {
+                        result is CoreResult.Success<*> -> {
                             // Безопасное извлечение данных
                             val data = result.data
                             var importedCount = 0
@@ -278,10 +279,14 @@ class ImportTransactionsViewModel(
                                 is Pair<*, *> -> {
                                     val first = data.first
                                     val second = data.second
-                                    if (first is Number) {
+                                    if (first is Int) {
+                                        importedCount = first
+                                    } else if (first is Number) {
                                         importedCount = first.toInt()
                                     }
-                                    if (second is Number) {
+                                    if (second is Int) {
+                                        skippedCount = second
+                                    } else if (second is Number) {
                                         skippedCount = second.toInt()
                                     }
                                 }
@@ -307,7 +312,7 @@ class ImportTransactionsViewModel(
                                 }
                             }
                         }
-                        is CoreResult.Error -> {
+                        result is CoreResult.Error -> {
                             // Получаем исходное сообщение об ошибке
                             val originalMessage = result.exception?.message ?: "Неизвестная ошибка"
 
@@ -326,7 +331,7 @@ class ImportTransactionsViewModel(
                             )
                             _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
                         }
-                        is ImportResult.Progress -> {
+                        result is ImportResult.Progress -> {
                             // Обрабатываем прогресс, но не устанавливаем ошибку
                             val progress = if (result.total > 0) (result.current * 100 / result.total) else 0
                             _state.value = _state.value.copy(
@@ -337,7 +342,7 @@ class ImportTransactionsViewModel(
                             )
                             _uiState.postValue(ImportUiState.Loading(result.message, progress))
                         }
-                        is ImportResult.Error -> {
+                        result is ImportResult.Error -> {
                             // Обработка ошибки из ImportResult.Error
                             val originalMessage = result.message ?: result.exception?.message ?: "Неизвестная ошибка"
                             val context = getApplication<Application>().applicationContext
@@ -354,7 +359,7 @@ class ImportTransactionsViewModel(
                             )
                             _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
                         }
-                        is ImportResult.Success -> {
+                        result is ImportResult.Success -> {
                             // Обработка успешного результата из ImportResult.Success
                             val importedCount = result.importedCount
                             val skippedCount = result.skippedCount
@@ -376,6 +381,9 @@ class ImportTransactionsViewModel(
                                     Timber.e(e, "Ошибка при проверке количества транзакций после импорта")
                                 }
                             }
+                        }
+                        else -> {
+                            Timber.w("Получен неизвестный тип результата: ${result?.javaClass?.name}")
                         }
                     }
                 }

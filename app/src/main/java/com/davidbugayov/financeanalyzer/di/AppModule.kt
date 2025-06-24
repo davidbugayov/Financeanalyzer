@@ -37,7 +37,7 @@ import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsVi
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.chart.statistics.viewmodel.FinancialStatisticsViewModel
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
@@ -162,7 +162,7 @@ val appModule = module {
 
     // ViewModel для экрана подробной финансовой статистики
     viewModel { parameters ->
-        FinancialStatisticsViewModel(
+        FinancialDetailStatisticsViewModel(
             startDate = parameters.get(),
             endDate = parameters.get(),
             transactionRepository = get(),

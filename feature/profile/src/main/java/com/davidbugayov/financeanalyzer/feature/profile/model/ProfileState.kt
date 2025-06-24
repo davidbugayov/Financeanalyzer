@@ -45,4 +45,4 @@ data class ProfileState(
     val isAppLockEnabled: Boolean = false,
     val isBiometricEnabled: Boolean = false,
     val hasNotificationPermission: Boolean = true,
-) 
+)
