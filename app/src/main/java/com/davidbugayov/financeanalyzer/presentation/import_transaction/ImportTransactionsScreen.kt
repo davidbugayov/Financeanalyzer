@@ -63,7 +63,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.SettingsPermissionDialog
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BankInstructionDialog
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BanksList
@@ -79,6 +79,8 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
+import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 
 /**
  * Экран импорта транзакций.
@@ -227,7 +229,6 @@ fun ImportTransactionsScreen(
                     title = stringResource(R.string.import_transactions_title),
                     showBackButton = true,
                     onBackClick = onNavigateBack,
-                    titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
                 )
             },
             floatingActionButton = {

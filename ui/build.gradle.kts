@@ -36,7 +36,7 @@ android {
     }
 
     composeOptions {
-        kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
+        kotlinCompilerExtensionVersion = libs.versions.composeCompiler.get()
     }
 }
 
@@ -44,7 +44,18 @@ dependencies {
     implementation(project(":domain"))
     implementation(project(":core"))
 
+    // Kotlin
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlin.coroutines.android)
+
+    // AndroidX
     implementation(libs.androidx.core.ktx)
+    implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.compose)
+    implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Compose
     implementation(platform(libs.compose.bom))
@@ -53,13 +64,17 @@ dependencies {
     implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.material.icons.extended)
-    implementation(libs.compose.runtime)
+    implementation(libs.compose.material3.window.size)
     implementation(libs.compose.foundation)
+    implementation(libs.compose.runtime)
+    implementation(libs.compose.runtime.livedata)
     implementation(libs.compose.animation)
     debugImplementation(libs.compose.ui.tooling)
+    debugImplementation(libs.compose.ui.test.manifest)
 
     // Koin
     implementation(libs.koin.android)
+    implementation(libs.koin.androidx.compose)
 
     // Timber
     implementation(libs.timber)

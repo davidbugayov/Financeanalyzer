@@ -11,4 +11,5 @@
     <string name="no_transactions">Нет транзакций</string>
     <string name="error_occurred">Произошла ошибка</string>
     <string name="retry">Повторить</string>
+    <string name="cd_back_button">Назад</string>
 </resources> 

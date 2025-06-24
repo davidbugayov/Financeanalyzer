@@ -32,7 +32,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
@@ -49,6 +49,7 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.presentation.components.FeatureAnnouncement
 
 /**
  * Главный экран приложения.
@@ -59,7 +60,7 @@ import timber.log.Timber
 private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -> Unit) {
     AppTopBar(
         title = stringResource(R.string.app_title),
-        navigationIcon = {
+        actions = {
             if (BuildConfig.DEBUG) {
                 IconButton(
                     onClick = onGenerateTestData,
@@ -70,16 +71,13 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
                     )
                 }
             }
-        },
-        actions = {
             IconButton(onClick = onNavigateToProfile) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = stringResource(R.string.profile),
                 )
             }
-        },
-        titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
+        }
     )
 }
 

@@ -174,33 +174,4 @@ fun FeedbackMessage(
     }
 }
 
-@Composable
-fun EnhancedEmptyContent() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
-    ) {
-        Icon(
-            imageVector = Icons.Default.AccountBalance,
-            contentDescription = stringResource(id = R.string.empty_state),
-            modifier = Modifier
-                .size(128.dp)
-                .padding(dimensionResource(R.dimen.spacing_normal)),
-            tint = MaterialTheme.colorScheme.primary.copy(alpha = 0.5f),
-        )
-
-        Text(
-            text = stringResource(id = R.string.empty_transactions),
-            style = MaterialTheme.typography.titleMedium,
-            textAlign = TextAlign.Center,
-        )
-
-        Text(
-            text = stringResource(id = R.string.empty_transactions_description),
-            style = MaterialTheme.typography.bodyMedium,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colorScheme.onSurfaceVariant,
-        )
-    }
-}
+// Компонент удален, используется EmptyContent из ui модуля

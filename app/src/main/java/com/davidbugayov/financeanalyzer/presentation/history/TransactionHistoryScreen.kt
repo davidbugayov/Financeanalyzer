@@ -22,15 +22,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
-import com.davidbugayov.financeanalyzer.presentation.components.EnhancedEmptyContent
+import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsHandler
@@ -54,6 +55,8 @@ import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
+import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -367,7 +370,7 @@ fun TransactionHistoryScreen(
                 } else if (state.isLoading && !state.isLoadingMore) {
                     CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
                 } else if (state.filteredTransactions.isEmpty()) {
-                    EnhancedEmptyContent()
+                    EmptyContent()
                 } else {
                     // Отображение сгруппированных транзакций
                     val groupedTransactions = viewModel.getGroupedTransactions()

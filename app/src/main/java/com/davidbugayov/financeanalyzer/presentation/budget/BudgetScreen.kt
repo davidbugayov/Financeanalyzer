@@ -23,6 +23,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.AlertDialog
@@ -45,6 +47,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -54,18 +57,20 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.components.NumberTextField
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.NumberTextField
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
@@ -329,8 +334,10 @@ fun BudgetScreen(
                             NumberTextField(
                                 value = categoryLimit,
                                 onValueChange = { categoryLimit = it },
-                                label = { Text("Лимит расходов") },
+                                label = "Лимит расходов",
                                 modifier = Modifier.fillMaxWidth(),
+                                allowDecimal = true,
+                                isError = false
                             )
                         }
                     },
@@ -354,7 +361,7 @@ fun BudgetScreen(
                                     }
                                 }
                             },
-                            enabled = categoryName.isNotBlank() && categoryLimit.toBigDecimalOrNull() != null,
+                            enabled = categoryName.isNotBlank() && categoryLimit.isNotBlank(),
                         ) {
                             Text("Добавить")
                         }
@@ -386,8 +393,10 @@ fun BudgetScreen(
                             NumberTextField(
                                 value = incomeAmount,
                                 onValueChange = { incomeAmount = it },
-                                label = { Text("Сумма дохода") },
+                                label = "Сумма дохода",
                                 modifier = Modifier.fillMaxWidth(),
+                                allowDecimal = true,
+                                isError = false
                             )
                         }
                     },
@@ -441,8 +450,10 @@ fun BudgetScreen(
                             NumberTextField(
                                 value = walletAmount,
                                 onValueChange = { walletAmount = it },
-                                label = { Text("Сумма") },
+                                label = "Сумма",
                                 modifier = Modifier.fillMaxWidth(),
+                                allowDecimal = true,
+                                isError = false
                             )
                         }
                     },
@@ -537,8 +548,10 @@ fun BudgetScreen(
                                 NumberTextField(
                                     value = transferAmount,
                                     onValueChange = { transferAmount = it },
-                                    label = { Text("Сумма перевода") },
+                                    label = "Сумма перевода",
                                     modifier = Modifier.fillMaxWidth(),
+                                    allowDecimal = true,
+                                    isError = false
                                 )
                             }
                         }
@@ -1037,8 +1050,10 @@ fun EditWalletDialog(
                 NumberTextField(
                     value = limit,
                     onValueChange = onLimitChange,
-                    label = { Text("Лимит расходов") },
+                    label = "Лимит расходов",
                     modifier = Modifier.fillMaxWidth(),
+                    allowDecimal = true,
+                    isError = false
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

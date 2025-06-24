@@ -48,7 +48,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineC
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.utils.LineChartUtils.findNearestPoint
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.utils.drawGridLines
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.utils.drawLineChart
-import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
+import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import timber.log.Timber

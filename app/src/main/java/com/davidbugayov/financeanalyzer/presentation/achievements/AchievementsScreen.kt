@@ -29,7 +29,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.AchievementItem
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
+import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 
 @Composable
 fun AchievementsScreen(achievements: List<Achievement>, onBack: () -> Unit) {

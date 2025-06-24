@@ -14,6 +14,7 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
@@ -26,7 +27,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.components.AppTopBar
+import com.davidbugayov.financeanalyzer.presentation.components.EmptyContent
+import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
+import com.davidbugayov.financeanalyzer.presentation.libraries.components.LibraryItem
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primary
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primaryContainer
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_secondary
@@ -45,7 +49,6 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
                 title = stringResource(id = R.string.libraries_title),
                 showBackButton = true,
                 onBackClick = onNavigateBack,
-                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
             )
         },
     ) { paddingValues ->
@@ -266,10 +269,10 @@ private fun getLibraries(): List<Library> {
  */
 @Composable
 private fun HorizontalDivider() {
-    Surface(
+    HorizontalDivider(
         modifier = Modifier
             .fillMaxWidth()
             .height(dimensionResource(R.dimen.height_divider)),
-        color = MaterialTheme.colorScheme.outlineVariant,
-    ) {}
+        color = MaterialTheme.colorScheme.outlineVariant
+    )
 }

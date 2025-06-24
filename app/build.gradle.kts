@@ -248,21 +248,28 @@ android {
 
 dependencies {
     // Modules
-    implementation(project(":domain"))
-    implementation(project(":data"))
-    implementation(project(":core"))
-    implementation(project(":navigation"))
-    implementation(project(":utils"))
-    implementation(project(":ui"))
+    val modules = listOf(
+        ":domain",
+        ":data",
+        ":core",
+        ":navigation",
+        ":utils",
+        ":ui",
+        ":feature",
+        ":feature:home",
+        ":feature:profile",
+        ":feature:history",
+        ":feature:statistics",
+        ":feature:transaction",
+        ":feature:widget"
+    )
 
-    // Feature modules
-    implementation(project(":feature"))
-    implementation(project(":feature:home"))
-    implementation(project(":feature:profile"))
-    implementation(project(":feature:history"))
-    implementation(project(":feature:statistics"))
-    implementation(project(":feature:transaction"))
-    implementation(project(":feature:widget"))
+    modules.forEach { module ->
+        implementation(project(module))
+        add("googleImplementation", project(module))
+        add("rustoreImplementation", project(module))
+        add("fdroidImplementation", project(module))
+    }
 
     // Kotlin
     implementation(libs.kotlin.stdlib)
