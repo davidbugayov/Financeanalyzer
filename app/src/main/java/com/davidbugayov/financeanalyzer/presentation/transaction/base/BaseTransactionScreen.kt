@@ -293,7 +293,6 @@ fun <E> BaseTransactionScreen(
                         handleExit()
                     }
                 },
-                titleFontSize = dimensionResource(R.dimen.text_size_normal).value.toInt(),
                 actions = {
                     if (!isEditMode && onNavigateToImport != null) {
                         IconButton(onClick = { navigateToImport() }) {
