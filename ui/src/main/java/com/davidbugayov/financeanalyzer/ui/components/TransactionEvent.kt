@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.components
+package com.davidbugayov.financeanalyzer.ui.components
 
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 

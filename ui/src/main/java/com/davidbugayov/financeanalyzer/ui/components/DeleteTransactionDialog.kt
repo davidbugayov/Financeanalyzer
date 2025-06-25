@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.components
+package com.davidbugayov.financeanalyzer.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -21,9 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -50,12 +49,11 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
         val sourceColorInt = transaction.sourceColor
         val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
 
-        colorFromInt ?: ColorUtils.getEffectiveSourceColor(
-            sourceName = transaction.source,
-            sourceColorHex = null,
-            isExpense = transaction.isExpense,
-            isDarkTheme = isDarkTheme,
-        )
+        colorFromInt ?: if (transaction.isExpense) {
+            if (isDarkTheme) Color(0xFFEF5350) else Color(0xFFD32F2F)
+        } else {
+            if (isDarkTheme) Color(0xFF66BB6A) else Color(0xFF388E3C)
+        }
     }
 
     AlertDialog(

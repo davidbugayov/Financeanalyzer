@@ -33,10 +33,10 @@ import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsDialog
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsHandler
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionDialogState
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionEvent
+import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
+import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsHandler
+import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
+import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
 import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionGroupList
@@ -55,7 +55,6 @@ import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState

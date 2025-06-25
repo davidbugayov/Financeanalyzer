@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.components
+package com.davidbugayov.financeanalyzer.ui.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -24,7 +24,6 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
 
@@ -151,21 +150,12 @@ fun TransactionActionsDialog(
 private fun rememberSourceColor(transaction: Transaction, isDarkTheme: Boolean): Color {
     return remember(transaction.source, transaction.sourceColor, transaction.isExpense, isDarkTheme) {
         val sourceColorInt = transaction.sourceColor
-        var colorFromInt: Color? = null
-        if (sourceColorInt != 0) { // 0 может быть маркером отсутствия цвета
-            colorFromInt = try {
-                Color(sourceColorInt)
-            } catch (_: Exception) {
-                null
-            }
+        val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
+
+        colorFromInt ?: if (transaction.isExpense) {
+            if (isDarkTheme) Color(0xFFEF5350) else Color(0xFFD32F2F)
+        } else {
+            if (isDarkTheme) Color(0xFF66BB6A) else Color(0xFF388E3C)
         }
-        // Если цвет из sourceColorInt не подошел, или его не было, пробуем по имени источника.
-        // sourceColorHex передаем null, так как мы уже обработали sourceColorInt.
-        colorFromInt ?: ColorUtils.getEffectiveSourceColor(
-            sourceName = transaction.source,
-            sourceColorHex = null,
-            isExpense = transaction.isExpense,
-            isDarkTheme = isDarkTheme,
-        )
     }
 }
