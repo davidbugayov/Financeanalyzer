@@ -280,7 +280,7 @@ fun HomeScreen(
                 .padding(paddingValues),
         ) {
             if (state.isLoading && state.transactions.isEmpty()) {
-                CenteredLoadingIndicator()
+                CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
             } else {
                 HomeMainContent(
                     windowSizeIsCompact = windowSize.isCompact(),
