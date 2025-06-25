@@ -25,6 +25,7 @@ import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
 
 /**
  * Диалог подтверждения удаления транзакции.
@@ -49,11 +50,12 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
         val sourceColorInt = transaction.sourceColor
         val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
 
-        colorFromInt ?: if (transaction.isExpense) {
-            if (isDarkTheme) Color(0xFFEF5350) else Color(0xFFD32F2F)
-        } else {
-            if (isDarkTheme) Color(0xFF66BB6A) else Color(0xFF388E3C)
-        }
+        colorFromInt ?: ColorUtils.getEffectiveSourceColor(
+            sourceName = transaction.source,
+            sourceColorHex = null,
+            isExpense = transaction.isExpense,
+            isDarkTheme = isDarkTheme,
+        )
     }
 
     AlertDialog(
