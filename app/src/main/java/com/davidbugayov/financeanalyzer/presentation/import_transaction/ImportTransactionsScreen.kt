@@ -79,8 +79,7 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
-import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
+import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 
 /**
  * Экран импорта транзакций.

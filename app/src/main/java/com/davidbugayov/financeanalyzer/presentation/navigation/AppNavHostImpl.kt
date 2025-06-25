@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import com.davidbugayov.financeanalyzer.feature.export_import.ExportImportScreen
-import com.davidbugayov.financeanalyzer.feature.statistics.detail.FinancialDetailsStatisticsScreen
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.FinancialDetailStatisticsScreen
 import com.davidbugayov.financeanalyzer.navigation.AppNavHost
 import com.davidbugayov.financeanalyzer.navigation.AppNavigation
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
@@ -61,7 +61,7 @@ fun AppNavHostImpl(
 
             if (periodTypeStr == "DETAILED") {
                 // Используем экран подробной статистики
-                FinancialDetailsStatisticsScreen(
+                FinancialDetailStatisticsScreen(
                     startDate = startDate,
                     endDate = endDate,
                     onNavigateBack = {

@@ -29,10 +29,10 @@ import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
-import com.davidbugayov.financeanalyzer.presentation.components.DatePickerDialog
+import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
+import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
-import com.davidbugayov.financeanalyzer.presentation.components.ErrorContent
+import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionActionsHandler
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionDialogState
@@ -56,7 +56,6 @@ import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
-import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState

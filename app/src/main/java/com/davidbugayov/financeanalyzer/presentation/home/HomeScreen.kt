@@ -33,7 +33,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseC
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.components.CenteredLoadingIndicator
+import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.presentation.components.DeleteTransactionDialog
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
