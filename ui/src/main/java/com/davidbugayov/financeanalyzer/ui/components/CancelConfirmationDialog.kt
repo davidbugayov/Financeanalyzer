@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.components
+package com.davidbugayov.financeanalyzer.ui.components
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -6,7 +6,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.ui.R
 
 @Composable
 fun CancelConfirmationDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {

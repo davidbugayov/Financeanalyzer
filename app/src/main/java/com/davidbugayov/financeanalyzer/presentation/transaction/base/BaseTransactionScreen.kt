@@ -36,10 +36,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import com.davidbugayov.financeanalyzer.presentation.components.CancelConfirmationDialog
+import com.davidbugayov.financeanalyzer.ui.components.CancelConfirmationDialog
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
 import com.davidbugayov.financeanalyzer.ui.components.NumberTextField
-import com.davidbugayov.financeanalyzer.presentation.components.SuccessDialog
+import com.davidbugayov.financeanalyzer.ui.components.SuccessDialog
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.presentation.transaction.base.components.AmountField

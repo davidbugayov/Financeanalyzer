@@ -12,4 +12,8 @@
     <string name="error_occurred">Произошла ошибка</string>
     <string name="retry">Повторить</string>
     <string name="cd_back_button">Назад</string>
+    <string name="cancel_transaction">Отменить транзакцию</string>
+    <string name="cancel_transaction_confirmation">Вы уверены, что хотите отменить добавление транзакции?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
 </resources> 
