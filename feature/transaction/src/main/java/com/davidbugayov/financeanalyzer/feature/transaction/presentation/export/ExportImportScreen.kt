@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.feature.export_import
+package com.davidbugayov.financeanalyzer.feature.transaction.presentation.export
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box

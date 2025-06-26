@@ -22,4 +22,4 @@ interface CategoriesViewModel {
 
     fun isDefaultIncomeCategory(category: com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory): Boolean =
         !category.isExpense && !category.isCustom
-} 
+}

@@ -1,6 +1,6 @@
-package com.davidbugayov.financeanalyzer.feature.di
+package com.davidbugayov.financeanalyzer.feature.transaction.di
 
-import com.davidbugayov.financeanalyzer.feature.export_import.ExportImportViewModel
+import com.davidbugayov.financeanalyzer.feature.transaction.presentation.export.ExportImportViewModel
 import org.koin.androidx.viewmodel.dsl.viewModel
 import org.koin.dsl.module
 

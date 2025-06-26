@@ -30,7 +30,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransac
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.feature.di.transactionModule
+import com.davidbugayov.financeanalyzer.feature.transaction.di.transactionModule
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel
@@ -97,7 +97,10 @@ val appModule = module {
     single { CalculateBalanceMetricsUseCase() }
     single { GetTransactionsForPeriodWithCacheUseCase(get()) }
     single { GetTransactionsForPeriodUseCase(get()) }
-    single { UpdateWidgetsUseCase() }
+    single<com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher> {
+        com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher(androidContext())
+    }
+    single { com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase(get()) }
     single { GetCategoriesWithAmountUseCase() }
     single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
     factory { UpdateWalletBalancesUseCase(get()) }

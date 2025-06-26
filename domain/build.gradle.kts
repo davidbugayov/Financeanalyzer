@@ -49,4 +49,6 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
+
+    // Document parsing & PDF/Excel libraries
 }

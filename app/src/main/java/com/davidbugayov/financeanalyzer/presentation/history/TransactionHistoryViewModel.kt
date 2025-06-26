@@ -140,7 +140,7 @@ class TransactionHistoryViewModel(
                 is Result.Success -> {
                     // Уведомление об удалении теперь происходит через SharedFlow репозитория
                     resetAndReloadTransactions()
-                    updateWidgetsUseCase(application.applicationContext)
+                    updateWidgetsUseCase()
                     Timber.d(
                         "Виджеты обновлены после удаления транзакции из TransactionHistoryViewModel.",
                     )

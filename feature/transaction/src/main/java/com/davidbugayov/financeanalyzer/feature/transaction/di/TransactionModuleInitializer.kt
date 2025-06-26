@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.feature.di
+package com.davidbugayov.financeanalyzer.feature.transaction.di
 
 import org.koin.core.context.loadKoinModules
 import org.koin.dsl.module

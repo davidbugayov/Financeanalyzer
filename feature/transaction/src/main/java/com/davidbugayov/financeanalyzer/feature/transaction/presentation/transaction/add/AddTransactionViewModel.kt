@@ -174,7 +174,7 @@ class AddTransactionViewModel(
                     )
                     incrementCategoryUsage(transactionToSave.category, transactionToSave.isExpense)
                     incrementSourceUsage(transactionToSave.source)
-                    updateWidgetsUseCase(context)
+                    updateWidgetsUseCase()
 
                     // Запрос отзыва (только RuStore). Реализация предоставляется в app-модуле.
                     // Для независимой компиляции feature-модуля просто пропускаем вызов здесь.

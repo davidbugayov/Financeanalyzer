@@ -209,7 +209,12 @@ fun TransactionHistoryScreen(
 
     // Диалог подтверждения удаления категории
     state.categoryToDelete?.let { (category, isExpense) ->
-        val isDefaultCategory = false
+        // Проверяем, является ли категория стандартной (не пользовательской)
+        val isDefaultCategory = if (isExpense) {
+            expenseCategories.find { it.name == category }?.let { !it.isCustom } ?: false
+        } else {
+            incomeCategories.find { it.name == category }?.let { !it.isCustom } ?: false
+        }
 
         DeleteCategoryConfirmDialog(
             category = category,

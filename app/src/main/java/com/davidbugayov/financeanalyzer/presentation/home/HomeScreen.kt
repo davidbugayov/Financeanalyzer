@@ -30,7 +30,7 @@ import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
@@ -94,7 +94,7 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
 private fun HomeMainContent(
     windowSizeIsCompact: Boolean,
     state: HomeState,
-    categoriesViewModel: CategoriesViewModel,
+    categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -178,7 +178,8 @@ private fun HomeFeedback(
 @Composable
 fun HomeScreen(
     viewModel: HomeViewModel = koinViewModel(),
-    categoriesViewModel: CategoriesViewModel = koinViewModel(),
+    categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel =
+        koinViewModel(),
     editViewModel: EditTransactionViewModel = koinViewModel(),
     updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject(),
 ) {
@@ -202,7 +203,7 @@ fun HomeScreen(
             screenName = "home",
             screenClass = "HomeScreen",
         )
-        updateWidgetsUseCase(context)
+        updateWidgetsUseCase()
 
         // Проверяем наличие обновлений при отображении главного экрана
         try {

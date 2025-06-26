@@ -1,14 +1,13 @@
-package com.davidbugayov.financeanalyzer.domain.usecase.widgets
+package com.davidbugayov.financeanalyzer.widget
 
 import android.appwidget.AppWidgetManager
 import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
-import com.davidbugayov.financeanalyzer.widget.BalanceWidget
-import com.davidbugayov.financeanalyzer.widget.SmallBalanceWidget
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher
 
-class UpdateWidgetsUseCase {
-    operator fun invoke(context: Context) {
+class AndroidWidgetRefresher(private val context: Context) : WidgetRefresher {
+    override fun refresh() {
         val manager = AppWidgetManager.getInstance(context)
         val balanceComp = ComponentName(context, BalanceWidget::class.java)
         val balanceIds = manager.getAppWidgetIds(balanceComp)

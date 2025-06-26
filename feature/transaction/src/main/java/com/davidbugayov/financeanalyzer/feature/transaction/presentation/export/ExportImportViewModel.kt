@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.feature.export_import
+package com.davidbugayov.financeanalyzer.feature.transaction.presentation.export
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel

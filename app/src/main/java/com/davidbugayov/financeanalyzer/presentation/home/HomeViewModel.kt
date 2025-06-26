@@ -214,7 +214,7 @@ class HomeViewModel(
                         )
 
                         context?.let { ctx ->
-                            updateWidgetsUseCase(ctx)
+                            updateWidgetsUseCase()
                             Timber.d(
                                 "Виджеты обновлены после удаления транзакции из HomeViewModel.",
                             )

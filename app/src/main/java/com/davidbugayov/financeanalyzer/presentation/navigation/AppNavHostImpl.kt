@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
-import com.davidbugayov.financeanalyzer.feature.export_import.ExportImportScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.presentation.export.ExportImportScreen
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.FinancialDetailStatisticsScreen
 import com.davidbugayov.financeanalyzer.navigation.AppNavHost
 import com.davidbugayov.financeanalyzer.navigation.AppNavigation

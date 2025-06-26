@@ -320,7 +320,7 @@ class EditTransactionViewModel(
                             isSuccess = true,
                         )
                     }
-                    updateWidgetsUseCase(application.applicationContext)
+                    updateWidgetsUseCase()
                     Timber.d("ТРАНЗАКЦИЯ: Успешно обновлена, ID=%s", transactionToSave.id)
                 } else if (result is CoreResult.Error) {
                     Timber.e(

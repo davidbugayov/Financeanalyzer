@@ -52,4 +52,4 @@ class AppCategoriesViewModel(
     override fun deleteIncomeCategory(name: String) {
         _incomeCategories.update { list -> list.filterNot { it.name == name } }
     }
-} 
+}

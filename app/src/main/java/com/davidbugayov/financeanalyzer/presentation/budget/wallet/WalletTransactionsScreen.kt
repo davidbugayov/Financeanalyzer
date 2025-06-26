@@ -48,7 +48,7 @@ import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.presentation.budget.ImportCategoriesDialog
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import kotlin.experimental.ExperimentalTypeInference
@@ -74,7 +74,8 @@ fun WalletTransactionsScreen(
     var showImportCategoriesDialog by remember { mutableStateOf(false) }
 
     // Получаем доступ к CategoriesViewModel для импорта категорий
-    val categoriesViewModel: CategoriesViewModel = koinViewModel()
+    val categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel =
+        koinViewModel()
     val expenseCategories by categoriesViewModel.expenseCategories.collectAsState()
 
     // Обработчик нажатия на кнопку "Потратить"
