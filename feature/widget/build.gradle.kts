@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.davidbugayov.financeanalyzer.feature.widget"
+    namespace = "com.davidbugayov.financeanalyzer.widget"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -75,6 +75,9 @@ dependencies {
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    // Logging
+    implementation(libs.timber)
 
     // Testing
     testImplementation(libs.junit)

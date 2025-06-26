@@ -7,7 +7,6 @@
     android:padding="6dp"
     android:background="@drawable/widget_background">
 
-    <!-- Левая часть с балансом -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"
@@ -37,7 +36,6 @@
             android:maxLines="1" />
     </LinearLayout>
 
-    <!-- Разделитель (используем TextView вместо View) -->
     <TextView
         android:layout_width="1dp"
         android:layout_height="match_parent"
@@ -45,7 +43,6 @@
         android:layout_marginLeft="4dp"
         android:layout_marginRight="4dp" />
 
-    <!-- Правая часть с доходами и расходами -->
     <LinearLayout
         android:layout_width="0dp"
         android:layout_height="match_parent"

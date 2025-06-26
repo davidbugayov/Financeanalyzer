@@ -7,5 +7,4 @@
     android:resizeMode="horizontal|vertical"
     android:widgetCategory="home_screen"
     android:previewLayout="@layout/balance_widget_layout"
-    android:description="@string/balance_widget_description">
-</appwidget-provider> 
+    android:description="@string/balance_widget_description" /> 

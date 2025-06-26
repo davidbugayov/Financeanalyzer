@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="income">Доходы</string>
+    <string name="expense">Расходы</string>
+    <string name="default_amount">0.00 ₽</string>
+    <string name="default_small_amount">0 ₽</string>
+    <string name="balance_widget_description">Виджет для отображения текущего баланса, доходов и расходов</string>
+    <string name="small_balance_widget_description">Компактный виджет для отображения текущего баланса</string>
+</resources> 
