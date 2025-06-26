@@ -78,4 +78,6 @@ dependencies {
 
     // Timber
     implementation(libs.timber)
+    // Material Components for Android (provides style attributes used in themes)
+    implementation(libs.material)
 }
