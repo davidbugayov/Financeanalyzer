@@ -66,6 +66,7 @@ dependencies {
     // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.material)
+    implementation(libs.androidx.splashscreen)
     testImplementation(libs.junit)
 
     // Compose
