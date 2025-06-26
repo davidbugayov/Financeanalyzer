@@ -257,6 +257,8 @@ dependencies {
         ":ui",
         ":feature",
         ":feature:home",
+        ":feature:budget",
+        ":feature:onboarding",
         ":feature:profile",
         ":feature:history",
         ":feature:statistics",
