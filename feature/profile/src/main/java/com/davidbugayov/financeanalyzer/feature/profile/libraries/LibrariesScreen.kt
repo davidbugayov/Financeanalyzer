@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.libraries
+package com.davidbugayov.financeanalyzer.feature.profile.libraries
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -17,7 +17,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -27,8 +26,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.ui.components.EmptyContent
-import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primary
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primaryContainer
@@ -36,8 +33,8 @@ import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_secondary
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_secondaryContainer
 
 /**
- * Экран для отображения списка используемых библиотек.
- * @param onNavigateBack Обработчик нажатия на кнопку "Назад".
+ * Экран со списком используемых в приложении библиотек.
+ * Вызывается из профиля.
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -92,17 +89,8 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
     }
 }
 
-/**
- * Элемент списка библиотек.
- * @param name Название библиотеки.
- * @param version Версия библиотеки.
- * @param description Описание библиотеки.
- * @param license Лицензия библиотеки.
- * @param index Индекс элемента в списке, используется для чередования оттенков.
- */
 @Composable
 private fun LibraryItem(name: String, version: String, description: String, license: String, index: Int) {
-    // Определяем градиент цветов в зависимости от четности индекса
     val gradientColors = if (index % 2 == 0) {
         listOf(
             md_theme_light_primary.copy(alpha = 0.9f),
@@ -115,7 +103,6 @@ private fun LibraryItem(name: String, version: String, description: String, lice
         )
     }
 
-    // Определяем цвет текста для заголовка на цветном фоне
     val textColor = Color.White
 
     Card(
@@ -129,7 +116,6 @@ private fun LibraryItem(name: String, version: String, description: String, lice
             containerColor = MaterialTheme.colorScheme.surface,
         ),
     ) {
-        // Заголовок с градиентом
         Box(
             modifier = Modifier
                 .fillMaxWidth()
@@ -154,7 +140,6 @@ private fun LibraryItem(name: String, version: String, description: String, lice
             }
         }
 
-        // Основное содержимое карточки
         Column(
             modifier = Modifier.padding(dimensionResource(R.dimen.spacing_normal)),
         ) {
@@ -167,7 +152,12 @@ private fun LibraryItem(name: String, version: String, description: String, lice
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_normal)))
 
-            HorizontalDivider()
+            HorizontalDivider(
+                color = MaterialTheme.colorScheme.outlineVariant,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(dimensionResource(R.dimen.height_divider)),
+            )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
 
@@ -180,13 +170,6 @@ private fun LibraryItem(name: String, version: String, description: String, lice
     }
 }
 
-/**
- * Модель данных для библиотеки.
- * @param name Название библиотеки.
- * @param version Версия библиотеки.
- * @param description Описание библиотеки.
- * @param license Лицензия библиотеки.
- */
 data class Library(
     val name: String,
     val version: String,
@@ -194,10 +177,6 @@ data class Library(
     val license: String,
 )
 
-/**
- * Возвращает список используемых библиотек.
- * @return Список библиотек.
- */
 private fun getLibraries(): List<Library> {
     return listOf(
         Library(
@@ -261,17 +240,4 @@ private fun getLibraries(): List<Library> {
             license = "Apache License 2.0",
         ),
     )
-}
-
-/**
- * Горизонтальный разделитель
- */
-@Composable
-private fun HorizontalDivider() {
-    HorizontalDivider(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(dimensionResource(R.dimen.height_divider)),
-        color = MaterialTheme.colorScheme.outlineVariant
-    )
-}
+} 

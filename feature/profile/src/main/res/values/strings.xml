@@ -1,0 +1,6 @@
+<resources>
+    <string name="libraries_title">Используемые библиотеки</string>
+    <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
+    <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
+    <string name="license_colon">Лицензия: %s</string>
+</resources> 
