@@ -42,8 +42,8 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryV
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
+import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
@@ -114,7 +114,10 @@ val appModule = module {
     }
 
     // ViewModels
-    viewModel { CategoriesViewModel(androidApplication()) }
+    viewModel { com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel(androidApplication()) }
+    single<com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel> {
+        get<com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel>()
+    }
     viewModel { AchievementsUiViewModel() }
     viewModel {
         AddTransactionViewModel(

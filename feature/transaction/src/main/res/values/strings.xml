@@ -94,4 +94,110 @@
   <string name="header_operation">Операция</string>
   <string name="header_document">Документ</string>
   <string name="header_amount">Сумма</string>
+  <string name="supported_banks_title">Поддерживаемые банки</string>
+  <string name="choose_file_button">Выбрать файл для импорта</string>
+  <string name="cancel">Отмена</string>
+  <string name="bank_instructions_title">Как получить выписку из %s</string>
+  <string name="unavailable_instructions">Инструкции недоступны для этого банка.</string>
+  <string name="got_it">Понятно</string>
+  <string name="bank_sberbank">Сбербанк</string>
+  <string name="bank_tinkoff">Тинькофф</string>
+  <string name="bank_alfabank">Альфа-Банк</string>
+  <string name="bank_ozon">Ozon Банк</string>
+  <string name="bank_csv">CSV файл</string>
+  <string name="importing_file">Импортируем файл…</string>
+  <string name="progress_percentage">%d%%</string>
+  <string name="how_to_import">Как импортировать транзакции</string>
+
+  <!-- Sberbank Instructions -->
+  <string name="sberbank_instructions_title">Через мобильное приложение Сбербанк:</string>
+  <string name="sberbank_instructions">1. Войдите в приложение Сбербанк\n2. Нажмите на карту, по которой нужна выписка\n3. Нажмите на кнопку \"Детали\" (три точки в правом верхнем углу)\n4. Выберите \"Выписка по счету\"\n5. Укажите период, за который нужна выписка\n6. Нажмите \"Сформировать выписку\"\n7. После формирования нажмите \"Скачать PDF\"\n8. Сохраните файл на устройство\n9. Импортируйте этот PDF-файл в наше приложение</string>
+  <string name="sberbank_note">Наше приложение поддерживает импорт PDF-выписок Сбербанка напрямую. Просто выберите скачанный PDF-файл и приложение автоматически распознает все транзакции.</string>
+
+  <!-- Tinkoff Instructions -->
+  <string name="tinkoff_instructions_title">Через мобильное приложение Тинькофф:</string>
+  <string name="tinkoff_instructions">1. Войдите в приложение Тинькофф\n2. Выберите карту или счет\n3. Нажмите на три точки в правом верхнем углу\n4. Выберите \"Выписка и справки\"\n5. Выберите \"Выписка по счету\"\n6. Выберите период выписки (например, за последний месяц)\n7. Нажмите \"Заказать выписку\"\n8. Дождитесь формирования выписки (обычно занимает несколько минут)\n9. Откройте полученную выписку и нажмите на значок \"Поделиться\"\n10. Сохраните PDF-файл на устройство\n11. Импортируйте сохраненный файл в наше приложение\n\nПриложение автоматически распознает новый формат выписок Тинькофф и корректно импортирует все транзакции.</string>
+
+  <!-- Alfa-Bank Instructions -->
+  <string name="alfabank_instructions_title_mobile">Через мобильное приложение Альфа-Банк:</string>
+  <string name="alfabank_instructions_mobile">1. Войдите в приложение Альфа-Банк\n2. Выберите карту или счет\n3. Нажмите на значок \"Выписка\" (иконка документа)\n4. Укажите период выписки\n5. Нажмите \"Сформировать\"\n6. После формирования нажмите \"Скачать\"\n7. Выберите формат XLSX (Excel)\n8. Сохраните файл на устройство\n9. Импортируйте этот XLSX-файл в наше приложение</string>
+  <string name="alfabank_instructions_title_web">Через Альфа-Банк Онлайн (веб-версия):</string>
+  <string name="alfabank_instructions_web">1. Войдите в личный кабинет Альфа-Банк Онлайн\n2. Выберите счет или карту\n3. Нажмите на кнопку \"Выписка\"\n4. Укажите период выписки\n5. Нажмите \"Сформировать выписку\"\n6. Выберите формат \"Excel\"\n7. Нажмите \"Скачать\"\n8. Импортируйте скачанный XLSX-файл в наше приложение</string>
+  <string name="alfabank_note_important">Важно:</string>
+  <string name="alfabank_note">Наше приложение поддерживает прямой импорт Excel-файлов (.xlsx) из Альфа-Банка. Просто выберите скачанный файл, и все транзакции будут автоматически распознаны.</string>
+
+  <!-- Ozon Instructions -->
+  <string name="ozon_instructions_title">Через приложение Ozon Банк:</string>
+  <string name="ozon_instructions">1. Войдите в приложение Ozon Банк\n2. Выберите карту или счет\n3. Перейдите во вкладку \"Ещё\" (внизу экрана)\n4. Выберите \"Получить справку\"\n5. Выберите \"О движении средств\"\n6. Выберите русский язык\n7. Выберите счет, по которому нужна выписка\n8. Укажите период выписки (например, последний месяц)\n9. Выберите тип операций (рекомендуем \"Все операции\")\n10. Нажмите \"Сформировать\"\n11. После формирования нажмите \"Скачать PDF\"\n12. Сохраните файл на устройство\n13. Импортируйте этот PDF-файл в наше приложение</string>
+
+  <!-- Bank Generic CSV -->
+  <string name="bank_generic_csv">Generic CSV (Configurable)</string>
+
+  <!-- Transaction source strings -->
+  <string name="transaction_source_sber">Сбер</string>
+  <string name="transaction_source_alfa">Альфа-Банк</string>
+  <string name="transaction_source_ozon">Озон</string>
+  <string name="transaction_source_tinkoff">Тинькофф</string>
+
+  <!-- Bank names -->
+  <string name="bank_sberbank_pdf">Сбербанк (PDF)</string>
+
+  <!-- Transaction notes -->
+  <string name="transaction_note_time">Время: %1$s</string>
+  <string name="transaction_note_auth_code">Код: %1$s</string>
+  <string name="transaction_note_balance">Баланс: %1$s</string>
+  <string name="transaction_note_details">Детали: %1$s</string>
+  <string name="transaction_title_unknown">Неизвестная операция</string>
+
+  <!-- New strings from the code block -->
+  <string name="add_button">Добавить</string>
+  <string name="select_category">Выбрать категорию</string>
+  <string name="add_custom_category">Добавить категорию</string>
+  <string name="add_custom_source">Добавить источник</string>
+  <string name="select_color">Выбрать цвет</string>
+  <string name="select_date_button">Выбрать дату</string>
+  <string name="note_optional">Заметка (необязательно)</string>
+  <string name="comment">Комментарий</string>
+  <string name="select_source">Выбрать источник</string>
+  <string name="delete_source">Удалить источник</string>
+  <string name="source">Источник</string>
+  <string name="income_type">Доход</string>
+  <string name="expense_type">Расход</string>
+  <string name="wallet_selected_singular">выбран кошелек</string>
+  <string name="wallet_selected_plural">выбрано кошельков</string>
+  <string name="select_wallets">Выбрать кошельки</string>
+  <string name="selected_wallets_count">Выбрано: %d</string>
+  <string name="add_to_wallets">Добавить в кошелек</string>
+  <string name="close">Закрыть</string>
+  <string name="show_more_categories">Показать больше</string>
+  <string name="hide_categories">Скрыть</string>
+  <string name="category">Категория</string>
+  <string name="source_name">Название источника</string>
+  <string name="date">Дата</string>
+  <string name="edit_transaction_title">Редактировать транзакцию</string>
+  <string name="save_button_text">Сохранить</string>
+  <string name="select_wallets_content_description">Выбор кошельков</string>
+
+  <!-- Transaction screen common strings -->
+  <string name="new_transaction_title">Новая транзакция</string>
+  <string name="add_button_text">Добавить</string>
+  <string name="error_title">Ошибка</string>
+  <string name="unknown_error_message">Произошла неизвестная ошибка</string>
+  <string name="dialog_ok">ОК</string>
+  <string name="attention_title">Внимание</string>
+  <string name="unsaved_data_warning">У вас есть несохранённые данные. Если продолжите, изменения будут потеряны.</string>
+  <string name="proceed_to_import">Перейти к импорту</string>
+  <string name="dialog_cancel">Отмена</string>
+  <string name="transaction_saved_success">Транзакция успешно сохранена!</string>
+  <string name="delete_category_title">Удаление категории</string>
+  <string name="delete_category_confirmation">Вы уверены, что хотите удалить категорию «%1$s»?</string>
+  <string name="dialog_delete">Удалить</string>
+  <string name="delete_source_title">Удаление источника</string>
+  <string name="delete_source_confirmation">Вы уверены, что хотите удалить источник «%1$s»?</string>
+  <string name="add_transaction">Добавление транзакции</string>
+  <string name="add_category">Добавить категорию</string>
+  <string name="category_name">Название категории</string>
+  <string name="select_icon">Выбрать иконку</string>
+  <string name="category_other">Другое</string>
+  <string name="category_transfer">Переводы</string>
 </resources>

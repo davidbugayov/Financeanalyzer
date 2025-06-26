@@ -65,3 +65,6 @@ include(":feature:history")
 include(":feature:statistics")
 include(":feature:transaction")
 include(":feature:widget")
+
+// Presentation module
+include(":presentation")

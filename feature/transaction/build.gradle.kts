@@ -13,6 +13,9 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        // Expose flavor constant so library can check at runtime
+        buildConfigField("boolean", "IS_RUSTORE_FLAVOR", "false")
     }
 
     buildTypes {
@@ -40,6 +43,7 @@ android {
 
     buildFeatures {
         compose = true
+        buildConfig = true
     }
 
     composeOptions {
@@ -55,6 +59,8 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":utils"))
     implementation(project(":feature"))
+    implementation(project(":feature:widget"))
+    implementation(project(":presentation"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
@@ -98,4 +104,7 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+
+    // Math expression parser
+    implementation(libs.exp4j)
 }

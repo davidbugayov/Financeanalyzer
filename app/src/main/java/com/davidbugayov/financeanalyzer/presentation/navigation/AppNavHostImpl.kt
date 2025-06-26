@@ -15,8 +15,8 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.FinancialSt
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileScreen
 import java.util.Date
 import org.koin.androidx.compose.koinViewModel

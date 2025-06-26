@@ -377,6 +377,10 @@ dependencies {
 
     // Exp4j
     implementation(libs.exp4j)
+
+    // Presentation
+    implementation(project(":presentation"))
+    implementation(project(":feature:transaction"))
 }
 
 composeCompiler {

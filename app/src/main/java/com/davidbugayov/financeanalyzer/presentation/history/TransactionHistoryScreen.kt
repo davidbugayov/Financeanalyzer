@@ -47,7 +47,7 @@ import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelec
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
+import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import timber.log.Timber
@@ -209,12 +209,7 @@ fun TransactionHistoryScreen(
 
     // Диалог подтверждения удаления категории
     state.categoryToDelete?.let { (category, isExpense) ->
-        // Определяем, является ли категория стандартной
-        val isDefaultCategory = if (isExpense) {
-            viewModel.categoriesViewModel.isDefaultExpenseCategory(category)
-        } else {
-            viewModel.categoriesViewModel.isDefaultIncomeCategory(category)
-        }
+        val isDefaultCategory = false
 
         DeleteCategoryConfirmDialog(
             category = category,

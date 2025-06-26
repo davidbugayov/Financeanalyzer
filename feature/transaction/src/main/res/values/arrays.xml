@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="default_source_names">
+        <item>Сбер</item>
+        <item>Тинькофф</item>
+        <item>Альфа</item>
+        <item>Озон</item>
+        <item>ВТБ</item>
+        <item>Газпромбанк</item>
+        <item>Райффайзен</item>
+        <item>Почта Банк</item>
+        <item>Юмани</item>
+        <item>Наличные</item>
+    </string-array>
+</resources> 
