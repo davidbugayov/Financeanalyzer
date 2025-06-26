@@ -933,7 +933,9 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         }
 
         // Если не удалось распознать ни как число, ни как выражение, возвращаем 0
-        Timber.e("parseMoneyExpression: не удалось распознать ни как число, ни как выражение: '$processedExpr', возвращаем 0")
+        Timber.e(
+            "parseMoneyExpression: не удалось распознать ни как число, ни как выражение: '$processedExpr', возвращаем 0",
+        )
         return Money(BigDecimal.ZERO, currency)
     }
 

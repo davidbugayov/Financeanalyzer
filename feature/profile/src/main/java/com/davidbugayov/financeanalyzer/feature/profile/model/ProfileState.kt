@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.profile.model
 
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
+import com.davidbugayov.financeanalyzer.utils.Time
 
 /**
  * Состояние экрана профиля.

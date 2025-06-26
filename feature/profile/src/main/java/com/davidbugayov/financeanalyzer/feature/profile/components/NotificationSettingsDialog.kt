@@ -33,7 +33,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
@@ -81,8 +81,8 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
 
     if (showTimePicker) {
         TimePickerDialog(
-            initialHour = state.transactionReminderTime?.hours ?: 20,
-            initialMinute = state.transactionReminderTime?.minutes ?: 0,
+            initialHour = state.transactionReminderTime?.hour ?: 20,
+            initialMinute = state.transactionReminderTime?.minute ?: 0,
             onTimeSelected = { hour, minute ->
                 viewModel.onEvent(
                     ProfileEvent.UpdateTransactionReminder(
@@ -201,8 +201,8 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                                     String.format(
                                         Locale.getDefault(),
                                         "%02d:%02d",
-                                        state.transactionReminderTime?.hours ?: 20,
-                                        state.transactionReminderTime?.minutes ?: 0,
+                                        state.transactionReminderTime?.hour ?: 20,
+                                        state.transactionReminderTime?.minute ?: 0,
                                     ),
                                 ),
                                 style = MaterialTheme.typography.bodyMedium,

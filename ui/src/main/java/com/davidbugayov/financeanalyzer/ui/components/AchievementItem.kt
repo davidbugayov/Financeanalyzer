@@ -25,7 +25,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Achievement
 @Composable
 fun AchievementItem(
     achievement: Achievement,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
@@ -34,12 +34,12 @@ fun AchievementItem(
                 MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
             } else {
                 MaterialTheme.colorScheme.surfaceVariant
-            }
-        )
+            },
+        ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             Icon(
                 imageVector = Icons.Default.EmojiEvents,
@@ -49,7 +49,7 @@ fun AchievementItem(
                 } else {
                     Color.Gray
                 },
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(48.dp),
             )
             Spacer(modifier = Modifier.size(16.dp))
             Column(modifier = Modifier.weight(1f)) {
@@ -61,7 +61,7 @@ fun AchievementItem(
                         MaterialTheme.colorScheme.onSurface
                     } else {
                         Color.Gray
-                    }
+                    },
                 )
                 Text(
                     text = achievement.description,
@@ -70,7 +70,7 @@ fun AchievementItem(
                         MaterialTheme.colorScheme.onSurfaceVariant
                     } else {
                         Color.Gray
-                    }
+                    },
                 )
             }
             if (achievement.isUnlocked) {
@@ -78,9 +78,9 @@ fun AchievementItem(
                     imageVector = Icons.Default.CheckCircle,
                     contentDescription = "Достигнуто",
                     tint = Color(0xFF4CAF50),
-                    modifier = Modifier.size(32.dp)
+                    modifier = Modifier.size(32.dp),
                 )
             }
         }
     }
-} 
+}

@@ -23,8 +23,6 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AccountBalanceWallet
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.CalendarMonth
-import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.AlertDialog
@@ -47,7 +45,6 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -57,13 +54,11 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -337,7 +332,7 @@ fun BudgetScreen(
                                 label = "Лимит расходов",
                                 modifier = Modifier.fillMaxWidth(),
                                 allowDecimal = true,
-                                isError = false
+                                isError = false,
                             )
                         }
                     },
@@ -396,7 +391,7 @@ fun BudgetScreen(
                                 label = "Сумма дохода",
                                 modifier = Modifier.fillMaxWidth(),
                                 allowDecimal = true,
-                                isError = false
+                                isError = false,
                             )
                         }
                     },
@@ -453,7 +448,7 @@ fun BudgetScreen(
                                 label = "Сумма",
                                 modifier = Modifier.fillMaxWidth(),
                                 allowDecimal = true,
-                                isError = false
+                                isError = false,
                             )
                         }
                     },
@@ -551,7 +546,7 @@ fun BudgetScreen(
                                     label = "Сумма перевода",
                                     modifier = Modifier.fillMaxWidth(),
                                     allowDecimal = true,
-                                    isError = false
+                                    isError = false,
                                 )
                             }
                         }
@@ -1053,7 +1048,7 @@ fun EditWalletDialog(
                     label = "Лимит расходов",
                     modifier = Modifier.fillMaxWidth(),
                     allowDecimal = true,
-                    isError = false
+                    isError = false,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))

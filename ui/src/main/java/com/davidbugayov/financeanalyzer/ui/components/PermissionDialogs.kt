@@ -46,4 +46,4 @@ object PermissionDialogs {
             dismissButton = { TextButton(onClick = onDismiss) { Text(stringResource(dismissButtonTextResId)) } },
         )
     }
-} 
+}

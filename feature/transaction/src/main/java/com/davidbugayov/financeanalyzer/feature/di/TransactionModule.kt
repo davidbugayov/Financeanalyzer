@@ -10,4 +10,4 @@ import org.koin.dsl.module
 val transactionModule = module {
     // ViewModels
     viewModel { ExportImportViewModel(get()) }
-} 
+}

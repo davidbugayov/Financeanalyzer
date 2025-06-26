@@ -60,8 +60,7 @@ include(":ui")
 // Feature modules
 include(":feature")
 include(":feature:home")
-// TODO: restore when Profile feature migration is finished
-// include(":feature:profile")
+include(":feature:profile")
 include(":feature:history")
 include(":feature:statistics")
 include(":feature:transaction")

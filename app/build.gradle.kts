@@ -257,10 +257,11 @@ dependencies {
         ":ui",
         ":feature",
         ":feature:home",
+        ":feature:profile",
         ":feature:history",
         ":feature:statistics",
         ":feature:transaction",
-        ":feature:widget"
+        ":feature:widget",
     )
 
     modules.forEach { module ->

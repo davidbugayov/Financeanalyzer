@@ -108,7 +108,9 @@ class TbankPdfHandler(
                         return false
                     }
                     if (hasTinkoffIndicator || hasTableFormat) {
-                        Timber.d("[$bankName Handler] Найден индикатор Тинькофф в содержимом файла. Табличный формат: $hasTableFormat")
+                        Timber.d(
+                            "[$bankName Handler] Найден индикатор Тинькофф в содержимом файла. Табличный формат: $hasTableFormat",
+                        )
                         return true
                     }
                 }

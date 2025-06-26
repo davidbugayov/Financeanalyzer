@@ -1,14 +1,14 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.analytics
-import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.ProfileAnalytics
 import com.davidbugayov.financeanalyzer.domain.model.mapException
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import java.util.Date
 import java.util.Calendar
+import java.util.Date
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 
 class GetProfileAnalyticsUseCase(
     private val transactionRepository: TransactionRepository,
@@ -17,11 +17,9 @@ class GetProfileAnalyticsUseCase(
 
     suspend operator fun invoke(): CoreResult<ProfileAnalytics> {
         return try {
-            // Получаем данные из репозиториев
             val transactions = transactionRepository.getAllTransactions()
             val wallets = walletRepository.getAllWallets().size
 
-            // Вычисляем финансовые показатели
             var totalIncome = Money.zero()
             var totalExpense = Money.zero()
             val incomeCategories = mutableSetOf<String>()
@@ -39,7 +37,6 @@ class GetProfileAnalyticsUseCase(
                 transaction.source?.let { sources.add(it) }
             }
 
-            // Вычисляем баланс и процент сбережений
             val balance = totalIncome.minus(totalExpense)
             val savingsRate = if (!totalIncome.isZero()) {
                 balance.amount.toDouble() / totalIncome.amount.toDouble() * 100.0
@@ -47,20 +44,17 @@ class GetProfileAnalyticsUseCase(
                 0.0
             }
 
-            // Вычисляем среднюю сумму расходов
             val averageExpense = if (expenseCategories.isNotEmpty()) {
                 totalExpense.div(expenseCategories.size.toDouble())
             } else {
                 Money.zero()
             }
 
-            // Вычисляем диапазон дат (последний год)
             val currentDate = Date()
             val calendar = Calendar.getInstance()
             calendar.add(Calendar.YEAR, -1)
             val yearAgoDate = calendar.time
 
-            // Создаем доменную модель ProfileAnalytics
             val profileAnalytics = ProfileAnalytics(
                 totalIncome = totalIncome,
                 totalExpense = totalExpense,
@@ -81,4 +75,4 @@ class GetProfileAnalyticsUseCase(
             CoreResult.Error(mapException(e))
         }
     }
-}
+} 

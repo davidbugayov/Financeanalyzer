@@ -42,7 +42,7 @@ data class ImportResults(
 @Composable
 fun ImportResultsSection(
     importResults: ImportResults?,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     if (importResults == null) return
 
@@ -54,11 +54,11 @@ fun ImportResultsSection(
         Card(
             modifier = Modifier.fillMaxWidth(),
             colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.card_elevation)
-            )
+                defaultElevation = dimensionResource(R.dimen.card_elevation),
+            ),
         ) {
             Column(
                 modifier = Modifier
@@ -131,9 +131,9 @@ fun ImportResultsSection(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer
+                            containerColor = MaterialTheme.colorScheme.errorContainer,
                         ),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card))
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
                     ) {
                         Text(
                             text = importResults.errorMessage,
@@ -148,9 +148,9 @@ fun ImportResultsSection(
                     Card(
                         modifier = Modifier.fillMaxWidth(),
                         colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
                         ),
-                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card))
+                        shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
                     ) {
                         Column(
                             modifier = Modifier
@@ -162,11 +162,11 @@ fun ImportResultsSection(
                                 text = stringResource(
                                     R.string.import_summary,
                                     importResults.importedCount,
-                                    importResults.skippedCount
+                                    importResults.skippedCount,
                                 ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
-                                textAlign = TextAlign.Center
+                                textAlign = TextAlign.Center,
                             )
                         }
                     }

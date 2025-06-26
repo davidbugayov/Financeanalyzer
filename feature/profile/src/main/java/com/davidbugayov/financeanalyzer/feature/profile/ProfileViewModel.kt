@@ -6,14 +6,13 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
-import com.davidbugayov.financeanalyzer.feature.profile.model.Time
+import com.davidbugayov.financeanalyzer.utils.Time
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -178,7 +177,7 @@ class ProfileViewModel(
     }
 
     @Suppress("UNCHECKED_CAST", "USELESS_IS_CHECK")
-    private fun exportTransactionsToCSV(action: ExportAction) {
+    private fun exportTransactionsToCSV(action: ExportTransactionsToCSVUseCase.ExportAction) {
         viewModelScope.launch {
             try {
                 val result = exportTransactionsToCSVUseCase()
@@ -194,19 +193,19 @@ class ProfileViewModel(
                         }
 
                         when (action) {
-                            ExportAction.SHARE -> {
+                            ExportTransactionsToCSVUseCase.ExportAction.SHARE -> {
                                 val shareResult = exportTransactionsToCSVUseCase.shareCSVFile(filePath)
                                 if (shareResult is CoreResult.Success) {
                                     Timber.d("[ProfileViewModel] File shared successfully")
                                 }
                             }
-                            ExportAction.OPEN -> {
+                            ExportTransactionsToCSVUseCase.ExportAction.OPEN -> {
                                 val openResult = exportTransactionsToCSVUseCase.openCSVFile(filePath)
                                 if (openResult is CoreResult.Success) {
                                     Timber.d("[ProfileViewModel] File opened successfully")
                                 }
                             }
-                            ExportAction.SAVE_ONLY -> {
+                            ExportTransactionsToCSVUseCase.ExportAction.SAVE_ONLY -> {
                                 // Ничего не делаем, файл уже сохранен
                             }
                             else -> {

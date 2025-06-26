@@ -333,8 +333,8 @@ class OzonPdfImportUseCase(
             } || headerLines.any {
                 // Проверка для формата из скриншота
                 (it.contains("Дата операции", ignoreCase = true) && it.contains("Документ", ignoreCase = true)) ||
-                (it.contains("Назначение платежа", ignoreCase = true) && it.contains("Сумма операции", ignoreCase = true)) ||
-                (it.contains("Российские рубли", ignoreCase = true) && it.contains("Валюта", ignoreCase = true))
+                    (it.contains("Назначение платежа", ignoreCase = true) && it.contains("Сумма операции", ignoreCase = true)) ||
+                    (it.contains("Российские рубли", ignoreCase = true) && it.contains("Валюта", ignoreCase = true))
             } || textSample.contains("Входящий остаток", ignoreCase = true) // Дополнительный индикатор для выписки с транзакциями
 
             // Подробные логи для отладки определения маркеров таблицы
@@ -342,16 +342,19 @@ class OzonPdfImportUseCase(
             headerLines.forEachIndexed { index, line ->
                 Timber.i("ОТЛАДКА-ОЗОН: Строка %d: '%s'", index + 1, line)
             }
-            
+
             Timber.i("ОТЛАДКА-ОЗОН: Проверка наличия ключевых слов в тексте:")
             Timber.i("ОТЛАДКА-ОЗОН: 'Дата операции': %s", textSample.contains("Дата операции", ignoreCase = true))
             Timber.i("ОТЛАДКА-ОЗОН: 'Документ': %s", textSample.contains("Документ", ignoreCase = true))
-            Timber.i("ОТЛАДКА-ОЗОН: 'Назначение платежа': %s", textSample.contains("Назначение платежа", ignoreCase = true))
+            Timber.i(
+                "ОТЛАДКА-ОЗОН: 'Назначение платежа': %s",
+                textSample.contains("Назначение платежа", ignoreCase = true),
+            )
             Timber.i("ОТЛАДКА-ОЗОН: 'Сумма операции': %s", textSample.contains("Сумма операции", ignoreCase = true))
             Timber.i("ОТЛАДКА-ОЗОН: 'Российские рубли': %s", textSample.contains("Российские рубли", ignoreCase = true))
             Timber.i("ОТЛАДКА-ОЗОН: 'Валюта': %s", textSample.contains("Валюта", ignoreCase = true))
             Timber.i("ОТЛАДКА-ОЗОН: 'Входящий остаток': %s", textSample.contains("Входящий остаток", ignoreCase = true))
-            
+
             Timber.d(
                 "Ozon isValidFormat: Проверка маркеров таблицы (Дата, Описание, Сумма / ДАТА И ВРЕМЯ, ОПИСАНИЕ ОПЕРАЦИИ, СУММА / История операций / Дата операции, Документ, Назначение платежа, Сумма операции) -> %s",
                 hasTableMarker,
@@ -359,10 +362,10 @@ class OzonPdfImportUseCase(
 
             // Проверка на статистический файл (справка о движении средств без таблицы транзакций)
             val isStatisticsFile = hasBankIndicator && hasStatementTitle && !hasTableMarker &&
-                textSample.contains("движени", ignoreCase = true) && 
+                textSample.contains("движени", ignoreCase = true) &&
                 textSample.contains("средств", ignoreCase = true) &&
                 !textSample.contains("Входящий остаток", ignoreCase = true) // Если есть "Входящий остаток", то это не статистика, а выписка
-            
+
             Timber.i("ОТЛАДКА-ОЗОН: Проверка на статистический файл: %s", isStatisticsFile)
             Timber.i("ОТЛАДКА-ОЗОН: Условия для статистического файла:")
             Timber.i("ОТЛАДКА-ОЗОН: - hasBankIndicator: %s", hasBankIndicator)
@@ -370,11 +373,16 @@ class OzonPdfImportUseCase(
             Timber.i("ОТЛАДКА-ОЗОН: - !hasTableMarker: %s", !hasTableMarker)
             Timber.i("ОТЛАДКА-ОЗОН: - содержит 'движени': %s", textSample.contains("движени", ignoreCase = true))
             Timber.i("ОТЛАДКА-ОЗОН: - содержит 'средств': %s", textSample.contains("средств", ignoreCase = true))
-            Timber.i("ОТЛАДКА-ОЗОН: - НЕ содержит 'Входящий остаток': %s", !textSample.contains("Входящий остаток", ignoreCase = true))
-            
+            Timber.i(
+                "ОТЛАДКА-ОЗОН: - НЕ содержит 'Входящий остаток': %s",
+                !textSample.contains("Входящий остаток", ignoreCase = true),
+            )
+
             if (isStatisticsFile) {
                 Timber.w("Ozon isValidFormat: Обнаружен файл со статистикой движения средств, а не с транзакциями")
-                throw StatisticsFileException("Файл содержит статистические данные о движении средств, а не транзакции.")
+                throw StatisticsFileException(
+                    "Файл содержит статистические данные о движении средств, а не транзакции.",
+                )
             }
 
             val isValid = hasBankIndicator && hasStatementTitle && hasTableMarker
@@ -404,7 +412,8 @@ class OzonPdfImportUseCase(
         val tableHeaderKeywords = listOf("ДАТА И ВРЕМЯ", "ОПИСАНИЕ ОПЕРАЦИИ", "СУММА", "БАЛАНС")
         val alternativeHeaderKeyword = "История операций"
         val statementHeaderKeyword = "Дата операции Документ Назначение платежа Сумма операции"
-        val newFormatHeaderKeywords = listOf("Дата операции", "Документ", "Назначение платежа", "Сумма операции", "Российские рубли", "Валюта")
+        val newFormatHeaderKeywords =
+            listOf("Дата операции", "Документ", "Назначение платежа", "Сумма операции", "Российские рубли", "Валюта")
 
         // Для отладки сохраним первые 30 строк
         val headerLines = mutableListOf<String>()
@@ -416,7 +425,7 @@ class OzonPdfImportUseCase(
             }
         }
         reader.reset()
-        
+
         Timber.i("ОТЛАДКА-ОЗОН-SKIP: Первые 30 строк файла:")
         headerLines.forEachIndexed { index, headerLine ->
             Timber.i("ОТЛАДКА-ОЗОН-SKIP: Строка %d: '%s'", index + 1, headerLine)
@@ -438,29 +447,45 @@ class OzonPdfImportUseCase(
             Timber.i("ОТЛАДКА-ОЗОН-SKIP: (Поиск заголовка) Строка %d: '%s'", linesSkipped, line)
 
             // Проверка на новый формат из скриншота
-            if (line.contains("Дата операции", ignoreCase = true) && 
-                (line.contains("Документ", ignoreCase = true) || 
-                 line.contains("Назначение платежа", ignoreCase = true))) {
-                
+            if (line.contains("Дата операции", ignoreCase = true) &&
+                (
+                    line.contains("Документ", ignoreCase = true) ||
+                        line.contains("Назначение платежа", ignoreCase = true)
+                    )
+            ) {
                 Timber.i("ОТЛАДКА-ОЗОН-SKIP: Найден заголовок нового формата на строке %d: '%s'", linesSkipped, line)
-                
+
                 // Проверяем следующую строку, там может быть продолжение заголовка
                 reader.mark(1024)
                 val nextLine = reader.readLine()?.replace("\\u0000", "")
-                
-                if (nextLine != null && (nextLine.contains("Сумма операции", ignoreCase = true) || 
-                                        nextLine.contains("Российские рубли", ignoreCase = true) ||
-                                        nextLine.contains("Валюта", ignoreCase = true))) {
-                    Timber.i("ОТЛАДКА-ОЗОН-SKIP: Найдено продолжение заголовка на строке %d: '%s'", linesSkipped + 1, nextLine)
+
+                if (nextLine != null && (
+                        nextLine.contains("Сумма операции", ignoreCase = true) ||
+                            nextLine.contains("Российские рубли", ignoreCase = true) ||
+                            nextLine.contains("Валюта", ignoreCase = true)
+                        )
+                ) {
+                    Timber.i(
+                        "ОТЛАДКА-ОЗОН-SKIP: Найдено продолжение заголовка на строке %d: '%s'",
+                        linesSkipped + 1,
+                        nextLine,
+                    )
                     linesSkipped++
-                    
+
                     // Проверяем еще одну строку, там может быть третья часть заголовка
                     reader.mark(1024)
                     val thirdLine = reader.readLine()?.replace("\\u0000", "")
-                    
-                    if (thirdLine != null && (thirdLine.contains("Российские рубли", ignoreCase = true) || 
-                                            thirdLine.contains("Валюта", ignoreCase = true))) {
-                        Timber.i("ОТЛАДКА-ОЗОН-SKIP: Найдена третья часть заголовка на строке %d: '%s'", linesSkipped + 1, thirdLine)
+
+                    if (thirdLine != null && (
+                            thirdLine.contains("Российские рубли", ignoreCase = true) ||
+                                thirdLine.contains("Валюта", ignoreCase = true)
+                            )
+                    ) {
+                        Timber.i(
+                            "ОТЛАДКА-ОЗОН-SKIP: Найдена третья часть заголовка на строке %d: '%s'",
+                            linesSkipped + 1,
+                            thirdLine,
+                        )
                         linesSkipped++
                     } else {
                         reader.reset() // Возвращаемся к предыдущей позиции
@@ -468,11 +493,11 @@ class OzonPdfImportUseCase(
                 } else {
                     reader.reset() // Возвращаемся к предыдущей позиции
                 }
-                
+
                 tableHeaderFound = true
                 break
             }
-            
+
             // Проверяем на заголовок "Справка о движении средств"
             if (line.trim().equals(statementHeaderKeyword, ignoreCase = true)) {
                 Timber.d(
@@ -609,7 +634,10 @@ class OzonPdfImportUseCase(
         }
 
         if (tableHeaderFound) {
-            Timber.i("ОТЛАДКА-ОЗОН-SKIP: Заголовки таблицы успешно найдены и пропущены (всего пропущено %d строк)", linesSkipped)
+            Timber.i(
+                "ОТЛАДКА-ОЗОН-SKIP: Заголовки таблицы успешно найдены и пропущены (всего пропущено %d строк)",
+                linesSkipped,
+            )
         } else {
             Timber.w("Ozon skipHeaders: Заголовки таблицы не найдены после пропуска %d строк", linesSkipped)
         }
@@ -704,27 +732,27 @@ class OzonPdfImportUseCase(
                 "(\\d{2}:\\d{2}:\\d{2})\\s+" + // 2: Время (HH:MM:SS)
                 "(\\d+)\\s+" + // 3: Номер документа
                 "(.+?)\\s+" + // 4: Описание операции
-                "([+\\-])\\s*(\\d[\\d\\s.,]*)\\s*₽.*$" // 5: Знак, 6: Сумма с символом рубля
+                "([+\\-])\\s*(\\d[\\d\\s.,]*)\\s*₽.*$", // 5: Знак, 6: Сумма с символом рубля
         )
-        
+
         // Дополнительное регулярное выражение для случая, когда дата и время на разных строках
         val multilineTransactionRegex = Regex(
-            "^(\\d{2}\\.\\d{2}\\.\\d{4})$" // 1: Дата (DD.MM.YYYY)
+            "^(\\d{2}\\.\\d{2}\\.\\d{4})$", // 1: Дата (DD.MM.YYYY)
         )
-        
+
         // Регулярное выражение для строки времени
         val timeLineRegex = Regex(
-            "^(\\d{2}:\\d{2}:\\d{2})$" // 1: Время (HH:MM:SS)
+            "^(\\d{2}:\\d{2}:\\d{2})$", // 1: Время (HH:MM:SS)
         )
-        
+
         // Регулярное выражение для строки номера документа
         val documentLineRegex = Regex(
-            "^(\\d+)$" // 1: Номер документа
+            "^(\\d+)$", // 1: Номер документа
         )
-        
+
         // Регулярное выражение для строки суммы
         val amountLineRegex = Regex(
-            "^([+\\-])?\\s*(\\d[\\d\\s.,]*)\\s*₽.*$" // 1: Знак (опционально), 2: Сумма с символом рубля
+            "^([+\\-])?\\s*(\\d[\\d\\s.,]*)\\s*₽.*$", // 1: Знак (опционально), 2: Сумма с символом рубля
         )
 
         // Проверяем новый формат из скриншота
@@ -732,7 +760,7 @@ class OzonPdfImportUseCase(
         if (newFormatMatch != null) {
             Timber.i("ОТЛАДКА-ОЗОН: Строка соответствует новому формату из скриншота!")
             Timber.i("ОТЛАДКА-ОЗОН: Группы нового формата: %s", newFormatMatch.groupValues.joinToString(" | "))
-            
+
             try {
                 val dateStr = newFormatMatch.groupValues[1]
                 val timeStr = newFormatMatch.groupValues[2]
@@ -740,22 +768,25 @@ class OzonPdfImportUseCase(
                 val description = newFormatMatch.groupValues[4]
                 val sign = newFormatMatch.groupValues[5]
                 val amountStr = newFormatMatch.groupValues[6].replace("\\s".toRegex(), "").replace(",", ".")
-                
+
                 val dateTimeStr = "$dateStr $timeStr"
                 val dateFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
                 val date = dateFormat.parse(dateTimeStr) ?: Date()
-                
+
                 val amount = amountStr.toDoubleOrNull() ?: 0.0
                 val isExpense = sign == "-"
                 val finalAmount = if (isExpense) -amount else amount
-                
+
                 val category = TransactionCategoryDetector.detect(description)
-                
+
                 Timber.i(
                     "ОТЛАДКА-ОЗОН: Успешный парсинг нового формата: Дата='%s', Сумма='%s', Описание='%s', Категория='%s'",
-                    date, finalAmount, description, category,
+                    date,
+                    finalAmount,
+                    description,
+                    category,
                 )
-                
+
                 // Создаем объект Transaction
                 return Transaction(
                     amount = Money(
@@ -775,15 +806,15 @@ class OzonPdfImportUseCase(
                 return null
             }
         }
-        
+
         // Проверка на строку с датой (начало многострочной транзакции)
         val multilineMatch = multilineTransactionRegex.find(trimmedLine)
         if (multilineMatch != null) {
             Timber.i("ОТЛАДКА-ОЗОН: Строка соответствует формату даты для многострочной транзакции: %s", trimmedLine)
-            
+
             // Начинаем новую транзакцию
             val dateStr = multilineMatch.groupValues[1]
-            
+
             // Сохраняем дату в состоянии
             try {
                 val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
@@ -796,49 +827,49 @@ class OzonPdfImportUseCase(
                 Timber.e(e, "ОТЛАДКА-ОЗОН: Ошибка при парсинге даты '%s'", dateStr)
                 currentTransactionState = null
             }
-            
+
             return null
         }
-        
+
         // Проверка на строку с временем
         if (currentTransactionState != null && currentTransactionState?.date != null) {
             val timeMatch = timeLineRegex.find(trimmedLine)
             if (timeMatch != null) {
                 Timber.i("ОТЛАДКА-ОЗОН: Строка соответствует формату времени: %s", trimmedLine)
-                
+
                 val timeStr = timeMatch.groupValues[1]
                 try {
                     // Обновляем дату, добавляя время
                     val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
                     val timeFormat = SimpleDateFormat("HH:mm:ss", Locale.getDefault())
-                    
+
                     val dateStr = dateFormat.format(currentTransactionState?.date!!)
                     val time = timeFormat.parse(timeStr)
-                    
+
                     val dateTimeFormat = SimpleDateFormat("dd.MM.yyyy HH:mm:ss", Locale.getDefault())
                     val dateTimeStr = "$dateStr $timeStr"
                     val newDate = dateTimeFormat.parse(dateTimeStr) ?: currentTransactionState?.date
-                    
+
                     currentTransactionState?.date = newDate
                     Timber.i("ОТЛАДКА-ОЗОН: Добавлено время '%s' к дате транзакции", timeStr)
                 } catch (e: Exception) {
                     Timber.e(e, "ОТЛАДКА-ОЗОН: Ошибка при добавлении времени '%s' к дате", timeStr)
                 }
-                
+
                 return null
             }
         }
-        
+
         // Проверка на строку с номером документа
         if (currentTransactionState != null && currentTransactionState?.date != null) {
             val documentMatch = documentLineRegex.find(trimmedLine)
             if (documentMatch != null) {
                 Timber.i("ОТЛАДКА-ОЗОН: Строка соответствует формату номера документа: %s", trimmedLine)
-                
+
                 val documentNumber = documentMatch.groupValues[1]
                 currentTransactionState?.documentNumber = documentNumber
                 Timber.i("ОТЛАДКА-ОЗОН: Добавлен номер документа '%s' к транзакции", documentNumber)
-                
+
                 return null
             }
         }
@@ -848,26 +879,26 @@ class OzonPdfImportUseCase(
             val newAmountMatch = amountLineRegex.find(trimmedLine)
             if (newAmountMatch != null) {
                 Timber.i("ОТЛАДКА-ОЗОН: Строка соответствует формату суммы с символом рубля: %s", trimmedLine)
-                
+
                 val sign = newAmountMatch.groupValues[1]
                 val amountStr = newAmountMatch.groupValues[2].replace("\\s".toRegex(), "").replace(",", ".")
-                
+
                 try {
                     val amount = amountStr.toDoubleOrNull() ?: 0.0
                     val isExpense = sign == "-"
                     val finalAmount = if (isExpense) -amount else amount
-                    
+
                     currentTransactionState?.amount = Math.abs(finalAmount)
                     currentTransactionState?.isExpense = isExpense
                     currentTransactionState?.currency = "RUB"
-                    
+
                     Timber.i("ОТЛАДКА-ОЗОН: Добавлена сумма %s к транзакции, расход: %s", finalAmount, isExpense)
-                    
+
                     // Если у нас есть все необходимые данные, завершаем транзакцию
-                    if (currentTransactionState?.date != null && 
-                        currentTransactionState?.documentNumber != null && 
-                        !currentTransactionState?.description.isNullOrEmpty()) {
-                        
+                    if (currentTransactionState?.date != null &&
+                        currentTransactionState?.documentNumber != null &&
+                        !currentTransactionState?.description.isNullOrEmpty()
+                    ) {
                         val transaction = finalizeCurrentTransaction()
                         currentTransactionState = null
                         return transaction
@@ -875,19 +906,19 @@ class OzonPdfImportUseCase(
                 } catch (e: Exception) {
                     Timber.e(e, "ОТЛАДКА-ОЗОН: Ошибка при парсинге суммы '%s'", amountStr)
                 }
-                
+
                 return null
             }
         }
-        
+
         // Если у нас есть незавершенная транзакция, и текущая строка не пустая и не соответствует
         // ни одному из специальных форматов, считаем её частью описания
-        if (currentTransactionState != null && trimmedLine.isNotBlank() && 
-            !trimmedLine.matches(Regex("^\\d{2}\\.\\d{2}\\.\\d{4}$")) && 
-            !trimmedLine.matches(Regex("^\\d{2}:\\d{2}:\\d{2}$")) && 
-            !trimmedLine.matches(Regex("^\\d+$")) && 
-            !amountLineRegex.matches(trimmedLine)) {
-            
+        if (currentTransactionState != null && trimmedLine.isNotBlank() &&
+            !trimmedLine.matches(Regex("^\\d{2}\\.\\d{2}\\.\\d{4}$")) &&
+            !trimmedLine.matches(Regex("^\\d{2}:\\d{2}:\\d{2}$")) &&
+            !trimmedLine.matches(Regex("^\\d+$")) &&
+            !amountLineRegex.matches(trimmedLine)
+        ) {
             currentTransactionState?.description?.append(
                 if (currentTransactionState?.description?.isEmpty() == true) "" else " ",
             )

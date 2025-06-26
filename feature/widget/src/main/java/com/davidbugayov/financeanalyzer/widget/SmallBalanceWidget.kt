@@ -7,7 +7,6 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.widget.RemoteViews
-import com.davidbugayov.financeanalyzer.widget.R
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
@@ -56,8 +55,12 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
             loadTransactionsUseCase().fold(
                 onSuccess = { transactions: List<Transaction> ->
                     val currency = if (transactions.isNotEmpty()) transactions.first().amount.currency else Money.zero().currency
-                    val income = transactions.filter { !it.isExpense }.fold(Money.zero(currency)) { acc, t -> acc + t.amount }
-                    val expense = transactions.filter { it.isExpense }.fold(Money.zero(currency)) { acc, t -> acc + t.amount }
+                    val income = transactions.filter { !it.isExpense }.fold(
+                        Money.zero(currency),
+                    ) { acc, t -> acc + t.amount }
+                    val expense = transactions.filter { it.isExpense }.fold(
+                        Money.zero(currency),
+                    ) { acc, t -> acc + t.amount }
                     val firstExpense = transactions.firstOrNull { it.isExpense }
                     val balance = if (firstExpense != null && firstExpense.amount.isNegative()) {
                         transactions.fold(Money.zero(currency)) { acc, t -> acc + t.amount }
@@ -65,8 +68,17 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
                         income - expense
                     }
                     withContext(Dispatchers.Main) {
-                        views.setTextViewText(R.id.small_widget_balance, balance.formatForDisplay(useMinimalDecimals = true))
-                        val color = if (balance.isPositive()) context.getColor(R.color.income) else context.getColor(R.color.expense)
+                        views.setTextViewText(
+                            R.id.small_widget_balance,
+                            balance.formatForDisplay(useMinimalDecimals = true),
+                        )
+                        val color = if (balance.isPositive()) {
+                            context.getColor(
+                                R.color.income,
+                            )
+                        } else {
+                            context.getColor(R.color.expense)
+                        }
                         views.setTextColor(R.id.small_widget_balance, color)
                         appWidgetManager.updateAppWidget(appWidgetId, views)
                     }
@@ -95,4 +107,4 @@ class SmallBalanceWidget : AppWidgetProvider(), KoinComponent {
             onUpdate(context, appWidgetManager, appWidgetIds)
         }
     }
-} 
+}

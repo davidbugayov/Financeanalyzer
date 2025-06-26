@@ -45,8 +45,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import com.davidbugayov.financeanalyzer.BuildConfig
-import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.feature.profile.components.AnalyticsSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.AppInfoSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.NotificationSettingsDialog
@@ -86,7 +84,7 @@ fun ProfileScreen(
     }
 
     val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
-    val buildVersion = remember { BuildConfig.VERSION_CODE.toString() }
+    val buildVersion = remember { (packageInfo?.longVersionCode ?: 0L).toString() }
 
     LaunchedEffect(Unit) {
         AnalyticsUtils.logScreenView(

@@ -1,8 +1,21 @@
 <resources>
+    <dimen name="profile_section_padding">16dp</dimen>
+    <dimen name="profile_section_spacing">16dp</dimen>
+    <dimen name="radius_large">24dp</dimen>
+    <dimen name="radius_medium">16dp</dimen>
+    <dimen name="radius_12dp">12dp</dimen>
     <dimen name="spacing_small">4dp</dimen>
     <dimen name="spacing_normal">8dp</dimen>
     <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
     <dimen name="spacing_xxlarge">36dp</dimen>
-    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="spacing_8dp">8dp</dimen>
+    <dimen name="icon_size_24dp">24dp</dimen>
+    <dimen name="icon_size_20dp">20dp</dimen>
+    <dimen name="icon_container_size_40dp">40dp</dimen>
     <dimen name="height_divider">1dp</dimen>
+    <dimen name="padding_horizontal_12dp">12dp</dimen>
+    <dimen name="padding_vertical_6dp">6dp</dimen>
+    <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
 </resources> 

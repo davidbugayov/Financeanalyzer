@@ -25,7 +25,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primary
 import com.davidbugayov.financeanalyzer.ui.theme.md_theme_light_primaryContainer
@@ -240,4 +240,4 @@ private fun getLibraries(): List<Library> {
             license = "Apache License 2.0",
         ),
     )
-} 
+}

@@ -97,7 +97,9 @@ class FinancialDetailStatisticsViewModel(
                     error = e.message ?: "Неизвестная ошибка при загрузке данных",
                 )
                 viewModelScope.launch {
-                    _effect.emit(FinancialDetailStatisticsContract.Effect.ShowError("Ошибка загрузки данных: ${e.message}"))
+                    _effect.emit(
+                        FinancialDetailStatisticsContract.Effect.ShowError("Ошибка загрузки данных: ${e.message}"),
+                    )
                 }
             }
         }

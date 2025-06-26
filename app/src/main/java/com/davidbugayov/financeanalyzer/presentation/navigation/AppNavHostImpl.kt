@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
+import com.davidbugayov.financeanalyzer.feature.profile.ProfileScreen
 import java.util.Date
 import org.koin.androidx.compose.koinViewModel
 
@@ -101,7 +102,9 @@ fun AppNavHostImpl(
                 onBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
             )
         },
-        onProfileScreen = {},
+        onProfileScreen = {
+            ProfileScreen()
+        },
         onLibrariesScreen = {},
         onExportImportScreen = {
             ExportImportScreen(

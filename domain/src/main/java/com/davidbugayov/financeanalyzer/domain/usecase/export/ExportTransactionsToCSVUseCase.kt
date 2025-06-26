@@ -26,7 +26,6 @@ class ExportTransactionsToCSVUseCase(
      * Тип действия для экспорта.
      */
     enum class ExportAction {
-
         SHARE,    // Поделиться файлом
         OPEN,     // Открыть файл
         SAVE_ONLY, // Только сохранить файл
@@ -78,33 +77,16 @@ class ExportTransactionsToCSVUseCase(
         }
     }
 
-    /**
-     * Открывает CSV-файл с помощью внешнего приложения.
-     *
-     * @param file Файл для открытия
-     * @return Результат операции
-     */
     fun openCSVFile(file: File): Result<Unit> {
         return Result.Success(Unit)
     }
 
-    /**
-     * Делится CSV-файлом с помощью диалога выбора приложения.
-     *
-     * @param file Файл для отправки
-     * @return Результат операции
-     */
     fun shareCSVFile(file: File): Result<Unit> {
         return Result.Success(Unit)
     }
 
-    /**
-     * Возвращает текущую дату и время в формате для имени файла.
-     *
-     * @return Строка с датой и временем в формате yyyy-MM-dd_HH-mm-ss
-     */
     private fun getCurrentDateTimeFormatted(): String {
         val dateFormat = SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", Locale.getDefault())
         return dateFormat.format(Date())
     }
-}
+} 

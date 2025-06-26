@@ -3,10 +3,6 @@ package com.davidbugayov.financeanalyzer.analytics
 import android.os.Bundle
 import timber.log.Timber
 
-/**
- * Реализация интерфейса IAnalytics, которая ничего не делает.
- * Используется для F-Droid версии приложения или когда аналитика отключена.
- */
 class NoOpAnalytics : IAnalytics {
     override fun logEvent(eventName: String) {
         Timber.d("Analytics event: $eventName (no-op)")

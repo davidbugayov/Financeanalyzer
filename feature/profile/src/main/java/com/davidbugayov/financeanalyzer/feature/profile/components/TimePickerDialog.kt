@@ -22,7 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.feature.profile.R
 
 /**
  * Диалог выбора времени для напоминаний

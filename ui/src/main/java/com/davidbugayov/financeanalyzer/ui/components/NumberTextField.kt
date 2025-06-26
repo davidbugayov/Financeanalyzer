@@ -18,7 +18,7 @@ fun NumberTextField(
     errorMessage: String? = null,
     allowNegative: Boolean = false,
     allowDecimal: Boolean = true,
-    maxLength: Int = Int.MAX_VALUE
+    maxLength: Int = Int.MAX_VALUE,
 ) {
     OutlinedTextField(
         value = value,
@@ -52,6 +52,6 @@ fun NumberTextField(
         } else {
             null
         },
-        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number)
+        keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     )
-} 
+}

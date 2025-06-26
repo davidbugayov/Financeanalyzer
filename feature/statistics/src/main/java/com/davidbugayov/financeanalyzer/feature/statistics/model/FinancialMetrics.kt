@@ -6,11 +6,11 @@ data class FinancialMetrics(
     val totalTransactions: Int = 0,
     val averageTransactionAmount: Money = Money.zero(),
     val savingsRate: Double = 0.0,
-    val topExpenseCategories: List<ExpenseCategory> = emptyList()
+    val topExpenseCategories: List<ExpenseCategory> = emptyList(),
 )
 
 data class ExpenseCategory(
     val name: String,
     val amount: Money,
-    val percentage: Double
-) 
+    val percentage: Double,
+)

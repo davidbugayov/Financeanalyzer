@@ -17,50 +17,53 @@ import com.davidbugayov.financeanalyzer.feature.statistics.model.FinancialMetric
 @Composable
 fun RecommendationsCard(
     metrics: FinancialMetrics,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
+        modifier = modifier,
     ) {
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
         ) {
             Text(
                 text = "Рекомендации",
                 style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
+                fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(16.dp))
-            
+
             // Рекомендации на основе нормы сбережений
             if (metrics.savingsRate < 0.2) {
                 Text(
                     text = "Попробуйте увеличить норму сбережений до 20% для лучшего финансового здоровья",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 Text(
                     text = "Отличная норма сбережений! Продолжайте в том же духе",
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
-            
+
             Spacer(modifier = Modifier.height(8.dp))
-            
+
             // Рекомендации по категориям расходов
             metrics.topExpenseCategories.firstOrNull()?.let { topCategory ->
                 if (topCategory.percentage > 0.4) {
                     Text(
-                        text = "Категория '${topCategory.name}' занимает ${String.format("%.1f", topCategory.percentage * 100)}% расходов. Рассмотрите возможность оптимизации",
+                        text = "Категория '${topCategory.name}' занимает ${String.format(
+                            "%.1f",
+                            topCategory.percentage * 100,
+                        )}% расходов. Рассмотрите возможность оптимизации",
                         style = MaterialTheme.typography.bodyMedium,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
             }
         }
     }
-} 
+}

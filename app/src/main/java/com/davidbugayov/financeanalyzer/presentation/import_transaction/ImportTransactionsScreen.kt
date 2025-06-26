@@ -58,7 +58,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -79,7 +78,6 @@ import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 
 /**
  * Экран импорта транзакций.
@@ -111,7 +109,9 @@ fun ImportTransactionsScreen(
 
     // Добавляем логирование для отслеживания изменений состояния
     LaunchedEffect(state) {
-        Timber.d("[SCREEN-DEBUG] 📱 Состояние обновлено: isLoading=${state.isLoading}, successCount=${state.successCount}, error=${state.error}")
+        Timber.d(
+            "[SCREEN-DEBUG] 📱 Состояние обновлено: isLoading=${state.isLoading}, successCount=${state.successCount}, error=${state.error}",
+        )
     }
 
     // Состояние для диалогов и UI
@@ -177,7 +177,9 @@ fun ImportTransactionsScreen(
     // Функция для проверки и запроса разрешений при необходимости
     fun checkAndRequestPermissions() {
         // Логируем текущее состояние перед сбросом
-        Timber.d("Текущее состояние перед сбросом: isLoading=${state.isLoading}, error=${state.error}, successCount=${state.successCount}")
+        Timber.d(
+            "Текущее состояние перед сбросом: isLoading=${state.isLoading}, error=${state.error}, successCount=${state.successCount}",
+        )
 
         // Сбрасываем состояние импорта перед выбором нового файла
         viewModel.handleIntent(ImportTransactionsIntent.ResetState)
@@ -185,7 +187,9 @@ fun ImportTransactionsScreen(
         // Небольшая задержка для гарантии обновления UI
         coroutineScope.launch {
             delay(100)
-            Timber.d("Состояние после сброса: isLoading=${state.isLoading}, error=${state.error}, successCount=${state.successCount}")
+            Timber.d(
+                "Состояние после сброса: isLoading=${state.isLoading}, error=${state.error}, successCount=${state.successCount}",
+            )
 
             if (Build.VERSION.SDK_INT >= 35) {
                 // Android 15+ использует новый API, не требующий разрешений
@@ -261,7 +265,7 @@ fun ImportTransactionsScreen(
                         .fillMaxSize()
                         .padding(horizontal = 16.dp)
                         .verticalScroll(rememberScrollState()),
-                horizontalAlignment = Alignment.CenterHorizontally,
+                    horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     // Секция инструкций (сворачиваемая)
@@ -295,10 +299,11 @@ fun ImportTransactionsScreen(
 
                                 IconButton(onClick = { expandedInstructions = !expandedInstructions }) {
                                     Icon(
-                                        imageVector = if (expandedInstructions)
+                                        imageVector = if (expandedInstructions) {
                                             Icons.Default.KeyboardArrowUp
-                                        else
-                                            Icons.Default.KeyboardArrowDown,
+                                        } else {
+                                            Icons.Default.KeyboardArrowDown
+                                        },
                                         contentDescription = null,
                                     )
                                 }
@@ -451,24 +456,24 @@ fun ImportTransactionsScreen(
                                 modifier = Modifier.padding(bottom = 12.dp),
                             )
 
-                AnimatedVisibility(
-                    visible = showBanksList,
-                    enter = fadeIn(animationSpec = tween(700)) +
-                        slideInVertically(
-                            initialOffsetY = { 50 },
-                            animationSpec = spring(
-                                dampingRatio = Spring.DampingRatioLowBouncy,
-                                stiffness = Spring.StiffnessLow,
-                            ),
-                        ),
-                ) {
-                    BanksList(
-                        onBankClick = { bank ->
-                            selectedBank = bank
-                            showBankInstructionDialog = true
-                        },
-                    )
-                }
+                            AnimatedVisibility(
+                                visible = showBanksList,
+                                enter = fadeIn(animationSpec = tween(700)) +
+                                    slideInVertically(
+                                        initialOffsetY = { 50 },
+                                        animationSpec = spring(
+                                            dampingRatio = Spring.DampingRatioLowBouncy,
+                                            stiffness = Spring.StiffnessLow,
+                                        ),
+                                    ),
+                            ) {
+                                BanksList(
+                                    onBankClick = { bank ->
+                                        selectedBank = bank
+                                        showBankInstructionDialog = true
+                                    },
+                                )
+                            }
                         }
                     }
                 }

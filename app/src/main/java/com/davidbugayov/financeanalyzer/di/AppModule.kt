@@ -48,6 +48,7 @@ import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -125,6 +126,15 @@ val appModule = module {
             updateWalletBalancesUseCase = get(),
             navigationManager = get(),
             application = androidApplication(),
+        )
+    }
+    viewModel {
+        ProfileViewModel(
+            exportTransactionsToCSVUseCase = get(),
+            getProfileAnalyticsUseCase = get(),
+            preferencesManager = get(),
+            notificationScheduler = get(),
+            navigationManager = get(),
         )
     }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get()) }

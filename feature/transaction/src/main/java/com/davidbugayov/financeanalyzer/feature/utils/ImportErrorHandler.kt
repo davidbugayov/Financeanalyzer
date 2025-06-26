@@ -18,7 +18,7 @@ object ImportErrorHandler {
     fun handleError(context: Context, error: Throwable?): String {
         // Логирование ошибки
         Timber.e(error)
-        
+
         return when {
             error == null -> context.getString(R.string.import_unknown_error)
             error.message?.contains("unsupported format", ignoreCase = true) == true ->
@@ -38,4 +38,4 @@ object ImportErrorHandler {
             else -> error.message ?: context.getString(R.string.import_unknown_error)
         }
     }
-} 
+}

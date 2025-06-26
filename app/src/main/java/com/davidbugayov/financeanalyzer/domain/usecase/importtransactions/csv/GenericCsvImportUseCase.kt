@@ -246,7 +246,9 @@ class GenericCsvImportUseCase(
                     try {
                         parsedDate = format.parse(dateString)
                         if (parsedDate != null) {
-                            Timber.d("[$bankName] Успешно распарсили дату '$dateString' с форматом '${format.toPattern()}'")
+                            Timber.d(
+                                "[$bankName] Успешно распарсили дату '$dateString' с форматом '${format.toPattern()}'",
+                            )
                             break
                         }
                     } catch (e: Exception) {

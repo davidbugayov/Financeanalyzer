@@ -1,9 +1,6 @@
 package com.davidbugayov.financeanalyzer.ui.components
 
 import androidx.compose.runtime.Composable
-import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
-import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
-import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 
 /**
  * Компонент для обработки действий с транзакциями.

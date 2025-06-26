@@ -50,7 +50,9 @@ class ImportTransactionsViewModel(
     // Наблюдатель за прямыми результатами импорта
     private val directResultObserver = Observer<ImportResult.Success?> { result ->
         result?.let {
-            Timber.i("Получен прямой результат импорта: importedCount=${it.importedCount}, skippedCount=${it.skippedCount}")
+            Timber.i(
+                "Получен прямой результат импорта: importedCount=${it.importedCount}, skippedCount=${it.skippedCount}",
+            )
             setSuccessState(it.importedCount, it.skippedCount, it.bankName)
         }
     }
@@ -105,7 +107,7 @@ class ImportTransactionsViewModel(
             successCount = importedCount,
             skippedCount = skippedCount,
             successMessage = successMessage,
-            error = null,  // Гарантируем, что ошибка сброшена
+            error = null, // Гарантируем, что ошибка сброшена
             fileName = _state.value.fileName, // Сохраняем имя файла
             bankName = actualBankName, // Используем скорректированное название банка
         )
@@ -168,31 +170,34 @@ class ImportTransactionsViewModel(
 
                         // Специальная обработка для файлов "Справка о движении средств"
                         if (fileName.contains("Справка_о_движении", ignoreCase = true) ||
-                            content.contains("Справка о движении средств", ignoreCase = true)) {
-
+                            content.contains("Справка о движении средств", ignoreCase = true)
+                        ) {
                             // Проверка на Тинькофф
                             if (content.contains("ТБАНК", ignoreCase = true) ||
                                 content.contains("TBANK", ignoreCase = true) ||
                                 content.contains("Тинькофф", ignoreCase = true) ||
-                                content.contains("Tinkoff", ignoreCase = true)) {
+                                content.contains("Tinkoff", ignoreCase = true)
+                            ) {
                                 bankName = "Тинькофф"
                             }
                             // Проверка на Сбербанк
                             else if (content.contains("Сбербанк", ignoreCase = true) ||
                                 content.contains("Sberbank", ignoreCase = true) ||
-                                content.contains("ПАО СБЕРБАНК", ignoreCase = true)) {
+                                content.contains("ПАО СБЕРБАНК", ignoreCase = true)
+                            ) {
                                 bankName = "Сбербанк"
                             }
                         }
                         // Специальная обработка для выписок по счету дебетовой карты
                         else if (fileName.contains("Выписка по счёту", ignoreCase = true) ||
-                            content.contains("Выписка по счёту", ignoreCase = true)) {
-
+                            content.contains("Выписка по счёту", ignoreCase = true)
+                        ) {
                             // Проверка на Сбербанк
                             if (content.contains("СберБанк", ignoreCase = true) ||
                                 content.contains("Сбербанк", ignoreCase = true) ||
                                 content.contains("Sberbank", ignoreCase = true) ||
-                                content.contains("www.sberbank.ru", ignoreCase = true)) {
+                                content.contains("www.sberbank.ru", ignoreCase = true)
+                            ) {
                                 bankName = "Сбербанк"
                             }
                         } else {
@@ -200,14 +205,16 @@ class ImportTransactionsViewModel(
                             if (content.contains("ТБАНК", ignoreCase = true) ||
                                 content.contains("TBANK", ignoreCase = true) ||
                                 content.contains("Тинькофф", ignoreCase = true) ||
-                                content.contains("Tinkoff", ignoreCase = true)) {
+                                content.contains("Tinkoff", ignoreCase = true)
+                            ) {
                                 bankName = "Тинькофф"
                             }
                             // Проверка на Сбербанк
                             else if (content.contains("Сбербанк", ignoreCase = true) ||
                                 content.contains("СберБанк", ignoreCase = true) ||
                                 content.contains("Sberbank", ignoreCase = true) ||
-                                content.contains("www.sberbank.ru", ignoreCase = true)) {
+                                content.contains("www.sberbank.ru", ignoreCase = true)
+                            ) {
                                 bankName = "Сбербанк"
                             }
                         }
@@ -228,7 +235,8 @@ class ImportTransactionsViewModel(
 
         // Дополнительная проверка для выписок по счету дебетовой карты
         if (fileName.contains("Выписка по счёту", ignoreCase = true) ||
-            fileName.contains("Выписка по счету", ignoreCase = true)) {
+            fileName.contains("Выписка по счету", ignoreCase = true)
+        ) {
             if (bankName == null || bankName == "PDF-выписка") {
                 // Если банк не определен, но файл похож на выписку Сбербанка
                 bankName = "Сбербанк"
@@ -365,7 +373,9 @@ class ImportTransactionsViewModel(
                             val skippedCount = result.skippedCount
                             val bankName = result.bankName
 
-                            Timber.i("Импорт завершен успешно через ImportResult.Success! Импортировано: $importedCount, Пропущено: $skippedCount, Банк: $bankName")
+                            Timber.i(
+                                "Импорт завершен успешно через ImportResult.Success! Импортировано: $importedCount, Пропущено: $skippedCount, Банк: $bankName",
+                            )
 
                             // Устанавливаем состояние успешного импорта через главный поток
                             viewModelScope.launch(Dispatchers.Main) {

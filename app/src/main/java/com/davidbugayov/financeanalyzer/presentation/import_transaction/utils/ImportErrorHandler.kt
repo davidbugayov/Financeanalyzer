@@ -2,8 +2,6 @@ package com.davidbugayov.financeanalyzer.presentation.import_transaction.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResults
 import timber.log.Timber
 
 /**
@@ -20,13 +18,15 @@ class ImportErrorHandler(private val context: Context) {
     fun getUserFriendlyErrorMessage(originalMessage: String): String {
         // Подробное логирование для отладки
         Timber.d("Обработка ошибки импорта: '$originalMessage'")
-        
+
         // Определяем тип ошибки по содержимому сообщения
         val userFriendlyMessage = when {
-            originalMessage.contains("statistics", ignoreCase = true) || 
-            originalMessage.contains("статистич", ignoreCase = true) ||
-            (originalMessage.contains("движени", ignoreCase = true) && 
-             originalMessage.contains("средств", ignoreCase = true)) -> {
+            originalMessage.contains("statistics", ignoreCase = true) ||
+                originalMessage.contains("статистич", ignoreCase = true) ||
+                (
+                    originalMessage.contains("движени", ignoreCase = true) &&
+                        originalMessage.contains("средств", ignoreCase = true)
+                    ) -> {
                 Timber.d("Определен тип ошибки: файл со статистикой")
                 context.getString(R.string.import_error_statistics_file)
             }
@@ -61,7 +61,7 @@ class ImportErrorHandler(private val context: Context) {
                 context.getString(R.string.import_error_unknown, "", originalMessage)
             }
         }
-        
+
         Timber.i("Ошибка импорта преобразована: '$originalMessage' -> '$userFriendlyMessage'")
         return userFriendlyMessage
     }

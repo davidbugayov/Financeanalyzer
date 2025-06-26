@@ -35,9 +35,9 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
-import com.davidbugayov.financeanalyzer.feature.profile.model.Time
+import com.davidbugayov.financeanalyzer.utils.Time
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.
@@ -118,8 +118,8 @@ fun SettingsSection(
                 } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
                     stringResource(
                         R.string.settings_reminder_time_format,
-                        transactionReminderTime.hours,
-                        transactionReminderTime.minutes,
+                        transactionReminderTime.hour,
+                        transactionReminderTime.minute,
                     )
                 } else {
                     stringResource(R.string.off)

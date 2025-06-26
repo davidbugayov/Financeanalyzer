@@ -36,7 +36,6 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
 import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
-import com.davidbugayov.financeanalyzer.presentation.components.FeatureAnnouncement
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
@@ -77,7 +76,7 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
                     contentDescription = stringResource(R.string.profile),
                 )
             }
-        }
+        },
     )
 }
 

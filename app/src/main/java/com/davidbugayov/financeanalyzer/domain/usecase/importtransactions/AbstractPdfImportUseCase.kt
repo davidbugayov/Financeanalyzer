@@ -201,7 +201,7 @@ abstract class AbstractPdfImportUseCase(
                         context.getString(
                             R.string.import_progress_saving_transactions,
                             transactions.size,
-                            currentBankName
+                            currentBankName,
                         ),
                     ),
                 )
