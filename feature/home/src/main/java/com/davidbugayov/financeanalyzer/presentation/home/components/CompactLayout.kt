@@ -1,0 +1,202 @@
+package com.davidbugayov.financeanalyzer.presentation.home.components
+
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
+import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import timber.log.Timber
+
+/**
+ * Компактный макет для телефонов
+ */
+@Composable
+private fun CompactBalanceAndFilters(
+    state: HomeState,
+    onFilterSelected: (TransactionFilter) -> Unit,
+    onToggleGroupSummary: (Boolean) -> Unit,
+    showGroupSummary: Boolean,
+) {
+    BalanceCard(balance = state.balance)
+    state.error?.let {
+        Text(
+            text = it,
+            color = MaterialTheme.colorScheme.error,
+            modifier = Modifier.padding(vertical = 4.dp),
+        )
+    }
+    HomeFilterChips(
+        currentFilter = state.currentFilter,
+        onFilterSelected = onFilterSelected,
+    )
+    HomeTransactionsHeader(
+        currentFilter = state.currentFilter,
+        showGroupSummary = showGroupSummary,
+        onToggleGroupSummary = onToggleGroupSummary,
+    )
+}
+
+@Composable
+private fun CompactEmptyState(onAddClick: () -> Unit) {
+    Box(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(top = 12.dp),
+        contentAlignment = Alignment.TopCenter,
+    ) {
+        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+            androidx.compose.material3.Icon(
+                imageVector = androidx.compose.material.icons.Icons.Filled.Add,
+                contentDescription = stringResource(R.string.empty_state_icon_desc),
+                tint = MaterialTheme.colorScheme.primary,
+                modifier = Modifier
+                    .padding(bottom = 8.dp)
+                    .size(36.dp),
+            )
+            Text(
+                text = stringResource(R.string.empty_state_title),
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 2,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(bottom = 4.dp),
+            )
+            Text(
+                text = stringResource(R.string.empty_state_subtitle),
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
+                maxLines = 3,
+                fontSize = 13.sp,
+                textAlign = androidx.compose.ui.text.style.TextAlign.Center,
+                modifier = Modifier.padding(bottom = 12.dp),
+            )
+            androidx.compose.material3.Button(
+                onClick = onAddClick,
+                shape = RoundedCornerShape(50),
+                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White,
+                ),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .heightIn(min = 44.dp),
+            ) {
+                Text(
+                    text = stringResource(R.string.empty_state_add_first_transaction),
+                    fontWeight = FontWeight.Medium,
+                    fontSize = 15.sp,
+                    maxLines = 1,
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun CompactTransactionList(
+    state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
+    showGroupSummary: Boolean,
+    onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit,
+) {
+    val lazyListState = rememberLazyListState()
+    LaunchedEffect(showGroupSummary) {
+        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+            lazyListState.animateScrollToItem(0)
+            Timber.d("CompactLayout: Скроллим к началу списка при показе сводки")
+        }
+    }
+    LazyColumn(
+        state = lazyListState,
+        modifier = Modifier.fillMaxSize(),
+    ) {
+        if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
+            item {
+                HomeGroupSummary(
+                    filteredTransactions = state.filteredTransactions,
+                    totalIncome = state.filteredIncome,
+                    totalExpense = state.filteredExpense,
+                    currentFilter = state.currentFilter,
+                    balance = state.filteredBalance,
+                )
+            }
+        }
+        items(
+            items = state.filteredTransactions,
+            key = { it.id },
+            contentType = { "transaction" },
+        ) { transaction ->
+            TransactionItem(
+                transaction = transaction,
+                categoriesViewModel = categoriesViewModel,
+                onClick = onTransactionClick,
+                onTransactionLongClick = onTransactionLongClick,
+            )
+        }
+    }
+}
+
+@Composable
+fun CompactLayout(
+    state: HomeState,
+    categoriesViewModel: CategoriesViewModel,
+    showGroupSummary: Boolean,
+    onToggleGroupSummary: (Boolean) -> Unit,
+    onFilterSelected: (TransactionFilter) -> Unit,
+    onTransactionClick: (Transaction) -> Unit,
+    onTransactionLongClick: (Transaction) -> Unit,
+    onAddClick: () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(horizontal = 8.dp),
+    ) {
+        CompactBalanceAndFilters(
+            state = state,
+            onFilterSelected = onFilterSelected,
+            onToggleGroupSummary = onToggleGroupSummary,
+            showGroupSummary = showGroupSummary,
+        )
+        when {
+            !state.isLoading && state.filteredTransactions.isEmpty() -> {
+                CompactEmptyState(onAddClick)
+            }
+            else -> {
+                CompactTransactionList(
+                    state = state,
+                    categoriesViewModel = categoriesViewModel,
+                    showGroupSummary = showGroupSummary,
+                    onTransactionClick = onTransactionClick,
+                    onTransactionLongClick = onTransactionLongClick,
+                )
+            }
+        }
+    }
+}

@@ -1,0 +1,395 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Spacing dimensions -->
+    <dimen name="spacing_tiny">3dp</dimen>
+    <dimen name="spacing_small">4dp</dimen>
+    <dimen name="spacing_medium">16dp</dimen>
+    <dimen name="spacing_normal">16dp</dimen>
+    <dimen name="spacing_large">24dp</dimen>
+    <dimen name="spacing_xlarge">32dp</dimen>
+    <dimen name="spacing_xxlarge">36dp</dimen>
+    <dimen name="spacing_xxsmall">4dp</dimen>
+    <dimen name="padding_small">4dp</dimen>
+    <dimen name="padding_medium">8dp</dimen>
+    <dimen name="padding_large">16dp</dimen>
+    <dimen name="padding_8dp">8dp</dimen>
+    <dimen name="padding_horizontal_12dp">12dp</dimen>
+    <dimen name="padding_vertical_6dp">6dp</dimen>
+    <dimen name="spacing_8dp">8dp</dimen>
+    <dimen name="space_small">8dp</dimen>
+    <dimen name="space_medium">16dp</dimen>
+    <dimen name="space_large">24dp</dimen>
+
+    <!-- Icon sizes -->
+    <dimen name="icon_size_small">20dp</dimen>
+    <dimen name="icon_size_medium">32dp</dimen>
+    <dimen name="icon_size_large">48dp</dimen>
+    <dimen name="icon_size_xlarge">56dp</dimen>
+    <dimen name="icon_size_xxlarge">64dp</dimen>
+    <dimen name="icon_size">24dp</dimen>
+    <dimen name="icon_size_20dp">20dp</dimen>
+    <dimen name="icon_size_24dp">24dp</dimen>
+    <dimen name="icon_size_28dp">28dp</dimen>
+    <dimen name="icon_container_size_40dp">40dp</dimen>
+    <dimen name="nav_icon_size">18dp</dimen>
+    <dimen name="main_nav_icon_size">22dp</dimen>
+
+    <!-- Heights -->
+    <dimen name="height_toolbar">56dp</dimen>
+    <dimen name="height_button">36dp</dimen>
+    <dimen name="height_nav_bar">80dp</dimen>
+    <dimen name="height_empty_state">150dp</dimen>
+    <dimen name="height_list_item">72dp</dimen>
+    <dimen name="height_bottom_sheet">350dp</dimen>
+    <dimen name="height_dialog">450dp</dimen>
+    <dimen name="height_progress_indicator">4dp</dimen>
+    <dimen name="height_divider">1dp</dimen>
+    <dimen name="divider_height">1dp</dimen>
+    <dimen name="button_height">56dp</dimen>
+    <dimen name="input_height">56dp</dimen>
+    <dimen name="list_item_height">84dp</dimen>
+    <dimen name="list_divider_height">1dp</dimen>
+    <dimen name="list_section_height">56dp</dimen>
+    <dimen name="profile_item_height">56dp</dimen>
+    <dimen name="empty_state_height">120dp</dimen>
+    <dimen name="nav_header_height">176dp</dimen>
+    <dimen name="bottom_nav_height">56dp</dimen>
+    <dimen name="status_bar_height">24dp</dimen>
+    <dimen name="navigation_bar_height">48dp</dimen>
+    <dimen name="nav_bar_height">62dp</dimen>
+
+    <!-- Text sizes -->
+    <dimen name="text_size_micro">11sp</dimen>
+    <dimen name="text_size_small">12sp</dimen>
+    <dimen name="text_size_medium">16sp</dimen>
+    <dimen name="text_size_normal">20sp</dimen>
+    <dimen name="text_size_large">22sp</dimen>
+    <dimen name="text_size_xlarge">24sp</dimen>
+    <dimen name="text_size_xxlarge">28sp</dimen>
+    <dimen name="text_size_xxxlarge">36sp</dimen>
+    <dimen name="text_small">11sp</dimen>
+    <dimen name="input_text_size">16sp</dimen>
+    <dimen name="input_helper_text_size">12sp</dimen>
+    <dimen name="input_error_text_size">12sp</dimen>
+    <dimen name="profile_header_text_size">18sp</dimen>
+
+    <!-- Radius and Elevation -->
+    <dimen name="radius_small">4dp</dimen>
+    <dimen name="radius_medium">8dp</dimen>
+    <dimen name="radius_large">16dp</dimen>
+    <dimen name="radius_xlarge">24dp</dimen>
+    <dimen name="radius_card">12dp</dimen>
+    <dimen name="radius_button">20dp</dimen>
+    <dimen name="radius_fab">28dp</dimen>
+    <dimen name="radius_12dp">12dp</dimen>
+    <dimen name="corner_radius">12dp</dimen>
+    <dimen name="card_corner_radius">12dp</dimen>
+    <dimen name="dialog_corner_radius">28dp</dimen>
+    <dimen name="card_elevation">4dp</dimen>
+    <dimen name="card_elevation_app_info_section">4dp</dimen>
+    <dimen name="card_elevation_settings_section">4dp</dimen>
+    <dimen name="button_elevation">2dp</dimen>
+    <dimen name="fab_elevation">6dp</dimen>
+    <dimen name="dialog_elevation">24dp</dimen>
+    <dimen name="elevation_small">2dp</dimen>
+
+    <!-- Stroke and Border -->
+    <dimen name="stroke_thin">1dp</dimen>
+    <dimen name="stroke_medium">2dp</dimen>
+    <dimen name="stroke_thick">3dp</dimen>
+    <dimen name="border_width_none">0dp</dimen>
+    <dimen name="border_width_small">1dp</dimen>
+    <dimen name="border_width_medium">2dp</dimen>
+    <dimen name="border_width_large">3dp</dimen>
+
+    <!-- Button dimensions -->
+    <dimen name="button_min_width">88dp</dimen>
+    <dimen name="button_padding">16dp</dimen>
+    <dimen name="fab_margin">16dp</dimen>
+    <dimen name="nav_button_size">42dp</dimen>
+    <dimen name="main_nav_button_size">48dp</dimen>
+
+    <!-- Layout dimensions -->
+    <dimen name="card_content_padding">16dp</dimen>
+    <dimen name="card_spacing">8dp</dimen>
+    <dimen name="card_image_height">200dp</dimen>
+    <dimen name="input_padding">16dp</dimen>
+    <dimen name="list_item_padding">20dp</dimen>
+    <dimen name="list_icon_size">48dp</dimen>
+    <dimen name="dialog_padding">24dp</dimen>
+    <dimen name="dialog_min_width">280dp</dimen>
+    <dimen name="dialog_max_width">560dp</dimen>
+    <dimen name="nav_drawer_width">280dp</dimen>
+    <dimen name="profile_section_spacing">16dp</dimen>
+    <dimen name="profile_section_padding">16dp</dimen>
+    <dimen name="profile_item_icon_size">24dp</dimen>
+    <dimen name="category_item_width">80dp</dimen>
+    <dimen name="category_icon_size">60dp</dimen>
+    <dimen name="color_picker_item_size">40dp</dimen>
+    <dimen name="bar_shape">16dp</dimen>
+
+    <!-- Animation dimensions -->
+    <dimen name="anim_offset_small">20dp</dimen>
+    <dimen name="anim_offset_medium">40dp</dimen>
+    <dimen name="anim_offset_large">60dp</dimen>
+
+    <!-- Chart common dimensions -->
+    <dimen name="chart_height">300dp</dimen>
+    <dimen name="chart_height_large">300dp</dimen>
+    <dimen name="chart_card_padding">16dp</dimen>
+    <dimen name="chart_title_padding">8dp</dimen>
+    <dimen name="chart_corner_radius">8dp</dimen>
+    <dimen name="chart_card_corner_radius">12dp</dimen>
+    <dimen name="chart_card_elevation">4dp</dimen>
+    <dimen name="chart_empty_state_elevation">2dp</dimen>
+    <dimen name="chart_padding">16dp</dimen>
+    <dimen name="chart_empty_message_padding">24dp</dimen>
+    <dimen name="chart_title_padding_bottom">8dp</dimen>
+    <dimen name="chart_subtitle_padding_bottom">16dp</dimen>
+
+    <!-- Chart element dimensions -->
+    <dimen name="chart_bar_width">24dp</dimen>
+    <dimen name="space_between_bars">24dp</dimen>
+    <dimen name="bar_width">24dp</dimen>
+    <dimen name="chart_axis_width">50dp</dimen>
+    <dimen name="chart_grid_stroke_width">1dp</dimen>
+    <dimen name="chart_grid_line_width">1dp</dimen>
+    <dimen name="chart_line_stroke_width">2dp</dimen>
+    <dimen name="chart_point_stroke_width">1dp</dimen>
+    <dimen name="chart_point_radius">4dp</dimen>
+    <dimen name="chart_selected_point_stroke_width">4dp</dimen>
+    <dimen name="chart_selected_point_radius">6dp</dimen>
+    <dimen name="chart_selected_point_outer_radius">12dp</dimen>
+    <dimen name="chart_selected_point_inner_radius">8dp</dimen>
+    <dimen name="chart_text_size">14sp</dimen>
+    <dimen name="chart_label_text_size">12sp</dimen>
+    <dimen name="chart_axis_text_size">10sp</dimen>
+
+    <!-- Chart legend dimensions -->
+    <dimen name="chart_legend_height">48dp</dimen>
+    <dimen name="chart_legend_item_width">12dp</dimen>
+    <dimen name="chart_legend_item_height">4dp</dimen>
+    <dimen name="chart_legend_item_size">12dp</dimen>
+    <dimen name="chart_legend_item_spacing">8dp</dimen>
+    <dimen name="chart_legend_padding">4dp</dimen>
+    <dimen name="chart_legend_spacing">8dp</dimen>
+    <dimen name="chart_legend_icon_size">12dp</dimen>
+    <dimen name="legend_icon_size">10dp</dimen>
+
+    <!-- Pie chart specific dimensions -->
+    <dimen name="pie_chart_size">220dp</dimen>
+    <dimen name="pie_chart_hole_radius">60dp</dimen>
+    <dimen name="pie_chart_stroke_width">40dp</dimen>
+    <dimen name="pie_chart_spacing">2dp</dimen>
+    <dimen name="chart_pie_stroke_width">24dp</dimen>
+    <dimen name="chart_pie_inner_radius_factor">0.65</dimen>
+    <dimen name="chart_pie_selected_offset">8dp</dimen>
+    <dimen name="pie_chart_inner_padding">20dp</dimen>
+    <dimen name="pie_chart_legend_item_height">48dp</dimen>
+    <dimen name="pie_chart_legend_icon_size">12dp</dimen>
+    <dimen name="pie_chart_legend_spacing">4dp</dimen>
+    <dimen name="pie_chart_legend_text_start_padding">8dp</dimen>
+    <dimen name="pie_chart_sector_spacing">2dp</dimen>
+    <dimen name="pie_chart_selected_stroke_width">3dp</dimen>
+    <dimen name="pie_chart_tap_threshold">30dp</dimen>
+    <dimen name="pie_chart_min_sector_angle">15</dimen>
+
+    <!-- Line chart dimensions -->
+    <dimen name="line_chart_height">220dp</dimen>
+    <dimen name="line_chart_padding">16dp</dimen>
+    <dimen name="line_chart_stroke_width">2dp</dimen>
+    <dimen name="line_chart_point_radius">4dp</dimen>
+    <dimen name="line_chart_selected_point_radius">6dp</dimen>
+    <dimen name="line_chart_selected_point_stroke_width">4dp</dimen>
+    <dimen name="line_chart_grid_stroke_width">1dp</dimen>
+    <dimen name="line_chart_tap_threshold">20dp</dimen>
+    <dimen name="line_chart_label_padding">4dp</dimen>
+    <dimen name="line_chart_label_corner_radius">4dp</dimen>
+    <dimen name="line_chart_grid_label_size">12sp</dimen>
+    <dimen name="line_chart_grid_lines">4</dimen>
+
+    <!-- Enhanced line chart dimensions -->
+    <dimen name="enhanced_line_chart_height">240dp</dimen>
+    <dimen name="enhanced_line_chart_padding">20dp</dimen>
+    <dimen name="enhanced_line_chart_stroke_width">2.5dp</dimen>
+    <dimen name="enhanced_line_chart_point_radius">5dp</dimen>
+    <dimen name="enhanced_line_chart_selected_point_radius">7dp</dimen>
+    <dimen name="enhanced_line_chart_selected_point_stroke_width">3dp</dimen>
+    <dimen name="enhanced_line_chart_grid_stroke_width">0.8dp</dimen>
+    <dimen name="enhanced_line_chart_tap_threshold">24dp</dimen>
+    <dimen name="enhanced_line_chart_text_size">14sp</dimen>
+    <dimen name="enhanced_line_chart_label_text_size">12sp</dimen>
+    <dimen name="enhanced_line_chart_legend_height">48dp</dimen>
+    <dimen name="enhanced_line_chart_legend_indicator_size">16dp</dimen>
+    <dimen name="enhanced_line_chart_legend_spacing">12dp</dimen>
+
+    <!-- Spacing dimensions -->
+    <dimen name="chart_spacing_normal">8dp</dimen>
+    <dimen name="chart_spacing_medium">12dp</dimen>
+    <dimen name="chart_spacing_large">16dp</dimen>
+    <dimen name="chart_selection_threshold">24dp</dimen>
+
+    <!-- Type selector dimensions -->
+    <dimen name="chart_type_selector_padding">8dp</dimen>
+    <dimen name="chart_type_selector_spacing">8dp</dimen>
+    <dimen name="chart_selector_button_padding">12dp</dimen>
+    <dimen name="chart_selector_button_corner_radius">8dp</dimen>
+
+    <!-- Enhanced category pie chart dimensions -->
+    <dimen name="enhanced_pie_chart_size">220dp</dimen>
+    <dimen name="enhanced_pie_chart_text_spacing_tiny">6dp</dimen>
+    <dimen name="enhanced_pie_chart_text_spacing_small">10dp</dimen>
+    <dimen name="enhanced_pie_chart_card_elevation">4dp</dimen>
+    <dimen name="enhanced_pie_chart_card_corner_radius">16dp</dimen>
+    <dimen name="enhanced_pie_chart_padding">16dp</dimen>
+    <dimen name="enhanced_pie_chart_padding_small">8dp</dimen>
+    <dimen name="enhanced_pie_chart_padding_tiny">4dp</dimen>
+    <dimen name="enhanced_pie_chart_category_icon_size">12dp</dimen>
+    <dimen name="enhanced_pie_chart_divider_height">1dp</dimen>
+    <dimen name="enhanced_pie_chart_category_spacing">6dp</dimen>
+    <dimen name="enhanced_pie_chart_sector_outer_stroke_width">1.5dp</dimen>
+    <dimen name="enhanced_pie_chart_sector_inner_stroke_width">1dp</dimen>
+    <dimen name="enhanced_pie_chart_animation_duration">800</dimen>
+
+    <!-- Enhanced Summary Card dimensions -->
+    <dimen name="enhanced_summary_card_corner_radius">20dp</dimen>
+    <dimen name="enhanced_summary_card_elevation">12dp</dimen>
+    <dimen name="enhanced_summary_card_padding_horizontal">20dp</dimen>
+    <dimen name="enhanced_summary_card_padding_vertical">16dp</dimen>
+    <dimen name="enhanced_summary_card_balance_font_size">42sp</dimen>
+    <dimen name="enhanced_summary_card_balance_letter_spacing">-1sp</dimen>
+    <dimen name="enhanced_summary_card_income_expense_font_size">18sp</dimen>
+    <dimen name="enhanced_summary_card_label_font_size">12sp</dimen>
+    <dimen name="enhanced_summary_card_icon_size">16dp</dimen>
+    <dimen name="enhanced_summary_card_spacing">6dp</dimen>
+
+    <!-- Financial Health Metrics dimensions -->
+    <dimen name="financial_health_card_corner_radius">16dp</dimen>
+    <dimen name="financial_health_card_elevation">4dp</dimen>
+    <dimen name="financial_health_card_padding">16dp</dimen>
+    <dimen name="financial_health_card_spacing">16dp</dimen>
+    <dimen name="financial_health_section_spacing">12dp</dimen>
+    <dimen name="financial_health_icon_size">20dp</dimen>
+    <dimen name="financial_health_help_icon_size">16dp</dimen>
+    <dimen name="financial_health_badge_padding_horizontal">12dp</dimen>
+    <dimen name="financial_health_badge_padding_vertical">4dp</dimen>
+    <dimen name="financial_health_badge_corner_radius">50dp</dimen>
+    <dimen name="financial_health_dialog_max_height">450dp</dimen>
+    <dimen name="financial_health_progress_height">8dp</dimen>
+
+    <!-- Dimensions for EnhancedCategoryPieChart Legend -->
+    <dimen name="legend_item_height_approx">14dp</dimen>
+    <dimen name="min_legend_height">50dp</dimen>
+    <dimen name="max_legend_height">280dp</dimen> <!-- Adjust based on MAX_CATEGORIES_VISIBLE * legend_item_height_approx -->
+    <dimen name="legend_indicator_size">12dp</dimen>
+
+    <!-- Standard Paddings (if not already present) -->
+    <dimen name="padding_extra_small">4dp</dimen>
+    <dimen name="padding_tiny">2dp</dimen>
+
+    <!-- New dimensions for EnhancedFinanceChartScreen -->
+    <dimen name="finance_chart_screen_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_tab_row_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_card_bottom_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_card_content_padding">16dp</dimen>
+    <dimen name="finance_chart_screen_vertical_spacing">8dp</dimen>
+    <dimen name="finance_chart_screen_analytics_text_padding">32dp</dimen>
+    <dimen name="finance_chart_screen_piechart_height">250dp</dimen>
+
+    <!-- Financial Statistics Screen dimens -->
+    <dimen name="financial_statistics_card_padding">16dp</dimen>
+    <dimen name="financial_statistics_card_corner_radius">16dp</dimen>
+    <dimen name="financial_statistics_card_elevation">4dp</dimen>
+    <dimen name="financial_statistics_spacer_large">16dp</dimen>
+    <dimen name="financial_statistics_spacer_medium">8dp</dimen>
+    <dimen name="financial_statistics_spacer_small">4dp</dimen>
+    <dimen name="financial_statistics_metric_row_vertical">4dp</dimen>
+
+    <!-- New dimensions for BudgetTip -->
+    <dimen name="budget_tip_vertical_margin">4dp</dimen>
+    <dimen name="budget_tip_corner_radius">8dp</dimen>
+    <dimen name="budget_tip_elevation">1dp</dimen>
+    <dimen name="budget_tip_content_padding">10dp</dimen>
+    <dimen name="budget_tip_icon_end_padding">8dp</dimen>
+    <dimen name="budget_tip_spacer">1dp</dimen>
+
+    <!-- CommentField dimensions -->
+    <dimen name="comment_field_padding_horizontal">16dp</dimen>
+    <dimen name="comment_field_padding_vertical">8dp</dimen>
+    <dimen name="comment_field_corner_radius">12dp</dimen>
+    <dimen name="comment_field_elevation">1dp</dimen>
+    <dimen name="comment_field_inner_padding_horizontal">16dp</dimen>
+    <dimen name="comment_field_inner_padding_vertical">8dp</dimen>
+
+    <!-- CategorySection dimensions -->
+    <dimen name="category_section_padding_horizontal">16dp</dimen>
+    <dimen name="category_section_padding_vertical">16dp</dimen>
+    <dimen name="category_section_spacing">8dp</dimen>
+    <dimen name="category_item_height">56dp</dimen>
+    <dimen name="category_item_padding_horizontal">16dp</dimen>
+    <dimen name="category_header_spacing">8dp</dimen>
+    <dimen name="category_header_padding_horizontal">8dp</dimen>
+    <dimen name="category_header_padding_vertical">4dp</dimen>
+    <dimen name="category_expand_text_padding_vertical">4dp</dimen>
+    <dimen name="category_expand_spacer_width">4dp</dimen>
+    <dimen name="category_grid_spacing">4dp</dimen>
+    <dimen name="category_item_circle_size">36dp</dimen>
+    <dimen name="category_item_icon_size">20dp</dimen>
+    <dimen name="category_item_vertical_padding">2dp</dimen>
+    <dimen name="category_item_spacer_height">2dp</dimen>
+    <dimen name="category_max_height">400dp</dimen>
+    <dimen name="category_collapsed_height">120dp</dimen>
+
+    <!-- AddButton dimensions -->
+    <dimen name="add_button_padding_horizontal">16dp</dimen>
+    <dimen name="add_button_padding_vertical">8dp</dimen>
+    <dimen name="add_button_height">56dp</dimen>
+    <dimen name="add_button_corner_radius">12dp</dimen>
+    <dimen name="add_button_progress_size">24dp</dimen>
+    <dimen name="add_button_progress_stroke_width">2dp</dimen>
+
+    <!-- DatePickerDialog dimensions -->
+    <dimen name="date_picker_snackbar_corner_radius">12dp</dimen>
+
+    <!-- SourceColorPickerDialog dimensions -->
+    <dimen name="source_color_picker_padding">8dp</dimen>
+    <dimen name="source_color_picker_item_spacing">12dp</dimen>
+    <dimen name="source_color_picker_item_size">40dp</dimen>
+    <dimen name="source_color_picker_item_padding">4dp</dimen>
+
+    <!-- CategoryPickerDialog dimensions -->
+    <dimen name="category_dialog_item_spacing">8dp</dimen>
+    <dimen name="category_dialog_item_border">1dp</dimen>
+    <dimen name="category_dialog_item_padding">4dp</dimen>
+    <dimen name="category_dialog_item_spacing_vertical">4dp</dimen>
+    <dimen name="category_dialog_icon_size">48dp</dimen>
+    <dimen name="category_dialog_icon_padding">8dp</dimen>
+    <dimen name="category_dialog_icon_border">2dp</dimen>
+    <dimen name="category_dialog_section_spacing">8dp</dimen>
+    <dimen name="category_dialog_icon_grid_max_height">300dp</dimen>
+
+    <!-- TransactionItem specific -->
+    <dimen name="card_horizontal_padding">12dp</dimen>
+    <dimen name="card_vertical_padding">6dp</dimen>
+    <dimen name="card_elevation_default">2dp</dimen>
+    <dimen name="card_corner_radius_medium">12dp</dimen>
+    <dimen name="card_content_padding_medium">12dp</dimen>
+    <dimen name="transaction_type_indicator_width">4dp</dimen>
+    <dimen name="icon_container_size_large">48dp</dimen>
+    <dimen name="source_indicator_size">8dp</dimen>
+    <dimen name="amount_type_icon_size">16dp</dimen>
+
+    <!-- General Spacing -->
+    <dimen name="spacing_xsmall">4dp</dimen>
+
+    <!-- Import components dimensions -->
+    <dimen name="import_progress_indicator_height">8dp</dimen>
+    <dimen name="import_icon_size">36dp</dimen>
+    <dimen name="import_icon_size_large">64dp</dimen>
+    <dimen name="import_card_spacing">16dp</dimen>
+    <dimen name="import_bank_icon_size">40dp</dimen>
+    <dimen name="import_bank_icon_inner_size">24dp</dimen>
+    <dimen name="import_dialog_width">90%</dimen>
+    <dimen name="import_dialog_content_padding">24dp</dimen>
+
+</resources>

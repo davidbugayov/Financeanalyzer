@@ -1,0 +1,1062 @@
+<resources>
+    <string name="app_name">Деньги под Контролем</string>
+    <string name="balance_widget_description">Виджет для отображения текущего баланса, доходов и расходов</string>
+    <string name="small_balance_widget_description">Компактный виджет для отображения текущего баланса</string>
+
+    <!-- Общие строки -->
+    <string name="currency_format">%s ₽</string>
+    <string name="income_currency_format">+%s ₽</string>
+    <string name="expense_currency_format">-%s ₽</string>
+    <string name="retry">Повторить</string>
+    <string name="error_occurred">Произошла ошибка</string>
+    <string name="no_transactions">Нет транзакций для отображения</string>
+    <string name="ok">OK</string>
+    <string name="cancel">Отмена</string>
+    <string name="back">Назад</string>
+    <string name="hide_summary">Скрыть сводку</string>
+    <string name="show_summary">Показать сводку</string>
+    <string name="expand">Развернуть</string>
+    <string name="collapse">Свернуть</string>
+    <string name="delete">Удалить</string>
+    <string name="delete_transaction">Удаление транзакции</string>
+    <string name="delete_transaction_confirmation">Вы уверены, что хотите удалить транзакцию из категории "%1$s" на сумму %2$s?</string>
+    <string name="show_all_transactions">Показать еще %d</string>
+    <string name="show_less">Свернуть</string>
+    <string name="daily_expenses">Ежедневные расходы</string>
+    <string name="cash_withdrawal">снятие</string>
+    <string name="cash_deposit">пополнение</string>
+    <string name="loading_data">Загрузка данных…</string>
+    <string name="error">Ошибка</string>
+    <string name="date_before_minimum">Дата раньше минимально допустимой</string>
+    <string name="date_after_maximum">Дата позже максимально допустимой</string>
+    <string name="invalid_date">Недопустимая дата</string>
+
+    <!-- Главный экран -->
+    <string name="app_title">Деньги под Контролем</string>
+    <string name="current_balance">Текущий баланс</string>
+    <string name="income">Доходы</string>
+    <string name="expense">Расходы</string>
+    <string name="balance">Баланс</string>
+    <string name="all">Все</string>
+    <string name="charts">Статистика</string>
+    <string name="charts_title">Финансовая статистика</string>
+    <string name="add_button">Добавить</string>
+    <string name="history">История</string>
+    <string name="home">Главная</string>
+    <string name="today">Сегодня</string>
+    <string name="week">Неделя</string>
+    <string name="month">Месяц</string>
+    <string name="recent_transactions">Последние транзакции</string>
+    <string name="unknown_error">Неизвестная ошибка</string>
+    <string name="profile_title">Профиль пользователя</string>
+
+    <!-- Фильтры -->
+    <string name="filter_today">Сегодня</string>
+    <string name="filter_week">Неделя</string>
+    <string name="filter_month">Месяц</string>
+    <string name="filter_by_category">Фильтр по категории</string>
+    <string name="filter_by_source">Фильтр по банкам</string>
+    <string name="select_sources">Выберите источники</string>
+    <string name="transactions_today">Транзакции за сегодня</string>
+    <string name="transactions_week">Транзакции за неделю</string>
+    <string name="transactions_month">Транзакции за месяц</string>
+    <string name="all_transactions">Все транзакции</string>
+    <string name="no_transactions_today">Нет транзакций за сегодня. Добавьте новую!</string>
+    <string name="no_transactions_week">Нет транзакций за неделю. Добавьте новую!</string>
+    <string name="no_transactions_month">Нет транзакций за месяц. Добавьте новую!</string>
+    <string name="no_transactions_all">Нет транзакций. Добавьте новую!</string>
+    <string name="showing_last_transactions">Показаны последние транзакции.</string>
+
+    <!-- Экран истории -->
+    <string name="history_title">История транзакций</string>
+    <string name="select_date">Выбрать дату</string>
+    <string name="date_format">Дата: %s</string>
+    <string name="group_by_day">По дням</string>
+    <string name="group_by_week">По неделям</string>
+    <string name="group_by_month">По месяцам</string>
+    <string name="income_label">Доход: %s</string>
+    <string name="expense_label">Расход: %s</string>
+    <string name="balance_label">Баланс: %s</string>
+    <string name="period_all">Все время</string>
+    <string name="period_day">День</string>
+    <string name="period_month">Месяц</string>
+    <string name="period_quarter">Квартал</string>
+    <string name="period_half_year">Полгода</string>
+    <string name="period_year">Год</string>
+    <string name="period_custom">Произвольный</string>
+    <string name="period_custom_range">%1$s – %2$s</string>
+    <string name="from_date">С: %s</string>
+    <string name="to_date">По: %s</string>
+    <string name="select_start_date">Выберите начальную дату</string>
+    <string name="select_end_date">Выберите конечную дату</string>
+    <string name="apply">Применить</string>
+    <string name="title_activity_transaction_history">История транзакций</string>
+
+    <!-- Экран добавления транзакции -->
+    <string name="add_transaction">Добавить транзакцию</string>
+    <string name="transaction_type">Тип транзакции:</string>
+    <string name="expense_type">Расход</string>
+    <string name="income_type">Доход</string>
+    <string name="title">Название</string>
+    <string name="amount">Сумма</string>
+    <string name="date">Дата</string>
+    <string name="select_date_button">Выбрать дату</string>
+    <string name="category">Категория</string>
+    <string name="select_category">Выбрать категорию</string>
+    <string name="note_optional">Примечание (необязательно)</string>
+    <string name="select_category_title">Выберите категорию</string>
+
+    <!-- Форматы -->
+    <string name="category_date_format">%1$s • %2$s</string>
+
+    <!-- Строки для ярлыков -->
+    <string name="add_transaction_short">Добавить</string>
+    <string name="add_transaction_long">Добавить транзакцию</string>
+    <string name="quick_add_short">+</string>
+    <string name="quick_add_long">Быстрое добавление</string>
+
+    <!-- Категории -->
+    <string name="add_category">Добавить категорию</string>
+    <string name="add_category_title">Добавление категории</string>
+    <string name="category_name">Название категории</string>
+    <string name="current_period">Текущий период</string>
+    <string name="previous_period">Прошлый период</string>
+    <string name="change_increase">На %d%% больше чем в прошлом периоде</string>
+    <string name="change_decrease">На %d%% меньше чем в прошлом периоде</string>
+    <string name="change_no_change">Без изменений по сравнению с прошлым периодом</string>
+    <string name="delete_category">Удаление категории</string>
+    <string name="delete_category_confirmation">Вы уверены, что хотите удалить категорию "%1$s"?\n\nЕсли это стандартная категория, она будет скрыта из списка. Если это пользовательская категория, она будет удалена полностью.</string>
+    <string name="delete_default_category_confirmation">Вы уверены, что хотите удалить стандартную категорию "%1$s"?\n\nОна будет скрыта из списка, но может быть восстановлена при переустановке приложения.</string>
+    <string name="delete_custom_category_confirmation">Вы уверены, что хотите удалить пользовательскую категорию "%1$s"?\n\nОна будет удалена полностью и не может быть восстановлена.</string>
+    <string name="category_delete_error">Категорию "Другое" нельзя удалить</string>
+
+    <!-- AddTransaction strings -->
+    <string name="confirm">Подтвердить</string>
+    <string name="success">Успешно</string>
+    <string name="transaction_added_successfully">Транзакция успешно добавлена</string>
+    <string name="transaction_updated_successfully">Транзакция успешно изменена</string>
+    <string name="add_another">Добавить еще</string>
+    <string name="done">Готово</string>
+    <string name="cancel_transaction">Отменить транзакцию</string>
+    <string name="cancel_transaction_confirmation">Вы уверены, что хотите отменить добавление транзакции?</string>
+    <string name="yes">Да</string>
+    <string name="no">Нет</string>
+    <string name="amount_error">Введите корректную сумму</string>
+    <string name="category_error">Выберите категорию</string>
+    <string name="add_custom_category">Добавить свою категорию</string>
+    <string name="enter_category_name">Введите название категории</string>
+    <string name="income_label_short">Доход</string>
+    <string name="expense_label_short">Расход</string>
+    <string name="tap_for_details">Нажмите для подробностей</string>
+
+    <!-- Chart strings -->
+    <string name="income_color">Цвет доходов</string>
+    <string name="expense_color">Цвет расходов</string>
+    <string name="balance_color">Цвет баланса</string>
+    <string name="grid_color">Цвет сетки</string>
+    <string name="background_color">Цвет фона</string>
+    <string name="dynamics_by_month">Динамика по месяцам</string>
+    <string name="chart_title_dynamics">Динамика доходов и расходов</string>
+    <string name="chart_subtitle_income">Доходы за период</string>
+    <string name="chart_subtitle_expense">Расходы за период</string>
+    <string name="chart_subtitle_both">Доходы и расходы за период</string>
+    <string name="chart_empty_line_data">Нет данных для отображения на графике</string>
+    <string name="chart_empty_pie_data">Нет данных для отображения</string>
+    <string name="chart_expenses">Расходы</string>
+    <string name="chart_legend_income">Доходы</string>
+    <string name="chart_legend_expense">Расходы</string>
+    <string name="chart_pie_title_income">Доходы по категориям</string>
+    <string name="chart_pie_title_expense">Расходы по категориям</string>
+    <string name="chart_type_selector_income">Доходы</string>
+    <string name="chart_type_selector_expense">Расходы</string>
+    <string name="chart_type_selector_both">Оба</string>
+    <string name="chart_no_data">Нет данных для отображения</string>
+    <string name="chart_income">Доходы</string>
+    <string name="chart_expense">Расходы</string>
+    <string name="chart_both">Оба</string>
+    <string name="chart_category_distribution">Распределение по категориям</string>
+    <string name="chart_income_expense_dynamics">Динамика доходов и расходов</string>
+    <string name="chart_daily_average">Среднее в день: %1$s</string>
+    <string name="chart_monthly_average">Среднее в месяц: %1$s</string>
+    <string name="chart_savings_months">Месяцев сбережений: %1$s</string>
+    <string name="chart_income_title">Доходы</string>
+    <string name="chart_expense_title">Расходы</string>
+    <string name="chart_both_title">Доходы и расходы</string>
+    <string name="chart_income_legend">Доходы</string>
+    <string name="chart_expense_legend">Расходы</string>
+    <string name="chart_pie_income_title">Доходы по категориям</string>
+    <string name="chart_pie_expense_title">Расходы по категориям</string>
+    <string name="chart_line_title">Динамика по времени</string>
+    <string name="chart_category_other">Другое</string>
+    <string name="chart_category_percent">%1$d%%</string>
+    <string name="chart_selected_point_value">%1$.2f ₽</string>
+    <string name="chart_selected_point_date">%1$s</string>
+    <string name="chart_select_point_prompt">Нажмите на точку для получения информации</string>
+    <string name="chart_total_value">Всего: %1$s</string>
+    <string name="chart_date_format">%1$s: %2$s</string>
+    <string name="chart_categories_title">Категории</string>
+    <string name="chart_other_category">Другое</string>
+    <string name="chart_category_percentage">%1$s: %2$s (%3$s%%)</string>
+    <string name="chart_income_label">Income</string>
+    <string name="chart_expense_label">Expenses</string>
+    <string name="chart_both_label">Both</string>
+    <string name="chart_loading">Loading chart data…</string>
+    <string name="chart_error">Failed to load chart data</string>
+    <string name="chart_total_amount">Total: %s</string>
+    <string name="chart_tap_to_select">Tap to select a point</string>
+    <string name="chart_select_type">Выберите тип графика</string>
+    <string name="chart_select_display_mode">Выберите режим отображения</string>
+    <string name="chart_select_period">Выберите период</string>
+    <string name="chart_pie_empty">Нет данных для отображения диаграммы</string>
+    <string name="chart_line_empty">Нет данных для отображения графика</string>
+    <string name="chart_enhanced_title">Расширенная аналитика</string>
+    <string name="chart_debug_info">Отладочная информация: %1$s</string>
+    <string name="chart_legend_title">Легенда</string>
+
+  <!-- Import errors -->
+  <string name="import_error_unsupported_format">Неподдерживаемый формат файла. Пожалуйста, выберите CSV-файл или выписку из поддерживаемого банка.</string>
+  <string name="import_error_unknown_format">Формат файла не распознан. Поддерживаются только CSV-файлы и выписки из банков.</string>
+  <string name="import_error_file_read">Не удалось прочитать файл. Проверьте, что файл не поврежден.</string>
+  <string name="import_error_no_transactions">В файле не найдено транзакций для импорта. Проверьте формат файла.</string>
+  <string name="import_error_date_format">Не удалось распознать даты в файле. Проверьте формат файла и убедитесь, что он соответствует формату выписки из банка.</string>
+  <string name="import_error_csv_format">Неверный формат CSV-файла. Проверьте структуру файла и убедитесь, что он содержит необходимые колонки (дата, сумма, описание).</string>
+  <string name="import_error_statistics_file">Файл содержит статистические данные, а не транзакции. Пожалуйста, выберите файл с транзакциями для импорта.</string>
+
+
+    <!-- Enhanced Line Chart strings -->
+    <string name="enhanced_line_chart_title">Улучшенная линейная диаграмма</string>
+    <string name="enhanced_line_chart_income">Доходы</string>
+    <string name="enhanced_line_chart_expense">Расходы</string>
+    <string name="enhanced_line_chart_both">Доходы и расходы</string>
+    <string name="enhanced_line_chart_no_data">Нет данных для отображения</string>
+    <string name="enhanced_line_chart_tap_point">Выберите точку для просмотра деталей</string>
+    <string name="enhanced_line_chart_selected_value">Значение: %1$s</string>
+    <string name="enhanced_line_chart_selected_date">Дата: %1$s</string>
+    <string name="enhanced_line_chart_total">Итого: %1$s</string>
+    <string name="enhanced_line_chart_grid_label">%1$s</string>
+
+    <!-- FinanceChartScreen strings -->
+    <string name="error_loading_transactions">Ошибка при загрузке транзакций: %s</string>
+    <string name="no_data_to_display">Нет данных для отображения</string>
+    <string name="expenses_by_category">Расходы по категориям</string>
+    <string name="no_expense_data">Нет данных о расходах</string>
+    <string name="income_by_category">Доходы по категориям</string>
+    <string name="no_income_data">Нет данных о доходах</string>
+    <string name="balance_by_month">Баланс по месяцам</string>
+    <string name="insufficient_data">Недостаточно данных для отображения</string>
+    <string name="expenses_last_7_days">Расходы за последние 7 дней</string>
+    <string name="no_expenses_recent_days">Нет данных о расходах за последние дни</string>
+    <string name="currency_format_with_percent" formatted="false">%.2f ₽ (%.1f%%)</string>
+
+    <!-- Analytics strings -->
+    <string name="analytics_title">Финансовая аналитика</string>
+    <string name="total_transactions">Всего транзакций</string>
+    <string name="expense_categories">Категории расходов</string>
+    <string name="income_categories">Категории доходов</string>
+    <string name="average_expense">Средний расход</string>
+    <string name="sources_used">Использовано источников</string>
+    <string name="total_income">Общий доход</string>
+    <string name="total_expense">Общий расход</string>
+    <string name="savings_rate">Норма сбережений</string>
+
+    <!-- Financial Statistics strings -->
+    <string name="transactions_statistics">Статистика транзакций</string>
+    <string name="income_transactions_count">Количество доходов</string>
+    <string name="expense_transactions_count">Количество расходов</string>
+    <string name="months_of_savings">Месяцев сбережений</string>
+    <string name="months_count">%.1f мес.</string>
+    <string name="recommendation_savings_rate">Старайтесь сохранять не менее 20% от доходов. Это поможет создать финансовую подушку безопасности.</string>
+    <string name="recommendation_top_expense">Обратите внимание на категорию \"%1$s\". Это ваша основная статья расходов.</string>
+    <string name="recommendation_no_savings">У вас нет сбережений. Рекомендуется создать финансовую подушку безопасности.</string>
+    <string name="recommendation_low_savings">Ваших сбережений хватит менее чем на 3 месяца. Рекомендуется увеличить подушку безопасности.</string>
+    <string name="recommendation_medium_savings">Ваших сбережений хватит на 3-6 месяцев. Хороший результат, но можно улучшить.</string>
+    <string name="expense_analysis">Анализ расходов</string>
+    <string name="avg_daily_expense">Средний расход в день</string>
+    <string name="avg_monthly_expense">Средний расход в месяц</string>
+    <string name="main_income_category">Основная категория доходов: %s</string>
+    <string name="main_expense_category">Основная категория расходов: %s</string>
+    <string name="most_frequent_expense_day">Самый частый день расходов: %s</string>
+    <string name="recommendations">Рекомендации</string>
+    <string name="savings_norm">Норма сбережений</string>
+    <string name="savings_status_done">Отлично</string>
+    <string name="avg_income_per_transaction">Средний доход на транзакцию</string>
+    <string name="avg_expense_per_transaction">Средний расход на транзакцию</string>
+    <string name="max_income">Максимальный доход</string>
+    <string name="max_expense">Максимальный расход</string>
+
+    <!-- Новые строки для улучшенного экрана финансовой статистики -->
+    <string name="top_expense_categories">Топ категорий расходов</string>
+    <string name="tap_bar_for_details">Нажмите на столбец для подробностей</string>
+    <string name="income_vs_expense">Доходы vs Расходы</string>
+    <string name="monthly_comparison">Сравнение по месяцам</string>
+    <string name="weekly_summary">Недельная сводка</string>
+    <string name="monthly_summary">Месячная сводка</string>
+    <string name="yearly_summary">Годовая сводка</string>
+    <string name="category_details">Детали категории</string>
+    <string name="budget_overview">Обзор бюджета</string>
+    <string name="spending_by_day">Расходы по дням</string>
+    <string name="spending_by_week">Расходы по неделям</string>
+    <string name="spending_by_month">Расходы по месяцам</string>
+    <string name="spending_by_year">Расходы по годам</string>
+    <string name="average_daily">Среднее за день</string>
+    <string name="average_monthly">Среднее за месяц</string>
+    <string name="average_yearly">Среднее за год</string>
+
+    <!-- Accessibility strings -->
+    <string name="cd_back_button">Вернуться назад</string>
+    <string name="cd_add_transaction">Добавить новую транзакцию</string>
+    <string name="cd_show_statistics">Показать статистику</string>
+    <string name="cd_show_history">Показать историю транзакций</string>
+    <string name="cd_expand_collapse">Развернуть или свернуть</string>
+    <string name="cd_select_period">Выбрать период</string>
+    <string name="cd_select_category">Выбрать категорию</string>
+    <string name="cd_info_icon">Информация</string>
+    <string name="cd_delete_icon">Удалить</string>
+    <string name="cd_edit_icon">Редактировать</string>
+    <string name="cd_filter_icon">Фильтр</string>
+    <string name="cd_sort_icon">Сортировка</string>
+    <string name="cd_search_icon">Поиск</string>
+    <string name="cd_close_icon">Закрыть</string>
+    <string name="cd_settings_icon">Настройки</string>
+    <string name="cd_done">Получено</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="show_expenses">Показать расходы</string>
+    <string name="show_income">Показать доходы</string>
+    <string name="average_values">Средние показатели</string>
+    <string name="analyze_expenses_for_budget">Анализ ваших средних трат для планирования бюджета</string>
+
+    <!-- Strings for FinanceChartScreen -->
+    <string name="low">Низкая</string>
+    <string name="medium">Средняя</string>
+    <string name="good">Хорошая</string>
+    <string name="recommended_savings_rate">Рекомендуется: 20% и выше</string>
+    <string name="savings_percentage">Процент дохода, который вы сохраняете</string>
+    <string name="understood">Понятно</string>
+    <string name="from">От</string>
+    <string name="to">До</string>
+    <string name="savings_rate_description">Норма сбережений – это важный финансовый показатель, который показывает, какую часть вашего дохода вы откладываете.</string>
+    <string name="how_calculated">Как рассчитывается:</string>
+    <string name="savings_rate_formula">Норма сбережений = ((Доходы – Расходы) / Доходы) × 100%</string>
+    <string name="recommended_values">Рекомендуемые значения:</string>
+    <string name="recommended_values_list" formatted="false">• Низкая: менее 10%\n• Средняя: 10–20%\n• Хорошая: 20% и выше</string>
+    <string name="importance">Почему это важно:</string>
+    <string name="importance_list">• Помогает создать финансовую подушку безопасности\n• Позволяет достигать долгосрочных финансовых целей\n• Обеспечивает финансовую стабильность\n• Защищает от непредвиденных расходов</string>
+    <string name="advice">Совет:</string>
+    <string name="advice_text">Старайтесь поддерживать норму сбережений на уровне 20% и выше. Это поможет вам создать надежный финансовый фундамент и достичь ваших финансовых целей.</string>
+
+    <!-- Adding missing string resources -->
+    <string name="year">Год</string>
+    <string name="all_time">Все</string>
+    <string name="select_period">Выберите период</string>
+    <string name="close">Закрыть</string>
+    <string name="start_date">Начальная дата</string>
+    <string name="end_date">Конечная дата</string>
+    <string name="amount_format">%.2f ₽</string>
+    <string name="day">День</string>
+    <string name="custom">Произвольный</string>
+    <string name="custom_period">Произвольный период</string>
+    <string name="all_categories">Все категории</string>
+    <string name="expenses">Расходы</string>
+    <string name="cannot_delete_default_category">Нельзя удалить стандартную категорию "%1$s"</string>
+
+    <!-- Добавленные строковые ресурсы для мультивыбора категорий -->
+    <string name="clear_selection">Сбросить выбор</string>
+    <string name="category_select_multiple">Выберите категории</string>
+    <string name="category_select_prompt">Можно выбрать несколько категорий</string>
+    <string name="select_all_categories">Выбрать все категории</string>
+
+    <!-- Добавленные строковые ресурсы для выбора источников -->
+    <string name="select_all_sources">Выбрать все источники</string>
+    <string name="all_sources">Все источники</string>
+    <string name="sources">Источники</string>
+
+    <!-- Источники средств -->
+    <string name="source">Откуда</string>
+    <string name="source_name">Название источника</string>
+    <string name="select_source">Выберите источник</string>
+    <string name="add_custom_source">Добавить источник</string>
+    <string name="select_color">Выберите цвет</string>
+    <string name="change_color">Изменить цвет</string>
+    <string name="source_error">Выберите источник</string>
+
+    <!-- Строки для сводки групп транзакций -->
+    <string name="summary">Сводка</string>
+    <string name="no_transactions_in_period">Нет транзакций за выбранный период</string>
+
+    <!-- Профиль -->
+    <string name="profile_save">Сохранить</string>
+    <string name="profile_cancel">Отмена</string>
+    <string name="profile_settings_section">Настройки приложения</string>
+    <string name="export_to_csv">Экспорт данных в CSV</string>
+    <string name="export_success">Данные успешно экспортированы</string>
+    <string name="export_description">Экспортирует все транзакции в CSV файл для использования в Excel или других программах.</string>
+    <string name="export_error">Ошибка при экспорте: %s</string>
+    <string name="export_choose_action">Выберите действие</string>
+    <string name="export_share">Отправить файл</string>
+    <string name="export_open">Открыть файл</string>
+    <string name="export_only_save">Только сохранить</string>
+    <string name="exported_file_path">Файл сохранён: %s</string>
+    <string name="profile_analytics_title">Финансовая аналитика</string>
+    <string name="profile_settings_title">Настройки</string>
+    <string name="profile_theme_title">Тема</string>
+    <string name="profile_language_title">Язык</string>
+    <string name="profile_currency_title">Валюта по умолчанию</string>
+    <string name="profile_transaction_reminders_title">Напоминания о транзакциях</string>
+    <string name="off">Отключено</string>
+    <string name="profile_theme_system">Системная</string>
+    <string name="profile_theme_light">Светлая</string>
+    <string name="profile_theme_dark">Тёмная</string>
+    <string name="profile_theme_select">Выберите тему</string>
+    <string name="profile_financial_summary">Ваша финансовая сводка</string>
+    <string name="profile_savings_rate_format">%.1f%%</string>
+
+    <!-- Финансовые цели -->
+    <string name="financial_goals">Финансовые цели</string>
+    <string name="active_goals">Активные цели</string>
+    <string name="completed_goals">Завершенные цели</string>
+    <string name="add_goal">Добавить цель</string>
+    <string name="edit_goal">Редактировать цель</string>
+    <string name="delete_goal">Удалить цель</string>
+    <string name="goal_name">Название цели</string>
+    <string name="goal_target_amount">Целевая сумма</string>
+    <string name="goal_current_amount">Текущая сумма</string>
+    <string name="goal_deadline">Срок достижения</string>
+    <string name="goal_category">Категория</string>
+    <string name="goal_description">Описание</string>
+    <string name="goal_progress">Прогресс</string>
+    <string name="goal_remaining">Осталось</string>
+    <string name="goal_add_amount">Добавить сумму</string>
+    <string name="goal_amount_to_add">Сумма для добавления</string>
+    <string name="goal_completed">Цель достигнута!</string>
+    <string name="goal_delete_confirmation">Вы уверены, что хотите удалить цель "%1$s"?</string>
+    <string name="no_goals">У вас пока нет финансовых целей</string>
+    <string name="add_your_first_goal">Добавьте свою первую финансовую цель</string>
+
+    <!-- Уведомления о транзакциях -->
+    <string name="transaction_reminder_channel_name">Напоминания о транзакциях</string>
+    <string name="transaction_reminder_channel_description">Уведомления о необходимости внести транзакции</string>
+    <string name="transaction_reminder_title">Не забудьте внести транзакции</string>
+    <string name="transaction_reminder_text">Пора внести ваши сегодняшние доходы и расходы</string>
+    <string name="transaction_reminders">Напоминания о транзакциях</string>
+    <string name="transaction_reminder_settings">Настройки напоминаний</string>
+    <string name="select_reminder_time">Выберите время напоминания:</string>
+    <string name="reminder_description">Включите напоминания, чтобы не забывать о важных транзакциях</string>
+    <string name="notifications_disabled_message">Напоминания отключены. Включите их, чтобы не забывать вносить транзакции.</string>
+    <string name="notification_disabled_title">Уведомления отключены</string>
+    <string name="notification_disabled_description">Для полноценной работы напоминаний включите разрешение на уведомления в настройках приложения</string>
+
+    <!-- Информация о приложении -->
+    <string name="app_info">О приложении</string>
+    <string name="libraries">Используемые библиотеки</string>
+    <string name="libraries_title">Используемые библиотеки</string>
+    <string name="libraries_description">Список библиотек, используемых в приложении "Деньги под Контролем"</string>
+    <string name="licenses_note">Все библиотеки используются в соответствии с их лицензиями. Полные тексты лицензий доступны на сайтах разработчиков библиотек.</string>
+    <string name="license_colon">Лицензия: %s</string>
+
+    <!-- Разрешения и настройки -->
+    <string name="permission_denied">Разрешение отклонено</string>
+    <string name="import_permission_required">Требуется разрешение</string>
+    <string name="permission_required">Требуется разрешение</string>
+    <string name="notification_permission_message">Для отправки напоминаний о транзакциях необходимо разрешение на уведомления.</string>
+    <string name="notification_permission_settings_message">Для работы напоминаний необходимо разрешение на уведомления. Вы можете включить их в настройках приложения.</string>
+    <string name="notification_permission_required">Для отправки напоминаний необходимо разрешение на уведомления.</string>
+    <string name="permission_message_android15">Для импорта файлов необходим доступ к выбранным вами файлам. Пожалуйста, предоставьте разрешение.</string>
+    <string name="permission_message">Для импорта файлов необходим доступ к хранилищу. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
+    <string name="save">Сохранить</string>
+    <string name="selected_time">Выбранное время: %1$d:%2$s</string>
+
+    <!-- Базовые строки -->
+    <string name="loading_error">Ошибка загрузки данных</string>
+    <string name="default_amount">0.00 ₽</string>
+    <string name="default_small_amount">0 ₽</string>
+    <string name="navigation_back">Назад</string>
+    <string name="transaction_history">История транзакций</string>
+
+    <!-- Savings Rate Dialog -->
+    <string name="savings_rate_dialog_title">Норма сбережений</string>
+    <string name="income_header">Доходы</string>
+    <string name="expenses_header">Расходы</string>
+    <string name="savings_amount">Сумма сбережений</string>
+
+    <!-- EmptyContent strings -->
+    <string name="empty_state">Пустое состояние</string>
+    <string name="empty_transactions">Нет транзакций</string>
+    <string name="empty_transactions_description">Добавьте свою первую транзакцию, нажав на кнопку "+"</string>
+
+    <!-- Bottom navigation -->
+    <string name="home_tab">Главная</string>
+    <string name="history_tab">История</string>
+    <string name="chart_tab">Графики</string>
+    <string name="add_tab">Добавить</string>
+    <string name="settings_tab">Настройки</string>
+    <string name="select_categories">Выберите категории</string>
+    <string name="category_statistics">Статистика по категории</string>
+    <string name="historical_transaction_stats">Историческая статистика транзакций</string>
+    <string name="transaction_count">Количество транзакций</string>
+    <string name="total_amount">Общая сумма</string>
+    <string name="average_per_transaction">Среднее за транзакцию</string>
+
+    <!-- Import Transactions Screen -->
+    <string name="import_transactions_title">Импорт транзакций</string>
+    <string name="supported_banks_title">Поддерживаемые банки</string>
+    <string name="choose_file_button">Выбрать файл для импорта</string>
+    <string name="how_to_import">Как импортировать транзакции</string>
+    <string name="import_instructions">1. Скачайте выписку из банка в формате CSV, PDF или XLSX\n2. Для Альфа-Банка лучше использовать формат XLSX\n3. Для Сбербанка поддерживается также PDF\n4. Нажмите кнопку ниже и выберите файл\n5. Дождитесь завершения импорта\n\nНажмите на банк ниже, чтобы узнать подробную инструкцию.</string>
+    <string name="import_csv_title">Импорт CSV-файлов</string>
+    <string name="csv_requirements_title">Требования к CSV-файлу:</string>
+    <string name="csv_requirements">• Столбцы: дата, сумма, категория\n• Разделитель: запятая или точка с запятой\n• Кодировка: UTF-8\n• Пример: 01.01.2023,1000,Продукты</string>
+    <string name="more_details">Подробнее</string>
+    <string name="import_in_progress">Импортируем транзакции…</string>
+    <string name="importing_transactions">Импортируем транзакции…</string>
+    <string name="import_progress_count">%1$d из %2$d транзакций</string>
+    <string name="import_success">Импорт завершён!</string>
+    <string name="imported_count">Импортировано: %d</string>
+    <string name="skipped_count">Пропущено: %d</string>
+    <string name="import_total_amount">Общая сумма: %d ₽</string>
+    <string name="import_error">Ошибка при импорте</string>
+    <string name="import_unknown_error">Неизвестная ошибка</string>
+    <string name="select_file_prompt">Выберите файл для импорта</string>
+    <string name="import_section_title">Импорт транзакций</string>
+    <string name="import_section_description">Импортируйте транзакции из CSV-файлов или банковских выписок. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
+    <string name="import_button">Импортировать</string>
+
+    <!-- Bank Instructions -->
+    <string name="bank_instructions_title">Как получить выписку из %s</string>
+    <string name="unavailable_instructions">Инструкции недоступны для этого банка.</string>
+    <string name="got_it">Понятно</string>
+
+    <!-- Sberbank -->
+    <string name="sberbank_instructions_title">Через мобильное приложение Сбербанк:</string>
+  <string name="sberbank_instructions">1. Войдите в приложение Сбербанк\n2. Нажмите на карту, по которой нужна выписка\n3. Нажмите на кнопку \"Детали\" (три точки в правом верхнем углу)\n4. Выберите \"Выписка по счету\"\n5. Укажите период, за который нужна выписка\n6. Нажмите \"Сформировать выписку\"\n7. После формирования нажмите \"Скачать PDF\"\n8. Сохраните файл на устройство\n9. Импортируйте этот PDF-файл в наше приложение</string>
+  <string name="sberbank_note">Наше приложение поддерживает импорт PDF-выписок Сбербанка напрямую. Просто выберите скачанный PDF-файл и приложение автоматически распознает все транзакции.</string>
+
+    <!-- Tinkoff -->
+  <string name="tinkoff_instructions_title">Через мобильное приложение Тинькофф:</string>
+  <string name="tinkoff_instructions">1. Войдите в приложение Тинькофф\n2. Выберите карту или счет\n3. Нажмите на три точки в правом верхнем углу\n4. Выберите \"Выписка и справки\"\n5. Выберите \"Выписка по счету\"\n6. Выберите период выписки (например, за последний месяц)\n7. Нажмите \"Заказать выписку\"\n8. Дождитесь формирования выписки (обычно занимает несколько минут)\n9. Откройте полученную выписку и нажмите на значок \"Поделиться\"\n10. Сохраните PDF-файл на устройство\n11. Импортируйте сохраненный файл в наше приложение\n\nПриложение автоматически распознает новый формат выписок Тинькофф и корректно импортирует все транзакции.</string>
+
+    <!-- Alfa-Bank -->
+    <string name="alfabank_instructions_title_mobile">Через мобильное приложение Альфа-Банк:</string>
+  <string name="alfabank_instructions_mobile">1. Войдите в приложение Альфа-Банк\n2. Выберите карту или счет\n3. Нажмите на значок \"Выписка\" (иконка документа)\n4. Укажите период выписки\n5. Нажмите \"Сформировать\"\n6. После формирования нажмите \"Скачать\"\n7. Выберите формат XLSX (Excel)\n8. Сохраните файл на устройство\n9. Импортируйте этот XLSX-файл в наше приложение</string>
+    <string name="alfabank_instructions_title_web">Через Альфа-Банк Онлайн (веб-версия):</string>
+  <string name="alfabank_instructions_web">1. Войдите в личный кабинет Альфа-Банк Онлайн\n2. Выберите счет или карту\n3. Нажмите на кнопку \"Выписка\"\n4. Укажите период выписки\n5. Нажмите \"Сформировать выписку\"\n6. Выберите формат \"Excel\"\n7. Нажмите \"Скачать\"\n8. Импортируйте скачанный XLSX-файл в наше приложение</string>
+    <string name="alfabank_note_important">Важно:</string>
+  <string name="alfabank_note">Наше приложение поддерживает прямой импорт Excel-файлов (.xlsx) из Альфа-Банка. Просто выберите скачанный файл, и все транзакции будут автоматически распознаны.</string>
+
+    <!-- Ozon -->
+    <string name="ozon_instructions_title">Через приложение Ozon Банк:</string>
+  <string name="ozon_instructions">1. Войдите в приложение Ozon Банк\n2. Выберите карту или счет\n3. Перейдите во вкладку \"Ещё\" (внизу экрана)\n4. Выберите \"Получить справку\"\n5. Выберите \"О движении средств\"\n6. Выберите русский язык\n7. Выберите счет, по которому нужна выписка\n8. Укажите период выписки (например, последний месяц)\n9. Выберите тип операций (рекомендуем \"Все операции\")\n10. Нажмите \"Сформировать\"\n11. После формирования нажмите \"Скачать PDF\"\n12. Сохраните файл на устройство\n13. Импортируйте этот PDF-файл в наше приложение</string>
+  <string name="ozon_note_important">Важно:</string>
+  <string name="ozon_note">Наше приложение поддерживает прямой импорт PDF-выписок из Ozon Банка. Просто выберите скачанный файл, и все транзакции будут автоматически распознаны.</string>
+
+    <!-- CSV Format -->
+    <string name="csv_instructions_title">Формат CSV-файла для импорта:</string>
+  <string name="csv_format_instructions">1. Первая строка может содержать заголовки столбцов\n2. Структура CSV файла должна содержать следующие столбцы:\n   - Столбец 1: ID или номер операции\n   - Столбец 2: Дата в формате yyyy-MM-dd_HH-mm-ss\n   - Столбец 3: Описание или категория\n   - Столбец 4: Сумма (с обозначением валюты)\n   - Столбец 5: Тип операции (Доход/Расход)\n   - Столбец 6: Примечание (опционально)\n   - Столбец 7: Источник средств (опционально)</string>
+    <string name="csv_example_title">Пример содержимого файла:</string>
+  <string name="csv_example">5,2025-03-26_06-37-11,Зарплата,50 545 ₽,Доход,Примечание к транзакции,Наличные\n48,2025-03-26_05-42-11,Продукты,3 149 ₽,Расход,Примечание к транзакции,Наличные</string>
+    <string name="csv_note_title">Примечание:</string>
+  <string name="csv_note">Убедитесь, что формат даты соответствует указанному шаблону yyyy-MM-dd_HH-mm-ss. Разделитель столбцов - запятая.</string>
+
+    <!-- Budget screen strings -->
+    <string name="budget_transactions">Транзакции</string>
+    <string name="budget_category_transactions">Транзакции категории %s</string>
+    <string name="add_budget_category">Добавить категорию бюджета</string>
+    <string name="budget_limit">Лимит бюджета</string>
+    <string name="budget_spent">Потратить</string>
+    <string name="budget_remaining">Осталось</string>
+    <string name="budget_overspent">Перерасход</string>
+    <string name="budget_category_name">Название категории</string>
+    <string name="budget_category_limit">Лимит категории</string>
+    <string name="budget_category_period">Период</string>
+    <string name="budget_category_add">Добавить</string>
+    <string name="budget_category_edit">Редактировать</string>
+    <string name="budget_category_delete">Удалить</string>
+    <string name="budget_category_delete_confirmation">Вы уверены, что хотите удалить эту категорию бюджета?</string>
+    <string name="budget_category_added">Категория бюджета добавлена</string>
+    <string name="budget_category_updated">Категория бюджета обновлена</string>
+    <string name="budget_category_deleted">Категория бюджета удалена</string>
+    <string name="budget_category_error_name">Введите название категории</string>
+    <string name="budget_category_error_limit">Введите лимит категории</string>
+    <string name="budget_category_error_exists">Категория с таким названием уже существует</string>
+    <string name="budget_category_error_delete">Не удалось удалить категорию</string>
+    <string name="budget_category_error_add">Не удалось добавить категорию</string>
+    <string name="budget_category_error_update">Не удалось обновить категорию</string>
+    <string name="budget_no_categories">Нет категорий бюджета</string>
+    <string name="budget_no_transactions">Нет транзакций в этой категории</string>
+    <string name="budget_add_first_category">Добавьте первую категорию бюджета</string>
+    <string name="budget_direct_expenses">Прямые траты</string>
+    <string name="budget_related_expenses">Связанные траты</string>
+    <string name="budget_total_expenses">Общие расходы</string>
+    <string name="budget_over_budget">от бюджета</string>
+    <string name="statistics">Статистика</string>
+
+    <!-- Icons for budget categories -->
+    <string name="ic_gamepad">ic_gamepad</string>
+    <string name="ic_restaurant">ic_restaurant</string>
+    <string name="ic_receipt">ic_receipt</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="select_icon">Выберите иконку</string>
+
+    <!-- Sources strings -->
+    <string name="delete_source">Удалить источник</string>
+
+    <!-- Общие тексты для графиков -->
+    <string name="chart_title_income">Доходы</string>
+    <string name="chart_title_expense">Расходы</string>
+    <string name="chart_title_both">Оба</string>
+    <string name="chart_title_dynamics_short">Динамика</string>
+    <string name="chart_title_categories">Категории</string>
+
+    <!-- Тексты для линейного графика -->
+    <string name="chart_title_income_dynamics">Динамика доходов</string>
+    <string name="chart_title_expense_dynamics">Динамика расходов</string>
+    <string name="chart_title_income_expense_dynamics">Динамика доходов и расходов</string>
+    <string name="chart_period_format">%1$s - %2$s</string>
+    <string name="chart_empty_line_data_short">Нет данных для графика</string>
+
+    <!-- Тексты для пирографа -->
+    <string name="chart_title_income_categories">Категории доходов</string>
+    <string name="chart_title_expense_categories">Категории расходов</string>
+    <string name="chart_percentage_format">%.1f%%</string>
+    <string name="chart_category_others">Другое</string>
+    <string name="chart_tap_hint">Нажмите на сектор для подробностей</string>
+
+    <!-- Тексты ошибок -->
+    <string name="error_title">Ошибка</string>
+    <string name="error_dismiss">ОК</string>
+
+    <!-- EnhancedCategoryPieChart strings -->
+    <string name="enhanced_chart_no_data">Нет доступных данных</string>
+    <string name="enhanced_chart_expenses">Расходы</string>
+    <string name="enhanced_chart_income">Доходы</string>
+    <string name="enhanced_chart_category_list">Список категорий</string>
+    <string name="enhanced_chart_income_single">Доход</string>
+    <string name="enhanced_chart_expense_single">Расход</string>
+    <string name="enhanced_chart_percent_format">%.1f%%</string>
+
+    <!-- Enhanced Summary Card strings -->
+    <string name="enhanced_summary_income">Доходы</string>
+    <string name="enhanced_summary_expense">Расходы</string>
+    <string name="enhanced_summary_select_period">Выбрать период</string>
+    <string name="enhanced_summary_all_time">Все время</string>
+    <string name="enhanced_summary_day">День: %s</string>
+    <string name="enhanced_summary_week" formatted="false">Неделя: %s – %s</string>
+    <string name="enhanced_summary_month" formatted="false">Месяц: %s – %s</string>
+    <string name="enhanced_summary_quarter" formatted="false">Квартал: %s – %s</string>
+    <string name="enhanced_summary_year" formatted="false">Год: %s – %s</string>
+    <string name="enhanced_summary_custom" formatted="false">%s – %s</string>
+
+    <!-- FinancialHealthMetricsCard strings -->
+    <string name="financial_health_analysis">Анализ финансового здоровья</string>
+    <string name="financial_health_subtitle">Ключевые показатели для планирования вашего бюджета</string>
+    <string name="financial_health_title">Финансовое здоровье</string>
+    <string name="financial_health_info_description">Информация о метриках</string>
+    <string name="financial_health_tooltip_description">Подсказка</string>
+
+    <string name="average_expenses_title">Средние расходы</string>
+    <string name="average_expenses_explanation">Рассчитывается на основе ваших трат за выбранный период. Помогает планировать ежедневный бюджет.</string>
+    <string name="daily_expenses_title">В день</string>
+    <string name="monthly_expenses_title">В месяц</string>
+    <string name="yearly_expenses_title">В год</string>
+
+    <string name="savings_rate_title">Норма сбережений</string>
+    <string name="savings_rate_explanation" formatted="false">Показывает процент дохода, который вы откладываете. Рекомендуемый показатель – от 15% до 30%. Чем выше, тем быстрее растут ваши накопления.</string>
+    <string name="savings_rate_percent">%d%%</string>
+    <string name="savings_rate_percent_0">0%</string>
+    <string name="savings_rate_percent_15">15%</string>
+    <string name="savings_rate_percent_30">30%</string>
+    <string name="savings_rate_percent_50">50%+</string>
+
+    <string name="financial_cushion_title">Финансовая подушка</string>
+    <string name="financial_cushion_explanation">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум – 3–6 месяцев.</string>
+    <string name="financial_cushion_months">%d</string>
+    <string name="financial_cushion_months_short">мес.</string>
+    <string name="financial_cushion_expenses">При ежемесячных расходах %s</string>
+
+    <string name="qualification_excellent">Отлично</string>
+    <string name="qualification_good">Хорошо</string>
+    <string name="qualification_satisfactory">Удовлетворительно</string>
+    <string name="qualification_needs_attention">Требует внимания</string>
+    <string name="qualification_insufficient">Недостаточно</string>
+
+    <string name="trend_positive">Положительный тренд</string>
+    <string name="trend_negative">Отрицательный тренд</string>
+    <string name="trend_neutral">Нейтральный тренд</string>
+
+    <string name="savings_rate_excellent">Вы отлично справляетесь с накоплениями! Продолжайте в том же духе.</string>
+    <string name="savings_rate_good">Хороший результат. Стремитесь увеличить до 30% для более быстрого роста накоплений.</string>
+    <string name="savings_rate_satisfactory">Неплохое начало. Попробуйте увеличить процент сбережений.</string>
+    <string name="savings_rate_needs_attention">Рекомендуется откладывать минимум 10–15% от дохода.</string>
+
+    <string name="financial_cushion_excellent">Вы хорошо защищены от финансовых неожиданностей! Ваш запас превышает рекомендуемый минимум в 6 месяцев.</string>
+    <string name="financial_cushion_good">У вас есть базовая финансовая подушка. Старайтесь увеличить её до 6 месяцев расходов.</string>
+    <string name="financial_cushion_insufficient">Рекомендуется иметь запас на 3–6 месяцев расходов. Работайте над увеличением сбережений.</string>
+
+    <string name="financial_health_explanation">Анализ финансового здоровья включает несколько ключевых метрик:</string>
+    <string name="financial_health_savings_rate_title">1. Норма сбережений</string>
+    <string name="financial_health_savings_rate_content">Показывает, какой процент дохода вы откладываете. Рассчитывается как отношение сбережений к общему доходу. Финансовые эксперты рекомендуют сохранять минимум 15–20% дохода.</string>
+    <string name="financial_health_average_expenses_title">2. Средние расходы</string>
+    <string name="financial_health_average_expenses_content">Ваши расходы в среднем за день, месяц и год, рассчитанные на основе истории трат. Помогают планировать бюджет и оценивать уровень потребления.</string>
+    <string name="financial_health_financial_cushion_title">3. Финансовая подушка</string>
+    <string name="financial_health_financial_cushion_content">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум – 3–6 месяцев для защиты от непредвиденных ситуаций.</string>
+    <string name="financial_health_tips_title">Советы по улучшению финансового здоровья:</string>
+    <string name="financial_health_tips_content">• Постарайтесь откладывать не менее 15–20% от дохода\n• Контролируйте ежедневные расходы\n• Создайте финансовую подушку на 3–6 месяцев\n• Инвестируйте регулярно\n• Избегайте кредитов с высокими процентами</string>
+    <string name="financial_health_recommended_values_title">Рекомендуемые значения показателей:</string>
+    <string name="financial_health_recommended_values_content" formatted="false">• Норма сбережений: выше 15% – хорошо, выше 30% – отлично\n• Финансовая подушка: 3–6 месяцев для наемных работников, 6–12 месяцев для предпринимателей\n• Соотношение долга к доходу: не более 30–40% ежемесячного дохода</string>
+    <string name="financial_health_ok_button">Понятно</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="tab_categories">Категории</string>
+    <string name="tab_dynamics">Динамика</string>
+    <string name="tab_analysis">Анализ</string>
+    <string name="detailed_financial_statistics">Подробная финансовая статистика</string>
+    <string name="explore_your_financial_metrics">Изучите ваши финансовые показатели</string>
+    <string name="analytics_coming_soon">Скоро здесь появится подробная аналитика и финансовые инсайты</string>
+    <string name="add_first_transaction">Добавьте первую транзакцию</string>
+    <string name="analytics_magic_hint">И начнётся магия аналитики ✨</string>
+
+    <!-- Financial Statistics Screen -->
+    <string name="financial_statistics_title">Финансовая статистика</string>
+    <string name="financial_statistics_period">Статистика за период</string>
+    <string name="key_metrics">Ключевые показатели</string>
+    <string name="savings_rate_fn">Норма сбережений: %1$d%%</string>
+    <string name="savings_status_excellent">Отлично</string>
+    <string name="savings_status_good">Хорошо</string>
+    <string name="savings_status_ok">Удовлетворительно</string>
+    <string name="savings_status_attention">Требует внимания</string>
+    <string name="transaction_statistics">Статистика транзакций</string>
+    <string name="income_transactions">Транзакций доходов</string>
+    <string name="expense_transactions">Транзакций расходов</string>
+    <string name="main_expense_categories">Основные категории расходов</string>
+    <string name="no_category">Без категории</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="monday">Понедельник</string>
+    <string name="tuesday">Вторник</string>
+    <string name="wednesday">Среда</string>
+    <string name="thursday">Четверг</string>
+    <string name="friday">Пятница</string>
+    <string name="saturday">Суббота</string>
+    <string name="sunday">Воскресенье</string>
+
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="budget_tips_title">Рекомендации по бюджету</string>
+    <string name="budget_tip_save_10_title">Откладывайте минимум 10% дохода</string>
+    <string name="budget_tip_save_10_desc">Регулярно переводите часть дохода на сбережения — это создаст финансовую подушку безопасности.</string>
+    <string name="budget_tip_control_categories_title">Контролируйте расходы по категориям</string>
+    <string name="budget_tip_control_categories_desc">Анализируйте, на что уходит больше всего денег, и ищите возможности для оптимизации.</string>
+    <string name="budget_tip_set_goals_title">Ставьте финансовые цели</string>
+    <string name="budget_tip_set_goals_desc">Планируйте крупные траты заранее и разбивайте их на небольшие накопления каждый месяц.</string>
+    <string name="budget_tip_check_weekly_title">Проверяйте бюджет раз в неделю</string>
+    <string name="budget_tip_check_weekly_desc">Регулярный анализ поможет вовремя скорректировать траты и не выйти за рамки бюджета.</string>
+
+    <!-- Категории (для CategoryMappers) -->
+    <string name="category_food">Продукты</string>
+    <string name="category_transport">Транспорт</string>
+    <string name="category_entertainment">Развлечения</string>
+    <string name="category_restaurant">Рестораны</string>
+    <string name="category_health">Здоровье</string>
+    <string name="category_clothing">Одежда</string>
+    <string name="category_housing">Жилье</string>
+    <string name="category_communication">Связь</string>
+    <string name="category_pet">Питомец</string>
+    <string name="category_services">Услуги</string>
+    <string name="category_charity">Благотворительность</string>
+    <string name="category_credit">Кредит</string>
+    <string name="category_transfer">Переводы</string>
+    <string name="category_salary">Зарплата</string>
+    <string name="category_freelance">Фриланс</string>
+    <string name="category_gift">Подарки</string>
+    <string name="category_interest">Проценты</string>
+    <string name="category_rent">Аренда</string>
+    <string name="category_other">Другое</string>
+    <string name="category_shopping">Покупки</string>
+    <string name="category_utilities">Коммунальные услуги</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="permission_denied_title">Разрешение отклонено</string>
+    <string name="permission_denied_text">Для получения уведомлений о транзакциях необходимо разрешение. Вы можете включить его в настройках приложения.</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="permission_required_title">Нужно разрешение</string>
+    <string name="permission_required_text">Для получения уведомлений о транзакциях требуется ваше разрешение.</string>
+    <string name="request_permission">Запросить разрешение</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="test_data_generated">Тестовые данные сгенерированы</string>
+    <string name="generate_test_data">Сгенерировать тестовые данные</string>
+    <string name="transaction_deleted">Транзакция удалена</string>
+    <string name="empty_transaction_id_error">Попытка навигации на экран редактирования с пустым transactionId!</string>
+    <string name="empty_state_icon_desc">Пусто</string>
+    <string name="empty_state_title">Здесь пока пусто</string>
+    <string name="empty_state_subtitle">Добавьте свою первую транзакцию, чтобы начать анализировать финансы!</string>
+    <string name="empty_state_add_first_transaction">Добавить первую транзакцию</string>
+    <string name="summary_today">Сводка за сегодня</string>
+    <string name="summary_week">Сводка за неделю</string>
+    <string name="summary_month">Сводка за месяц</string>
+    <string name="summary_all_time">Сводка за все время</string>
+    <string name="no_expenses_period">Нет расходов за выбранный период</string>
+    <string name="no_income_period">Нет доходов за выбранный период</string>
+    <string name="and_more_categories">И ещё %1$d категорий</string>
+    <string name="hide">Скрыть</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="notification_settings">Настройки уведомлений</string>
+    <string name="enable_reminders">Включить напоминания</string>
+    <string name="reminder_time">Время напоминания</string>
+    <string name="reminder_time_description">Напоминание будет в %1$s</string>
+    <string name="edit_time">Изменить время</string>
+
+    <!-- New strings for Profile -->
+    <string name="budget">Бюджет</string>
+    <string name="export_import">Экспорт и импорт</string>
+    <string name="unknown">Неизвестно</string>
+    <string name="settings_section">Секция настроек</string>
+    <string name="analytics_section">Секция аналитики</string>
+    <string name="app_info_section">Секция информации о приложении</string>
+    <string name="budget_section">Секция бюджета</string>
+    <string name="export_import_section">Секция экспорт и импорт</string>
+    <string name="profile">Профиль</string>
+    <string name="app_version">Версия приложения</string>
+    <string name="build_version">Версия сборки</string>
+
+    <!-- Строки для настроек -->
+    <string name="settings_theme_title">Тема оформления</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_theme_system">Системная</string>
+    <string name="settings_language_title">Язык приложения</string>
+    <string name="settings_language_current_value">Русский</string>
+    <string name="settings_currency_current_value">Рубль (₽)</string>
+    <string name="settings_reminder_time_format" formatted="false">Ежедневно в %02d:%02d</string>
+    <string name="error_loading_analytics">Ошибка при загрузке аналитики</string>
+
+    <!-- Финансовые цели -->
+    <string name="no_transactions_available">Нет транзакций</string>
+    <string name="all_time_label">Все время</string>
+    <string name="error_loading_profile_analytics_detail">Не удалось загрузить аналитику профиля: %1$s</string>
+
+    <!-- Строки для AddTransactionScreen -->
+    <string name="new_transaction_title">Новая транзакция</string>
+    <string name="add_button_text">Добавить</string>
+
+    <!-- Строки для BaseTransactionScreen (диалоги, кнопки и т.д.) -->
+    <string name="unknown_error_message">Произошла неизвестная ошибка</string>
+    <string name="dialog_ok">OK</string>
+    <string name="edit_transaction_title">Редактирование транзакции</string>
+    <string name="save_button_text">Сохранить</string>
+    <string name="import_transactions_content_description">Импорт транзакций</string>
+    <string name="attention_title">Внимание</string>
+    <string name="unsaved_data_warning">У вас есть несохраненные данные. Если вы перейдете к импорту, они будут потеряны.</string>
+    <string name="proceed_to_import">Перейти к импорту</string>
+    <string name="dialog_cancel">Отмена</string> <!-- Эта строка может использоваться многократно -->
+    <string name="transaction_saved_success">Транзакция успешно сохранена!</string>
+    <string name="delete_category_title">Удаление категории</string>
+    <string name="dialog_delete">Удалить</string>
+    <string name="delete_source_title">Удаление источника</string>
+    <string name="delete_source_confirmation">Вы уверены, что хотите удалить источник \'%1$s\'?</string> <!-- Используем %1$s для форматирования -->
+
+    <string-array name="default_source_names">
+        <item>Сбер</item>
+        <item>Тинькофф</item>
+        <item>Альфа</item>
+        <item>Озон</item>
+        <item>ВТБ</item>
+        <item>Газпромбанк</item>
+        <item>Райффайзен</item>
+        <item>Почта Банк</item>
+        <item>Юмани</item>
+        <item>Наличные</item>
+    </string-array>
+
+    <!-- Wallet Selection Section -->
+    <string name="add_to_wallets">Добавить в кошельки</string>
+    <string name="wallet_selected_singular">Выбран 1 кошелек</string>
+    <string name="wallet_selected_plural">Выбрано %d кошельков</string>
+    <string name="select_wallets">Выбрать кошельки</string>
+    <string name="selected_wallets_count">Выбрано кошельков: %d</string>
+    <string name="select_wallets_content_description">Выбрать кошельки</string>
+
+    <!-- CategorySection strings -->
+    <string name="show_more_categories">Показать ещё</string>
+    <string name="hide_categories">Скрыть</string>
+
+    <!-- TransactionItem specific -->
+    <string name="unknown_source">Неизвестный источник</string>
+    <string name="expense_transaction">Расход</string>
+    <string name="income_transaction">Доход</string>
+
+    <string name="export_import_screen_title">Экспорт и импорт данных</string>
+    <string name="export_section_title">Экспорт данных</string>
+    <string name="export_section_description">Экспортируйте все транзакции в CSV файл для использования в Excel или других программах.</string>
+    <string name="export_action_error">Не удалось выполнить действие: %1$s</string>
+    <string name="error_no_csv_app">Нет приложения для открытия CSV-файлов. Вы можете открыть файл вручную через файловый менеджер или воспользоваться функцией "Поделиться".</string>
+    <string name="error_action_failed">Не удалось выполнить действие: %1$s</string>
+    <string name="export_success_title">Файл сохранён</string>
+    <string name="export_error_title">Ошибка экспорта</string>
+
+    <string name="export_section_title_emoji">📤 Экспорт данных</string>
+    <string name="export_section_description_friendly">Скачайте все свои транзакции в формате CSV — удобно для Excel и других программ. Ваши данные всегда под рукой!</string>
+    <string name="export_button_friendly">Экспортировать в CSV</string>
+
+    <string name="import_section_title_emoji">📥 Импорт транзакций</string>
+    <string name="import_section_description_friendly">Загрузите выписку из банка или CSV-файл, чтобы добавить транзакции в приложение. Поддерживаются Сбербанк, Т-Банк, Альфа-Банк и Ozon Банк.</string>
+    <string name="import_button_friendly">Импортировать из файла</string>
+    <string name="importing_file">Импортирую…</string>
+
+    <string name="open_csv_with">Открыть CSV файл с помощью…</string>
+
+    <string name="profile_budget_subtitle">Планируйте бюджет и контролируйте расходы</string>
+    <string name="profile_export_import_subtitle">Экспортируйте или импортируйте ваши данные</string>
+
+    <string name="bank_sberbank">Сбербанк</string>
+    <string name="bank_tinkoff">Тинькофф</string>
+    <string name="bank_alfabank">Альфа-Банк</string>
+    <string name="bank_ozon">Ozon</string>
+    <string name="bank_csv">CSV</string>
+
+    <string name="import_progress_starting">Начало импорта файла %1$s</string>
+    <string name="import_error_pdf_extraction_failed">Не удалось извлечь текст из PDF или файл пуст: %1$s</string>
+    <string name="import_progress_text_extracted_validating">Текст извлечен из %1$s, проверка формата…</string>
+    <string name="import_error_invalid_format">Файл %1$s не является поддерживаемой выпиской или формат не поддерживается.</string>
+    <string name="import_progress_format_validated_skipping_headers">Формат файла %1$s проверен, пропуск заголовков…</string>
+    <string name="import_progress_processing_transactions">Обработка транзакций из файла %1$s…</string>
+    <string name="import_error_no_transactions_found">Не найдено ни одной транзакции в файле %1$s</string>
+    <string name="import_progress_saving_transactions">Сохранение %1$d транзакций из файла %2$s…</string>
+    <string name="import_error_io_exception">Ошибка чтения файла %1$s: %2$s</string>
+    <string name="import_error_unknown">Неизвестная ошибка при импорте файла %1$s: %2$s</string>
+    <string name="import_error_pdf_extraction_exception">Ошибка при извлечении текста из PDF файла %1$s: %2$s</string>
+    <string name="import_success_message">Импортировано %1$d транзакций, пропущено %2$d из файла %3$s</string>
+    <string name="import_progress_completed">Импорт файла %1$s завершен</string>
+
+    <string name="bank_sberbank_pdf">Сбербанк (PDF)</string>
+    <string name="transaction_source_sber">Сбер</string>
+    <string name="transaction_note_time">Время: %1$s</string>
+    <string name="transaction_note_auth_code">Код: %1$s</string>
+    <string name="transaction_note_balance">Баланс: %1$s</string>
+    <string name="transaction_note_details">Детали: %1$s</string>
+    <string name="transaction_title_unknown">Неизвестная операция</string>
+    <string name="transaction_source_alfa">Альфа-Банк</string>
+    <string name="transaction_source_ozon">Озон</string>
+    <string name="transaction_source_tinkoff">Тинькофф</string>
+
+    <string name="header_date_operation">Дата операции</string>
+    <string name="header_date">Дата</string>
+    <string name="header_operation">Операция</string>
+    <string name="header_document">Документ</string>
+    <string name="header_amount">Сумма</string>
+    <string name="csv_file_empty">CSV-файл пуст.</string>
+    <string name="csv_format_check">Проверка формата CSV. Первая строка: %1$s. Разделитель: \'%2$s\'. Валиден: %3$s</string>
+    <string name="csv_header_skipped">Пропущена строка заголовка: %1$s</string>
+    <string name="csv_no_header">Заголовка нет (по конфигу)</string>
+    <string name="csv_parsing_line">Парсинг строки: %1$s</string>
+    <string name="csv_not_enough_columns">Недостаточно колонок. Ожидалось минимум %1$d, получено %2$d. Строка: %3$s</string>
+    <string name="csv_skip_invalid_status">Пропуск транзакции из-за невалидного статуса: \'%1$s\'. Валидные: %2$s. Строка: %3$s</string>
+    <string name="csv_date_not_found">Не найдена дата по индексу %1$d. Строка: %2$s</string>
+    <string name="csv_no_description">N/A</string>
+    <string name="csv_amount_not_found">Не найдена сумма по индексу %1$d. Строка: %2$s</string>
+    <string name="csv_date_parse_error">Не удалось распарсить дату: \'%1$s\' с форматом \'%2$s\'. Строка: %3$s</string>
+    <string name="csv_amount_parse_error">Не удалось распарсить сумму: \'%1$s\' (после очистки). Строка: %2$s</string>
+    <string name="csv_amount_parse_exception">Ошибка при парсинге суммы: \'%1$s\'. %2$s</string>
+    <string name="csv_expense_value">Расход</string>
+    <string name="csv_imported_note">Импортировано из Generic CSV</string>
+    <string name="csv_parse_line_error">Ошибка при парсинге строки: %1$s. Config: %2$s</string>
+    <string name="csv_skip_line_not_enough_columns">Пропуск строки из-за недостаточного количества колонок: %1$s</string>
+    <string name="bank_generic_csv">Generic CSV (Configurable)</string>
+
+    <string name="achievements">Достижения</string>
+    <string name="profile_achievements_subtitle">Открывайте достижения за активность и прогресс</string>
+    <string name="achievement_first_steps_unlocked">Достижение разблокировано: Первые шаги!</string>
+
+    <!-- Enhanced Financial Analytics strings -->
+    <string name="financial_health_metrics">Показатели финансового здоровья</string>
+    <string name="months_of_savings_title">Месяцев сбережений</string>
+    <string name="debt_to_income_title">Соотношение долга к доходу</string>
+    <string name="emergency_fund_title">Фонд чрезвычайных ситуаций</string>
+    <string name="financial_freedom_title">Индекс финансовой свободы</string>
+    <string name="months_of_savings_description">На сколько месяцев хватит ваших сбережений</string>
+    <string name="debt_to_income_description">Отношение ежемесячных платежей по долгам к доходу</string>
+    <string name="emergency_fund_description">Наличие средств на случай непредвиденных расходов</string>
+    <string name="financial_freedom_description">Насколько вы близки к финансовой независимости</string>
+    <string name="months_of_savings_excellent">Отлично</string>
+    <string name="months_of_savings_good">Хорошо</string>
+    <string name="months_of_savings_satisfactory">Удовлетворительно</string>
+    <string name="months_of_savings_needs_attention">Требует внимания</string>
+    <string name="debt_to_income_excellent">Отлично</string>
+    <string name="debt_to_income_good">Хорошо</string>
+    <string name="debt_to_income_satisfactory">Удовлетворительно</string>
+    <string name="debt_to_income_needs_attention">Требует внимания</string>
+    <string name="emergency_fund_excellent">Отлично</string>
+    <string name="emergency_fund_good">Хорошо</string>
+    <string name="emergency_fund_satisfactory">Удовлетворительно</string>
+    <string name="emergency_fund_needs_attention">Требует внимания</string>
+    <string name="financial_freedom_excellent">Отлично</string>
+    <string name="financial_freedom_good">Хорошо</string>
+    <string name="financial_freedom_satisfactory">Удовлетворительно</string>
+    <string name="financial_freedom_needs_attention">Требует внимания</string>
+    <string name="savings_rate_value">%1$.1f%%</string>
+    <string name="months_of_savings_value">%1$.1f мес.</string>
+    <string name="debt_to_income_value">%1$.1f%%</string>
+    <string name="emergency_fund_value">%1$.1f%%</string>
+    <string name="financial_freedom_value">%1$.1f%%</string>
+    <string name="financial_health_score">Оценка финансового здоровья</string>
+    <string name="financial_health_score_value">%1$d / 100</string>
+    <string name="financial_health_score_excellent">Отличное финансовое здоровье</string>
+    <string name="financial_health_score_good">Хорошее финансовое здоровье</string>
+    <string name="financial_health_score_satisfactory">Удовлетворительное финансовое здоровье</string>
+    <string name="financial_health_score_needs_attention">Финансовое здоровье требует внимания</string>
+
+    <!-- Enhanced Financial Statistics strings -->
+    <string name="enhanced_financial_statistics">Расширенная финансовая статистика</string>
+    <string name="income_expense_summary">Сводка доходов и расходов</string>
+    <string name="transaction_summary">Сводка транзакций</string>
+    <string name="category_analysis">Анализ категорий</string>
+    <string name="financial_trends">Финансовые тренды</string>
+    <string name="financial_recommendations">Финансовые рекомендации</string>
+    <string name="total_income_value">%1$s</string>
+    <string name="total_expense_value">%1$s</string>
+    <string name="net_savings_value">%1$s</string>
+    <string name="savings_rate_percentage">%1$.1f%%</string>
+    <string name="transaction_count_value">%1$d</string>
+    <string name="avg_transaction_value">%1$s</string>
+    <string name="top_income_category_value">%1$s (%2$s)</string>
+    <string name="top_expense_category_value">%1$s (%2$s)</string>
+    <string name="income_trend">Тренд доходов</string>
+    <string name="expense_trend">Тренд расходов</string>
+    <string name="savings_trend">Тренд сбережений</string>
+    <string name="trend_increasing">Растет</string>
+    <string name="trend_decreasing">Снижается</string>
+    <string name="trend_stable">Стабильно</string>
+    <string name="recommendation_save_more">Увеличьте норму сбережений до 15-20%</string>
+    <string name="recommendation_reduce_expenses">Сократите расходы в категории %1$s</string>
+    <string name="recommendation_emergency_fund">Создайте фонд чрезвычайных ситуаций</string>
+    <string name="recommendation_diversify_income">Диверсифицируйте источники дохода</string>
+    <string name="recommendation_track_expenses">Регулярно отслеживайте расходы</string>
+    <string name="recommendation_budget_planning">Составьте бюджет на следующий месяц</string>
+    <string name="recommendation_save_10_15">Старайтесь сохранять 10-15% от вашего дохода</string>
+    <string name="recommendation_increase_savings">Хорошо! Попробуйте увеличить норму сбережений до 20%</string>
+    <string name="recommendation_savings_excellent">Отлично! Вы сохраняете более 20% дохода</string>
+    <string name="recommendation_top_expense_category">Обратите внимание на категорию "%1$s" - это ваша главная статья расходов</string>
+    <string name="recommendation_months_of_savings_low">Увеличьте финансовую подушку безопасности до 3-6 месяцев расходов</string>
+    <string name="recommendation_months_of_savings_medium">Хорошо! Стремитесь к подушке безопасности в 6+ месяцев расходов</string>
+    <string name="recommendation_months_of_savings_high">Отлично! У вас надежная финансовая подушка безопасности</string>
+    <string name="recommendation_increase_income">Ищите способы увеличить ваш доход</string>
+    <string name="recommendation_auto_savings">Настройте автоматические переводы на сберегательный счет</string>
+    <string name="recommendation_compare_prices">Сравнивайте цены перед крупными покупками</string>
+    <string name="recommendation_avoid_impulse">Избегайте импульсивных покупок</string>
+    <string name="no_recommendations">Нет рекомендаций на данный момент</string>
+    <string name="savings_rate_label">Норма сбережений</string>
+    <string name="months_of_savings_label">Месяцев сбережений</string>
+
+  <!-- Import Results strings -->
+  <string name="import_results">Результаты импорта</string>
+  <string name="import_completed">Импорт завершён</string>
+  <string name="import_summary">Импорт успешно завершен. Импортировано: %1$d, Пропущено: %2$d</string>
+  <string name="progress_percentage">%d%%</string>
+
+  <!-- Permission Dialog strings -->
+  <string name="permission_settings_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
+  <string name="permission_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Это позволит выбрать файл для импорта транзакций.</string>
+  <string name="grant_permission">Разрешить</string>
+</resources>

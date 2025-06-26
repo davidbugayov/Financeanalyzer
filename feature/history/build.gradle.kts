@@ -55,6 +55,8 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":utils"))
     implementation(project(":feature"))
+    implementation(project(":presentation"))
+    implementation(project(":feature:transaction"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
@@ -70,11 +72,15 @@ dependencies {
     implementation(libs.compose.material3)
     implementation(libs.compose.foundation)
     implementation(libs.compose.runtime)
+    implementation(libs.compose.material.icons.extended)
     debugImplementation(libs.compose.ui.tooling)
 
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
+
+    // Timber
+    implementation(libs.timber)
 
     // Testing
     testImplementation(libs.junit)

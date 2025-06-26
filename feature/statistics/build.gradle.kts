@@ -6,6 +6,8 @@ plugins {
 }
 
 android {
+    // Use the same namespace as the application module so that we can share
+    // resources (R.* references) without copying them into this feature.
     namespace = "com.davidbugayov.financeanalyzer.feature.statistics"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
@@ -55,6 +57,7 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":utils"))
     implementation(project(":feature"))
+    implementation(project(":presentation"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
