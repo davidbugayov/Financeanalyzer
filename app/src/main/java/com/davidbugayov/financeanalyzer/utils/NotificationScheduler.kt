@@ -7,15 +7,9 @@ import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
+import com.davidbugayov.financeanalyzer.utils.Time
 import timber.log.Timber
 import java.util.Calendar
-
-// Интерфейс для NotificationScheduler
-interface INotificationScheduler {
-
-    fun updateTransactionReminder(isEnabled: Boolean, reminderTime: Time? = null)
-}
 
 /**
  * Класс для планирования и управления уведомлениями.
@@ -23,7 +17,7 @@ interface INotificationScheduler {
 class NotificationScheduler(
     private val applicationContext: Context,
     private val preferencesManager: PreferencesManager, // Добавляем PreferencesManager как зависимость
-) : INotificationScheduler {
+): com.davidbugayov.financeanalyzer.utils.INotificationScheduler {
 
     private val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
     private val TRANSACTION_REMINDER_REQUEST_CODE = 1001
@@ -123,7 +117,7 @@ class NotificationScheduler(
     override fun updateTransactionReminder(isEnabled: Boolean, reminderTime: Time?) {
         if (isEnabled) {
             val (h, m) = if (reminderTime != null) {
-                Pair(reminderTime.hours, reminderTime.minutes)
+                Pair(reminderTime.hour, reminderTime.minute)
             } else {
                 preferencesManager.getReminderTime()
             }

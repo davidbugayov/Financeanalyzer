@@ -257,7 +257,6 @@ dependencies {
         ":ui",
         ":feature",
         ":feature:home",
-        ":feature:profile",
         ":feature:history",
         ":feature:statistics",
         ":feature:transaction",

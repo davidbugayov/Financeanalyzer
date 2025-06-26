@@ -16,4 +16,9 @@
     <string name="cancel_transaction_confirmation">Вы уверены, что хотите отменить добавление транзакции?</string>
     <string name="yes">Да</string>
     <string name="no">Нет</string>
+    <string name="permission_required">Требуется разрешение</string>
+    <string name="permission_settings_rationale">Для работы функции необходимо предоставить разрешение в настройках приложения.</string>
+    <string name="permission_rationale">Для работы функции необходимо разрешение.</string>
+    <string name="open_settings">Открыть настройки</string>
+    <string name="grant_permission">Разрешить</string>
 </resources> 

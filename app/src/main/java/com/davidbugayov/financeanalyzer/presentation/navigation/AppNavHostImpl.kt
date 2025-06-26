@@ -16,7 +16,6 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryS
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.libraries.LibrariesScreen
-import com.davidbugayov.financeanalyzer.presentation.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionScreen
 import java.util.Date
@@ -103,9 +102,7 @@ fun AppNavHostImpl(
                 onBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
             )
         },
-        onProfileScreen = {
-            ProfileScreen()
-        },
+        onProfileScreen = {},
         onLibrariesScreen = {
             LibrariesScreen(
                 onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },

@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.profile.components
+package com.davidbugayov.financeanalyzer.feature.profile.components
 
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding

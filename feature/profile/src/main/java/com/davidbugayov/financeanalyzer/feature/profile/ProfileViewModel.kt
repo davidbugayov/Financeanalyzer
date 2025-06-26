@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.profile
+package com.davidbugayov.financeanalyzer.feature.profile
 
 import android.content.Intent
 import androidx.lifecycle.ViewModel
@@ -11,9 +11,9 @@ import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactions
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
-import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
-import com.davidbugayov.financeanalyzer.presentation.profile.model.ProfileState
-import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
+import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
+import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
+import com.davidbugayov.financeanalyzer.feature.profile.model.Time
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager

@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.profile.components
+package com.davidbugayov.financeanalyzer.feature.profile.components
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -37,7 +37,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.R
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
-import com.davidbugayov.financeanalyzer.presentation.profile.model.Time
+import com.davidbugayov.financeanalyzer.feature.profile.model.Time
 
 /**
  * Компонент для отображения секции настроек в профиле пользователя.

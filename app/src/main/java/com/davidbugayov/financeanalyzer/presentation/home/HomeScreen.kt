@@ -34,8 +34,9 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.components.AnimatedBottomNavigationBar
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
-import com.davidbugayov.financeanalyzer.presentation.components.FeedbackMessage
-import com.davidbugayov.financeanalyzer.presentation.components.FeedbackType
+import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
+import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
+import com.davidbugayov.financeanalyzer.presentation.components.FeatureAnnouncement
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
@@ -48,7 +49,6 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.presentation.components.FeatureAnnouncement
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 
 /**

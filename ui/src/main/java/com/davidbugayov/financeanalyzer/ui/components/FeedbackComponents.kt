@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.components
+package com.davidbugayov.financeanalyzer.ui.components
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -39,7 +39,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.R
+import com.davidbugayov.financeanalyzer.ui.R
 import kotlinx.coroutines.delay
 
 /**

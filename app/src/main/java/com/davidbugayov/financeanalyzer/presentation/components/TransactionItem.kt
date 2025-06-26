@@ -225,8 +225,8 @@ fun TransactionItem(
         modifier = Modifier
             .fillMaxWidth()
             .padding(
-                horizontal = dimensionResource(id = R.dimen.card_horizontal_padding), // e.g., 12dp or 16dp from dimens
-                vertical = dimensionResource(id = R.dimen.card_vertical_padding), // e.g., 6dp or 8dp from dimens
+                horizontal = dimensionResource(id = R.dimen.card_horizontal_padding),
+                vertical = dimensionResource(id = R.dimen.card_vertical_padding),
             )
             .graphicsLayer {
                 alpha = animatedAlpha
@@ -238,138 +238,107 @@ fun TransactionItem(
             ),
         elevation = CardDefaults.cardElevation(
             defaultElevation = dimensionResource(id = R.dimen.card_elevation_default),
-        ), // e.g., 2dp or 4dp
-        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius_medium)), // e.g., 12dp
+        ),
+        shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius_medium)),
         colors = CardDefaults.cardColors(
             containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ), // Slightly different surface for differentiation
+        ),
     ) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.card_content_padding_medium)), // e.g., 12dp or 16dp
+                .padding(dimensionResource(id = R.dimen.card_content_padding_medium)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Transaction type indicator bar
             Box(
                 modifier = Modifier
-                    .width(dimensionResource(id = R.dimen.transaction_type_indicator_width)) // e.g., 4dp
-                    .height(
-                        dimensionResource(id = R.dimen.icon_container_size_large),
-                    ) // e.g., 48dp, to match a slightly larger icon area
+                    .width(dimensionResource(id = R.dimen.transaction_type_indicator_width))
+                    .height(dimensionResource(id = R.dimen.icon_container_size_large))
                     .background(
                         color = transactionTypeColor,
                         shape = RoundedCornerShape(
-                            topStart = dimensionResource(id = R.dimen.radius_small), // e.g., 4dp
+                            topStart = dimensionResource(id = R.dimen.radius_small),
                             bottomStart = dimensionResource(id = R.dimen.radius_small),
                         ),
                     ),
             )
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium))) // e.g., 12dp
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
 
             // Category Icon
             Box(
                 modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.icon_container_size_large)) // e.g., 48dp
+                    .size(dimensionResource(id = R.dimen.icon_container_size_large))
                     .clip(CircleShape)
-                    .background(categoryActualColor.copy(alpha = 0.2f)), // Slightly more pronounced background
+                    .background(categoryActualColor.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
                     imageVector = categoryIcon,
-                    contentDescription = transaction.category, // For accessibility
+                    contentDescription = transaction.category,
                     tint = categoryActualColor,
-                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)), // e.g., 24dp
+                    modifier = Modifier.size(dimensionResource(id = R.dimen.icon_size_medium)),
                 )
             }
 
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium))) // e.g., 12dp
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
 
-            // Transaction Details: Category, Description, (New) Source, and Date
+            // Transaction Details
             Column(
-                modifier = Modifier.weight(1f), // Takes available space
-                verticalArrangement = Arrangement.Center, // Vertically center content within this column
+                modifier = Modifier.weight(1f),
+                verticalArrangement = Arrangement.Center,
             ) {
-                // Category Name
                 Text(
                     text = transaction.category.replaceFirstChar {
                         if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                    }, // Capitalize first letter
-                    style = MaterialTheme.typography.titleMedium, // Slightly larger/bolder for category
+                    },
+                    style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,
                     color = MaterialTheme.colorScheme.onSurface,
                 )
 
-                // Source Name - NEW
                 if (transaction.source.isNotBlank()) {
                     Text(
                         text = transaction.source,
-                        style = MaterialTheme.typography.bodySmall, // Smaller font for source
-                        color = sourceActualColor, // Apply source color
+                        style = MaterialTheme.typography.bodySmall,
+                        color = sourceActualColor,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        modifier = Modifier.padding(
-                            top = dimensionResource(id = R.dimen.line_chart_stroke_width),
-                        ), // Placeholder, will be updated or requires user to add to dimens.xml
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.line_chart_stroke_width)),
                     )
                 }
 
-                // Note (formerly Description)
                 if (!transaction.note.isNullOrBlank()) {
                     Text(
-                        text = transaction.note ?: "", // Use safe call with default empty string
+                        text = transaction.note ?: "",
                         style = MaterialTheme.typography.bodyMedium,
                         maxLines = 1,
                         overflow = TextOverflow.Ellipsis,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant, // Slightly muted color
-                        modifier = Modifier.padding(
-                            top = dimensionResource(id = R.dimen.spacing_small),
-                        ), // Placeholder, will be updated or requires user to add to dimens.xml
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        modifier = Modifier.padding(top = dimensionResource(id = R.dimen.spacing_small)),
                     )
                 }
             }
 
-            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_small))) // e.g., 8dp
+            Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_small)))
 
-            // Amount and Date Column
             Column(
                 horizontalAlignment = Alignment.End,
-                verticalArrangement = Arrangement.Center, // Vertically center content within this column
+                verticalArrangement = Arrangement.Center,
             ) {
                 Text(
                     text = formattedAmount,
-                    style = MaterialTheme.typography.titleMedium, // Consistent with category title
+                    style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = transactionTypeColor, // Color indicates income/expense/transfer
+                    color = transactionTypeColor,
                 )
                 Text(
                     text = formattedDate,
-                    style = MaterialTheme.typography.bodySmall, // Smaller font for date
-                    color = MaterialTheme.colorScheme.onSurfaceVariant, // Muted color
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             }
         }
     }
-}
-
-// Make sure you have these (or similar) dimension resources defined in your dimens.xml:
-// <dimen name="card_horizontal_padding">12dp</dimen>
-// <dimen name="card_vertical_padding">6dp</dimen>
-// <dimen name="card_elevation_default">2dp</dimen>
-// <dimen name="card_corner_radius_medium">12dp</dimen>
-// <dimen name="card_content_padding_medium">12dp</dimen>
-// <dimen name="transaction_type_indicator_width">4dp</dimen>
-// <dimen name="icon_container_size_large">48dp</dimen>
-// <dimen name="icon_size_medium">24dp</dimen>
-// <dimen name="source_indicator_size">8dp</dimen>
-// <dimen name="amount_type_icon_size">16dp</dimen>
-// <dimen name="spacing_large">16dp</dimen>
-// <dimen name="spacing_medium">12dp</dimen>
-// <dimen name="spacing_xsmall">4dp</dimen>
-// <dimen name="spacing_xxsmall">2dp</dimen>
-
-// And string resources:
-// <string name="unknown_source">Неизвестный источник</string>
-// <string name="expense_transaction">Расходная транзакция</string>
-// <string name="income_transaction">Доходная транзакция</string>
+} 

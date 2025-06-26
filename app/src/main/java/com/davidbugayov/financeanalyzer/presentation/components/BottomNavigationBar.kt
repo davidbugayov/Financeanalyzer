@@ -171,4 +171,4 @@ private fun NavButton(icon: ImageVector, text: String, onClick: () -> Unit) {
             maxLines = 1,
         )
     }
-}
+} 

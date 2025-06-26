@@ -36,15 +36,6 @@ import timber.log.Timber
 
 /**
  * Компонент для объявления о новой функции.
- * Может использоваться для отображения информации о новой возможности приложения.
- *
- * @param title Заголовок объявления
- * @param description Описание новой функции
- * @param actionText Текст для призыва к действию
- * @param icon Иконка, которая отображается рядом с заголовком
- * @param preferencesKey Ключ для сохранения состояния (закрыто/открыто) объявления
- * @param onActionClick Действие, которое выполняется при нажатии на actionText
- * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
 fun FeatureAnnouncement(
@@ -61,13 +52,10 @@ fun FeatureAnnouncement(
     var visible by remember { mutableStateOf(false) }
     val coroutineScope = rememberCoroutineScope()
 
-    // Проверяем, было ли объявление закрыто ранее
     LaunchedEffect(preferencesKey) {
         val isDismissed = preferencesManager.getBooleanPreference(preferencesKey, false)
         visible = !isDismissed
-        Timber.d(
-            "FeatureAnnouncement: key=$preferencesKey, isDismissed=$isDismissed, visible=$visible",
-        )
+        Timber.d("FeatureAnnouncement: key=$preferencesKey, isDismissed=$isDismissed, visible=$visible")
     }
 
     if (visible) {
@@ -102,9 +90,6 @@ fun FeatureAnnouncement(
                     )
                     IconButton(onClick = {
                         coroutineScope.launch {
-                            Timber.d(
-                                "FeatureAnnouncement: closing by clicking X button, key=$preferencesKey",
-                            )
                             preferencesManager.setBooleanPreference(preferencesKey, true)
                             visible = false
                         }
@@ -133,11 +118,7 @@ fun FeatureAnnouncement(
                     color = MaterialTheme.colorScheme.primary,
                     textDecoration = TextDecoration.Underline,
                     modifier = Modifier.clickable(onClick = {
-                        Timber.d(
-                            "FeatureAnnouncement: closing by clicking action text, key=$preferencesKey",
-                        )
                         onActionClick()
-                        // Закрываем объявление после клика
                         coroutineScope.launch {
                             preferencesManager.setBooleanPreference(preferencesKey, true)
                             visible = false
@@ -147,4 +128,4 @@ fun FeatureAnnouncement(
             }
         }
     }
-}
+} 

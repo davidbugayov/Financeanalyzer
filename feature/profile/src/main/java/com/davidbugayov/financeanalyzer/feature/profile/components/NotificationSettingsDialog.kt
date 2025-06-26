@@ -1,4 +1,4 @@
-package com.davidbugayov.financeanalyzer.presentation.profile.components
+package com.davidbugayov.financeanalyzer.feature.profile.components
 
 import android.os.Build
 import androidx.compose.foundation.layout.Arrangement
@@ -34,9 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import com.davidbugayov.financeanalyzer.R
-import com.davidbugayov.financeanalyzer.presentation.components.PermissionDialogs
-import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
-import com.davidbugayov.financeanalyzer.presentation.profile.event.ProfileEvent
+import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
+import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import java.util.Locale

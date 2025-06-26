@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.davidbugayov.financeanalyzer.feature.profile"
+    namespace = "com.davidbugayov.financeanalyzer"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {

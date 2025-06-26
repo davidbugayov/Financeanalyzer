@@ -55,7 +55,6 @@ dependencies {
     implementation(project(":navigation"))
     implementation(project(":utils"))
     implementation(project(":feature"))
-    implementation(project(":feature:profile"))
 
     // AndroidX
     implementation(libs.androidx.core.ktx)

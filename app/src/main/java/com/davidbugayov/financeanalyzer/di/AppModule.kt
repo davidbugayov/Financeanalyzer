@@ -42,7 +42,6 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryV
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
-import com.davidbugayov.financeanalyzer.presentation.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
@@ -126,15 +125,6 @@ val appModule = module {
             updateWalletBalancesUseCase = get(),
             navigationManager = get(),
             application = androidApplication(),
-        )
-    }
-    viewModel {
-        ProfileViewModel(
-            exportTransactionsToCSVUseCase = get(),
-            getProfileAnalyticsUseCase = get(),
-            preferencesManager = get(),
-            notificationScheduler = get(),
-            navigationManager = get(),
         )
     }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get()) }
