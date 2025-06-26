@@ -72,4 +72,9 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+
+    // Timber
+    implementation(libs.timber)
+    // Splash screen support attributes
+    implementation(libs.androidx.splashscreen)
 }
