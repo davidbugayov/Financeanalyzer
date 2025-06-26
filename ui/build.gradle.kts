@@ -56,6 +56,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.compose)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.androidx.splashscreen)
 
     // Compose
     implementation(platform(libs.compose.bom))
