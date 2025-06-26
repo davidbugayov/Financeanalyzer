@@ -65,6 +65,8 @@ include(":feature:history")
 include(":feature:statistics")
 include(":feature:transaction")
 include(":feature:widget")
+include(":feature:budget")
+include(":feature:onboarding")
 
 // Presentation module
 include(":presentation")

@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "com.davidbugayov.financeanalyzer.presentation"
+    namespace = "com.davidbugayov.financeanalyzer.feature.budget"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -49,29 +49,39 @@ android {
 
 dependencies {
     implementation(project(":domain"))
+    implementation(project(":data"))
     implementation(project(":core"))
     implementation(project(":ui"))
+    implementation(project(":navigation"))
     implementation(project(":utils"))
+    implementation(project(":feature"))
+    implementation(project(":presentation"))
+    implementation(project(":feature:transaction"))
 
+    // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.activity.compose)
+    implementation(libs.androidx.navigation.compose)
 
     // Compose
     implementation(platform(libs.compose.bom))
     implementation(libs.compose.ui)
     implementation(libs.compose.ui.graphics)
+    implementation(libs.compose.ui.tooling.preview)
     implementation(libs.compose.material3)
     implementation(libs.compose.foundation)
     implementation(libs.compose.runtime)
     implementation(libs.compose.material.icons.extended)
+    debugImplementation(libs.compose.ui.tooling)
 
     // Koin
     implementation(libs.koin.android)
     implementation(libs.koin.androidx.compose)
 
+    // Testing
+    testImplementation(libs.junit)
+
     // Timber
     implementation(libs.timber)
-
-    testImplementation(libs.junit)
-}
+} 
