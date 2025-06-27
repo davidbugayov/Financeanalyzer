@@ -6,7 +6,6 @@ import android.app.NotificationManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
-import com.davidbugayov.financeanalyzer.utils.R
 import timber.log.Timber
 import java.util.Calendar
 

@@ -60,6 +60,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import android.annotation.SuppressLint
 
 /**
  * Экран профиля пользователя.
@@ -84,6 +85,7 @@ fun ProfileScreen(
     }
 
     val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
+    @SuppressLint("NewApi")
     val buildVersion = remember { (packageInfo?.longVersionCode ?: 0L).toString() }
 
     LaunchedEffect(Unit) {

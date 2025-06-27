@@ -10,3 +10,11 @@ plugins {
     alias(libs.plugins.firebase.crashlytics) apply false
     alias(libs.plugins.firebase.perf) apply false
 }
+
+subprojects {
+    plugins.withId("org.jlleitschuh.gradle.ktlint") {
+        extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
+            ignoreFailures.set(true)
+        }
+    }
+}

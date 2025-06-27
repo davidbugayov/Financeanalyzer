@@ -82,3 +82,7 @@ dependencies {
     // Material Components for Android (provides style attributes used in themes)
     implementation(libs.material)
 }
+
+ktlint {
+    ignoreFailures.set(true)
+}

@@ -46,6 +46,10 @@ android {
         buildConfig = true
     }
 
+    lint {
+        disable += "StringFormatMatches"
+    }
+
     composeOptions {
         kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
     }

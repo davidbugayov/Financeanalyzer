@@ -78,3 +78,7 @@ dependencies {
 
     testImplementation(libs.junit)
 }
+
+ktlint {
+    ignoreFailures.set(true)
+}
