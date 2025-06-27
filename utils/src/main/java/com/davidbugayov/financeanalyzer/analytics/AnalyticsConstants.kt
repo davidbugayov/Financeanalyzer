@@ -67,6 +67,8 @@ object AnalyticsConstants {
         const val RENDER_TIME = "render_time"
         const val MEMORY_USAGE = "memory_usage"
         const val BATTERY_USAGE = "battery_usage"
+        const val OPERATION_COMPLETED = "operation_completed"
+        const val NETWORK_CALL = "network_call"
         
         // События функций
         const val FEATURE_USED = "feature_used"

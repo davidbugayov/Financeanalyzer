@@ -47,7 +47,12 @@ object UserEventTracker {
             screenTimeMap[screenName] = (screenTimeMap[screenName] ?: 0) + duration
             
             // Логируем время на экране
-            AnalyticsUtils.logUserEngagement(duration, screenName)
+            val params = Bundle().apply {
+                putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, duration)
+                putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
+            }
+            
+            AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ENGAGEMENT, params)
             
             Timber.d("Screen closed: $screenName, duration: $duration ms")
             
@@ -119,7 +124,14 @@ object UserEventTracker {
      * @param feedback Текстовый отзыв (опционально)
      */
     fun trackUserFeedback(score: Int, feedback: String? = null) {
-        AnalyticsUtils.logUserFeedback(score, feedback)
+        val params = Bundle().apply {
+            putInt(AnalyticsConstants.Params.USER_FEEDBACK_SCORE, score)
+            if (feedback != null) {
+                putString(AnalyticsConstants.Params.USER_FEEDBACK_TEXT, feedback)
+            }
+        }
+        
+        AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_FEEDBACK, params)
         
         Timber.d("User feedback: score=$score, feedback=${feedback ?: "none"}")
     }
