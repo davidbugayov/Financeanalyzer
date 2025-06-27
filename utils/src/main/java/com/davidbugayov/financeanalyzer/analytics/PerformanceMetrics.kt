@@ -1,96 +1,95 @@
 package com.davidbugayov.financeanalyzer.analytics
 
-import android.app.ActivityManager
-import android.content.Context
 import android.os.Bundle
-import android.os.Debug
 import android.os.SystemClock
-import android.util.Log
 import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
-import java.util.concurrent.TimeUnit
 
 /**
- * Utility class for tracking performance metrics of key user scenarios.
- * Uses the analytics system to report metrics.
+ * Класс для отслеживания и анализа производительности приложения.
+ * Собирает метрики о времени выполнения операций, загрузке экранов,
+ * использовании памяти и т.д.
  */
 object PerformanceMetrics {
-    private const val TAG = "PerformanceMetrics"
     private val operationTimers = ConcurrentHashMap<String, Long>()
-    private val operationCounters = ConcurrentHashMap<String, Int>()
     private val screenLoadTimers = ConcurrentHashMap<String, Long>()
     private val dbOperationTimers = ConcurrentHashMap<String, Long>()
-    private val networkOperationTimers = ConcurrentHashMap<String, Long>()
-    private val renderTimers = ConcurrentHashMap<String, Long>()
+    private val networkCallTimers = ConcurrentHashMap<String, Long>()
     
-    // Пороговые значения для предупреждений (в миллисекундах)
-    private const val SCREEN_LOAD_WARNING_THRESHOLD = 500L
-    private const val DB_OPERATION_WARNING_THRESHOLD = 100L
-    private const val NETWORK_OPERATION_WARNING_THRESHOLD = 1000L
-    private const val RENDER_WARNING_THRESHOLD = 16L // ~60 FPS
-    private const val OPERATION_WARNING_THRESHOLD = 500L
+    private const val SCREEN_LOAD_WARNING_THRESHOLD = 500L // миллисекунды
+    private const val DB_OPERATION_WARNING_THRESHOLD = 100L // миллисекунды
+    private const val NETWORK_CALL_WARNING_THRESHOLD = 1000L // миллисекунды
 
+    // Имена экранов для отслеживания
+    object Screens {
+        const val HOME = "home_screen"
+        const val PROFILE = "profile_screen"
+        const val ADD_TRANSACTION = "add_transaction_screen"
+        const val EDIT_TRANSACTION = "edit_transaction_screen"
+        const val TRANSACTION_HISTORY = "transaction_history_screen"
+        const val TRANSACTION_DETAILS = "transaction_details_screen"
+        const val STATISTICS = "statistics_screen"
+        const val BUDGET = "budget_screen"
+        const val SETTINGS = "settings_screen"
+        const val CATEGORIES = "categories_screen"
+        const val EXPORT_IMPORT = "export_import_screen"
+        const val ACHIEVEMENTS = "achievements_screen"
+    }
+    
     /**
-     * Start timing an operation
-     * @param operationName Name of the operation to time
+     * Начать отслеживание времени выполнения операции
+     * @param operationName Название операции
      */
     fun startOperation(operationName: String) {
         operationTimers[operationName] = SystemClock.elapsedRealtime()
         Timber.d("Started timing operation: $operationName")
     }
-
+    
     /**
-     * End timing an operation and report the duration
-     * @param operationName Name of the operation that was timed
-     * @param additionalParams Additional parameters to include in the analytics event
+     * Завершить отслеживание времени выполнения операции
+     * @param operationName Название операции
+     * @return Время выполнения в миллисекундах или -1, если операция не была начата
      */
-    fun endOperation(operationName: String, additionalParams: Map<String, Any> = emptyMap()) {
+    fun endOperation(operationName: String): Long {
         val startTime = operationTimers.remove(operationName)
         if (startTime == null) {
             Timber.w("Attempted to end timing for operation that wasn't started: $operationName")
-            return
+            return -1
         }
-
+        
         val duration = SystemClock.elapsedRealtime() - startTime
+        Timber.d("Operation $operationName took $duration ms")
         
-        // Увеличиваем счетчик операций
-        operationCounters[operationName] = (operationCounters[operationName] ?: 0) + 1
-        
-        // Логируем предупреждение, если операция заняла слишком много времени
-        if (duration > OPERATION_WARNING_THRESHOLD) {
-            Timber.w("Operation $operationName took $duration ms, which exceeds the warning threshold of $OPERATION_WARNING_THRESHOLD ms")
-        }
-        
-        Timber.d("Operation $operationName completed in $duration ms")
-
-        // Report to analytics
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, duration)
             putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
-            putInt(AnalyticsConstants.Params.FEATURE_USAGE_COUNT, operationCounters[operationName] ?: 1)
-            
-            // Add any additional parameters
-            additionalParams.forEach { (key, value) ->
-                when (value) {
-                    is String -> putString(key, value)
-                    is Int -> putInt(key, value)
-                    is Long -> putLong(key, value)
-                    is Float -> putFloat(key, value)
-                    is Double -> putDouble(key, value)
-                    is Boolean -> putBoolean(key, value)
-                    else -> putString(key, value.toString())
-                }
-            }
         }
         
-        AnalyticsUtils.logEvent(AnalyticsConstants.Events.PERFORMANCE_METRIC, params)
+        AnalyticsUtils.logEvent(AnalyticsConstants.Events.OPERATION_COMPLETED, params)
+        
+        return duration
     }
-
+    
     /**
-     * Track a specific user action with its duration
-     * @param actionName Name of the user action
-     * @param durationMs Duration of the action in milliseconds
-     * @param additionalParams Additional parameters to include in the analytics event
+     * Отслеживать время выполнения блока кода
+     * @param operationName Название операции
+     * @param block Блок кода для выполнения
+     * @return Результат выполнения блока
+     */
+    inline fun <T> trackOperation(operationName: String, block: () -> T): T {
+        startOperation(operationName)
+        try {
+            return block()
+        } finally {
+            endOperation(operationName)
+        }
+    }
+    
+    /**
+     * Отслеживать действие пользователя с его длительностью
+     * @param actionName Название действия пользователя
+     * @param durationMs Длительность действия в миллисекундах
+     * @param additionalParams Дополнительные параметры
      */
     fun trackAction(actionName: String, durationMs: Long, additionalParams: Map<String, Any> = emptyMap()) {
         Timber.d("Action $actionName took $durationMs ms")
@@ -173,9 +172,8 @@ object PerformanceMetrics {
     /**
      * End timing a database operation and report the duration
      * @param operationName Name of the database operation that was timed
-     * @param queryCount Number of queries executed (optional)
      */
-    fun endDbOperation(operationName: String, queryCount: Int = 1) {
+    fun endDbOperation(operationName: String) {
         val startTime = dbOperationTimers.remove(operationName)
         if (startTime == null) {
             Timber.w("Attempted to end timing for DB operation that wasn't started: $operationName")
@@ -189,98 +187,119 @@ object PerformanceMetrics {
             Timber.w("DB operation $operationName took $duration ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms")
         }
         
-        Timber.d("DB operation $operationName completed in $duration ms with $queryCount queries")
+        Timber.d("DB operation $operationName took $duration ms")
         
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, duration)
             putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
-            putInt(AnalyticsConstants.Params.DB_QUERY_COUNT, queryCount)
         }
         
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_OPERATION, params)
     }
     
     /**
-     * Start timing a network operation
-     * @param operationName Name of the network operation to time
+     * Track a database operation with its duration
+     * @param operationName Name of the database operation
+     * @param durationMs Duration of the operation in milliseconds
      */
-    fun startNetworkOperation(operationName: String) {
-        networkOperationTimers[operationName] = SystemClock.elapsedRealtime()
-        Timber.d("Started timing network operation: $operationName")
-    }
-    
-    /**
-     * End timing a network operation and report the duration
-     * @param operationName Name of the network operation that was timed
-     * @param bytesSent Number of bytes sent (optional)
-     * @param bytesReceived Number of bytes received (optional)
-     */
-    fun endNetworkOperation(operationName: String, bytesSent: Long = 0, bytesReceived: Long = 0) {
-        val startTime = networkOperationTimers.remove(operationName)
-        if (startTime == null) {
-            Timber.w("Attempted to end timing for network operation that wasn't started: $operationName")
-            return
+    fun trackDbOperation(operationName: String, durationMs: Long) {
+        // Логируем предупреждение, если операция с БД заняла слишком много времени
+        if (durationMs > DB_OPERATION_WARNING_THRESHOLD) {
+            Timber.w("DB operation $operationName took $durationMs ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms")
         }
         
-        val duration = SystemClock.elapsedRealtime() - startTime
-        
-        // Логируем предупреждение, если сетевая операция заняла слишком много времени
-        if (duration > NETWORK_OPERATION_WARNING_THRESHOLD) {
-            Timber.w("Network operation $operationName took $duration ms, which exceeds the warning threshold of $NETWORK_OPERATION_WARNING_THRESHOLD ms")
-        }
-        
-        Timber.d("Network operation $operationName completed in $duration ms, sent: $bytesSent bytes, received: $bytesReceived bytes")
+        Timber.d("DB operation $operationName took $durationMs ms")
         
         val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, duration)
+            putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
             putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
-            putLong("bytes_sent", bytesSent)
-            putLong("bytes_received", bytesReceived)
         }
         
-        AnalyticsUtils.logEvent("network_operation", params)
+        AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_OPERATION, params)
     }
     
     /**
-     * Start timing a render operation
-     * @param viewName Name of the view to time
+     * Time a database operation block
+     * @param operationName Name of the database operation
+     * @param block Block of code to time
+     * @return Result of the block
      */
-    fun startRenderTiming(viewName: String) {
-        renderTimers[viewName] = SystemClock.elapsedRealtime()
-        Timber.d("Started timing render: $viewName")
+    inline fun <T> trackDbOperation(operationName: String, block: () -> T): T {
+        startDbOperation(operationName)
+        try {
+            return block()
+        } finally {
+            endDbOperation(operationName)
+        }
     }
     
     /**
-     * End timing a render operation and report the duration
-     * @param viewName Name of the view that was timed
+     * Start timing a network call
+     * @param url URL of the network call to time
      */
-    fun endRenderTiming(viewName: String) {
-        val startTime = renderTimers.remove(viewName)
+    fun startNetworkCall(url: String) {
+        networkCallTimers[url] = SystemClock.elapsedRealtime()
+        Timber.d("Started timing network call to: $url")
+    }
+    
+    /**
+     * End timing a network call and report the duration
+     * @param url URL of the network call that was timed
+     * @param statusCode HTTP status code of the response
+     */
+    fun endNetworkCall(url: String, statusCode: Int) {
+        val startTime = networkCallTimers.remove(url)
         if (startTime == null) {
-            Timber.w("Attempted to end timing for render that wasn't started: $viewName")
+            Timber.w("Attempted to end timing for network call that wasn't started: $url")
             return
         }
         
         val duration = SystemClock.elapsedRealtime() - startTime
         
-        // Логируем предупреждение, если рендеринг занял слишком много времени
-        if (duration > RENDER_WARNING_THRESHOLD) {
-            Timber.w("Render $viewName took $duration ms, which exceeds the warning threshold of $RENDER_WARNING_THRESHOLD ms")
+        // Логируем предупреждение, если сетевой запрос занял слишком много времени
+        if (duration > NETWORK_CALL_WARNING_THRESHOLD) {
+            Timber.w("Network call to $url took $duration ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms")
         }
         
-        Timber.d("Render $viewName completed in $duration ms")
+        Timber.d("Network call to $url took $duration ms with status code $statusCode")
         
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, duration)
-            putString("view_name", viewName)
+            putString("url", url)
+            putInt("status_code", statusCode)
         }
         
-        AnalyticsUtils.logEvent(AnalyticsConstants.Events.RENDER_TIME, params)
+        AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_CALL, params)
     }
     
     /**
-     * Track memory usage of the application
-     * Примечание: требуется Context, поэтому этот метод нужно вызывать из Activity или Service
+     * Track a network call with its duration
+     * @param url URL of the network call
+     * @param durationMs Duration of the call in milliseconds
+     * @param statusCode HTTP status code of the response
+     */
+    fun trackNetworkCall(url: String, durationMs: Long, statusCode: Int) {
+        // Логируем предупреждение, если сетевой запрос занял слишком много времени
+        if (durationMs > NETWORK_CALL_WARNING_THRESHOLD) {
+            Timber.w("Network call to $url took $durationMs ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms")
+        }
+        
+        Timber.d("Network call to $url took $durationMs ms with status code $statusCode")
+        
+        val params = Bundle().apply {
+            putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
+            putString("url", url)
+            putInt("status_code", statusCode)
+        }
+        
+        AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_CALL, params)
+    }
+    
+    /**
+     * Track memory usage
+     * @param usedMemoryMB Used memory in MB
+     * @param totalMemoryMB Total memory in MB
+     * @param availableMemoryMB Available memory in MB
      */
     fun trackMemoryUsage(usedMemoryMB: Long, totalMemoryMB: Long, availableMemoryMB: Long) {
         val percentUsed = (usedMemoryMB.toFloat() / totalMemoryMB.toFloat()) * 100
@@ -360,42 +379,24 @@ object PerformanceMetrics {
     // Common action names
     object Actions {
         const val BUTTON_CLICK = "button_click"
-        const val FORM_SUBMIT = "form_submit"
-        const val LIST_SCROLL = "list_scroll"
-        const val FILTER_APPLY = "filter_apply"
-        const val SEARCH = "search"
         const val SWIPE = "swipe"
-        const val LONG_PRESS = "long_press"
-        const val DOUBLE_TAP = "double_tap"
-        const val DRAG_DROP = "drag_drop"
-        const val PINCH_ZOOM = "pinch_zoom"
-        const val DIALOG_OPEN = "dialog_open"
-        const val DIALOG_CLOSE = "dialog_close"
-        const val MENU_OPEN = "menu_open"
-        const val MENU_ITEM_SELECT = "menu_item_select"
-        const val TAB_SWITCH = "tab_switch"
         const val NAVIGATION = "navigation"
-        const val REFRESH_PULL = "refresh_pull"
-        const val KEYBOARD_OPEN = "keyboard_open"
-        const val TEXT_INPUT = "text_input"
-        const val DATE_SELECT = "date_select"
+        const val SELECTION = "selection"
+        const val SEARCH = "search"
+        const val FILTER = "filter"
+        const val SORT = "sort"
+        const val EDIT = "edit"
+        const val DELETE = "delete"
+        const val SHARE = "share"
+        const val SAVE = "save"
+        const val CANCEL = "cancel"
+        const val CONFIRM = "confirm"
+        const val TOGGLE = "toggle"
+        const val REFRESH = "refresh"
+        const val SCROLL = "scroll"
+        const val ZOOM = "zoom"
+        const val LONG_PRESS = "long_press"
+        const val DRAG = "drag"
+        const val DROP = "drop"
     }
-    
-    // Common screen names
-    object Screens {
-        const val HOME = "home_screen"
-        const val TRANSACTION_ADD = "transaction_add_screen"
-        const val TRANSACTION_EDIT = "transaction_edit_screen"
-        const val TRANSACTION_DETAILS = "transaction_details_screen"
-        const val CATEGORY_LIST = "category_list_screen"
-        const val CATEGORY_EDIT = "category_edit_screen"
-        const val STATISTICS = "statistics_screen"
-        const val REPORTS = "reports_screen"
-        const val SETTINGS = "settings_screen"
-        const val PROFILE = "profile_screen"
-        const val BUDGET = "budget_screen"
-        const val SEARCH_RESULTS = "search_results_screen"
-        const val EXPORT_IMPORT = "export_import_screen"
-        const val ONBOARDING = "onboarding_screen"
-    }
-} 
+}

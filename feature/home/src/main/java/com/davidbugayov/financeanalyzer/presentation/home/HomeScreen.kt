@@ -27,7 +27,11 @@ import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
+import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
@@ -49,6 +53,7 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
+import android.os.SystemClock
 
 /**
  * Главный экран приложения.
@@ -62,7 +67,13 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
         actions = {
             if (BuildConfig.DEBUG) {
                 IconButton(
-                    onClick = onGenerateTestData,
+                    onClick = {
+                        // Отслеживаем действие пользователя
+                        UserEventTracker.trackUserAction("generate_test_data", mapOf(
+                            "source" to "home_screen"
+                        ))
+                        onGenerateTestData()
+                    },
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -70,7 +81,15 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
                     )
                 }
             }
-            IconButton(onClick = onNavigateToProfile) {
+            IconButton(
+                onClick = {
+                    // Отслеживаем действие пользователя
+                    UserEventTracker.trackUserAction("navigate_to_profile", mapOf(
+                        "source" to "home_screen"
+                    ))
+                    onNavigateToProfile()
+                }
+            ) {
                 Icon(
                     imageVector = Icons.Default.Person,
                     contentDescription = stringResource(R.string.profile),
@@ -84,9 +103,29 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
 private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: () -> Unit, onNavigateToAdd: () -> Unit) {
     AnimatedBottomNavigationBar(
         visible = true,
-        onChartClick = onNavigateToChart,
-        onHistoryClick = onNavigateToHistory,
-        onAddClick = onNavigateToAdd,
+        onChartClick = {
+            // Отслеживаем действие пользователя
+            UserEventTracker.trackUserAction("navigate_to_chart", mapOf(
+                "source" to "home_screen"
+            ))
+            onNavigateToChart()
+        },
+        onHistoryClick = {
+            // Отслеживаем действие пользователя
+            UserEventTracker.trackUserAction("navigate_to_history", mapOf(
+                "source" to "home_screen"
+            ))
+            onNavigateToHistory()
+        },
+        onAddClick = {
+            // Отслеживаем действие пользователя
+            UserEventTracker.trackUserAction("navigate_to_add", mapOf(
+                "source" to "home_screen"
+            ))
+            // Отслеживаем использование функции
+            UserEventTracker.trackFeatureUsage("add_transaction")
+            onNavigateToAdd()
+        },
     )
 }
 
@@ -182,6 +221,8 @@ fun HomeScreen(
         koinViewModel(),
     editViewModel: EditTransactionViewModel = koinViewModel(),
     updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject(),
+    userEventTracker: UserEventTracker = koinInject(),
+    errorTracker: ErrorTracker = koinInject(),
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -193,27 +234,63 @@ fun HomeScreen(
     var selectedTransactionForActions by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
+    
+    // Отслеживаем время загрузки экрана
+    val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
     val testDataGeneratedMsg = stringResource(R.string.test_data_generated)
     val transactionDeletedMsg = stringResource(R.string.transaction_deleted)
     val emptyTransactionIdErrorMsg = stringResource(R.string.empty_transaction_id_error)
 
+    // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {
+        // Отмечаем начало загрузки экрана
+        PerformanceMetrics.startScreenLoadTiming(PerformanceMetrics.Screens.HOME)
+        
+        // Логируем просмотр экрана
         AnalyticsUtils.logScreenView(
             screenName = "home",
             screenClass = "HomeScreen",
         )
-        updateWidgetsUseCase()
-
-        // Проверяем наличие обновлений при отображении главного экрана
+        
+        // Отслеживаем открытие экрана для аналитики пользовательских событий
+        userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.HOME)
+        
+        // Логируем использование функции
+        userEventTracker.trackFeatureUsage("home_view")
+        
         try {
-            // Проверка обновлений в RuStore будет выполняться только если это rustore flavor
-            // Для других flavor это будет заглушка, которая не вызывает ошибок
-            com.davidbugayov.financeanalyzer.utils.RuStoreUtils.checkForUpdates(context)
+            // Загружаем данные для экрана
+            viewModel.loadData()
         } catch (e: Exception) {
-            Timber.e(e, "Ошибка при проверке обновлений")
+            Timber.e(e, "Ошибка при загрузке данных для главного экрана")
+            
+            // Отслеживаем ошибку
+            errorTracker.trackException(e, isFatal = false, mapOf(
+                "location" to "home_screen",
+                "action" to "load_data"
+            ))
+        }
+        
+        // Завершаем отслеживание загрузки экрана
+        PerformanceMetrics.endScreenLoadTiming(PerformanceMetrics.Screens.HOME)
+        
+        // Дополнительно отслеживаем время загрузки экрана
+        val loadTime = SystemClock.elapsedRealtime() - screenLoadStartTime
+        AnalyticsUtils.logEvent(AnalyticsConstants.Events.SCREEN_LOAD, android.os.Bundle().apply {
+            putString(AnalyticsConstants.Params.SCREEN_NAME, "home")
+            putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
+        })
+    }
+    
+    // Отслеживаем закрытие экрана
+    DisposableEffect(Unit) {
+        onDispose {
+            // Отслеживаем закрытие экрана
+            userEventTracker.trackScreenClose(PerformanceMetrics.Screens.HOME)
         }
     }
+
     LaunchedEffect(Unit) {
         val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(savedShowSummary))
@@ -233,17 +310,19 @@ fun HomeScreen(
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
-    val onTransactionClick = remember<(Transaction) -> Unit> {
-        { transaction ->
-            selectedTransactionForActions = transaction
-            showActionsDialog = true
-        }
+    val onTransactionClick = { transaction: Transaction ->
+        userEventTracker.trackUserAction("transaction_click", mapOf(
+            "transaction_id" to transaction.id,
+            "transaction_amount" to transaction.amount.amount.toString()
+        ))
+        viewModel.onEvent(HomeEvent.NavigateToTransactionDetails(transaction.id))
     }
-    val onTransactionLongClick = remember<(Transaction) -> Unit> {
-        { transaction ->
-            selectedTransactionForActions = transaction
-            showActionsDialog = true
-        }
+    val onTransactionLongClick = { transaction: Transaction ->
+        userEventTracker.trackUserAction("transaction_long_click", mapOf(
+            "transaction_id" to transaction.id
+        ))
+        selectedTransactionForActions = transaction
+        showActionsDialog = true
     }
     val onToggleGroupSummary = remember<(Boolean) -> Unit> {
         { newValue ->
@@ -251,8 +330,12 @@ fun HomeScreen(
             sharedPreferences.edit { putBoolean("show_group_summary", newValue) }
         }
     }
-    val onFilterSelected = remember<(TransactionFilter) -> Unit> {
-        { filter -> viewModel.onEvent(HomeEvent.SetFilter(filter)) }
+    val onFilterSelected = { filter: TransactionFilter ->
+        userEventTracker.trackUserAction("filter_selected", mapOf(
+            "filter" to filter.toString()
+        ))
+        userEventTracker.trackFeatureUsage("transaction_filter")
+        viewModel.onEvent(HomeEvent.FilterSelected(filter))
     }
     Scaffold(
         topBar = {
@@ -318,26 +401,30 @@ fun HomeScreen(
             selectedTransactionForActions = null
         },
         onDeleteTransaction = { transaction ->
-            viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
+            userEventTracker.trackUserAction("delete_transaction", mapOf(
+                "transaction_id" to transaction.id,
+                "transaction_amount" to transaction.amount.amount.toString()
+            ))
+            viewModel.onEvent(HomeEvent.DeleteTransaction(transaction))
             showActionsDialog = false
             selectedTransactionForActions = null
         },
         onEditTransaction = { transaction ->
-            if (transaction.id.isBlank()) {
-                Timber.e(emptyTransactionIdErrorMsg)
-                feedbackMessage = emptyTransactionIdErrorMsg
-                feedbackType = FeedbackType.ERROR
-                showFeedback = true
-            } else {
-                editViewModel.loadTransactionForEditById(transaction.id)
-                viewModel.onEvent(HomeEvent.EditTransaction(transaction))
-            }
+            userEventTracker.trackUserAction("edit_transaction", mapOf(
+                "transaction_id" to transaction.id
+            ))
+            userEventTracker.trackFeatureUsage("edit_transaction")
+            viewModel.onEvent(HomeEvent.NavigateToEditTransaction(transaction.id))
             showActionsDialog = false
             selectedTransactionForActions = null
         },
         transactionToDelete = state.transactionToDelete,
         onConfirmDelete = {
             state.transactionToDelete?.let { transactionToDelete ->
+                userEventTracker.trackUserAction("delete_transaction", mapOf(
+                    "transaction_id" to transactionToDelete.id,
+                    "transaction_amount" to transactionToDelete.amount.amount.toString()
+                ))
                 viewModel.onEvent(HomeEvent.DeleteTransaction(transactionToDelete))
                 feedbackMessage = transactionDeletedMsg
                 feedbackType = FeedbackType.SUCCESS
