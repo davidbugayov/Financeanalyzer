@@ -9,6 +9,8 @@ import org.koin.android.ext.koin.androidLogger
 import org.koin.core.context.startKoin
 import org.koin.core.logger.Level
 import timber.log.Timber
+import org.koin.android.ext.android.inject
+import com.davidbugayov.financeanalyzer.utils.logging.Logger
 
 /**
  * Базовый абстрактный класс приложения.
@@ -16,6 +18,8 @@ import timber.log.Timber
  * Конкретные реализации для разных флейворов должны наследоваться от этого класса.
  */
 abstract class BaseFinanceApp : Application() {
+
+    private val logger: Logger by inject()
 
     override fun onCreate() {
         super.onCreate()
@@ -50,7 +54,7 @@ abstract class BaseFinanceApp : Application() {
             // Загружаем все модули
             modules(allModules)
         }
-        Timber.d("Koin успешно инициализирован")
+        logger.d("Koin успешно инициализирован")
     }
 
     /**
@@ -59,16 +63,16 @@ abstract class BaseFinanceApp : Application() {
     private fun initModules() {
         // Инициализация модуля транзакций
         TransactionModuleInitializer.initialize()
-        Timber.d("Модули успешно инициализированы")
+        logger.d("Модули успешно инициализированы")
     }
 
     /**
      * Логирует основную информацию об устройстве
      */
     private fun logDeviceInfo() {
-        Timber.d("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
-        Timber.d("Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
-        Timber.d("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
+        logger.d("Device: ${Build.MANUFACTURER} ${Build.MODEL}")
+        logger.d("Android version: ${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
+        logger.d("App version: ${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})")
     }
 
     /**
