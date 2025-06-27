@@ -1,5 +1,5 @@
-- New: Implemented comprehensive analytics system to improve app performance
-- New: Added user action tracking module to enhance user experience
-- Improved: Optimized memory and device resource usage
-- Improved: Added screen load time tracking for optimization
-- Fixed: Eliminated unused methods in analytics modules 
+• New: Implemented comprehensive analytics system to improve app performance
+• New: Added user action tracking module to enhance UX
+• Improved: Optimized memory and device resource usage
+• Improved: Added screen loading time tracking for optimization
+• Fixed: Removed unused methods in analytics modules 

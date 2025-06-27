@@ -20,8 +20,16 @@ Builds:
       export FDROID_BUILD=1
     gradle:
       - fdroidRelease
+  - versionName: 2.18.0.fd
+    versionCode: 37
+    commit: v2.18.0
+    subdir: app
+    init: |
+      export FDROID_BUILD=1
+    gradle:
+      - fdroidRelease
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.17.0.fd
-CurrentVersionCode: 36 
+CurrentVersion: 2.18.0.fd
+CurrentVersionCode: 37 
