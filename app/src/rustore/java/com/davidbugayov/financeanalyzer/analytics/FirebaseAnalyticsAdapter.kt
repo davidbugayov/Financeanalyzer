@@ -5,11 +5,11 @@ import com.google.firebase.analytics.FirebaseAnalytics
 import timber.log.Timber
 
 /**
- * Адаптер для Firebase Analytics, реализующий интерфейс IAnalytics.
- * Используется в RuStore flavor.
+ * Adapter for Firebase Analytics implementing IAnalytics.
+ * Used in RuStore flavor.
  */
 class FirebaseAnalyticsAdapter(
-    private val firebaseAnalytics: FirebaseAnalytics,
+    private val firebaseAnalytics: FirebaseAnalytics
 ) : IAnalytics {
 
     override fun logEvent(eventName: String) {
@@ -31,4 +31,4 @@ class FirebaseAnalyticsAdapter(
         Timber.d("Setting Firebase user ID: $userId")
         firebaseAnalytics.setUserId(userId)
     }
-}
+} 

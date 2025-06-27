@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.di
 
+import com.davidbugayov.financeanalyzer.analytics.di.analyticsUtilsModule
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
@@ -44,12 +45,12 @@ import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTr
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
+import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
-import com.davidbugayov.financeanalyzer.utils.di.loggingModule
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -79,6 +80,13 @@ val appModule = module {
     single { NotificationScheduler(androidContext(), get()) }
     single<INotificationScheduler> { get<NotificationScheduler>() }
     single { NavigationManager() }
+    
+    // CrashReporter
+    single { 
+        CrashReporter.apply { 
+            init(androidApplication()) 
+        }
+    }
 
     // Import/Export
     single { ImportTransactionsManager(androidContext()) }
@@ -178,4 +186,4 @@ val appModule = module {
     }
 }
 
-val allModules = listOf(appModule, repositoryModule, transactionModule, loggingModule)
+val allModules = listOf(appModule, repositoryModule, transactionModule, analyticsUtilsModule)

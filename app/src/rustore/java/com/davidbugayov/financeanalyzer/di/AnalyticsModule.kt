@@ -17,7 +17,7 @@ import org.koin.dsl.single
 import timber.log.Timber
 
 /**
- * Koin module for Google flavor analytics.
+ * Koin module for RuStore flavor analytics.
  */
 val analyticsModule = module {
     single<IAnalytics> {

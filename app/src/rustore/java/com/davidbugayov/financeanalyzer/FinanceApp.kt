@@ -30,9 +30,6 @@ class FinanceApp : BaseFinanceApp() {
      * Инициализирует компоненты, специфичные для RuStore flavor
      */
     override fun initFlavor() {
-        // Инициализация аналитики
-        initAnalytics()
-
         // Логируем событие открытия приложения
         AnalyticsUtils.logAppOpen()
     }

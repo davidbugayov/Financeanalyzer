@@ -50,6 +50,8 @@ android {
             "IS_RUSTORE_FLAVOR",
             "false",
         ) // По умолчанию false, переопределим для rustore flavor
+        // AppMetrica API key
+        buildConfigField("String", "APPMETRICA_API_KEY", "\"d4ec51de-47c3-4997-812f-97b9a6663dad\"")
 
         // Enable R8 support
         proguardFiles(
@@ -322,10 +324,11 @@ dependencies {
     // Используем Firebase BOM (Bill of Materials) для управления версиями
     val firebaseBom = platform(libs.firebase.bom)
     implementation(firebaseBom)
+    // Firebase BOM for google and rustore flavors
     "googleImplementation"(firebaseBom)
     "rustoreImplementation"(firebaseBom)
 
-    // Firebase Analytics (если используется)
+    // Firebase Analytics (if used)
     "googleImplementation"(libs.firebase.analytics)
     "rustoreImplementation"(libs.firebase.analytics)
 
@@ -383,6 +386,9 @@ dependencies {
     // Presentation
     implementation(project(":presentation"))
     implementation(project(":feature:transaction"))
+
+    // Lifecycle Process для отслеживания жизненного цикла приложения
+    implementation("androidx.lifecycle:lifecycle-process:${libs.versions.androidxLifecycle.get()}")
 }
 
 composeCompiler {
@@ -438,6 +444,7 @@ tasks.whenTaskAdded {
 // Исключаем все проприетарные зависимости из F-Droid сборки
 configurations.all {
     if (name.contains("fdroid", ignoreCase = true)) {
+        // Exclude Firebase and Google Play services for F-Droid
         exclude(group = "com.google.firebase")
         exclude(group = "com.google.android.gms")
         // AppMetrica разрешена в F-Droid сборке

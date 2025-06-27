@@ -30,6 +30,7 @@ import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -55,12 +56,20 @@ import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
+import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
+import com.davidbugayov.financeanalyzer.utils.MemoryUtils
+import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import org.koin.androidx.compose.get
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import android.annotation.SuppressLint
+import android.os.SystemClock
 
 /**
  * Экран профиля пользователя.
@@ -79,6 +88,10 @@ fun ProfileScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
+    
+    // Получаем компоненты аналитики
+    val userEventTracker: UserEventTracker = get()
+    val errorTracker: ErrorTracker = get()
 
     val packageInfo = remember {
         context.packageManager.getPackageInfo(context.packageName, 0)
@@ -87,12 +100,80 @@ fun ProfileScreen(
     val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
     @SuppressLint("NewApi")
     val buildVersion = remember { (packageInfo?.longVersionCode ?: 0L).toString() }
+    
+    // Отслеживаем время загрузки экрана
+    val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
+    // Отслеживаем открытие экрана
     LaunchedEffect(Unit) {
+        // Отмечаем начало загрузки экрана
+        PerformanceMetrics.startScreenLoadTiming(PerformanceMetrics.Screens.PROFILE)
+        
+        // Логируем просмотр экрана
         AnalyticsUtils.logScreenView(
             screenName = "profile",
             screenClass = "ProfileScreen",
         )
+        
+        // Отслеживаем открытие экрана для аналитики пользовательских событий
+        userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.PROFILE)
+        
+        // Логируем использование функции профиля
+        userEventTracker.trackFeatureUsage("profile_view")
+        
+        // Отправляем данные о состоянии пользователя в аналитику
+        AnalyticsUtils.setUserProperty("has_transactions", (state.totalTransactions > 0).toString())
+        AnalyticsUtils.setUserProperty("has_categories", 
+            (state.totalExpenseCategories > 0 || state.totalIncomeCategories > 0).toString())
+        AnalyticsUtils.setUserProperty("savings_rate", state.savingsRate.toString())
+        
+        // Запрашиваем оценку приложения в RuStore, если это rustore flavor
+        try {
+            (context as? Activity)?.let { activity ->
+                RuStoreUtils.requestReview(activity)
+                
+                // Логируем запрос на оценку
+                AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_RATING, android.os.Bundle().apply {
+                    putString(AnalyticsConstants.Params.SOURCE, "rustore")
+                    putString("request_location", "profile_screen")
+                })
+            }
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка при запросе оценки в RuStore")
+            
+            // Отслеживаем ошибку
+            errorTracker.trackException(e, isFatal = false, mapOf(
+                "location" to "profile_screen",
+                "action" to "request_review"
+            ))
+        }
+        
+        // Завершаем отслеживание загрузки экрана
+        PerformanceMetrics.endScreenLoadTiming(PerformanceMetrics.Screens.PROFILE)
+        
+        // Дополнительно отслеживаем время загрузки экрана
+        val loadTime = SystemClock.elapsedRealtime() - screenLoadStartTime
+        AnalyticsUtils.logEvent(AnalyticsConstants.Events.SCREEN_LOAD, android.os.Bundle().apply {
+            putString(AnalyticsConstants.Params.SCREEN_NAME, "profile")
+            putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
+        })
+    }
+    
+    // Отслеживаем закрытие экрана
+    DisposableEffect(Unit) {
+        onDispose {
+            // Отслеживаем закрытие экрана
+            userEventTracker.trackScreenClose(PerformanceMetrics.Screens.PROFILE)
+            
+            // Отслеживаем использование памяти
+            try {
+                (context as? Activity)?.let {
+                    MemoryUtils.trackMemoryUsage(it)
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при отслеживании памяти")
+            }
+        }
     }
 
     LaunchedEffect(state) {
@@ -110,6 +191,14 @@ fun ProfileScreen(
                 context.startActivity(intent)
             } catch (e: Exception) {
                 Timber.e(e, "Failed to start activity for intent: $intent")
+                
+                // Отслеживаем ошибку
+                errorTracker.trackException(e, isFatal = false, mapOf(
+                    "location" to "profile_screen",
+                    "action" to "start_activity",
+                    "intent" to intent.toString()
+                ))
+                
                 scope.launch {
                     snackbarHostState.showSnackbar(
                         "Не удалось выполнить действие: ${e.localizedMessage}",
@@ -132,7 +221,15 @@ fun ProfileScreen(
 
         Scaffold(
             topBar = {
-                ProfileTopBar(onNavigateBack = { viewModel.onEvent(ProfileEvent.NavigateBack) })
+                ProfileTopBar(onNavigateBack = { 
+                    // Логируем действие пользователя
+                    userEventTracker.trackUserAction(PerformanceMetrics.Actions.NAVIGATION, mapOf(
+                        "from" to "profile_screen",
+                        "action" to "back"
+                    ))
+                    
+                    viewModel.onEvent(ProfileEvent.NavigateBack) 
+                })
             },
             snackbarHost = { SnackbarHost(snackbarHostState) },
         ) { paddingValues ->
@@ -153,10 +250,26 @@ fun ProfileScreen(
                     averageExpense = state.averageExpense,
                     totalSourcesUsed = state.totalSourcesUsed,
                     dateRange = state.dateRange,
-                    onSavingsRateClick = { viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics) },
+                    onSavingsRateClick = { 
+                        // Логируем действие пользователя
+                        userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
+                            "section" to "analytics",
+                            "target" to "financial_statistics"
+                        ))
+                        
+                        viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics) 
+                    },
                     modifier = Modifier
                         .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
-                        .clickable { viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics) },
+                        .clickable { 
+                            // Логируем действие пользователя
+                            userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
+                                "section" to "analytics",
+                                "target" to "financial_statistics"
+                            ))
+                            
+                            viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics) 
+                        },
                 )
 
                 Spacer(
@@ -167,7 +280,15 @@ fun ProfileScreen(
                     iconBackground = MaterialTheme.colorScheme.primary,
                     title = stringResource(R.string.budget),
                     subtitle = stringResource(R.string.profile_budget_subtitle),
-                    onClick = { viewModel.onEvent(ProfileEvent.NavigateToBudget) },
+                    onClick = { 
+                        // Логируем действие пользователя
+                        userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
+                            "section" to "profile",
+                            "target" to "budget"
+                        ))
+                        
+                        viewModel.onEvent(ProfileEvent.NavigateToBudget) 
+                    },
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
                         vertical = 4.dp,
@@ -181,7 +302,15 @@ fun ProfileScreen(
                     iconBackground = MaterialTheme.colorScheme.primary,
                     title = stringResource(R.string.export_import),
                     subtitle = stringResource(R.string.profile_export_import_subtitle),
-                    onClick = { viewModel.onEvent(ProfileEvent.NavigateToExportImport) },
+                    onClick = { 
+                        // Логируем действие пользователя
+                        userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
+                            "section" to "profile",
+                            "target" to "export_import"
+                        ))
+                        
+                        viewModel.onEvent(ProfileEvent.NavigateToExportImport) 
+                    },
                     modifier = Modifier.padding(
                         horizontal = dimensionResource(R.dimen.profile_section_padding),
                         vertical = 4.dp,
