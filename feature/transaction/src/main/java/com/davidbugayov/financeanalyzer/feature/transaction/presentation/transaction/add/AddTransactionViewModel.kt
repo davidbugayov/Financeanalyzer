@@ -341,6 +341,19 @@ class AddTransactionViewModel(
     }
 
     /**
+     * Устанавливает тип транзакции (расход или доход) принудительно
+     * @param isExpense true для расхода, false для дохода
+     */
+    fun setForceExpense(isExpense: Boolean) {
+        _state.update { 
+            it.copy(
+                isExpense = isExpense,
+                forceExpense = isExpense
+            )
+        }
+    }
+
+    /**
      * Инициализация экрана: сбрасывает состояние и загружает данные.
      */
     fun initializeScreen() {

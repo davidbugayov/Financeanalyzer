@@ -140,7 +140,7 @@ class AppNavigation {
      * @param onAchievementsScreen Функция для отображения экрана Achievements
      */
     fun NavGraphBuilder.transactionGraph(
-        onAddTransactionScreen: @Composable (category: String?) -> Unit,
+        onAddTransactionScreen: @Composable (category: String?, forceExpense: Boolean?) -> Unit,
         onEditTransactionScreen: @Composable (transactionId: String) -> Unit,
         onImportTransactionsScreen: @Composable () -> Unit,
         onAchievementsScreen: @Composable () -> Unit,
@@ -152,6 +152,11 @@ class AppNavigation {
                     type = NavType.StringType
                     nullable = true
                 },
+                navArgument(Screen.AddTransaction.FORCE_EXPENSE_ARG) {
+                    type = NavType.BoolType
+                    nullable = true
+                    defaultValue = null
+                },
             ),
             enterTransition = defaultEnterUp(),
             exitTransition = defaultExitDown(),
@@ -159,7 +164,12 @@ class AppNavigation {
             popExitTransition = defaultExitDown(),
         ) { backStackEntry ->
             val category = backStackEntry.arguments?.getString(Screen.AddTransaction.CATEGORY_ARG)
-            onAddTransactionScreen(category)
+            val forceExpense = if (backStackEntry.arguments?.containsKey(Screen.AddTransaction.FORCE_EXPENSE_ARG) == true) {
+                backStackEntry.arguments?.getBoolean(Screen.AddTransaction.FORCE_EXPENSE_ARG)
+            } else {
+                null
+            }
+            onAddTransactionScreen(category, forceExpense)
         }
         composable(
             route = Screen.EditTransaction.route,

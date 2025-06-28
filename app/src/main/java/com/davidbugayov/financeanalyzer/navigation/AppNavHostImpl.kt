@@ -80,8 +80,8 @@ fun AppNavHostImpl(
         onWalletTransactionsScreen = { walletId ->
             WalletTransactionsScreen(walletId = walletId)
         },
-        onAddTransactionScreen = { category ->
-            AddTransactionScreen(category = category)
+        onAddTransactionScreen = { category, forceExpense ->
+            AddTransactionScreen(category = category, forceExpense = forceExpense)
         },
         onEditTransactionScreen = { transactionId ->
             EditTransactionScreen(transactionId = transactionId)

@@ -181,7 +181,7 @@ class HomeViewModel(
                 navigationManager.navigate(NavigationManager.Command.Navigate(Screen.History.route))
             }
             is HomeEvent.NavigateToAddTransaction -> {
-                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.route))
+                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)))
             }
             is HomeEvent.EditTransaction -> {
                 navigationManager.navigate(

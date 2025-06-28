@@ -18,14 +18,25 @@ sealed class Screen(val route: String) {
     data object AddTransaction : Screen("add") {
         // Константы для аргументов
         const val CATEGORY_ARG = "category"
+        const val FORCE_EXPENSE_ARG = "forceExpense"
 
-        const val routeWithArgs: String = "add?$CATEGORY_ARG={$CATEGORY_ARG}"
+        const val routeWithArgs: String = "add?$CATEGORY_ARG={$CATEGORY_ARG}&$FORCE_EXPENSE_ARG={$FORCE_EXPENSE_ARG}"
 
-        fun createRoute(category: String? = null): String {
-            return if (category != null) {
+        fun createRoute(category: String? = null, forceExpense: Boolean? = null): String {
+            val baseRoute = if (category != null) {
                 "add?$CATEGORY_ARG=$category"
             } else {
                 "add"
+            }
+            
+            return if (forceExpense != null) {
+                if (category != null) {
+                    "$baseRoute&$FORCE_EXPENSE_ARG=$forceExpense"
+                } else {
+                    "add?$FORCE_EXPENSE_ARG=$forceExpense"
+                }
+            } else {
+                baseRoute
             }
         }
     }

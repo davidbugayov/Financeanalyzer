@@ -31,6 +31,7 @@ import timber.log.Timber
 @Composable
 fun AddTransactionScreen(
     category: String? = null,
+    forceExpense: Boolean? = null,
     viewModel: AddTransactionViewModel = koinViewModel(),
     userEventTracker: UserEventTracker = koinInject(),
     errorTracker: ErrorTracker = koinInject()
@@ -44,6 +45,12 @@ fun AddTransactionScreen(
     LaunchedEffect(key1 = category) {
         category?.let {
             viewModel.setCategory(it)
+        }
+    }
+
+    LaunchedEffect(key1 = forceExpense) {
+        forceExpense?.let {
+            viewModel.setForceExpense(it)
         }
     }
 

@@ -81,7 +81,7 @@ fun AppNavHost(
     onBudgetScreen: @Composable () -> Unit,
     onFinancialStatisticsScreen: @Composable (startDate: Long, endDate: Long, periodType: String?) -> Unit,
     onWalletTransactionsScreen: @Composable (walletId: String) -> Unit,
-    onAddTransactionScreen: @Composable (category: String?) -> Unit,
+    onAddTransactionScreen: @Composable (category: String?, forceExpense: Boolean?) -> Unit,
     onEditTransactionScreen: @Composable (transactionId: String) -> Unit,
     onImportTransactionsScreen: @Composable () -> Unit,
     onAchievementsScreen: @Composable () -> Unit,
