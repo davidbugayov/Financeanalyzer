@@ -89,7 +89,7 @@ dependencies {
     // Logging
     implementation(libs.timber)
 
-    // Exp4j для математических выражений
+    // Exp4j
     implementation(libs.exp4j)
 }
 

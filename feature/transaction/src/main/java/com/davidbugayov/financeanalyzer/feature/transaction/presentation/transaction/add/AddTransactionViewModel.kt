@@ -339,4 +339,16 @@ class AddTransactionViewModel(
     fun setCategory(category: String) {
         _state.update { it.copy(category = category) }
     }
+
+    /**
+     * Инициализация экрана: сбрасывает состояние и загружает данные.
+     */
+    fun initializeScreen() {
+        // Сброс полей
+        resetFields()
+        // Повторная загрузка базовых данных
+        loadInitialData()
+        loadWallets()
+        loadSources()
+    }
 }

@@ -261,7 +261,7 @@ fun HomeScreen(
         
         try {
             // Загружаем данные для экрана
-            viewModel.loadData()
+            viewModel.onEvent(HomeEvent.LoadTransactions)
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при загрузке данных для главного экрана")
             
@@ -315,7 +315,7 @@ fun HomeScreen(
             "transaction_id" to transaction.id,
             "transaction_amount" to transaction.amount.amount.toString()
         ))
-        viewModel.onEvent(HomeEvent.NavigateToTransactionDetails(transaction.id))
+        viewModel.onEvent(HomeEvent.EditTransaction(transaction))
     }
     val onTransactionLongClick = { transaction: Transaction ->
         userEventTracker.trackUserAction("transaction_long_click", mapOf(
@@ -335,7 +335,7 @@ fun HomeScreen(
             "filter" to filter.toString()
         ))
         userEventTracker.trackFeatureUsage("transaction_filter")
-        viewModel.onEvent(HomeEvent.FilterSelected(filter))
+        viewModel.onEvent(HomeEvent.SetFilter(filter))
     }
     Scaffold(
         topBar = {
@@ -414,7 +414,7 @@ fun HomeScreen(
                 "transaction_id" to transaction.id
             ))
             userEventTracker.trackFeatureUsage("edit_transaction")
-            viewModel.onEvent(HomeEvent.NavigateToEditTransaction(transaction.id))
+            viewModel.onEvent(HomeEvent.EditTransaction(transaction))
             showActionsDialog = false
             selectedTransactionForActions = null
         },

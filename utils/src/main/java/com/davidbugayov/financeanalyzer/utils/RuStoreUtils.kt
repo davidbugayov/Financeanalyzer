@@ -4,23 +4,21 @@ import android.app.Activity
 import android.content.Context
 
 /**
- * Stub implementation of RuStoreUtils for library modules.
- * For non-rustore flavors, this does nothing.
+ * Stub implementation of RuStoreUtils for non-RuStore flavors.
+ * Does nothing in Google and F-Droid builds.
  */
 object RuStoreUtils {
     /**
-     * Stub method for checking updates in RuStore.
-     * Does nothing in non-rustore flavors.
+     * No-op update check.
      */
     fun checkForUpdates(context: Context) {
-        // No-op stub for non-rustore flavors
+        // No-op
     }
-    
+
     /**
-     * Stub method for requesting app review in RuStore.
-     * Does nothing in non-rustore flavors.
+     * No-op review request.
      */
     fun requestReview(activity: Activity) {
-        // No-op stub for non-rustore flavors
+        // No-op
     }
 } 
