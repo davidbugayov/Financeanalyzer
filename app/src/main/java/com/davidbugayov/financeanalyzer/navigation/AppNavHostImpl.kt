@@ -11,7 +11,7 @@ import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransac
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.FinancialStatisticsScreen as EnhancedFinancialStatisticsScreen
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryScreen
 import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.presentation.import.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.presentation.transaction.add.AddTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileScreen
@@ -104,7 +104,11 @@ fun AppNavHostImpl(
         onProfileScreen = {
             ProfileScreen()
         },
-        onLibrariesScreen = {},
+        onLibrariesScreen = {
+            com.davidbugayov.financeanalyzer.feature.profile.libraries.LibrariesScreen(
+                onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) }
+            )
+        },
         onExportImportScreen = {
             ExportImportScreen(
                 onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },

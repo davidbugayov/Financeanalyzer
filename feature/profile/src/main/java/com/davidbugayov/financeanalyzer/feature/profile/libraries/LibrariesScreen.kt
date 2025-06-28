@@ -181,13 +181,13 @@ private fun getLibraries(): List<Library> {
     return listOf(
         Library(
             name = "Jetpack Compose",
-            version = "1.5.0",
+            version = "1.6.1",
             description = "Современный инструментарий для создания нативного UI на Android",
             license = "Apache License 2.0",
         ),
         Library(
             name = "Kotlin Coroutines",
-            version = "1.7.3",
+            version = "1.8.0",
             description = "Библиотека для асинхронного программирования в Kotlin",
             license = "Apache License 2.0",
         ),
@@ -204,21 +204,9 @@ private fun getLibraries(): List<Library> {
             license = "Apache License 2.0",
         ),
         Library(
-            name = "Firebase Analytics",
-            version = "32.7.4",
-            description = "Библиотека для аналитики и отслеживания пользовательских событий",
-            license = "Apache License 2.0",
-        ),
-        Library(
-            name = "Firebase Crashlytics",
-            version = "2.9.9",
-            description = "Библиотека для отслеживания сбоев и ошибок в приложении",
-            license = "Apache License 2.0",
-        ),
-        Library(
-            name = "Material Components",
-            version = "1.11.0",
-            description = "Компоненты Material Design для Android",
+            name = "Material3",
+            version = "1.2.0",
+            description = "Компоненты Material Design 3 для Android",
             license = "Apache License 2.0",
         ),
         Library(
@@ -235,8 +223,32 @@ private fun getLibraries(): List<Library> {
         ),
         Library(
             name = "Apache POI",
-            version = "5.2.3",
+            version = "5.2.5",
             description = "Библиотека для работы с документами Microsoft Office",
+            license = "Apache License 2.0",
+        ),
+        Library(
+            name = "Navigation Compose",
+            version = "2.7.7",
+            description = "Библиотека для навигации в приложениях на Jetpack Compose",
+            license = "Apache License 2.0",
+        ),
+        Library(
+            name = "Lifecycle",
+            version = "2.7.0",
+            description = "Библиотека для управления жизненным циклом компонентов Android",
+            license = "Apache License 2.0",
+        ),
+        Library(
+            name = "Core KTX",
+            version = "1.12.0",
+            description = "Расширения Kotlin для основных библиотек Android",
+            license = "Apache License 2.0",
+        ),
+        Library(
+            name = "Accompanist",
+            version = "0.34.0",
+            description = "Набор библиотек для расширения возможностей Jetpack Compose",
             license = "Apache License 2.0",
         ),
     )

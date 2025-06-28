@@ -37,6 +37,8 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import kotlinx.coroutines.launch
@@ -234,7 +236,7 @@ private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boo
             )
 
             Text(
-                text = String.format("%.2f", balance),
+                text = Money(balance).formatForDisplay(showCurrency = false, useMinimalDecimals = true),
                 style = MaterialTheme.typography.bodyLarge,
                 color = balanceTextColor,
                 fontWeight = FontWeight.Bold,

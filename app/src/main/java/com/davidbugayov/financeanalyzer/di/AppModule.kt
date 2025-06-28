@@ -41,7 +41,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
-import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
+import com.davidbugayov.financeanalyzer.feature.transaction.presentation.import.import_transaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
