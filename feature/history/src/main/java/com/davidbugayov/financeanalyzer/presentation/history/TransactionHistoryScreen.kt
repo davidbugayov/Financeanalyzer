@@ -277,8 +277,22 @@ fun TransactionHistoryScreen(
     // Диалог выбора источника
     if (state.showSourceDialog) {
         // Получаем список всех источников из транзакций
-        val sources = remember(state.transactions) {
-            val sourceNames = state.transactions.map { it.source }.distinct().sorted()
+        val sources = remember(state.filteredTransactions, state.transactions) {
+            // Используем отфильтрованные транзакции, если они есть, иначе все транзакции
+            val transactionsToUse = if (state.filteredTransactions.isNotEmpty()) {
+                state.filteredTransactions
+            } else {
+                state.transactions
+            }
+            
+            val sourceNames = transactionsToUse.map { it.source }.distinct().sorted()
+            
+            // Отладочная информация
+            Timber.d("Источники для диалога: $sourceNames")
+            Timber.d("Количество транзакций: ${transactionsToUse.size}")
+            Timber.d("Отфильтрованные транзакции: ${state.filteredTransactions.size}")
+            Timber.d("Все транзакции: ${state.transactions.size}")
+            
             sourceNames.map { sourceName ->
                 val sourceColor = ColorUtils.getSourceColorByName(sourceName)?.toArgb() ?: 0xFF2196F3.toInt()
                 Source(
