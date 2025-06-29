@@ -287,23 +287,15 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 Timber.d("HOME: Начинаем плавное обновление данных")
-                
-                // Получаем текущие параметры
                 val currentState = _state.value
                 val (startDate, endDate) = getPeriodDates(currentState.currentFilter)
-                
-                Timber.d("HOME: Текущее состояние - isLoading: ${currentState.isLoading}, транзакций: ${currentState.filteredTransactions.size}")
-                
-                // Загружаем только новые данные без очистки кэша
+                // ОЧИЩАЕМ КЭШ ПЕРЕД ЗАГРУЗКОЙ
+                getTransactionsForPeriodWithCacheUseCase.clearCache()
                 val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
                 Timber.d("HOME: Плавно загружено транзакций: %d", transactions.size)
-                
-                // Обновляем UI без показа индикатора загрузки
                 updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
-                
             } catch (e: Exception) {
                 Timber.e(e, "HOME: Ошибка при плавном обновлении: %s", e.message)
-                // В случае ошибки - полная перезагрузка
                 Timber.d("HOME: Ошибка при плавном обновлении, переключаемся на полную перезагрузку")
                 clearCaches()
                 getTransactionsForPeriodWithCacheUseCase.clearCache()

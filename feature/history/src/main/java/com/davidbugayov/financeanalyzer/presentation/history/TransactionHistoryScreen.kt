@@ -90,7 +90,8 @@ fun TransactionHistoryScreen(
             }
             is TransactionEvent.DeleteTransaction -> {
                 viewModel.onEvent(TransactionHistoryEvent.DeleteTransaction(event.transaction))
-                showActionsDialog = false
+                // Закрываем диалог подтверждения после удаления
+                viewModel.onEvent(TransactionHistoryEvent.HideDeleteConfirmDialog)
             }
             is TransactionEvent.ShowEditDialog -> {
                 // Навигация на экран редактирования
@@ -228,14 +229,30 @@ fun TransactionHistoryScreen(
         )
     }
 
-    // Используем общий компонент для работы с транзакциями
+    // Диалог с действиями для транзакции
+    if (showActionsDialog && selectedTransaction != null) {
+        TransactionActionsDialog(
+            transaction = selectedTransaction!!,
+            onDismiss = { showActionsDialog = false },
+            onDelete = { transaction ->
+                // Вместо локального состояния вызываем showDeleteConfirmDialog через viewModel
+                viewModel.onEvent(TransactionHistoryEvent.ShowDeleteConfirmDialog(transaction))
+                showActionsDialog = false
+                selectedTransaction = null
+            },
+            onEdit = { transaction ->
+                showActionsDialog = false
+                handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction.id))
+            },
+        )
+    }
+
+    // Диалог подтверждения удаления транзакции через TransactionActionsHandler (как в HomeScreen)
     TransactionActionsHandler(
         transactionDialogState = state.toTransactionDialogState(),
         onEvent = { event -> handleTransactionEvent(event) },
         onNavigateToEdit = { transactionId ->
-            // Загружаем транзакцию в ViewModel для редактирования
             editTransactionViewModel.loadTransactionForEditById(transactionId)
-            // Переходим на экран редактирования
             viewModel.onEditTransaction(transactionId)
             Timber.d("Navigating to edit transaction with ID: $transactionId")
         },
@@ -273,23 +290,6 @@ fun TransactionHistoryScreen(
             },
             onDismiss = {
                 viewModel.onEvent(TransactionHistoryEvent.HideDeleteSourceConfirmDialog)
-            },
-        )
-    }
-
-    // Диалог с действиями для транзакции
-    if (showActionsDialog && selectedTransaction != null) {
-        TransactionActionsDialog(
-            transaction = selectedTransaction!!,
-            onDismiss = { showActionsDialog = false },
-            onDelete = { transaction ->
-                showActionsDialog = false
-                handleTransactionEvent(TransactionEvent.ShowDeleteConfirmDialog(transaction))
-            },
-            onEdit = { transaction ->
-                showActionsDialog = false
-                // Загружаем транзакцию в ViewModel для редактирования и переходим на экран редактирования
-                handleTransactionEvent(TransactionEvent.ShowEditDialog(transaction.id))
             },
         )
     }

@@ -23,6 +23,7 @@ sealed class TransactionHistoryEvent {
 
     // События для удаления транзакции
     data class DeleteTransaction(val transaction: Transaction) : TransactionHistoryEvent()
+    data class UpdateTransaction(val transaction: Transaction) : TransactionHistoryEvent()
     data class ShowDeleteConfirmDialog(val transaction: Transaction) : TransactionHistoryEvent()
     data object HideDeleteConfirmDialog : TransactionHistoryEvent()
 

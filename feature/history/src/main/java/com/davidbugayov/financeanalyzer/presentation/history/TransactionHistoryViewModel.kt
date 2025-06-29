@@ -14,6 +14,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransac
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -47,6 +48,7 @@ class TransactionHistoryViewModel(
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val application: Application,
     private val navigationManager: NavigationManager,
+    private val updateTransactionUseCase: UpdateTransactionUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(TransactionHistoryState())
@@ -91,6 +93,7 @@ class TransactionHistoryViewModel(
     fun onEvent(event: TransactionHistoryEvent) {
         when (event) {
             is TransactionHistoryEvent.DeleteTransaction -> deleteTransaction(event.transaction)
+            is TransactionHistoryEvent.UpdateTransaction -> updateTransaction(event.transaction)
             is TransactionHistoryEvent.SetGroupingType -> updateGroupingType(event.type)
             is TransactionHistoryEvent.SetPeriodType -> updatePeriodType(event.type)
             is TransactionHistoryEvent.SetCategories -> updateCategories(event.categories)
@@ -154,6 +157,23 @@ class TransactionHistoryViewModel(
                 }
                 is Result.Error -> {
                     Timber.e(result.exception, "Failed to delete transaction")
+                    val errorMessage = result.exception.message ?: "Unknown error"
+                    _state.update { it.copy(error = errorMessage) }
+                }
+            }
+        }
+    }
+
+    private fun updateTransaction(transaction: Transaction) {
+        viewModelScope.launch {
+            when (val result = updateTransactionUseCase(transaction)) {
+                is Result.Success -> {
+                    resetAndReloadTransactions()
+                    updateWidgetsUseCase()
+                    Timber.d("Транзакция успешно обновлена в истории: ${transaction.id}")
+                }
+                is Result.Error -> {
+                    Timber.e(result.exception, "Ошибка при обновлении транзакции")
                     val errorMessage = result.exception.message ?: "Unknown error"
                     _state.update { it.copy(error = errorMessage) }
                 }

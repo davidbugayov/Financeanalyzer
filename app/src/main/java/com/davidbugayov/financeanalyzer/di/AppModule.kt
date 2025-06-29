@@ -166,7 +166,7 @@ val appModule = module {
         )
     }
     viewModel {
-        TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), androidApplication(), get())
+        TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), androidApplication(), get(), get())
     }
     viewModel { BudgetViewModel(get(), get(), get()) }
     viewModel { WalletTransactionsViewModel(get(), get(), get()) }

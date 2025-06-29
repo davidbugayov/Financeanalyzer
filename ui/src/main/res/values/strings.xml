@@ -98,10 +98,7 @@
     <string name="expense_type">Расход</string>
     <string name="income_type">Доход</string>
     <string name="title">Название</string>
-    <string name="amount">Сумма</string>
-    <string name="date">Дата</string>
     <string name="select_date_button">Выбрать дату</string>
-    <string name="category">Категория</string>
     <string name="select_category">Выбрать категорию</string>
     <string name="note_optional">Примечание (необязательно)</string>
     <string name="select_category_title">Выберите категорию</string>
@@ -372,7 +369,6 @@
     <string name="sources">Источники</string>
 
     <!-- Источники средств -->
-    <string name="source">Откуда</string>
     <string name="source_name">Название источника</string>
     <string name="select_source">Выберите источник</string>
     <string name="add_custom_source">Добавить источник</string>
@@ -1059,4 +1055,11 @@
   <string name="permission_settings_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
   <string name="permission_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Это позволит выбрать файл для импорта транзакций.</string>
   <string name="grant_permission">Разрешить</string>
+
+    <string name="amount">Сумма: %1$s</string>
+    <string name="category">Категория: %1$s</string>
+    <string name="date">Дата: %1$s</string>
+    <string name="source">Источник: %1$s</string>
+    <string name="note">Примечание: %1$s</string>
+    <string name="delete_transaction_confirm">Вы уверены, что хотите удалить эту транзакцию?</string>
 </resources>
