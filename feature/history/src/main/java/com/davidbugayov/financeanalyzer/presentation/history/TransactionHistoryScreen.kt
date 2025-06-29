@@ -63,6 +63,11 @@ import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
 import java.text.SimpleDateFormat
 import java.util.Locale
+import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
+import android.content.Context
+import androidx.compose.ui.platform.LocalContext
+import android.app.Application
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -269,17 +274,20 @@ fun TransactionHistoryScreen(
 
     // Диалог выбора источника
     if (state.showSourceDialog) {
-        // Получаем список всех источников из utils
-        // TODO: Источники должны приходить из ViewModel/state (например, state.availableSources)
-        // val sources = remember {
-        //     val defaultSources = ColorUtils.defaultSources // ОШИБКА: defaultSources удален
-        //     defaultSources + listOf(Source(name = "Наличные", color = 0xFF9E9E9E.toInt()))
-        // }
-        val sourcesPlaceholder: List<Source> = emptyList() // Временная заглушка
+        // Получаем список всех источников из транзакций
+        val sources = remember(state.transactions) {
+            val sourceNames = state.transactions.map { it.source }.distinct().sorted()
+            sourceNames.map { sourceName ->
+                Source(
+                    name = sourceName,
+                    color = 0xFF2196F3.toInt() // Синий цвет по умолчанию
+                )
+            }
+        }
 
         SourceSelectionDialog(
             selectedSources = state.selectedSources,
-            sources = sourcesPlaceholder, // Используем заглушку
+            sources = sources,
             onSourcesSelected = { selectedSources ->
                 viewModel.onEvent(TransactionHistoryEvent.SetSources(selectedSources))
                 viewModel.onEvent(TransactionHistoryEvent.HideSourceDialog)
