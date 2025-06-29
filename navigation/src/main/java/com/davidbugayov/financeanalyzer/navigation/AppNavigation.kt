@@ -154,8 +154,6 @@ class AppNavigation {
                 },
                 navArgument(Screen.AddTransaction.FORCE_EXPENSE_ARG) {
                     type = NavType.BoolType
-                    nullable = true
-                    defaultValue = null
                 },
             ),
             enterTransition = defaultEnterUp(),

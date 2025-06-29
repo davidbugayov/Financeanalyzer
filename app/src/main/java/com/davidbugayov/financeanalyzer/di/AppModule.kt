@@ -37,11 +37,9 @@ import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUi
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.BudgetViewModel
 import com.davidbugayov.financeanalyzer.presentation.budget.wallet.WalletTransactionsViewModel
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
-import com.davidbugayov.financeanalyzer.feature.transaction.presentation.import.import_transaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
@@ -51,6 +49,7 @@ import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
 import org.koin.androidx.viewmodel.dsl.viewModel
@@ -80,11 +79,11 @@ val appModule = module {
     single { NotificationScheduler(androidContext(), get()) }
     single<INotificationScheduler> { get<NotificationScheduler>() }
     single { NavigationManager() }
-    
+
     // CrashReporter
-    single { 
-        CrashReporter.apply { 
-            init(androidApplication()) 
+    single {
+        CrashReporter.apply {
+            init(androidApplication())
         }
     }
 
