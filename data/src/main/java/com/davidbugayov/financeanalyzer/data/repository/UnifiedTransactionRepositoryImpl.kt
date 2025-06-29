@@ -222,7 +222,8 @@ class UnifiedTransactionRepositoryImpl(
      */
     override suspend fun updateTransaction(transaction: Transaction) {
         val entity = transactionMapper.mapToEntity(transaction)
-        transactionDao.updateTransaction(entity)
+        // Use insert with REPLACE strategy to upsert based on unique id_string
+        transactionDao.insertTransaction(entity)
 
         // Обновляем кэш
         transactionsCache[transaction.id] = transaction

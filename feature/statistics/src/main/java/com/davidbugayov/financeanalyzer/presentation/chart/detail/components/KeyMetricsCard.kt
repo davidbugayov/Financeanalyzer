@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.detail.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -39,7 +40,13 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: 
         elevation = CardDefaults.cardElevation(
             defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
         ),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
+        colors = CardDefaults.cardColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+        ),
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+        ),
     ) {
         Column(
             modifier = Modifier
@@ -50,6 +57,7 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: 
                 text = stringResource(R.string.key_metrics),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
+                color = MaterialTheme.colorScheme.primary,
             )
 
             Spacer(

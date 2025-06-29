@@ -297,9 +297,14 @@ fun HomeScreen(
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
+        var lastRefreshTime = 0L
         val observer = LifecycleEventObserver { _, event ->
             if (event == Lifecycle.Event.ON_RESUME) {
-                viewModel.onEvent(HomeEvent.LoadTransactions)
+                val currentTime = System.currentTimeMillis()
+                if (currentTime - lastRefreshTime > 2000) {
+                    viewModel.onEvent(HomeEvent.LoadTransactions)
+                    lastRefreshTime = currentTime
+                }
             }
         }
         lifecycleOwner.lifecycle.addObserver(observer)

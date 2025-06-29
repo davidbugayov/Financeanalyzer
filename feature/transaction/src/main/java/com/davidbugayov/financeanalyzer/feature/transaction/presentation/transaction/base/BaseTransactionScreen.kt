@@ -592,6 +592,7 @@ fun <E> BaseTransactionScreen(
                     SuccessDialog(
                         message = stringResource(R.string.transaction_saved_success),
                         onDismiss = {
+                            Timber.d("UI: Нажато 'OK' в диалоге успеха, вызываем handleExit()")
                             viewModel.onEvent(
                                 eventFactory(BaseTransactionEvent.HideSuccessDialog),
                                 context,

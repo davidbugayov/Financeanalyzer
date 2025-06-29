@@ -1,0 +1,7 @@
+• Improved: Significantly enhanced visibility of TransactionGroup on dark background
+• Improved: Added contrast borders and enhanced visualization for transaction groups
+• Improved: Card for transition to detailed financial statistics became more noticeable and modern
+• Improved: Detailed financial statistics screen uses enhanced colors from UI module
+• Improved: KeyMetricsCard received more contrast colors for better visibility on dark background
+• Improved: HomeGroupSummary now has borders and enhanced visualization
+• Fixed: Resolved issues with interface element visibility in dark theme 

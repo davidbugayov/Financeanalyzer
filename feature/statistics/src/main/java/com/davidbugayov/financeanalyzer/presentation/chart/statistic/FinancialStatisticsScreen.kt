@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistic
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -168,7 +169,7 @@ fun FinancialStatisticsScreen(
                 },
             )
         },
-        snackbarHost = { androidx.compose.material3.SnackbarHost(snackbarHostState) },
+        snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
             modifier = Modifier
@@ -451,10 +452,14 @@ fun FinancialStatisticsScreen(
                                             },
                                         shape = RoundedCornerShape(16.dp),
                                         elevation = CardDefaults.cardElevation(
-                                            defaultElevation = 4.dp,
+                                            defaultElevation = 6.dp,
                                         ),
                                         colors = CardDefaults.cardColors(
-                                            containerColor = LocalFriendlyCardBackgroundColor.current,
+                                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                                        ),
+                                        border = BorderStroke(
+                                            width = 2.dp,
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
                                         ),
                                     ) {
                                         Row(
@@ -475,6 +480,7 @@ fun FinancialStatisticsScreen(
                                                     ),
                                                     style = MaterialTheme.typography.titleMedium,
                                                     fontWeight = FontWeight.Bold,
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                                                 )
 
                                                 Text(
@@ -482,7 +488,7 @@ fun FinancialStatisticsScreen(
                                                         R.string.explore_your_financial_metrics,
                                                     ),
                                                     style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                                                 )
                                             }
 
@@ -490,6 +496,7 @@ fun FinancialStatisticsScreen(
                                                 imageVector = Icons.Filled.Analytics,
                                                 contentDescription = null,
                                                 tint = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.size(32.dp),
                                             )
                                         }
                                     }

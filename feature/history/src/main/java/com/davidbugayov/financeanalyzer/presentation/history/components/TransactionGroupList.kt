@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.history.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -44,6 +45,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
+import androidx.compose.ui.unit.dp
 
 /**
  * Компонент для отображения сгруппированных транзакций с поддержкой пагинации.
@@ -199,11 +201,21 @@ private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boo
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val balanceTextColor = if (balance >= 0) incomeColor else expenseColor
-    // Определяем цвет фона карты в зависимости от знака баланса
+    
+    // Улучшенные цвета фона для лучшей видимости на темном фоне
     val cardBackgroundColor = if (balance >= 0) {
-        LocalIncomeColor.current.copy(alpha = 0.1f) // Светлый оттенок для дохода
+        // Для доходов - более яркий зеленый фон
+        incomeColor.copy(alpha = 0.15f)
     } else {
-        LocalExpenseColor.current.copy(alpha = 0.1f) // Светлый оттенок для расхода
+        // Для расходов - более яркий красный фон
+        expenseColor.copy(alpha = 0.15f)
+    }
+    
+    // Добавляем границу для лучшей видимости
+    val borderColor = if (balance >= 0) {
+        incomeColor.copy(alpha = 0.3f)
+    } else {
+        expenseColor.copy(alpha = 0.3f)
     }
 
     Card(
@@ -215,6 +227,11 @@ private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boo
             )
             .clickable { onToggle(!isExpanded) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
+        border = BorderStroke(
+            width = 1.dp,
+            color = borderColor
+        ),
+        elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
             modifier = Modifier
@@ -233,6 +250,7 @@ private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boo
                 style = MaterialTheme.typography.bodyLarge,
                 modifier = Modifier.weight(1f),
                 fontWeight = FontWeight.Medium,
+                color = MaterialTheme.colorScheme.onSurface,
             )
 
             Text(
