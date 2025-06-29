@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import android.content.Context
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -673,6 +674,31 @@ class EditTransactionViewModel(
                 )
             }
 
+            is BaseTransactionEvent.AddCustomSource -> {
+                val trimmedName = event.source.trim()
+                if (trimmedName.length >= 2) {
+                    val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
+                        name = trimmedName,
+                        color = event.color,
+                        isCustom = true
+                    )
+                    val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
+                        sourcePreferences,
+                        _state.value.sources,
+                        newSource
+                    )
+                    _state.update { state ->
+                        state.copy(
+                            sources = updatedSources,
+                            showCustomSourceDialog = false,
+                            customSource = "",
+                            source = trimmedName,
+                            sourceColor = event.color
+                        )
+                    }
+                }
+            }
+
             else -> handleBaseEvent(event, context)
         }
     }
@@ -784,6 +810,36 @@ class EditTransactionViewModel(
                 error = errorMessage,
                 isLoading = false,
             )
+        }
+    }
+
+    override fun handleBaseEvent(event: BaseTransactionEvent, context: Context) {
+        when (event) {
+            is BaseTransactionEvent.AddCustomSource -> {
+                val trimmedName = event.source.trim()
+                if (trimmedName.length >= 2) {
+                    val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
+                        name = trimmedName,
+                        color = event.color,
+                        isCustom = true
+                    )
+                    val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
+                        sourcePreferences,
+                        _state.value.sources,
+                        newSource
+                    )
+                    _state.update { state ->
+                        state.copy(
+                            sources = updatedSources,
+                            showCustomSourceDialog = false,
+                            customSource = "",
+                            source = trimmedName,
+                            sourceColor = event.color
+                        )
+                    }
+                }
+            }
+            else -> super.handleBaseEvent(event, context)
         }
     }
 }

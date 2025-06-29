@@ -11,30 +11,17 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 // import com.davidbugayov.financeanalyzer.utils.ColorUtils // ColorUtils может быть еще нужен для getSourceColorByName, если используется где-то еще
 
 fun getInitialSources(sourcePreferences: SourcePreferences, resources: Resources): List<Source> {
-    val savedSources = sourcePreferences.getCustomSources()
-    return if (savedSources.isNotEmpty()) {
-        savedSources.map { customSource ->
-            Source(name = customSource.name, color = ColorUtils.parseHexColor(customSource.colorHex))
-        }
-    } else {
-        val defaultSourceNames = resources.getStringArray(R.array.default_source_names).toList()
-
-        val defaultSources = defaultSourceNames.map { name ->
-            val colorObject = ColorUtils.getSourceColorByName(name.lowercase()) ?: CashColor
-            Source(name = name, color = colorObject.toArgb())
-        }
-
-        // Сохраняем дефолтные источники в формате CustomSourceData
-        val customSourceData = defaultSources.map { source ->
-            SourcePreferences.CustomSourceData(
-                name = source.name,
-                colorHex = ColorUtils.colorToHex(source.color),
-            )
-        }
-        sourcePreferences.saveCustomSources(customSourceData)
-
-        defaultSources
+    val defaultSourceNames = resources.getStringArray(R.array.default_source_names).toList()
+    val defaultSources = defaultSourceNames.map { name ->
+        val colorObject = ColorUtils.getSourceColorByName(name.lowercase()) ?: CashColor
+        Source(name = name, color = colorObject.toArgb())
     }
+    val savedSources = sourcePreferences.getCustomSources().map { customSource ->
+        Source(name = customSource.name, color = ColorUtils.parseHexColor(customSource.colorHex), isCustom = true)
+    }
+    // Объединяем дефолтные и кастомные, убираем дубликаты по имени
+    val allSources = (defaultSources + savedSources).distinctBy { it.name }
+    return allSources
 }
 
 fun addCustomSource(

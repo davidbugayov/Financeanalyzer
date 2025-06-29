@@ -276,12 +276,9 @@ fun TransactionHistoryScreen(
 
     // Диалог выбора источника
     if (state.showSourceDialog) {
-        // Получаем список всех источников так же, как в BaseTransactionViewModel
         val context = LocalContext.current
-        val sources = remember(context) {
-            val sourcePreferences = SourcePreferences.getInstance(context)
-            getInitialSources(sourcePreferences, context.resources)
-        }
+        val sourcePreferences = SourcePreferences.getInstance(context)
+        val sources = getInitialSources(sourcePreferences, context.resources)
 
         SourceSelectionDialog(
             selectedSources = state.selectedSources,

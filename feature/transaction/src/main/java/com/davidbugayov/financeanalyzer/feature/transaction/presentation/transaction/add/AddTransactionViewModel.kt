@@ -235,6 +235,7 @@ class AddTransactionViewModel(
     override fun onEvent(event: BaseTransactionEvent, context: Context) {
         when (event) {
             is BaseTransactionEvent.Submit -> submitTransaction(context)
+            is BaseTransactionEvent.AddCustomSource -> handleBaseEvent(event, context)
             else -> handleBaseEvent(event, context)
         }
     }
@@ -378,5 +379,35 @@ class AddTransactionViewModel(
         
         Timber.d("AddTransactionViewModel: initializeScreen завершена, forceExpense=%b, isExpense=%b", 
                 _state.value.forceExpense, _state.value.isExpense)
+    }
+
+    override fun handleBaseEvent(event: BaseTransactionEvent, context: Context) {
+        when (event) {
+            is BaseTransactionEvent.AddCustomSource -> {
+                val trimmedName = event.source.trim()
+                if (trimmedName.length >= 2) {
+                    val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
+                        name = trimmedName,
+                        color = event.color,
+                        isCustom = true
+                    )
+                    val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
+                        sourcePreferences,
+                        _state.value.sources,
+                        newSource
+                    )
+                    _state.update { state ->
+                        state.copy(
+                            sources = updatedSources,
+                            showCustomSourceDialog = false,
+                            customSource = "",
+                            source = trimmedName,
+                            sourceColor = event.color
+                        )
+                    }
+                }
+            }
+            else -> super.handleBaseEvent(event, context)
+        }
     }
 }
