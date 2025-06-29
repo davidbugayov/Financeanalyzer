@@ -21,6 +21,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -224,6 +226,11 @@ private fun ExpandedTransactionList(
             Timber.d("ExpandedLayout: Скроллим к началу списка при показе сводки")
         }
     }
+    
+    // Отслеживаем количество транзакций для анимации новых элементов
+    val previousTransactionCount = remember { mutableStateOf(0) }
+    val currentTransactionCount = state.filteredTransactions.size
+    
     LazyColumn(
         state = lazyListState,
         modifier = Modifier.fillMaxSize(),
@@ -233,12 +240,26 @@ private fun ExpandedTransactionList(
             key = { it.id },
             contentType = { "transaction" },
         ) { transaction ->
+            val isNewTransaction = state.filteredTransactions.indexOf(transaction) >= previousTransactionCount.value
+            val animationDelay = if (isNewTransaction) {
+                (state.filteredTransactions.indexOf(transaction) - previousTransactionCount.value) * 100L
+            } else {
+                0L
+            }
+            
             TransactionItem(
                 transaction = transaction,
                 categoriesViewModel = categoriesViewModel,
                 onClick = onTransactionClick,
                 onTransactionLongClick = onTransactionLongClick,
+                animated = isNewTransaction,
+                animationDelay = animationDelay,
             )
         }
+    }
+    
+    // Обновляем счетчик транзакций после рендеринга
+    LaunchedEffect(currentTransactionCount) {
+        previousTransactionCount.value = currentTransactionCount
     }
 }

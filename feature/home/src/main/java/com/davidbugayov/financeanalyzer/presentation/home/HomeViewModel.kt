@@ -252,29 +252,102 @@ class HomeViewModel(
         viewModelScope.launch {
             Timber.d("Subscribing to repository data changes")
             repository.dataChangeEvents.collect { event ->
-                // Очищаем кэши синхронно
-                filteredTransactionsCache.clear()
-                statsCache.clear()
-                transactionCache.clear()
-                getTransactionsForPeriodWithCacheUseCase.clearCache() // <--- ВАЖНО! Очищаем кэш use case
+                when (event) {
+                    is com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent.TransactionChanged -> {
+                        val transactionId = event.transactionId
+                        Timber.d("HOME: Получено событие изменения транзакции: $transactionId")
+                        
+                        // Плавное обновление без полной перезагрузки
+                        updateDataSmoothly()
+                    }
+                    else -> {
+                        // Для других типов изменений - полная перезагрузка
+                        Timber.d("HOME: Получено событие изменения данных, полная перезагрузка")
+                        clearCaches()
+                        getTransactionsForPeriodWithCacheUseCase.clearCache()
+                        _state.update { it.copy(isLoading = true) }
+                        loadTransactions()
+                    }
+                }
+            }
+        }
+    }
 
-                // Показываем индикатор загрузки
-                _state.update { it.copy(isLoading = true) }
-                // Перезагружаем данные
+    /**
+     * Плавное обновление данных без полной перезагрузки
+     */
+    private fun updateDataSmoothly() {
+        viewModelScope.launch {
+            try {
+                Timber.d("HOME: Плавное обновление данных")
+                
+                // Получаем текущие параметры
+                val currentState = _state.value
+                val (startDate, endDate) = getPeriodDates(currentState.currentFilter)
+                
+                // Загружаем только новые данные без очистки кэша
+                val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
+                Timber.d("HOME: Плавно обновлено транзакций: %d", transactions.size)
+                
+                // Обновляем UI без показа индикатора загрузки
+                updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
+                
+            } catch (e: Exception) {
+                Timber.e(e, "HOME: Ошибка при плавном обновлении: %s", e.message)
+                // В случае ошибки - полная перезагрузка
+                clearCaches()
+                getTransactionsForPeriodWithCacheUseCase.clearCache()
                 loadTransactions()
             }
         }
     }
 
     /**
+     * Плавное обновление отфильтрованных транзакций без показа индикатора загрузки
+     */
+    private fun updateFilteredTransactionsSmoothly(filter: TransactionFilter, transactions: List<Transaction>) {
+        viewModelScope.launch {
+            val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
+                val income = financialMetrics.getTotalIncomeAsMoney()
+                val expense = financialMetrics.getTotalExpenseAsMoney()
+                val balance = financialMetrics.getCurrentBalance()
+                Triple(income, expense, balance)
+            } else {
+                val stats = calculateStats(transactions)
+                stats
+            }
+            
+            val transactionGroups = groupTransactionsByDate(transactions)
+            
+            _state.update {
+                it.copy(
+                    filteredTransactions = transactions,
+                    transactionGroups = transactionGroups,
+                    filteredIncome = filteredIncome,
+                    filteredExpense = filteredExpense,
+                    filteredBalance = filteredBalance,
+                    isLoading = false, // Не показываем индикатор загрузки
+                )
+            }
+            
+            // Обновляем статистику по категориям в фоне
+            updateCategoryStats(transactions)
+        }
+    }
+
+    /**
      * Инициирует фоновую загрузку данных
      * Обновляет данные в фоне, не блокируя UI
+     * @param showLoading Показывать ли индикатор загрузки
      */
-    private fun loadTransactions() {
+    private fun loadTransactions(showLoading: Boolean = true) {
         viewModelScope.launch {
             getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем кэш перед загрузкой
-            Timber.d("HOME: Начало загрузки транзакций")
-            _state.update { it.copy(isLoading = true) }
+            Timber.d("HOME: Начало загрузки транзакций, showLoading=$showLoading")
+            
+            if (showLoading) {
+                _state.update { it.copy(isLoading = true) }
+            }
             
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
