@@ -420,7 +420,18 @@ fun TransactionHistoryScreen(
 
                             TransactionGroup(
                                 date = try {
-                                    dateFormat.parse(period) ?: java.util.Date()
+                                    when {
+                                        // Для диапазонов дат берем первую дату
+                                        period.contains("-") -> {
+                                            val firstDatePart = period.split("-")[0].trim()
+                                            val yearPart = period.split(" ").last()
+                                            val fullDateString = "$firstDatePart $yearPart"
+                                            SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(fullDateString) ?: java.util.Date()
+                                        }
+                                        else -> {
+                                            dateFormat.parse(period) ?: java.util.Date()
+                                        }
+                                    }
                                 } catch (e: Exception) {
                                     Timber.e(e, "Ошибка при парсинге даты: $period")
                                     java.util.Date()
