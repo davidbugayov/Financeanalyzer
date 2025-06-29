@@ -67,6 +67,7 @@ import kotlinx.coroutines.delay
  * @param modifier Модификатор для настройки внешнего вида
  * @param startDate Начальная дата для отображения календаря
  * @param endDate Конечная дата для отображения календаря
+ * @param periodType Тип периода
  * @param viewModel ViewModel графиков для обновления данных при изменении периода
  */
 @Composable
@@ -76,6 +77,7 @@ fun EnhancedSummaryCard(
     modifier: Modifier = Modifier,
     startDate: Date = Date(),
     endDate: Date = Date(),
+    periodType: PeriodType = PeriodType.MONTH,
     viewModel: EnhancedFinanceChartViewModel? = null,
 ) {
     val balance = income.minus(expense)
@@ -88,7 +90,7 @@ fun EnhancedSummaryCard(
     var showEndDatePicker by remember { mutableStateOf(false) }
 
     // Используем только входящие параметры для периода
-    var selectedPeriodType by remember { mutableStateOf(PeriodType.MONTH) }
+    var selectedPeriodType by remember { mutableStateOf(periodType) }
     var currentStartDate by remember { mutableStateOf(startDate) }
     var currentEndDate by remember { mutableStateOf(endDate) }
 
@@ -118,6 +120,10 @@ fun EnhancedSummaryCard(
     LaunchedEffect(key1 = Unit) {
         delay(100)
         visible = true
+    }
+
+    LaunchedEffect(periodType) {
+        selectedPeriodType = periodType
     }
 
     // Определяем цвет рамки в зависимости от баланса (как в BalanceCard)

@@ -245,6 +245,7 @@ fun FinancialStatisticsScreen(
                         expense = (state.expense ?: Money.zero()).abs(),
                         startDate = state.startDate,
                         endDate = state.endDate,
+                        periodType = state.periodType,
                         viewModel = viewModel,
                         modifier = Modifier
                             .fillMaxWidth()
