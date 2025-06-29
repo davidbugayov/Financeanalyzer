@@ -68,6 +68,8 @@ import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import android.content.Context
 import androidx.compose.ui.platform.LocalContext
 import android.app.Application
+import com.davidbugayov.financeanalyzer.utils.ColorUtils
+import androidx.compose.ui.graphics.toArgb
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -278,9 +280,10 @@ fun TransactionHistoryScreen(
         val sources = remember(state.transactions) {
             val sourceNames = state.transactions.map { it.source }.distinct().sorted()
             sourceNames.map { sourceName ->
+                val sourceColor = ColorUtils.getSourceColorByName(sourceName)?.toArgb() ?: 0xFF2196F3.toInt()
                 Source(
                     name = sourceName,
-                    color = 0xFF2196F3.toInt() // Синий цвет по умолчанию
+                    color = sourceColor
                 )
             }
         }
