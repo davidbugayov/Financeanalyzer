@@ -134,6 +134,7 @@ class TransactionHistoryViewModel(
             is TransactionHistoryEvent.HideStartDatePicker -> hideStartDatePicker()
             is TransactionHistoryEvent.ShowEndDatePicker -> showEndDatePicker()
             is TransactionHistoryEvent.HideEndDatePicker -> hideEndDatePicker()
+            is TransactionHistoryEvent.NavigateToAddTransaction -> navigateToAddTransaction()
         }
     }
 
@@ -821,5 +822,9 @@ class TransactionHistoryViewModel(
         navigationManager.navigate(
             NavigationManager.Command.Navigate(Screen.EditTransaction.createRoute(transactionId)),
         )
+    }
+
+    private fun navigateToAddTransaction() {
+        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)))
     }
 }

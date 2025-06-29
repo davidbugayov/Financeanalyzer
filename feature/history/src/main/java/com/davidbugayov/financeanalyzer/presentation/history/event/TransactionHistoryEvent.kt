@@ -48,4 +48,7 @@ sealed class TransactionHistoryEvent {
     data object HideStartDatePicker : TransactionHistoryEvent()
     data object ShowEndDatePicker : TransactionHistoryEvent()
     data object HideEndDatePicker : TransactionHistoryEvent()
+
+    // Навигация к добавлению транзакции
+    data object NavigateToAddTransaction : TransactionHistoryEvent()
 }
