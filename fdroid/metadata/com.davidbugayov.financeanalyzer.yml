@@ -36,8 +36,14 @@ Builds:
       export FDROID_BUILD=1
     gradle:
       - fdroidRelease
+  - versionName: 2.20.0.fd
+    versionCode: 39
+    commit: v2.20.0
+    changelog: |
+      • Улучшено: Диалог выбора периода в статистике теперь всегда выделяет реально выбранный период
+      • Улучшено: Фильтрация по периоду, категориям и источникам в истории и статистике стала надёжнее и удобнее
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.19.0.fd
-CurrentVersionCode: 38 
+CurrentVersion: 2.20.0.fd
+CurrentVersionCode: 39 
