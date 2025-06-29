@@ -250,8 +250,9 @@ class HomeViewModel(
      */
     private fun subscribeToRepositoryChanges() {
         viewModelScope.launch {
-            Timber.d("Subscribing to repository data changes")
+            Timber.d("HOME: Подписываемся на изменения данных в репозитории")
             repository.dataChangeEvents.collect { event ->
+                Timber.d("HOME: Получено событие изменения данных: $event")
                 when (event) {
                     is com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent.TransactionChanged -> {
                         val transactionId = event.transactionId
@@ -265,6 +266,7 @@ class HomeViewModel(
                         Timber.d("HOME: Получено событие изменения данных, полная перезагрузка")
                         clearCaches()
                         getTransactionsForPeriodWithCacheUseCase.clearCache()
+                        Timber.d("HOME: Устанавливаем isLoading = true для полной перезагрузки")
                         _state.update { it.copy(isLoading = true) }
                         loadTransactions()
                     }
@@ -279,15 +281,17 @@ class HomeViewModel(
     private fun updateDataSmoothly() {
         viewModelScope.launch {
             try {
-                Timber.d("HOME: Плавное обновление данных")
+                Timber.d("HOME: Начинаем плавное обновление данных")
                 
                 // Получаем текущие параметры
                 val currentState = _state.value
                 val (startDate, endDate) = getPeriodDates(currentState.currentFilter)
                 
+                Timber.d("HOME: Текущее состояние - isLoading: ${currentState.isLoading}, транзакций: ${currentState.filteredTransactions.size}")
+                
                 // Загружаем только новые данные без очистки кэша
                 val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
-                Timber.d("HOME: Плавно обновлено транзакций: %d", transactions.size)
+                Timber.d("HOME: Плавно загружено транзакций: %d", transactions.size)
                 
                 // Обновляем UI без показа индикатора загрузки
                 updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
@@ -295,6 +299,7 @@ class HomeViewModel(
             } catch (e: Exception) {
                 Timber.e(e, "HOME: Ошибка при плавном обновлении: %s", e.message)
                 // В случае ошибки - полная перезагрузка
+                Timber.d("HOME: Ошибка при плавном обновлении, переключаемся на полную перезагрузку")
                 clearCaches()
                 getTransactionsForPeriodWithCacheUseCase.clearCache()
                 loadTransactions()
@@ -307,6 +312,10 @@ class HomeViewModel(
      */
     private fun updateFilteredTransactionsSmoothly(filter: TransactionFilter, transactions: List<Transaction>) {
         viewModelScope.launch {
+            Timber.d("HOME: updateFilteredTransactionsSmoothly - начинаем обновление")
+            Timber.d("HOME: Текущее количество транзакций: ${_state.value.filteredTransactions.size}")
+            Timber.d("HOME: Новое количество транзакций: ${transactions.size}")
+            
             val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
                 val income = financialMetrics.getTotalIncomeAsMoney()
                 val expense = financialMetrics.getTotalExpenseAsMoney()
@@ -319,7 +328,9 @@ class HomeViewModel(
             
             val transactionGroups = groupTransactionsByDate(transactions)
             
+            Timber.d("HOME: Обновляем состояние с новыми данными")
             _state.update {
+                Timber.d("HOME: Внутри _state.update - старый isLoading: ${it.isLoading}")
                 it.copy(
                     filteredTransactions = transactions,
                     transactionGroups = transactionGroups,
@@ -329,6 +340,7 @@ class HomeViewModel(
                     isLoading = false, // Не показываем индикатор загрузки
                 )
             }
+            Timber.d("HOME: Состояние обновлено, новый isLoading: ${_state.value.isLoading}")
             
             // Обновляем статистику по категориям в фоне
             updateCategoryStats(transactions)
@@ -344,8 +356,10 @@ class HomeViewModel(
         viewModelScope.launch {
             getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем кэш перед загрузкой
             Timber.d("HOME: Начало загрузки транзакций, showLoading=$showLoading")
+            Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
             
             if (showLoading) {
+                Timber.d("HOME: Устанавливаем isLoading = true")
                 _state.update { it.copy(isLoading = true) }
             }
             
@@ -356,6 +370,7 @@ class HomeViewModel(
                 updateFilteredTransactions(_state.value.currentFilter)
             } catch (e: Exception) {
                 Timber.e(e, "HOME: Ошибка при загрузке транзакций: %s", e.message)
+                Timber.d("HOME: Устанавливаем isLoading = false из-за ошибки")
                 _state.update { it.copy(isLoading = false, error = e.message) }
             }
         }
@@ -446,8 +461,13 @@ class HomeViewModel(
      */
     private fun updateFilteredTransactions(filter: TransactionFilter) {
         viewModelScope.launch {
+            Timber.d("HOME: updateFilteredTransactions - начинаем обновление с фильтром: $filter")
+            Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
+            
             val (startDate, endDate) = getPeriodDates(filter)
             val filteredTransactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
+            Timber.d("HOME: Получено отфильтрованных транзакций: ${filteredTransactions.size}")
+            
             val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
                 val income = financialMetrics.getTotalIncomeAsMoney()
                 val expense = financialMetrics.getTotalExpenseAsMoney()
@@ -458,7 +478,10 @@ class HomeViewModel(
                 stats
             }
             val transactionGroups = groupTransactionsByDate(filteredTransactions)
+            
+            Timber.d("HOME: Обновляем состояние в updateFilteredTransactions")
             _state.update {
+                Timber.d("HOME: Внутри updateFilteredTransactions _state.update - старый isLoading: ${it.isLoading}")
                 it.copy(
                     filteredTransactions = filteredTransactions,
                     transactionGroups = transactionGroups,
@@ -468,6 +491,7 @@ class HomeViewModel(
                     isLoading = false,
                 )
             }
+            Timber.d("HOME: updateFilteredTransactions завершен, новый isLoading: ${_state.value.isLoading}")
         }
     }
 

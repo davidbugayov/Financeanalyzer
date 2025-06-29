@@ -128,6 +128,16 @@ private fun CompactTransactionList(
     onTransactionLongClick: (Transaction) -> Unit,
 ) {
     val lazyListState = rememberLazyListState()
+    
+    // Логируем изменения состояния
+    LaunchedEffect(state.isLoading) {
+        Timber.d("UI: CompactTransactionList - isLoading изменился на: ${state.isLoading}")
+    }
+    
+    LaunchedEffect(state.filteredTransactions.size) {
+        Timber.d("UI: CompactTransactionList - количество транзакций изменилось на: ${state.filteredTransactions.size}")
+    }
+    
     LaunchedEffect(showGroupSummary) {
         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
             lazyListState.animateScrollToItem(0)
@@ -138,6 +148,8 @@ private fun CompactTransactionList(
     // Отслеживаем количество транзакций для анимации новых элементов
     val previousTransactionCount = remember { mutableStateOf(0) }
     val currentTransactionCount = state.filteredTransactions.size
+    
+    Timber.d("UI: CompactTransactionList рендеринг - isLoading: ${state.isLoading}, транзакций: ${state.filteredTransactions.size}")
     
     LazyColumn(
         state = lazyListState,
@@ -166,6 +178,10 @@ private fun CompactTransactionList(
                 0L
             }
             
+            if (isNewTransaction) {
+                Timber.d("UI: Рендерим новую транзакцию: ${transaction.id} с задержкой: ${animationDelay}ms")
+            }
+            
             TransactionItem(
                 transaction = transaction,
                 categoriesViewModel = categoriesViewModel,
@@ -179,6 +195,7 @@ private fun CompactTransactionList(
     
     // Обновляем счетчик транзакций после рендеринга
     LaunchedEffect(currentTransactionCount) {
+        Timber.d("UI: Обновляем счетчик транзакций с ${previousTransactionCount.value} на $currentTransactionCount")
         previousTransactionCount.value = currentTransactionCount
     }
 }
