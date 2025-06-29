@@ -299,11 +299,17 @@ fun HomeScreen(
     DisposableEffect(lifecycleOwner) {
         var lastRefreshTime = 0L
         val observer = LifecycleEventObserver { _, event ->
+            Timber.d("HOME: Событие жизненного цикла: $event")
             if (event == Lifecycle.Event.ON_RESUME) {
                 val currentTime = System.currentTimeMillis()
+                Timber.d("HOME: ON_RESUME - время с последнего обновления: ${currentTime - lastRefreshTime}ms")
                 if (currentTime - lastRefreshTime > 2000) {
-                    viewModel.onEvent(HomeEvent.LoadTransactions)
+                    Timber.d("HOME: ON_RESUME - проверяем необходимость обновления данных")
+                    // Вместо полной перезагрузки просто проверяем, нужно ли обновить данные
+                    // Плавное обновление уже происходит через subscribeToRepositoryChanges
                     lastRefreshTime = currentTime
+                } else {
+                    Timber.d("HOME: ON_RESUME - пропускаем обновление (прошло менее 2 секунд)")
                 }
             }
         }
