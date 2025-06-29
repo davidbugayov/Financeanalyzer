@@ -10,6 +10,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FilterList
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -309,6 +311,22 @@ fun TransactionHistoryScreen(
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
                     IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Category,
+                            contentDescription = stringResource(R.string.filter_by_category),
+                        )
+                    }
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.AccountBalance,
+                            contentDescription = stringResource(R.string.filter_by_source),
+                        )
+                    }
+                    IconButton(
                         onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }
                     ) {
                         Icon(
@@ -374,6 +392,37 @@ fun TransactionHistoryScreen(
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
                     )
+                }
+
+                // Отображение выбранных фильтров
+                if (state.selectedCategories.isNotEmpty() || state.selectedSources.isNotEmpty()) {
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        // Выбранные категории
+                        if (state.selectedCategories.isNotEmpty()) {
+                            Text(
+                                text = "Категории: ${state.selectedCategories.joinToString(", ")}",
+                                fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontWeight = FontWeight.Medium,
+                                modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_medium)),
+                            )
+                        }
+                        
+                        // Выбранные источники
+                        if (state.selectedSources.isNotEmpty()) {
+                            Text(
+                                text = "Источники: ${state.selectedSources.joinToString(", ")}",
+                                fontSize = dimensionResource(R.dimen.text_size_small).value.sp,
+                                color = MaterialTheme.colorScheme.secondary,
+                                fontWeight = FontWeight.Medium,
+                            )
+                        }
+                    }
                 }
 
                 // Показываем статистику по категории
