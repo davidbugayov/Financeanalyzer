@@ -4,7 +4,6 @@ import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.core.util.safeCall
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import timber.log.Timber
 
 /**
  * Use case для удаления транзакции.
@@ -18,7 +17,6 @@ class DeleteTransactionUseCase(private val repository: ITransactionRepository) {
      */
     suspend operator fun invoke(transaction: Transaction): CoreResult<Unit> {
         return safeCall {
-            Timber.d("Удаление транзакции: id=${transaction.id}, сумма=${transaction.amount}")
             repository.deleteTransaction(transaction)
         }
     }

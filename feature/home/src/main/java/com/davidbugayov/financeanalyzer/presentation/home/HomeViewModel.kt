@@ -201,8 +201,11 @@ class HomeViewModel(
     private fun deleteTransaction(transaction: Transaction, context: Context? = null) {
         viewModelScope.launch {
             try {
+                Timber.d("HOME: Начинаем удаление транзакции: id=${transaction.id}, сумма=${transaction.amount}, категория=${transaction.category}")
+                
                 deleteTransactionUseCase(transaction).fold(
                     onSuccess = {
+                        Timber.d("HOME: Транзакция успешно удалена из базы данных")
                         clearCaches()
                         getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                         _state.update { it.copy(transactionToDelete = null) }
@@ -222,9 +225,11 @@ class HomeViewModel(
                         } ?: Timber.w(
                             "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
                         )
+                        
+                        Timber.d("HOME: Удаление транзакции завершено успешно")
                     },
                     onFailure = { exception ->
-                        Timber.e(exception, "Failed to delete transaction")
+                        Timber.e(exception, "HOME: Ошибка при удалении транзакции: ${exception.message}")
                         _state.update {
                             it.copy(
                                 error = exception.message ?: "Failed to delete transaction",
@@ -234,7 +239,7 @@ class HomeViewModel(
                     },
                 )
             } catch (e: Exception) {
-                Timber.e(e, "Error deleting transaction")
+                Timber.e(e, "HOME: Исключение при удалении транзакции: ${e.message}")
                 _state.update {
                     it.copy(
                         error = e.message ?: "Error deleting transaction",

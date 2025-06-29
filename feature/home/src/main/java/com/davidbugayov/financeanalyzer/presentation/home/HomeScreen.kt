@@ -411,7 +411,8 @@ fun HomeScreen(
                 "transaction_id" to transaction.id,
                 "transaction_amount" to transaction.amount.amount.toString()
             ))
-            viewModel.onEvent(HomeEvent.DeleteTransaction(transaction))
+            // Показываем диалог подтверждения вместо прямого удаления
+            viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
             showActionsDialog = false
             selectedTransactionForActions = null
         },
