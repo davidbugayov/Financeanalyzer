@@ -354,14 +354,29 @@ class AddTransactionViewModel(
     }
 
     /**
-     * Инициализация экрана: сбрасывает состояние и загружает данные.
+     * Инициализация экрана: загружает данные и сбрасывает поля, сохраняя forceExpense.
      */
     fun initializeScreen() {
-        // Сброс полей
-        resetFields()
-        // Повторная загрузка базовых данных
+        // Сначала загружаем базовые данные
         loadInitialData()
         loadWallets()
         loadSources()
+        
+        // Затем сбрасываем поля, но сохраняем forceExpense и isExpense
+        val currentForceExpense = _state.value.forceExpense
+        val currentIsExpense = _state.value.isExpense
+        
+        resetFields()
+        
+        // Восстанавливаем forceExpense и isExpense после сброса
+        _state.update { 
+            it.copy(
+                forceExpense = currentForceExpense,
+                isExpense = currentIsExpense
+            )
+        }
+        
+        Timber.d("AddTransactionViewModel: initializeScreen завершена, forceExpense=%b, isExpense=%b", 
+                _state.value.forceExpense, _state.value.isExpense)
     }
 }
