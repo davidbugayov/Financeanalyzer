@@ -238,8 +238,8 @@ class UnifiedTransactionRepositoryImpl(
      * Удаляет транзакцию.
      */
     override suspend fun deleteTransaction(transaction: Transaction) {
-        val entity = transactionMapper.mapToEntity(transaction)
-        transactionDao.deleteTransaction(entity)
+        // Удаляем по строковому id, чтобы избежать проблем с Room и первичным ключом
+        transactionDao.deleteTransactionById(transaction.id)
 
         // Удаляем из кэша
         transactionsCache.remove(transaction.id)
