@@ -236,6 +236,7 @@ class AddTransactionViewModel(
         when (event) {
             is BaseTransactionEvent.Submit -> submitTransaction(context)
             is BaseTransactionEvent.AddCustomSource -> handleBaseEvent(event, context)
+            is BaseTransactionEvent.DeleteSource -> super.handleBaseEvent(event, context)
             else -> handleBaseEvent(event, context)
         }
     }
@@ -407,6 +408,7 @@ class AddTransactionViewModel(
                     }
                 }
             }
+            is BaseTransactionEvent.DeleteSource -> super.handleBaseEvent(event, context)
             else -> super.handleBaseEvent(event, context)
         }
     }

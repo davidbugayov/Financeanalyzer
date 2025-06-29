@@ -89,6 +89,9 @@ class SourcePreferences private constructor(context: Context) {
         val sources = getCustomSources().toMutableList()
         if (sources.removeIf { it.name == sourceName }) {
             saveCustomSources(sources)
+        } else {
+            // Если не кастомный — добавляем в удалённые дефолтные
+            addDeletedDefaultSource(sourceName)
         }
     }
 

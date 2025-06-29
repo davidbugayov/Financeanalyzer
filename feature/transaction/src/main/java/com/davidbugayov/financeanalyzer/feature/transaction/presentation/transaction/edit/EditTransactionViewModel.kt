@@ -699,6 +699,7 @@ class EditTransactionViewModel(
                 }
             }
 
+            is BaseTransactionEvent.DeleteSource -> super.handleBaseEvent(event, context)
             else -> handleBaseEvent(event, context)
         }
     }
@@ -839,6 +840,7 @@ class EditTransactionViewModel(
                     }
                 }
             }
+            is BaseTransactionEvent.DeleteSource -> super.handleBaseEvent(event, context)
             else -> super.handleBaseEvent(event, context)
         }
     }

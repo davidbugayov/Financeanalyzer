@@ -11,11 +11,14 @@ import com.davidbugayov.financeanalyzer.utils.ColorUtils
 // import com.davidbugayov.financeanalyzer.utils.ColorUtils // ColorUtils может быть еще нужен для getSourceColorByName, если используется где-то еще
 
 fun getInitialSources(sourcePreferences: SourcePreferences, resources: Resources): List<Source> {
+    val deletedDefaultSources = sourcePreferences.getDeletedDefaultSources()
     val defaultSourceNames = resources.getStringArray(R.array.default_source_names).toList()
-    val defaultSources = defaultSourceNames.map { name ->
-        val colorObject = ColorUtils.getSourceColorByName(name.lowercase()) ?: CashColor
-        Source(name = name, color = colorObject.toArgb())
-    }
+    val defaultSources = defaultSourceNames
+        .filter { it !in deletedDefaultSources }
+        .map { name ->
+            val colorObject = ColorUtils.getSourceColorByName(name.lowercase()) ?: CashColor
+            Source(name = name, color = colorObject.toArgb())
+        }
     val savedSources = sourcePreferences.getCustomSources().map { customSource ->
         Source(name = customSource.name, color = ColorUtils.parseHexColor(customSource.colorHex), isCustom = true)
     }
