@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -43,6 +44,27 @@ class FinancialMetrics private constructor() : KoinComponent {
     init {
         Timber.d("Инициализация FinancialMetrics (реальный баланс)")
         recalculateStats()
+        
+        // Подписываемся на события изменения данных из репозитория
+        scope.launch {
+            try {
+                // Приводим к UnifiedTransactionRepository для доступа к dataChangeEvents
+                val unifiedRepo = repository as? com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
+                unifiedRepo?.dataChangeEvents?.collect { event ->
+                    when (event) {
+                        is DataChangeEvent.TransactionChanged -> {
+                            Timber.d("FinancialMetrics: Получено событие изменения транзакции, пересчитываем метрики")
+                            recalculateStats()
+                        }
+                        else -> {
+                            // Игнорируем другие события
+                        }
+                    }
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка при подписке на события изменения данных в FinancialMetrics")
+            }
+        }
     }
 
     /**
