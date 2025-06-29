@@ -25,6 +25,8 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -64,14 +66,22 @@ fun AmountField(
         }
 
         val textToShow = if (isFocused) {
-            internalRawAmount // В фокусе показываем "сырое" значение
+            internalRawAmount
         } else {
-            // Не в фокусе, пытаемся отформатировать "сырое" значение
             val numericValue = internalRawAmount.toDoubleOrNull()
             if (numericValue != null) {
-                Money(numericValue).format() // Форматируем, если это число
+                // Format number without currency symbol and drop trailing .00
+                val formattedWithSymbol = Money(numericValue).format()
+                val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
+                val sep = Money(numericValue).currency.decimalSeparator.toString()
+                val zeroSuffix = sep + "0".repeat(Money(numericValue).currency.decimalPlaces)
+                if (withoutSymbol.endsWith(zeroSuffix)) {
+                    withoutSymbol.removeSuffix(zeroSuffix)
+                } else {
+                    withoutSymbol
+                }
             } else {
-                internalRawAmount // Иначе (например, выражение "100+5") показываем как есть
+                internalRawAmount
             }
         }
 
@@ -134,6 +144,7 @@ fun AmountField(
                     // При получении фокуса (isFocused стало true),
                     // LaunchedEffect(amount, isFocused) отобразит "сырое" значение.
                 },
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
             textStyle = MaterialTheme.typography.titleLarge.copy(
                 textAlign = TextAlign.End,
                 fontWeight = FontWeight.Bold,
