@@ -136,6 +136,7 @@ class HomeViewModel(
                 updateFilteredTransactions(event.filter)
             }
             is HomeEvent.LoadTransactions -> {
+                Timber.d("HOME: Загрузка транзакций запрошена")
                 loadTransactions()
             }
             is HomeEvent.GenerateTestData -> {
@@ -271,32 +272,17 @@ class HomeViewModel(
      */
     private fun loadTransactions() {
         viewModelScope.launch {
+            getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем кэш перед загрузкой
+            Timber.d("HOME: Начало загрузки транзакций")
             _state.update { it.copy(isLoading = true) }
+            
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
-                val metrics = calculateBalanceMetricsUseCase(transactions, startDate, endDate)
-                _state.update {
-                    it.copy(
-                        transactions = transactions,
-                        income = metrics.income,
-                        expense = metrics.expense,
-                        filteredTransactions = transactions,
-                        filteredIncome = metrics.income,
-                        filteredExpense = metrics.expense,
-                        filteredBalance = metrics.income - metrics.expense,
-                        isLoading = false,
-                        error = null,
-                    )
-                }
-                viewModelScope.launch(Dispatchers.Default) {
-                    updateCategoryStats(transactions)
-                }
-                viewModelScope.launch(Dispatchers.Default) {
-                    updateFilteredTransactions(_state.value.currentFilter)
-                }
+                Timber.d("HOME: Загружено транзакций: %d", transactions.size)
+                updateFilteredTransactions(_state.value.currentFilter)
             } catch (e: Exception) {
-                Timber.e(e, "Ошибка при загрузке транзакций: ${e.message}")
+                Timber.e(e, "HOME: Ошибка при загрузке транзакций: %s", e.message)
                 _state.update { it.copy(isLoading = false, error = e.message) }
             }
         }

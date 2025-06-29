@@ -274,6 +274,10 @@ class EditTransactionViewModel(
                 val result = updateTransactionUseCase(transactionToSave)
 
                 if (result is CoreResult.Success) {
+                    Timber.d(
+                        "ТРАНЗАКЦИЯ: Обновление успешно выполнено. ID: %s, Сумма: %s, Категория: %s, Источник: %s",
+                        transactionToSave.id, transactionToSave.amount, transactionToSave.category, transactionToSave.source
+                    )
                     // Обновляем балансы кошельков, если это доход и выбраны кошельки
                     val walletIdsList = transactionToSave.walletIds?.toList() ?: emptyList()
                     if (!transactionToSave.isExpense && walletIdsList.isNotEmpty()) {
