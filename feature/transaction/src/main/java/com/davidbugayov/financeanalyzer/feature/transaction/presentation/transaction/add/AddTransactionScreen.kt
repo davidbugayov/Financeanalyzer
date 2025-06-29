@@ -49,8 +49,16 @@ fun AddTransactionScreen(
     }
 
     LaunchedEffect(key1 = forceExpense) {
-        forceExpense?.let {
-            viewModel.setForceExpense(it)
+        forceExpense?.let { shouldForceExpense ->
+            Timber.d("AddTransactionScreen: Setting forceExpense to $shouldForceExpense")
+            viewModel.setForceExpense(shouldForceExpense)
+            
+            // Сразу отправляем событие для принудительной установки типа
+            if (shouldForceExpense) {
+                viewModel.onEvent(BaseTransactionEvent.ForceSetExpenseType, context)
+            } else {
+                viewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType, context)
+            }
         }
     }
 
@@ -92,14 +100,6 @@ fun AddTransactionScreen(
             putString(AnalyticsConstants.Params.SCREEN_NAME, "add_transaction")
             putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
         })
-    }
-
-    LaunchedEffect(state.forceExpense) {
-        if (state.forceExpense) {
-            viewModel.onEvent(BaseTransactionEvent.ForceSetExpenseType, context)
-        } else {
-            viewModel.onEvent(BaseTransactionEvent.ForceSetIncomeType, context)
-        }
     }
 
     /*

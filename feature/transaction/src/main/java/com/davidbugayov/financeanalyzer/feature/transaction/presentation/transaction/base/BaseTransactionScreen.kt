@@ -240,14 +240,16 @@ fun <E> BaseTransactionScreen(
 
     // Специальная обработка для типа транзакции на основе forceExpense
     LaunchedEffect(state.forceExpense) {
-        Timber.d("forceExpense изменен: %b", state.forceExpense)
-        // Если forceExpense=true и isExpense=false, переключаем на расход
+        Timber.d("BaseTransactionScreen: forceExpense изменен: %b, текущий isExpense: %b", state.forceExpense, state.isExpense)
+        // Если forceExpense=true и isExpense=false, принудительно устанавливаем расход
         if (state.forceExpense && !state.isExpense) {
-            viewModel.onEvent(eventFactory(BaseTransactionEvent.ToggleTransactionType), context)
+            Timber.d("BaseTransactionScreen: Принудительно устанавливаем тип транзакции на РАСХОД")
+            viewModel.onEvent(eventFactory(BaseTransactionEvent.ForceSetExpenseType), context)
         }
-        // Если forceExpense=false и isExpense=true, переключаем на доход
+        // Если forceExpense=false и isExpense=true, принудительно устанавливаем доход
         else if (!state.forceExpense && state.isExpense) {
-            viewModel.onEvent(eventFactory(BaseTransactionEvent.ToggleTransactionType), context)
+            Timber.d("BaseTransactionScreen: Принудительно устанавливаем тип транзакции на ДОХОД")
+            viewModel.onEvent(eventFactory(BaseTransactionEvent.ForceSetIncomeType), context)
         }
     }
 
