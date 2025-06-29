@@ -104,12 +104,12 @@ fun TransactionGroupList(
         state = listState,
         modifier = Modifier.fillMaxWidth(),
     ) {
-        transactionGroups.forEach { group ->
+        transactionGroups.forEachIndexed { groupIndex, group ->
             val formattedDate = dateFormat.format(group.date)
             val isExpanded = expandedGroups[formattedDate] == true
 
             // Заголовок группы
-            item(key = "header_$formattedDate") {
+            item(key = "header_${groupIndex}_$formattedDate") {
                 ExpandableGroupHeader(
                     date = formattedDate,
                     balance = group.balance,
@@ -144,7 +144,7 @@ fun TransactionGroupList(
             if (isExpanded) {
                 items(
                     items = group.transactions,
-                    key = { transaction -> "transaction_${transaction.id}" },
+                    key = { transaction -> "transaction_${groupIndex}_${transaction.id}" },
                 ) { transaction ->
                     TransactionItem(
                         transaction = transaction,
@@ -165,7 +165,7 @@ fun TransactionGroupList(
             }
 
             // Разделитель между группами
-            item(key = "spacer_$formattedDate") {
+            item(key = "spacer_${groupIndex}_$formattedDate") {
                 Spacer(
                     modifier = Modifier
                         .fillMaxWidth()
