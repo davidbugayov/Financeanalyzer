@@ -417,52 +417,49 @@ fun TransactionHistoryScreen(
                             val balance = income - expense
 
                             // Определяем формат даты в зависимости от типа группировки
-                            val dateFormat = when {
+                            val parsedDate = when {
                                 // Формат "DD MMMM YYYY" (например, "1 января 2024")
-                                period.matches(Regex("\\d{1,2} [а-яА-Я]+ \\d{4}")) ->
-                                    SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
-
+                                period.matches(Regex("\\d{1,2} [а-яА-Я]+ \\d{4}")) -> {
+                                    try {
+                                        SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru")).parse(period)
+                                    } catch (e: Exception) {
+                                        Timber.e(e, "Ошибка при парсинге даты: $period")
+                                        null
+                                    }
+                                }
+                                
                                 // Формат "DD.MM - DD.MM YYYY" (например, "01.01 - 07.01 2024")
                                 period.contains("-") -> {
-                                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                                    val regex = Regex("(\\d{2})\\.(\\d{2}) - (\\d{2})\\.(\\d{2}) (\\d{4})")
+                                    val match = regex.matchEntire(period)
+                                    if (match != null) {
+                                        val (startDay, startMonth, _, _, year) = match.destructured
+                                        val parseString = "$startDay.$startMonth.$year"
+                                        try {
+                                            SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(parseString)
+                                        } catch (e: Exception) {
+                                            Timber.e(e, "Ошибка при парсинге диапазона дат: $period")
+                                            null
+                                        }
+                                    } else {
+                                        Timber.e("Не удалось распарсить диапазон дат: $period")
+                                        null
+                                    }
                                 }
-
+                                
                                 // Формат "MMMM YYYY" (например, "Январь 2024")
-                                else -> SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru"))
-                            }
-
-                            val parsedDate = try {
-                                dateFormat.parse(period)
-                            } catch (e: Exception) {
-                                Timber.e(e, "Ошибка при парсинге даты: $period")
-                                null
-                            }
-
-                            val displayPeriod = when {
-                                period.contains("-") -> {
-                                    val firstDatePart = period.split("-")[0].trim()
-                                    val yearPart = period.split(" ").last()
-                                    val fullDateString = "$firstDatePart $yearPart"
-                                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(fullDateString)
+                                else -> {
+                                    try {
+                                        SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru")).parse(period)
+                                    } catch (e: Exception) {
+                                        Timber.e(e, "Ошибка при парсинге даты: $period")
+                                        null
+                                    }
                                 }
-                                else -> parsedDate
                             }
 
                             TransactionGroup(
-                                date = when {
-                                    period.contains("-") -> {
-                                        val regex = Regex("(\\d{2})\\.(\\d{2}) - (\\d{2})\\.(\\d{2}) (\\d{4})")
-                                        val match = regex.matchEntire(period)
-                                        if (match != null) {
-                                            val (startDay, startMonth, _, _, year) = match.destructured
-                                            val parseString = "$startDay.$startMonth.$year"
-                                            try { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(parseString) } catch (e: Exception) { java.util.Date() }
-                                        } else {
-                                            java.util.Date()
-                                        }
-                                    }
-                                    else -> try { dateFormat.parse(period) } catch (e: Exception) { java.util.Date() }
-                                },
+                                date = parsedDate ?: java.util.Date(),
                                 transactions = transactions,
                                 balance = balance,
                                 displayPeriod = period,
