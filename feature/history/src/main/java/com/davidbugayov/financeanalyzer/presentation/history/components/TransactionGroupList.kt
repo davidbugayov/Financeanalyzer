@@ -74,11 +74,11 @@ fun TransactionGroupList(
     val dateFormat = remember { SimpleDateFormat("dd MMMM yyyy", Locale.getDefault()) }
 
     // Используем mutableStateMapOf для хранения состояния раскрытия групп
-    // По умолчанию все группы раскрыты, кроме последних двух
+    // По умолчанию все группы свернуты
     val expandedGroups = remember(transactionGroups) {
         mutableStateMapOf<String, Boolean>().apply {
             transactionGroups.forEachIndexed { index, group ->
-                this[dateFormat.format(group.date)] = index < 2 // Автоматически раскрываем только первые 2 группы
+                this[dateFormat.format(group.date)] = false // Все группы свернуты по умолчанию
             }
         }
     }
@@ -111,7 +111,7 @@ fun TransactionGroupList(
             // Заголовок группы
             item(key = "header_${groupIndex}_$formattedDate") {
                 ExpandableGroupHeader(
-                    date = formattedDate,
+                    date = group.displayPeriod,
                     balance = group.balance,
                     isExpanded = isExpanded,
                     onToggle = { expanded ->
@@ -189,6 +189,15 @@ fun TransactionGroupList(
                     )
                 }
             }
+        }
+
+        // Spacer для отступа под FloatingActionButton
+        item(key = "fab_spacer") {
+            Spacer(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(80.dp)
+            )
         }
     }
 }

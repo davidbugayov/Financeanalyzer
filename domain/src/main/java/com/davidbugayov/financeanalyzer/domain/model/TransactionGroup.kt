@@ -11,11 +11,13 @@ import java.util.Date
  * @property balance Общий баланс группы (доходы - расходы)
  * @property name Название группы (обычно категория или дата)
  * @property total Общая сумма транзакций в группе
+ * @property displayPeriod Строковое представление диапазона дат
  */
 data class TransactionGroup(
     val date: Date,
     val transactions: List<Transaction>,
     val balance: Double = 0.0,
     val name: String = date.toString(),
-    val total: Double = balance
+    val total: Double = balance,
+    val displayPeriod: String = ""
 ) 

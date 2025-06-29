@@ -8,9 +8,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.DateRange
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
@@ -304,6 +307,16 @@ fun TransactionHistoryScreen(
                 title = stringResource(R.string.title_activity_transaction_history),
                 showBackButton = true,
                 onBackClick = viewModel::onNavigateBack,
+                actions = {
+                    IconButton(
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.FilterList,
+                            contentDescription = stringResource(R.string.cd_filter_icon),
+                        )
+                    }
+                },
             )
         },
         modifier = Modifier.fillMaxSize(),
@@ -418,26 +431,41 @@ fun TransactionHistoryScreen(
                                 else -> SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru"))
                             }
 
+                            val parsedDate = try {
+                                dateFormat.parse(period)
+                            } catch (e: Exception) {
+                                Timber.e(e, "Ошибка при парсинге даты: $period")
+                                null
+                            }
+
+                            val displayPeriod = when {
+                                period.contains("-") -> {
+                                    val firstDatePart = period.split("-")[0].trim()
+                                    val yearPart = period.split(" ").last()
+                                    val fullDateString = "$firstDatePart $yearPart"
+                                    SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(fullDateString)
+                                }
+                                else -> parsedDate
+                            }
+
                             TransactionGroup(
-                                date = try {
-                                    when {
-                                        // Для диапазонов дат берем первую дату
-                                        period.contains("-") -> {
-                                            val firstDatePart = period.split("-")[0].trim()
-                                            val yearPart = period.split(" ").last()
-                                            val fullDateString = "$firstDatePart $yearPart"
-                                            SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(fullDateString) ?: java.util.Date()
-                                        }
-                                        else -> {
-                                            dateFormat.parse(period) ?: java.util.Date()
+                                date = when {
+                                    period.contains("-") -> {
+                                        val regex = Regex("(\\d{2})\\.(\\d{2}) - (\\d{2})\\.(\\d{2}) (\\d{4})")
+                                        val match = regex.matchEntire(period)
+                                        if (match != null) {
+                                            val (startDay, startMonth, _, _, year) = match.destructured
+                                            val parseString = "$startDay.$startMonth.$year"
+                                            try { SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(parseString) } catch (e: Exception) { java.util.Date() }
+                                        } else {
+                                            java.util.Date()
                                         }
                                     }
-                                } catch (e: Exception) {
-                                    Timber.e(e, "Ошибка при парсинге даты: $period")
-                                    java.util.Date()
+                                    else -> try { dateFormat.parse(period) } catch (e: Exception) { java.util.Date() }
                                 },
                                 transactions = transactions,
                                 balance = balance,
+                                displayPeriod = period,
                             )
                         }
                     }
