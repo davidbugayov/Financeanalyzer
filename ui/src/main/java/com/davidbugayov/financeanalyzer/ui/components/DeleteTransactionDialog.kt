@@ -26,6 +26,7 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import java.text.SimpleDateFormat
 import java.util.Locale
 import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 
 /**
  * Диалог подтверждения удаления транзакции.
@@ -65,19 +66,15 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
         text = {
             Column {
                 Text(
-                    text = "Сумма: ${transaction.amount}\n" +
-                        "Категория: ${transaction.category}",
+                    text = stringResource(R.string.amount, transaction.amount.formatForDisplay(useMinimalDecimals = true)) + "\n" +
+                        stringResource(R.string.category, transaction.category),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = if (transaction.isExpense) {
-                        "-${moneyFormatter.abs()}"
-                    } else {
-                        "+$moneyFormatter"
-                    },
+                    text = (if (transaction.isExpense) "-" else "+") + moneyFormatter.abs().formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                     style = MaterialTheme.typography.bodyMedium,
                     color = if (transaction.isExpense) {
                         MaterialTheme.colorScheme.error
@@ -89,7 +86,7 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = "Дата: ${dateFormatter.format(transaction.date)}",
+                    text = stringResource(R.string.date, dateFormatter.format(transaction.date)),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
@@ -104,7 +101,7 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
-                        text = "Источник: ${transaction.source}",
+                        text = stringResource(R.string.source, transaction.source),
                         style = MaterialTheme.typography.bodyMedium,
                         color = effectiveSourceColor,
                     )
@@ -114,7 +111,7 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
                     if (note.isNotBlank()) {
                         Spacer(modifier = Modifier.height(12.dp))
                         Text(
-                            text = "Примечание: $note",
+                            text = stringResource(R.string.note, note),
                             style = MaterialTheme.typography.bodySmall,
                         )
                     }
@@ -123,7 +120,7 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = "Вы уверены, что хотите удалить эту транзакцию?",
+                    text = stringResource(R.string.delete_transaction_confirm),
                     style = MaterialTheme.typography.bodyMedium,
                     color = MaterialTheme.colorScheme.error,
                 )
