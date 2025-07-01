@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.home.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
@@ -14,8 +15,10 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -36,6 +39,8 @@ import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import androidx.paging.compose.LazyPagingItems
 import androidx.compose.foundation.lazy.LazyListState
 import androidx.paging.LoadState
+import com.davidbugayov.financeanalyzer.presentation.home.components.HomeGroupSummary
+import androidx.compose.foundation.layout.height
 
 /**
  * Компактный макет для телефонов
@@ -185,6 +190,19 @@ fun CompactLayout(
         }
     }
 
+    var stablePagingItems by remember { mutableStateOf(pagingItems) }
+
+    // Обновляем cache, когда пришли данные
+    if (pagingItems.itemCount > 0) {
+        stablePagingItems = pagingItems
+    }
+
+    val itemsToDisplay = if (pagingItems.loadState.refresh is LoadState.Loading && pagingItems.itemCount == 0) {
+        stablePagingItems
+    } else {
+        pagingItems
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -201,8 +219,20 @@ fun CompactLayout(
                 CompactEmptyState(onAddClick)
             }
             else -> {
+                if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                    // Сводка перед списком
+                    HomeGroupSummary(
+                        filteredTransactions = state.filteredTransactions,
+                        totalIncome = state.filteredIncome,
+                        totalExpense = state.filteredExpense,
+                        currentFilter = state.currentFilter,
+                        balance = state.filteredBalance,
+                    )
+                    Spacer(modifier = Modifier.height(8.dp))
+                }
+
                 TransactionPagingList(
-                    items = pagingItems,
+                    items = itemsToDisplay,
                     categoriesViewModel = categoriesViewModel,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
