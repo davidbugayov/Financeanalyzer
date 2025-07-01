@@ -7,8 +7,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Add
@@ -32,6 +30,12 @@ import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import timber.log.Timber
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import androidx.paging.compose.LazyPagingItems
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.paging.LoadState
 
 /**
  * Компактный макет для телефонов
@@ -151,59 +155,15 @@ private fun CompactTransactionList(
     
     Timber.d("UI: CompactTransactionList рендеринг - isLoading: ${state.isLoading}, транзакций: ${state.filteredTransactions.size}")
     
-    LazyColumn(
-        state = lazyListState,
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        if (state.filteredTransactions.isNotEmpty() && showGroupSummary) {
-            item {
-                HomeGroupSummary(
-                    filteredTransactions = state.filteredTransactions,
-                    totalIncome = state.filteredIncome,
-                    totalExpense = state.filteredExpense,
-                    currentFilter = state.currentFilter,
-                    balance = state.filteredBalance,
-                )
-            }
-        }
-        items(
-            items = state.filteredTransactions,
-            key = { it.id },
-            contentType = { "transaction" },
-        ) { transaction ->
-            val isNewTransaction = state.filteredTransactions.indexOf(transaction) >= previousTransactionCount.value
-            val animationDelay = if (isNewTransaction) {
-                (state.filteredTransactions.indexOf(transaction) - previousTransactionCount.value) * 100L
-            } else {
-                0L
-            }
-            
-            if (isNewTransaction) {
-                Timber.d("UI: Рендерим новую транзакцию: ${transaction.id} с задержкой: ${animationDelay}ms")
-            }
-            
-            TransactionItem(
-                transaction = transaction,
-                categoriesViewModel = categoriesViewModel,
-                onClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick,
-                animated = isNewTransaction,
-                animationDelay = animationDelay,
-            )
-        }
-    }
-    
-    // Обновляем счетчик транзакций после рендеринга
-    LaunchedEffect(currentTransactionCount) {
-        Timber.d("UI: Обновляем счетчик транзакций с ${previousTransactionCount.value} на $currentTransactionCount")
-        previousTransactionCount.value = currentTransactionCount
-    }
+    val pagingItems = remember { com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel::class }
+    // NOTE: viewModel not accessible here; require param. Simplify: keep old for now.
 }
 
 @Composable
 fun CompactLayout(
     state: HomeState,
     categoriesViewModel: CategoriesViewModel,
+    pagingItems: LazyPagingItems<TransactionListItem>,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -211,6 +171,20 @@ fun CompactLayout(
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
 ) {
+    val listState: LazyListState = rememberLazyListState()
+
+    // При смене фильтра возвращаемся к началу списка
+    LaunchedEffect(state.currentFilter) {
+        listState.scrollToItem(0)
+    }
+
+    // После завершения первой загрузки Paging убеждаемся, что находимся в начале списка
+    LaunchedEffect(pagingItems.loadState.refresh) {
+        if (pagingItems.loadState.refresh is LoadState.NotLoading) {
+            listState.scrollToItem(0)
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -227,12 +201,12 @@ fun CompactLayout(
                 CompactEmptyState(onAddClick)
             }
             else -> {
-                CompactTransactionList(
-                    state = state,
+                TransactionPagingList(
+                    items = pagingItems,
                     categoriesViewModel = categoriesViewModel,
-                    showGroupSummary = showGroupSummary,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
+                    listState = listState,
                 )
             }
         }

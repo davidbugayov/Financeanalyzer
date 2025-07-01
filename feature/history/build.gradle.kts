@@ -84,4 +84,8 @@ dependencies {
 
     // Testing
     testImplementation(libs.junit)
+
+    // Paging Compose
+    implementation(libs.paging.compose)
+    implementation(libs.paging.runtime)
 }

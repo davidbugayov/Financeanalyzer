@@ -149,4 +149,14 @@ interface TransactionRepository {
      * @param id Идентификатор транзакции для удаления.
      */
     suspend fun deleteTransaction(id: String)
+
+    /**
+     * Поток постраничных данных всех транзакций.
+     */
+    fun getAllPaged(pageSize: Int): kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<Transaction>>
+
+    /**
+     * Поток постраничных данных транзакций за период.
+     */
+    fun getByPeriodPaged(startDate: java.util.Date, endDate: java.util.Date, pageSize: Int): kotlinx.coroutines.flow.Flow<androidx.paging.PagingData<Transaction>>
 }

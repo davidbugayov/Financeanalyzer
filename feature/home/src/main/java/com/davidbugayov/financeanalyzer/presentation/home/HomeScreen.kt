@@ -54,6 +54,9 @@ import org.koin.compose.koinInject
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 import android.os.SystemClock
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 
 /**
  * Главный экран приложения.
@@ -134,6 +137,7 @@ private fun HomeMainContent(
     windowSizeIsCompact: Boolean,
     state: HomeState,
     categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel,
+    pagingItems: androidx.paging.compose.LazyPagingItems<TransactionListItem>,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -145,6 +149,7 @@ private fun HomeMainContent(
         CompactLayout(
             state = state,
             categoriesViewModel = categoriesViewModel,
+            pagingItems = pagingItems,
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
@@ -156,6 +161,7 @@ private fun HomeMainContent(
         ExpandedLayout(
             state = state,
             categoriesViewModel = categoriesViewModel,
+            pagingItems = pagingItems,
             showGroupSummary = showGroupSummary,
             onToggleGroupSummary = onToggleGroupSummary,
             onFilterSelected = onFilterSelected,
@@ -227,6 +233,7 @@ fun HomeScreen(
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val windowSize = rememberWindowSize()
+    val pagingItems = viewModel.pagedUiModels.collectAsLazyPagingItems()
 
     var showFeedback by remember { mutableStateOf(false) }
     var feedbackMessage by remember { mutableStateOf("") }
@@ -292,8 +299,16 @@ fun HomeScreen(
     }
 
     LaunchedEffect(Unit) {
+        // Load persisted group summary toggle
         val savedShowSummary = sharedPreferences.getBoolean("show_group_summary", false)
         viewModel.onEvent(HomeEvent.SetShowGroupSummary(savedShowSummary))
+
+        // Load persisted transaction filter (if any) so it survives navigation away and back
+        sharedPreferences.getString("current_filter", null)?.let { savedFilterName ->
+            kotlin.runCatching { TransactionFilter.valueOf(savedFilterName) }.getOrNull()?.let { savedFilter ->
+                viewModel.onEvent(HomeEvent.SetFilter(savedFilter))
+            }
+        }
     }
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
@@ -338,9 +353,11 @@ fun HomeScreen(
     }
     val onFilterSelected = { filter: TransactionFilter ->
         userEventTracker.trackUserAction("filter_selected", mapOf(
-            "filter" to filter.toString()
+            "filter" to filter.toString(),
         ))
         userEventTracker.trackFeatureUsage("transaction_filter")
+        // Persist selected filter so it can be restored later
+        sharedPreferences.edit { putString("current_filter", filter.name) }
         viewModel.onEvent(HomeEvent.SetFilter(filter))
     }
     Scaffold(
@@ -375,6 +392,7 @@ fun HomeScreen(
                     windowSizeIsCompact = windowSize.isCompact(),
                     state = state,
                     categoriesViewModel = categoriesViewModel,
+                    pagingItems = pagingItems,
                     showGroupSummary = state.showGroupSummary,
                     onToggleGroupSummary = onToggleGroupSummary,
                     onFilterSelected = onFilterSelected,

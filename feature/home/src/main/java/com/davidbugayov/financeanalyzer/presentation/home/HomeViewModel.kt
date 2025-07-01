@@ -16,7 +16,6 @@ import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
 import java.util.Calendar
@@ -30,6 +29,16 @@ import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
 import kotlinx.coroutines.flow.first
+import androidx.paging.map
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import kotlinx.coroutines.flow.Flow
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import java.text.SimpleDateFormat
+import java.util.Locale
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 
 /**
  * ViewModel для главного экрана.
@@ -59,7 +68,49 @@ class HomeViewModel(
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
 
+    // -------- Paging ------------
+    private val pagerTrigger = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
+
+    val pagedTransactions: Flow<PagingData<Transaction>> = pagerTrigger
+        .flatMapLatest {
+            val s = _state.value
+            val (startDate, endDate) = getPeriodDates(s.currentFilter)
+            val pageSize = 50
+            if (s.currentFilter == TransactionFilter.ALL) {
+                repository.getAllPaged(pageSize)
+            } else {
+                repository.getByPeriodPaged(startDate, endDate, pageSize)
+            }
+        }
+        .cachedIn(viewModelScope)
+
+    val pagedUiModels: Flow<PagingData<TransactionListItem>> = pagedTransactions
+        .map { pagingData ->
+            pagingData
+                .map { tx -> TransactionListItem.Item(tx) }
+                .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
+                    if (after == null) return@insertSeparators null
+
+                    val beforeDateKey = before?.transaction?.date?.let { dayKey(it) }
+                    val afterDateKey = dayKey(after.transaction.date)
+
+                    if (before == null || beforeDateKey != afterDateKey) {
+                        TransactionListItem.Header(afterDateKey)
+                    } else {
+                        null
+                    }
+                }
+        }
+        .cachedIn(viewModelScope)
+
+    private fun reloadPaged() { pagerTrigger.tryEmit(Unit) }
+
+    private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
+    private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)
+
     init {
+        // Первичная инициализация Paging
+        pagerTrigger.tryEmit(Unit)
         Timber.d("HomeViewModel initialized")
         subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
 
@@ -175,7 +226,7 @@ class HomeViewModel(
         viewModelScope.launch {
             try {
                 Timber.d("HOME: Начинаем удаление транзакции: id=${transaction.id}, сумма=${transaction.amount}, категория=${transaction.category}")
-                
+
                 deleteTransactionUseCase(transaction).fold(
                     onSuccess = {
                         Timber.d("HOME: Транзакция успешно удалена из базы данных")
@@ -196,7 +247,7 @@ class HomeViewModel(
                         } ?: Timber.w(
                             "Context не предоставлен в HomeViewModel, виджеты не обновлены после удаления.",
                         )
-                        
+
                         Timber.d("HOME: Удаление транзакции завершено успешно")
                     },
                     onFailure = { exception ->
@@ -233,7 +284,7 @@ class HomeViewModel(
                     is com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent.TransactionChanged -> {
                         val transactionId = event.transactionId
                         Timber.d("HOME: Получено событие изменения транзакции: $transactionId")
-                        
+
                         // Плавное обновление без полной перезагрузки
                         updateDataSmoothly()
                     }
@@ -278,7 +329,7 @@ class HomeViewModel(
             Timber.d("HOME: updateFilteredTransactionsSmoothly - начинаем обновление")
             Timber.d("HOME: Текущее количество транзакций: ${_state.value.filteredTransactions.size}")
             Timber.d("HOME: Новое количество транзакций: ${transactions.size}")
-            
+
             val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
                 val income = financialMetrics.getTotalIncomeAsMoney()
                 val expense = financialMetrics.getTotalExpenseAsMoney()
@@ -288,9 +339,9 @@ class HomeViewModel(
                 val stats = calculateStats(transactions)
                 stats
             }
-            
+
             val transactionGroups = groupTransactionsByDate(transactions)
-            
+
             Timber.d("HOME: Обновляем состояние с новыми данными")
             _state.update {
                 Timber.d("HOME: Внутри _state.update - старый isLoading: ${it.isLoading}")
@@ -304,10 +355,11 @@ class HomeViewModel(
                 )
             }
             Timber.d("HOME: Состояние обновлено, новый isLoading: ${_state.value.isLoading}")
-            
+
             // Обновляем статистику по категориям в фоне
             updateCategoryStats(transactions)
         }
+        reloadPaged()
     }
 
     /**
@@ -319,12 +371,12 @@ class HomeViewModel(
         viewModelScope.launch {
             Timber.d("HOME: Начало загрузки транзакций, showLoading=$showLoading")
             Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
-            
+
             if (showLoading) {
                 Timber.d("HOME: Устанавливаем isLoading = true")
                 _state.update { it.copy(isLoading = true) }
             }
-            
+
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
                 val transactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
@@ -423,11 +475,11 @@ class HomeViewModel(
         viewModelScope.launch {
             Timber.d("HOME: updateFilteredTransactions - начинаем обновление с фильтром: $filter")
             Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
-            
+
             val (startDate, endDate) = getPeriodDates(filter)
             val filteredTransactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
             Timber.d("HOME: Получено отфильтрованных транзакций: ${filteredTransactions.size}")
-            
+
             val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
                 val income = financialMetrics.getTotalIncomeAsMoney()
                 val expense = financialMetrics.getTotalExpenseAsMoney()
@@ -438,7 +490,7 @@ class HomeViewModel(
                 stats
             }
             val transactionGroups = groupTransactionsByDate(filteredTransactions)
-            
+
             Timber.d("HOME: Обновляем состояние в updateFilteredTransactions")
             _state.update {
                 Timber.d("HOME: Внутри updateFilteredTransactions _state.update - старый isLoading: ${it.isLoading}")
@@ -452,6 +504,7 @@ class HomeViewModel(
                 )
             }
             Timber.d("HOME: updateFilteredTransactions завершен, новый isLoading: ${_state.value.isLoading}")
+            reloadPaged()
         }
     }
 

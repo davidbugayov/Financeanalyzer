@@ -37,6 +37,11 @@ import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import timber.log.Timber
+import androidx.paging.compose.LazyPagingItems
+import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.paging.LoadState
 
 /**
  * Расширенный макет для планшетов
@@ -45,6 +50,7 @@ import timber.log.Timber
 fun ExpandedLayout(
     state: HomeState,
     categoriesViewModel: CategoriesViewModel,
+    pagingItems: LazyPagingItems<TransactionListItem>,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,
     onFilterSelected: (TransactionFilter) -> Unit,
@@ -52,6 +58,18 @@ fun ExpandedLayout(
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
 ) {
+    val listState: LazyListState = rememberLazyListState()
+
+    LaunchedEffect(state.currentFilter) {
+        listState.scrollToItem(0)
+    }
+
+    LaunchedEffect(pagingItems.loadState.refresh) {
+        if (pagingItems.loadState.refresh is LoadState.NotLoading) {
+            listState.scrollToItem(0)
+        }
+    }
+
     Row(
         modifier = Modifier
             .fillMaxSize()
@@ -67,11 +85,13 @@ fun ExpandedLayout(
         ExpandedRightPanel(
             state = state,
             categoriesViewModel = categoriesViewModel,
+            pagingItems = pagingItems,
             showGroupSummary = showGroupSummary,
             onTransactionClick = onTransactionClick,
             onTransactionLongClick = onTransactionLongClick,
             onAddClick = onAddClick,
             modifier = Modifier.weight(1f),
+            listState = listState,
         )
     }
 }
@@ -117,11 +137,13 @@ private fun ExpandedLeftPanel(
 private fun ExpandedRightPanel(
     state: HomeState,
     categoriesViewModel: CategoriesViewModel,
+    pagingItems: LazyPagingItems<TransactionListItem>,
     showGroupSummary: Boolean,
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     onAddClick: () -> Unit,
     modifier: Modifier = Modifier,
+    listState: LazyListState,
 ) {
     Timber.d(
         "[UI] ExpandedRightPanel: isLoading=%s, filteredTransactions.isEmpty()=%s",
@@ -140,12 +162,12 @@ private fun ExpandedRightPanel(
                 ExpandedEmptyState(onAddClick)
             }
             else -> {
-                ExpandedTransactionList(
-                    state = state,
+                TransactionPagingList(
+                    items = pagingItems,
                     categoriesViewModel = categoriesViewModel,
-                    showGroupSummary = showGroupSummary,
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
+                    listState = listState,
                 )
             }
         }
@@ -208,58 +230,5 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
                 maxLines = 1,
             )
         }
-    }
-}
-
-@Composable
-private fun ExpandedTransactionList(
-    state: HomeState,
-    categoriesViewModel: CategoriesViewModel,
-    showGroupSummary: Boolean,
-    onTransactionClick: (Transaction) -> Unit,
-    onTransactionLongClick: (Transaction) -> Unit,
-) {
-    val lazyListState = rememberLazyListState()
-    LaunchedEffect(showGroupSummary) {
-        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-            lazyListState.animateScrollToItem(0)
-            Timber.d("ExpandedLayout: Скроллим к началу списка при показе сводки")
-        }
-    }
-    
-    // Отслеживаем количество транзакций для анимации новых элементов
-    val previousTransactionCount = remember { mutableStateOf(0) }
-    val currentTransactionCount = state.filteredTransactions.size
-    
-    LazyColumn(
-        state = lazyListState,
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        items(
-            items = state.filteredTransactions,
-            key = { it.id },
-            contentType = { "transaction" },
-        ) { transaction ->
-            val isNewTransaction = state.filteredTransactions.indexOf(transaction) >= previousTransactionCount.value
-            val animationDelay = if (isNewTransaction) {
-                (state.filteredTransactions.indexOf(transaction) - previousTransactionCount.value) * 100L
-            } else {
-                0L
-            }
-            
-            TransactionItem(
-                transaction = transaction,
-                categoriesViewModel = categoriesViewModel,
-                onClick = onTransactionClick,
-                onTransactionLongClick = onTransactionLongClick,
-                animated = isNewTransaction,
-                animationDelay = animationDelay,
-            )
-        }
-    }
-    
-    // Обновляем счетчик транзакций после рендеринга
-    LaunchedEffect(currentTransactionCount) {
-        previousTransactionCount.value = currentTransactionCount
     }
 }

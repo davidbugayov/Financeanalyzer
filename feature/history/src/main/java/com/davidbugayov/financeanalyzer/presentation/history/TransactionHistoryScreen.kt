@@ -61,8 +61,7 @@ import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
-import java.text.SimpleDateFormat
-import java.util.Locale
+import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import android.content.Context
@@ -70,6 +69,9 @@ import androidx.compose.ui.platform.LocalContext
 import android.app.Application
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 import androidx.compose.ui.graphics.toArgb
+import androidx.paging.compose.collectAsLazyPagingItems
+import androidx.paging.compose.LazyPagingItems
+import androidx.paging.LoadState
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -371,9 +373,7 @@ fun TransactionHistoryScreen(
                     GroupingChips(
                         currentGrouping = state.groupingType,
                         onGroupingSelected = {
-                            viewModel.onEvent(
-                                TransactionHistoryEvent.SetGroupingType(it),
-                            )
+                            viewModel.onEvent(TransactionHistoryEvent.SetGroupingType(it))
                         },
                     )
                 }
@@ -450,93 +450,53 @@ fun TransactionHistoryScreen(
                 } else if (state.filteredTransactions.isEmpty()) {
                     EmptyContent()
                 } else {
-                    // Отображение сгруппированных транзакций
-                    val groupedTransactions = viewModel.getGroupedTransactions()
-                    val transactionGroups = remember(groupedTransactions) {
-                        groupedTransactions.map { (period, transactions) ->
-                            // Вычисляем баланс для группы транзакций
-                            // Для доходов
-                            val income = transactions
-                                .filter { !it.isExpense }
-                                .sumOf { it.amount.amount.toDouble() }
+                    // Paging список транзакций без группировки
+                    val pagingItems = viewModel.pagedUiModels.collectAsLazyPagingItems()
 
-                            // Для расходов берем абсолютное значение (без минуса)
-                            val expense = transactions
-                                .filter { it.isExpense }
-                                .sumOf { it.amount.amount.abs().toDouble() }
-
-                            // Для баланса: доходы - расходы
-                            val balance = income - expense
-
-                            // Определяем формат даты в зависимости от типа группировки
-                            val parsedDate = when {
-                                // Формат "DD MMMM YYYY" (например, "1 января 2024")
-                                period.matches(Regex("\\d{1,2} [а-яА-Я]+ \\d{4}")) -> {
-                                    try {
-                                        SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru")).parse(period)
-                                    } catch (e: Exception) {
-                                        Timber.e(e, "Ошибка при парсинге даты: $period")
-                                        null
-                                    }
-                                }
-                                
-                                // Формат "DD.MM - DD.MM YYYY" (например, "01.01 - 07.01 2024")
-                                period.contains("-") -> {
-                                    val regex = Regex("(\\d{2})\\.(\\d{2}) - (\\d{2})\\.(\\d{2}) (\\d{4})")
-                                    val match = regex.matchEntire(period)
-                                    if (match != null) {
-                                        val (startDay, startMonth, _, _, year) = match.destructured
-                                        val parseString = "$startDay.$startMonth.$year"
-                                        try {
-                                            SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).parse(parseString)
-                                        } catch (e: Exception) {
-                                            Timber.e(e, "Ошибка при парсинге диапазона дат: $period")
-                                            null
-                                        }
-                                    } else {
-                                        Timber.e("Не удалось распарсить диапазон дат: $period")
-                                        null
-                                    }
-                                }
-                                
-                                // Формат "MMMM YYYY" (например, "Январь 2024")
-                                else -> {
-                                    try {
-                                        SimpleDateFormat("MMMM yyyy", Locale.forLanguageTag("ru")).parse(period)
-                                    } catch (e: Exception) {
-                                        Timber.e(e, "Ошибка при парсинге даты: $period")
-                                        null
-                                    }
-                                }
+                    when {
+                        pagingItems.loadState.refresh is LoadState.Loading -> {
+                            CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                        }
+                        pagingItems.loadState.refresh is LoadState.Error -> {
+                            val e = (pagingItems.loadState.refresh as LoadState.Error).error
+                            ErrorContent(error = e.localizedMessage ?: "Error") {
+                                pagingItems.retry()
                             }
-
-                            TransactionGroup(
-                                date = parsedDate ?: java.util.Date(),
-                                transactions = transactions,
-                                balance = balance,
-                                displayPeriod = period,
-                            )
+                        }
+                        pagingItems.itemCount == 0 -> {
+                            EmptyContent()
+                        }
+                        else -> {
+                            if (state.groupedTransactions.isNotEmpty()) {
+                                // новый аккордеон-список
+                                com.davidbugayov.financeanalyzer.presentation.components.GroupedTransactionList(
+                                    groups = state.groupedTransactions,
+                                    categoriesViewModel = viewModel.categoriesViewModel,
+                                    onTransactionClick = { tx ->
+                                        selectedTransaction = tx
+                                        showActionsDialog = true
+                                    },
+                                    onTransactionLongClick = { tx ->
+                                        selectedTransaction = tx
+                                        showActionsDialog = true
+                                    },
+                                )
+                            } else {
+                                TransactionPagingList(
+                                    items = pagingItems,
+                                    categoriesViewModel = viewModel.categoriesViewModel,
+                                    onTransactionClick = { transaction ->
+                                        selectedTransaction = transaction
+                                        showActionsDialog = true
+                                    },
+                                    onTransactionLongClick = { transaction ->
+                                        selectedTransaction = transaction
+                                        showActionsDialog = true
+                                    },
+                                )
+                            }
                         }
                     }
-
-                    TransactionGroupList(
-                        transactionGroups = transactionGroups,
-                        categoriesViewModel = viewModel.categoriesViewModel,
-                        onTransactionClick = { transaction ->
-                            selectedTransaction = transaction
-                            showActionsDialog = true
-                        },
-                        onTransactionLongClick = { transaction ->
-                            // Показываем тот же диалог выбора действий, что и при клике
-                            selectedTransaction = transaction
-                            showActionsDialog = true
-                        },
-                        onLoadMore = {
-                            viewModel.onEvent(TransactionHistoryEvent.LoadMoreTransactions)
-                        },
-                        isLoading = state.isLoadingMore,
-                        hasMoreData = state.hasMoreData,
-                    )
                 }
             }
         }

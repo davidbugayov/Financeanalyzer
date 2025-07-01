@@ -19,6 +19,10 @@ import kotlinx.datetime.toJavaLocalDate
 import java.time.ZoneOffset
 import java.util.Date
 import java.util.Calendar
+import androidx.paging.Pager
+import androidx.paging.PagingConfig
+import androidx.paging.PagingData
+import androidx.paging.map
 
 /**
  * Реализация унифицированного репозитория транзакций.
@@ -345,4 +349,17 @@ class UnifiedTransactionRepositoryImpl(
     ): List<Transaction> {
         return getTransactionsByDateRangePaginated(startDate, endDate, limit, offset)
     }
+
+    // ---------------- Paging API ----------------
+
+    override fun getAllPaged(pageSize: Int): Flow<PagingData<Transaction>> = Pager(
+        config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
+        pagingSourceFactory = { transactionDao.pagingSourceAll() },
+    ).flow.map { pagingData -> pagingData.map { transactionMapper.mapFromEntity(it) } }
+
+    override fun getByPeriodPaged(startDate: Date, endDate: Date, pageSize: Int): Flow<PagingData<Transaction>> =
+        Pager(
+            config = PagingConfig(pageSize = pageSize, enablePlaceholders = false),
+            pagingSourceFactory = { transactionDao.pagingSourceByDateRange(startDate, endDate) },
+        ).flow.map { pagingData -> pagingData.map { transactionMapper.mapFromEntity(it) } }
 } 

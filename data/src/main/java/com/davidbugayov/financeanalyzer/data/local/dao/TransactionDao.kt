@@ -135,4 +135,16 @@ interface TransactionDao {
      */
     @Query("DELETE FROM transactions WHERE id_string = :id")
     suspend fun deleteTransactionById(id: String)
+
+    /**
+     * PagingSource для всех транзакций по убыванию даты.
+     */
+    @Query("SELECT * FROM transactions ORDER BY date DESC")
+    fun pagingSourceAll(): androidx.paging.PagingSource<Int, TransactionEntity>
+
+    /**
+     * PagingSource для транзакций в указанном диапазоне дат.
+     */
+    @Query("SELECT * FROM transactions WHERE date BETWEEN :startDate AND :endDate ORDER BY date DESC")
+    fun pagingSourceByDateRange(startDate: Date, endDate: Date): androidx.paging.PagingSource<Int, TransactionEntity>
 } 

@@ -51,4 +51,5 @@ dependencies {
     implementation(libs.timber)
 
     // Document parsing & PDF/Excel libraries
+    implementation(libs.paging.runtime)
 }

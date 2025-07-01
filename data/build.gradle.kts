@@ -49,6 +49,7 @@ dependencies {
     implementation(libs.room.runtime)
     implementation(libs.room.ktx)
     ksp(libs.room.compiler)
+    implementation(libs.room.paging)
 
     // Koin
     implementation(libs.koin.android)
@@ -58,4 +59,7 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
+
+    // Paging
+    implementation(libs.paging.runtime)
 }

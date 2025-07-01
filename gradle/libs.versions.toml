@@ -122,6 +122,7 @@ timber = { group = "com.jakewharton.timber", name = "timber", version.ref = "tim
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
+room-paging = { group = "androidx.room", name = "room-paging", version.ref = "room" }
 
 # JSON
 gson = { group = "com.google.code.gson", name = "gson", version.ref = "gson" }
@@ -149,6 +150,10 @@ rustore-appupdate = { group = "ru.rustore.sdk", name = "appupdate", version.ref 
 
 # AppMetrica
 appmetrica-sdk = { group = "io.appmetrica.analytics", name = "analytics", version.ref = "appmetrica" }
+
+# Paging
+paging-runtime = { group = "androidx.paging", name = "paging-runtime-ktx", version = "3.2.1" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version = "3.2.1" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }

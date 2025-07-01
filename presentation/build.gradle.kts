@@ -77,6 +77,10 @@ dependencies {
     implementation(libs.timber)
 
     testImplementation(libs.junit)
+
+    // Paging
+    implementation(libs.paging.compose)
+    implementation(libs.paging.runtime)
 }
 
 ktlint {

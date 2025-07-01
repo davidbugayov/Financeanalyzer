@@ -22,6 +22,7 @@ import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
@@ -33,11 +34,21 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
 import kotlinx.coroutines.flow.first
+import androidx.paging.PagingData
+import kotlinx.coroutines.flow.Flow
+import androidx.paging.insertSeparators
+import androidx.paging.cachedIn
+import java.text.SimpleDateFormat
+import java.util.Locale
+import androidx.paging.map
+import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.flow.MutableSharedFlow
 
 class TransactionHistoryViewModel(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
@@ -55,7 +66,64 @@ class TransactionHistoryViewModel(
     private val _state = MutableStateFlow(TransactionHistoryState())
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
 
+    // ----------- Paging ------------
+
+    private val pagerTrigger = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
+
+    /**
+     * Публикует поток постраничных данных в соответствии с текущим периодом.
+     * Пересоздается при вызове [reloadPagedTransactions].
+     */
+    val pagedTransactions: Flow<PagingData<Transaction>> = pagerTrigger
+        .flatMapLatest {
+            val s = state.value
+            val pageSize = s.pageSize
+            if (s.periodType == com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL) {
+                repository.getAllPaged(pageSize)
+            } else {
+                repository.getByPeriodPaged(s.startDate, s.endDate, pageSize)
+            }
+        }
+        .cachedIn(viewModelScope)
+
+    // ---------- Helpers для заголовков ----------
+    private val dayFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
+    private val monthFormatter = SimpleDateFormat("LLLL yyyy", Locale.forLanguageTag("ru"))
+
+    private fun headerKey(date: java.util.Date, grouping: GroupingType): String {
+        return when (grouping) {
+            GroupingType.DAY -> dayFormatter.format(date)
+            GroupingType.WEEK -> {
+                val cal = Calendar.getInstance().apply { time = date }
+                val week = cal.get(Calendar.WEEK_OF_YEAR)
+                val year = cal.get(Calendar.YEAR)
+                "Неделя $week, $year"
+            }
+            GroupingType.MONTH -> monthFormatter.format(date)
+        }
+    }
+
+    /** PagingData с Header/Item согласно выбранной группировке */
+    val pagedUiModels: Flow<PagingData<TransactionListItem>> = pagedTransactions
+        .map { pagingData ->
+            val grouping = state.value.groupingType
+            pagingData.map { tx -> TransactionListItem.Item(tx) }
+                .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
+                    if (after == null) return@insertSeparators null
+                    val beforeKey = before?.transaction?.date?.let { headerKey(it, grouping) }
+                    val afterKey = headerKey(after.transaction.date, grouping)
+                    if (before == null || beforeKey != afterKey) TransactionListItem.Header(afterKey) else null
+                }
+        }
+        .cachedIn(viewModelScope)
+
+    private fun reloadPagedTransactions() {
+        pagerTrigger.tryEmit(Unit)
+    }
+
     init {
+        // Первичный запуск Paging
+        pagerTrigger.tryEmit(Unit)
         Timber.d("Инициализация TransactionHistoryViewModel с начальным периодом ALL")
         // Принудительно устанавливаем период на ALL
         val initialPeriod = PeriodType.ALL
@@ -73,6 +141,7 @@ class TransactionHistoryViewModel(
 
         // Загружаем транзакции и категории
         loadTransactionsFirstPage()
+        reloadPagedTransactions()
         loadCategories()
         subscribeToRepositoryChanges() // Подписываемся на изменения в репозитории
     }
@@ -636,11 +705,13 @@ class TransactionHistoryViewModel(
         // Загружаем транзакции для нового периода
         Timber.d("Перезагружаем транзакции для периода $periodType")
         loadTransactionsFirstPage()
+        reloadPagedTransactions()
     }
 
     private fun updateGroupingType(groupingType: GroupingType) {
         _state.update { it.copy(groupingType = groupingType) }
         updateFilteredAndGroupedTransactions()
+        reloadPagedTransactions() // перегенерируем Paging с новыми Header
     }
 
     private fun updateCategories(categories: List<String>) {
@@ -828,4 +899,8 @@ class TransactionHistoryViewModel(
     private fun navigateToAddTransaction() {
         navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)))
     }
+
+    private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)
+
+    private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
 }
