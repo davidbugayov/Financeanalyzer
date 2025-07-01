@@ -27,8 +27,8 @@ val useCaseModule = module {
     single { GroupTransactionsUseCase() }
     single { ValidateTransactionUseCase() }
     single { GetTransactionByIdUseCase(get()) }
-    single { GetTransactionsForPeriodWithCacheUseCase(get()) }
     single { GetTransactionsForPeriodUseCase(get()) }
+    single { com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase(get()) }
     single<GetTransactionsUseCase> { GetTransactionsUseCaseImpl(get()) }
 
     // Wallet / balance

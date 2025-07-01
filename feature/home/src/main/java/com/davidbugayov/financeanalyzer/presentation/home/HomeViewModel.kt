@@ -9,7 +9,7 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -29,6 +29,7 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
+import kotlinx.coroutines.flow.first
 
 /**
  * ViewModel для главного экрана.
@@ -36,7 +37,7 @@ import timber.log.Timber
  *
  * @property addTransactionUseCase UseCase для добавления новых транзакций
  * @property deleteTransactionUseCase UseCase для удаления транзакций
- * @property getTransactionsForPeriodWithCacheUseCase UseCase для получения транзакций за период с кэшированием
+ * @property getTransactionsForPeriodFlowUseCase UseCase для получения транзакций за период с кэшированием
  * @property calculateBalanceMetricsUseCase UseCase для расчета финансовых метрик
  * @property repository Репозиторий для прямого доступа к транзакциям с поддержкой пагинации и подпиской на изменения
  * @property _state Внутренний MutableStateFlow для хранения состояния экрана
@@ -45,7 +46,7 @@ import timber.log.Timber
 class HomeViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
-    private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
+    private val getTransactionsForPeriodFlowUseCase: GetTransactionsForPeriodFlowUseCase,
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase,
     private val repository: TransactionRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
@@ -207,7 +208,6 @@ class HomeViewModel(
                     onSuccess = {
                         Timber.d("HOME: Транзакция успешно удалена из базы данных")
                         clearCaches()
-                        getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                         _state.update { it.copy(transactionToDelete = null) }
 
                         // Логируем событие в аналитику
@@ -270,7 +270,6 @@ class HomeViewModel(
                         // Для других типов изменений - полная перезагрузка
                         Timber.d("HOME: Получено событие изменения данных, полная перезагрузка")
                         clearCaches()
-                        getTransactionsForPeriodWithCacheUseCase.clearCache()
                         Timber.d("HOME: Устанавливаем isLoading = true для полной перезагрузки")
                         _state.update { it.copy(isLoading = true) }
                         loadTransactions()
@@ -290,15 +289,13 @@ class HomeViewModel(
                 val currentState = _state.value
                 val (startDate, endDate) = getPeriodDates(currentState.currentFilter)
                 // ОЧИЩАЕМ КЭШ ПЕРЕД ЗАГРУЗКОЙ
-                getTransactionsForPeriodWithCacheUseCase.clearCache()
-                val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
+                val transactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
                 Timber.d("HOME: Плавно загружено транзакций: %d", transactions.size)
                 updateFilteredTransactionsSmoothly(currentState.currentFilter, transactions)
             } catch (e: Exception) {
                 Timber.e(e, "HOME: Ошибка при плавном обновлении: %s", e.message)
                 Timber.d("HOME: Ошибка при плавном обновлении, переключаемся на полную перезагрузку")
                 clearCaches()
-                getTransactionsForPeriodWithCacheUseCase.clearCache()
                 loadTransactions()
             }
         }
@@ -351,7 +348,6 @@ class HomeViewModel(
      */
     private fun loadTransactions(showLoading: Boolean = true) {
         viewModelScope.launch {
-            getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем кэш перед загрузкой
             Timber.d("HOME: Начало загрузки транзакций, showLoading=$showLoading")
             Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
             
@@ -362,7 +358,7 @@ class HomeViewModel(
             
             try {
                 val (startDate, endDate) = getPeriodDates(_state.value.currentFilter)
-                val transactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
+                val transactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
                 Timber.d("HOME: Загружено транзакций: %d", transactions.size)
                 updateFilteredTransactions(_state.value.currentFilter)
             } catch (e: Exception) {
@@ -433,7 +429,6 @@ class HomeViewModel(
                 }
                 if (!hasError) {
                     clearCaches()
-                    getTransactionsForPeriodWithCacheUseCase.clearCache() // Очищаем in-memory кэш
                     Timber.d("Test data generation completed successfully")
                 } else {
                     _state.update {
@@ -462,7 +457,7 @@ class HomeViewModel(
             Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
             
             val (startDate, endDate) = getPeriodDates(filter)
-            val filteredTransactions = getTransactionsForPeriodWithCacheUseCase(startDate, endDate)
+            val filteredTransactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
             Timber.d("HOME: Получено отфильтрованных транзакций: ${filteredTransactions.size}")
             
             val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {

@@ -12,7 +12,7 @@ import com.davidbugayov.financeanalyzer.domain.model.filter.PeriodType as Domain
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
@@ -44,7 +44,7 @@ class TransactionHistoryViewModel(
     private val deleteTransactionUseCase: DeleteTransactionUseCase,
     private val repository: TransactionRepository,
     val categoriesViewModel: CategoriesViewModel,
-    private val getTransactionsForPeriodWithCacheUseCase: GetTransactionsForPeriodWithCacheUseCase,
+    private val getTransactionsForPeriodFlowUseCase: GetTransactionsForPeriodFlowUseCase,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val application: Application,
     private val navigationManager: NavigationManager,
@@ -250,10 +250,10 @@ class TransactionHistoryViewModel(
                                 Timber.d(
                                     "Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}",
                                 )
-                                getTransactionsForPeriodWithCacheUseCase(
+                                getTransactionsForPeriodFlowUseCase(
                                     currentState.startDate,
                                     currentState.endDate,
-                                )
+                                ).first()
                             }
                             PeriodType.MONTH -> {
                                 val calendar = Calendar.getInstance()

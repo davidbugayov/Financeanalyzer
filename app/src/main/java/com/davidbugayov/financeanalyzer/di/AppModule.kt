@@ -22,7 +22,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransac
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.FilterTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionByIdUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
-import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodWithCacheUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GroupTransactionsUseCase
@@ -103,7 +102,6 @@ val appModule = module {
     single { ValidateTransactionUseCase() }
     single { GetTransactionByIdUseCase(get()) }
     single { CalculateBalanceMetricsUseCase() }
-    single { GetTransactionsForPeriodWithCacheUseCase(get()) }
     single { GetTransactionsForPeriodUseCase(get()) }
     single<com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher> {
         com.davidbugayov.financeanalyzer.widget.AndroidWidgetRefresher(androidContext())
