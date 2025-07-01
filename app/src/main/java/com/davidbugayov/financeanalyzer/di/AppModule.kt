@@ -184,5 +184,3 @@ val appModule = module {
         )
     }
 }
-
-val allModules = listOf(appModule, repositoryModule, transactionModule, analyticsUtilsModule)
