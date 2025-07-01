@@ -24,6 +24,13 @@ interface TransactionDao {
     suspend fun getAllTransactions(): List<TransactionEntity>
 
     /**
+     * Поток всех транзакций из базы данных. Room будет автоматически эмитить новые значения
+     * при изменениях таблицы.
+     */
+    @Query("SELECT * FROM transactions ORDER BY date DESC")
+    fun observeAllTransactions(): kotlinx.coroutines.flow.Flow<List<TransactionEntity>>
+
+    /**
      * Получает транзакции с пагинацией
      * @param limit Количество транзакций для загрузки
      * @param offset Смещение (количество пропускаемых транзакций)

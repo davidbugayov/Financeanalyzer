@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import kotlinx.datetime.toJavaLocalDate
@@ -293,11 +294,11 @@ class UnifiedTransactionRepositoryImpl(
      * Получает поток всех сущностей.
      */
     override fun getAll(): Flow<List<Transaction>> {
-        // Создаем Flow, который будет возвращать все транзакции
-        return flow {
-            val transactions = loadTransactions()
-            emit(transactions)
-        }
+        // Используем реактивный поток Room — новые данные прилетают автоматически
+        return transactionDao.observeAllTransactions()
+            .map { entities ->
+                entities.map { transactionMapper.mapFromEntity(it) }
+            }
     }
 
     /**
