@@ -142,22 +142,11 @@ class HomeViewModel(
     fun onEvent(event: HomeEvent, context: Context? = null) {
         when (event) {
             is HomeEvent.SetFilter -> {
-                _state.update {
-                    it.copy(
-                        currentFilter = event.filter,
-                        isLoading = true, // Показываем индикатор загрузки
-                        // Очищаем текущие отфильтрованные данные для UI
-                        filteredTransactions = emptyList(),
-                        transactionGroups = emptyList(), // Очищаем группы тоже
-                        // Сбрасываем статистику для фильтра
-                        filteredIncome = Money.zero(),
-                        filteredExpense = Money.zero(),
-                        filteredBalance = Money.zero(),
-                    )
-                }
-                // Запускаем обновление отфильтрованных транзакций в фоне
-                // Эта функция позже установит isLoading = false
-                updateFilteredTransactions(event.filter)
+                // Обновляем только фильтр, не трогаем остальные данные, чтобы избежать мерцания
+                _state.update { it.copy(currentFilter = event.filter) }
+
+                // Плавно обновляем данные без очистки UI
+                updateDataSmoothly()
             }
             is HomeEvent.LoadTransactions -> {
                 Timber.d("HOME: Загрузка транзакций запрошена")
