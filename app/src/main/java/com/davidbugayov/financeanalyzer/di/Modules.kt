@@ -14,5 +14,6 @@ val allModules = listOf(
     useCaseModule,
     viewModelModule,
     transactionModule,
+    analyticsModule,
     analyticsUtilsModule,
 ) 

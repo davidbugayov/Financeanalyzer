@@ -3,7 +3,7 @@ package com.davidbugayov.financeanalyzer.di
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.NotificationScheduler
-import com.davidbugayov.financeanalyzer.utils.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.factory.ImportFactory
 import org.koin.android.ext.koin.androidApplication
