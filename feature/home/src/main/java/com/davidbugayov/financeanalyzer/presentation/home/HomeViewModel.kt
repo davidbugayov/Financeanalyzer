@@ -56,34 +56,6 @@ class HomeViewModel(
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
-    // --- Кэширование ---
-    // Кэши для хранения результатов вычислений, чтобы избежать повторных затратных операций
-    /**
-     * Кэш для отфильтрованных транзакций.
-     * Ключ: пара (фильтр, список всех транзакций).
-     * Значение: тройка (отфильтрованные транзакции, статистика, группы транзакций).
-     * * Позволяет избежать повторной фильтрации и группировки, если фильтр не изменился.
-     */
-    private val filteredTransactionsCache =
-        mutableMapOf<FilterCacheKey, Triple<List<Transaction>, Triple<Money, Money, Money>, List<com.davidbugayov.financeanalyzer.domain.model.TransactionGroup>>>()
-
-    /**
-     * Кэш для базовой статистики (доход, расход, баланс) по списку транзакций.
-     * Ключ: список транзакций.
-     * Значение: статистика (доход, расход, баланс).
-     * * Используется для быстрого доступа к статистике, если она уже была вычислена.
-     */
-    private val statsCache = mutableMapOf<List<Transaction>, Triple<Money, Money, Money>>()
-
-    /**
-     * Кэш для исходных транзакций, загруженных из репозитория для определенного периода.
-     * Ключ: строка, представляющая период (например, "transactions_start_end").
-     * Значение: список транзакций за этот период.
-     * * Позволяет избежать повторных запросов к репозиторию для одного и того же периода.
-     */
-    private val transactionCache = mutableMapOf<String, List<Transaction>>()
-    // --- Конец Кэширования ---
-
     // Финансовые метрики
     private val financialMetrics = FinancialMetrics.getInstance()
 
@@ -207,7 +179,6 @@ class HomeViewModel(
                 deleteTransactionUseCase(transaction).fold(
                     onSuccess = {
                         Timber.d("HOME: Транзакция успешно удалена из базы данных")
-                        clearCaches()
                         _state.update { it.copy(transactionToDelete = null) }
 
                         // Логируем событие в аналитику
@@ -269,7 +240,6 @@ class HomeViewModel(
                     else -> {
                         // Для других типов изменений - полная перезагрузка
                         Timber.d("HOME: Получено событие изменения данных, полная перезагрузка")
-                        clearCaches()
                         Timber.d("HOME: Устанавливаем isLoading = true для полной перезагрузки")
                         _state.update { it.copy(isLoading = true) }
                         loadTransactions()
@@ -295,7 +265,6 @@ class HomeViewModel(
             } catch (e: Exception) {
                 Timber.e(e, "HOME: Ошибка при плавном обновлении: %s", e.message)
                 Timber.d("HOME: Ошибка при плавном обновлении, переключаемся на полную перезагрузку")
-                clearCaches()
                 loadTransactions()
             }
         }
@@ -428,7 +397,6 @@ class HomeViewModel(
                     )
                 }
                 if (!hasError) {
-                    clearCaches()
                     Timber.d("Test data generation completed successfully")
                 } else {
                     _state.update {
@@ -488,17 +456,6 @@ class HomeViewModel(
     }
 
     /**
-     * Очищает все кэши
-     */
-    private fun clearCaches() {
-        viewModelScope.launch(Dispatchers.Default) {
-            filteredTransactionsCache.clear()
-            statsCache.clear()
-            transactionCache.clear()
-        }
-    }
-
-    /**
      * Вычисляет основные финансовые показатели для списка транзакций:
      * доход, расход и баланс
      *
@@ -510,13 +467,6 @@ class HomeViewModel(
             return Triple(Money.zero(), Money.zero(), Money.zero())
         }
 
-        // Проверяем, есть ли эти транзакции в кэше
-        val cachedStats = statsCache[transactions]
-        if (cachedStats != null) {
-            return cachedStats
-        }
-
-        // Используем CalculateBalanceMetricsUseCase для расчёта
         // Находим минимальную и максимальную даты в транзакциях
         val startDate = transactions.minByOrNull { it.date }?.date ?: java.util.Date()
         val endDate = transactions.maxByOrNull { it.date }?.date ?: java.util.Date()
@@ -526,7 +476,6 @@ class HomeViewModel(
         val balance = income - expense
 
         val result = Triple(income, expense, balance)
-        statsCache[transactions] = result
         return result
     }
 
@@ -588,19 +537,6 @@ class HomeViewModel(
             )
         }
     }
-
-    /**
-     * Ключ для кэша фильтрованных транзакций (`filteredTransactionsCache`).
-     * Включает сам фильтр и хэш-код списка транзакций, к которому он применялся.
-     *
-     * Использование хэш-кода вместо размера списка (`size`) гарантирует более точное
-     * отслеживание изменений в данных. Размер может не измениться при изменении содержимого
-     * (например, при замене одной транзакции другой), а хэш-код отразит это изменение.
-     */
-    private data class FilterCacheKey(
-        val filter: TransactionFilter,
-        val transactionListHashCode: Int, // Используем хэш-код списка для точности кэширования
-    )
 
     private fun getPeriodDates(filter: TransactionFilter): Pair<java.util.Date, java.util.Date> {
         val calendar = Calendar.getInstance()
