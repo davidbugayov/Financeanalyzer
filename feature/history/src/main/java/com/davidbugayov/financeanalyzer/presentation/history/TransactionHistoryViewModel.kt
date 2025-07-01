@@ -711,7 +711,7 @@ class TransactionHistoryViewModel(
     private fun updateGroupingType(groupingType: GroupingType) {
         _state.update { it.copy(groupingType = groupingType) }
         updateFilteredAndGroupedTransactions()
-        reloadPagedTransactions() // перегенерируем Paging с новыми Header
+        // Убираем принудительный reset Paging, чтобы избежать мерцания экрана при переключении вкладок
     }
 
     private fun updateCategories(categories: List<String>) {
