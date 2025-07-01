@@ -377,3 +377,24 @@
 
 # Правила для javax.lang.model
 -dontwarn javax.lang.model.element.Modifier
+
+# Keep all Composable functions so they are not removed or renamed by R8
+-keepclassmembers,allowobfuscation class * {
+    @androidx.compose.runtime.Composable <methods>;
+}
+
+# Keep all navigation classes and sealed classes to ensure routes are preserved
+-keep class com.davidbugayov.financeanalyzer.navigation.** { *; }
+
+# Keep all UI screens to ensure Composable screens are not removed
+-keep class com.davidbugayov.financeanalyzer.presentation.** { *; }
+
+# Keep any class containing Composable functions to ensure Composables are preserved
+-keepclasseswithmembers class * {
+    @androidx.compose.runtime.Composable <methods>;
+}
+
+# Keep Composable methods so they are not removed
+-keepclassmembers class * {
+    @androidx.compose.runtime.Composable <methods>;
+}

@@ -34,6 +34,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CancelConfirmationDialog
@@ -57,7 +58,10 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Wall
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import org.koin.compose.koinInject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.components.ReminderBubble
 
 /**
  * Базовый экран для работы с транзакциями
@@ -76,6 +80,12 @@ fun <E> BaseTransactionScreen(
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
+    val preferencesManager: PreferencesManager = koinInject()
+
+    // Состояние для показа напоминания об импорте (только для экрана добавления)
+    var showImportReminder by remember {
+        mutableStateOf(!isEditMode && onNavigateToImport != null && !preferencesManager.isImportReminderShown())
+    }
 
     // Устанавливаем значения по умолчанию для строковых ресурсов
     val actualScreenTitle = if (isEditMode) {
@@ -282,6 +292,12 @@ fun <E> BaseTransactionScreen(
         }
     }
 
+    // Функция для обработки закрытия напоминания об импорте
+    fun handleImportReminderDismiss() {
+        showImportReminder = false
+        preferencesManager.setImportReminderShown()
+    }
+
     Scaffold(
         topBar = {
             AppTopBar(
@@ -322,6 +338,23 @@ fun <E> BaseTransactionScreen(
                     .imePadding()
                     .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
             ) {
+                // Показываем напоминание об импорте только на экране добавления транзакции
+                if (!isEditMode && onNavigateToImport != null) {
+                    ReminderBubble(
+                        visible = showImportReminder,
+                        title = stringResource(R.string.import_transactions_title),
+                        description = stringResource(R.string.import_transactions_hint),
+                        actionButtonText = stringResource(R.string.import_button),
+                        dismissButtonText = stringResource(R.string.close),
+                        onDismiss = { handleImportReminderDismiss() },
+                        onAction = {
+                            handleImportReminderDismiss()
+                            navigateToImport()
+                        },
+                        modifier = Modifier.padding(vertical = 8.dp)
+                    )
+                }
+
                 // Заголовок с датой и типом транзакции
                 TransactionHeader(
                     date = state.selectedDate,

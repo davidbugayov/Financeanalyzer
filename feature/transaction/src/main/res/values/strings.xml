@@ -40,6 +40,7 @@
   <string name="export_import">Экспорт и импорт</string>
   <string name="export_import_section">Секция экспорт и импорт</string>
   <string name="import_transactions_content_description">Импорт транзакций</string>
+  <string name="import_transactions_hint">Нажмите, чтобы импортировать транзакции из разных банков</string>
   <string name="export_import_screen_title">Экспорт и импорт данных</string>
   <string name="export_section_title">Экспорт данных</string>
   <string name="export_section_description">Экспортируйте все транзакции в CSV файл для использования в Excel или других программах.</string>

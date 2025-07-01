@@ -66,6 +66,7 @@ class PreferencesManager(context: Context) {
         private const val PREFERENCES_NAME = "finance_analyzer_prefs"
         private const val KEY_THEME_MODE = "theme_mode"
         private const val KEY_TRANSACTION_REMINDER_ENABLED = "transaction_reminder_enabled"
+        private const val KEY_IMPORT_REMINDER_SHOWN = "import_reminder_shown"
 
         // Добавим ключи для времени напоминания, если они еще не в companion object
         private const val KEY_REMINDER_HOUR = "reminder_hour"
@@ -114,5 +115,20 @@ class PreferencesManager(context: Context) {
         val hour = sharedPreferences.getInt(KEY_REMINDER_HOUR, 20) // Используем константу ключа
         val minute = sharedPreferences.getInt(KEY_REMINDER_MINUTE, 0) // Используем константу ключа
         return Pair(hour, minute)
+    }
+
+    /**
+     * Проверяет, было ли показано напоминание об импорте транзакций.
+     * @return true, если напоминание уже было показано
+     */
+    fun isImportReminderShown(): Boolean {
+        return sharedPreferences.getBoolean(KEY_IMPORT_REMINDER_SHOWN, false)
+    }
+
+    /**
+     * Отмечает напоминание об импорте транзакций как показанное.
+     */
+    fun setImportReminderShown() {
+        sharedPreferences.edit { putBoolean(KEY_IMPORT_REMINDER_SHOWN, true) }
     }
 }

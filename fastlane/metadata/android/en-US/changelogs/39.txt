@@ -1,0 +1,10 @@
+• Improved: Period selection dialog in statistics now always highlights the actual selected period
+• Improved: Filtering by period, categories, and sources in transaction history and statistics screens is more reliable and user-friendly
+• Improved: Source and category management — changes are instantly reflected in all screens, including add/edit and filters
+• Improved: Source selection dialog now always shows all available sources, both default and custom
+• Improved: Category deletion and updates are now immediately visible in the UI
+• Improved: Source deletion logic — custom sources are removed, default sources can be hidden
+• Improved: All dialogs and lists now use the latest state for immediate UI updates
+• Fixed: Crash due to duplicate keys in transaction history list
+• Fixed: UI padding and overlapping issues with floating action button
+• Fixed: Various minor bugs and improved overall stability 
