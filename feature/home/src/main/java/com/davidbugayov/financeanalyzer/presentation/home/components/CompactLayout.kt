@@ -219,16 +219,21 @@ fun CompactLayout(
                 CompactEmptyState(onAddClick)
             }
             else -> {
-                if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-                    // Сводка перед списком
-                    HomeGroupSummary(
-                        filteredTransactions = state.filteredTransactions,
-                        totalIncome = state.filteredIncome,
-                        totalExpense = state.filteredExpense,
-                        currentFilter = state.currentFilter,
-                        balance = state.filteredBalance,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
+                val headerContent: (@Composable () -> Unit)? = if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                    {
+                        Column {
+                            HomeGroupSummary(
+                                filteredTransactions = state.filteredTransactions,
+                                totalIncome = state.filteredIncome,
+                                totalExpense = state.filteredExpense,
+                                currentFilter = state.currentFilter,
+                                balance = state.filteredBalance,
+                            )
+                            Spacer(modifier = Modifier.height(8.dp))
+                        }
+                    }
+                } else {
+                    null
                 }
 
                 TransactionPagingList(
@@ -237,6 +242,7 @@ fun CompactLayout(
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
                     listState = listState,
+                    headerContent = headerContent,
                 )
             }
         }

@@ -34,10 +34,21 @@ fun TransactionPagingList(
     onTransactionClick: (Transaction) -> Unit,
     onTransactionLongClick: (Transaction) -> Unit,
     listState: LazyListState? = null,
+    /**
+     * Optional content that will be displayed **before** the list of transactions and will
+     * scroll together with the rest of the items. Handy for adding headers like summaries.
+     */
+    headerContent: (@Composable () -> Unit)? = null,
 ) {
     val lazyState = listState ?: rememberLazyListState()
 
     LazyColumn(modifier = Modifier.fillMaxWidth(), state = lazyState) {
+        // Optional header
+        headerContent?.let { header ->
+            item(key = "header_content") {
+                header()
+            }
+        }
         items(count = items.itemCount) { index ->
             when (val model = items[index]) {
                 is TransactionListItem.Header -> {
