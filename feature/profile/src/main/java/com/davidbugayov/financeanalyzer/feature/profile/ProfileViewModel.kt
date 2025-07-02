@@ -4,6 +4,8 @@ import android.content.Intent
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
@@ -35,6 +37,8 @@ class ProfileViewModel(
     private val preferencesManager: PreferencesManager,
     private val notificationScheduler: INotificationScheduler,
     private val navigationManager: NavigationManager,
+    val userEventTracker: UserEventTracker,
+    val errorTracker: ErrorTracker
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())

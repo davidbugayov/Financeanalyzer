@@ -147,6 +147,8 @@ val appModule = module {
             preferencesManager = get(),
             notificationScheduler = get(),
             navigationManager = get(),
+            userEventTracker = get(),
+            errorTracker = get()
         )
     }
     viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get()) }

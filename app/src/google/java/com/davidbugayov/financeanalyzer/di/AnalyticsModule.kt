@@ -7,13 +7,14 @@ import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
 import io.appmetrica.analytics.AppMetricaConfig
 import io.appmetrica.analytics.AppMetrica
 import org.koin.android.ext.koin.androidContext
 import org.koin.dsl.module
-import org.koin.dsl.single
 import timber.log.Timber
 
 /**
@@ -52,4 +53,8 @@ val analyticsModule = module {
 
         composite
     }
+    
+    // Добавляем трекеры для аналитики
+    single { UserEventTracker }
+    single { ErrorTracker }
 } 

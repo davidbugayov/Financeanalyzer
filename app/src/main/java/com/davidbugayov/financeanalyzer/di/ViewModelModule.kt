@@ -44,6 +44,8 @@ val viewModelModule = module {
             preferencesManager = get(),
             notificationScheduler = get(),
             navigationManager = get(),
+            userEventTracker = get(),
+            errorTracker = get()
         )
     }
 

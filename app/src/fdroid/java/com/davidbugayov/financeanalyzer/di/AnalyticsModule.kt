@@ -4,8 +4,9 @@ import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.IAnalytics
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import org.koin.dsl.module
-import org.koin.dsl.single
 
 /**
  * DI-модуль аналитики для F-Droid flavor
@@ -18,4 +19,8 @@ val analyticsModule = module {
         AnalyticsUtils.init(composite)
         composite
     }
+    
+    // Добавляем трекеры для аналитики
+    single { UserEventTracker }
+    single { ErrorTracker }
 } 

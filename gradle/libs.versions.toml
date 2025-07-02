@@ -7,15 +7,13 @@ javaVersion = "21"
 # Plugins
 androidGradlePlugin = "8.11.0"
 kotlin = "2.1.20"
-googleServices = "4.4.2"
-coroutines = "1.8.1"
-kotlinx-datetime = "0.6.0"
-kotlinx-serialization = "1.7.3"
-composeBom = "2025.06.00"
-composeMaterial3 = "1.3.2"
-appmetrica = "6.5.0"
-ktlint = "12.1.1"
-composeCompiler = "1.5.8"
+googleServices = "4.4.3"
+coroutines = "1.10.2"
+kotlinx-datetime = "0.7.0"
+kotlinx-serialization = "1.9.0"
+composeBom = "2024.06.00"
+appmetrica = "7.9.0"
+ktlint = "12.3.0"
 
 # AndroidX
 androidxCore = "1.16.0"
@@ -23,24 +21,21 @@ androidxLifecycle = "2.9.1"
 androidxActivity = "1.10.1"
 androidxNavigation = "2.9.0"
 androidxSplashscreen = "1.0.1"
-androidxAppcompat = "1.7.0"
+androidxAppcompat = "1.7.1"
 material = "1.12.0"
 customView = "1.2.0"
 customViewPoolingContainer = "1.1.0"
 
-# Compose
-composeUiTooling = "1.8.2"
-
 # Accompanist
-accompanist = "0.32.0"
+accompanist = "0.36.0"
 
 # Firebase
-firebaseBom = "33.15.0"
+firebaseBom = "33.16.0"
 firebaseCrashlyticsPlugin = "3.0.4"
 firebasePerfPlugin = "1.4.2"
 
 # Koin
-koin = "3.5.6"
+koin = "4.1.0"
 
 # Testing
 junit = "4.13.2"
@@ -49,20 +44,26 @@ junit = "4.13.2"
 timber = "5.0.1"
 
 # Other
-room = "2.7.1"
+room = "2.7.2"
 roomKsp = "2.1.20-2.0.1"
-gson = "2.11.0"
+gson = "2.13.1"
 pdfbox = "2.0.27.0"
 
 # Excel parsing libraries
-poi = "5.3.0"
+poi = "5.4.1"
 
 # Apache Commons
-apacheCommonsCsv = "1.10.0"
-commonsIo = "2.15.1"
+apacheCommonsCsv = "1.14.0"
+commonsIo = "2.19.0"
 
 # RuStore SDK версия (только для Google flavor)
 rustore = "8.0.0"
+
+# Paging
+paging = "3.3.6"
+
+# Exp4j
+exp4j = "0.4.8"
 
 [libraries]
 # Kotlin
@@ -90,10 +91,10 @@ material = { group = "com.google.android.material", name = "material", version.r
 compose-bom = { group = "androidx.compose", name = "compose-bom", version.ref = "composeBom" }
 compose-ui = { group = "androidx.compose.ui", name = "ui" }
 compose-ui-graphics = { group = "androidx.compose.ui", name = "ui-graphics" }
-compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling", version.ref = "composeUiTooling" }
+compose-ui-tooling = { group = "androidx.compose.ui", name = "ui-tooling" }
 compose-ui-tooling-preview = { group = "androidx.compose.ui", name = "ui-tooling-preview" }
 compose-ui-test-manifest = { group = "androidx.compose.ui", name = "ui-test-manifest" }
-compose-material3 = { group = "androidx.compose.material3", name = "material3", version.ref = "composeMaterial3" }
+compose-material3 = { group = "androidx.compose.material3", name = "material3" }
 compose-material3-window-size = { group = "androidx.compose.material3", name = "material3-window-size-class" }
 compose-material-icons-extended = { group = "androidx.compose.material", name = "material-icons-extended" }
 compose-foundation = { group = "androidx.compose.foundation", name = "foundation" }
@@ -142,7 +143,7 @@ commons-io = { group = "commons-io", name = "commons-io", version.ref = "commons
 junit = { group = "junit", name = "junit", version.ref = "junit" }
 
 # Exp4j
-exp4j = { group = "net.objecthunter", name = "exp4j", version = "0.4.8" }
+exp4j = { group = "net.objecthunter", name = "exp4j", version.ref = "exp4j" }
 
 # RuStore SDK - используются только для RuStore flavor
 rustore-review = { group = "ru.rustore.sdk", name = "review", version.ref = "rustore" }
@@ -152,8 +153,8 @@ rustore-appupdate = { group = "ru.rustore.sdk", name = "appupdate", version.ref 
 appmetrica-sdk = { group = "io.appmetrica.analytics", name = "analytics", version.ref = "appmetrica" }
 
 # Paging
-paging-runtime = { group = "androidx.paging", name = "paging-runtime-ktx", version = "3.2.1" }
-paging-compose = { group = "androidx.paging", name = "paging-compose", version = "3.2.1" }
+paging-runtime = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "paging" }
+paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
