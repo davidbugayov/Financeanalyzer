@@ -33,10 +33,10 @@ android {
 
     kotlinOptions {
         jvmTarget = libs.versions.javaVersion.get()
-        freeCompilerArgs += listOf(
+        freeCompilerArgs = listOf(
             "-opt-in=kotlin.RequiresOptIn",
             "-Xjvm-default=all",
-            "-Xcontext-receivers",
+            "-Xcontext-parameters",
         )
     }
 

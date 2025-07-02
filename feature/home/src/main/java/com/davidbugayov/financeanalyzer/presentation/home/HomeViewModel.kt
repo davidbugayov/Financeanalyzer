@@ -39,6 +39,7 @@ import java.text.SimpleDateFormat
 import java.util.Locale
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * ViewModel для главного экрана.
@@ -52,6 +53,7 @@ import kotlinx.coroutines.flow.map
  * @property _state Внутренний MutableStateFlow для хранения состояния экрана
  * @property state Публичный StateFlow для наблюдения за состоянием экрана
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 class HomeViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     private val deleteTransactionUseCase: DeleteTransactionUseCase,

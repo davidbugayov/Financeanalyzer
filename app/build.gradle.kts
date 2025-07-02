@@ -193,9 +193,11 @@ android {
         jvmTarget = libs.versions.javaVersion.get()
         // Enable compiler optimizations
         freeCompilerArgs += listOf(
+            "-Xcontext-parameters",
             "-opt-in=kotlin.RequiresOptIn",
             "-Xjvm-default=all",
-            "-Xcontext-receivers",
+            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
         )
     }
 
@@ -577,15 +579,5 @@ tasks.register("prepareAllReleases") {
         println("Все релизы подготовлены!")
         println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
         println("==========================================")
-    }
-}
-
-tasks.withType<org.jetbrains.kotlin.gradle.tasks.KotlinCompile>().configureEach {
-    kotlinOptions {
-        // Add any Kotlin compiler options here
-        freeCompilerArgs += listOf(
-            "-Xskip-prerelease-check",
-            "-Xallow-unstable-dependencies",
-        )
     }
 }

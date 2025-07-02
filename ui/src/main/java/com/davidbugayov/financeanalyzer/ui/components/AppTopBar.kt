@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.ui.components
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material3.ExperimentalMaterial3Api
@@ -33,7 +34,7 @@ fun AppTopBar(
             if (showBackButton) {
                 IconButton(onClick = onBackClick) {
                     Icon(
-                        imageVector = Icons.Default.ArrowBack,
+                        imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                         contentDescription = "Назад",
                     )
                 }

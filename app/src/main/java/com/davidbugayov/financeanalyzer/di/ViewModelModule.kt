@@ -13,69 +13,41 @@ import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import org.koin.android.ext.koin.androidApplication
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import org.koin.core.module.dsl.bind
+import org.koin.androidx.viewmodel.dsl.viewModel
 
 val viewModelModule = module {
     // Categories ViewModel is shared across app
-    viewModel { com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel(androidApplication()) }
-    single<com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel> { get<com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel>() }
+    viewModelOf(::AppCategoriesViewModel)
+    singleOf(::AppCategoriesViewModel) { bind<CategoriesViewModel>() }
 
-    viewModel { AchievementsUiViewModel() }
+    viewModelOf(::AchievementsUiViewModel)
 
-    viewModel {
-        AddTransactionViewModel(
-            addTransactionUseCase = get(),
-            categoriesViewModel = get(),
-            sourcePreferences = get(),
-            walletRepository = get(),
-            updateWidgetsUseCase = get(),
-            updateWalletBalancesUseCase = get(),
-            navigationManager = get(),
-            application = androidApplication(),
-        )
-    }
+    viewModelOf(::AddTransactionViewModel)
 
-    viewModel {
-        ProfileViewModel(
-            exportTransactionsToCSVUseCase = get(),
-            getProfileAnalyticsUseCase = get(),
-            preferencesManager = get(),
-            notificationScheduler = get(),
-            navigationManager = get(),
-            userEventTracker = get(),
-            errorTracker = get()
-        )
-    }
+    viewModelOf(::ProfileViewModel)
 
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get()) }
+    viewModelOf(::HomeViewModel)
 
-    viewModel {
-        EditTransactionViewModel(
-            getTransactionByIdUseCase = get(),
-            updateTransactionUseCase = get(),
-            categoriesViewModel = get(),
-            sourcePreferences = get(),
-            walletRepository = get(),
-            updateWidgetsUseCase = get(),
-            updateWalletBalancesUseCase = get(),
-            navigationManager = get(),
-            application = androidApplication(),
-        )
-    }
+    viewModelOf(::EditTransactionViewModel)
 
-    viewModel { TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), androidApplication(), get(), get()) }
+    viewModelOf(::TransactionHistoryViewModel)
 
-    viewModel { BudgetViewModel(get(), get(), get()) }
+    viewModelOf(::BudgetViewModel)
 
-    viewModel { WalletTransactionsViewModel(get(), get(), get()) }
+    viewModelOf(::WalletTransactionsViewModel)
 
-    viewModel { ImportTransactionsViewModel(get(), androidApplication()) }
+    viewModelOf(::ImportTransactionsViewModel)
 
-    viewModel { OnboardingViewModel(get()) }
+    viewModelOf(::OnboardingViewModel)
 
-    viewModel { AchievementsViewModel() }
+    viewModelOf(::AchievementsViewModel)
 
     viewModel { parameters ->
         FinancialDetailStatisticsViewModel(

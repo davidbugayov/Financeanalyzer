@@ -49,10 +49,15 @@ import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import org.koin.android.ext.koin.androidApplication
 import org.koin.android.ext.koin.androidContext
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModelOf
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import org.koin.core.module.dsl.bind
+import org.koin.androidx.viewmodel.dsl.viewModel
 
 /**
  * Единый DI-модуль приложения. Все зависимости, ViewModel, use-case, менеджеры и утилиты.
@@ -123,58 +128,20 @@ val appModule = module {
     }
 
     // ViewModels
-    viewModel { com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel(androidApplication()) }
-    single<com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel> {
-        get<com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel>()
-    }
-    viewModel { AchievementsUiViewModel() }
-    viewModel {
-        AddTransactionViewModel(
-            addTransactionUseCase = get(),
-            categoriesViewModel = get(),
-            sourcePreferences = get(),
-            walletRepository = get(),
-            updateWidgetsUseCase = get(),
-            updateWalletBalancesUseCase = get(),
-            navigationManager = get(),
-            application = androidApplication(),
-        )
-    }
-    viewModel {
-        ProfileViewModel(
-            exportTransactionsToCSVUseCase = get(),
-            getProfileAnalyticsUseCase = get(),
-            preferencesManager = get(),
-            notificationScheduler = get(),
-            navigationManager = get(),
-            userEventTracker = get(),
-            errorTracker = get()
-        )
-    }
-    viewModel { HomeViewModel(get(), get(), get(), get(), get(), get(), get()) }
-    viewModel {
-        EditTransactionViewModel(
-            getTransactionByIdUseCase = get(),
-            updateTransactionUseCase = get(),
-            categoriesViewModel = get(),
-            sourcePreferences = get(),
-            walletRepository = get(),
-            updateWidgetsUseCase = get(),
-            updateWalletBalancesUseCase = get(),
-            navigationManager = get(),
-            application = androidApplication(),
-        )
-    }
-    viewModel {
-        TransactionHistoryViewModel(get(), get(), get(), get(), get(), get(), get(), androidApplication(), get(), get())
-    }
-    viewModel { BudgetViewModel(get(), get(), get()) }
-    viewModel { WalletTransactionsViewModel(get(), get(), get()) }
-    viewModel { ImportTransactionsViewModel(get(), androidApplication()) }
-    viewModel { OnboardingViewModel(get()) }
-    viewModel { AchievementsViewModel() }
-
-    // ViewModel для экрана подробной финансовой статистики
+    viewModelOf(::AppCategoriesViewModel)
+    singleOf(::AppCategoriesViewModel) { bind<CategoriesViewModel>() }
+    viewModelOf(::AchievementsUiViewModel)
+    viewModelOf(::AddTransactionViewModel)
+    viewModelOf(::ProfileViewModel)
+    viewModelOf(::HomeViewModel)
+    viewModelOf(::EditTransactionViewModel)
+    viewModelOf(::TransactionHistoryViewModel)
+    viewModelOf(::BudgetViewModel)
+    viewModelOf(::WalletTransactionsViewModel)
+    viewModelOf(::ImportTransactionsViewModel)
+    viewModelOf(::OnboardingViewModel)
+    viewModelOf(::AchievementsViewModel)
+    // Для параметризованной:
     viewModel { parameters ->
         FinancialDetailStatisticsViewModel(
             startDate = parameters.get(),
