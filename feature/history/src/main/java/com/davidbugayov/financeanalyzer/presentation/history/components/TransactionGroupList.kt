@@ -196,7 +196,7 @@ fun TransactionGroupList(
             Spacer(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(80.dp)
+                    .height(80.dp),
             )
         }
     }
@@ -210,7 +210,7 @@ private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boo
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val balanceTextColor = if (balance >= 0) incomeColor else expenseColor
-    
+
     // Улучшенные цвета фона для лучшей видимости на темном фоне
     val cardBackgroundColor = if (balance >= 0) {
         // Для доходов - более яркий зеленый фон
@@ -219,7 +219,7 @@ private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boo
         // Для расходов - более яркий красный фон
         expenseColor.copy(alpha = 0.15f)
     }
-    
+
     // Добавляем границу для лучшей видимости
     val borderColor = if (balance >= 0) {
         incomeColor.copy(alpha = 0.3f)
@@ -238,7 +238,7 @@ private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boo
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
         border = BorderStroke(
             width = 1.dp,
-            color = borderColor
+            color = borderColor,
         ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {

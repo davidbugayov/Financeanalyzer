@@ -21,4 +21,4 @@ object RuStoreUtils {
     fun requestReview(activity: Activity) {
         // No-op
     }
-} 
+}

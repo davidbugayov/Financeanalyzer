@@ -61,7 +61,6 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
 import com.davidbugayov.financeanalyzer.utils.RuStoreUtils
-import com.davidbugayov.financeanalyzer.utils.Time
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
@@ -96,6 +95,7 @@ fun ProfileScreen(
     }
 
     val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
+
     @SuppressLint("NewApi")
     val buildVersion = remember { (packageInfo?.longVersionCode ?: 0L).toString() }
 
@@ -121,8 +121,10 @@ fun ProfileScreen(
 
         // Отправляем данные о состоянии пользователя в аналитику
         AnalyticsUtils.setUserProperty("has_transactions", (state.totalTransactions > 0).toString())
-        AnalyticsUtils.setUserProperty("has_categories",
-            (state.totalExpenseCategories > 0 || state.totalIncomeCategories > 0).toString())
+        AnalyticsUtils.setUserProperty(
+            "has_categories",
+            (state.totalExpenseCategories > 0 || state.totalIncomeCategories > 0).toString(),
+        )
         AnalyticsUtils.setUserProperty("savings_rate", state.savingsRate.toString())
 
         // Запрашиваем оценку приложения в RuStore, если это rustore flavor
@@ -131,19 +133,26 @@ fun ProfileScreen(
                 RuStoreUtils.requestReview(activity)
 
                 // Логируем запрос на оценку
-                AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_RATING, android.os.Bundle().apply {
-                    putString(AnalyticsConstants.Params.SOURCE, "rustore")
-                    putString("request_location", "profile_screen")
-                })
+                AnalyticsUtils.logEvent(
+                    AnalyticsConstants.Events.USER_RATING,
+                    android.os.Bundle().apply {
+                        putString(AnalyticsConstants.Params.SOURCE, "rustore")
+                        putString("request_location", "profile_screen")
+                    },
+                )
             }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при запросе оценки в RuStore")
 
             // Отслеживаем ошибку
-            errorTracker.trackException(e, isFatal = false, mapOf(
-                "location" to "profile_screen",
-                "action" to "request_review"
-            ))
+            errorTracker.trackException(
+                e,
+                isFatal = false,
+                mapOf(
+                    "location" to "profile_screen",
+                    "action" to "request_review",
+                ),
+            )
         }
 
         // Завершаем отслеживание загрузки экрана
@@ -151,10 +160,13 @@ fun ProfileScreen(
 
         // Дополнительно отслеживаем время загрузки экрана
         val loadTime = SystemClock.elapsedRealtime() - screenLoadStartTime
-        AnalyticsUtils.logEvent(AnalyticsConstants.Events.SCREEN_LOAD, android.os.Bundle().apply {
-            putString(AnalyticsConstants.Params.SCREEN_NAME, "profile")
-            putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
-        })
+        AnalyticsUtils.logEvent(
+            AnalyticsConstants.Events.SCREEN_LOAD,
+            android.os.Bundle().apply {
+                putString(AnalyticsConstants.Params.SCREEN_NAME, "profile")
+                putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
+            },
+        )
     }
 
     // Отслеживаем закрытие экрана
@@ -191,11 +203,15 @@ fun ProfileScreen(
                 Timber.e(e, "Failed to start activity for intent: $intent")
 
                 // Отслеживаем ошибку
-                errorTracker.trackException(e, isFatal = false, mapOf(
-                    "location" to "profile_screen",
-                    "action" to "start_activity",
-                    "intent" to intent.toString()
-                ))
+                errorTracker.trackException(
+                    e,
+                    isFatal = false,
+                    mapOf(
+                        "location" to "profile_screen",
+                        "action" to "start_activity",
+                        "intent" to intent.toString(),
+                    ),
+                )
 
                 scope.launch {
                     snackbarHostState.showSnackbar(
@@ -221,10 +237,13 @@ fun ProfileScreen(
             topBar = {
                 ProfileTopBar(onNavigateBack = {
                     // Логируем действие пользователя
-                    userEventTracker.trackUserAction(PerformanceMetrics.Actions.NAVIGATION, mapOf(
-                        "from" to "profile_screen",
-                        "action" to "back"
-                    ))
+                    userEventTracker.trackUserAction(
+                        PerformanceMetrics.Actions.NAVIGATION,
+                        mapOf(
+                            "from" to "profile_screen",
+                            "action" to "back",
+                        ),
+                    )
 
                     viewModel.onEvent(ProfileEvent.NavigateBack)
                 })
@@ -250,10 +269,13 @@ fun ProfileScreen(
                     dateRange = state.dateRange,
                     onSavingsRateClick = {
                         // Логируем действие пользователя
-                        userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
-                            "section" to "analytics",
-                            "target" to "financial_statistics"
-                        ))
+                        userEventTracker.trackUserAction(
+                            PerformanceMetrics.Actions.BUTTON_CLICK,
+                            mapOf(
+                                "section" to "analytics",
+                                "target" to "financial_statistics",
+                            ),
+                        )
 
                         viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
                     },
@@ -261,10 +283,13 @@ fun ProfileScreen(
                         .padding(horizontal = dimensionResource(R.dimen.profile_section_padding))
                         .clickable {
                             // Логируем действие пользователя
-                            userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
-                                "section" to "analytics",
-                                "target" to "financial_statistics"
-                            ))
+                            userEventTracker.trackUserAction(
+                                PerformanceMetrics.Actions.BUTTON_CLICK,
+                                mapOf(
+                                    "section" to "analytics",
+                                    "target" to "financial_statistics",
+                                ),
+                            )
 
                             viewModel.onEvent(ProfileEvent.NavigateToFinancialStatistics)
                         },
@@ -280,10 +305,13 @@ fun ProfileScreen(
                     subtitle = stringResource(R.string.profile_budget_subtitle),
                     onClick = {
                         // Логируем действие пользователя
-                        userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
-                            "section" to "profile",
-                            "target" to "budget"
-                        ))
+                        userEventTracker.trackUserAction(
+                            PerformanceMetrics.Actions.BUTTON_CLICK,
+                            mapOf(
+                                "section" to "profile",
+                                "target" to "budget",
+                            ),
+                        )
 
                         viewModel.onEvent(ProfileEvent.NavigateToBudget)
                     },
@@ -302,10 +330,13 @@ fun ProfileScreen(
                     subtitle = stringResource(R.string.profile_export_import_subtitle),
                     onClick = {
                         // Логируем действие пользователя
-                        userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
-                            "section" to "profile",
-                            "target" to "export_import"
-                        ))
+                        userEventTracker.trackUserAction(
+                            PerformanceMetrics.Actions.BUTTON_CLICK,
+                            mapOf(
+                                "section" to "profile",
+                                "target" to "export_import",
+                            ),
+                        )
 
                         viewModel.onEvent(ProfileEvent.NavigateToExportImport)
                     },
@@ -325,10 +356,13 @@ fun ProfileScreen(
                     subtitle = stringResource(R.string.profile_achievements_subtitle),
                     onClick = {
                         // Логируем действие пользователя
-                        userEventTracker.trackUserAction(PerformanceMetrics.Actions.BUTTON_CLICK, mapOf(
-                            "section" to "profile",
-                            "target" to "achievements"
-                        ))
+                        userEventTracker.trackUserAction(
+                            PerformanceMetrics.Actions.BUTTON_CLICK,
+                            mapOf(
+                                "section" to "profile",
+                                "target" to "achievements",
+                            ),
+                        )
 
                         viewModel.onEvent(ProfileEvent.NavigateToAchievements)
                     },

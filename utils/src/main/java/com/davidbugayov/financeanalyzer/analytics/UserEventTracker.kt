@@ -15,10 +15,10 @@ object UserEventTracker {
     private val featureUsageCount = ConcurrentHashMap<String, Int>()
     private val featureLastUsed = ConcurrentHashMap<String, Long>()
     private val sessionStartTime = SystemClock.elapsedRealtime()
-    
+
     private var currentScreen: String? = null
     private var currentScreenStartTime: Long = 0
-    
+
     /**
      * Отслеживать открытие экрана
      * @param screenName Название экрана
@@ -28,13 +28,13 @@ object UserEventTracker {
         currentScreen?.let {
             trackScreenClose(it)
         }
-        
+
         currentScreen = screenName
         currentScreenStartTime = SystemClock.elapsedRealtime()
-        
+
         Timber.d("Screen opened: $screenName")
     }
-    
+
     /**
      * Отслеживать закрытие экрана
      * @param screenName Название экрана
@@ -42,25 +42,25 @@ object UserEventTracker {
     fun trackScreenClose(screenName: String) {
         if (currentScreen == screenName && currentScreenStartTime > 0) {
             val duration = SystemClock.elapsedRealtime() - currentScreenStartTime
-            
+
             // Добавляем время к общему времени на экране
             screenTimeMap[screenName] = (screenTimeMap[screenName] ?: 0) + duration
-            
+
             // Логируем время на экране
             val params = Bundle().apply {
                 putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, duration)
                 putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
             }
-            
+
             AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ENGAGEMENT, params)
-            
+
             Timber.d("Screen closed: $screenName, duration: $duration ms")
-            
+
             currentScreen = null
             currentScreenStartTime = 0
         }
     }
-    
+
     /**
      * Отслеживать использование функции
      * @param featureName Название функции
@@ -70,22 +70,22 @@ object UserEventTracker {
         // Увеличиваем счетчик использования функции
         val count = (featureUsageCount[featureName] ?: 0) + 1
         featureUsageCount[featureName] = count
-        
+
         // Запоминаем время последнего использования
         featureLastUsed[featureName] = System.currentTimeMillis()
-        
+
         // Логируем использование функции
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.FEATURE_NAME, featureName)
             putString(AnalyticsConstants.Params.FEATURE_RESULT, result)
             putInt(AnalyticsConstants.Params.FEATURE_USAGE_COUNT, count)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.FEATURE_USED, params)
-        
+
         Timber.d("Feature used: $featureName, result: $result, count: $count")
     }
-    
+
     /**
      * Отслеживать действие пользователя
      * @param actionName Название действия
@@ -93,12 +93,12 @@ object UserEventTracker {
      */
     fun trackUserAction(actionName: String, params: Map<String, Any> = emptyMap()) {
         val startTime = SystemClock.elapsedRealtime()
-        
+
         // Подготавливаем параметры для аналитики
         val analyticsParams = Bundle().apply {
             putString(AnalyticsConstants.Params.ACTION_NAME, actionName)
             putString(AnalyticsConstants.Params.SCREEN_NAME, currentScreen ?: "unknown")
-            
+
             // Добавляем дополнительные параметры
             params.forEach { (key, value) ->
                 when (value) {
@@ -112,12 +112,12 @@ object UserEventTracker {
                 }
             }
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ACTION, analyticsParams)
-        
+
         Timber.d("User action: $actionName on screen ${currentScreen ?: "unknown"}")
     }
-    
+
     /**
      * Отслеживать отзыв пользователя
      * @param score Оценка (от 1 до 5)
@@ -130,12 +130,12 @@ object UserEventTracker {
                 putString(AnalyticsConstants.Params.USER_FEEDBACK_TEXT, feedback)
             }
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_FEEDBACK, params)
-        
+
         Timber.d("User feedback: score=$score, feedback=${feedback ?: "none"}")
     }
-    
+
     /**
      * Отслеживать рейтинг приложения
      * @param rating Оценка (от 1 до 5)
@@ -146,12 +146,12 @@ object UserEventTracker {
             putInt(AnalyticsConstants.Params.USER_RATING, rating)
             putString(AnalyticsConstants.Params.SOURCE, source)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_RATING, params)
-        
+
         Timber.d("App rating: $rating from $source")
     }
-    
+
     /**
      * Получить общее время, проведенное на экране
      * @param screenName Название экрана
@@ -160,7 +160,7 @@ object UserEventTracker {
     fun getTotalScreenTime(screenName: String): Long {
         return screenTimeMap[screenName] ?: 0L
     }
-    
+
     /**
      * Получить количество использований функции
      * @param featureName Название функции
@@ -169,7 +169,7 @@ object UserEventTracker {
     fun getFeatureUsageCount(featureName: String): Int {
         return featureUsageCount[featureName] ?: 0
     }
-    
+
     /**
      * Получить время последнего использования функции
      * @param featureName Название функции
@@ -178,7 +178,7 @@ object UserEventTracker {
     fun getFeatureLastUsed(featureName: String): Long? {
         return featureLastUsed[featureName]
     }
-    
+
     /**
      * Получить продолжительность текущей сессии
      * @return Время в миллисекундах
@@ -186,7 +186,7 @@ object UserEventTracker {
     fun getSessionDuration(): Long {
         return SystemClock.elapsedRealtime() - sessionStartTime
     }
-    
+
     /**
      * Отправить данные о сессии в аналитику
      */
@@ -195,16 +195,16 @@ object UserEventTracker {
         val screenCount = screenTimeMap.size
         val totalScreenTime = screenTimeMap.values.sum()
         val featureCount = featureUsageCount.size
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, sessionDuration)
             putInt("screen_count", screenCount)
             putLong("total_screen_time", totalScreenTime)
             putInt("feature_count", featureCount)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ENGAGEMENT, params)
-        
+
         Timber.d("Session stats: duration=$sessionDuration ms, screens=$screenCount, features=$featureCount")
     }
-} 
+}

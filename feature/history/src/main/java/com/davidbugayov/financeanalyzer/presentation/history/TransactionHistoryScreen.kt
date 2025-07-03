@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.AccountBalance
@@ -33,9 +32,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.feature.history.R
-import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
@@ -47,7 +44,6 @@ import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
 import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
 import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
-import com.davidbugayov.financeanalyzer.presentation.history.components.TransactionGroupList
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
 import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
@@ -64,13 +60,8 @@ import org.koin.androidx.compose.koinViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import android.content.Context
 import androidx.compose.ui.platform.LocalContext
-import android.app.Application
-import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import androidx.compose.ui.graphics.toArgb
 import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.compose.LazyPagingItems
 import androidx.paging.LoadState
 
 /**
@@ -316,7 +307,7 @@ fun TransactionHistoryScreen(
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
                     IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) }
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowCategoryDialog) },
                     ) {
                         Icon(
                             imageVector = Icons.Filled.Category,
@@ -324,7 +315,7 @@ fun TransactionHistoryScreen(
                         )
                     }
                     IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) }
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowSourceDialog) },
                     ) {
                         Icon(
                             imageVector = Icons.Filled.AccountBalance,
@@ -332,7 +323,7 @@ fun TransactionHistoryScreen(
                         )
                     }
                     IconButton(
-                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) }
+                        onClick = { viewModel.onEvent(TransactionHistoryEvent.ShowPeriodDialog) },
                     ) {
                         Icon(
                             imageVector = Icons.Filled.FilterList,
@@ -415,7 +406,7 @@ fun TransactionHistoryScreen(
                                 modifier = Modifier.padding(end = dimensionResource(R.dimen.spacing_medium)),
                             )
                         }
-                        
+
                         // Выбранные источники
                         if (state.selectedSources.isNotEmpty()) {
                             Text(

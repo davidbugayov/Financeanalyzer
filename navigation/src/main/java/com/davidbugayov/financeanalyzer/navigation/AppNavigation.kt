@@ -19,6 +19,7 @@ class AppNavigation {
      * @param onBudgetScreen Функция для отображения экрана Budget
      * @param onFinancialStatisticsScreen Функция для отображения экрана FinancialStatistics
      * @param onWalletTransactionsScreen Функция для отображения экрана WalletTransactions
+     * @param onWalletSetupScreen Функция для отображения экрана WalletSetup
      */
     fun NavGraphBuilder.mainGraph(
         onHomeScreen: @Composable () -> Unit,
@@ -30,6 +31,8 @@ class AppNavigation {
             periodType: String?,
         ) -> Unit,
         onWalletTransactionsScreen: @Composable (walletId: String) -> Unit,
+        onWalletSetupScreen: @Composable () -> Unit = {},
+        onSubWalletsScreen: @Composable (parentWalletId: String) -> Unit = { _ -> },
     ) {
         composable(
             route = Screen.Home.route,
@@ -130,6 +133,28 @@ class AppNavigation {
             // Вызываем тот же обработчик, но с параметром DETAILED
             onFinancialStatisticsScreen(finalStartDate, finalEndDate, "DETAILED")
         }
+
+        composable(
+            route = Screen.WalletSetup.route,
+            enterTransition = defaultEnterLeft(),
+            exitTransition = defaultExitRight(),
+            popEnterTransition = defaultEnterLeft(),
+            popExitTransition = defaultExitRight(),
+        ) {
+            onWalletSetupScreen()
+        }
+
+        composable(
+            route = Screen.SubWallets.route,
+            arguments = listOf(navArgument("parentWalletId") { type = NavType.StringType }),
+            enterTransition = defaultEnterLeft(),
+            exitTransition = defaultExitRight(),
+            popEnterTransition = defaultEnterLeft(),
+            popExitTransition = defaultExitRight(),
+        ) { backStackEntry ->
+            val parentWalletId = backStackEntry.arguments?.getString("parentWalletId") ?: return@composable
+            onSubWalletsScreen(parentWalletId)
+        }
     }
 
     /**
@@ -153,7 +178,8 @@ class AppNavigation {
                     nullable = true
                 },
                 navArgument(Screen.AddTransaction.FORCE_EXPENSE_ARG) {
-                    type = NavType.BoolType
+                    type = NavType.StringType
+                    nullable = true
                 },
             ),
             enterTransition = defaultEnterUp(),
@@ -162,11 +188,8 @@ class AppNavigation {
             popExitTransition = defaultExitDown(),
         ) { backStackEntry ->
             val category = backStackEntry.arguments?.getString(Screen.AddTransaction.CATEGORY_ARG)
-            val forceExpense = if (backStackEntry.arguments?.containsKey(Screen.AddTransaction.FORCE_EXPENSE_ARG) == true) {
-                backStackEntry.arguments?.getBoolean(Screen.AddTransaction.FORCE_EXPENSE_ARG)
-            } else {
-                null
-            }
+            val forceExpenseStr = backStackEntry.arguments?.getString(Screen.AddTransaction.FORCE_EXPENSE_ARG)
+            val forceExpense = forceExpenseStr?.toBooleanStrictOrNull()
             onAddTransactionScreen(category, forceExpense)
         }
         composable(

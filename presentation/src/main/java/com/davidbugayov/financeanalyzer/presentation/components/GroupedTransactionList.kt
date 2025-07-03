@@ -21,7 +21,6 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.R as UiR
 
 /**
@@ -94,4 +93,4 @@ fun GroupedTransactionList(
         }
         item("fab_spacer") { Spacer(modifier = Modifier.height(80.dp)) }
     }
-} 
+}

@@ -24,7 +24,6 @@ import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.presentation.R
 import timber.log.Timber
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.runtime.remember
 import androidx.compose.foundation.lazy.rememberLazyListState
 
 @Composable
@@ -100,4 +99,4 @@ fun TransactionPagingList(
         }
         item("fab_spacer") { Spacer(modifier = Modifier.height(80.dp)) }
     }
-} 
+}

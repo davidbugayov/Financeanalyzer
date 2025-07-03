@@ -57,7 +57,7 @@ fun AnimatedBottomNavigationBar(
     onChartClick: () -> Unit = {},
     onHistoryClick: () -> Unit = {},
     onAddClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     val density = LocalDensity.current
     // IME insets (keyboard)
@@ -69,18 +69,18 @@ fun AnimatedBottomNavigationBar(
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(animationSpec = tween(400, easing = EaseInOut)) + slideInVertically(
-            initialOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut)
+            initialOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
         ),
         exit = fadeOut(animationSpec = tween(400, easing = EaseInOut)) + slideOutVertically(
-            targetOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut)
+            targetOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
         ),
-        modifier = modifier
+        modifier = modifier,
     ) {
         Surface(
             modifier = Modifier.fillMaxWidth(),
             color = MaterialTheme.colorScheme.surface.copy(alpha = 0.97f),
             shadowElevation = 0.dp,
-            tonalElevation = dimensionResource(R.dimen.elevation_small)
+            tonalElevation = dimensionResource(R.dimen.elevation_small),
         ) {
             Row(
                 modifier = Modifier
@@ -90,28 +90,28 @@ fun AnimatedBottomNavigationBar(
                         start = dimensionResource(R.dimen.spacing_small),
                         end = dimensionResource(R.dimen.spacing_small),
                         top = dimensionResource(R.dimen.spacing_xxsmall),
-                        bottom = dimensionResource(R.dimen.spacing_xxsmall)
+                        bottom = dimensionResource(R.dimen.spacing_xxsmall),
                     )
                     .heightIn(min = dimensionResource(R.dimen.nav_bar_height)),
                 horizontalArrangement = Arrangement.SpaceEvenly,
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 NavButton(
                     icon = Icons.Default.Assessment,
                     text = stringResource(R.string.statistics),
-                    onClick = onChartClick
+                    onClick = onChartClick,
                 )
 
                 NavButton(
                     icon = Icons.Default.Add,
                     text = stringResource(R.string.add_button),
-                    onClick = onAddClick
+                    onClick = onAddClick,
                 )
 
                 NavButton(
                     icon = Icons.Default.History,
                     text = stringResource(R.string.history),
-                    onClick = onHistoryClick
+                    onClick = onHistoryClick,
                 )
             }
         }
@@ -131,20 +131,20 @@ private fun NavButton(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .padding(horizontal = spacingXx)
-            .widthIn(min = buttonSize + spacingXx)
+            .widthIn(min = buttonSize + spacingXx),
     ) {
         FilledIconButton(
             onClick = onClick,
             modifier = Modifier.size(buttonSize),
             colors = IconButtonDefaults.filledIconButtonColors(
                 containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White
-            )
+                contentColor = Color.White,
+            ),
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.size(iconSize)
+                modifier = Modifier.size(iconSize),
             )
         }
 
@@ -155,7 +155,7 @@ private fun NavButton(
             fontWeight = FontWeight.Medium,
             modifier = Modifier.padding(top = 2.dp),
             color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1
+            maxLines = 1,
         )
     }
-} 
+}

@@ -277,7 +277,10 @@ class EditTransactionViewModel(
                 if (result is CoreResult.Success) {
                     Timber.d(
                         "ТРАНЗАКЦИЯ: Обновление успешно выполнено. ID: %s, Сумма: %s, Категория: %s, Источник: %s",
-                        transactionToSave.id, transactionToSave.amount, transactionToSave.category, transactionToSave.source
+                        transactionToSave.id,
+                        transactionToSave.amount,
+                        transactionToSave.category,
+                        transactionToSave.source,
                     )
                     // Обновляем балансы кошельков, если это доход и выбраны кошельки
                     val walletIdsList = transactionToSave.walletIds?.toList() ?: emptyList()
@@ -624,6 +627,7 @@ class EditTransactionViewModel(
             is BaseTransactionEvent.ToggleAddToWallet -> {
                 val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
                     currentAddToWallet = _state.value.addToWallet,
+                    isExpense = _state.value.isExpense,
                 )
 
                 _state.update {
@@ -680,12 +684,12 @@ class EditTransactionViewModel(
                     val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
                         name = trimmedName,
                         color = event.color,
-                        isCustom = true
+                        isCustom = true,
                     )
                     val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
                         sourcePreferences,
                         _state.value.sources,
-                        newSource
+                        newSource,
                     )
                     _state.update { state ->
                         state.copy(
@@ -693,7 +697,7 @@ class EditTransactionViewModel(
                             showCustomSourceDialog = false,
                             customSource = "",
                             source = trimmedName,
-                            sourceColor = event.color
+                            sourceColor = event.color,
                         )
                     }
                 }
@@ -822,12 +826,12 @@ class EditTransactionViewModel(
                     val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
                         name = trimmedName,
                         color = event.color,
-                        isCustom = true
+                        isCustom = true,
                     )
                     val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
                         sourcePreferences,
                         _state.value.sources,
-                        newSource
+                        newSource,
                     )
                     _state.update { state ->
                         state.copy(
@@ -835,7 +839,7 @@ class EditTransactionViewModel(
                             showCustomSourceDialog = false,
                             customSource = "",
                             source = trimmedName,
-                            sourceColor = event.color
+                            sourceColor = event.color,
                         )
                     }
                 }

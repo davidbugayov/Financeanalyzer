@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.di
 
-import com.davidbugayov.financeanalyzer.analytics.di.analyticsUtilsModule
 import com.davidbugayov.financeanalyzer.data.local.database.AppDatabase
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryPreferences
 import com.davidbugayov.financeanalyzer.data.preferences.CategoryUsagePreferences
@@ -30,7 +29,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransac
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.feature.transaction.di.transactionModule
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel

@@ -106,4 +106,8 @@ class WalletRepositoryImpl(
             return null
         }
     }
+
+    override suspend fun getSubWallets(parentId: String): List<Wallet> {
+        return walletPreferences.getWallets().filter { it.parentWalletId == parentId }
+    }
 }

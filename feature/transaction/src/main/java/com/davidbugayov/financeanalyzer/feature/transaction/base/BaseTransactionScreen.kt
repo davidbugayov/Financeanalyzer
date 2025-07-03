@@ -250,7 +250,11 @@ fun <E> BaseTransactionScreen(
 
     // Специальная обработка для типа транзакции на основе forceExpense
     LaunchedEffect(state.forceExpense) {
-        Timber.d("BaseTransactionScreen: forceExpense изменен: %b, текущий isExpense: %b", state.forceExpense, state.isExpense)
+        Timber.d(
+            "BaseTransactionScreen: forceExpense изменен: %b, текущий isExpense: %b",
+            state.forceExpense,
+            state.isExpense,
+        )
         // Если forceExpense=true и isExpense=false, принудительно устанавливаем расход
         if (state.forceExpense && !state.isExpense) {
             Timber.d("BaseTransactionScreen: Принудительно устанавливаем тип транзакции на РАСХОД")
@@ -351,7 +355,7 @@ fun <E> BaseTransactionScreen(
                             handleImportReminderDismiss()
                             navigateToImport()
                         },
-                        modifier = Modifier.padding(vertical = 8.dp)
+                        modifier = Modifier.padding(vertical = 8.dp),
                     )
                 }
 
@@ -556,7 +560,8 @@ fun <E> BaseTransactionScreen(
                             context,
                         )
                     },
-                    isVisible = !state.isExpense && viewModel.wallets.isNotEmpty(), // Показываем только для доходов и если есть кошельки
+                    isVisible = viewModel.wallets.isNotEmpty(), // Показываем если есть кошельки
+                    isExpense = state.isExpense,
                 )
 
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_medium)))

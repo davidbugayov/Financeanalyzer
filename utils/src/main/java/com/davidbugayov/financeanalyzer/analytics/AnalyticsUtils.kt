@@ -2,7 +2,6 @@
 package com.davidbugayov.financeanalyzer.analytics
 
 import org.koin.core.component.KoinComponent
-import org.koin.core.component.inject
 import android.os.Bundle
 import android.content.Context
 import android.net.ConnectivityManager
@@ -20,7 +19,7 @@ object AnalyticsUtils : KoinComponent {
     private lateinit var analytics: IAnalytics
     private var sessionId: String = UUID.randomUUID().toString()
     private var appOpenTimestamp: Long = 0L
-    
+
     fun init(analyticsImpl: IAnalytics) {
         analytics = analyticsImpl
         sessionId = UUID.randomUUID().toString()
@@ -54,7 +53,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Жизненный цикл приложения
-    
+
     fun logAppOpen() {
         appOpenTimestamp = System.currentTimeMillis()
         val params = Bundle().apply {
@@ -63,7 +62,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.APP_OPEN, params)
         Timber.d("App open logged, session: $sessionId")
     }
-    
+
     fun logAppClose() {
         val sessionDuration = System.currentTimeMillis() - appOpenTimestamp
         val params = Bundle().apply {
@@ -73,7 +72,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.APP_CLOSE, params)
         Timber.d("App close logged, session: $sessionId, duration: $sessionDuration ms")
     }
-    
+
     fun logAppBackground() {
         val sessionDuration = System.currentTimeMillis() - appOpenTimestamp
         val params = Bundle().apply {
@@ -83,7 +82,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.APP_BACKGROUND, params)
         Timber.d("App background logged, session: $sessionId, duration: $sessionDuration ms")
     }
-    
+
     fun logAppForeground() {
         appOpenTimestamp = System.currentTimeMillis()
         val params = Bundle().apply {
@@ -94,7 +93,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Экраны и навигация
-    
+
     fun logScreenView(screenName: String, screenClass: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
@@ -104,7 +103,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.SCREEN_VIEW, params)
         Timber.d("Screen view logged: $screenName ($screenClass)")
     }
-    
+
     fun logScreenLoad(screenName: String, durationMs: Long) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
@@ -113,7 +112,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.SCREEN_LOAD, params)
         Timber.d("Screen load logged: $screenName, duration: $durationMs ms")
     }
-    
+
     fun logNavigation(source: String, destination: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.SOURCE, source)
@@ -124,13 +123,16 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Транзакции
-    
+
     fun logTransactionAdded(amount: Money, category: String, isExpense: Boolean, hasDescription: Boolean, source: String = AnalyticsConstants.Values.SOURCE_USER) {
         val params = Bundle().apply {
             putString(
-                AnalyticsConstants.Params.TRANSACTION_TYPE, 
-                if (isExpense) AnalyticsConstants.Values.TRANSACTION_TYPE_EXPENSE 
-                else AnalyticsConstants.Values.TRANSACTION_TYPE_INCOME
+                AnalyticsConstants.Params.TRANSACTION_TYPE,
+                if (isExpense) {
+                    AnalyticsConstants.Values.TRANSACTION_TYPE_EXPENSE
+                } else {
+                    AnalyticsConstants.Values.TRANSACTION_TYPE_INCOME
+                },
             )
             putString(AnalyticsConstants.Params.TRANSACTION_AMOUNT, amount.toString())
             putString(AnalyticsConstants.Params.TRANSACTION_CATEGORY, category)
@@ -144,9 +146,12 @@ object AnalyticsUtils : KoinComponent {
     fun logTransactionEdited(amount: Money, category: String, isExpense: Boolean) {
         val params = Bundle().apply {
             putString(
-                AnalyticsConstants.Params.TRANSACTION_TYPE, 
-                if (isExpense) AnalyticsConstants.Values.TRANSACTION_TYPE_EXPENSE 
-                else AnalyticsConstants.Values.TRANSACTION_TYPE_INCOME
+                AnalyticsConstants.Params.TRANSACTION_TYPE,
+                if (isExpense) {
+                    AnalyticsConstants.Values.TRANSACTION_TYPE_EXPENSE
+                } else {
+                    AnalyticsConstants.Values.TRANSACTION_TYPE_INCOME
+                },
             )
             putString(AnalyticsConstants.Params.TRANSACTION_AMOUNT, amount.toString())
             putString(AnalyticsConstants.Params.TRANSACTION_CATEGORY, category)
@@ -158,9 +163,12 @@ object AnalyticsUtils : KoinComponent {
     fun logTransactionDeleted(amount: Money, category: String, isExpense: Boolean) {
         val params = Bundle().apply {
             putString(
-                AnalyticsConstants.Params.TRANSACTION_TYPE, 
-                if (isExpense) AnalyticsConstants.Values.TRANSACTION_TYPE_EXPENSE 
-                else AnalyticsConstants.Values.TRANSACTION_TYPE_INCOME
+                AnalyticsConstants.Params.TRANSACTION_TYPE,
+                if (isExpense) {
+                    AnalyticsConstants.Values.TRANSACTION_TYPE_EXPENSE
+                } else {
+                    AnalyticsConstants.Values.TRANSACTION_TYPE_INCOME
+                },
             )
             putString(AnalyticsConstants.Params.TRANSACTION_AMOUNT, amount.toString())
             putString(AnalyticsConstants.Params.TRANSACTION_CATEGORY, category)
@@ -168,7 +176,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.TRANSACTION_DELETED, params)
         Timber.d("Transaction deleted logged: $amount, $category, ${if (isExpense) "expense" else "income"}")
     }
-    
+
     fun logTransactionFiltered(filters: Map<String, String>, resultCount: Int) {
         val params = Bundle().apply {
             putInt(AnalyticsConstants.Params.TRANSACTION_COUNT, resultCount)
@@ -180,7 +188,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.TRANSACTION_FILTERED, params)
         Timber.d("Transaction filtered logged: ${filters.size} filters, $resultCount results")
     }
-    
+
     fun logTransactionSearched(query: String, resultCount: Int) {
         val params = Bundle().apply {
             putString("search_query", query)
@@ -189,21 +197,21 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.TRANSACTION_SEARCHED, params)
         Timber.d("Transaction searched logged: \"$query\", $resultCount results")
     }
-    
+
     fun logTransactionImported(source: String, count: Int, success: Boolean, errorMessage: String? = null) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.IMPORT_SOURCE, source)
             putInt(AnalyticsConstants.Params.TRANSACTION_COUNT, count)
             putString(
                 AnalyticsConstants.Params.FEATURE_RESULT,
-                if (success) AnalyticsConstants.Values.RESULT_SUCCESS else AnalyticsConstants.Values.RESULT_FAILURE
+                if (success) AnalyticsConstants.Values.RESULT_SUCCESS else AnalyticsConstants.Values.RESULT_FAILURE,
             )
             errorMessage?.let { putString(AnalyticsConstants.Params.ERROR_MESSAGE, it) }
         }
         logEvent(AnalyticsConstants.Events.TRANSACTION_IMPORTED, params)
         Timber.d("Transaction imported logged: $source, $count transactions, success: $success")
     }
-    
+
     fun logTransactionExportStarted(format: String, count: Int, periodType: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.EXPORT_FORMAT, format)
@@ -213,7 +221,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.TRANSACTION_EXPORT_STARTED, params)
         Timber.d("Transaction export started: $format, $count transactions, period: $periodType")
     }
-    
+
     fun logTransactionExportCompleted(format: String, count: Int, durationMs: Long) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.EXPORT_FORMAT, format)
@@ -224,7 +232,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.TRANSACTION_EXPORT_COMPLETED, params)
         Timber.d("Transaction export completed: $format, $count transactions, duration: $durationMs ms")
     }
-    
+
     fun logTransactionExportFailed(format: String, errorMessage: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.EXPORT_FORMAT, format)
@@ -236,14 +244,17 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Категории
-    
+
     fun logCategoryAdded(category: String, isExpense: Boolean) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.CATEGORY_NAME, category)
             putString(
-                AnalyticsConstants.Params.CATEGORY_TYPE, 
-                if (isExpense) AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE 
-                else AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                AnalyticsConstants.Params.CATEGORY_TYPE,
+                if (isExpense) {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE
+                } else {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                },
             )
         }
         logEvent(AnalyticsConstants.Events.CATEGORY_ADDED, params)
@@ -255,9 +266,12 @@ object AnalyticsUtils : KoinComponent {
             putString(AnalyticsConstants.Params.CATEGORY_NAME, newCategory)
             putString(AnalyticsConstants.Params.CATEGORY_OLD_NAME, oldCategory)
             putString(
-                AnalyticsConstants.Params.CATEGORY_TYPE, 
-                if (isExpense) AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE 
-                else AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                AnalyticsConstants.Params.CATEGORY_TYPE,
+                if (isExpense) {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE
+                } else {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                },
             )
         }
         logEvent(AnalyticsConstants.Events.CATEGORY_EDITED, params)
@@ -268,22 +282,28 @@ object AnalyticsUtils : KoinComponent {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.CATEGORY_NAME, category)
             putString(
-                AnalyticsConstants.Params.CATEGORY_TYPE, 
-                if (isExpense) AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE 
-                else AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                AnalyticsConstants.Params.CATEGORY_TYPE,
+                if (isExpense) {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE
+                } else {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                },
             )
         }
         logEvent(AnalyticsConstants.Events.CATEGORY_DELETED, params)
         Timber.d("Category deleted: $category (${if (isExpense) "expense" else "income"})")
     }
-    
+
     fun logCategorySelected(category: String, isExpense: Boolean, source: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.CATEGORY_NAME, category)
             putString(
-                AnalyticsConstants.Params.CATEGORY_TYPE, 
-                if (isExpense) AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE 
-                else AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                AnalyticsConstants.Params.CATEGORY_TYPE,
+                if (isExpense) {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_EXPENSE
+                } else {
+                    AnalyticsConstants.Values.CATEGORY_TYPE_INCOME
+                },
             )
             putString(AnalyticsConstants.Params.SOURCE, source)
         }
@@ -292,7 +312,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Бюджет
-    
+
     fun logBudgetCreated(category: String, amount: Money, periodType: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.BUDGET_CATEGORY, category)
@@ -302,7 +322,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.BUDGET_CREATED, params)
         Timber.d("Budget created: $category, $amount, period: $periodType")
     }
-    
+
     fun logBudgetUpdated(category: String, oldAmount: Money, newAmount: Money) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.BUDGET_CATEGORY, category)
@@ -312,7 +332,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.BUDGET_UPDATED, params)
         Timber.d("Budget updated: $category, $oldAmount -> $newAmount")
     }
-    
+
     fun logBudgetLimitReached(category: String, amount: Money, percentage: Float) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.BUDGET_CATEGORY, category)
@@ -324,7 +344,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Отчеты
-    
+
     fun logReportGenerated(periodType: String, startDate: Date, endDate: Date, format: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.PERIOD_TYPE, periodType)
@@ -335,7 +355,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.REPORT_GENERATED, params)
         Timber.d("Report generated: $periodType, $format")
     }
-    
+
     fun logReportShared(format: String, shareMethod: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.REPORT_FORMAT, format)
@@ -346,7 +366,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Настройки
-    
+
     fun logSettingsChanged(settingName: String, settingValue: String, previousValue: String? = null) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.SETTING_NAME, settingName)
@@ -358,7 +378,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Ошибки
-    
+
     fun logError(errorType: String, errorMessage: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
@@ -367,7 +387,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.ERROR, params)
         Timber.d("Error logged: $errorType - $errorMessage")
     }
-    
+
     fun logValidationError(field: String, errorMessage: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.VALIDATION_FIELD, field)
@@ -379,7 +399,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Функции и фичи
-    
+
     fun logFeatureUsed(featureName: String, result: String = AnalyticsConstants.Values.RESULT_SUCCESS) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.FEATURE_NAME, featureName)
@@ -388,7 +408,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.FEATURE_USED, params)
         Timber.d("Feature used logged: $featureName, result: $result")
     }
-    
+
     fun logFeatureEnabled(featureName: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.FEATURE_NAME, featureName)
@@ -396,7 +416,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.FEATURE_ENABLED, params)
         Timber.d("Feature enabled: $featureName")
     }
-    
+
     fun logFeatureDisabled(featureName: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.FEATURE_NAME, featureName)
@@ -406,7 +426,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Виджеты
-    
+
     fun logWidgetAdded(widgetType: String, widgetSize: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.WIDGET_TYPE, widgetType)
@@ -415,7 +435,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.WIDGET_ADDED, params)
         Timber.d("Widget added: $widgetType, size: $widgetSize")
     }
-    
+
     fun logWidgetInteraction(widgetType: String, action: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.WIDGET_TYPE, widgetType)
@@ -426,7 +446,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Уведомления
-    
+
     fun logNotificationReceived(notificationType: String, notificationId: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.NOTIFICATION_TYPE, notificationType)
@@ -435,7 +455,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.NOTIFICATION_RECEIVED, params)
         Timber.d("Notification received: $notificationType, id: $notificationId")
     }
-    
+
     fun logNotificationOpened(notificationType: String, notificationId: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.NOTIFICATION_TYPE, notificationType)
@@ -446,7 +466,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Обновления
-    
+
     fun logUpdateAvailable(version: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.UPDATE_VERSION, version)
@@ -454,7 +474,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.UPDATE_AVAILABLE, params)
         Timber.d("Update available: $version")
     }
-    
+
     fun logUpdateInstalled(version: String, source: String) {
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.UPDATE_VERSION, version)
@@ -465,7 +485,7 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Пользовательская активность
-    
+
     fun logUserEngagement(durationMs: Long, screenName: String) {
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, durationMs)
@@ -474,7 +494,7 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.USER_ENGAGEMENT, params)
         Timber.d("User engagement: $durationMs ms on $screenName")
     }
-    
+
     fun logUserFeedback(score: Int, text: String?) {
         val params = Bundle().apply {
             putInt(AnalyticsConstants.Params.USER_FEEDBACK_SCORE, score)
@@ -485,26 +505,33 @@ object AnalyticsUtils : KoinComponent {
     }
 
     // Утилиты для получения информации о системе
-    
+
     fun getDeviceInfo(context: Context): Bundle {
         return Bundle().apply {
             putString(AnalyticsConstants.Params.DEVICE_MODEL, "${Build.MANUFACTURER} ${Build.MODEL}")
             putString(AnalyticsConstants.Params.DEVICE_BRAND, Build.BRAND)
-            putString(AnalyticsConstants.Params.ANDROID_VERSION, "${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})")
+            putString(
+                AnalyticsConstants.Params.ANDROID_VERSION,
+                "${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})",
+            )
             putString(AnalyticsConstants.Params.NETWORK_TYPE, getNetworkType(context))
         }
     }
-    
+
     private fun getNetworkType(context: Context): String {
         val connectivityManager = context.getSystemService(Context.CONNECTIVITY_SERVICE) as ConnectivityManager
-        
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
             val network = connectivityManager.activeNetwork ?: return AnalyticsConstants.Values.NETWORK_TYPE_NONE
             val capabilities = connectivityManager.getNetworkCapabilities(network) ?: return AnalyticsConstants.Values.NETWORK_TYPE_NONE
-            
+
             return when {
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_WIFI) -> AnalyticsConstants.Values.NETWORK_TYPE_WIFI
-                capabilities.hasTransport(NetworkCapabilities.TRANSPORT_CELLULAR) -> AnalyticsConstants.Values.NETWORK_TYPE_MOBILE
+                capabilities.hasTransport(
+                    NetworkCapabilities.TRANSPORT_WIFI,
+                ) -> AnalyticsConstants.Values.NETWORK_TYPE_WIFI
+                capabilities.hasTransport(
+                    NetworkCapabilities.TRANSPORT_CELLULAR,
+                ) -> AnalyticsConstants.Values.NETWORK_TYPE_MOBILE
                 else -> AnalyticsConstants.Values.NETWORK_TYPE_NONE
             }
         } else {

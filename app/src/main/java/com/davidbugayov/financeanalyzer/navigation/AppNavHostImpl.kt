@@ -17,6 +17,7 @@ import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransaction
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileScreen
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsViewModel
+import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.SubWalletsScreen
 import java.util.Date
 import org.koin.androidx.compose.koinViewModel
 
@@ -80,6 +81,18 @@ fun AppNavHostImpl(
         onWalletTransactionsScreen = { walletId ->
             WalletTransactionsScreen(walletId = walletId)
         },
+        onWalletSetupScreen = {
+            com.davidbugayov.financeanalyzer.presentation.budget.setup.WalletSetupScreen()
+        },
+        onSubWalletsScreen = { parentWalletId ->
+            SubWalletsScreen(
+                parentWalletId = parentWalletId,
+                onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
+                onNavigateToWalletSetup = {
+                    navigationManager.navigate(NavigationManager.Command.Navigate(Screen.WalletSetup.route))
+                },
+            )
+        },
         onAddTransactionScreen = { category, forceExpense ->
             AddTransactionScreen(category = category, forceExpense = forceExpense)
         },
@@ -106,7 +119,7 @@ fun AppNavHostImpl(
         },
         onLibrariesScreen = {
             com.davidbugayov.financeanalyzer.feature.profile.libraries.LibrariesScreen(
-                onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) }
+                onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
             )
         },
         onExportImportScreen = {

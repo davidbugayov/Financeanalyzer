@@ -76,4 +76,10 @@ interface WalletRepository {
      * @return Список кошельков, связанных с данной транзакцией
      */
     suspend fun getWalletsForTransaction(transactionId: String): List<Wallet>
+
+    /**
+     * Возвращает подпулы (sub-wallets) для указанного родительского кошелька
+     * @param parentId ID родительского кошелька
+     */
+    suspend fun getSubWallets(parentId: String): List<Wallet>
 }

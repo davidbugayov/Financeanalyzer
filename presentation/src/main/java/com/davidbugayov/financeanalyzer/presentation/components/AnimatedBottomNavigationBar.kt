@@ -14,4 +14,4 @@ fun AnimatedBottomNavigationBar(
     onAddClick: () -> Unit,
 ) {
     // No-op placeholder
-} 
+}

@@ -29,4 +29,4 @@ val utilsModule = module {
     // Import / Export helpers
     single { ImportTransactionsManager(androidContext()) }
     single { ImportFactory(androidContext(), get()) }
-} 
+}

@@ -105,15 +105,15 @@ fun FinancialDetailStatisticsScreen(startDate: Long, endDate: Long, onNavigateBa
                 Card(
                     modifier = Modifier.fillMaxWidth(),
                     colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f)
+                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
                     ),
                     border = BorderStroke(
                         width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
                     ),
                 ) {
                     Column(
-                        modifier = Modifier.padding(16.dp)
+                        modifier = Modifier.padding(16.dp),
                     ) {
                         Text(
                             text = stringResource(R.string.financial_statistics_period),
@@ -128,7 +128,7 @@ fun FinancialDetailStatisticsScreen(startDate: Long, endDate: Long, onNavigateBa
                         )
                     }
                 }
-                
+
                 Spacer(
                     modifier = Modifier.height(
                         dimensionResource(R.dimen.financial_statistics_spacer_large),

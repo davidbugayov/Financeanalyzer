@@ -30,10 +30,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.ui.R
 import kotlinx.coroutines.delay
 
 /**
@@ -63,13 +61,13 @@ fun ReminderBubble(
     autoDismissTimeMillis: Long = 15000,
     onDismiss: () -> Unit,
     onAction: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     AnimatedVisibility(
         visible = visible,
         enter = fadeIn(animationSpec = tween(durationMillis = 500)),
         exit = fadeOut(animationSpec = tween(durationMillis = 300)),
-        modifier = modifier
+        modifier = modifier,
     ) {
         Card(
             modifier = Modifier
@@ -78,89 +76,89 @@ fun ReminderBubble(
             shape = RoundedCornerShape(16.dp),
             colors = CardDefaults.cardColors(
                 containerColor = MaterialTheme.colorScheme.primaryContainer,
-                contentColor = MaterialTheme.colorScheme.onPrimaryContainer
+                contentColor = MaterialTheme.colorScheme.onPrimaryContainer,
             ),
             border = BorderStroke(
                 width = 1.dp,
-                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f)
+                color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
             ),
             elevation = CardDefaults.cardElevation(
-                defaultElevation = 4.dp
-            )
+                defaultElevation = 4.dp,
+            ),
         ) {
             Column(
-                modifier = Modifier.padding(16.dp)
+                modifier = Modifier.padding(16.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = icon,
                         contentDescription = null,
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(28.dp)
+                        modifier = Modifier.size(28.dp),
                     )
-                    
+
                     Spacer(modifier = Modifier.padding(horizontal = 12.dp))
-                    
+
                     Column {
                         Text(
                             text = title,
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
-                        
+
                         Text(
                             text = description,
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     TextButton(onClick = onDismiss) {
                         Text(
                             text = dismissButtonText,
-                            color = MaterialTheme.colorScheme.primary
+                            color = MaterialTheme.colorScheme.primary,
                         )
                     }
-                    
+
                     Button(
                         onClick = onAction,
                         colors = ButtonDefaults.buttonColors(
                             containerColor = MaterialTheme.colorScheme.primary,
-                            contentColor = MaterialTheme.colorScheme.onPrimary
+                            contentColor = MaterialTheme.colorScheme.onPrimary,
                         ),
-                        shape = RoundedCornerShape(8.dp)
+                        shape = RoundedCornerShape(8.dp),
                     ) {
                         Icon(
                             imageVector = actionIcon,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
-                        
+
                         Spacer(modifier = Modifier.padding(horizontal = 4.dp))
-                        
+
                         Text(
                             text = actionButtonText,
                             style = MaterialTheme.typography.labelLarge,
-                            fontWeight = FontWeight.Medium
+                            fontWeight = FontWeight.Medium,
                         )
                     }
                 }
             }
         }
     }
-    
+
     // Автоматически скрываем напоминание через некоторое время, если задано
     if (autoDismissTimeMillis > 0) {
         LaunchedEffect(visible) {
@@ -170,4 +168,4 @@ fun ReminderBubble(
             }
         }
     }
-} 
+}

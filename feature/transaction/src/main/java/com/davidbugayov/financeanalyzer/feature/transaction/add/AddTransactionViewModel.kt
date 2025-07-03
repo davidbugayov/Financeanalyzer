@@ -339,7 +339,20 @@ class AddTransactionViewModel(
     }
 
     fun setCategory(category: String) {
-        _state.update { it.copy(category = category) }
+        val walletsList = _wallets.value
+        val matchedWallet = walletsList.find { it.name == category }
+        if (matchedWallet != null && _state.value.isExpense) {
+            _state.update {
+                it.copy(
+                    category = category,
+                    addToWallet = true,
+                    selectedWallets = listOf(matchedWallet.id),
+                    targetWalletId = matchedWallet.id,
+                )
+            }
+        } else {
+            _state.update { it.copy(category = category) }
+        }
     }
 
     /**
@@ -347,10 +360,10 @@ class AddTransactionViewModel(
      * @param isExpense true для расхода, false для дохода
      */
     fun setForceExpense(isExpense: Boolean) {
-        _state.update { 
+        _state.update {
             it.copy(
                 isExpense = isExpense,
-                forceExpense = isExpense
+                forceExpense = isExpense,
             )
         }
     }
@@ -363,23 +376,26 @@ class AddTransactionViewModel(
         loadInitialData()
         loadWallets()
         loadSources()
-        
+
         // Затем сбрасываем поля, но сохраняем forceExpense и isExpense
         val currentForceExpense = _state.value.forceExpense
         val currentIsExpense = _state.value.isExpense
-        
+
         resetFields()
-        
+
         // Восстанавливаем forceExpense и isExpense после сброса
-        _state.update { 
+        _state.update {
             it.copy(
                 forceExpense = currentForceExpense,
-                isExpense = currentIsExpense
+                isExpense = currentIsExpense,
             )
         }
-        
-        Timber.d("AddTransactionViewModel: initializeScreen завершена, forceExpense=%b, isExpense=%b", 
-                _state.value.forceExpense, _state.value.isExpense)
+
+        Timber.d(
+            "AddTransactionViewModel: initializeScreen завершена, forceExpense=%b, isExpense=%b",
+            _state.value.forceExpense,
+            _state.value.isExpense,
+        )
     }
 
     override fun handleBaseEvent(event: BaseTransactionEvent, context: Context) {
@@ -390,12 +406,12 @@ class AddTransactionViewModel(
                     val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
                         name = trimmedName,
                         color = event.color,
-                        isCustom = true
+                        isCustom = true,
                     )
                     val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
                         sourcePreferences,
                         _state.value.sources,
-                        newSource
+                        newSource,
                     )
                     _state.update { state ->
                         state.copy(
@@ -403,7 +419,7 @@ class AddTransactionViewModel(
                             showCustomSourceDialog = false,
                             customSource = "",
                             source = trimmedName,
-                            sourceColor = event.color
+                            sourceColor = event.color,
                         )
                     }
                 }

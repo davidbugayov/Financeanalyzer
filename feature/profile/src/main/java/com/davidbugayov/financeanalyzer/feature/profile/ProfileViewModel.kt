@@ -38,7 +38,7 @@ class ProfileViewModel(
     private val notificationScheduler: INotificationScheduler,
     private val navigationManager: NavigationManager,
     val userEventTracker: UserEventTracker,
-    val errorTracker: ErrorTracker
+    val errorTracker: ErrorTracker,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ProfileState())

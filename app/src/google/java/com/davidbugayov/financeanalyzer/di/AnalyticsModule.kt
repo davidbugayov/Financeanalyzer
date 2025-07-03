@@ -53,8 +53,8 @@ val analyticsModule = module {
 
         composite
     }
-    
+
     // Добавляем трекеры для аналитики
     single { UserEventTracker }
     single { ErrorTracker }
-} 
+}

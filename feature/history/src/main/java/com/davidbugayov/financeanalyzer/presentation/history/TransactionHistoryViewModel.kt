@@ -897,7 +897,9 @@ class TransactionHistoryViewModel(
     }
 
     private fun navigateToAddTransaction() {
-        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)))
+        navigationManager.navigate(
+            NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)),
+        )
     }
 
     private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)

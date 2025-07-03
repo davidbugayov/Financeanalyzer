@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 
 /**
  * Диалог выбора кошельков для добавления дохода
@@ -153,7 +154,7 @@ private fun WalletItem(wallet: Wallet, isSelected: Boolean, onCheckedChange: (Bo
             )
 
             Text(
-                text = "Баланс: ${wallet.balance}",
+                text = "Баланс: ${wallet.balance.formatForDisplay()}",
                 style = MaterialTheme.typography.bodySmall,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
             )

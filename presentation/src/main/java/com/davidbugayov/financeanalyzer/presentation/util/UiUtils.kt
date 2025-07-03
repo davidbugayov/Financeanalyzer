@@ -64,4 +64,4 @@ object UiUtils {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
         return dateFormat.format(date)
     }
-} 
+}

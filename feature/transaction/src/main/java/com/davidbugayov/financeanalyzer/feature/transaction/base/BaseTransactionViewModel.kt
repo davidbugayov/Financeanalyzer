@@ -100,7 +100,7 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     /**
      * Определяет список кошельков для сохранения в транзакции
      * @param isExpense Является ли транзакция расходом
-     * @param addToWallet Флаг добавления в кошельки
+     * @param addToWallet Флаг добавления/списания в/из кошельков
      * @param selectedWallets Список выбранных кошельков
      * @return Список ID кошельков или null
      */
@@ -109,8 +109,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         addToWallet: Boolean,
         selectedWallets: List<String>,
     ): List<String>? {
-        return if (!isExpense && addToWallet && selectedWallets.isNotEmpty()) {
-            Timber.d("Сохраняем выбранные кошельки: ${selectedWallets.size} шт.")
+        return if (addToWallet && selectedWallets.isNotEmpty()) {
+            if (isExpense) {
+                Timber.d("Сохраняем кошельки для списания: ${selectedWallets.size} шт.")
+            } else {
+                Timber.d("Сохраняем кошельки для пополнения: ${selectedWallets.size} шт.")
+            }
             selectedWallets
         } else {
             Timber.d(
@@ -137,18 +141,34 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     /**
      * Обрабатывает событие переключения флага "Добавить в кошельки"
      * @param currentAddToWallet Текущее значение флага
+     * @param isExpense Является ли транзакция расходом
      * @return Пара (новое значение флага, новый список выбранных кошельков)
      */
-    protected fun handleToggleAddToWallet(currentAddToWallet: Boolean): Pair<Boolean, List<String>> {
+    protected fun handleToggleAddToWallet(
+        currentAddToWallet: Boolean,
+        isExpense: Boolean,
+    ): Pair<Boolean, List<String>> {
         val newAddToWallet = !currentAddToWallet
 
         return if (newAddToWallet) {
-            // При включении автоматически выбираем все кошельки, если список пуст
-            val allWalletIds = wallets.map { it.id }
-            Timber.d(
-                "Включение кошельков, автоматический выбор всех ${allWalletIds.size} кошельков",
-            )
-            Pair(true, allWalletIds)
+            if (isExpense) {
+                // Для расходов выбираем первый доступный кошелёк
+                val firstWalletId = wallets.firstOrNull()?.id
+                if (firstWalletId != null) {
+                    Timber.d("Включение кошелька для расхода, выбираем первый кошелёк: $firstWalletId")
+                    Pair(true, listOf(firstWalletId))
+                } else {
+                    Timber.d("Нет доступных кошельков для расхода")
+                    Pair(false, emptyList())
+                }
+            } else {
+                // Для доходов автоматически выбираем все кошельки
+                val allWalletIds = wallets.map { it.id }
+                Timber.d(
+                    "Включение кошельков для дохода, автоматический выбор всех ${allWalletIds.size} кошельков",
+                )
+                Pair(true, allWalletIds)
+            }
         } else {
             // При отключении очищаем список
             Timber.d("Отключение кошельков")
@@ -353,8 +373,18 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 copyState(state, showWalletSelector = false)
             }
 
-            is BaseTransactionEvent.ToggleAddToWallet -> _state.update { state ->
-                copyState(state, addToWallet = !state.addToWallet)
+            is BaseTransactionEvent.ToggleAddToWallet -> {
+                val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
+                    _state.value.addToWallet,
+                    _state.value.isExpense,
+                )
+                _state.update { state ->
+                    copyState(
+                        state,
+                        addToWallet = newAddToWallet,
+                        selectedWallets = newSelectedWallets,
+                    )
+                }
             }
 
             is BaseTransactionEvent.SelectWallet -> {

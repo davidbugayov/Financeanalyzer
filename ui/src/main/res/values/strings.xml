@@ -1062,4 +1062,57 @@
     <string name="source">Источник: %1$s</string>
     <string name="note">Примечание: %1$s</string>
     <string name="delete_transaction_confirm">Вы уверены, что хотите удалить эту транзакцию?</string>
+    
+    <!-- Wallet Setup strings -->
+    <string name="wallet_setup_title">Новый кошелёк</string>
+    <string name="wallet_setup_description">Кошельки помогают отслеживать баланс и расходы по разным источникам денег</string>
+    <string name="wallet_name_label">Название кошелька</string>
+    <string name="wallet_name_hint">Например: Основная карта, Наличные</string>
+    <string name="wallet_name_description">Дайте понятное название, чтобы легко различать кошельки</string>
+    <string name="wallet_type_label">Тип кошелька</string>
+    <string name="wallet_type_hint">Выберите тип</string>
+    <string name="wallet_goal_checkbox">🎯 Накопительная цель</string>
+    <string name="wallet_goal_description">Установите целевую сумму для отслеживания прогресса</string>
+    <string name="wallet_goal_amount_label">Целевая сумма</string>
+    <string name="wallet_goal_amount_hint">Введите сумму цели</string>
+    <string name="wallet_goal_amount_example">Пример: 100000 для покупки машины или 50000 для отпуска</string>
+    <string name="wallet_create_button">Создать кошелёк</string>
+    <string name="wallet_creating">Создаю кошелёк…</string>
+    <string name="wallet_created_success">✅ Кошелёк успешно создан!</string>
+    <string name="wallet_setup_tip">Совет: Создайте отдельные кошельки для разных целей — это поможет лучше контролировать финансы</string>
+    
+    <!-- Wallet Type Names -->
+    <string name="wallet_type_cash">Наличные</string>
+    <string name="wallet_type_card">Банковская карта</string>
+    <string name="wallet_type_savings">Сбережения</string>
+    <string name="wallet_type_investment">Инвестиции</string>
+    <string name="wallet_type_goal">Накопительная цель</string>
+    <string name="wallet_type_other">Другое</string>
+    
+    <!-- Wallet Type Descriptions -->
+    <string name="wallet_type_cash_desc">Наличные деньги в кошельке или дома</string>
+    <string name="wallet_type_card_desc">Дебетовые карты, расчётные счета в банке</string>
+    <string name="wallet_type_savings_desc">Сберегательные счета, депозиты, накопления</string>
+    <string name="wallet_type_investment_desc">Брокерские счета, ИИС, инвестиционные портфели</string>
+    <string name="wallet_type_goal_desc">Специальные счета для достижения целей</string>
+    <string name="wallet_type_other_desc">Кредиты, долги, займы и другие финансовые инструменты</string>
+    
+    <!-- Wallet Validation Messages -->
+    <string name="wallet_error_name_empty">Введите название кошелька</string>
+    <string name="wallet_error_goal_amount_empty">Введите целевую сумму для накопительной цели</string>
+    <string name="wallet_error_goal_amount_zero">Целевая сумма должна быть больше нуля</string>
+    <string name="wallet_error_goal_amount_invalid">Введите корректную сумму</string>
+    <string name="wallet_error_creation_failed">Ошибка при создании кошелька: %1$s</string>
+    
+    <!-- Wallet Selection in Transactions -->
+    <string name="deduct_from_wallets">Списать с кошелька</string>
+    <string name="wallet_selected_for_expense">Выбран кошелёк для списания</string>
+    <string name="wallets_selected_for_expense">Выбрано %d кошельков для списания</string>
+    <string name="wallet_selected_for_income">Выбран кошелёк для пополнения</string>
+    <string name="wallets_selected_for_income">Выбрано %d кошельков для пополнения</string>
+    <string name="wallet_expense_explanation">Сумма будет списана с выбранного кошелька</string>
+    <string name="wallet_income_explanation">Сумма будет добавлена в выбранные кошельки</string>
+    <string name="select_wallet_for_expense">Выберите кошелёк для списания</string>
+    <string name="select_wallets_for_income">Выберите кошельки для пополнения</string>
+    <string name="selected_wallet_count">Выбран 1 кошелёк</string>
 </resources>

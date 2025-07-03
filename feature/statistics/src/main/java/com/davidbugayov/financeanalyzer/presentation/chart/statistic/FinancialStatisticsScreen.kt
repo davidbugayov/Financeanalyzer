@@ -69,7 +69,6 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.viewmodel.E
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
@@ -460,7 +459,7 @@ fun FinancialStatisticsScreen(
                                         ),
                                         border = BorderStroke(
                                             width = 2.dp,
-                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f)
+                                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
                                         ),
                                     ) {
                                         Row(
@@ -489,7 +488,9 @@ fun FinancialStatisticsScreen(
                                                         R.string.explore_your_financial_metrics,
                                                     ),
                                                     style = MaterialTheme.typography.bodyMedium,
-                                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
+                                                    color = MaterialTheme.colorScheme.onPrimaryContainer.copy(
+                                                        alpha = 0.8f,
+                                                    ),
                                                 )
                                             }
 

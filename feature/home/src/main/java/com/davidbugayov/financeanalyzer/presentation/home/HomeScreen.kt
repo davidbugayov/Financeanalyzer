@@ -55,7 +55,6 @@ import timber.log.Timber
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
 import android.os.SystemClock
 import androidx.paging.compose.collectAsLazyPagingItems
-import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 
 /**
@@ -72,9 +71,12 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
                 IconButton(
                     onClick = {
                         // Отслеживаем действие пользователя
-                        UserEventTracker.trackUserAction("generate_test_data", mapOf(
-                            "source" to "home_screen"
-                        ))
+                        UserEventTracker.trackUserAction(
+                            "generate_test_data",
+                            mapOf(
+                                "source" to "home_screen",
+                            ),
+                        )
                         onGenerateTestData()
                     },
                 ) {
@@ -87,11 +89,14 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
             IconButton(
                 onClick = {
                     // Отслеживаем действие пользователя
-                    UserEventTracker.trackUserAction("navigate_to_profile", mapOf(
-                        "source" to "home_screen"
-                    ))
+                    UserEventTracker.trackUserAction(
+                        "navigate_to_profile",
+                        mapOf(
+                            "source" to "home_screen",
+                        ),
+                    )
                     onNavigateToProfile()
-                }
+                },
             ) {
                 Icon(
                     imageVector = Icons.Default.Person,
@@ -108,23 +113,32 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
         visible = true,
         onChartClick = {
             // Отслеживаем действие пользователя
-            UserEventTracker.trackUserAction("navigate_to_chart", mapOf(
-                "source" to "home_screen"
-            ))
+            UserEventTracker.trackUserAction(
+                "navigate_to_chart",
+                mapOf(
+                    "source" to "home_screen",
+                ),
+            )
             onNavigateToChart()
         },
         onHistoryClick = {
             // Отслеживаем действие пользователя
-            UserEventTracker.trackUserAction("navigate_to_history", mapOf(
-                "source" to "home_screen"
-            ))
+            UserEventTracker.trackUserAction(
+                "navigate_to_history",
+                mapOf(
+                    "source" to "home_screen",
+                ),
+            )
             onNavigateToHistory()
         },
         onAddClick = {
             // Отслеживаем действие пользователя
-            UserEventTracker.trackUserAction("navigate_to_add", mapOf(
-                "source" to "home_screen"
-            ))
+            UserEventTracker.trackUserAction(
+                "navigate_to_add",
+                mapOf(
+                    "source" to "home_screen",
+                ),
+            )
             // Отслеживаем использование функции
             UserEventTracker.trackFeatureUsage("add_transaction")
             onNavigateToAdd()
@@ -241,7 +255,7 @@ fun HomeScreen(
     var selectedTransactionForActions by remember { mutableStateOf<Transaction?>(null) }
     var showActionsDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
-    
+
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
@@ -253,43 +267,50 @@ fun HomeScreen(
     LaunchedEffect(Unit) {
         // Отмечаем начало загрузки экрана
         PerformanceMetrics.startScreenLoadTiming(PerformanceMetrics.Screens.HOME)
-        
+
         // Логируем просмотр экрана
         AnalyticsUtils.logScreenView(
             screenName = "home",
             screenClass = "HomeScreen",
         )
-        
+
         // Отслеживаем открытие экрана для аналитики пользовательских событий
         userEventTracker.trackScreenOpen(PerformanceMetrics.Screens.HOME)
-        
+
         // Логируем использование функции
         userEventTracker.trackFeatureUsage("home_view")
-        
+
         try {
             // Загружаем данные для экрана
             viewModel.onEvent(HomeEvent.LoadTransactions)
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при загрузке данных для главного экрана")
-            
+
             // Отслеживаем ошибку
-            errorTracker.trackException(e, isFatal = false, mapOf(
-                "location" to "home_screen",
-                "action" to "load_data"
-            ))
+            errorTracker.trackException(
+                e,
+                isFatal = false,
+                mapOf(
+                    "location" to "home_screen",
+                    "action" to "load_data",
+                ),
+            )
         }
-        
+
         // Завершаем отслеживание загрузки экрана
         PerformanceMetrics.endScreenLoadTiming(PerformanceMetrics.Screens.HOME)
-        
+
         // Дополнительно отслеживаем время загрузки экрана
         val loadTime = SystemClock.elapsedRealtime() - screenLoadStartTime
-        AnalyticsUtils.logEvent(AnalyticsConstants.Events.SCREEN_LOAD, android.os.Bundle().apply {
-            putString(AnalyticsConstants.Params.SCREEN_NAME, "home")
-            putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
-        })
+        AnalyticsUtils.logEvent(
+            AnalyticsConstants.Events.SCREEN_LOAD,
+            android.os.Bundle().apply {
+                putString(AnalyticsConstants.Params.SCREEN_NAME, "home")
+                putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
+            },
+        )
     }
-    
+
     // Отслеживаем закрытие экрана
     DisposableEffect(Unit) {
         onDispose {
@@ -332,16 +353,22 @@ fun HomeScreen(
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
     val onTransactionClick = { transaction: Transaction ->
-        userEventTracker.trackUserAction("transaction_click", mapOf(
-            "transaction_id" to transaction.id,
-            "transaction_amount" to transaction.amount.amount.toString()
-        ))
+        userEventTracker.trackUserAction(
+            "transaction_click",
+            mapOf(
+                "transaction_id" to transaction.id,
+                "transaction_amount" to transaction.amount.amount.toString(),
+            ),
+        )
         viewModel.onEvent(HomeEvent.EditTransaction(transaction))
     }
     val onTransactionLongClick = { transaction: Transaction ->
-        userEventTracker.trackUserAction("transaction_long_click", mapOf(
-            "transaction_id" to transaction.id
-        ))
+        userEventTracker.trackUserAction(
+            "transaction_long_click",
+            mapOf(
+                "transaction_id" to transaction.id,
+            ),
+        )
         selectedTransactionForActions = transaction
         showActionsDialog = true
     }
@@ -352,9 +379,12 @@ fun HomeScreen(
         }
     }
     val onFilterSelected = { filter: TransactionFilter ->
-        userEventTracker.trackUserAction("filter_selected", mapOf(
-            "filter" to filter.toString(),
-        ))
+        userEventTracker.trackUserAction(
+            "filter_selected",
+            mapOf(
+                "filter" to filter.toString(),
+            ),
+        )
         userEventTracker.trackFeatureUsage("transaction_filter")
         // Persist selected filter so it can be restored later
         sharedPreferences.edit { putString("current_filter", filter.name) }
@@ -425,19 +455,25 @@ fun HomeScreen(
             selectedTransactionForActions = null
         },
         onDeleteTransaction = { transaction ->
-            userEventTracker.trackUserAction("delete_transaction", mapOf(
-                "transaction_id" to transaction.id,
-                "transaction_amount" to transaction.amount.amount.toString()
-            ))
+            userEventTracker.trackUserAction(
+                "delete_transaction",
+                mapOf(
+                    "transaction_id" to transaction.id,
+                    "transaction_amount" to transaction.amount.amount.toString(),
+                ),
+            )
             // Показываем диалог подтверждения вместо прямого удаления
             viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
             showActionsDialog = false
             selectedTransactionForActions = null
         },
         onEditTransaction = { transaction ->
-            userEventTracker.trackUserAction("edit_transaction", mapOf(
-                "transaction_id" to transaction.id
-            ))
+            userEventTracker.trackUserAction(
+                "edit_transaction",
+                mapOf(
+                    "transaction_id" to transaction.id,
+                ),
+            )
             userEventTracker.trackFeatureUsage("edit_transaction")
             viewModel.onEvent(HomeEvent.EditTransaction(transaction))
             showActionsDialog = false
@@ -446,10 +482,13 @@ fun HomeScreen(
         transactionToDelete = state.transactionToDelete,
         onConfirmDelete = {
             state.transactionToDelete?.let { transactionToDelete ->
-                userEventTracker.trackUserAction("delete_transaction", mapOf(
-                    "transaction_id" to transactionToDelete.id,
-                    "transaction_amount" to transactionToDelete.amount.amount.toString()
-                ))
+                userEventTracker.trackUserAction(
+                    "delete_transaction",
+                    mapOf(
+                        "transaction_id" to transactionToDelete.id,
+                        "transaction_amount" to transactionToDelete.amount.amount.toString(),
+                    ),
+                )
                 viewModel.onEvent(HomeEvent.DeleteTransaction(transactionToDelete))
                 feedbackMessage = transactionDeletedMsg
                 feedbackType = FeedbackType.SUCCESS

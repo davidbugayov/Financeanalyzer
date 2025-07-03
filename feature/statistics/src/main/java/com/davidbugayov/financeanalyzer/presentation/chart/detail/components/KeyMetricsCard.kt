@@ -28,7 +28,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
 fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: Modifier = Modifier) {
@@ -45,7 +44,7 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: 
         ),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
         ),
     ) {
         Column(

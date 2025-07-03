@@ -105,7 +105,9 @@ class HomeViewModel(
         }
         .cachedIn(viewModelScope)
 
-    private fun reloadPaged() { pagerTrigger.tryEmit(Unit) }
+    private fun reloadPaged() {
+        pagerTrigger.tryEmit(Unit)
+    }
 
     private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
     private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)
@@ -197,7 +199,9 @@ class HomeViewModel(
                 navigationManager.navigate(NavigationManager.Command.Navigate(Screen.History.route))
             }
             is HomeEvent.NavigateToAddTransaction -> {
-                navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)))
+                navigationManager.navigate(
+                    NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)),
+                )
             }
             is HomeEvent.EditTransaction -> {
                 navigationManager.navigate(
@@ -216,7 +220,9 @@ class HomeViewModel(
     private fun deleteTransaction(transaction: Transaction, context: Context? = null) {
         viewModelScope.launch {
             try {
-                Timber.d("HOME: Начинаем удаление транзакции: id=${transaction.id}, сумма=${transaction.amount}, категория=${transaction.category}")
+                Timber.d(
+                    "HOME: Начинаем удаление транзакции: id=${transaction.id}, сумма=${transaction.amount}, категория=${transaction.category}",
+                )
 
                 deleteTransactionUseCase(transaction).fold(
                     onSuccess = {
@@ -361,7 +367,9 @@ class HomeViewModel(
     private fun loadTransactions(showLoading: Boolean = true) {
         viewModelScope.launch {
             Timber.d("HOME: Начало загрузки транзакций, showLoading=$showLoading")
-            Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
+            Timber.d(
+                "HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}",
+            )
 
             if (showLoading) {
                 Timber.d("HOME: Устанавливаем isLoading = true")
@@ -465,7 +473,9 @@ class HomeViewModel(
     private fun updateFilteredTransactions(filter: TransactionFilter) {
         viewModelScope.launch {
             Timber.d("HOME: updateFilteredTransactions - начинаем обновление с фильтром: $filter")
-            Timber.d("HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}")
+            Timber.d(
+                "HOME: Текущее состояние - isLoading: ${_state.value.isLoading}, транзакций: ${_state.value.filteredTransactions.size}",
+            )
 
             val (startDate, endDate) = getPeriodDates(filter)
             val filteredTransactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()

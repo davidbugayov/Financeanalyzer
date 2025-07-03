@@ -34,7 +34,7 @@ fun AddTransactionScreen(
     forceExpense: Boolean? = null,
     viewModel: AddTransactionViewModel = koinViewModel(),
     userEventTracker: UserEventTracker = koinInject(),
-    errorTracker: ErrorTracker = koinInject()
+    errorTracker: ErrorTracker = koinInject(),
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -42,17 +42,11 @@ fun AddTransactionScreen(
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
-    LaunchedEffect(key1 = category) {
-        category?.let {
-            viewModel.setCategory(it)
-        }
-    }
-
     LaunchedEffect(key1 = forceExpense) {
         forceExpense?.let { shouldForceExpense ->
             Timber.d("AddTransactionScreen: Setting forceExpense to $shouldForceExpense")
             viewModel.setForceExpense(shouldForceExpense)
-            
+
             // Сразу отправляем событие для принудительной установки типа
             if (shouldForceExpense) {
                 viewModel.onEvent(BaseTransactionEvent.ForceSetExpenseType, context)
@@ -81,14 +75,20 @@ fun AddTransactionScreen(
         try {
             // Инициализация экрана
             viewModel.initializeScreen()
+            // После сброса полей применяем category, если он был передан
+            category?.let { viewModel.setCategory(it) }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при инициализации экрана добавления транзакции")
 
             // Отслеживаем ошибку
-            errorTracker.trackException(e, isFatal = false, mapOf(
-                "location" to "add_transaction_screen",
-                "action" to "initialize_screen"
-            ))
+            errorTracker.trackException(
+                e,
+                isFatal = false,
+                mapOf(
+                    "location" to "add_transaction_screen",
+                    "action" to "initialize_screen",
+                ),
+            )
         }
 
         // Завершаем отслеживание загрузки экрана
@@ -96,10 +96,13 @@ fun AddTransactionScreen(
 
         // Дополнительно отслеживаем время загрузки экрана
         val loadTime = SystemClock.elapsedRealtime() - screenLoadStartTime
-        AnalyticsUtils.logEvent(AnalyticsConstants.Events.SCREEN_LOAD, Bundle().apply {
-            putString(AnalyticsConstants.Params.SCREEN_NAME, "add_transaction")
-            putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
-        })
+        AnalyticsUtils.logEvent(
+            AnalyticsConstants.Events.SCREEN_LOAD,
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.SCREEN_NAME, "add_transaction")
+                putLong(AnalyticsConstants.Params.DURATION_MS, loadTime)
+            },
+        )
     }
 
     /*
@@ -125,26 +128,32 @@ fun AddTransactionScreen(
         if (state.isSuccess) {
             userEventTracker.trackFeatureUsage("transaction_added", AnalyticsConstants.Values.RESULT_SUCCESS)
 
-            AnalyticsUtils.logEvent(AnalyticsConstants.Events.TRANSACTION_ADDED, Bundle().apply {
-                putString(AnalyticsConstants.Params.TRANSACTION_TYPE, if (state.isExpense) "EXPENSE" else "INCOME")
-                putString(AnalyticsConstants.Params.TRANSACTION_AMOUNT, state.amount)
-                putString(AnalyticsConstants.Params.TRANSACTION_CATEGORY, state.category)
-            })
+            AnalyticsUtils.logEvent(
+                AnalyticsConstants.Events.TRANSACTION_ADDED,
+                Bundle().apply {
+                    putString(AnalyticsConstants.Params.TRANSACTION_TYPE, if (state.isExpense) "EXPENSE" else "INCOME")
+                    putString(AnalyticsConstants.Params.TRANSACTION_AMOUNT, state.amount)
+                    putString(AnalyticsConstants.Params.TRANSACTION_CATEGORY, state.category)
+                },
+            )
         }
     }
 
     BaseTransactionScreen(
         viewModel = viewModel,
         onNavigateBack = {
-            userEventTracker.trackUserAction("navigate_back", mapOf(
-                "screen" to "add_transaction",
-                "has_unsaved_changes" to (
-                    state.amount.isNotBlank() ||
-                    state.title.isNotBlank() ||
-                    state.category.isNotBlank() ||
-                    state.note.isNotBlank()
-                ).toString()
-            ))
+            userEventTracker.trackUserAction(
+                "navigate_back",
+                mapOf(
+                    "screen" to "add_transaction",
+                    "has_unsaved_changes" to (
+                        state.amount.isNotBlank() ||
+                            state.title.isNotBlank() ||
+                            state.category.isNotBlank() ||
+                            state.note.isNotBlank()
+                        ).toString(),
+                ),
+            )
             viewModel.onNavigateBack()
         },
         screenTitle = stringResource(R.string.new_transaction_title),

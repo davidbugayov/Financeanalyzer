@@ -23,21 +23,9 @@ sealed class Screen(val route: String) {
         const val routeWithArgs: String = "add?$CATEGORY_ARG={$CATEGORY_ARG}&$FORCE_EXPENSE_ARG={$FORCE_EXPENSE_ARG}"
 
         fun createRoute(category: String? = null, forceExpense: Boolean? = null): String {
-            val baseRoute = if (category != null) {
-                "add?$CATEGORY_ARG=$category"
-            } else {
-                "add"
-            }
-            
-            return if (forceExpense != null) {
-                if (category != null) {
-                    "$baseRoute&$FORCE_EXPENSE_ARG=$forceExpense"
-                } else {
-                    "add?$FORCE_EXPENSE_ARG=$forceExpense"
-                }
-            } else {
-                baseRoute
-            }
+            val cat = category ?: ""
+            val force = forceExpense?.toString() ?: ""
+            return "add?category=$cat&forceExpense=$force"
         }
     }
 
@@ -107,4 +95,13 @@ sealed class Screen(val route: String) {
 
     /** Экран достижений */
     data object Achievements : Screen("achievements")
+
+    /** Экран мастера создания кошелька */
+    data object WalletSetup : Screen("wallet_setup")
+
+    data class SubWallets(val parentWalletId: String) : Screen("sub_wallets/{parentWalletId}") {
+        companion object {
+            const val route = "sub_wallets/{parentWalletId}"
+        }
+    }
 }

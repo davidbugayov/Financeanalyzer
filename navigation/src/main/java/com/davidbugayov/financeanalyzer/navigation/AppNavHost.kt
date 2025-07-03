@@ -81,6 +81,8 @@ fun AppNavHost(
     onBudgetScreen: @Composable () -> Unit,
     onFinancialStatisticsScreen: @Composable (startDate: Long, endDate: Long, periodType: String?) -> Unit,
     onWalletTransactionsScreen: @Composable (walletId: String) -> Unit,
+    onWalletSetupScreen: @Composable () -> Unit = {},
+    onSubWalletsScreen: @Composable (parentWalletId: String) -> Unit = { _ -> },
     onAddTransactionScreen: @Composable (category: String?, forceExpense: Boolean?) -> Unit,
     onEditTransactionScreen: @Composable (transactionId: String) -> Unit,
     onImportTransactionsScreen: @Composable () -> Unit,
@@ -97,6 +99,8 @@ fun AppNavHost(
                 onBudgetScreen,
                 onFinancialStatisticsScreen,
                 onWalletTransactionsScreen,
+                onWalletSetupScreen,
+                onSubWalletsScreen,
             )
 
             transactionGraph(

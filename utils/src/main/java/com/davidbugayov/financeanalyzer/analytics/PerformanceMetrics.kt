@@ -15,7 +15,7 @@ object PerformanceMetrics {
     private val screenLoadTimers = ConcurrentHashMap<String, Long>()
     private val dbOperationTimers = ConcurrentHashMap<String, Long>()
     private val networkCallTimers = ConcurrentHashMap<String, Long>()
-    
+
     private const val SCREEN_LOAD_WARNING_THRESHOLD = 500L // миллисекунды
     private const val DB_OPERATION_WARNING_THRESHOLD = 100L // миллисекунды
     private const val NETWORK_CALL_WARNING_THRESHOLD = 1000L // миллисекунды
@@ -35,7 +35,7 @@ object PerformanceMetrics {
         const val EXPORT_IMPORT = "export_import_screen"
         const val ACHIEVEMENTS = "achievements_screen"
     }
-    
+
     /**
      * Начать отслеживание времени выполнения операции
      * @param operationName Название операции
@@ -44,7 +44,7 @@ object PerformanceMetrics {
         operationTimers[operationName] = SystemClock.elapsedRealtime()
         Timber.d("Started timing operation: $operationName")
     }
-    
+
     /**
      * Завершить отслеживание времени выполнения операции
      * @param operationName Название операции
@@ -56,20 +56,20 @@ object PerformanceMetrics {
             Timber.w("Attempted to end timing for operation that wasn't started: $operationName")
             return -1
         }
-        
+
         val duration = SystemClock.elapsedRealtime() - startTime
         Timber.d("Operation $operationName took $duration ms")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, duration)
             putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.OPERATION_COMPLETED, params)
-        
+
         return duration
     }
-    
+
     /**
      * Отслеживать время выполнения блока кода
      * @param operationName Название операции
@@ -84,7 +84,7 @@ object PerformanceMetrics {
             endOperation(operationName)
         }
     }
-    
+
     /**
      * Отслеживать действие пользователя с его длительностью
      * @param actionName Название действия пользователя
@@ -93,11 +93,11 @@ object PerformanceMetrics {
      */
     fun trackAction(actionName: String, durationMs: Long, additionalParams: Map<String, Any> = emptyMap()) {
         Timber.d("Action $actionName took $durationMs ms")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
             putString(AnalyticsConstants.Params.ACTION_NAME, actionName)
-            
+
             // Add any additional parameters
             additionalParams.forEach { (key, value) ->
                 when (value) {
@@ -111,7 +111,7 @@ object PerformanceMetrics {
                 }
             }
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ACTION, params)
     }
 
@@ -123,19 +123,21 @@ object PerformanceMetrics {
     fun trackScreenLoad(screenName: String, durationMs: Long) {
         // Логируем предупреждение, если загрузка экрана заняла слишком много времени
         if (durationMs > SCREEN_LOAD_WARNING_THRESHOLD) {
-            Timber.w("Screen $screenName loaded in $durationMs ms, which exceeds the warning threshold of $SCREEN_LOAD_WARNING_THRESHOLD ms")
+            Timber.w(
+                "Screen $screenName loaded in $durationMs ms, which exceeds the warning threshold of $SCREEN_LOAD_WARNING_THRESHOLD ms",
+            )
         }
-        
+
         Timber.d("Screen $screenName loaded in $durationMs ms")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
             putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.SCREEN_LOAD, params)
     }
-    
+
     /**
      * Start timing a screen load
      * @param screenName Name of the screen to time
@@ -144,7 +146,7 @@ object PerformanceMetrics {
         screenLoadTimers[screenName] = SystemClock.elapsedRealtime()
         Timber.d("Started timing screen load: $screenName")
     }
-    
+
     /**
      * End timing a screen load and report the duration
      * @param screenName Name of the screen that was timed
@@ -155,11 +157,11 @@ object PerformanceMetrics {
             Timber.w("Attempted to end timing for screen that wasn't started: $screenName")
             return
         }
-        
+
         val duration = SystemClock.elapsedRealtime() - startTime
         trackScreenLoad(screenName, duration)
     }
-    
+
     /**
      * Start timing a database operation
      * @param operationName Name of the database operation to time
@@ -168,7 +170,7 @@ object PerformanceMetrics {
         dbOperationTimers[operationName] = SystemClock.elapsedRealtime()
         Timber.d("Started timing DB operation: $operationName")
     }
-    
+
     /**
      * End timing a database operation and report the duration
      * @param operationName Name of the database operation that was timed
@@ -179,24 +181,26 @@ object PerformanceMetrics {
             Timber.w("Attempted to end timing for DB operation that wasn't started: $operationName")
             return
         }
-        
+
         val duration = SystemClock.elapsedRealtime() - startTime
-        
+
         // Логируем предупреждение, если операция с БД заняла слишком много времени
         if (duration > DB_OPERATION_WARNING_THRESHOLD) {
-            Timber.w("DB operation $operationName took $duration ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms")
+            Timber.w(
+                "DB operation $operationName took $duration ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms",
+            )
         }
-        
+
         Timber.d("DB operation $operationName took $duration ms")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, duration)
             putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_OPERATION, params)
     }
-    
+
     /**
      * Track a database operation with its duration
      * @param operationName Name of the database operation
@@ -205,19 +209,21 @@ object PerformanceMetrics {
     fun trackDbOperation(operationName: String, durationMs: Long) {
         // Логируем предупреждение, если операция с БД заняла слишком много времени
         if (durationMs > DB_OPERATION_WARNING_THRESHOLD) {
-            Timber.w("DB operation $operationName took $durationMs ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms")
+            Timber.w(
+                "DB operation $operationName took $durationMs ms, which exceeds the warning threshold of $DB_OPERATION_WARNING_THRESHOLD ms",
+            )
         }
-        
+
         Timber.d("DB operation $operationName took $durationMs ms")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
             putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_OPERATION, params)
     }
-    
+
     /**
      * Time a database operation block
      * @param operationName Name of the database operation
@@ -232,7 +238,7 @@ object PerformanceMetrics {
             endDbOperation(operationName)
         }
     }
-    
+
     /**
      * Start timing a network call
      * @param url URL of the network call to time
@@ -241,7 +247,7 @@ object PerformanceMetrics {
         networkCallTimers[url] = SystemClock.elapsedRealtime()
         Timber.d("Started timing network call to: $url")
     }
-    
+
     /**
      * End timing a network call and report the duration
      * @param url URL of the network call that was timed
@@ -253,25 +259,27 @@ object PerformanceMetrics {
             Timber.w("Attempted to end timing for network call that wasn't started: $url")
             return
         }
-        
+
         val duration = SystemClock.elapsedRealtime() - startTime
-        
+
         // Логируем предупреждение, если сетевой запрос занял слишком много времени
         if (duration > NETWORK_CALL_WARNING_THRESHOLD) {
-            Timber.w("Network call to $url took $duration ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms")
+            Timber.w(
+                "Network call to $url took $duration ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms",
+            )
         }
-        
+
         Timber.d("Network call to $url took $duration ms with status code $statusCode")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, duration)
             putString("url", url)
             putInt("status_code", statusCode)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_CALL, params)
     }
-    
+
     /**
      * Track a network call with its duration
      * @param url URL of the network call
@@ -281,20 +289,22 @@ object PerformanceMetrics {
     fun trackNetworkCall(url: String, durationMs: Long, statusCode: Int) {
         // Логируем предупреждение, если сетевой запрос занял слишком много времени
         if (durationMs > NETWORK_CALL_WARNING_THRESHOLD) {
-            Timber.w("Network call to $url took $durationMs ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms")
+            Timber.w(
+                "Network call to $url took $durationMs ms, which exceeds the warning threshold of $NETWORK_CALL_WARNING_THRESHOLD ms",
+            )
         }
-        
+
         Timber.d("Network call to $url took $durationMs ms with status code $statusCode")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
             putString("url", url)
             putInt("status_code", statusCode)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_CALL, params)
     }
-    
+
     /**
      * Track memory usage
      * @param usedMemoryMB Used memory in MB
@@ -303,19 +313,19 @@ object PerformanceMetrics {
      */
     fun trackMemoryUsage(usedMemoryMB: Long, totalMemoryMB: Long, availableMemoryMB: Long) {
         val percentUsed = (usedMemoryMB.toFloat() / totalMemoryMB.toFloat()) * 100
-        
+
         Timber.d("Memory usage: $usedMemoryMB MB / $totalMemoryMB MB ($percentUsed%)")
-        
+
         val params = Bundle().apply {
             putLong(AnalyticsConstants.Params.MEMORY_USAGE_MB, usedMemoryMB)
             putLong(AnalyticsConstants.Params.MEMORY_TOTAL, totalMemoryMB)
             putLong(AnalyticsConstants.Params.MEMORY_AVAILABLE, availableMemoryMB)
             putFloat("memory_percent_used", percentUsed)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.MEMORY_USAGE, params)
     }
-    
+
     /**
      * Track a background task
      * @param taskName Name of the background task
@@ -324,16 +334,16 @@ object PerformanceMetrics {
      */
     fun trackBackgroundTask(taskName: String, durationMs: Long, result: String) {
         Timber.d("Background task $taskName completed in $durationMs ms with result: $result")
-        
+
         val params = Bundle().apply {
             putString("task_name", taskName)
             putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
             putString(AnalyticsConstants.Params.FEATURE_RESULT, result)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.BACKGROUND_TASK, params)
     }
-    
+
     /**
      * Track frame rate metrics
      * @param fps Frames per second
@@ -342,13 +352,13 @@ object PerformanceMetrics {
      */
     fun trackFrameMetrics(fps: Float, droppedFrames: Int, screenName: String) {
         Timber.d("Frame metrics: $fps FPS, $droppedFrames dropped frames on screen $screenName")
-        
+
         val params = Bundle().apply {
             putFloat(AnalyticsConstants.Params.FRAME_RATE, fps)
             putInt(AnalyticsConstants.Params.FRAME_DROP_COUNT, droppedFrames)
             putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
         }
-        
+
         AnalyticsUtils.logEvent("frame_metrics", params)
     }
 

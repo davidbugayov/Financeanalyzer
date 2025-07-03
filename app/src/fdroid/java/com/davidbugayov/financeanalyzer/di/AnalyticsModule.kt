@@ -19,8 +19,8 @@ val analyticsModule = module {
         AnalyticsUtils.init(composite)
         composite
     }
-    
+
     // Добавляем трекеры для аналитики
     single { UserEventTracker }
     single { ErrorTracker }
-} 
+}

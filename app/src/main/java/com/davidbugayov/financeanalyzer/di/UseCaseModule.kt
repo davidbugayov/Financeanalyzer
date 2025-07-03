@@ -8,7 +8,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactions
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCaseImpl
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.manager.ImportTransactionsManager
-import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.factory.ImportFactory
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.*
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
@@ -35,8 +34,13 @@ val useCaseModule = module {
     // Wallet / balance
     factory { UpdateWalletBalancesUseCase(get()) }
 
+    // Распределение дохода
+    factory { com.davidbugayov.financeanalyzer.domain.usecase.wallet.AllocateIncomeUseCase(get()) }
+
     // Widgets
-    single<com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher> { AndroidWidgetRefresher(androidContext()) }
+    single<com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher> {
+        AndroidWidgetRefresher(androidContext())
+    }
     single { UpdateWidgetsUseCase(get()) }
 
     // Analytics
@@ -55,4 +59,6 @@ val useCaseModule = module {
     single<ImportTransactionsUseCase> {
         ImportTransactionsUseCaseImpl(get<ImportTransactionsManager>())
     }
+
+    factory { com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase() }
 }

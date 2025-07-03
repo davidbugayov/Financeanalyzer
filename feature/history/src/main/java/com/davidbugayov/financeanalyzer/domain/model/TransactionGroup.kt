@@ -5,5 +5,5 @@ data class TransactionGroup(
     val date: Date,
     val transactions: List<Transaction>,
     val balance: Double,
-    val displayPeriod: String
-) 
+    val displayPeriod: String,
+)

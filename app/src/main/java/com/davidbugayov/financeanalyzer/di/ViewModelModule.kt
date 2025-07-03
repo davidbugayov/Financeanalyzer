@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.di
 
-import android.app.Application
 import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsUiViewModel
@@ -15,7 +14,8 @@ import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import org.koin.android.ext.koin.androidApplication
+import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.SubWalletsViewModel
+import com.davidbugayov.financeanalyzer.presentation.budget.setup.WalletSetupViewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -39,9 +39,26 @@ val viewModelModule = module {
 
     viewModelOf(::TransactionHistoryViewModel)
 
-    viewModelOf(::BudgetViewModel)
+    viewModel {
+        BudgetViewModel(
+            walletRepository = get(),
+            transactionRepository = get(),
+            navigationManager = get(),
+            allocateIncomeUseCase = get(),
+            goalProgressUseCase = get(),
+        )
+    }
 
     viewModelOf(::WalletTransactionsViewModel)
+
+    viewModelOf(::WalletSetupViewModel)
+
+    viewModel { parameters ->
+        SubWalletsViewModel(
+            parentWalletId = parameters.get(),
+            walletRepository = get(),
+        )
+    }
 
     viewModelOf(::ImportTransactionsViewModel)
 
@@ -57,4 +74,4 @@ val viewModelModule = module {
             calculateCategoryStatsUseCase = get(),
         )
     }
-} 
+}

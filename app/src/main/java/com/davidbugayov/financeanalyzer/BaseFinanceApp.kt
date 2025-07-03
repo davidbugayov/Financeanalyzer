@@ -2,11 +2,9 @@ package com.davidbugayov.financeanalyzer
 
 import android.app.Application
 import android.os.Build
-import android.os.SystemClock
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
@@ -37,14 +35,14 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
     override fun onCreate() {
         // Start tracking app startup time
         PerformanceMetrics.startOperation(PerformanceMetrics.Operations.APP_STARTUP)
-        
+
         super<Application>.onCreate()
 
         // Настройка Timber для логирования
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
         }
-        
+
         // Инициализация системы отчетов об ошибках
         CrashReporter.init(this)
 
@@ -59,16 +57,16 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
 
         // Инициализируем специфичные для флейвора компоненты
         initFlavor()
-        
+
         // Регистрируем наблюдатель за жизненным циклом приложения
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
-        
+
         // Отправляем событие открытия приложения
         AnalyticsUtils.logAppOpen()
-        
+
         // Отслеживаем использование памяти
         MemoryUtils.trackMemoryUsage(this)
-        
+
         // End tracking app startup time
         PerformanceMetrics.endOperation(PerformanceMetrics.Operations.APP_STARTUP)
     }
@@ -104,11 +102,11 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         val deviceInfo = "${Build.MANUFACTURER} ${Build.MODEL}"
         val androidVersion = "${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})"
         val appVersion = "${BuildConfig.VERSION_NAME} (${BuildConfig.VERSION_CODE})"
-        
+
         Timber.d("Device: $deviceInfo")
         Timber.d("Android version: $androidVersion")
         Timber.d("App version: $appVersion")
-        
+
         // Отправляем данные устройства в аналитику
         AnalyticsUtils.setUserProperty("device_model", deviceInfo)
         AnalyticsUtils.setUserProperty("android_version", androidVersion)
@@ -116,7 +114,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         AnalyticsUtils.setUserProperty("app_flavor", BuildConfig.FLAVOR)
         AnalyticsUtils.setUserProperty("app_build_type", BuildConfig.BUILD_TYPE)
     }
-    
+
     /**
      * Вызывается, когда приложение переходит на передний план
      */
@@ -124,17 +122,17 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         super<DefaultLifecycleObserver>.onStart(owner)
         AnalyticsUtils.logAppForeground()
     }
-    
+
     /**
      * Вызывается, когда приложение уходит на задний план
      */
     override fun onStop(owner: LifecycleOwner) {
         super<DefaultLifecycleObserver>.onStop(owner)
         AnalyticsUtils.logAppBackground()
-        
+
         // Отправляем статистику сессии
         userEventTracker.sendSessionStats()
-        
+
         // Отслеживаем использование памяти
         MemoryUtils.trackMemoryUsage(this)
     }

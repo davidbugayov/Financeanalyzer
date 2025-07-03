@@ -201,4 +201,16 @@
   <string name="select_icon">Выбрать иконку</string>
   <string name="category_other">Другое</string>
   <string name="category_transfer">Переводы</string>
+  
+  <!-- Wallet Selection in Transactions -->
+  <string name="deduct_from_wallets">Списать с кошелька</string>
+  <string name="wallet_selected_for_expense">Выбран кошелёк для списания</string>
+  <string name="wallets_selected_for_expense">Выбрано %d кошельков для списания</string>
+  <string name="wallet_selected_for_income">Выбран кошелёк для пополнения</string>
+  <string name="wallets_selected_for_income">Выбрано %d кошельков для пополнения</string>
+  <string name="wallet_expense_explanation">Сумма будет списана с выбранного кошелька</string>
+  <string name="wallet_income_explanation">Сумма будет добавлена в выбранные кошельки</string>
+  <string name="select_wallet_for_expense">Выберите кошелёк для списания</string>
+  <string name="select_wallets_for_income">Выберите кошельки для пополнения</string>
+  <string name="selected_wallet_count">Выбран 1 кошелёк</string>
 </resources>

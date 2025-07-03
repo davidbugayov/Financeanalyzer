@@ -12,7 +12,7 @@ import java.io.StringWriter
  */
 object ErrorTracker {
     private const val MAX_STACK_TRACE_LENGTH = 4000 // Лимит длины стека вызовов для аналитики
-    
+
     /**
      * Отслеживать ошибку
      * @param errorType Тип ошибки
@@ -21,11 +21,11 @@ object ErrorTracker {
      */
     fun trackError(errorType: String, errorMessage: String, additionalParams: Map<String, Any> = emptyMap()) {
         Timber.e("Error: [$errorType] $errorMessage")
-        
+
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
             putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
-            
+
             // Добавляем дополнительные параметры
             additionalParams.forEach { (key, value) ->
                 when (value) {
@@ -39,33 +39,37 @@ object ErrorTracker {
                 }
             }
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.ERROR, params)
     }
-    
+
     /**
      * Отслеживать исключение
      * @param throwable Исключение
      * @param isFatal Является ли исключение фатальным (приводящим к сбою)
      * @param additionalParams Дополнительные параметры
      */
-    fun trackException(throwable: Throwable, isFatal: Boolean = false, additionalParams: Map<String, Any> = emptyMap()) {
+    fun trackException(
+        throwable: Throwable,
+        isFatal: Boolean = false,
+        additionalParams: Map<String, Any> = emptyMap(),
+    ) {
         val errorType = throwable::class.java.simpleName
         val errorMessage = throwable.message ?: "No message"
         val stackTrace = getStackTraceString(throwable)
-        
+
         if (isFatal) {
             Timber.e(throwable, "FATAL: $errorType - $errorMessage")
         } else {
             Timber.e(throwable, "Exception: $errorType - $errorMessage")
         }
-        
+
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
             putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
             putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
             putBoolean(AnalyticsConstants.Params.IS_FATAL, isFatal)
-            
+
             // Добавляем дополнительные параметры
             additionalParams.forEach { (key, value) ->
                 when (value) {
@@ -79,11 +83,11 @@ object ErrorTracker {
                 }
             }
         }
-        
+
         val eventName = if (isFatal) AnalyticsConstants.Events.APP_CRASH else AnalyticsConstants.Events.APP_EXCEPTION
         AnalyticsUtils.logEvent(eventName, params)
     }
-    
+
     /**
      * Отслеживать ошибку валидации
      * @param field Поле, в котором произошла ошибка
@@ -91,16 +95,16 @@ object ErrorTracker {
      */
     fun trackValidationError(field: String, errorMessage: String) {
         Timber.w("Validation error in field '$field': $errorMessage")
-        
+
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.VALIDATION_FIELD, field)
             putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
             putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_VALIDATION)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.VALIDATION_ERROR, params)
     }
-    
+
     /**
      * Отслеживать ошибку сети
      * @param url URL, на котором произошла ошибка
@@ -109,17 +113,17 @@ object ErrorTracker {
      */
     fun trackNetworkError(url: String, errorCode: Int, errorMessage: String) {
         Timber.e("Network error: [$errorCode] $errorMessage, URL: $url")
-        
+
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_NETWORK)
             putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
             putInt(AnalyticsConstants.Params.ERROR_CODE, errorCode)
             putString("url", url)
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_ERROR, params)
     }
-    
+
     /**
      * Отслеживать ошибку базы данных
      * @param operation Операция, при которой произошла ошибка
@@ -132,19 +136,19 @@ object ErrorTracker {
         } else {
             Timber.e("Database error during $operation: $errorMessage")
         }
-        
+
         val params = Bundle().apply {
             putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_DATABASE)
             putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
             putString(AnalyticsConstants.Params.OPERATION_NAME, operation)
-            throwable?.let { 
+            throwable?.let {
                 putString(AnalyticsConstants.Params.STACK_TRACE, getStackTraceString(it))
             }
         }
-        
+
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_ERROR, params)
     }
-    
+
     /**
      * Получить строковое представление стека вызовов
      * @param throwable Исключение
@@ -155,15 +159,15 @@ object ErrorTracker {
         val pw = PrintWriter(sw)
         throwable.printStackTrace(pw)
         var stackTrace = sw.toString()
-        
+
         // Ограничиваем длину стека вызовов для аналитики
         if (stackTrace.length > MAX_STACK_TRACE_LENGTH) {
             stackTrace = stackTrace.substring(0, MAX_STACK_TRACE_LENGTH) + "... (truncated)"
         }
-        
+
         return stackTrace
     }
-    
+
     /**
      * Получить корневую причину исключения
      * @param throwable Исключение
@@ -176,7 +180,7 @@ object ErrorTracker {
         }
         return rootCause
     }
-    
+
     /**
      * Получить краткое описание ошибки для пользователя
      * @param throwable Исключение
@@ -195,4 +199,4 @@ object ErrorTracker {
             else -> "Произошла ошибка: ${rootCause.message ?: "неизвестная ошибка"}"
         }
     }
-} 
+}

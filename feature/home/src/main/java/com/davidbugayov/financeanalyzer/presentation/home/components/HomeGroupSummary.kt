@@ -89,7 +89,7 @@ fun HomeGroupSummary(
         colors = CardDefaults.cardColors(containerColor = cardBg),
         border = BorderStroke(
             width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f)
+            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
         ),
     ) {
         Column(

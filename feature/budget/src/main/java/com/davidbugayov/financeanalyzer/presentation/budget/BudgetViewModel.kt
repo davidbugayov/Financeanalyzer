@@ -5,6 +5,8 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.usecase.wallet.AllocateIncomeUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
@@ -15,13 +17,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.math.BigDecimal
 import java.util.UUID
 
 class BudgetViewModel(
     private val walletRepository: WalletRepository,
     private val transactionRepository: TransactionRepository,
     private val navigationManager: NavigationManager,
+    private val allocateIncomeUseCase: AllocateIncomeUseCase,
+    val goalProgressUseCase: GoalProgressUseCase,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(BudgetState())
@@ -43,6 +46,18 @@ class BudgetViewModel(
 
     fun onNavigateToTransactions(walletId: String) {
         navigationManager.navigate(NavigationManager.Command.Navigate(Screen.WalletTransactions.createRoute(walletId)))
+    }
+
+    fun onNavigateToWalletSetup() {
+        navigationManager.navigate(
+            NavigationManager.Command.Navigate(com.davidbugayov.financeanalyzer.navigation.Screen.WalletSetup.route),
+        )
+    }
+
+    fun onNavigateToSubWallets(parentWalletId: String) {
+        navigationManager.navigate(
+            NavigationManager.Command.Navigate("sub_wallets/$parentWalletId"),
+        )
     }
 
     private fun subscribeToTransactionChanges() {
@@ -261,50 +276,14 @@ class BudgetViewModel(
      */
     private fun distributeIncome(amount: Money) {
         viewModelScope.launch {
-            try {
-                val wallets = _state.value.categories
-
-                if (wallets.isEmpty()) {
-                    Timber.d("Нет кошельков для распределения дохода")
-                    return@launch
+            when (val result = allocateIncomeUseCase(amount)) {
+                is com.davidbugayov.financeanalyzer.core.util.Result.Success -> {
+                    loadBudgetCategories()
+                    Timber.d("Доход успешно распределен через AllocateIncomeUseCase")
                 }
-
-                // Рассчитываем общий лимит
-                val totalLimit = wallets.fold(Money(0.0)) { acc, wallet -> acc.plus(wallet.limit) }
-
-                if (totalLimit.amount <= BigDecimal.ZERO) {
-                    Timber.d("Нулевой или отрицательный общий лимит, невозможно распределить доход")
-                    return@launch
-                }
-
-                // Распределяем доход по кошелькам пропорционально их лимитам
-                wallets.forEach { wallet ->
-                    // Рассчитываем долю кошелька от общего лимита
-                    val proportion = wallet.limit.amount / totalLimit.amount
-
-                    // Рассчитываем сумму для добавления в этот кошелек
-                    val amountToAdd = Money(amount.amount * proportion)
-
-                    // Обновляем баланс кошелька
-                    val updatedWallet = wallet.copy(
-                        balance = wallet.balance.plus(amountToAdd),
-                        linkedCategories = wallet.linkedCategories,
-                    )
-
-                    // Сохраняем обновленный кошелек
-                    walletRepository.updateWallet(updatedWallet)
-                }
-
-                // Перезагружаем кошельки
-                loadBudgetCategories()
-
-                Timber.d("Доход успешно распределен")
-            } catch (e: Exception) {
-                Timber.e(e, "Ошибка при распределении дохода")
-                _state.update {
-                    it.copy(
-                        error = e.message ?: "Ошибка при распределении дохода",
-                    )
+                is com.davidbugayov.financeanalyzer.core.util.Result.Error -> {
+                    Timber.e(result.exception, "Ошибка при распределении дохода")
+                    _state.update { it.copy(error = result.exception.message ?: "Ошибка при распределении дохода") }
                 }
             }
         }

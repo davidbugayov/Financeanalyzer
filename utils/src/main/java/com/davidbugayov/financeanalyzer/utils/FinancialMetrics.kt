@@ -44,7 +44,7 @@ class FinancialMetrics private constructor() : KoinComponent {
     init {
         Timber.d("Инициализация FinancialMetrics (реальный баланс)")
         recalculateStats()
-        
+
         // Подписываемся на события изменения данных из репозитория
         scope.launch {
             try {

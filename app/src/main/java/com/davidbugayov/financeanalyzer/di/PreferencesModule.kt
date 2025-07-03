@@ -22,4 +22,4 @@ val preferencesModule = module {
 
     single { PreferencesManager(androidContext()) }
     single { OnboardingManager(androidContext()) }
-} 
+}

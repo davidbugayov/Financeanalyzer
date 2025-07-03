@@ -16,4 +16,4 @@ val allModules = listOf(
     transactionModule,
     analyticsModule,
     analyticsUtilsModule,
-) 
+)
