@@ -19,5 +19,6 @@ class NavigationManager {
             private fun readResolve(): Any = NavigateUp
         }
         data class PopUpTo(val destination: String, val inclusive: Boolean) : Command()
+        data class NavigateAndClearBackStack(val destination: String, val popUpTo: String) : Command()
     }
 }

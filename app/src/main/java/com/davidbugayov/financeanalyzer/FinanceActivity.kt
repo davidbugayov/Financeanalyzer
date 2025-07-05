@@ -25,12 +25,14 @@ import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
+import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class FinanceActivity : ComponentActivity() {
 
     private val navigationManager: NavigationManager by inject()
+    private val onboardingManager: OnboardingManager by inject()
 
     // Начальный экран для навигации
     private var startDestination = Screen.Home.route
@@ -41,6 +43,11 @@ class FinanceActivity : ComponentActivity() {
 
         // Обрабатываем deep links
         handleIntent(intent)
+
+        // Проверяем, нужно ли показывать онбординг
+        if (!onboardingManager.isOnboardingCompleted()) {
+            startDestination = Screen.Onboarding.route
+        }
 
         // Делаем контент приложения отображаться под системными панелями
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -106,13 +113,13 @@ class FinanceActivity : ComponentActivity() {
 
     private fun applyContent() {
         setContent {
-            FinanceAppContent(navigationManager)
+            FinanceAppContent(navigationManager, startDestination)
         }
     }
 }
 
 @Composable
-fun FinanceAppContent(navigationManager: NavigationManager) {
+fun FinanceAppContent(navigationManager: NavigationManager, startDestination: String) {
     // Получаем текущую тему из AppTheme и наблюдаем за изменениями
     val themeMode by AppTheme.currentTheme.collectAsState()
 
@@ -124,7 +131,7 @@ fun FinanceAppContent(navigationManager: NavigationManager) {
                 color = MaterialTheme.colorScheme.background,
             ) {
                 val navController = rememberNavController()
-                AppNavHostImpl(navController = navController, navigationManager = navigationManager)
+                AppNavHostImpl(navController = navController, navigationManager = navigationManager, startDestination = startDestination)
             }
         }
     }

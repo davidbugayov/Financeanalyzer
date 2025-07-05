@@ -14,6 +14,7 @@ class AppNavigation {
 
     /**
      * Создает основной граф навигации
+     * @param onOnboardingScreen Функция для отображения экрана Onboarding
      * @param onHomeScreen Функция для отображения экрана Home
      * @param onHistoryScreen Функция для отображения экрана History
      * @param onBudgetScreen Функция для отображения экрана Budget
@@ -22,6 +23,7 @@ class AppNavigation {
      * @param onWalletSetupScreen Функция для отображения экрана WalletSetup
      */
     fun NavGraphBuilder.mainGraph(
+        onOnboardingScreen: @Composable () -> Unit,
         onHomeScreen: @Composable () -> Unit,
         onHistoryScreen: @Composable () -> Unit,
         onBudgetScreen: @Composable () -> Unit,
@@ -34,6 +36,15 @@ class AppNavigation {
         onWalletSetupScreen: @Composable () -> Unit = {},
         onSubWalletsScreen: @Composable (parentWalletId: String) -> Unit = { _ -> },
     ) {
+        composable(
+            route = Screen.Onboarding.route,
+            enterTransition = defaultEnterUp(),
+            exitTransition = defaultExitDown(),
+            popEnterTransition = defaultEnterUp(),
+            popExitTransition = defaultExitDown(),
+        ) {
+            onOnboardingScreen()
+        }
         composable(
             route = Screen.Home.route,
             enterTransition = defaultEnterRight(),

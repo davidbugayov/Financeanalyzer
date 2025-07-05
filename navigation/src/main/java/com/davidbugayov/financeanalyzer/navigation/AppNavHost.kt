@@ -22,12 +22,14 @@ import kotlinx.coroutines.flow.onEach
  *
  * @param navController Контроллер навигации
  * @param navigationManager Менеджер навигации для обработки команд
+ * @param startDestination Начальный экран для навигации
  * @param content Содержимое навигационного графа
  */
 @Composable
 fun AppNavHost(
     navController: NavHostController,
     navigationManager: NavigationManager,
+    startDestination: String = Screen.Home.route,
     content: NavGraphBuilder.() -> Unit,
 ) {
     LaunchedEffect("navigation") {
@@ -41,13 +43,19 @@ fun AppNavHost(
                     command.destination,
                     command.inclusive,
                 )
+                is NavigationManager.Command.NavigateAndClearBackStack -> navController.navigate(
+                    command.destination,
+                ) { 
+                    popUpTo(command.popUpTo) { inclusive = true }
+                    launchSingleTop = true
+                }
             }
         }.launchIn(this)
     }
 
     NavHost(
         navController = navController,
-        startDestination = Screen.Home.route,
+        startDestination = startDestination,
         builder = content,
     )
 }
@@ -58,6 +66,7 @@ fun AppNavHost(
  * @param navController Контроллер навигации
  * @param navigationManager Менеджер навигации для обработки команд
  * @param appNavigation Класс с определениями графов навигации
+ * @param onOnboardingScreen Функция для отображения экрана Onboarding
  * @param onHomeScreen Функция для отображения экрана Home
  * @param onHistoryScreen Функция для отображения экрана History
  * @param onBudgetScreen Функция для отображения экрана Budget
@@ -76,6 +85,7 @@ fun AppNavHost(
     navController: NavHostController,
     navigationManager: NavigationManager,
     appNavigation: AppNavigation,
+    onOnboardingScreen: @Composable () -> Unit,
     onHomeScreen: @Composable () -> Unit,
     onHistoryScreen: @Composable () -> Unit,
     onBudgetScreen: @Composable () -> Unit,
@@ -90,10 +100,12 @@ fun AppNavHost(
     onProfileScreen: @Composable () -> Unit,
     onLibrariesScreen: @Composable () -> Unit,
     onExportImportScreen: @Composable () -> Unit,
+    startDestination: String = Screen.Home.route,
 ) {
-    AppNavHost(navController, navigationManager) {
+    AppNavHost(navController, navigationManager, startDestination) {
         with(appNavigation) {
             mainGraph(
+                onOnboardingScreen,
                 onHomeScreen,
                 onHistoryScreen,
                 onBudgetScreen,

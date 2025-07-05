@@ -8,6 +8,9 @@ package com.davidbugayov.financeanalyzer.navigation
  */
 sealed class Screen(val route: String) {
 
+    /** Экран онбординга для новых пользователей */
+    data object Onboarding : Screen("onboarding")
+
     /** Главный экран с балансом и последними транзакциями */
     data object Home : Screen("home")
 

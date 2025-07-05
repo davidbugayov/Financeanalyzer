@@ -20,6 +20,8 @@ import com.davidbugayov.financeanalyzer.presentation.achievements.AchievementsVi
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.SubWalletsScreen
 import java.util.Date
 import org.koin.androidx.compose.koinViewModel
+import com.davidbugayov.financeanalyzer.feature.onboarding.OnboardingScreen
+import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 
 /**
  * Реализация AppNavHost для приложения.
@@ -27,11 +29,13 @@ import org.koin.androidx.compose.koinViewModel
  *
  * @param navController Контроллер навигации
  * @param navigationManager Менеджер навигации
+ * @param startDestination Начальный экран
  */
 @Composable
 fun AppNavHostImpl(
     navController: NavHostController,
     navigationManager: NavigationManager,
+    startDestination: String = Screen.Home.route,
 ) {
     val appNavigation = AppNavigation()
 
@@ -39,6 +43,21 @@ fun AppNavHostImpl(
         navController = navController,
         navigationManager = navigationManager,
         appNavigation = appNavigation,
+        onOnboardingScreen = {
+            val onboardingViewModel: OnboardingViewModel = koinViewModel()
+            OnboardingScreen(
+                onFinish = {
+                    onboardingViewModel.completeOnboarding()
+                    // Переходим на главный экран и очищаем back stack от онбординга
+                    navigationManager.navigate(
+                        NavigationManager.Command.NavigateAndClearBackStack(
+                            destination = Screen.Home.route,
+                            popUpTo = Screen.Onboarding.route
+                        )
+                    )
+                }
+            )
+        },
         onHomeScreen = {
             HomeScreen()
         },
@@ -135,5 +154,6 @@ fun AppNavHostImpl(
                 viewModel = koinViewModel(),
             )
         },
+        startDestination = startDestination
     )
 }
