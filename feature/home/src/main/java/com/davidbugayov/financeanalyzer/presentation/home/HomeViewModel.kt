@@ -432,7 +432,7 @@ class HomeViewModel(
             try {
                 Timber.d("Generating test data")
                 _state.update { it.copy(isLoading = true) }
-                val testTransactions = TestDataGenerator.generateTransactions(10_000)
+                val testTransactions = TestDataGenerator.generateTransactions(500)
                 var hasError = false
                 testTransactions.forEach { transaction ->
                     Timber.d("Saving test transaction: ${transaction.category}")

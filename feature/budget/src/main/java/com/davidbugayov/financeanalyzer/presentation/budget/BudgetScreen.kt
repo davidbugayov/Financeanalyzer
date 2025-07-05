@@ -79,6 +79,10 @@ import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
 import androidx.compose.material3.Surface
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.ui.platform.LocalLifecycleOwner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -86,6 +90,21 @@ fun BudgetScreen(
     viewModel: BudgetViewModel = koinViewModel(),
 ) {
     val state by viewModel.state.collectAsState()
+
+    // Добавляем наблюдение за жизненным циклом, чтобы обновлять список кошельков при возврате на экран
+    val lifecycleOwner = LocalLifecycleOwner.current
+    DisposableEffect(lifecycleOwner) {
+        val observer = LifecycleEventObserver { _, event ->
+            if (event == Lifecycle.Event.ON_RESUME) {
+                // Перезагружаем кошельки каждый раз, когда экран становится видимым
+                viewModel.onEvent(BudgetEvent.LoadCategories)
+            }
+        }
+        lifecycleOwner.lifecycle.addObserver(observer)
+        onDispose {
+            lifecycleOwner.lifecycle.removeObserver(observer)
+        }
+    }
 
     // Состояние диалогов
     var showAddCategoryDialog by remember { mutableStateOf(false) }
