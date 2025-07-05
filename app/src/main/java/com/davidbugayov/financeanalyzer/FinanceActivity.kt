@@ -102,10 +102,32 @@ class FinanceActivity : ComponentActivity() {
      * Обрабатывает входящий intent и определяет начальный экран
      */
     private fun handleIntent(intent: Intent?) {
+        // Обрабатываем deep links
         intent?.data?.let { uri ->
             when (uri.toString()) {
                 "financeanalyzer://add" -> {
-                    startDestination = "add"
+                    startDestination = Screen.AddTransaction.route
+                }
+            }
+        }
+        
+        // Обрабатываем шорткаты (extras)
+        intent?.getStringExtra("screen")?.let { screen ->
+            when (screen) {
+                "add" -> {
+                    startDestination = Screen.AddTransaction.route
+                }
+            }
+        }
+    }
+
+    override fun onNewIntent(intent: Intent) {
+        super.onNewIntent(intent)
+        // Обрабатываем новый intent когда приложение уже запущено
+        intent.getStringExtra("screen")?.let { screen ->
+            when (screen) {
+                "add" -> {
+                    navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.route))
                 }
             }
         }
