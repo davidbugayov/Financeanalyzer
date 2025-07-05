@@ -7,7 +7,7 @@
         android:shortcutShortLabel="@string/add_transaction_short"
         android:shortcutLongLabel="@string/add_transaction_long">
         <intent
-            android:action="android.intent.action.MAIN"
+            android:action="android.intent.action.VIEW"
             android:targetClass="com.davidbugayov.financeanalyzer.FinanceActivity">
             <extra android:name="screen" android:value="add" />
         </intent>
