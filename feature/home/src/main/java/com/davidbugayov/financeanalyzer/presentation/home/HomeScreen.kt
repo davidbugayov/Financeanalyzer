@@ -119,6 +119,8 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
                     "source" to "home_screen",
                 ),
             )
+            // Триггер ачивки - посещение раздела
+            Timber.d("🏆 Триггер ачивки: Пользователь посетил раздел 'Статистика'")
             onNavigateToChart()
         },
         onHistoryClick = {
@@ -129,6 +131,8 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
                     "source" to "home_screen",
                 ),
             )
+            // Триггер ачивки - посещение раздела
+            Timber.d("🏆 Триггер ачивки: Пользователь посетил раздел 'История'")
             onNavigateToHistory()
         },
         onAddClick = {
@@ -141,6 +145,8 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
             )
             // Отслеживаем использование функции
             UserEventTracker.trackFeatureUsage("add_transaction")
+            // Триггер ачивки - добавление транзакции
+            Timber.d("🏆 Триггер ачивки: Пользователь добавляет транзакцию")
             onNavigateToAdd()
         },
     )

@@ -1143,4 +1143,102 @@
     <string name="wallet_overview">Обзор кошелька</string>
     <string name="wallet_financial_health">Финансовое здоровье</string>
 
+    <!-- Achievement Categories -->
+    <string name="achievement_category_transactions">Транзакции</string>
+    <string name="achievement_category_budget">Бюджетирование</string>
+    <string name="achievement_category_savings">Накопления</string>
+    <string name="achievement_category_habits">Привычки</string>
+    <string name="achievement_category_statistics">Статистика</string>
+    <string name="achievement_category_milestones">Важные вехи</string>
+    <string name="achievement_category_special">Специальные</string>
+
+    <!-- Achievement Rarity -->
+    <string name="achievement_rarity_common">Обычное</string>
+    <string name="achievement_rarity_rare">Редкое</string>
+    <string name="achievement_rarity_epic">Эпическое</string>
+    <string name="achievement_rarity_legendary">Легендарное</string>
+
+    <!-- Achievement UI -->
+    <string name="achievement_progress">Прогресс: %1$d/%2$d</string>
+    <string name="achievement_reward">Награда: %1$d монет</string>
+    <string name="achievement_unlocked">Разблокировано!</string>
+    <string name="achievement_locked">Заблокировано</string>
+    <string name="achievement_hidden">Скрытое достижение</string>
+    <string name="achievement_filter_all">Все</string>
+    <string name="achievement_filter_unlocked">Разблокированные</string>
+    <string name="achievement_filter_locked">Заблокированные</string>
+
+    <!-- Transaction Achievements -->
+    <string name="achievement_first_transaction_title">Первые шаги</string>
+    <string name="achievement_first_transaction_desc">Добавьте свою первую транзакцию</string>
+    
+    <string name="achievement_transaction_master_title">Мастер транзакций</string>
+    <string name="achievement_transaction_master_desc">Добавьте 100 транзакций</string>
+    
+    <string name="achievement_daily_tracker_title">Ежедневный трекер</string>
+    <string name="achievement_daily_tracker_desc">Добавляйте транзакции 7 дней подряд</string>
+    
+    <string name="achievement_category_organizer_title">Организатор категорий</string>
+    <string name="achievement_category_organizer_desc">Используйте 10 разных категорий</string>
+
+    <!-- Budget Achievements -->
+    <string name="achievement_first_budget_title">Первый бюджет</string>
+    <string name="achievement_first_budget_desc">Создайте свой первый бюджет</string>
+    
+    <string name="achievement_budget_keeper_title">Хранитель бюджета</string>
+    <string name="achievement_budget_keeper_desc">Не превышайте бюджет 3 месяца подряд</string>
+    
+    <string name="achievement_budget_saver_title">Экономный</string>
+    <string name="achievement_budget_saver_desc">Потратьте менее 80% от бюджета за месяц</string>
+
+    <!-- Savings Achievements -->
+    <string name="achievement_first_savings_title">Первая копейка</string>
+    <string name="achievement_first_savings_desc">Накопите 1000 рублей</string>
+    
+    <string name="achievement_savings_goal_title">Цель достигнута</string>
+    <string name="achievement_savings_goal_desc">Достигните цели накоплений</string>
+    
+    <string name="achievement_emergency_fund_title">Подушка безопасности</string>
+    <string name="achievement_emergency_fund_desc">Накопите сумму на 3 месяца расходов</string>
+
+    <!-- Habit Achievements -->
+    <string name="achievement_week_no_coffee_title">Неделя без кофе</string>
+    <string name="achievement_week_no_coffee_desc">Не тратьте на кофе 7 дней подряд</string>
+    
+    <string name="achievement_healthy_spender_title">Здоровые траты</string>
+    <string name="achievement_healthy_spender_desc">Тратьте на здоровье 5 дней подряд</string>
+    
+    <string name="achievement_no_impulse_title">Контроль импульсов</string>
+    <string name="achievement_no_impulse_desc">Неделя без спонтанных покупок</string>
+
+    <!-- Statistics Achievements -->
+    <string name="achievement_data_analyst_title">Аналитик данных</string>
+    <string name="achievement_data_analyst_desc">Просмотрите статистику 10 раз</string>
+    
+    <string name="achievement_trend_watcher_title">Наблюдатель трендов</string>
+    <string name="achievement_trend_watcher_desc">Отследите тренд расходов за год</string>
+
+    <!-- Milestone Achievements -->
+    <string name="achievement_app_explorer_title">Исследователь</string>
+    <string name="achievement_app_explorer_desc">Посетите все разделы приложения</string>
+    
+    <string name="achievement_month_user_title">Постоянный пользователь</string>
+    <string name="achievement_month_user_desc">Используйте приложение месяц</string>
+    
+    <string name="achievement_year_user_title">Верный спутник</string>
+    <string name="achievement_year_user_desc">Используйте приложение целый год</string>
+
+    <!-- Special Achievements -->
+    <string name="achievement_early_bird_title">Ранняя пташка</string>
+    <string name="achievement_early_bird_desc">Добавьте транзакцию до 7 утра</string>
+    
+    <string name="achievement_night_owl_title">Ночная сова</string>
+    <string name="achievement_night_owl_desc">Добавьте транзакцию после 23:00</string>
+    
+    <string name="achievement_weekend_warrior_title">Выходной воин</string>
+    <string name="achievement_weekend_warrior_desc">Активно используйте приложение в выходные</string>
+    
+    <string name="achievement_perfectionist_title">Перфекционист</string>
+    <string name="achievement_perfectionist_desc">Заполните все поля в 50 транзакциях</string>
+
 </resources>

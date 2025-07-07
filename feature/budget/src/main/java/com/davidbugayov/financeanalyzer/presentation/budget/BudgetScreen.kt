@@ -145,6 +145,8 @@ fun BudgetScreen(
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
                     IconButton(onClick = {
+                        // Триггер ачивки - работа с доходами/бюджетом
+                        Timber.d("🏆 Триггер ачивки: Пользователь работает с доходами")
                         tempIncomeAmount = "" // Сбрасываем временную сумму
                         showDistributeConfirmation = true
                     }) {
