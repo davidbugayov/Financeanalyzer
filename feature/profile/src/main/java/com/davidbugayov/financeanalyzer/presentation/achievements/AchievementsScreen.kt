@@ -196,18 +196,18 @@ private fun AchievementStatsCard(achievements: List<Achievement>) {
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
+                    Text(
+                        text = totalCoins.toString(),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
+                        color = Color(0xFFFFD700)
+                    )
+                    Spacer(modifier = Modifier.width(4.dp))
                     Icon(
                         painter = painterResource(com.davidbugayov.financeanalyzer.utils.R.drawable.ic_rubble),
                         contentDescription = null,
                         tint = Color(0xFFFFD700),
                         modifier = Modifier.size(20.dp)
-                    )
-                    Spacer(modifier = Modifier.width(4.dp))
-                    Text(
-                        text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.currency_format, totalCoins.toString()),
-                        style = MaterialTheme.typography.titleMedium,
-                        fontWeight = FontWeight.Bold,
-                        color = Color(0xFFFFD700)
                     )
                 }
             }
@@ -460,18 +460,18 @@ private fun ModernAchievementCard(achievement: Achievement) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
+                        Text(
+                            text = achievement.rewardCoins.toString(),
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
+                            fontWeight = FontWeight.Medium
+                        )
+                        Spacer(modifier = Modifier.width(2.dp))
                         Icon(
                             painter = painterResource(com.davidbugayov.financeanalyzer.utils.R.drawable.ic_rubble),
                             contentDescription = null,
                             tint = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
                             modifier = Modifier.size(16.dp)
-                        )
-                        Spacer(modifier = Modifier.width(2.dp))
-                        Text(
-                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.currency_format, achievement.rewardCoins.toString()),
-                            style = MaterialTheme.typography.bodySmall,
-                            color = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
-                            fontWeight = FontWeight.Medium
                         )
                     }
                 }
