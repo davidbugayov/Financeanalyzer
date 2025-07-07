@@ -7,6 +7,8 @@ import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.UnifiedTransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
+import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
+import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepositoryImpl
 import org.koin.dsl.module
 
 /**
@@ -28,4 +30,7 @@ val repositoryModule = module {
 
     // Другие репозитории
     single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
+    
+    // Репозиторий достижений
+    single<AchievementsRepository> { AchievementsRepositoryImpl() }
 }

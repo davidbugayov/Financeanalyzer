@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.analytics.di.analyticsUtilsModule
  * Contains a single list of all Koin modules that should be loaded in [BaseFinanceApp].
  */
 val allModules = listOf(
+    appModule,
     databaseModule,
     preferencesModule,
     repositoryModule,

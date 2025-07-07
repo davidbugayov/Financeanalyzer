@@ -20,7 +20,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import org.koin.core.module.dsl.bind
-import org.koin.androidx.viewmodel.dsl.viewModel
+import org.koin.core.module.dsl.viewModel
 
 val viewModelModule = module {
     // Categories ViewModel is shared across app
@@ -39,26 +39,13 @@ val viewModelModule = module {
 
     viewModelOf(::TransactionHistoryViewModel)
 
-    viewModel {
-        BudgetViewModel(
-            walletRepository = get(),
-            transactionRepository = get(),
-            navigationManager = get(),
-            allocateIncomeUseCase = get(),
-            goalProgressUseCase = get(),
-        )
-    }
+    viewModel { BudgetViewModel(get(), get(), get(), get(), get()) }
 
     viewModelOf(::WalletTransactionsViewModel)
 
     viewModelOf(::WalletSetupViewModel)
 
-    viewModel { parameters ->
-        SubWalletsViewModel(
-            parentWalletId = parameters.get(),
-            walletRepository = get(),
-        )
-    }
+    viewModel { parameters -> SubWalletsViewModel(parameters.get(), get()) }
 
     viewModelOf(::ImportTransactionsViewModel)
 
@@ -66,12 +53,5 @@ val viewModelModule = module {
 
     viewModelOf(::AchievementsViewModel)
 
-    viewModel { parameters ->
-        FinancialDetailStatisticsViewModel(
-            startDate = parameters.get(),
-            endDate = parameters.get(),
-            transactionRepository = get(),
-            calculateCategoryStatsUseCase = get(),
-        )
-    }
+    viewModel { parameters -> FinancialDetailStatisticsViewModel(parameters.get(), parameters.get(), get(), get()) }
 }
