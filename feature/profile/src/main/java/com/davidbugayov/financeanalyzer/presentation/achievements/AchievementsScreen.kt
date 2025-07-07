@@ -22,6 +22,8 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -32,7 +34,7 @@ import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timeline
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -97,7 +99,13 @@ fun AchievementsScreen(
             }
     }
 
-    Column(modifier = Modifier.fillMaxSize()) {
+    val scrollState = rememberScrollState()
+    
+    Column(
+        modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(scrollState)
+    ) {
         AppTopBar(
             title = stringResource(R.string.achievements),
             showBackButton = true,
@@ -116,15 +124,11 @@ fun AchievementsScreen(
         )
         
         // Список ачивок
-        LazyColumn(
-            contentPadding = PaddingValues(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize(),
+        Column(
+            modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+            verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
-            items(
-                items = filteredAchievements,
-                key = { it.id }
-            ) { achievement ->
+            filteredAchievements.forEach { achievement ->
                 AnimatedVisibility(
                     visible = true,
                     enter = fadeIn(tween(300)) + slideInVertically(tween(300)) { it / 4 }
@@ -200,7 +204,7 @@ private fun AchievementStatsCard(achievements: List<Achievement>) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
-                        text = totalCoins.toString(),
+                        text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.currency_format, totalCoins.toString()),
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold,
                         color = Color(0xFFFFD700)
@@ -464,7 +468,7 @@ private fun ModernAchievementCard(achievement: Achievement) {
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Text(
-                            text = achievement.rewardCoins.toString(),
+                            text = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.currency_format, achievement.rewardCoins.toString()),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
                             fontWeight = FontWeight.Medium
@@ -526,7 +530,7 @@ private fun getCategoryIcon(category: AchievementCategory): ImageVector {
         AchievementCategory.BUDGET -> Icons.Filled.Wallet
         AchievementCategory.SAVINGS -> Icons.Filled.MonetizationOn
         AchievementCategory.HABITS -> Icons.Filled.LocalCafe
-        AchievementCategory.STATISTICS -> Icons.Filled.TrendingUp
+        AchievementCategory.STATISTICS -> Icons.AutoMirrored.Filled.TrendingUp
         AchievementCategory.MILESTONES -> Icons.Filled.Star
         AchievementCategory.SPECIAL -> Icons.Filled.EmojiEvents
     }
