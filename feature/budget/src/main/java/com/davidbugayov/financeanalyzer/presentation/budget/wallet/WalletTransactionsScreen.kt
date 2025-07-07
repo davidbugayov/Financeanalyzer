@@ -128,6 +128,8 @@ fun WalletTransactionsScreen(
                 WalletSummaryCard(
                     wallet = wallet,
                     onSpendClick = navigateToAddTransaction,
+                    onAddFundsClick = null, // Можно добавить позже
+                    onManageClick = null, // Можно добавить позже
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(16.dp),

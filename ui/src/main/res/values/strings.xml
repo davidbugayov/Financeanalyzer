@@ -1115,4 +1115,32 @@
     <string name="select_wallet_for_expense">Выберите кошелёк для списания</string>
     <string name="select_wallets_for_income">Выберите кошельки для пополнения</string>
     <string name="selected_wallet_count">Выбран 1 кошелёк</string>
+
+    <!-- Widget strings -->
+    <string name="widget_no_data">Нет данных</string>
+    <string name="widget_loading">Загрузка...</string>
+
+    <!-- Modern Wallet Summary Card strings -->
+    <string name="wallet_spent_amount">Потрачено</string>
+    <string name="wallet_remaining_amount">Осталось</string>
+    <string name="wallet_budget_limit">Бюджет</string>
+    <string name="wallet_balance">Баланс кошелька</string>
+    <string name="wallet_available_balance">Доступно</string>
+    <string name="wallet_spend_action">Потратить</string>
+    <string name="wallet_add_funds_action">Пополнить</string>
+    <string name="wallet_manage_action">Управление</string>
+    <string name="wallet_budget_progress">Прогресс бюджета</string>
+    <string name="wallet_budget_exceeded">Превышен лимит</string>
+    <string name="wallet_days_remaining">Дней осталось</string>
+    <string name="wallet_period_ends">Период заканчивается</string>
+    <string name="wallet_daily_budget">Дневной бюджет</string>
+    <string name="wallet_spending_trend">Тренд трат</string>
+    <string name="wallet_savings_potential">Потенциал сбережений</string>
+    <string name="wallet_quick_actions">Быстрые действия</string>
+    <string name="wallet_statistics">Статистика</string>
+    <string name="wallet_export_data">Экспорт данных</string>
+    <string name="wallet_share">Поделиться</string>
+    <string name="wallet_overview">Обзор кошелька</string>
+    <string name="wallet_financial_health">Финансовое здоровье</string>
+
 </resources>

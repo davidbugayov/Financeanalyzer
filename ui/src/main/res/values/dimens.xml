@@ -392,4 +392,34 @@
     <dimen name="import_dialog_width">90%</dimen>
     <dimen name="import_dialog_content_padding">24dp</dimen>
 
+    <!-- Quick action button dimensions -->
+    <dimen name="quick_action_button_size">52dp</dimen>
+    <dimen name="quick_action_icon_size">28dp</dimen>
+    <dimen name="quick_action_spacing">12dp</dimen>
+
+    <!-- Modern Wallet Summary Card dimensions -->
+    <dimen name="wallet_card_padding">20dp</dimen>
+    <dimen name="wallet_card_corner_radius">20dp</dimen>
+    <dimen name="wallet_card_elevation">8dp</dimen>
+    <dimen name="wallet_header_spacing">16dp</dimen>
+    <dimen name="wallet_section_spacing">24dp</dimen>
+    <dimen name="wallet_progress_size">140dp</dimen>
+    <dimen name="wallet_progress_stroke_width">8dp</dimen>
+    <dimen name="wallet_progress_background_stroke">6dp</dimen>
+    <dimen name="wallet_metric_spacing">12dp</dimen>
+    <dimen name="wallet_action_button_height">48dp</dimen>
+    <dimen name="wallet_action_button_corner_radius">12dp</dimen>
+    <dimen name="wallet_stats_card_padding">16dp</dimen>
+    <dimen name="wallet_stats_card_corner_radius">16dp</dimen>
+    <dimen name="wallet_stats_icon_size">24dp</dimen>
+    <dimen name="wallet_period_indicator_size">8dp</dimen>
+    <dimen name="wallet_gradient_height">120dp</dimen>
+    <dimen name="wallet_divider_margin">20dp</dimen>
+    <dimen name="wallet_floating_action_margin">16dp</dimen>
+    <dimen name="wallet_subtitle_margin_top">4dp</dimen>
+    <dimen name="wallet_progress_text_size">32sp</dimen>
+    <dimen name="wallet_percentage_text_size">14sp</dimen>
+    <dimen name="wallet_metric_value_text_size">18sp</dimen>
+    <dimen name="wallet_metric_label_text_size">12sp</dimen>
+
 </resources>
