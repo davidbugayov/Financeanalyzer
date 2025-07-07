@@ -31,7 +31,7 @@ import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.LocalCafe
-import androidx.compose.material.icons.filled.MonetizationOn
+import androidx.compose.ui.res.painterResource
 import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
@@ -197,7 +197,7 @@ private fun AchievementStatsCard(achievements: List<Achievement>) {
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.MonetizationOn,
+                        painter = painterResource(com.davidbugayov.financeanalyzer.utils.R.drawable.ic_rubble),
                         contentDescription = null,
                         tint = Color(0xFFFFD700),
                         modifier = Modifier.size(20.dp)
@@ -461,7 +461,7 @@ private fun ModernAchievementCard(achievement: Achievement) {
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Icon(
-                            imageVector = Icons.Filled.MonetizationOn,
+                            painter = painterResource(com.davidbugayov.financeanalyzer.utils.R.drawable.ic_rubble),
                             contentDescription = null,
                             tint = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
                             modifier = Modifier.size(16.dp)
@@ -528,7 +528,7 @@ private fun getCategoryIcon(category: AchievementCategory): ImageVector {
     return when (category) {
         AchievementCategory.TRANSACTIONS -> Icons.Filled.Timeline
         AchievementCategory.BUDGET -> Icons.Filled.Wallet
-        AchievementCategory.SAVINGS -> Icons.Filled.MonetizationOn
+        AchievementCategory.SAVINGS -> Icons.Filled.Star
         AchievementCategory.HABITS -> Icons.Filled.LocalCafe
         AchievementCategory.STATISTICS -> Icons.AutoMirrored.Filled.TrendingUp
         AchievementCategory.MILESTONES -> Icons.Filled.Star
