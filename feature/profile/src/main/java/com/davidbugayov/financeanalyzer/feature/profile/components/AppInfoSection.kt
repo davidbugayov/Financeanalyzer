@@ -65,7 +65,7 @@ fun AppInfoSection(
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
-                        painter = painterResource(R.drawable.ic_app_icon),
+                        painter = painterResource(com.davidbugayov.financeanalyzer.ui.R.drawable.ic_app_icon),
                         contentDescription = stringResource(R.string.app_info),
                         tint = Color.White,
                         modifier = Modifier.size(28.dp),
