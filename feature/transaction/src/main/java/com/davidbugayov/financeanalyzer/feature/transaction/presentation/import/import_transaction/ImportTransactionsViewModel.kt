@@ -526,25 +526,32 @@ class ImportTransactionsViewModel(
      * Триггеры достижений за импорт из банков
      */
     private fun triggerBankImportAchievements(bankName: String?) {
+        Timber.d("🏆 Вызов триггеров достижений для банка: '$bankName'")
         when (bankName?.lowercase()) {
             "тинькофф", "тинь", "tinkoff", "tbank" -> {
+                Timber.d("🏆 Триггер Тинькофф")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("tinkoff_importer")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
             }
             "сбербанк", "сбер", "sberbank" -> {
+                Timber.d("🏆 Триггер Сбербанк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("sberbank_importer")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
             }
             "альфа-банк", "альфа", "alfa", "alpha" -> {
+                Timber.d("🏆 Триггер Альфа-Банк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("alfabank_importer")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
             }
             "озон банк", "озон", "ozon" -> {
+                Timber.d("🏆 Триггер OZON Банк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("ozon_importer")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
             }
+            else -> {
+                Timber.d("🏆 Банк '$bankName' не распознан для достижений")
+            }
         }
-        Timber.d("🏆 Триггеры достижений для банка: $bankName")
     }
 }
 
