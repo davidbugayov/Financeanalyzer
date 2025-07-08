@@ -16,7 +16,6 @@ import com.davidbugayov.financeanalyzer.ui.theme.BankYoomoney
 import com.davidbugayov.financeanalyzer.ui.theme.CashColor
 
 object ColorUtils {
-
     /**
      * Возвращает цвет для источника по его названию из ui.theme.Color.
      * Если цвет для источника не найден, возвращает null.
@@ -112,7 +111,10 @@ object ColorUtils {
      * Оставлена для возможного редкого использования, если нужно получить Int цвет из XML.
      */
     @Deprecated("Prefer defining colors in ui.theme.Color.kt for Compose.")
-    fun getIntColorFromXml(context: Context, resId: Int): Int {
+    fun getIntColorFromXml(
+        context: Context,
+        resId: Int,
+    ): Int {
         return ContextCompat.getColor(context, resId)
     }
 }

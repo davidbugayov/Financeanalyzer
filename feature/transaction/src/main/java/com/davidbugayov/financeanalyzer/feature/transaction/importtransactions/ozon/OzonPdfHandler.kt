@@ -15,21 +15,25 @@ class OzonPdfHandler(
     transactionRepository: TransactionRepository,
     context: Context,
 ) : AbstractPdfBankHandler(transactionRepository, context) {
-
     override val bankName: String = "Ozon PDF"
 
     // Ключевые слова для PDF-файлов Ozon
-    override val pdfKeywords: List<String> = listOf(
-        "ozon",
-        "озон",
-        "ozon statement",
-        "выписка ozon",
-    )
+    override val pdfKeywords: List<String> =
+        listOf(
+            "ozon",
+            "озон",
+            "ozon statement",
+            "выписка ozon",
+        )
 
     /**
      * Проверяет, может ли данный хендлер обработать файл по имени
      */
-    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
+    override fun canHandle(
+        fileName: String,
+        uri: Uri,
+        fileType: FileType,
+    ): Boolean {
         if (!supportsFileType(fileType)) return false
         val hasKeyword = pdfKeywords.any { fileName.lowercase().contains(it.lowercase()) }
         return hasKeyword

@@ -7,7 +7,6 @@ package com.davidbugayov.financeanalyzer.navigation
  * @property route Уникальный маршрут для навигации к экрану
  */
 sealed class Screen(val route: String) {
-
     /** Экран онбординга для новых пользователей */
     data object Onboarding : Screen("onboarding")
 
@@ -25,7 +24,10 @@ sealed class Screen(val route: String) {
 
         const val routeWithArgs: String = "add?$CATEGORY_ARG={$CATEGORY_ARG}&$FORCE_EXPENSE_ARG={$FORCE_EXPENSE_ARG}"
 
-        fun createRoute(category: String? = null, forceExpense: Boolean? = null): String {
+        fun createRoute(
+            category: String? = null,
+            forceExpense: Boolean? = null,
+        ): String {
             val cat = category ?: ""
             val force = forceExpense?.toString() ?: ""
             return "add?category=$cat&forceExpense=$force"
@@ -43,7 +45,6 @@ sealed class Screen(val route: String) {
 
     /** Экран редактирования существующей транзакции */
     data object EditTransaction : Screen("edit/{$TRANSACTION_ID_ARG}") {
-
         fun createRoute(transactionId: String) = "edit/$transactionId"
     }
 
@@ -51,8 +52,11 @@ sealed class Screen(val route: String) {
     data object FinancialStatistics : Screen(
         "financial_statistics?$START_DATE_ARG={$START_DATE_ARG}&$END_DATE_ARG={$END_DATE_ARG}&$PERIOD_TYPE_ARG={$PERIOD_TYPE_ARG}",
     ) {
-
-        fun createRoute(startDate: Long?, endDate: Long?, periodType: String? = null): String {
+        fun createRoute(
+            startDate: Long?,
+            endDate: Long?,
+            periodType: String? = null,
+        ): String {
             val start = startDate ?: System.currentTimeMillis()
             val end = endDate ?: System.currentTimeMillis()
             return if (periodType != null) {
@@ -67,8 +71,10 @@ sealed class Screen(val route: String) {
     data object DetailedFinancialStatistics : Screen(
         "detailed_financial_statistics?$START_DATE_ARG={$START_DATE_ARG}&$END_DATE_ARG={$END_DATE_ARG}",
     ) {
-
-        fun createRoute(startDate: Long?, endDate: Long?): String {
+        fun createRoute(
+            startDate: Long?,
+            endDate: Long?,
+        ): String {
             val start = startDate ?: System.currentTimeMillis()
             val end = endDate ?: System.currentTimeMillis()
             return "detailed_financial_statistics?$START_DATE_ARG=$start&$END_DATE_ARG=$end"
@@ -89,7 +95,6 @@ sealed class Screen(val route: String) {
 
     /** Экран транзакций кошелька */
     data object WalletTransactions : Screen("wallet/{$WALLET_ID_ARG}") {
-
         fun createRoute(walletId: String) = "wallet/$walletId"
     }
 

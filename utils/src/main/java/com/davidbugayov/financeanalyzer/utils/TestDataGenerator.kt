@@ -14,25 +14,26 @@ import kotlin.random.Random
  * В String не выносить!
  */
 object TestDataGenerator {
+    private val expenseCategories =
+        listOf(
+            "Продукты",
+            "Транспорт",
+            "Развлечения",
+            "Здоровье",
+            "Одежда",
+            "Рестораны",
+            "Коммунальные платежи",
+            "Другое",
+        )
 
-    private val expenseCategories = listOf(
-        "Продукты",
-        "Транспорт",
-        "Развлечения",
-        "Здоровье",
-        "Одежда",
-        "Рестораны",
-        "Коммунальные платежи",
-        "Другое",
-    )
-
-    private val incomeCategories = listOf(
-        "Зарплата",
-        "Фриланс",
-        "Подарки",
-        "Инвестиции",
-        "Другое",
-    )
+    private val incomeCategories =
+        listOf(
+            "Зарплата",
+            "Фриланс",
+            "Подарки",
+            "Инвестиции",
+            "Другое",
+        )
 
     /**
      * Генерирует список тестовых транзакций
@@ -59,49 +60,61 @@ object TestDataGenerator {
             val isExpense = Random.nextDouble() < 0.7
 
             // Выбираем случайную категорию
-            val category = if (isExpense) {
-                expenseCategories.random()
-            } else {
-                incomeCategories.random()
-            }
+            val category =
+                if (isExpense) {
+                    expenseCategories.random()
+                } else {
+                    incomeCategories.random()
+                }
 
             // Генерируем случайную сумму
-            val amount = if (isExpense) {
-                when (category) {
-                    "Продукты" -> Random.nextDouble(100.0, 5000.0)
-                    "Транспорт" -> Random.nextDouble(50.0, 1000.0)
-                    "Развлечения" -> Random.nextDouble(500.0, 3000.0)
-                    "Здоровье" -> Random.nextDouble(200.0, 10000.0)
-                    "Одежда" -> Random.nextDouble(1000.0, 15000.0)
-                    "Рестораны" -> Random.nextDouble(500.0, 5000.0)
-                    "Коммунальные платежи" -> Random.nextDouble(1000.0, 8000.0)
-                    else -> Random.nextDouble(100.0, 3000.0)
+            val amount =
+                if (isExpense) {
+                    when (category) {
+                        "Продукты" -> Random.nextDouble(100.0, 5000.0)
+                        "Транспорт" -> Random.nextDouble(50.0, 1000.0)
+                        "Развлечения" -> Random.nextDouble(500.0, 3000.0)
+                        "Здоровье" -> Random.nextDouble(200.0, 10000.0)
+                        "Одежда" -> Random.nextDouble(1000.0, 15000.0)
+                        "Рестораны" -> Random.nextDouble(500.0, 5000.0)
+                        "Коммунальные платежи" -> Random.nextDouble(1000.0, 8000.0)
+                        else -> Random.nextDouble(100.0, 3000.0)
+                    }
+                } else {
+                    when (category) {
+                        "Зарплата" -> Random.nextDouble(30000.0, 150000.0)
+                        "Фриланс" -> Random.nextDouble(5000.0, 50000.0)
+                        "Подарки" -> Random.nextDouble(1000.0, 10000.0)
+                        "Инвестиции" -> Random.nextDouble(1000.0, 20000.0)
+                        else -> Random.nextDouble(1000.0, 5000.0)
+                    }
                 }
-            } else {
-                when (category) {
-                    "Зарплата" -> Random.nextDouble(30000.0, 150000.0)
-                    "Фриланс" -> Random.nextDouble(5000.0, 50000.0)
-                    "Подарки" -> Random.nextDouble(1000.0, 10000.0)
-                    "Инвестиции" -> Random.nextDouble(1000.0, 20000.0)
-                    else -> Random.nextDouble(1000.0, 5000.0)
-                }
-            }
 
             // Создаем транзакцию и добавляем в список
-            val source = if (Random.nextBoolean()) "Сбер" else if (Random.nextBoolean()) "Т-Банк" else "Наличные"
+            val source =
+                if (Random.nextBoolean()) {
+                    "Сбер"
+                } else if (Random.nextBoolean()) {
+                    "Т-Банк"
+                } else {
+                    "Наличные"
+                }
             transactions.add(
                 Transaction(
                     id = i.toString(),
-                    amount = Money(
-                        amount,
-                    ), // Используем конструктор Money с Double, который правильно масштабирует значение
+                    amount =
+                        Money(
+                            amount,
+                        ),
+                    // Используем конструктор Money с Double, который правильно масштабирует значение
                     category = category,
                     isExpense = isExpense,
                     date = date,
                     note = if (Random.nextBoolean()) "Примечание к транзакции" else null,
                     source = source,
-                    sourceColor = ColorUtils.getSourceColorByName(source)?.toArgb()
-                        ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
+                    sourceColor =
+                        ColorUtils.getSourceColorByName(source)?.toArgb()
+                            ?: if (isExpense) ExpenseColorInt else IncomeColorInt,
                 ),
             )
         }

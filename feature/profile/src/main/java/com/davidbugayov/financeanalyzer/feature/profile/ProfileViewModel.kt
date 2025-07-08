@@ -8,16 +8,16 @@ import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.navigation.Screen
+import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
-import com.davidbugayov.financeanalyzer.utils.Time
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
+import com.davidbugayov.financeanalyzer.utils.Time
 import java.io.File
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,7 +40,6 @@ class ProfileViewModel(
     val userEventTracker: UserEventTracker,
     val errorTracker: ErrorTracker,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(ProfileState())
     val state: StateFlow<ProfileState> = _state.asStateFlow()
 
@@ -195,11 +194,17 @@ class ProfileViewModel(
                                 exportError = null,
                             )
                         }
-                        
+
                         // Триггеры достижений за экспорт
-                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("backup_created")
-                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("export_master")
-                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("backup_enthusiast")
+                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                            "backup_created",
+                        )
+                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                            "export_master",
+                        )
+                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                            "backup_enthusiast",
+                        )
 
                         when (action) {
                             ExportTransactionsToCSVUseCase.ExportAction.SHARE -> {
@@ -268,20 +273,21 @@ class ProfileViewModel(
                     )
 
                     // Форматируем dateRange в строку
-                    val dateRangeStr = try {
-                        val dateRange = analytics.dateRange
-                        if (dateRange != null) {
-                            val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
-                            val startStr = dateFormat.format(dateRange.first)
-                            val endStr = dateFormat.format(dateRange.second)
-                            "$startStr - $endStr"
-                        } else {
+                    val dateRangeStr =
+                        try {
+                            val dateRange = analytics.dateRange
+                            if (dateRange != null) {
+                                val dateFormat = java.text.SimpleDateFormat("dd.MM.yyyy", java.util.Locale.getDefault())
+                                val startStr = dateFormat.format(dateRange.first)
+                                val endStr = dateFormat.format(dateRange.second)
+                                "$startStr - $endStr"
+                            } else {
+                                "Все время"
+                            }
+                        } catch (exception: Exception) {
+                            Timber.e(exception, "Ошибка при форматировании dateRange")
                             "Все время"
                         }
-                    } catch (exception: Exception) {
-                        Timber.e(exception, "Ошибка при форматировании dateRange")
-                        "Все время"
-                    }
 
                     // Форматируем averageExpense в строку
                     val averageExpenseStr = analytics.averageExpense.formatForDisplay(useMinimalDecimals = true)
@@ -290,20 +296,21 @@ class ProfileViewModel(
                         "[ProfileViewModel] Formatted values: dateRange=$dateRangeStr, averageExpense=$averageExpenseStr",
                     )
 
-                    val newState = _state.value.copy(
-                        isLoading = false,
-                        totalIncome = analytics.totalIncome,
-                        totalExpense = analytics.totalExpense,
-                        balance = analytics.balance,
-                        savingsRate = analytics.savingsRate,
-                        totalTransactions = analytics.totalTransactions,
-                        totalExpenseCategories = analytics.totalExpenseCategories,
-                        totalIncomeCategories = analytics.totalIncomeCategories,
-                        averageExpense = averageExpenseStr,
-                        totalSourcesUsed = analytics.totalSourcesUsed,
-                        dateRange = dateRangeStr,
-                        error = null,
-                    )
+                    val newState =
+                        _state.value.copy(
+                            isLoading = false,
+                            totalIncome = analytics.totalIncome,
+                            totalExpense = analytics.totalExpense,
+                            balance = analytics.balance,
+                            savingsRate = analytics.savingsRate,
+                            totalTransactions = analytics.totalTransactions,
+                            totalExpenseCategories = analytics.totalExpenseCategories,
+                            totalIncomeCategories = analytics.totalIncomeCategories,
+                            averageExpense = averageExpenseStr,
+                            totalSourcesUsed = analytics.totalSourcesUsed,
+                            dateRange = dateRangeStr,
+                            error = null,
+                        )
 
                     _state.update { newState }
 

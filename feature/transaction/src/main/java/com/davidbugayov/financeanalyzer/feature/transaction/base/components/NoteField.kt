@@ -9,7 +9,11 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 
 @Composable
-fun NoteField(note: String, onNoteChange: (String) -> Unit, modifier: Modifier = Modifier) {
+fun NoteField(
+    note: String,
+    onNoteChange: (String) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     OutlinedTextField(
         value = note,
         onValueChange = onNoteChange,

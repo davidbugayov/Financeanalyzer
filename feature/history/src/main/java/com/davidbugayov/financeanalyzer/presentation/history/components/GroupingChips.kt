@@ -24,52 +24,59 @@ import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
  * @param onGroupingSelected Callback, вызываемый при выборе типа группировки
  */
 @Composable
-fun GroupingChips(currentGrouping: GroupingType, onGroupingSelected: (GroupingType) -> Unit) {
+fun GroupingChips(
+    currentGrouping: GroupingType,
+    onGroupingSelected: (GroupingType) -> Unit,
+) {
     val selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
     val selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
     val unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
     val unselectedLabelColor = MaterialTheme.colorScheme.onSurfaceVariant
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
         horizontalArrangement = Arrangement.spacedBy(dimensionResource(R.dimen.spacing_medium)),
     ) {
         FilterChip(
             selected = currentGrouping == GroupingType.DAY,
             onClick = { onGroupingSelected(GroupingType.DAY) },
             label = { Text(stringResource(R.string.group_by_day)) },
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = selectedContainerColor,
-                selectedLabelColor = selectedLabelColor,
-                containerColor = unselectedContainerColor,
-                labelColor = unselectedLabelColor,
-            ),
+            colors =
+                FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = selectedContainerColor,
+                    selectedLabelColor = selectedLabelColor,
+                    containerColor = unselectedContainerColor,
+                    labelColor = unselectedLabelColor,
+                ),
         )
 
         FilterChip(
             selected = currentGrouping == GroupingType.WEEK,
             onClick = { onGroupingSelected(GroupingType.WEEK) },
             label = { Text(stringResource(R.string.group_by_week)) },
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = selectedContainerColor,
-                selectedLabelColor = selectedLabelColor,
-                containerColor = unselectedContainerColor,
-                labelColor = unselectedLabelColor,
-            ),
+            colors =
+                FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = selectedContainerColor,
+                    selectedLabelColor = selectedLabelColor,
+                    containerColor = unselectedContainerColor,
+                    labelColor = unselectedLabelColor,
+                ),
         )
 
         FilterChip(
             selected = currentGrouping == GroupingType.MONTH,
             onClick = { onGroupingSelected(GroupingType.MONTH) },
             label = { Text(stringResource(R.string.group_by_month)) },
-            colors = FilterChipDefaults.filterChipColors(
-                selectedContainerColor = selectedContainerColor,
-                selectedLabelColor = selectedLabelColor,
-                containerColor = unselectedContainerColor,
-                labelColor = unselectedLabelColor,
-            ),
+            colors =
+                FilterChipDefaults.filterChipColors(
+                    selectedContainerColor = selectedContainerColor,
+                    selectedLabelColor = selectedLabelColor,
+                    containerColor = unselectedContainerColor,
+                    labelColor = unselectedLabelColor,
+                ),
         )
     }
 }

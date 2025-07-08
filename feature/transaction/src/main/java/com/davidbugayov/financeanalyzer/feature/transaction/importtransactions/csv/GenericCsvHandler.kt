@@ -14,7 +14,6 @@ class GenericCsvHandler(
     transactionRepository: TransactionRepository,
     context: Context,
 ) : AbstractBankHandler(transactionRepository, context) {
-
     override val bankName: String = "Generic CSV"
 
     override fun supportsFileType(fileType: FileType): Boolean {
@@ -24,16 +23,17 @@ class GenericCsvHandler(
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
             // Пытаемся определить формат файла по имени
-            val defaultConfig = CsvParseConfig(
-                // Более гибкая конфигурация для парсинга различных форматов CSV
-                dateColumnIndex = 1, // Дата во втором столбце (индекс 1), а первый столбец - ID
-                dateFormatString = "yyyy-MM-dd_HH-mm-ss", // Формат даты с временем
-                descriptionColumnIndex = 2, // Описание в третьем столбце
-                amountColumnIndex = 3, // Сумма в четвертом столбце
-                expectedMinColumnCount = 4, // Минимум 4 столбца для валидной строки
-                hasHeader = true, // Предполагаем, что есть заголовок
-                isExpenseColumnIndex = 4, // Индекс колонки с типом транзакции (Доход/Расход)
-            )
+            val defaultConfig =
+                CsvParseConfig(
+                    // Более гибкая конфигурация для парсинга различных форматов CSV
+                    dateColumnIndex = 1, // Дата во втором столбце (индекс 1), а первый столбец - ID
+                    dateFormatString = "yyyy-MM-dd_HH-mm-ss", // Формат даты с временем
+                    descriptionColumnIndex = 2, // Описание в третьем столбце
+                    amountColumnIndex = 3, // Сумма в четвертом столбце
+                    expectedMinColumnCount = 4, // Минимум 4 столбца для валидной строки
+                    hasHeader = true, // Предполагаем, что есть заголовок
+                    isExpenseColumnIndex = 4, // Индекс колонки с типом транзакции (Доход/Расход)
+                )
             Timber.Forest.d(
                 "[$bankName Handler] Creating GenericCsvImportUseCase with config: $defaultConfig",
             )
@@ -48,7 +48,11 @@ class GenericCsvHandler(
         return listOf(".csv", "export", "transactions") // Добавлены общие ключевые слова
     }
 
-    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
+    override fun canHandle(
+        fileName: String,
+        uri: Uri,
+        fileType: FileType,
+    ): Boolean {
         // Сначала базовая проверка (тип файла и ключевые слова в имени)
         if (super.canHandle(fileName, uri, fileType)) {
             return true

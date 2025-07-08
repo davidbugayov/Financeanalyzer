@@ -8,10 +8,10 @@ import org.koin.dsl.module
  * This class is responsible for initializing the transaction module and loading its Koin modules.
  */
 object TransactionModuleInitializer {
-
-    private val transactionModule = module {
-        // Empty for now, will be filled with actual dependencies later
-    }
+    private val transactionModule =
+        module {
+            // Empty for now, will be filled with actual dependencies later
+        }
 
     /**
      * Initialize the transaction module.

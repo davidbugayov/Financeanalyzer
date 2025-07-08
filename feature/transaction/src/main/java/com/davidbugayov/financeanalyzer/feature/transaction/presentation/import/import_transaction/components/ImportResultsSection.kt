@@ -47,38 +47,44 @@ fun ImportResultsSection(
     if (importResults == null) return
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.space_small)),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(R.dimen.space_small)),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.card_elevation),
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            elevation =
+                CardDefaults.cardElevation(
+                    defaultElevation = dimensionResource(R.dimen.card_elevation),
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.space_small)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.space_small)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Иконка успеха или ошибки
                 Icon(
-                    imageVector = if (importResults.errorMessage != null) {
-                        Icons.Rounded.Error
-                    } else {
-                        Icons.Rounded.CheckCircle
-                    },
+                    imageVector =
+                        if (importResults.errorMessage != null) {
+                            Icons.Rounded.Error
+                        } else {
+                            Icons.Rounded.CheckCircle
+                        },
                     contentDescription = null,
-                    tint = if (importResults.errorMessage != null) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        LocalSuccessColor.current
-                    },
+                    tint =
+                        if (importResults.errorMessage != null) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            LocalSuccessColor.current
+                        },
                     modifier = Modifier.size(dimensionResource(R.dimen.import_icon_size_large)),
                 )
 
@@ -86,17 +92,19 @@ fun ImportResultsSection(
 
                 // Заголовок результата
                 Text(
-                    text = if (importResults.errorMessage != null) {
-                        stringResource(R.string.import_error)
-                    } else {
-                        stringResource(R.string.import_completed)
-                    },
+                    text =
+                        if (importResults.errorMessage != null) {
+                            stringResource(R.string.import_error)
+                        } else {
+                            stringResource(R.string.import_completed)
+                        },
                     style = MaterialTheme.typography.titleLarge,
-                    color = if (importResults.errorMessage != null) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        LocalSuccessColor.current
-                    },
+                    color =
+                        if (importResults.errorMessage != null) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            LocalSuccessColor.current
+                        },
                 )
 
                 // Отображение названия банка, если оно есть
@@ -130,9 +138,10 @@ fun ImportResultsSection(
                     // Сообщение об ошибке
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.errorContainer,
-                        ),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.errorContainer,
+                            ),
                         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
                     ) {
                         Text(
@@ -147,23 +156,26 @@ fun ImportResultsSection(
                     // Статистика импорта
                     Card(
                         modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.primaryContainer,
-                        ),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.primaryContainer,
+                            ),
                         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(dimensionResource(R.dimen.space_small)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(dimensionResource(R.dimen.space_small)),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Text(
-                                text = stringResource(
-                                    R.string.import_summary,
-                                    importResults.importedCount,
-                                    importResults.skippedCount,
-                                ),
+                                text =
+                                    stringResource(
+                                        R.string.import_summary,
+                                        importResults.importedCount,
+                                        importResults.skippedCount,
+                                    ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                                 textAlign = TextAlign.Center,

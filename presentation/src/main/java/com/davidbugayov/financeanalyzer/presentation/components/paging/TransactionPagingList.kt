@@ -6,6 +6,8 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyListState
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
@@ -18,13 +20,11 @@ import androidx.compose.ui.unit.dp
 import androidx.paging.LoadState
 import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import com.davidbugayov.financeanalyzer.presentation.R
 import timber.log.Timber
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.rememberLazyListState
 
 @Composable
 fun TransactionPagingList(
@@ -54,9 +54,10 @@ fun TransactionPagingList(
                     Text(
                         text = model.title,
                         style = MaterialTheme.typography.titleMedium,
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = dimensionResource(id = R.dimen.spacing_small)),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = dimensionResource(id = R.dimen.spacing_small)),
                     )
                 }
                 is TransactionListItem.Item -> {
@@ -82,9 +83,10 @@ fun TransactionPagingList(
                 loadState.append is LoadState.Loading -> {
                     item("append_loading") {
                         Box(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(dimensionResource(id = R.dimen.spacing_large)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(dimensionResource(id = R.dimen.spacing_large)),
                             contentAlignment = Alignment.Center,
                         ) {
                             CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)

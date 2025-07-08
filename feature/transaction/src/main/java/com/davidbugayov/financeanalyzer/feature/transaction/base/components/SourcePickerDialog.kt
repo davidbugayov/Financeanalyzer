@@ -29,8 +29,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.feature.transaction.R
 import timber.log.Timber
 
 @OptIn(ExperimentalFoundationApi::class)
@@ -51,24 +51,26 @@ fun SourcePickerDialog(
                 LazyColumn {
                     items(sources) { source ->
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .combinedClickable(
-                                    onClick = { onSourceSelected(source) },
-                                    onLongClick = {
-                                        Timber.d("Long press on source: ${source.name}")
-                                        onDeleteSource(source.name)
-                                    },
-                                )
-                                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .combinedClickable(
+                                        onClick = { onSourceSelected(source) },
+                                        onLongClick = {
+                                            Timber.d("Long press on source: ${source.name}")
+                                            onDeleteSource(source.name)
+                                        },
+                                    )
+                                    .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .padding(end = dimensionResource(R.dimen.spacing_medium))
-                                    .size(dimensionResource(R.dimen.icon_size_small))
-                                    .clip(CircleShape)
-                                    .background(Color(source.color)),
+                                modifier =
+                                    Modifier
+                                        .padding(end = dimensionResource(R.dimen.spacing_medium))
+                                        .size(dimensionResource(R.dimen.icon_size_small))
+                                        .clip(CircleShape)
+                                        .background(Color(source.color)),
                             )
                             Text(
                                 text = source.name,
@@ -79,27 +81,30 @@ fun SourcePickerDialog(
                                 imageVector = Icons.Default.Delete,
                                 contentDescription = stringResource(R.string.delete_source),
                                 tint = Color.Gray.copy(alpha = 0.5f),
-                                modifier = Modifier
-                                    .padding(start = 8.dp)
-                                    .size(18.dp)
-                                    .clickable { onDeleteSource(source.name) },
+                                modifier =
+                                    Modifier
+                                        .padding(start = 8.dp)
+                                        .size(18.dp)
+                                        .clickable { onDeleteSource(source.name) },
                             )
                         }
                     }
                     item {
                         Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .clickable { onAddCustomSource() }
-                                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .clickable { onAddCustomSource() }
+                                    .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
                             verticalAlignment = Alignment.CenterVertically,
                         ) {
                             Icon(
                                 imageVector = Icons.Default.Add,
                                 contentDescription = stringResource(R.string.add_custom_source),
-                                modifier = Modifier
-                                    .padding(end = dimensionResource(R.dimen.spacing_medium))
-                                    .size(dimensionResource(R.dimen.icon_size_small)),
+                                modifier =
+                                    Modifier
+                                        .padding(end = dimensionResource(R.dimen.spacing_medium))
+                                        .size(dimensionResource(R.dimen.icon_size_small)),
                             )
                             Text(stringResource(R.string.add_custom_source))
                         }

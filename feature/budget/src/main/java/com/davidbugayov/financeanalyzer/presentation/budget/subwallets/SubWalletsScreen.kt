@@ -11,11 +11,11 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import org.koin.androidx.compose.koinViewModel
-import org.koin.core.parameter.parametersOf
+import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.EmptySubWalletsState
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.ParentWalletCard
 import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.SubWalletCard
-import com.davidbugayov.financeanalyzer.presentation.budget.subwallets.components.EmptySubWalletsState
+import org.koin.androidx.compose.koinViewModel
+import org.koin.core.parameter.parametersOf
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -68,9 +68,10 @@ fun SubWalletsScreen(
         },
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
             contentPadding = PaddingValues(16.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp),
         ) {

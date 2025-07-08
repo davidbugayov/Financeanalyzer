@@ -3,6 +3,10 @@ package com.davidbugayov.financeanalyzer.presentation.history
 import android.app.Application
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.Result
@@ -22,34 +26,31 @@ import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
 import com.davidbugayov.financeanalyzer.presentation.history.model.GroupingType
-import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
+import java.text.SimpleDateFormat
 import java.util.Calendar
 import java.util.Date
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flatMapLatest
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import timber.log.Timber
-import kotlinx.coroutines.flow.first
-import androidx.paging.PagingData
-import kotlinx.coroutines.flow.Flow
-import androidx.paging.insertSeparators
-import androidx.paging.cachedIn
-import java.text.SimpleDateFormat
-import java.util.Locale
-import androidx.paging.map
-import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.flow.MutableSharedFlow
 
+@kotlinx.coroutines.ExperimentalCoroutinesApi
 class TransactionHistoryViewModel(
     private val filterTransactionsUseCase: FilterTransactionsUseCase,
     private val groupTransactionsUseCase: GroupTransactionsUseCase,
@@ -62,7 +63,6 @@ class TransactionHistoryViewModel(
     private val navigationManager: NavigationManager,
     private val updateTransactionUseCase: UpdateTransactionUseCase,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(TransactionHistoryState())
     val state: StateFlow<TransactionHistoryState> = _state.asStateFlow()
 
@@ -74,23 +74,27 @@ class TransactionHistoryViewModel(
      * Публикует поток постраничных данных в соответствии с текущим периодом.
      * Пересоздается при вызове [reloadPagedTransactions].
      */
-    val pagedTransactions: Flow<PagingData<Transaction>> = pagerTrigger
-        .flatMapLatest {
-            val s = state.value
-            val pageSize = s.pageSize
-            if (s.periodType == com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL) {
-                repository.getAllPaged(pageSize)
-            } else {
-                repository.getByPeriodPaged(s.startDate, s.endDate, pageSize)
+    val pagedTransactions: Flow<PagingData<Transaction>> =
+        pagerTrigger
+            .flatMapLatest {
+                val s = state.value
+                val pageSize = s.pageSize
+                if (s.periodType == com.davidbugayov.financeanalyzer.navigation.model.PeriodType.ALL) {
+                    repository.getAllPaged(pageSize)
+                } else {
+                    repository.getByPeriodPaged(s.startDate, s.endDate, pageSize)
+                }
             }
-        }
-        .cachedIn(viewModelScope)
+            .cachedIn(viewModelScope)
 
     // ---------- Helpers для заголовков ----------
     private val dayFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
     private val monthFormatter = SimpleDateFormat("LLLL yyyy", Locale.forLanguageTag("ru"))
 
-    private fun headerKey(date: java.util.Date, grouping: GroupingType): String {
+    private fun headerKey(
+        date: java.util.Date,
+        grouping: GroupingType,
+    ): String {
         return when (grouping) {
             GroupingType.DAY -> dayFormatter.format(date)
             GroupingType.WEEK -> {
@@ -104,18 +108,19 @@ class TransactionHistoryViewModel(
     }
 
     /** PagingData с Header/Item согласно выбранной группировке */
-    val pagedUiModels: Flow<PagingData<TransactionListItem>> = pagedTransactions
-        .map { pagingData ->
-            val grouping = state.value.groupingType
-            pagingData.map { tx -> TransactionListItem.Item(tx) }
-                .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
-                    if (after == null) return@insertSeparators null
-                    val beforeKey = before?.transaction?.date?.let { headerKey(it, grouping) }
-                    val afterKey = headerKey(after.transaction.date, grouping)
-                    if (before == null || beforeKey != afterKey) TransactionListItem.Header(afterKey) else null
-                }
-        }
-        .cachedIn(viewModelScope)
+    val pagedUiModels: Flow<PagingData<TransactionListItem>> =
+        pagedTransactions
+            .map { pagingData ->
+                val grouping = state.value.groupingType
+                pagingData.map { tx -> TransactionListItem.Item(tx) }
+                    .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
+                        if (after == null) return@insertSeparators null
+                        val beforeKey = before?.transaction?.date?.let { headerKey(it, grouping) }
+                        val afterKey = headerKey(after.transaction.date, grouping)
+                        if (before == null || beforeKey != afterKey) TransactionListItem.Header(afterKey) else null
+                    }
+            }
+            .cachedIn(viewModelScope)
 
     private fun reloadPagedTransactions() {
         pagerTrigger.tryEmit(Unit)
@@ -168,31 +173,36 @@ class TransactionHistoryViewModel(
             is TransactionHistoryEvent.SetPeriodType -> updatePeriodType(event.type)
             is TransactionHistoryEvent.SetCategories -> updateCategories(event.categories)
             is TransactionHistoryEvent.SetSources -> updateSources(event.sources)
-            is TransactionHistoryEvent.SetDateRange -> updateDateRange(
-                event.startDate,
-                event.endDate,
-            )
+            is TransactionHistoryEvent.SetDateRange ->
+                updateDateRange(
+                    event.startDate,
+                    event.endDate,
+                )
             is TransactionHistoryEvent.SetStartDate -> updateStartDate(event.date)
             is TransactionHistoryEvent.SetEndDate -> updateEndDate(event.date)
             is TransactionHistoryEvent.ReloadTransactions -> resetAndReloadTransactions()
             is TransactionHistoryEvent.LoadMoreTransactions -> loadMoreTransactions()
-            is TransactionHistoryEvent.ShowDeleteConfirmDialog -> showDeleteConfirmDialog(
-                event.transaction,
-            )
+            is TransactionHistoryEvent.ShowDeleteConfirmDialog ->
+                showDeleteConfirmDialog(
+                    event.transaction,
+                )
             is TransactionHistoryEvent.HideDeleteConfirmDialog -> hideDeleteConfirmDialog()
-            is TransactionHistoryEvent.DeleteCategory -> deleteCategory(
-                event.category,
-                event.isExpense,
-            )
-            is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog -> showDeleteCategoryConfirmDialog(
-                event.category,
-                event.isExpense,
-            )
+            is TransactionHistoryEvent.DeleteCategory ->
+                deleteCategory(
+                    event.category,
+                    event.isExpense,
+                )
+            is TransactionHistoryEvent.ShowDeleteCategoryConfirmDialog ->
+                showDeleteCategoryConfirmDialog(
+                    event.category,
+                    event.isExpense,
+                )
             is TransactionHistoryEvent.HideDeleteCategoryConfirmDialog -> hideDeleteCategoryConfirmDialog()
             is TransactionHistoryEvent.DeleteSource -> deleteSource(event.source)
-            is TransactionHistoryEvent.ShowDeleteSourceConfirmDialog -> showDeleteSourceConfirmDialog(
-                event.source,
-            )
+            is TransactionHistoryEvent.ShowDeleteSourceConfirmDialog ->
+                showDeleteSourceConfirmDialog(
+                    event.source,
+                )
             is TransactionHistoryEvent.HideDeleteSourceConfirmDialog -> hideDeleteSourceConfirmDialog()
             is TransactionHistoryEvent.ShowPeriodDialog -> showPeriodDialog()
             is TransactionHistoryEvent.HidePeriodDialog -> hidePeriodDialog()
@@ -296,57 +306,59 @@ class TransactionHistoryViewModel(
                 Timber.d("Начинаем загрузку транзакций с периодом: ${currentState.periodType}")
 
                 // Создаем вспомогательную корутину для получения общего количества транзакций
-                val totalCountDeferred = viewModelScope.async(Dispatchers.IO) {
-                    try {
-                        val count = repository.getTransactionsCount()
-                        Timber.d("Общее количество транзакций: $count")
-                        count
-                    } catch (exception: Exception) {
-                        Timber.e(exception, "Ошибка при получении количества транзакций: ${exception.message}")
-                        0 // По умолчанию считаем, что транзакций нет
+                val totalCountDeferred =
+                    viewModelScope.async(Dispatchers.IO) {
+                        try {
+                            val count = repository.getTransactionsCount()
+                            Timber.d("Общее количество транзакций: $count")
+                            count
+                        } catch (exception: Exception) {
+                            Timber.e(exception, "Ошибка при получении количества транзакций: ${exception.message}")
+                            0 // По умолчанию считаем, что транзакций нет
+                        }
                     }
-                }
 
                 // Запускаем асинхронную загрузку транзакций
-                var transactions = withContext(Dispatchers.IO) {
-                    try {
-                        Timber.d("Загрузка транзакций с периодом: ${currentState.periodType}")
-                        when (currentState.periodType) {
-                            PeriodType.ALL -> {
-                                Timber.d("Загружаем ВСЕ транзакции напрямую из репозитория")
-                                repository.getAllTransactions()
+                var transactions =
+                    withContext(Dispatchers.IO) {
+                        try {
+                            Timber.d("Загрузка транзакций с периодом: ${currentState.periodType}")
+                            when (currentState.periodType) {
+                                PeriodType.ALL -> {
+                                    Timber.d("Загружаем ВСЕ транзакции напрямую из репозитория")
+                                    repository.getAllTransactions()
+                                }
+                                PeriodType.CUSTOM, PeriodType.DAY, PeriodType.QUARTER, PeriodType.YEAR -> {
+                                    Timber.d(
+                                        "Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}",
+                                    )
+                                    getTransactionsForPeriodFlowUseCase(
+                                        currentState.startDate,
+                                        currentState.endDate,
+                                    ).first()
+                                }
+                                PeriodType.MONTH -> {
+                                    val calendar = Calendar.getInstance()
+                                    calendar.time = currentState.endDate
+                                    val year = calendar.get(Calendar.YEAR)
+                                    val month = calendar.get(Calendar.MONTH) + 1
+                                    Timber.d("Загружаем транзакции за МЕСЯЦ: $year-$month")
+                                    repository.getTransactionsByMonth(year, month)
+                                }
+                                PeriodType.WEEK -> {
+                                    val calendar = Calendar.getInstance()
+                                    calendar.time = currentState.endDate
+                                    val year = calendar.get(Calendar.YEAR)
+                                    val week = calendar.get(Calendar.WEEK_OF_YEAR)
+                                    Timber.d("Загружаем транзакции за НЕДЕЛЮ: $year-$week")
+                                    repository.getTransactionsByWeek(year, week)
+                                }
                             }
-                            PeriodType.CUSTOM, PeriodType.DAY, PeriodType.QUARTER, PeriodType.YEAR -> {
-                                Timber.d(
-                                    "Загружаем транзакции через use case по периоду: ${currentState.startDate} - ${currentState.endDate}",
-                                )
-                                getTransactionsForPeriodFlowUseCase(
-                                    currentState.startDate,
-                                    currentState.endDate,
-                                ).first()
-                            }
-                            PeriodType.MONTH -> {
-                                val calendar = Calendar.getInstance()
-                                calendar.time = currentState.endDate
-                                val year = calendar.get(Calendar.YEAR)
-                                val month = calendar.get(Calendar.MONTH) + 1
-                                Timber.d("Загружаем транзакции за МЕСЯЦ: $year-$month")
-                                repository.getTransactionsByMonth(year, month)
-                            }
-                            PeriodType.WEEK -> {
-                                val calendar = Calendar.getInstance()
-                                calendar.time = currentState.endDate
-                                val year = calendar.get(Calendar.YEAR)
-                                val week = calendar.get(Calendar.WEEK_OF_YEAR)
-                                Timber.d("Загружаем транзакции за НЕДЕЛЮ: $year-$week")
-                                repository.getTransactionsByWeek(year, week)
-                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Ошибка при загрузке первой страницы транзакций: ${e.message}")
+                            emptyList()
                         }
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при загрузке первой страницы транзакций: ${e.message}")
-                        emptyList()
                     }
-                }
 
                 // Получаем общее количество транзакций из отложенного вычисления
                 val totalCount = totalCountDeferred.await()
@@ -419,37 +431,38 @@ class TransactionHistoryViewModel(
                 val offset = currentPage * pageSize
 
                 // Загружаем следующую страницу в IO потоке
-                var nextPageTransactions = withContext(Dispatchers.IO) {
-                    try {
-                        when (currentState.periodType) {
-                            PeriodType.ALL -> {
-                                // Загружаем все транзакции с пагинацией
-                                repository.getTransactionsPaginated(pageSize, offset)
+                var nextPageTransactions =
+                    withContext(Dispatchers.IO) {
+                        try {
+                            when (currentState.periodType) {
+                                PeriodType.ALL -> {
+                                    // Загружаем все транзакции с пагинацией
+                                    repository.getTransactionsPaginated(pageSize, offset)
+                                }
+                                PeriodType.CUSTOM -> {
+                                    // Для пользовательского периода используем фильтрацию по диапазону дат
+                                    repository.getTransactionsByDateRangePaginated(
+                                        currentState.startDate,
+                                        currentState.endDate,
+                                        pageSize,
+                                        offset,
+                                    )
+                                }
+                                else -> {
+                                    // Для остальных периодов используем стандартный метод с диапазоном дат
+                                    repository.getTransactionsByDateRangePaginated(
+                                        currentState.startDate,
+                                        currentState.endDate,
+                                        pageSize,
+                                        offset,
+                                    )
+                                }
                             }
-                            PeriodType.CUSTOM -> {
-                                // Для пользовательского периода используем фильтрацию по диапазону дат
-                                repository.getTransactionsByDateRangePaginated(
-                                    currentState.startDate,
-                                    currentState.endDate,
-                                    pageSize,
-                                    offset,
-                                )
-                            }
-                            else -> {
-                                // Для остальных периодов используем стандартный метод с диапазоном дат
-                                repository.getTransactionsByDateRangePaginated(
-                                    currentState.startDate,
-                                    currentState.endDate,
-                                    pageSize,
-                                    offset,
-                                )
-                            }
+                        } catch (e: Exception) {
+                            Timber.e(e, "Ошибка при загрузке следующей страницы: ${e.message}")
+                            emptyList()
                         }
-                    } catch (e: Exception) {
-                        Timber.e(e, "Ошибка при загрузке следующей страницы: ${e.message}")
-                        emptyList()
                     }
-                }
 
                 // Если новых транзакций нет - больше нет данных
                 if (nextPageTransactions.isEmpty()) {
@@ -513,24 +526,27 @@ class TransactionHistoryViewModel(
                 val transactions = currentState.transactions
 
                 // Фильтруем транзакции по категории и периодам
-                val currentPeriodTransactions = transactions.filter {
-                    it.category == category && it.date >= startDate && it.date <= endDate
-                }
+                val currentPeriodTransactions =
+                    transactions.filter {
+                        it.category == category && it.date >= startDate && it.date <= endDate
+                    }
                 val previousPeriodStart = Date(startDate.time - (endDate.time - startDate.time))
-                val previousPeriodTransactions = transactions.filter {
-                    it.category == category && it.date >= previousPeriodStart && it.date < startDate
-                }
+                val previousPeriodTransactions =
+                    transactions.filter {
+                        it.category == category && it.date >= previousPeriodStart && it.date < startDate
+                    }
 
                 // Вычисляем суммы для текущего и предыдущего периодов
                 val currentTotal = currentPeriodTransactions.sumOf { it.amount.amount }
                 val previousTotal = previousPeriodTransactions.sumOf { it.amount.amount }
 
                 // Вычисляем процентное изменение
-                val percentageChange = if (previousTotal != BigDecimal.ZERO) {
-                    ((currentTotal - previousTotal) * BigDecimal(100)) / previousTotal
-                } else {
-                    null
-                }
+                val percentageChange =
+                    if (previousTotal != BigDecimal.ZERO) {
+                        ((currentTotal - previousTotal) * BigDecimal(100)) / previousTotal
+                    } else {
+                        null
+                    }
 
                 _state.update {
                     it.copy(
@@ -555,7 +571,10 @@ class TransactionHistoryViewModel(
     /**
      * Применяет фильтры по категориям и источникам к списку транзакций
      */
-    private fun filterTransactions(transactions: List<Transaction>, state: TransactionHistoryState): List<Transaction> {
+    private fun filterTransactions(
+        transactions: List<Transaction>,
+        state: TransactionHistoryState,
+    ): List<Transaction> {
         return filterTransactionsUseCase(
             transactions = transactions,
             periodType = toDomainPeriodType(state.periodType),
@@ -627,36 +646,39 @@ class TransactionHistoryViewModel(
             // Фильтруем транзакции только если есть фильтры
             val hasFilters = currentState.selectedCategories.isNotEmpty() || currentState.selectedSources.isNotEmpty()
 
-            val filteredTransactions = if (hasFilters) {
-                // Применяем фильтрацию только если заданы фильтры
-                val before = transactions.size
-                val filtered = filterTransactions(transactions, currentState)
-                Timber.d("Фильтрация: $before -> ${filtered.size} транзакций")
-                filtered
-            } else {
-                // Если нет фильтров, используем исходный список
-                transactions
-            }
+            val filteredTransactions =
+                if (hasFilters) {
+                    // Применяем фильтрацию только если заданы фильтры
+                    val before = transactions.size
+                    val filtered = filterTransactions(transactions, currentState)
+                    Timber.d("Фильтрация: $before -> ${filtered.size} транзакций")
+                    filtered
+                } else {
+                    // Если нет фильтров, используем исходный список
+                    transactions
+                }
 
             // Вычисляем группы транзакций, если нужно
-            val groupedTransactions = if (filteredTransactions.isNotEmpty()) {
-                val startTime = System.currentTimeMillis()
+            val groupedTransactions =
+                if (filteredTransactions.isNotEmpty()) {
+                    val startTime = System.currentTimeMillis()
 
-                // Используем более эффективный алгоритм группировки
-                val groups = groupTransactionsUseCase(
-                    transactions = filteredTransactions,
-                    groupingType = toDomainGroupingType(currentState.groupingType),
-                )
+                    // Используем более эффективный алгоритм группировки
+                    val groups =
+                        groupTransactionsUseCase(
+                            transactions = filteredTransactions,
+                            groupingType = toDomainGroupingType(currentState.groupingType),
+                        )
 
-                val endTime = System.currentTimeMillis()
-                Timber.d(
-                    "Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс",
-                )
+                    val endTime = System.currentTimeMillis()
+                    Timber.d(
+                        "Группировка ${filteredTransactions.size} транзакций заняла ${endTime - startTime} мс",
+                    )
 
-                groups
-            } else {
-                emptyMap()
-            }
+                    groups
+                } else {
+                    emptyMap()
+                }
 
             // Обновляем состояние в основном потоке
             withContext(Dispatchers.Main) {
@@ -680,11 +702,12 @@ class TransactionHistoryViewModel(
         val currentState = _state.value
 
         // Используем общую логику для вычисления дат начала и конца периода
-        val (startDate, endDate) = DateUtils.updatePeriodDates(
-            periodType = periodType,
-            currentStartDate = currentState.startDate,
-            currentEndDate = currentState.endDate,
-        )
+        val (startDate, endDate) =
+            DateUtils.updatePeriodDates(
+                periodType = periodType,
+                currentStartDate = currentState.startDate,
+                currentEndDate = currentState.endDate,
+            )
 
         // Обновляем состояние
         _state.update {
@@ -724,7 +747,10 @@ class TransactionHistoryViewModel(
         updateFilteredAndGroupedTransactions()
     }
 
-    private fun updateDateRange(startDate: Date, endDate: Date) {
+    private fun updateDateRange(
+        startDate: Date,
+        endDate: Date,
+    ) {
         _state.update {
             it.copy(
                 startDate = startDate,
@@ -753,7 +779,10 @@ class TransactionHistoryViewModel(
         _state.update { it.copy(transactionToDelete = null) }
     }
 
-    private fun deleteCategory(category: String, isExpense: Boolean) {
+    private fun deleteCategory(
+        category: String,
+        isExpense: Boolean,
+    ) {
         viewModelScope.launch {
             // Логируем удаление категории
             AnalyticsUtils.logCategoryDeleted(category, isExpense)
@@ -773,7 +802,10 @@ class TransactionHistoryViewModel(
         }
     }
 
-    private fun showDeleteCategoryConfirmDialog(category: String, isExpense: Boolean) {
+    private fun showDeleteCategoryConfirmDialog(
+        category: String,
+        isExpense: Boolean,
+    ) {
         _state.update { it.copy(categoryToDelete = Pair(category, isExpense)) }
     }
 
@@ -875,10 +907,11 @@ class TransactionHistoryViewModel(
                 val endDate = calendar.time
                 calendar.add(Calendar.MONTH, -1)
                 val startDate = calendar.time
-                val monthlyTransactions = repository.getTransactionsByDateRangeList(
-                    startDate,
-                    endDate,
-                )
+                val monthlyTransactions =
+                    repository.getTransactionsByDateRangeList(
+                        startDate,
+                        endDate,
+                    )
                 Timber.d("Транзакций за последний месяц: ${monthlyTransactions.size}")
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при проверке количества транзакций: ${e.message}")

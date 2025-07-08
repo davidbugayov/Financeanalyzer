@@ -10,7 +10,6 @@ import java.text.NumberFormat
  * Перечисление для позиции символа валюты
  */
 enum class SymbolPosition {
-
     BEFORE,
     AFTER,
 }
@@ -30,7 +29,6 @@ enum class Currency(
     val decimalSeparator: Char,
     val symbolPosition: SymbolPosition,
 ) {
-
     RUB("₽", "RUB", 2, ',', SymbolPosition.AFTER),
     USD("$", "USD", 2, '.', SymbolPosition.BEFORE),
     EUR("€", "EUR", 2, ',', SymbolPosition.AFTER),
@@ -64,7 +62,6 @@ data class Money(
     val amount: BigDecimal,
     val currency: Currency = Currency.RUB,
 ) {
-
     init {
         require(amount.scale() <= currency.decimalPlaces) {
             "Amount scale (${amount.scale()}) exceeds currency decimal places (${currency.decimalPlaces})"
@@ -92,7 +89,6 @@ data class Money(
     )
 
     companion object {
-
         /**
          * Создает нулевое денежное значение
          * @param currency Валюта (по умолчанию RUB)

@@ -26,23 +26,30 @@ import com.davidbugayov.financeanalyzer.feature.transaction.R
  * Диалог с инструкциями по импорту для выбранного банка
  */
 @Composable
-fun BankInstructionDialog(bankName: String, onDismiss: () -> Unit) {
+fun BankInstructionDialog(
+    bankName: String,
+    onDismiss: () -> Unit,
+) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.space_medium)),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.dialog_elevation),
-            ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.space_medium)),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
+            elevation =
+                CardDefaults.cardElevation(
+                    defaultElevation = dimensionResource(R.dimen.dialog_elevation),
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.import_dialog_content_padding)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.import_dialog_content_padding)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
@@ -56,10 +63,11 @@ fun BankInstructionDialog(bankName: String, onDismiss: () -> Unit) {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.space_medium)))
 
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false)
-                        .verticalScroll(rememberScrollState()),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .weight(1f, fill = false)
+                            .verticalScroll(rememberScrollState()),
                 ) {
                     BankInstructionsContent(bankName = bankName)
                 }

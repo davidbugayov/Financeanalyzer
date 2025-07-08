@@ -7,10 +7,10 @@ import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.launch
-import java.util.UUID
 
 /** Состояние мастера создания кошелька */
 data class WalletSetupState(
@@ -28,7 +28,6 @@ class WalletSetupViewModel(
     private val walletRepository: WalletRepository,
     private val navigationManager: NavigationManager,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(WalletSetupState())
     val state: StateFlow<WalletSetupState> = _state
 
@@ -50,10 +49,11 @@ class WalletSetupViewModel(
      * Переключить режим накопительной цели
      */
     fun toggleGoal(enabled: Boolean) {
-        _state.value = _state.value.copy(
-            isGoal = enabled,
-            goalAmountText = if (!enabled) "" else _state.value.goalAmountText,
-        )
+        _state.value =
+            _state.value.copy(
+                isGoal = enabled,
+                goalAmountText = if (!enabled) "" else _state.value.goalAmountText,
+            )
     }
 
     /**
@@ -87,43 +87,46 @@ class WalletSetupViewModel(
             return
         }
 
-        val goalAmount = if (s.isGoal && s.goalAmountText.isNotBlank()) {
-            try {
-                val amount = s.goalAmountText.toDouble()
-                if (amount <= 0) {
-                    _state.value = s.copy(error = "Целевая сумма должна быть больше нуля")
+        val goalAmount =
+            if (s.isGoal && s.goalAmountText.isNotBlank()) {
+                try {
+                    val amount = s.goalAmountText.toDouble()
+                    if (amount <= 0) {
+                        _state.value = s.copy(error = "Целевая сумма должна быть больше нуля")
+                        return
+                    }
+                    Money(amount)
+                } catch (e: Exception) {
+                    _state.value = s.copy(error = "Введите корректную сумму")
                     return
                 }
-                Money(amount)
-            } catch (e: Exception) {
-                _state.value = s.copy(error = "Введите корректную сумму")
-                return
+            } else {
+                null
             }
-        } else {
-            null
-        }
 
         _state.value = s.copy(isLoading = true, error = null)
 
         viewModelScope.launch {
             try {
-                val wallet = Wallet(
-                    name = s.name.trim(),
-                    limit = Money(0.0),
-                    spent = Money(0.0),
-                    id = UUID.randomUUID().toString(),
-                    balance = Money(0.0),
-                    type = s.type,
-                    goalAmount = goalAmount,
-                    goalDate = s.goalDateMillis,
-                )
+                val wallet =
+                    Wallet(
+                        name = s.name.trim(),
+                        limit = Money(0.0),
+                        spent = Money(0.0),
+                        id = UUID.randomUUID().toString(),
+                        balance = Money(0.0),
+                        type = s.type,
+                        goalAmount = goalAmount,
+                        goalDate = s.goalDateMillis,
+                    )
 
                 walletRepository.addWallet(wallet)
 
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    isSuccess = true,
-                )
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        isSuccess = true,
+                    )
 
                 // Небольшая задержка для показа успешного состояния
                 kotlinx.coroutines.delay(500)
@@ -131,10 +134,11 @@ class WalletSetupViewModel(
                 // Возвращаемся к экрану бюджета где будет отображен новый кошелёк
                 navigationManager.navigate(NavigationManager.Command.NavigateUp)
             } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = "Ошибка при создании кошелька: ${e.message}",
-                )
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        error = "Ошибка при создании кошелька: ${e.message}",
+                    )
             }
         }
     }

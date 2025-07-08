@@ -7,7 +7,8 @@ import org.koin.dsl.module
 /**
  * Koin module for transaction feature.
  */
-val transactionModule = module {
-    // ViewModels
-    viewModel { ExportImportViewModel(get()) }
-}
+val transactionModule =
+    module {
+        // ViewModels
+        viewModel { ExportImportViewModel(get()) }
+    }

@@ -1,7 +1,7 @@
 package com.davidbugayov.financeanalyzer.presentation.budget.wallet.model
 
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
 
 /**
  * Состояние для экрана транзакций кошелька

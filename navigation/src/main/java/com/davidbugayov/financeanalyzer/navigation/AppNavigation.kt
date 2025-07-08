@@ -11,7 +11,6 @@ import androidx.navigation.navArgument
  * Содержит методы для создания различных графов навигации.
  */
 class AppNavigation {
-
     /**
      * Создает основной граф навигации
      * @param onOnboardingScreen Функция для отображения экрана Onboarding
@@ -74,21 +73,22 @@ class AppNavigation {
         }
         composable(
             route = Screen.FinancialStatistics.route,
-            arguments = listOf(
-                navArgument(Screen.START_DATE_ARG) {
-                    type = NavType.LongType
-                    defaultValue = -1L
-                },
-                navArgument(Screen.END_DATE_ARG) {
-                    type = NavType.LongType
-                    defaultValue = -1L
-                },
-                navArgument(Screen.PERIOD_TYPE_ARG) {
-                    type = NavType.StringType
-                    nullable = true
-                    defaultValue = null
-                },
-            ),
+            arguments =
+                listOf(
+                    navArgument(Screen.START_DATE_ARG) {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                    navArgument(Screen.END_DATE_ARG) {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                    navArgument(Screen.PERIOD_TYPE_ARG) {
+                        type = NavType.StringType
+                        nullable = true
+                        defaultValue = null
+                    },
+                ),
             enterTransition = defaultEnterUp(),
             exitTransition = defaultExitDown(),
             popEnterTransition = defaultEnterUp(),
@@ -119,16 +119,17 @@ class AppNavigation {
         // Добавляем экран подробной финансовой статистики с анимацией слева направо
         composable(
             route = Screen.DetailedFinancialStatistics.route,
-            arguments = listOf(
-                navArgument(Screen.START_DATE_ARG) {
-                    type = NavType.LongType
-                    defaultValue = -1L
-                },
-                navArgument(Screen.END_DATE_ARG) {
-                    type = NavType.LongType
-                    defaultValue = -1L
-                },
-            ),
+            arguments =
+                listOf(
+                    navArgument(Screen.START_DATE_ARG) {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                    navArgument(Screen.END_DATE_ARG) {
+                        type = NavType.LongType
+                        defaultValue = -1L
+                    },
+                ),
             enterTransition = defaultEnterLeft(),
             exitTransition = defaultExitRight(),
             popEnterTransition = defaultEnterLeft(),
@@ -183,16 +184,17 @@ class AppNavigation {
     ) {
         composable(
             route = Screen.AddTransaction.routeWithArgs,
-            arguments = listOf(
-                navArgument(Screen.AddTransaction.CATEGORY_ARG) {
-                    type = NavType.StringType
-                    nullable = true
-                },
-                navArgument(Screen.AddTransaction.FORCE_EXPENSE_ARG) {
-                    type = NavType.StringType
-                    nullable = true
-                },
-            ),
+            arguments =
+                listOf(
+                    navArgument(Screen.AddTransaction.CATEGORY_ARG) {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                    navArgument(Screen.AddTransaction.FORCE_EXPENSE_ARG) {
+                        type = NavType.StringType
+                        nullable = true
+                    },
+                ),
             enterTransition = defaultEnterUp(),
             exitTransition = defaultExitDown(),
             popEnterTransition = defaultEnterUp(),

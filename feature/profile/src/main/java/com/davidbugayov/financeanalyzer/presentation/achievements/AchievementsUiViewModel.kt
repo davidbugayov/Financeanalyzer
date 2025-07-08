@@ -13,7 +13,6 @@ data class AchievementsUiState(
 )
 
 class AchievementsUiViewModel : ViewModel() {
-
     private val _uiState = MutableStateFlow(AchievementsUiState())
     val uiState: StateFlow<AchievementsUiState> = _uiState
 

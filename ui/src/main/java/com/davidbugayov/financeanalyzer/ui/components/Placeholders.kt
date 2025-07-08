@@ -106,7 +106,10 @@ fun EmptyContent(
  * @param onRetry Обработчик повторной попытки
  */
 @Composable
-fun ErrorContent(error: String, onRetry: () -> Unit) {
+fun ErrorContent(
+    error: String,
+    onRetry: () -> Unit,
+) {
     Box(
         modifier = Modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,

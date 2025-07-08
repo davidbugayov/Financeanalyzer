@@ -3,6 +3,8 @@ package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.facto
 // Removed SberbankHandler, TinkoffCsvHandler, AlfaBankCsvHandler
 import android.content.Context
 import android.net.Uri
+import com.davidbugayov.financeanalyzer.core.util.Result
+import com.davidbugayov.financeanalyzer.core.util.safeCallSync
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.FileType
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.alfabank.AlfaBankExcelHandler
@@ -13,8 +15,6 @@ import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.handle
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.ozon.OzonPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.sberbank.SberbankPdfHandler
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.tbank.TbankPdfHandler
-import com.davidbugayov.financeanalyzer.core.util.Result
-import com.davidbugayov.financeanalyzer.core.util.safeCallSync
 import timber.log.Timber
 
 /**
@@ -25,7 +25,6 @@ class ImportFactory(
     private val context: Context,
     private val transactionRepository: TransactionRepository,
 ) {
-
     private val handlers: List<AbstractBankHandler> by lazy {
         listOf(
             // Specific handlers first
@@ -53,17 +52,22 @@ class ImportFactory(
      * @param fileType Тип файла.
      * @return Экземпляр ImportTransactionsUseCase или null, если обработчик не найден или не поддерживает тип файла.
      */
-    fun getImporter(fileName: String, uri: Uri, fileType: FileType): ImportTransactionsUseCase? {
+    fun getImporter(
+        fileName: String,
+        uri: Uri,
+        fileType: FileType,
+    ): ImportTransactionsUseCase? {
         Timber.d("Attempting to find importer for: $fileName, type: $fileType")
 
         // Явно проверяем, является ли файл выпиской с движением средств
         if (fileType == FileType.PDF && (
                 fileName.contains("движени", ignoreCase = true) ||
                     fileName.contains("справка", ignoreCase = true)
-                )
+            )
         ) {
             // Сначала проверяем на Ozon в имени файла
-            if (fileName.contains("ozon", ignoreCase = true) || fileName.contains(
+            if (fileName.contains("ozon", ignoreCase = true) ||
+                fileName.contains(
                     "озон",
                     ignoreCase = true,
                 )

@@ -2,25 +2,33 @@ package com.davidbugayov.financeanalyzer.feature.transaction.base
 
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import kotlinx.coroutines.flow.StateFlow
 
 interface TransactionScreenViewModel<S, E> {
-
     val state: StateFlow<S>
     val wallets: List<Wallet>
-    fun onEvent(event: E, context: android.content.Context)
+
+    fun onEvent(
+        event: E,
+        context: android.content.Context,
+    )
+
     fun resetFields()
+
     fun updateCategoryPositions()
+
     fun updateSourcePositions()
+
     fun submitTransaction(context: android.content.Context)
+
     fun clearSelectedWallets()
+
     fun selectAllWallets(context: android.content.Context)
 }
 
 interface BaseTransactionState {
-
     val title: String
     val amount: String
     val amountError: Boolean
@@ -68,14 +76,16 @@ interface BaseTransactionState {
     val customCategoryIcon: ImageVector?
 }
 
-fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent = { eventData ->
-    when (eventData) {
-        is com.davidbugayov.financeanalyzer.domain.model.Source -> BaseTransactionEvent.SetSource(
-            eventData.name,
-        )
-        is UiCategory -> BaseTransactionEvent.SetCategory(eventData.name)
-        is java.util.Date -> BaseTransactionEvent.SetDate(eventData)
-        is BaseTransactionEvent -> eventData
-        else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
+fun defaultTransactionEventFactory(isEditMode: Boolean = false): (Any) -> BaseTransactionEvent =
+    { eventData ->
+        when (eventData) {
+            is com.davidbugayov.financeanalyzer.domain.model.Source ->
+                BaseTransactionEvent.SetSource(
+                    eventData.name,
+                )
+            is UiCategory -> BaseTransactionEvent.SetCategory(eventData.name)
+            is java.util.Date -> BaseTransactionEvent.SetDate(eventData)
+            is BaseTransactionEvent -> eventData
+            else -> if (isEditMode) BaseTransactionEvent.SubmitEdit else BaseTransactionEvent.Submit
+        }
     }
-}

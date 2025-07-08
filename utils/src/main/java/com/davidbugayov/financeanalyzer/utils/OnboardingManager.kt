@@ -9,11 +9,11 @@ import androidx.core.content.edit
  * Отвечает за хранение информации о том, был ли показан онбординг пользователю.
  */
 class OnboardingManager(context: Context) {
-
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-        PREFERENCES_NAME,
-        Context.MODE_PRIVATE,
-    )
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(
+            PREFERENCES_NAME,
+            Context.MODE_PRIVATE,
+        )
 
     /**
      * Проверяет, был ли уже показан онбординг пользователю.

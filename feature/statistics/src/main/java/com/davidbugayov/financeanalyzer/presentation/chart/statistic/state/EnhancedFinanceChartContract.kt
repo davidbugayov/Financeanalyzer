@@ -1,32 +1,40 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistic.state
 import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Category
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
-import java.util.Date
-import java.util.Calendar
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartPoint
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
+import java.util.Calendar
+import java.util.Date
 
 sealed class EnhancedFinanceChartIntent {
     object LoadData : EnhancedFinanceChartIntent()
+
     data class ChangePeriod(
         val periodType: PeriodType,
         val startDate: Date,
         val endDate: Date,
     ) : EnhancedFinanceChartIntent()
+
     data class SelectCategory(val category: Category?) : EnhancedFinanceChartIntent()
+
     data class ChangeChartTab(val tabIndex: Int) : EnhancedFinanceChartIntent()
+
     data class ChangeLineChartMode(val mode: LineChartDisplayMode) : EnhancedFinanceChartIntent()
+
     data class ToggleExpenseView(val showExpenses: Boolean) : EnhancedFinanceChartIntent()
+
     object AddTransactionClicked : EnhancedFinanceChartIntent()
     // Добавляй другие интенты по мере необходимости
 }
 
 sealed class EnhancedFinanceChartEffect {
     data class ShowError(val message: String) : EnhancedFinanceChartEffect()
+
     object ScrollToSummary : EnhancedFinanceChartEffect()
+
     object NavigateToAddTransaction : EnhancedFinanceChartEffect()
     // Добавляй другие эффекты по необходимости
 }
@@ -37,19 +45,21 @@ data class EnhancedFinanceChartState(
     val transactions: List<Transaction> = emptyList(),
     val income: Money? = null,
     val expense: Money? = null,
-    val startDate: Date = Calendar.getInstance().apply {
-        add(Calendar.MONTH, -1)
-        set(Calendar.HOUR_OF_DAY, 0)
-        set(Calendar.MINUTE, 0)
-        set(Calendar.SECOND, 0)
-        set(Calendar.MILLISECOND, 0)
-    }.time,
-    val endDate: Date = Calendar.getInstance().apply {
-        set(Calendar.HOUR_OF_DAY, 23)
-        set(Calendar.MINUTE, 59)
-        set(Calendar.SECOND, 59)
-        set(Calendar.MILLISECOND, 999)
-    }.time,
+    val startDate: Date =
+        Calendar.getInstance().apply {
+            add(Calendar.MONTH, -1)
+            set(Calendar.HOUR_OF_DAY, 0)
+            set(Calendar.MINUTE, 0)
+            set(Calendar.SECOND, 0)
+            set(Calendar.MILLISECOND, 0)
+        }.time,
+    val endDate: Date =
+        Calendar.getInstance().apply {
+            set(Calendar.HOUR_OF_DAY, 23)
+            set(Calendar.MINUTE, 59)
+            set(Calendar.SECOND, 59)
+            set(Calendar.MILLISECOND, 999)
+        }.time,
     val periodType: PeriodType = PeriodType.MONTH,
     val selectedCategory: Category? = null,
     val selectedTab: Int = 0,

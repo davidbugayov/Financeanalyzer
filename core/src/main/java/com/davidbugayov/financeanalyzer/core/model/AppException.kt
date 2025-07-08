@@ -7,7 +7,6 @@ sealed class AppException(
     message: String? = null,
     cause: Throwable? = null,
 ) : Exception(message, cause) {
-
     /**
      * Ошибки сети
      */
@@ -15,7 +14,6 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-
         class Connection(cause: Throwable? = null) : Network("Ошибка подключения к сети", cause)
     }
 
@@ -26,7 +24,6 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-
         class ValidationError(message: String? = null) : Data(message ?: "Ошибка валидации")
 
         class NotFound(message: String? = null) : Data(message ?: "Данные не найдены")
@@ -39,7 +36,6 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-
         class ReadError(message: String? = null, cause: Throwable? = null) : FileSystem(
             message ?: "Ошибка чтения файла",
             cause,
@@ -53,7 +49,6 @@ sealed class AppException(
         message: String? = null,
         cause: Throwable? = null,
     ) : AppException(message, cause) {
-
         class InvalidOperation(message: String) : Business(message)
     }
 
@@ -74,7 +69,6 @@ sealed class AppException(
     ) : AppException(message ?: "Ошибка приложения", cause)
 
     companion object {
-
         /**
          * Преобразует стандартное исключение в AppException
          */

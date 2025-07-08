@@ -30,9 +30,10 @@ fun HomeTransactionsHeader(
     onToggleGroupSummary: (Boolean) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -45,11 +46,12 @@ fun HomeTransactionsHeader(
             onClick = { onToggleGroupSummary(!showGroupSummary) },
         ) {
             Text(
-                text = if (showGroupSummary) {
-                    stringResource(R.string.hide_summary)
-                } else {
-                    stringResource(R.string.show_summary)
-                },
+                text =
+                    if (showGroupSummary) {
+                        stringResource(R.string.hide_summary)
+                    } else {
+                        stringResource(R.string.show_summary)
+                    },
                 fontSize = 13.sp,
                 fontWeight = FontWeight.Medium,
             )

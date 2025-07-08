@@ -22,7 +22,6 @@ class SubWalletsViewModel(
     private val parentWalletId: String,
     private val walletRepository: WalletRepository,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(SubWalletsState())
     val state: StateFlow<SubWalletsState> = _state.asStateFlow()
 
@@ -42,26 +41,30 @@ class SubWalletsViewModel(
 
                     // Загружаем подкошельки
                     val subWallets = walletRepository.getSubWallets(parentWalletId)
-                    val totalAmount = subWallets.fold(Money.zero()) { acc, wallet ->
-                        acc + wallet.balance
-                    }
+                    val totalAmount =
+                        subWallets.fold(Money.zero()) { acc, wallet ->
+                            acc + wallet.balance
+                        }
 
-                    _state.value = _state.value.copy(
-                        subWallets = subWallets,
-                        totalSubWalletAmount = totalAmount,
-                        isLoading = false,
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            subWallets = subWallets,
+                            totalSubWalletAmount = totalAmount,
+                            isLoading = false,
+                        )
                 } else {
-                    _state.value = _state.value.copy(
-                        error = "Кошелек не найден",
-                        isLoading = false,
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            error = "Кошелек не найден",
+                            isLoading = false,
+                        )
                 }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    error = e.message ?: "Неизвестная ошибка",
-                    isLoading = false,
-                )
+                _state.value =
+                    _state.value.copy(
+                        error = e.message ?: "Неизвестная ошибка",
+                        isLoading = false,
+                    )
             }
         }
     }
@@ -79,14 +82,16 @@ class SubWalletsViewModel(
                     // Перезагружаем данные
                     loadData()
                 } else {
-                    _state.value = _state.value.copy(
-                        error = "Подкошелек не найден",
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            error = "Подкошелек не найден",
+                        )
                 }
             } catch (e: Exception) {
-                _state.value = _state.value.copy(
-                    error = e.message ?: "Неизвестная ошибка",
-                )
+                _state.value =
+                    _state.value.copy(
+                        error = e.message ?: "Неизвестная ошибка",
+                    )
             }
         }
     }

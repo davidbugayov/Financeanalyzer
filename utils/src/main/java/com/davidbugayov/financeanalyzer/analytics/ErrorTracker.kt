@@ -1,9 +1,9 @@
 package com.davidbugayov.financeanalyzer.analytics
 
 import android.os.Bundle
-import timber.log.Timber
 import java.io.PrintWriter
 import java.io.StringWriter
+import timber.log.Timber
 
 /**
  * Класс для отслеживания и анализа ошибок приложения.
@@ -19,26 +19,31 @@ object ErrorTracker {
      * @param errorMessage Сообщение об ошибке
      * @param additionalParams Дополнительные параметры
      */
-    fun trackError(errorType: String, errorMessage: String, additionalParams: Map<String, Any> = emptyMap()) {
+    fun trackError(
+        errorType: String,
+        errorMessage: String,
+        additionalParams: Map<String, Any> = emptyMap(),
+    ) {
         Timber.e("Error: [$errorType] $errorMessage")
 
-        val params = Bundle().apply {
-            putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
 
-            // Добавляем дополнительные параметры
-            additionalParams.forEach { (key, value) ->
-                when (value) {
-                    is String -> putString(key, value)
-                    is Int -> putInt(key, value)
-                    is Long -> putLong(key, value)
-                    is Float -> putFloat(key, value)
-                    is Double -> putDouble(key, value)
-                    is Boolean -> putBoolean(key, value)
-                    else -> putString(key, value.toString())
+                // Добавляем дополнительные параметры
+                additionalParams.forEach { (key, value) ->
+                    when (value) {
+                        is String -> putString(key, value)
+                        is Int -> putInt(key, value)
+                        is Long -> putLong(key, value)
+                        is Float -> putFloat(key, value)
+                        is Double -> putDouble(key, value)
+                        is Boolean -> putBoolean(key, value)
+                        else -> putString(key, value.toString())
+                    }
                 }
             }
-        }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.ERROR, params)
     }
@@ -64,25 +69,26 @@ object ErrorTracker {
             Timber.e(throwable, "Exception: $errorType - $errorMessage")
         }
 
-        val params = Bundle().apply {
-            putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
-            putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
-            putBoolean(AnalyticsConstants.Params.IS_FATAL, isFatal)
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
+                putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
+                putBoolean(AnalyticsConstants.Params.IS_FATAL, isFatal)
 
-            // Добавляем дополнительные параметры
-            additionalParams.forEach { (key, value) ->
-                when (value) {
-                    is String -> putString(key, value)
-                    is Int -> putInt(key, value)
-                    is Long -> putLong(key, value)
-                    is Float -> putFloat(key, value)
-                    is Double -> putDouble(key, value)
-                    is Boolean -> putBoolean(key, value)
-                    else -> putString(key, value.toString())
+                // Добавляем дополнительные параметры
+                additionalParams.forEach { (key, value) ->
+                    when (value) {
+                        is String -> putString(key, value)
+                        is Int -> putInt(key, value)
+                        is Long -> putLong(key, value)
+                        is Float -> putFloat(key, value)
+                        is Double -> putDouble(key, value)
+                        is Boolean -> putBoolean(key, value)
+                        else -> putString(key, value.toString())
+                    }
                 }
             }
-        }
 
         val eventName = if (isFatal) AnalyticsConstants.Events.APP_CRASH else AnalyticsConstants.Events.APP_EXCEPTION
         AnalyticsUtils.logEvent(eventName, params)
@@ -93,14 +99,18 @@ object ErrorTracker {
      * @param field Поле, в котором произошла ошибка
      * @param errorMessage Сообщение об ошибке
      */
-    fun trackValidationError(field: String, errorMessage: String) {
+    fun trackValidationError(
+        field: String,
+        errorMessage: String,
+    ) {
         Timber.w("Validation error in field '$field': $errorMessage")
 
-        val params = Bundle().apply {
-            putString(AnalyticsConstants.Params.VALIDATION_FIELD, field)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
-            putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_VALIDATION)
-        }
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.VALIDATION_FIELD, field)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
+                putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_VALIDATION)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.VALIDATION_ERROR, params)
     }
@@ -111,15 +121,20 @@ object ErrorTracker {
      * @param errorCode Код ошибки
      * @param errorMessage Сообщение об ошибке
      */
-    fun trackNetworkError(url: String, errorCode: Int, errorMessage: String) {
+    fun trackNetworkError(
+        url: String,
+        errorCode: Int,
+        errorMessage: String,
+    ) {
         Timber.e("Network error: [$errorCode] $errorMessage, URL: $url")
 
-        val params = Bundle().apply {
-            putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_NETWORK)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
-            putInt(AnalyticsConstants.Params.ERROR_CODE, errorCode)
-            putString("url", url)
-        }
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_NETWORK)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
+                putInt(AnalyticsConstants.Params.ERROR_CODE, errorCode)
+                putString("url", url)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_ERROR, params)
     }
@@ -130,21 +145,26 @@ object ErrorTracker {
      * @param errorMessage Сообщение об ошибке
      * @param throwable Исключение (опционально)
      */
-    fun trackDatabaseError(operation: String, errorMessage: String, throwable: Throwable? = null) {
+    fun trackDatabaseError(
+        operation: String,
+        errorMessage: String,
+        throwable: Throwable? = null,
+    ) {
         if (throwable != null) {
             Timber.e(throwable, "Database error during $operation: $errorMessage")
         } else {
             Timber.e("Database error during $operation: $errorMessage")
         }
 
-        val params = Bundle().apply {
-            putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_DATABASE)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
-            putString(AnalyticsConstants.Params.OPERATION_NAME, operation)
-            throwable?.let {
-                putString(AnalyticsConstants.Params.STACK_TRACE, getStackTraceString(it))
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.ERROR_TYPE, AnalyticsConstants.Values.ERROR_TYPE_DATABASE)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
+                putString(AnalyticsConstants.Params.OPERATION_NAME, operation)
+                throwable?.let {
+                    putString(AnalyticsConstants.Params.STACK_TRACE, getStackTraceString(it))
+                }
             }
-        }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_ERROR, params)
     }

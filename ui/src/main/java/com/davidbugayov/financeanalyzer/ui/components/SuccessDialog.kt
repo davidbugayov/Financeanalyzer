@@ -20,7 +20,11 @@ import androidx.compose.ui.unit.dp
  * Диалог успешного завершения операции
  */
 @Composable
-fun SuccessDialog(message: String, onDismiss: () -> Unit, onAddAnother: () -> Unit) {
+fun SuccessDialog(
+    message: String,
+    onDismiss: () -> Unit,
+    onAddAnother: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = {},
         title = {

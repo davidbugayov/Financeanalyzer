@@ -30,11 +30,17 @@ class CompositeAnalytics : IAnalytics {
         analytics.forEach { it.logEvent(eventName) }
     }
 
-    override fun logEvent(eventName: String, params: Bundle) {
+    override fun logEvent(
+        eventName: String,
+        params: Bundle,
+    ) {
         analytics.forEach { it.logEvent(eventName, params) }
     }
 
-    override fun setUserProperty(name: String, value: String) {
+    override fun setUserProperty(
+        name: String,
+        value: String,
+    ) {
         analytics.forEach { it.setUserProperty(name, value) }
     }
 

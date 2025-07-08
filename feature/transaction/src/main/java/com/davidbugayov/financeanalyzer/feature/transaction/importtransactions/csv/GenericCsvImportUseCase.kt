@@ -1,13 +1,13 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.csv
 
 import android.content.Context
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.category.TransactionCategoryDetector
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.BankImportUseCase
+import com.davidbugayov.financeanalyzer.feature.transaction.R
 import java.io.BufferedReader
 import java.text.SimpleDateFormat
 import java.util.Date
@@ -37,7 +37,6 @@ data class CsvParseConfig(
     val validStatusValues: List<String>? = null, // Список валидных статусов (если колонка есть)
     val skipTransactionIfStatusInvalid: Boolean = true, // Пропускать ли строки с невалидным статусом
 ) {
-
     // Регулярка для очистки суммы
     val amountCharsToRemoveRegex: Regex? by lazy {
         amountCharsToRemoveRegexPattern?.let { Regex(it) }
@@ -58,7 +57,6 @@ class GenericCsvImportUseCase(
     transactionRepository: TransactionRepository,
     private val config: CsvParseConfig = CsvParseConfig(),
 ) : BankImportUseCase(transactionRepository, context) {
-
     override val bankName: String = context.getString(R.string.bank_generic_csv)
 
     /**
@@ -105,17 +103,18 @@ class GenericCsvImportUseCase(
         Timber.d("[$bankName] ${context.getString(R.string.csv_parsing_line, line)}")
 
         // Определяем разделитель, если строка не соответствует ожидаемому формату
-        val actualDelimiter = if (line.contains(config.delimiter)) {
-            config.delimiter
-        } else if (line.contains(',')) {
-            ','
-        } else if (line.contains(';')) {
-            ';'
-        } else if (line.contains('\t')) {
-            '\t'
-        } else {
-            config.delimiter // Используем настроенный разделитель по умолчанию
-        }
+        val actualDelimiter =
+            if (line.contains(config.delimiter)) {
+                config.delimiter
+            } else if (line.contains(',')) {
+                ','
+            } else if (line.contains(';')) {
+                ';'
+            } else if (line.contains('\t')) {
+                '\t'
+            } else {
+                config.delimiter // Используем настроенный разделитель по умолчанию
+            }
 
         val columns = line.split(actualDelimiter).map { it.trim().removeSurrounding("\"") }
 
@@ -135,7 +134,8 @@ class GenericCsvImportUseCase(
         }
         if (config.skipTransactionIfStatusInvalid && config.statusColumnIndex != null && config.validStatusValues?.isNotEmpty() == true) {
             val status = columns.getOrNull(config.statusColumnIndex)
-            if (status == null || config.validStatusValues.none {
+            if (status == null ||
+                config.validStatusValues.none {
                     it.equals(
                         status,
                         ignoreCase = true,
@@ -185,19 +185,21 @@ class GenericCsvImportUseCase(
                 )
                 return null
             }
-            val description = columns.getOrNull(config.descriptionColumnIndex) ?: context.getString(
-                R.string.csv_no_description,
-            )
-            var amountString = columns.getOrNull(config.amountColumnIndex) ?: run {
-                Timber.e(
-                    "[$bankName] ${context.getString(
-                        R.string.csv_amount_not_found,
-                        config.amountColumnIndex,
-                        line,
-                    )}",
+            val description =
+                columns.getOrNull(config.descriptionColumnIndex) ?: context.getString(
+                    R.string.csv_no_description,
                 )
-                return null
-            }
+            var amountString =
+                columns.getOrNull(config.amountColumnIndex) ?: run {
+                    Timber.e(
+                        "[$bankName] ${context.getString(
+                            R.string.csv_amount_not_found,
+                            config.amountColumnIndex,
+                            line,
+                        )}",
+                    )
+                    return null
+                }
 
             // Очистка суммы от нецифровых символов, кроме разделителей
             config.amountCharsToRemoveRegex?.let { regex ->
@@ -224,82 +226,87 @@ class GenericCsvImportUseCase(
             }
 
             // Определение валюты
-            val currencyString = config.currencyColumnIndex?.let { index ->
-                columns.getOrNull(index)?.takeIf { it.isNotBlank() }
-            } ?: config.defaultCurrencyCode
+            val currencyString =
+                config.currencyColumnIndex?.let { index ->
+                    columns.getOrNull(index)?.takeIf { it.isNotBlank() }
+                } ?: config.defaultCurrencyCode
 
             Timber.d("[$bankName] Обработанная строка суммы: '$amountString', валюта: '$currencyString'")
-            val transactionDate = try {
-                // Пробуем парсить дату с использованием нескольких распространенных форматов
-                val dateFormats = listOf(
-                    config.dateFormat, // Сначала пробуем формат из конфига
-                    SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", config.locale),
-                    SimpleDateFormat("yyyy-MM-dd", config.locale),
-                    SimpleDateFormat("dd.MM.yyyy", config.locale),
-                    SimpleDateFormat("dd.MM.yyyy HH:mm:ss", config.locale),
-                    SimpleDateFormat("yyyy/MM/dd", config.locale),
-                    SimpleDateFormat("MM/dd/yyyy", config.locale),
-                )
+            val transactionDate =
+                try {
+                    // Пробуем парсить дату с использованием нескольких распространенных форматов
+                    val dateFormats =
+                        listOf(
+                            config.dateFormat, // Сначала пробуем формат из конфига
+                            SimpleDateFormat("yyyy-MM-dd_HH-mm-ss", config.locale),
+                            SimpleDateFormat("yyyy-MM-dd", config.locale),
+                            SimpleDateFormat("dd.MM.yyyy", config.locale),
+                            SimpleDateFormat("dd.MM.yyyy HH:mm:ss", config.locale),
+                            SimpleDateFormat("yyyy/MM/dd", config.locale),
+                            SimpleDateFormat("MM/dd/yyyy", config.locale),
+                        )
 
-                var parsedDate: Date? = null
-                for (format in dateFormats) {
-                    try {
-                        parsedDate = format.parse(dateString)
-                        if (parsedDate != null) {
-                            Timber.d(
-                                "[$bankName] Успешно распарсили дату '$dateString' с форматом '${format.toPattern()}'",
-                            )
-                            break
+                    var parsedDate: Date? = null
+                    for (format in dateFormats) {
+                        try {
+                            parsedDate = format.parse(dateString)
+                            if (parsedDate != null) {
+                                Timber.d(
+                                    "[$bankName] Успешно распарсили дату '$dateString' с форматом '${format.toPattern()}'",
+                                )
+                                break
+                            }
+                        } catch (e: Exception) {
+                            // Просто пробуем следующий формат
                         }
-                    } catch (e: Exception) {
-                        // Просто пробуем следующий формат
                     }
-                }
 
-                parsedDate ?: throw Exception("Не удалось распарсить дату ни одним из доступных форматов")
-            } catch (e: Exception) {
-                Timber.e(
-                    e,
-                    "[$bankName] ${context.getString(
-                        R.string.csv_date_parse_error,
-                        dateString,
-                        config.dateFormat.toPattern(),
-                        line,
-                    )}",
-                )
-                return null
-            }
-            val amountValue = try {
-                amountString.toDoubleOrNull() ?: run {
+                    parsedDate ?: throw Exception("Не удалось распарсить дату ни одним из доступных форматов")
+                } catch (e: Exception) {
                     Timber.e(
+                        e,
                         "[$bankName] ${context.getString(
-                            R.string.csv_amount_parse_error,
-                            amountString,
+                            R.string.csv_date_parse_error,
+                            dateString,
+                            config.dateFormat.toPattern(),
                             line,
                         )}",
                     )
                     return null
                 }
-            } catch (e: NumberFormatException) {
-                Timber.e(
-                    e,
-                    "[$bankName] ${context.getString(
-                        R.string.csv_amount_parse_exception,
-                        amountString,
-                        e.message,
-                    )}",
-                )
-                return null
-            }
-            val isExpense = if (config.isExpenseColumnIndex != null) {
-                val expenseValue = columns.getOrNull(config.isExpenseColumnIndex)
-                expenseValue?.equals(config.isExpenseTrueValue, ignoreCase = true) == true
-            } else {
-                columns.getOrNull(4)?.equals(
-                    context.getString(R.string.csv_expense_value),
-                    ignoreCase = true,
-                ) ?: (amountValue < 0)
-            }
+            val amountValue =
+                try {
+                    amountString.toDoubleOrNull() ?: run {
+                        Timber.e(
+                            "[$bankName] ${context.getString(
+                                R.string.csv_amount_parse_error,
+                                amountString,
+                                line,
+                            )}",
+                        )
+                        return null
+                    }
+                } catch (e: NumberFormatException) {
+                    Timber.e(
+                        e,
+                        "[$bankName] ${context.getString(
+                            R.string.csv_amount_parse_exception,
+                            amountString,
+                            e.message,
+                        )}",
+                    )
+                    return null
+                }
+            val isExpense =
+                if (config.isExpenseColumnIndex != null) {
+                    val expenseValue = columns.getOrNull(config.isExpenseColumnIndex)
+                    expenseValue?.equals(config.isExpenseTrueValue, ignoreCase = true) == true
+                } else {
+                    columns.getOrNull(4)?.equals(
+                        context.getString(R.string.csv_expense_value),
+                        ignoreCase = true,
+                    ) ?: (amountValue < 0)
+                }
             val absAmount = kotlin.math.abs(amountValue)
             val currency = Currency.fromCode(currencyString.uppercase(Locale.ROOT))
             val money = Money(absAmount, currency)

@@ -2,8 +2,8 @@ package com.davidbugayov.financeanalyzer.analytics
 
 import android.os.Bundle
 import android.os.SystemClock
-import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
+import timber.log.Timber
 
 /**
  * Класс для отслеживания пользовательских событий и активности.
@@ -47,10 +47,11 @@ object UserEventTracker {
             screenTimeMap[screenName] = (screenTimeMap[screenName] ?: 0) + duration
 
             // Логируем время на экране
-            val params = Bundle().apply {
-                putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, duration)
-                putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
-            }
+            val params =
+                Bundle().apply {
+                    putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, duration)
+                    putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
+                }
 
             AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ENGAGEMENT, params)
 
@@ -66,7 +67,10 @@ object UserEventTracker {
      * @param featureName Название функции
      * @param result Результат использования (успех, ошибка и т.д.)
      */
-    fun trackFeatureUsage(featureName: String, result: String = AnalyticsConstants.Values.RESULT_SUCCESS) {
+    fun trackFeatureUsage(
+        featureName: String,
+        result: String = AnalyticsConstants.Values.RESULT_SUCCESS,
+    ) {
         // Увеличиваем счетчик использования функции
         val count = (featureUsageCount[featureName] ?: 0) + 1
         featureUsageCount[featureName] = count
@@ -75,11 +79,12 @@ object UserEventTracker {
         featureLastUsed[featureName] = System.currentTimeMillis()
 
         // Логируем использование функции
-        val params = Bundle().apply {
-            putString(AnalyticsConstants.Params.FEATURE_NAME, featureName)
-            putString(AnalyticsConstants.Params.FEATURE_RESULT, result)
-            putInt(AnalyticsConstants.Params.FEATURE_USAGE_COUNT, count)
-        }
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.FEATURE_NAME, featureName)
+                putString(AnalyticsConstants.Params.FEATURE_RESULT, result)
+                putInt(AnalyticsConstants.Params.FEATURE_USAGE_COUNT, count)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.FEATURE_USED, params)
 
@@ -91,27 +96,31 @@ object UserEventTracker {
      * @param actionName Название действия
      * @param params Дополнительные параметры
      */
-    fun trackUserAction(actionName: String, params: Map<String, Any> = emptyMap()) {
+    fun trackUserAction(
+        actionName: String,
+        params: Map<String, Any> = emptyMap(),
+    ) {
         val startTime = SystemClock.elapsedRealtime()
 
         // Подготавливаем параметры для аналитики
-        val analyticsParams = Bundle().apply {
-            putString(AnalyticsConstants.Params.ACTION_NAME, actionName)
-            putString(AnalyticsConstants.Params.SCREEN_NAME, currentScreen ?: "unknown")
+        val analyticsParams =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.ACTION_NAME, actionName)
+                putString(AnalyticsConstants.Params.SCREEN_NAME, currentScreen ?: "unknown")
 
-            // Добавляем дополнительные параметры
-            params.forEach { (key, value) ->
-                when (value) {
-                    is String -> putString(key, value)
-                    is Int -> putInt(key, value)
-                    is Long -> putLong(key, value)
-                    is Float -> putFloat(key, value)
-                    is Double -> putDouble(key, value)
-                    is Boolean -> putBoolean(key, value)
-                    else -> putString(key, value.toString())
+                // Добавляем дополнительные параметры
+                params.forEach { (key, value) ->
+                    when (value) {
+                        is String -> putString(key, value)
+                        is Int -> putInt(key, value)
+                        is Long -> putLong(key, value)
+                        is Float -> putFloat(key, value)
+                        is Double -> putDouble(key, value)
+                        is Boolean -> putBoolean(key, value)
+                        else -> putString(key, value.toString())
+                    }
                 }
             }
-        }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ACTION, analyticsParams)
 
@@ -123,13 +132,17 @@ object UserEventTracker {
      * @param score Оценка (от 1 до 5)
      * @param feedback Текстовый отзыв (опционально)
      */
-    fun trackUserFeedback(score: Int, feedback: String? = null) {
-        val params = Bundle().apply {
-            putInt(AnalyticsConstants.Params.USER_FEEDBACK_SCORE, score)
-            if (feedback != null) {
-                putString(AnalyticsConstants.Params.USER_FEEDBACK_TEXT, feedback)
+    fun trackUserFeedback(
+        score: Int,
+        feedback: String? = null,
+    ) {
+        val params =
+            Bundle().apply {
+                putInt(AnalyticsConstants.Params.USER_FEEDBACK_SCORE, score)
+                if (feedback != null) {
+                    putString(AnalyticsConstants.Params.USER_FEEDBACK_TEXT, feedback)
+                }
             }
-        }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_FEEDBACK, params)
 
@@ -141,11 +154,15 @@ object UserEventTracker {
      * @param rating Оценка (от 1 до 5)
      * @param source Источник оценки (внутренний, Google Play, RuStore и т.д.)
      */
-    fun trackAppRating(rating: Int, source: String) {
-        val params = Bundle().apply {
-            putInt(AnalyticsConstants.Params.USER_RATING, rating)
-            putString(AnalyticsConstants.Params.SOURCE, source)
-        }
+    fun trackAppRating(
+        rating: Int,
+        source: String,
+    ) {
+        val params =
+            Bundle().apply {
+                putInt(AnalyticsConstants.Params.USER_RATING, rating)
+                putString(AnalyticsConstants.Params.SOURCE, source)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_RATING, params)
 
@@ -196,12 +213,13 @@ object UserEventTracker {
         val totalScreenTime = screenTimeMap.values.sum()
         val featureCount = featureUsageCount.size
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, sessionDuration)
-            putInt("screen_count", screenCount)
-            putLong("total_screen_time", totalScreenTime)
-            putInt("feature_count", featureCount)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.USER_ENGAGEMENT_TIME, sessionDuration)
+                putInt("screen_count", screenCount)
+                putLong("total_screen_time", totalScreenTime)
+                putInt("feature_count", featureCount)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ENGAGEMENT, params)
 

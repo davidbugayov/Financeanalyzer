@@ -60,20 +60,21 @@ fun AchievementNotification(
     rewardCoins: Int,
     isVisible: Boolean,
     onDismiss: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
 ) {
     var showContent by remember { mutableStateOf(false) }
-    
+
     // Анимация вращения трофея
     val rotationAngle by animateFloatAsState(
         targetValue = if (showContent) 360f else 0f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow
-        ),
-        label = "trophy_rotation"
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow,
+            ),
+        label = "trophy_rotation",
     )
-    
+
     LaunchedEffect(isVisible) {
         if (isVisible) {
             delay(100)
@@ -85,147 +86,159 @@ fun AchievementNotification(
             showContent = false
         }
     }
-    
+
     AnimatedVisibility(
         visible = isVisible,
-        enter = slideInVertically(
-            initialOffsetY = { -it },
-            animationSpec = tween(600)
-        ) + fadeIn(animationSpec = tween(400)),
-        exit = slideOutVertically(
-            targetOffsetY = { -it },
-            animationSpec = tween(400)
-        ) + fadeOut(animationSpec = tween(300)),
-        modifier = modifier
+        enter =
+            slideInVertically(
+                initialOffsetY = { -it },
+                animationSpec = tween(600),
+            ) + fadeIn(animationSpec = tween(400)),
+        exit =
+            slideOutVertically(
+                targetOffsetY = { -it },
+                animationSpec = tween(400),
+            ) + fadeOut(animationSpec = tween(300)),
+        modifier = modifier,
     ) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
             elevation = CardDefaults.cardElevation(defaultElevation = 12.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.primaryContainer
-            )
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.primaryContainer,
+                ),
         ) {
             AnimatedVisibility(
                 visible = showContent,
-                enter = scaleIn(
-                    animationSpec = spring(
-                        dampingRatio = Spring.DampingRatioMediumBouncy
-                    )
-                ) + fadeIn(),
-                exit = scaleOut() + fadeOut()
+                enter =
+                    scaleIn(
+                        animationSpec =
+                            spring(
+                                dampingRatio = Spring.DampingRatioMediumBouncy,
+                            ),
+                    ) + fadeIn(),
+                exit = scaleOut() + fadeOut(),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(20.dp)
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(20.dp),
                 ) {
                     // Заголовок с кнопкой закрытия
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = "🎉 Достижение разблокировано!",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onPrimaryContainer
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
-                        
+
                         IconButton(
                             onClick = onDismiss,
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(24.dp),
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Close,
                                 contentDescription = "Закрыть",
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier.size(20.dp)
+                                modifier = Modifier.size(20.dp),
                             )
                         }
                     }
-                    
+
                     Spacer(modifier = Modifier.height(16.dp))
-                    
+
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         // Анимированная иконка трофея
                         Box(
-                            modifier = Modifier
-                                .size(56.dp)
-                                .background(
-                                    brush = Brush.radialGradient(
-                                        colors = listOf(
-                                            Color(0xFFFFD700),
-                                            Color(0xFFFFA000)
-                                        )
+                            modifier =
+                                Modifier
+                                    .size(56.dp)
+                                    .background(
+                                        brush =
+                                            Brush.radialGradient(
+                                                colors =
+                                                    listOf(
+                                                        Color(0xFFFFD700),
+                                                        Color(0xFFFFA000),
+                                                    ),
+                                            ),
+                                        shape = CircleShape,
                                     ),
-                                    shape = CircleShape
-                                ),
-                            contentAlignment = Alignment.Center
+                            contentAlignment = Alignment.Center,
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.EmojiEvents,
                                 contentDescription = null,
                                 tint = Color.White,
-                                modifier = Modifier
-                                    .size(32.dp)
-                                    .rotate(rotationAngle)
+                                modifier =
+                                    Modifier
+                                        .size(32.dp)
+                                        .rotate(rotationAngle),
                             )
                         }
-                        
+
                         Spacer(modifier = Modifier.width(16.dp))
-                        
+
                         Column(
-                            modifier = Modifier.weight(1f)
+                            modifier = Modifier.weight(1f),
                         ) {
                             Text(
                                 text = title,
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
                             )
-                            
+
                             Spacer(modifier = Modifier.height(4.dp))
-                            
+
                             Text(
                                 text = description,
                                 style = MaterialTheme.typography.bodyMedium,
-                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f)
+                                color = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.8f),
                             )
                         }
-                        
+
                         // Награда
                         Column(
-                            horizontalAlignment = Alignment.CenterHorizontally
+                            horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             Box(
-                                modifier = Modifier
-                                    .clip(RoundedCornerShape(12.dp))
-                                    .background(Color(0xFFFFD700).copy(alpha = 0.2f))
-                                    .padding(horizontal = 12.dp, vertical = 6.dp),
-                                contentAlignment = Alignment.Center
+                                modifier =
+                                    Modifier
+                                        .clip(RoundedCornerShape(12.dp))
+                                        .background(Color(0xFFFFD700).copy(alpha = 0.2f))
+                                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                                contentAlignment = Alignment.Center,
                             ) {
                                 Row(
-                                    verticalAlignment = Alignment.CenterVertically
+                                    verticalAlignment = Alignment.CenterVertically,
                                 ) {
                                     Icon(
                                         imageVector = Icons.Filled.MonetizationOn,
                                         contentDescription = null,
                                         tint = Color(0xFFFFD700),
-                                        modifier = Modifier.size(16.dp)
+                                        modifier = Modifier.size(16.dp),
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
                                         text = "+$rewardCoins",
                                         style = MaterialTheme.typography.labelLarge,
                                         fontWeight = FontWeight.Bold,
-                                        color = Color(0xFFFFD700)
+                                        color = Color(0xFFFFD700),
                                     )
                                 }
                             }
@@ -249,7 +262,7 @@ private fun AchievementNotificationPreview() {
             description = "Добавьте свою первую транзакцию",
             rewardCoins = 10,
             isVisible = true,
-            onDismiss = {}
+            onDismiss = {},
         )
     }
 } 

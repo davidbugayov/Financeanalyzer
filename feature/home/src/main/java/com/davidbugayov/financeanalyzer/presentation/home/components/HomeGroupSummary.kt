@@ -26,10 +26,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryCardBackground
 import com.davidbugayov.financeanalyzer.ui.theme.LocalSummaryDivider
@@ -69,28 +69,31 @@ fun HomeGroupSummary(
 
     val periodTitle = periodTitleForFilter(currentFilter)
 
-    val categoryGroups = remember(filteredTransactions, showExpenses) {
-        val filteredByType = filteredTransactions.filter { it.isExpense == showExpenses }
-        val groupedByCategory = filteredByType.groupBy { it.category }
-        groupedByCategory.map { (category, transactions) ->
-            CategorySummary(
-                category = category,
-                amount = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount },
-                isExpense = showExpenses,
-            )
-        }.sortedByDescending { it.amount.amount }
-    }
+    val categoryGroups =
+        remember(filteredTransactions, showExpenses) {
+            val filteredByType = filteredTransactions.filter { it.isExpense == showExpenses }
+            val groupedByCategory = filteredByType.groupBy { it.category }
+            groupedByCategory.map { (category, transactions) ->
+                CategorySummary(
+                    category = category,
+                    amount = transactions.fold(Money.zero()) { acc, transaction -> acc + transaction.amount },
+                    isExpense = showExpenses,
+                )
+            }.sortedByDescending { it.amount.amount }
+        }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp, vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 12.dp, vertical = 4.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
         colors = CardDefaults.cardColors(containerColor = cardBg),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-        ),
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+            ),
     ) {
         Column(
             modifier = Modifier.padding(12.dp),
@@ -111,14 +114,15 @@ fun HomeGroupSummary(
                 onSwitch = { showExpenses = !showExpenses },
                 textSecondary = textSecondary,
             )
-            val visibleCount = if (showAllGroups) {
-                categoryGroups.size
-            } else {
-                minOf(
-                    5,
-                    categoryGroups.size,
-                )
-            }
+            val visibleCount =
+                if (showAllGroups) {
+                    categoryGroups.size
+                } else {
+                    minOf(
+                        5,
+                        categoryGroups.size,
+                    )
+                }
             val visibleCategories = categoryGroups.take(visibleCount)
             SummaryCategoryList(
                 visibleCategories = visibleCategories,
@@ -139,7 +143,10 @@ fun HomeGroupSummary(
 }
 
 @Composable
-private fun SummaryHeader(periodTitle: String, textPrimary: Color) {
+private fun SummaryHeader(
+    periodTitle: String,
+    textPrimary: Color,
+) {
     Text(
         text = periodTitle,
         style = MaterialTheme.typography.titleMedium,
@@ -161,9 +168,10 @@ private fun SummaryTotals(
     textSecondary: Color,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
@@ -180,9 +188,10 @@ private fun SummaryTotals(
         )
     }
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
@@ -199,9 +208,10 @@ private fun SummaryTotals(
         )
     }
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
@@ -220,26 +230,33 @@ private fun SummaryTotals(
 }
 
 @Composable
-private fun SummaryCategorySwitcher(showExpenses: Boolean, onSwitch: () -> Unit, textSecondary: Color) {
+private fun SummaryCategorySwitcher(
+    showExpenses: Boolean,
+    onSwitch: () -> Unit,
+    textSecondary: Color,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         Text(
-            text = stringResource(
-                if (showExpenses) R.string.expense_categories else R.string.income_categories,
-            ),
+            text =
+                stringResource(
+                    if (showExpenses) R.string.expense_categories else R.string.income_categories,
+                ),
             style = MaterialTheme.typography.titleSmall,
             fontSize = 14.sp,
             fontWeight = FontWeight.Medium,
             color = textSecondary,
         )
         Text(
-            text = stringResource(
-                if (showExpenses) R.string.show_income else R.string.show_expenses,
-            ),
+            text =
+                stringResource(
+                    if (showExpenses) R.string.show_income else R.string.show_expenses,
+                ),
             fontSize = 12.sp,
             color = MaterialTheme.colorScheme.primary,
             fontWeight = FontWeight.Medium,
@@ -260,9 +277,10 @@ private fun SummaryCategoryList(
     ) {
         visibleCategories.forEach { categorySummary ->
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(vertical = 2.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(vertical = 2.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -276,11 +294,12 @@ private fun SummaryCategoryList(
                     modifier = Modifier.weight(1f),
                 )
                 Text(
-                    text = if (categorySummary.isExpense) {
-                        "-" + categorySummary.amount.abs().formatForDisplay(showCurrency = false)
-                    } else {
-                        "+" + categorySummary.amount.abs().formatForDisplay(showCurrency = false)
-                    },
+                    text =
+                        if (categorySummary.isExpense) {
+                            "-" + categorySummary.amount.abs().formatForDisplay(showCurrency = false)
+                        } else {
+                            "+" + categorySummary.amount.abs().formatForDisplay(showCurrency = false)
+                        },
                     fontSize = 13.sp,
                     color = if (categorySummary.isExpense) expenseColor else incomeColor,
                     fontWeight = FontWeight.Medium,
@@ -291,11 +310,15 @@ private fun SummaryCategoryList(
 }
 
 @Composable
-private fun SummaryEmptyState(showExpenses: Boolean, textSecondary: Color) {
+private fun SummaryEmptyState(
+    showExpenses: Boolean,
+    textSecondary: Color,
+) {
     Text(
-        text = stringResource(
-            if (showExpenses) R.string.no_expenses_period else R.string.no_income_period,
-        ),
+        text =
+            stringResource(
+                if (showExpenses) R.string.no_expenses_period else R.string.no_income_period,
+            ),
         fontSize = 13.sp,
         color = textSecondary,
         modifier = Modifier.padding(vertical = 8.dp),
@@ -303,29 +326,38 @@ private fun SummaryEmptyState(showExpenses: Boolean, textSecondary: Color) {
 }
 
 @Composable
-private fun SummaryShowMoreButton(moreCount: Int, textSecondary: Color, onClick: () -> Unit) {
+private fun SummaryShowMoreButton(
+    moreCount: Int,
+    textSecondary: Color,
+    onClick: () -> Unit,
+) {
     Text(
         text = stringResource(R.string.and_more_categories, moreCount),
         fontSize = 12.sp,
         color = textSecondary,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp)
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp)
+                .clickable { onClick() },
         fontWeight = FontWeight.Medium,
     )
 }
 
 @Composable
-private fun SummaryHideButton(textSecondary: Color, onClick: () -> Unit) {
+private fun SummaryHideButton(
+    textSecondary: Color,
+    onClick: () -> Unit,
+) {
     Text(
         text = stringResource(R.string.hide),
         fontSize = 12.sp,
         color = textSecondary,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 4.dp)
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 4.dp)
+                .clickable { onClick() },
         fontWeight = FontWeight.Medium,
     )
 }

@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
@@ -27,17 +28,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.feature.home.R
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import timber.log.Timber
-import androidx.paging.compose.LazyPagingItems
-import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.paging.LoadState
+import timber.log.Timber
 
 /**
  * Расширенный макет для планшетов
@@ -67,9 +67,10 @@ fun ExpandedLayout(
     }
 
     Row(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 16.dp),
     ) {
         ExpandedLeftPanel(
             state = state,
@@ -101,9 +102,10 @@ private fun ExpandedLeftPanel(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .padding(end = 8.dp)
-            .verticalScroll(rememberScrollState()),
+        modifier =
+            modifier
+                .padding(end = 8.dp)
+                .verticalScroll(rememberScrollState()),
     ) {
         BalanceCard(balance = state.balance)
         Spacer(modifier = Modifier.height(16.dp))
@@ -147,9 +149,10 @@ private fun ExpandedRightPanel(
         state.filteredTransactions.isEmpty(),
     )
     Box(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(start = 8.dp),
+        modifier =
+            modifier
+                .fillMaxSize()
+                .padding(start = 8.dp),
         contentAlignment = Alignment.Center,
     ) {
         when {
@@ -174,18 +177,20 @@ private fun ExpandedRightPanel(
 private fun ExpandedEmptyState(onAddClick: () -> Unit) {
     Timber.d("[UI] ExpandedEmptyState отображается")
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(top = 32.dp, start = 16.dp, end = 16.dp, bottom = 32.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         androidx.compose.material3.Icon(
             imageVector = androidx.compose.material.icons.Icons.Filled.Add,
             contentDescription = stringResource(R.string.empty_state_icon_desc),
             tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .size(36.dp),
+            modifier =
+                Modifier
+                    .padding(bottom = 8.dp)
+                    .size(36.dp),
         )
         Text(
             text = stringResource(R.string.empty_state_title),
@@ -210,14 +215,16 @@ private fun ExpandedEmptyState(onAddClick: () -> Unit) {
                 onAddClick()
             },
             shape = RoundedCornerShape(50),
-            colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White,
-            ),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp)
-                .heightIn(min = 44.dp),
+            colors =
+                androidx.compose.material3.ButtonDefaults.buttonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White,
+                ),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .heightIn(min = 44.dp),
         ) {
             Text(
                 text = stringResource(R.string.empty_state_add_first_transaction),

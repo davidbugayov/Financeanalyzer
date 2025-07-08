@@ -4,7 +4,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.core.graphics.toColorInt
 
 object ColorUtils {
-
     /**
      * Получает эффективный цвет источника для транзакции.
      * ВАЖНО: Эта функция возвращает Color, а не Int.

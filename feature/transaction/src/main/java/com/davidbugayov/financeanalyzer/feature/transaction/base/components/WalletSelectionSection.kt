@@ -55,9 +55,10 @@ fun WalletSelectionSection(
 
     if (isVisible) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp),
         ) {
             Spacer(modifier = Modifier.height(16.dp))
 
@@ -66,11 +67,12 @@ fun WalletSelectionSection(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = if (isExpense) {
-                        stringResource(R.string.deduct_from_wallets)
-                    } else {
-                        stringResource(R.string.add_to_wallets)
-                    },
+                    text =
+                        if (isExpense) {
+                            stringResource(R.string.deduct_from_wallets)
+                        } else {
+                            stringResource(R.string.add_to_wallets)
+                        },
                     style = MaterialTheme.typography.bodyMedium,
                     modifier = Modifier.weight(1f),
                 )
@@ -94,21 +96,22 @@ fun WalletSelectionSection(
                 // Показываем количество выбранных кошельков с правильным текстом
                 if (selectedWallets.isNotEmpty()) {
                     Spacer(modifier = Modifier.height(4.dp))
-                    val statusText = if (isExpense) {
-                        // Для расходов обычно выбирается один кошелёк
-                        if (selectedWallets.size == 1) {
-                            stringResource(R.string.wallet_selected_for_expense)
+                    val statusText =
+                        if (isExpense) {
+                            // Для расходов обычно выбирается один кошелёк
+                            if (selectedWallets.size == 1) {
+                                stringResource(R.string.wallet_selected_for_expense)
+                            } else {
+                                stringResource(R.string.wallets_selected_for_expense, selectedWallets.size)
+                            }
                         } else {
-                            stringResource(R.string.wallets_selected_for_expense, selectedWallets.size)
+                            // Для доходов можно выбрать несколько кошельков
+                            if (selectedWallets.size == 1) {
+                                stringResource(R.string.wallet_selected_for_income)
+                            } else {
+                                stringResource(R.string.wallets_selected_for_income, selectedWallets.size)
+                            }
                         }
-                    } else {
-                        // Для доходов можно выбрать несколько кошельков
-                        if (selectedWallets.size == 1) {
-                            stringResource(R.string.wallet_selected_for_income)
-                        } else {
-                            stringResource(R.string.wallets_selected_for_income, selectedWallets.size)
-                        }
-                    }
 
                     Text(
                         text = statusText,
@@ -120,11 +123,12 @@ fun WalletSelectionSection(
                 // Добавляем пояснительный текст
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = if (isExpense) {
-                        stringResource(R.string.wallet_expense_explanation)
-                    } else {
-                        stringResource(R.string.wallet_income_explanation)
-                    },
+                    text =
+                        if (isExpense) {
+                            stringResource(R.string.wallet_expense_explanation)
+                        } else {
+                            stringResource(R.string.wallet_income_explanation)
+                        },
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
@@ -145,25 +149,26 @@ private fun SelectWalletsButton(
     targetWalletName: String?,
     isExpense: Boolean,
 ) {
-    val text = when {
-        selectedWallets.isEmpty() -> {
-            if (isExpense) {
-                stringResource(R.string.select_wallet_for_expense)
-            } else {
-                stringResource(R.string.select_wallets_for_income)
+    val text =
+        when {
+            selectedWallets.isEmpty() -> {
+                if (isExpense) {
+                    stringResource(R.string.select_wallet_for_expense)
+                } else {
+                    stringResource(R.string.select_wallets_for_income)
+                }
+            }
+            selectedWallets.size == 1 && targetWalletName != null -> {
+                targetWalletName
+            }
+            isExpense && selectedWallets.size == 1 -> {
+                // Для расходов показываем название единственного выбранного кошелька
+                targetWalletName ?: stringResource(R.string.selected_wallet_count, selectedWallets.size)
+            }
+            else -> {
+                stringResource(R.string.selected_wallets_count, selectedWallets.size)
             }
         }
-        selectedWallets.size == 1 && targetWalletName != null -> {
-            targetWalletName
-        }
-        isExpense && selectedWallets.size == 1 -> {
-            // Для расходов показываем название единственного выбранного кошелька
-            targetWalletName ?: stringResource(R.string.selected_wallet_count, selectedWallets.size)
-        }
-        else -> {
-            stringResource(R.string.selected_wallets_count, selectedWallets.size)
-        }
-    }
 
     WalletSelectorButton(
         text = text,
@@ -183,35 +188,39 @@ private fun WalletSelectorButton(
     modifier: Modifier,
     isExpense: Boolean,
 ) {
-    val containerColor = if (isExpense) {
-        MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
-    } else {
-        MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
-    }
+    val containerColor =
+        if (isExpense) {
+            MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.2f)
+        } else {
+            MaterialTheme.colorScheme.secondaryContainer.copy(alpha = 0.2f)
+        }
 
-    val contentColor = if (isExpense) {
-        MaterialTheme.colorScheme.onErrorContainer
-    } else {
-        MaterialTheme.colorScheme.onSecondaryContainer
-    }
+    val contentColor =
+        if (isExpense) {
+            MaterialTheme.colorScheme.onErrorContainer
+        } else {
+            MaterialTheme.colorScheme.onSecondaryContainer
+        }
 
-    val borderColor = if (isExpense) {
-        MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.1f)
-    } else {
-        MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f)
-    }
+    val borderColor =
+        if (isExpense) {
+            MaterialTheme.colorScheme.onErrorContainer.copy(alpha = 0.1f)
+        } else {
+            MaterialTheme.colorScheme.onSecondaryContainer.copy(alpha = 0.1f)
+        }
 
     Row(
-        modifier = modifier
-            .clip(RoundedCornerShape(8.dp))
-            .background(containerColor)
-            .border(
-                width = 1.dp,
-                color = borderColor,
-                shape = RoundedCornerShape(8.dp),
-            )
-            .clickable { onClick() }
-            .padding(horizontal = 12.dp, vertical = 8.dp),
+        modifier =
+            modifier
+                .clip(RoundedCornerShape(8.dp))
+                .background(containerColor)
+                .border(
+                    width = 1.dp,
+                    color = borderColor,
+                    shape = RoundedCornerShape(8.dp),
+                )
+                .clickable { onClick() }
+                .padding(horizontal = 12.dp, vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(

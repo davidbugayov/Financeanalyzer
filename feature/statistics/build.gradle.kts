@@ -34,10 +34,11 @@ android {
 
     kotlinOptions {
         jvmTarget = libs.versions.javaVersion.get()
-        freeCompilerArgs += listOf(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all",
-        )
+        freeCompilerArgs +=
+            listOf(
+                "-opt-in=kotlin.RequiresOptIn",
+                "-Xjvm-default=all",
+            )
     }
 
     buildFeatures {

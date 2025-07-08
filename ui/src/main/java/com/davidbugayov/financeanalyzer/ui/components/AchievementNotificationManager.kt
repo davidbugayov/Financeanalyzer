@@ -19,11 +19,11 @@ import kotlinx.coroutines.flow.collectLatest
 fun AchievementNotificationManager(
     achievementEngine: AchievementEngine?,
     modifier: Modifier = Modifier,
-    content: @Composable () -> Unit
+    content: @Composable () -> Unit,
 ) {
     var currentNotification by remember { mutableStateOf<Achievement?>(null) }
     var showNotification by remember { mutableStateOf(false) }
-    
+
     // Подписываемся на новые достижения
     LaunchedEffect(achievementEngine) {
         achievementEngine?.newAchievements?.collectLatest { achievement ->
@@ -31,11 +31,11 @@ fun AchievementNotificationManager(
             showNotification = true
         }
     }
-    
+
     Box(modifier = modifier.fillMaxSize()) {
         // Основной контент экрана
         content()
-        
+
         // Уведомление о достижении поверх всего контента
         currentNotification?.let { achievement ->
             AchievementNotification(
@@ -43,14 +43,15 @@ fun AchievementNotificationManager(
                 description = achievement.description,
                 rewardCoins = achievement.rewardCoins,
                 isVisible = showNotification,
-                onDismiss = { 
+                onDismiss = {
                     showNotification = false
                     // После скрытия анимации сбрасываем уведомление
                     currentNotification = null
                 },
-                modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .padding(16.dp)
+                modifier =
+                    Modifier
+                        .align(Alignment.TopCenter)
+                        .padding(16.dp),
             )
         }
     }
@@ -61,10 +62,10 @@ fun AchievementNotificationManager(
  */
 object AchievementEngineProvider {
     private var _engine: AchievementEngine? = null
-    
+
     fun initialize(engine: AchievementEngine) {
         _engine = engine
     }
-    
+
     fun get(): AchievementEngine? = _engine
 } 

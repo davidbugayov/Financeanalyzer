@@ -27,9 +27,10 @@ fun ExpenseAnalysisCard(
         modifier = modifier,
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
         ) {
             Text(
                 text = "Анализ расходов",
@@ -40,9 +41,10 @@ fun ExpenseAnalysisCard(
             LazyColumn {
                 items(metrics.topExpenseCategories) { category ->
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = 8.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 8.dp),
                     ) {
                         Column(
                             modifier = Modifier.weight(1f),

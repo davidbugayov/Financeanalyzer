@@ -1,14 +1,13 @@
 package com.davidbugayov.financeanalyzer.feature.profile.event
 
-import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase.ExportAction
+import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 
 /**
  * События экрана профиля.
  * Следует принципам MVI (Model-View-Intent).
  */
 sealed class ProfileEvent {
-
     /**
      * Событие экспорта транзакций в CSV.
      */

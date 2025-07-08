@@ -13,13 +13,14 @@ import org.koin.dsl.module
 /**
  * Module that provides shared preferences singletons.
  */
-val preferencesModule = module {
-    single { CategoryPreferences.getInstance(androidContext()) }
-    single { CategoryUsagePreferences.getInstance(androidContext()) }
-    single { SourcePreferences.getInstance(androidContext()) }
-    single { SourceUsagePreferences.getInstance(androidContext()) }
-    single { WalletPreferences.getInstance(androidContext()) }
+val preferencesModule =
+    module {
+        single { CategoryPreferences.getInstance(androidContext()) }
+        single { CategoryUsagePreferences.getInstance(androidContext()) }
+        single { SourcePreferences.getInstance(androidContext()) }
+        single { SourceUsagePreferences.getInstance(androidContext()) }
+        single { WalletPreferences.getInstance(androidContext()) }
 
-    single { PreferencesManager(androidContext()) }
-    single { OnboardingManager(androidContext()) }
-}
+        single { PreferencesManager(androidContext()) }
+        single { OnboardingManager(androidContext()) }
+    }

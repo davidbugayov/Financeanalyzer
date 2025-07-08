@@ -7,7 +7,6 @@ import timber.log.Timber
  * Заглушка для F-Droid совместимости.
  */
 object CrashlyticsUtils {
-
     /**
      * Логирует нефатальное исключение в Timber
      */
@@ -32,35 +31,50 @@ object CrashlyticsUtils {
     /**
      * Заглушка для строкового ключ-значения
      */
-    fun setCustomKey(key: String, value: String) {
+    fun setCustomKey(
+        key: String,
+        value: String,
+    ) {
         Timber.d("Key: $key = $value")
     }
 
     /**
      * Заглушка для целочисленного ключ-значения
      */
-    fun setCustomKey(key: String, value: Int) {
+    fun setCustomKey(
+        key: String,
+        value: Int,
+    ) {
         Timber.d("Key: $key = $value")
     }
 
     /**
      * Заглушка для булевского ключ-значения
      */
-    fun setCustomKey(key: String, value: Boolean) {
+    fun setCustomKey(
+        key: String,
+        value: Boolean,
+    ) {
         Timber.d("Key: $key = $value")
     }
 
     /**
      * Заглушка для числа с плавающей точкой ключ-значения
      */
-    fun setCustomKey(key: String, value: Float) {
+    fun setCustomKey(
+        key: String,
+        value: Float,
+    ) {
         Timber.d("Key: $key = $value")
     }
 
     /**
      * Заглушка для числа с плавающей точкой ключ-значения
      */
-    fun setCustomKey(key: String, value: Double) {
+    fun setCustomKey(
+        key: String,
+        value: Double,
+    ) {
         Timber.d("Key: $key = $value")
     }
 }

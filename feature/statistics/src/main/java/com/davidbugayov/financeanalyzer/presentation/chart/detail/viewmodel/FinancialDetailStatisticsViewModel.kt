@@ -9,6 +9,10 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCatego
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.utils.DateUtils
+import java.math.BigDecimal
+import java.math.RoundingMode
+import java.util.Calendar
+import java.util.Date
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -17,10 +21,6 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.math.BigDecimal
-import java.math.RoundingMode
-import java.util.Calendar
-import java.util.Date
 
 /**
  * ViewModel для экрана подробной финансовой статистики.
@@ -37,7 +37,6 @@ class FinancialDetailStatisticsViewModel(
     private val transactionRepository: TransactionRepository,
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(FinancialDetailStatisticsContract.State())
     val state: StateFlow<FinancialDetailStatisticsContract.State> = _state.asStateFlow()
 
@@ -80,22 +79,24 @@ class FinancialDetailStatisticsViewModel(
                 val (income, expense) = calculateIncomeAndExpense(transactions)
 
                 // Обновляем состояние
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    transactions = transactions,
-                    income = income,
-                    expense = expense,
-                    period = formattedPeriod,
-                )
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        transactions = transactions,
+                        income = income,
+                        expense = expense,
+                        period = formattedPeriod,
+                    )
 
                 // Рассчитываем расширенные метрики
                 calculateFinancialMetrics(transactions, income, expense)
             } catch (e: Exception) {
                 Timber.e(e, "Error loading financial statistics data")
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = e.message ?: "Неизвестная ошибка при загрузке данных",
-                )
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        error = e.message ?: "Неизвестная ошибка при загрузке данных",
+                    )
                 viewModelScope.launch {
                     _effect.emit(
                         FinancialDetailStatisticsContract.Effect.ShowError("Ошибка загрузки данных: ${e.message}"),
@@ -130,14 +131,19 @@ class FinancialDetailStatisticsViewModel(
     /**
      * Расчет расширенных финансовых метрик
      */
-    private fun calculateFinancialMetrics(transactions: List<Transaction>, income: Money, expense: Money) {
+    private fun calculateFinancialMetrics(
+        transactions: List<Transaction>,
+        income: Money,
+        expense: Money,
+    ) {
         // Рассчитываем норму сбережений (если доход > 0)
-        val savingsRate = if (income.amount > BigDecimal.ZERO) {
-            val balance = income.amount.subtract(expense.amount)
-            balance.divide(income.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
-        } else {
-            0f
-        }
+        val savingsRate =
+            if (income.amount > BigDecimal.ZERO) {
+                val balance = income.amount.subtract(expense.amount)
+                balance.divide(income.amount, 4, RoundingMode.HALF_EVEN).multiply(BigDecimal(100)).toFloat()
+            } else {
+                0f
+            }
 
         // Рассчитываем статистику по категориям
         val (categoryStats, totalIncome, totalExpense) = calculateCategoryStatsUseCase(transactions)
@@ -148,11 +154,12 @@ class FinancialDetailStatisticsViewModel(
 
         // Рассчитываем среднедневной и среднемесячный расход
         val dayCount = ((endDate - startDate) / (24 * 60 * 60 * 1000)).toInt().coerceAtLeast(1)
-        val averageDailyExpense = if (dayCount > 0) {
-            Money(expense.amount.divide(BigDecimal(dayCount), 2, RoundingMode.HALF_EVEN))
-        } else {
-            Money.zero()
-        }
+        val averageDailyExpense =
+            if (dayCount > 0) {
+                Money(expense.amount.divide(BigDecimal(dayCount), 2, RoundingMode.HALF_EVEN))
+            } else {
+                Money.zero()
+            }
 
         val averageMonthlyExpense = Money(averageDailyExpense.amount.multiply(BigDecimal(30)))
 
@@ -161,81 +168,90 @@ class FinancialDetailStatisticsViewModel(
         val topIncomeCategory = incomeCategories.maxByOrNull { it.amount.amount }?.category ?: ""
 
         // Создаем топ категории расходов для UI
-        val topExpenseCategories = expenseCategories
-            .sortedByDescending { it.amount.amount }
-            .take(3)
-            .map { Pair(it.category, it.amount) }
+        val topExpenseCategories =
+            expenseCategories
+                .sortedByDescending { it.amount.amount }
+                .take(3)
+                .map { Pair(it.category, it.amount) }
 
         // Рассчитываем количество месяцев, на которые хватит сбережений
-        val monthsOfSavings = if (averageMonthlyExpense.amount > BigDecimal.ZERO) {
-            val savings = income.amount.subtract(expense.amount)
-            (savings.divide(averageMonthlyExpense.amount, 0, RoundingMode.FLOOR)).toInt()
-        } else {
-            0
-        }
+        val monthsOfSavings =
+            if (averageMonthlyExpense.amount > BigDecimal.ZERO) {
+                val savings = income.amount.subtract(expense.amount)
+                (savings.divide(averageMonthlyExpense.amount, 0, RoundingMode.FLOOR)).toInt()
+            } else {
+                0
+            }
 
         // Рассчитываем статистику по транзакциям
         val incomeTransactionsCount = transactions.count { it.amount.amount > BigDecimal.ZERO }
         val expenseTransactionsCount = transactions.count { it.amount.amount < BigDecimal.ZERO }
 
         // Средний доход и расход на транзакцию
-        val averageIncomePerTransaction = if (incomeTransactionsCount > 0) {
-            Money(income.amount.divide(BigDecimal(incomeTransactionsCount), 2, RoundingMode.HALF_EVEN))
-        } else {
-            Money.zero()
-        }
+        val averageIncomePerTransaction =
+            if (incomeTransactionsCount > 0) {
+                Money(income.amount.divide(BigDecimal(incomeTransactionsCount), 2, RoundingMode.HALF_EVEN))
+            } else {
+                Money.zero()
+            }
 
-        val averageExpensePerTransaction = if (expenseTransactionsCount > 0) {
-            Money(expense.amount.divide(BigDecimal(expenseTransactionsCount), 2, RoundingMode.HALF_EVEN))
-        } else {
-            Money.zero()
-        }
+        val averageExpensePerTransaction =
+            if (expenseTransactionsCount > 0) {
+                Money(expense.amount.divide(BigDecimal(expenseTransactionsCount), 2, RoundingMode.HALF_EVEN))
+            } else {
+                Money.zero()
+            }
 
         // Максимальный доход и расход
-        val maxIncome = transactions
-            .filter { it.amount.amount > BigDecimal.ZERO }
-            .maxByOrNull { it.amount.amount }
-            ?.amount ?: Money.zero()
+        val maxIncome =
+            transactions
+                .filter { it.amount.amount > BigDecimal.ZERO }
+                .maxByOrNull { it.amount.amount }
+                ?.amount ?: Money.zero()
 
-        val maxExpense = transactions
-            .filter { it.amount.amount < BigDecimal.ZERO }
-            .minByOrNull { it.amount.amount }
-            ?.amount?.let { Money(it.amount.abs()) } ?: Money.zero()
+        val maxExpense =
+            transactions
+                .filter { it.amount.amount < BigDecimal.ZERO }
+                .minByOrNull { it.amount.amount }
+                ?.amount?.let { Money(it.amount.abs()) } ?: Money.zero()
 
         // Определяем самый частый день расходов
-        val dayOfWeekMap = transactions
-            .filter { it.amount.amount < BigDecimal.ZERO }
-            .groupBy { getDayOfWeekName(it.date) }
-            .mapValues { it.value.size }
+        val dayOfWeekMap =
+            transactions
+                .filter { it.amount.amount < BigDecimal.ZERO }
+                .groupBy { getDayOfWeekName(it.date) }
+                .mapValues { it.value.size }
 
-        val mostFrequentExpenseDay = dayOfWeekMap.entries
-            .maxByOrNull { it.value }
-            ?.key ?: ""
+        val mostFrequentExpenseDay =
+            dayOfWeekMap.entries
+                .maxByOrNull { it.value }
+                ?.key ?: ""
 
         // Обновляем метрики
-        _metrics.value = FinancialMetrics(
-            savingsRate = savingsRate,
-            expenseCategories = expenseCategories,
-            incomeCategories = incomeCategories,
-            transactionCount = transactions.size,
-            totalTransactions = transactions.size,
-            averageDailyExpense = averageDailyExpense,
-            averageMonthlyExpense = averageMonthlyExpense,
-            largestExpenseCategory = topExpenseCategory,
-            largestIncomeCategory = topIncomeCategory,
-            dayCount = dayCount,
-            topExpenseCategories = topExpenseCategories,
-            topExpenseCategory = topExpenseCategory,
-            topIncomeCategory = topIncomeCategory,
-            mostFrequentExpenseDay = mostFrequentExpenseDay,
-            monthsOfSavings = monthsOfSavings.toFloat(),
-            incomeTransactionsCount = incomeTransactionsCount,
-            expenseTransactionsCount = expenseTransactionsCount,
-            averageIncomePerTransaction = averageIncomePerTransaction,
-            averageExpensePerTransaction = averageExpensePerTransaction,
-            maxIncome = maxIncome,
-            maxExpense = maxExpense,
-        )
+        _metrics.value =
+            FinancialMetrics(
+                savingsRate = savingsRate,
+                expenseCategories = expenseCategories,
+                incomeCategories = incomeCategories,
+                transactionCount = transactions.size,
+                totalTransactions = transactions.size,
+                averageDailyExpense = averageDailyExpense,
+                averageMonthlyExpense = averageMonthlyExpense,
+                largestExpenseCategory = topExpenseCategory,
+                largestIncomeCategory = topIncomeCategory,
+                dayCount = dayCount,
+                topExpenseCategories = topExpenseCategories,
+                topExpenseCategory = topExpenseCategory,
+                topIncomeCategory = topIncomeCategory,
+                mostFrequentExpenseDay = mostFrequentExpenseDay,
+                monthsOfSavings = monthsOfSavings.toFloat(),
+                incomeTransactionsCount = incomeTransactionsCount,
+                expenseTransactionsCount = expenseTransactionsCount,
+                averageIncomePerTransaction = averageIncomePerTransaction,
+                averageExpensePerTransaction = averageExpensePerTransaction,
+                maxIncome = maxIncome,
+                maxExpense = maxExpense,
+            )
     }
 
     /**

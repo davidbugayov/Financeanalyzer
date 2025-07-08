@@ -15,7 +15,10 @@ object ImportErrorHandler {
      * @param error Ошибка или исключение
      * @return Сообщение об ошибке для отображения пользователю
      */
-    fun handleError(context: Context, error: Throwable?): String {
+    fun handleError(
+        context: Context,
+        error: Throwable?,
+    ): String {
         // Логирование ошибки
         Timber.e(error)
 

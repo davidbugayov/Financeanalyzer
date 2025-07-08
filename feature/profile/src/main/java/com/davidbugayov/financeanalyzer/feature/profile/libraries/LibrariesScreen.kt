@@ -49,9 +49,10 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
         },
     ) { paddingValues ->
         LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
             contentPadding = PaddingValues(dimensionResource(R.dimen.spacing_normal)),
         ) {
             item {
@@ -90,39 +91,50 @@ fun LibrariesScreen(onNavigateBack: () -> Unit) {
 }
 
 @Composable
-private fun LibraryItem(name: String, version: String, description: String, license: String, index: Int) {
-    val gradientColors = if (index % 2 == 0) {
-        listOf(
-            md_theme_light_primary.copy(alpha = 0.9f),
-            md_theme_light_primaryContainer.copy(alpha = 0.3f),
-        )
-    } else {
-        listOf(
-            md_theme_light_secondary.copy(alpha = 0.8f),
-            md_theme_light_secondaryContainer.copy(alpha = 0.3f),
-        )
-    }
+private fun LibraryItem(
+    name: String,
+    version: String,
+    description: String,
+    license: String,
+    index: Int,
+) {
+    val gradientColors =
+        if (index % 2 == 0) {
+            listOf(
+                md_theme_light_primary.copy(alpha = 0.9f),
+                md_theme_light_primaryContainer.copy(alpha = 0.3f),
+            )
+        } else {
+            listOf(
+                md_theme_light_secondary.copy(alpha = 0.8f),
+                md_theme_light_secondaryContainer.copy(alpha = 0.3f),
+            )
+        }
 
     val textColor = Color.White
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.card_elevation).div(2),
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(R.dimen.spacing_medium)),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.card_elevation).div(2),
+            ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
     ) {
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(
-                    brush = Brush.horizontalGradient(gradientColors),
-                )
-                .padding(dimensionResource(R.dimen.spacing_normal)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .background(
+                        brush = Brush.horizontalGradient(gradientColors),
+                    )
+                    .padding(dimensionResource(R.dimen.spacing_normal)),
         ) {
             Column {
                 Text(
@@ -154,9 +166,10 @@ private fun LibraryItem(name: String, version: String, description: String, lice
 
             HorizontalDivider(
                 color = MaterialTheme.colorScheme.outlineVariant,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(R.dimen.height_divider)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(dimensionResource(R.dimen.height_divider)),
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))

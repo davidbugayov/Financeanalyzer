@@ -44,10 +44,10 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
-import com.davidbugayov.financeanalyzer.presentation.R
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.presentation.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.ui.theme.DefaultCategoryColor
 import com.davidbugayov.financeanalyzer.ui.theme.ExpenseColorDark
@@ -63,8 +63,11 @@ import java.util.Locale
 import kotlinx.coroutines.delay
 
 object Formatters {
-
-    fun formatAmount(money: Money, useMinimalDecimals: Boolean = false, showCurrency: Boolean = true): String {
+    fun formatAmount(
+        money: Money,
+        useMinimalDecimals: Boolean = false,
+        showCurrency: Boolean = true,
+    ): String {
         return money.formatForDisplay(showCurrency = showCurrency, useMinimalDecimals = useMinimalDecimals)
     }
 }
@@ -99,9 +102,10 @@ fun TransactionItem(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
 
-    val transferCategoryString = stringResource(id = R.string.category_transfer).lowercase(
-        Locale.getDefault(),
-    )
+    val transferCategoryString =
+        stringResource(id = R.string.category_transfer).lowercase(
+            Locale.getDefault(),
+        )
 
     val incomeColor = if (isDarkTheme) IncomeColorDark else IncomeColorLight
     val expenseColor = if (isDarkTheme) ExpenseColorDark else ExpenseColorLight
@@ -127,69 +131,76 @@ fun TransactionItem(
     val expenseCategories by categoriesViewModel.expenseCategories.collectAsState()
     val incomeCategories by categoriesViewModel.incomeCategories.collectAsState()
 
-    val uiCategory = remember(
-        transaction.category,
-        transaction.isExpense,
-        expenseCategories,
-        incomeCategories,
-    ) {
-        val categories = if (transaction.isExpense) expenseCategories else incomeCategories
-        categories.find { it.name.equals(transaction.category, ignoreCase = true) }
-    }
+    val uiCategory =
+        remember(
+            transaction.category,
+            transaction.isExpense,
+            expenseCategories,
+            incomeCategories,
+        ) {
+            val categories = if (transaction.isExpense) expenseCategories else incomeCategories
+            categories.find { it.name.equals(transaction.category, ignoreCase = true) }
+        }
 
     val categoryActualColor = uiCategory?.color ?: DefaultCategoryColor
     val categoryIcon = uiCategory?.icon ?: Icons.Default.Category
 
-    val sourceActualColor = remember(transaction.sourceColor, transaction.source, isDarkTheme) {
-        val colorFromInt = if (transaction.sourceColor != 0) Color(transaction.sourceColor) else null
-        // Fallback to a slightly transparent default color if no specific source color is found
-        colorFromInt ?: ColorUtils.getSourceColorByName(transaction.source) ?: DefaultCategoryColor.copy(
-            alpha = 0.7f,
-        )
-    }
-
-    val formattedDate = remember(transaction.date) {
-        val calendar = Calendar.getInstance()
-        val currentYear = calendar.get(Calendar.YEAR)
-        calendar.time = transaction.date
-        val transactionYear = calendar.get(Calendar.YEAR)
-        if (transactionYear == currentYear) {
-            getDayMonthFormatter().format(transaction.date)
-        } else {
-            getDayMonthYearFormatter().format(transaction.date)
-        }
-    }
-
-    val formattedAmount = remember(
-        transaction.amount,
-        transaction.isExpense,
-        transaction.category,
-        transferCategoryString,
-    ) {
-        val moneyAmount = transaction.amount
-
-        val isTransfer = transaction.category.equals(transferCategoryString, ignoreCase = true) ||
-            transaction.category.equals("Перевод", ignoreCase = true)
-
-        val prefix = when {
-            isTransfer -> "" // Transfers usually don't need a +/- sign from this logic, Money.format handles it if needed
-            transaction.isExpense -> "-"
-            else -> "+"
-        }
-
-        if (isTransfer) {
-            // For transfers, display absolute amount, sign logic might be inherent or not needed
-            Formatters.formatAmount(
-                moneyAmount.abs(),
-                useMinimalDecimals = true,
-            )
-        } else {
-            prefix + Formatters.formatAmount(
-                moneyAmount.abs(),
-                useMinimalDecimals = true,
+    val sourceActualColor =
+        remember(transaction.sourceColor, transaction.source, isDarkTheme) {
+            val colorFromInt = if (transaction.sourceColor != 0) Color(transaction.sourceColor) else null
+            // Fallback to a slightly transparent default color if no specific source color is found
+            colorFromInt ?: ColorUtils.getSourceColorByName(transaction.source) ?: DefaultCategoryColor.copy(
+                alpha = 0.7f,
             )
         }
-    }
+
+    val formattedDate =
+        remember(transaction.date) {
+            val calendar = Calendar.getInstance()
+            val currentYear = calendar.get(Calendar.YEAR)
+            calendar.time = transaction.date
+            val transactionYear = calendar.get(Calendar.YEAR)
+            if (transactionYear == currentYear) {
+                getDayMonthFormatter().format(transaction.date)
+            } else {
+                getDayMonthYearFormatter().format(transaction.date)
+            }
+        }
+
+    val formattedAmount =
+        remember(
+            transaction.amount,
+            transaction.isExpense,
+            transaction.category,
+            transferCategoryString,
+        ) {
+            val moneyAmount = transaction.amount
+
+            val isTransfer =
+                transaction.category.equals(transferCategoryString, ignoreCase = true) ||
+                    transaction.category.equals("Перевод", ignoreCase = true)
+
+            val prefix =
+                when {
+                    isTransfer -> "" // Transfers usually don't need a +/- sign from this logic, Money.format handles it if needed
+                    transaction.isExpense -> "-"
+                    else -> "+"
+                }
+
+            if (isTransfer) {
+                // For transfers, display absolute amount, sign logic might be inherent or not needed
+                Formatters.formatAmount(
+                    moneyAmount.abs(),
+                    useMinimalDecimals = true,
+                )
+            } else {
+                prefix +
+                    Formatters.formatAmount(
+                        moneyAmount.abs(),
+                        useMinimalDecimals = true,
+                    )
+            }
+        }
 
     var visible by remember { mutableStateOf(!animated) }
 
@@ -214,63 +225,71 @@ fun TransactionItem(
 
     val animatedTranslationY by animateFloatAsState(
         targetValue = if (visible) 0f else targetTranslationYPx, // Use Px value here
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow, // Softer spring
-        ),
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow, // Softer spring
+            ),
         label = "TransactionItemTranslationY",
     )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.card_horizontal_padding),
-                vertical = dimensionResource(id = R.dimen.card_vertical_padding),
-            )
-            .graphicsLayer {
-                alpha = animatedAlpha
-                translationY = animatedTranslationY
-            }
-            .combinedClickable(
-                onClick = { onClick(transaction) },
-                onLongClick = { onTransactionLongClick(transaction) },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = dimensionResource(id = R.dimen.card_horizontal_padding),
+                    vertical = dimensionResource(id = R.dimen.card_vertical_padding),
+                )
+                .graphicsLayer {
+                    alpha = animatedAlpha
+                    translationY = animatedTranslationY
+                }
+                .combinedClickable(
+                    onClick = { onClick(transaction) },
+                    onLongClick = { onTransactionLongClick(transaction) },
+                ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(id = R.dimen.card_elevation_default),
             ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(id = R.dimen.card_elevation_default),
-        ),
         shape = RoundedCornerShape(dimensionResource(id = R.dimen.card_corner_radius_medium)),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant,
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant,
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.card_content_padding_medium)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(id = R.dimen.card_content_padding_medium)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Transaction type indicator bar
             Box(
-                modifier = Modifier
-                    .width(dimensionResource(id = R.dimen.transaction_type_indicator_width))
-                    .height(dimensionResource(id = R.dimen.icon_container_size_large))
-                    .background(
-                        color = transactionTypeColor,
-                        shape = RoundedCornerShape(
-                            topStart = dimensionResource(id = R.dimen.radius_small),
-                            bottomStart = dimensionResource(id = R.dimen.radius_small),
+                modifier =
+                    Modifier
+                        .width(dimensionResource(id = R.dimen.transaction_type_indicator_width))
+                        .height(dimensionResource(id = R.dimen.icon_container_size_large))
+                        .background(
+                            color = transactionTypeColor,
+                            shape =
+                                RoundedCornerShape(
+                                    topStart = dimensionResource(id = R.dimen.radius_small),
+                                    bottomStart = dimensionResource(id = R.dimen.radius_small),
+                                ),
                         ),
-                    ),
             )
             Spacer(modifier = Modifier.width(dimensionResource(id = R.dimen.spacing_medium)))
 
             // Category Icon
             Box(
-                modifier = Modifier
-                    .size(dimensionResource(id = R.dimen.icon_container_size_large))
-                    .clip(CircleShape)
-                    .background(categoryActualColor.copy(alpha = 0.2f)),
+                modifier =
+                    Modifier
+                        .size(dimensionResource(id = R.dimen.icon_container_size_large))
+                        .clip(CircleShape)
+                        .background(categoryActualColor.copy(alpha = 0.2f)),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -289,9 +308,10 @@ fun TransactionItem(
                 verticalArrangement = Arrangement.Center,
             ) {
                 Text(
-                    text = transaction.category.replaceFirstChar {
-                        if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
-                    },
+                    text =
+                        transaction.category.replaceFirstChar {
+                            if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString()
+                        },
                     style = MaterialTheme.typography.titleMedium,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis,

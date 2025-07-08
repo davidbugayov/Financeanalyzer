@@ -18,8 +18,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
-import kotlinx.coroutines.launch
 import java.util.Date
+import kotlinx.coroutines.launch
 
 /**
  * Диалог выбора даты.
@@ -39,9 +39,10 @@ fun DatePickerDialog(
     onDateSelected: (Date) -> Unit,
     onDismiss: () -> Unit,
 ) {
-    val datePickerState = rememberDatePickerState(
-        initialSelectedDateMillis = initialDate.time,
-    )
+    val datePickerState =
+        rememberDatePickerState(
+            initialSelectedDateMillis = initialDate.time,
+        )
     val snackbarHostState = remember { SnackbarHostState() }
     val coroutineScope = rememberCoroutineScope()
 
@@ -53,8 +54,9 @@ fun DatePickerDialog(
     LaunchedEffect(datePickerState.selectedDateMillis) {
         datePickerState.selectedDateMillis?.let { millis ->
             val selectedDate = Date(millis)
-            val isValid = (minDate == null || selectedDate >= minDate) &&
-                (maxDate == null || selectedDate <= maxDate)
+            val isValid =
+                (minDate == null || selectedDate >= minDate) &&
+                    (maxDate == null || selectedDate <= maxDate)
             if (!isValid) {
                 coroutineScope.launch {
                     snackbarHostState.showSnackbar(
@@ -80,8 +82,9 @@ fun DatePickerDialog(
                 onClick = {
                     datePickerState.selectedDateMillis?.let { millis ->
                         val selectedDate = Date(millis)
-                        val isValid = (minDate == null || selectedDate >= minDate) &&
-                            (maxDate == null || selectedDate <= maxDate)
+                        val isValid =
+                            (minDate == null || selectedDate >= minDate) &&
+                                (maxDate == null || selectedDate <= maxDate)
                         if (isValid) {
                             onDateSelected(selectedDate)
                         } else {
@@ -113,9 +116,10 @@ fun DatePickerDialog(
         Column {
             DatePicker(
                 state = datePickerState,
-                colors = DatePickerDefaults.colors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
+                colors =
+                    DatePickerDefaults.colors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
             )
             SnackbarHost(
                 hostState = snackbarHostState,

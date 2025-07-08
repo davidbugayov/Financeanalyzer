@@ -65,8 +65,9 @@ fun SettingsSection(
     modifier: Modifier = Modifier,
 ) {
     Column(
-        modifier = modifier
-            .fillMaxWidth(),
+        modifier =
+            modifier
+                .fillMaxWidth(),
     ) {
         Text(
             text = stringResource(R.string.profile_settings_title),
@@ -75,18 +76,20 @@ fun SettingsSection(
         )
         AnimatedVisibility(visible = true, enter = fadeIn()) {
             SettingsActionCard(
-                icon = when (themeMode) {
-                    ThemeMode.LIGHT -> Icons.Default.LightMode
-                    ThemeMode.DARK -> Icons.Default.DarkMode
-                    ThemeMode.SYSTEM -> Icons.Default.Brightness6
-                },
+                icon =
+                    when (themeMode) {
+                        ThemeMode.LIGHT -> Icons.Default.LightMode
+                        ThemeMode.DARK -> Icons.Default.DarkMode
+                        ThemeMode.SYSTEM -> Icons.Default.Brightness6
+                    },
                 iconBackground = MaterialTheme.colorScheme.primary,
                 title = stringResource(R.string.settings_theme_title),
-                subtitle = when (themeMode) {
-                    ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
-                    ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
-                    ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
-                },
+                subtitle =
+                    when (themeMode) {
+                        ThemeMode.LIGHT -> stringResource(R.string.settings_theme_light)
+                        ThemeMode.DARK -> stringResource(R.string.settings_theme_dark)
+                        ThemeMode.SYSTEM -> stringResource(R.string.settings_theme_system)
+                    },
                 onClick = onThemeClick,
             )
         }
@@ -113,17 +116,18 @@ fun SettingsSection(
                 icon = Icons.Default.Timer,
                 iconBackground = MaterialTheme.colorScheme.primary,
                 title = stringResource(R.string.profile_transaction_reminders_title),
-                subtitle = if (!hasNotificationPermission) {
-                    stringResource(R.string.notification_disabled_description)
-                } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
-                    stringResource(
-                        R.string.settings_reminder_time_format,
-                        transactionReminderTime.hour,
-                        transactionReminderTime.minute,
-                    )
-                } else {
-                    stringResource(R.string.off)
-                },
+                subtitle =
+                    if (!hasNotificationPermission) {
+                        stringResource(R.string.notification_disabled_description)
+                    } else if (isTransactionReminderEnabled && transactionReminderTime != null) {
+                        stringResource(
+                            R.string.settings_reminder_time_format,
+                            transactionReminderTime.hour,
+                            transactionReminderTime.minute,
+                        )
+                    } else {
+                        stringResource(R.string.off)
+                    },
                 subtitleColor = if (!hasNotificationPermission) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurfaceVariant,
                 onClick = onTransactionReminderClick,
             )
@@ -141,11 +145,12 @@ fun SettingsActionCard(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp, horizontal = 0.dp)
-            .background(Color.Transparent)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp, horizontal = 0.dp)
+                .background(Color.Transparent)
+                .clickable(onClick = onClick),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -155,9 +160,10 @@ fun SettingsActionCard(
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                modifier = Modifier
-                    .size(40.dp)
-                    .background(iconBackground, shape = CircleShape),
+                modifier =
+                    Modifier
+                        .size(40.dp)
+                        .background(iconBackground, shape = CircleShape),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

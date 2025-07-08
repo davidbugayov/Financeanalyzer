@@ -28,8 +28,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
-import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.domain.model.Wallet
 
 /**
  * Диалог выбора кошельков для добавления дохода
@@ -51,18 +51,21 @@ fun WalletSelectorDialog(
 ) {
     Dialog(onDismissRequest = onDismiss) {
         Card(
-            modifier = Modifier
-                .fillMaxWidth()
-                .wrapContentHeight(),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .wrapContentHeight(),
             shape = RoundedCornerShape(16.dp),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surface,
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surface,
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(16.dp),
             ) {
                 Text(
                     text = "Выберите кошельки",
@@ -73,9 +76,10 @@ fun WalletSelectorDialog(
 
                 if (wallets.isEmpty()) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(100.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(100.dp),
                         contentAlignment = Alignment.Center,
                     ) {
                         Text(
@@ -86,9 +90,10 @@ fun WalletSelectorDialog(
                     }
                 } else {
                     LazyColumn(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(max = 300.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(max = 300.dp),
                     ) {
                         items(wallets) { wallet ->
                             WalletItem(
@@ -103,9 +108,10 @@ fun WalletSelectorDialog(
                 }
 
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(top = 16.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(top = 16.dp),
                     horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(onClick = onDismiss) {
@@ -130,11 +136,16 @@ fun WalletSelectorDialog(
  * Элемент списка кошельков с чекбоксом
  */
 @Composable
-private fun WalletItem(wallet: Wallet, isSelected: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun WalletItem(
+    wallet: Wallet,
+    isSelected: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
@@ -143,9 +154,10 @@ private fun WalletItem(wallet: Wallet, isSelected: Boolean, onCheckedChange: (Bo
         )
 
         Column(
-            modifier = Modifier
-                .weight(1f)
-                .padding(start = 8.dp),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .padding(start = 8.dp),
         ) {
             Text(
                 text = wallet.name,

@@ -12,14 +12,21 @@ interface CategoriesViewModel {
     val expenseCategories: StateFlow<List<UiCategory>>
     val incomeCategories: StateFlow<List<UiCategory>>
 
-    fun addCustomCategory(name: String, isExpense: Boolean, icon: androidx.compose.ui.graphics.vector.ImageVector? = null)
+    fun addCustomCategory(
+        name: String,
+        isExpense: Boolean,
+        icon: androidx.compose.ui.graphics.vector.ImageVector? = null,
+    )
+
     fun deleteExpenseCategory(name: String)
+
     fun deleteIncomeCategory(name: String)
+
     fun isDefaultExpenseCategory(
         category: com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory,
-    ): Boolean =
-        category.isExpense && !category.isCustom
+    ): Boolean = category.isExpense && !category.isCustom
 
-    fun isDefaultIncomeCategory(category: com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory): Boolean =
-        !category.isExpense && !category.isCustom
+    fun isDefaultIncomeCategory(
+        category: com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory,
+    ): Boolean = !category.isExpense && !category.isCustom
 }

@@ -89,13 +89,14 @@ fun CustomSourceDialog(
 
                 Row(
                     verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            Timber.d("Color picker clicked, showing color picker dialog")
-                            showColorPicker = true
-                        }
-                        .padding(vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                Timber.d("Color picker clicked, showing color picker dialog")
+                                showColorPicker = true
+                            }
+                            .padding(vertical = 8.dp),
                 ) {
                     Text(
                         text = "Выберите цвет:",
@@ -103,11 +104,12 @@ fun CustomSourceDialog(
                     )
 
                     Box(
-                        modifier = Modifier
-                            .size(40.dp)
-                            .clip(CircleShape)
-                            .background(Color(color))
-                            .clickable { showColorPicker = true },
+                        modifier =
+                            Modifier
+                                .size(40.dp)
+                                .clip(CircleShape)
+                                .background(Color(color))
+                                .clickable { showColorPicker = true },
                     )
                 }
             }

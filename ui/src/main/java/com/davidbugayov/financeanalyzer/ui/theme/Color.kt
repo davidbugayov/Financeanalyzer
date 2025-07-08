@@ -167,36 +167,38 @@ val CategoryInterest = Color(0xFFFFD600) // Yellow Darker - Оставить
 val CategoryRental = Color(0xFF8D6E63) // Brownish Grey (Listed as income rent) - Оставить
 
 // Maps for category colors
-val incomeCategoryColorsMap: Map<String, Color> = mapOf(
-    "salary" to CategorySalary,
-    "business" to CategoryBusiness,
-    "investments" to CategoryInvestments,
-    "rental" to CategoryRental,
-    "gifts" to CategoryGifts,
-    "other_income" to CategoryOtherIncome,
-    "freelance" to CategoryFreelance,
-    "interest" to CategoryInterest,
-).withDefault { DefaultCategoryColor }
+val incomeCategoryColorsMap: Map<String, Color> =
+    mapOf(
+        "salary" to CategorySalary,
+        "business" to CategoryBusiness,
+        "investments" to CategoryInvestments,
+        "rental" to CategoryRental,
+        "gifts" to CategoryGifts,
+        "other_income" to CategoryOtherIncome,
+        "freelance" to CategoryFreelance,
+        "interest" to CategoryInterest,
+    ).withDefault { DefaultCategoryColor }
 
-val expenseCategoryColorsMap: Map<String, Color> = mapOf(
-    "food" to CategoryFood,
-    "transport" to CategoryTransport,
-    "housing" to CategoryHousing,
-    "entertainment" to CategoryEntertainment,
-    "health" to CategoryHealth,
-    "education" to CategoryEducation,
-    "shopping" to CategoryShopping,
-    "utilities" to CategoryUtilities,
-    "other_expense" to CategoryOtherExpense,
-    "restaurant" to CategoryRestaurant,
-    "clothing" to CategoryClothing,
-    "communication" to CategoryCommunication,
-    "pet" to CategoryPet,
-    "services" to CategoryServices,
-    "charity" to CategoryCharity,
-    "credit" to CategoryCredit,
-    "transfer" to CategoryTransfer,
-).withDefault { DefaultCategoryColor }
+val expenseCategoryColorsMap: Map<String, Color> =
+    mapOf(
+        "food" to CategoryFood,
+        "transport" to CategoryTransport,
+        "housing" to CategoryHousing,
+        "entertainment" to CategoryEntertainment,
+        "health" to CategoryHealth,
+        "education" to CategoryEducation,
+        "shopping" to CategoryShopping,
+        "utilities" to CategoryUtilities,
+        "other_expense" to CategoryOtherExpense,
+        "restaurant" to CategoryRestaurant,
+        "clothing" to CategoryClothing,
+        "communication" to CategoryCommunication,
+        "pet" to CategoryPet,
+        "services" to CategoryServices,
+        "charity" to CategoryCharity,
+        "credit" to CategoryCredit,
+        "transfer" to CategoryTransfer,
+    ).withDefault { DefaultCategoryColor }
 
 /**
  * Converts a Compose Color object to a HEX string (e.g., "#RRGGBB").
@@ -214,23 +216,25 @@ val IncomeColorInt = IncomeColorLight.toArgb()
 val ExpenseColorInt = ExpenseColorLight.toArgb()
 
 // Palettes (Can be expanded and refined)
-val IncomeChartPalette = listOf(
-    Color(0xFF4CAF50),
-    Color(0xFF66BB6A),
-    Color(0xFF81C784),
-    Color(0xFFA5D6A7),
-    Color(0xFFC8E6C9),
-    Color(0xFF00C853),
-)
+val IncomeChartPalette =
+    listOf(
+        Color(0xFF4CAF50),
+        Color(0xFF66BB6A),
+        Color(0xFF81C784),
+        Color(0xFFA5D6A7),
+        Color(0xFFC8E6C9),
+        Color(0xFF00C853),
+    )
 
-val ExpenseChartPalette = listOf(
-    Color(0xFFF44336),
-    Color(0xFFEF5350),
-    Color(0xFFE57373),
-    Color(0xFFEF9A9A),
-    Color(0xFFFFCDD2),
-    Color(0xFFD50000),
-)
+val ExpenseChartPalette =
+    listOf(
+        Color(0xFFF44336),
+        Color(0xFFEF5350),
+        Color(0xFFE57373),
+        Color(0xFFEF9A9A),
+        Color(0xFFFFCDD2),
+        Color(0xFFD50000),
+    )
 
 // --- Мягкие цвета для HomeGroupSummary ---
 val SummaryCardBackgroundLight = Color(0xFFF8FAFC)

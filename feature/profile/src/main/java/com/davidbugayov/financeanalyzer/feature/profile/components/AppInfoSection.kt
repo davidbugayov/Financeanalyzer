@@ -47,9 +47,10 @@ fun AppInfoSection(
 ) {
     AnimatedVisibility(visible = true, enter = fadeIn()) {
         Card(
-            modifier = modifier
-                .fillMaxWidth()
-                .clickable { onNavigateToLibraries() },
+            modifier =
+                modifier
+                    .fillMaxWidth()
+                    .clickable { onNavigateToLibraries() },
             elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
             shape = RoundedCornerShape(20.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
@@ -59,9 +60,10 @@ fun AppInfoSection(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(48.dp)
-                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    modifier =
+                        Modifier
+                            .size(48.dp)
+                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -78,9 +80,10 @@ fun AppInfoSection(
                 ) {
                     Text(
                         text = stringResource(R.string.app_info),
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            fontWeight = FontWeight.Bold,
-                        ),
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                fontWeight = FontWeight.Bold,
+                            ),
                         color = MaterialTheme.colorScheme.onSurface,
                         maxLines = 1,
                     )

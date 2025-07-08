@@ -4,7 +4,6 @@ package com.davidbugayov.financeanalyzer.feature.transaction.validation
  * Вспомогательный класс для сбора и применения ошибок валидации
  */
 class ValidationBuilder {
-
     private var hasAmountError = false
     private var hasCategoryError = false
     private var hasSourceError = false

@@ -4,10 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
-import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
-import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsState
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsEvent
+import com.davidbugayov.financeanalyzer.presentation.budget.wallet.model.WalletTransactionsState
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +24,6 @@ class WalletTransactionsViewModel(
     private val transactionRepository: TransactionRepository,
     private val navigationManager: NavigationManager,
 ) : ViewModel(), KoinComponent {
-
     private val _state = MutableStateFlow(WalletTransactionsState())
     val state: StateFlow<WalletTransactionsState> = _state.asStateFlow()
 
@@ -68,11 +67,12 @@ class WalletTransactionsViewModel(
 
                 if (now > periodEnd) {
                     // Период истек, сбрасываем потраченную сумму
-                    val updatedWallet = wallet.copy(
-                        spent = wallet.spent.copy(amount = java.math.BigDecimal.ZERO),
-                        periodStartDate = now,
-                        linkedCategories = wallet.linkedCategories,
-                    )
+                    val updatedWallet =
+                        wallet.copy(
+                            spent = wallet.spent.copy(amount = java.math.BigDecimal.ZERO),
+                            periodStartDate = now,
+                            linkedCategories = wallet.linkedCategories,
+                        )
 
                     walletRepository.updateWallet(updatedWallet)
 
@@ -124,16 +124,18 @@ class WalletTransactionsViewModel(
                 val allTransactions = transactionRepository.getAllTransactions()
 
                 // Фильтруем транзакции, относящиеся к данному кошельку
-                val walletTransactions = allTransactions.filter { transaction -> // Учитываем основное условие: совпадение по имени или ID категории
-                    val baseMatch = transaction.category == wallet.name || transaction.categoryId == wallet.id
+                val walletTransactions =
+                    allTransactions.filter {
+                            transaction -> // Учитываем основное условие: совпадение по имени или ID категории
+                        val baseMatch = transaction.category == wallet.name || transaction.categoryId == wallet.id
 
-                    // Проверяем наличие в связанных категориях
-                    val linkedCategories = wallet.linkedCategories
-                    val linkedCategoryMatch = linkedCategories.isNotEmpty() && (linkedCategories.contains(transaction.category) || linkedCategories.contains(transaction.categoryId))
+                        // Проверяем наличие в связанных категориях
+                        val linkedCategories = wallet.linkedCategories
+                        val linkedCategoryMatch = linkedCategories.isNotEmpty() && (linkedCategories.contains(transaction.category) || linkedCategories.contains(transaction.categoryId))
 
-                    // Транзакция подходит, если выполняется любое из условий
-                    baseMatch || linkedCategoryMatch
-                }.sortedByDescending { it.date }
+                        // Транзакция подходит, если выполняется любое из условий
+                        baseMatch || linkedCategoryMatch
+                    }.sortedByDescending { it.date }
 
                 _state.update {
                     it.copy(
@@ -181,9 +183,10 @@ class WalletTransactionsViewModel(
                 }
 
                 // Обновляем кошелек с новым списком связанных категорий
-                val updatedWallet = currentWallet.copy(
-                    linkedCategories = categories,
-                )
+                val updatedWallet =
+                    currentWallet.copy(
+                        linkedCategories = categories,
+                    )
 
                 // Сохраняем обновленный кошелек
                 walletRepository.updateWallet(updatedWallet)

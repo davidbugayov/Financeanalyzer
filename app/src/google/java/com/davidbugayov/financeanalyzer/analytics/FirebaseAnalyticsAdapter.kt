@@ -11,18 +11,23 @@ import timber.log.Timber
 class FirebaseAnalyticsAdapter(
     private val firebaseAnalytics: FirebaseAnalytics,
 ) : IAnalytics {
-
     override fun logEvent(eventName: String) {
         Timber.d("Logging Firebase event: $eventName")
         firebaseAnalytics.logEvent(eventName, null)
     }
 
-    override fun logEvent(eventName: String, params: Bundle) {
+    override fun logEvent(
+        eventName: String,
+        params: Bundle,
+    ) {
         Timber.d("Logging Firebase event: $eventName with params: $params")
         firebaseAnalytics.logEvent(eventName, params)
     }
 
-    override fun setUserProperty(name: String, value: String) {
+    override fun setUserProperty(
+        name: String,
+        value: String,
+    ) {
         Timber.d("Setting Firebase user property: $name = $value")
         firebaseAnalytics.setUserProperty(name, value)
     }

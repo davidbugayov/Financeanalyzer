@@ -49,7 +49,11 @@ import org.koin.core.parameter.parametersOf
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FinancialDetailStatisticsScreen(startDate: Long, endDate: Long, onNavigateBack: () -> Unit) {
+fun FinancialDetailStatisticsScreen(
+    startDate: Long,
+    endDate: Long,
+    onNavigateBack: () -> Unit,
+) {
     val viewModel: FinancialDetailStatisticsViewModel = koinViewModel { parametersOf(startDate, endDate) }
     val state = viewModel.state.collectAsState().value
     val metrics = viewModel.metrics.collectAsState().value
@@ -72,12 +76,14 @@ fun FinancialDetailStatisticsScreen(startDate: Long, endDate: Long, onNavigateBa
         }
     }
 
-    val backgroundGradient = Brush.verticalGradient(
-        colors = listOf(
-            MaterialTheme.colorScheme.surface,
-            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
-        ),
-    )
+    val backgroundGradient =
+        Brush.verticalGradient(
+            colors =
+                listOf(
+                    MaterialTheme.colorScheme.surface,
+                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.5f),
+                ),
+        )
 
     Scaffold(
         topBar = {
@@ -90,27 +96,31 @@ fun FinancialDetailStatisticsScreen(startDate: Long, endDate: Long, onNavigateBa
         snackbarHost = { SnackbarHost(snackbarHostState) },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues)
-                .background(backgroundGradient),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues)
+                    .background(backgroundGradient),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(scrollState)
-                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                        .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
             ) {
                 // Заголовок с периодом
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
-                    ),
-                    border = BorderStroke(
-                        width = 1.dp,
-                        color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
-                    ),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer.copy(alpha = 0.1f),
+                        ),
+                    border =
+                        BorderStroke(
+                            width = 1.dp,
+                            color = MaterialTheme.colorScheme.primary.copy(alpha = 0.2f),
+                        ),
                 ) {
                     Column(
                         modifier = Modifier.padding(16.dp),
@@ -130,9 +140,10 @@ fun FinancialDetailStatisticsScreen(startDate: Long, endDate: Long, onNavigateBa
                 }
 
                 Spacer(
-                    modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large),
-                    ),
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
                 )
                 KeyMetricsCard(
                     income = state.income,
@@ -141,27 +152,30 @@ fun FinancialDetailStatisticsScreen(startDate: Long, endDate: Long, onNavigateBa
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
-                    modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large),
-                    ),
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
                 )
                 TransactionsStatisticsCard(
                     metrics = metrics,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
-                    modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large),
-                    ),
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
                 )
                 ExpenseAnalysisCard(
                     metrics = metrics,
                     modifier = Modifier.fillMaxWidth(),
                 )
                 Spacer(
-                    modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_large),
-                    ),
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
                 )
                 RecommendationsCard(
                     metrics = metrics,

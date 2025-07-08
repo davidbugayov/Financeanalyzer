@@ -35,20 +35,23 @@ fun AppNavHost(
     LaunchedEffect("navigation") {
         navigationManager.commands.onEach { command ->
             when (command) {
-                is NavigationManager.Command.Navigate -> navController.navigate(
-                    command.destination,
-                ) { launchSingleTop = true }
+                is NavigationManager.Command.Navigate ->
+                    navController.navigate(
+                        command.destination,
+                    ) { launchSingleTop = true }
                 is NavigationManager.Command.NavigateUp -> navController.navigateUp()
-                is NavigationManager.Command.PopUpTo -> navController.popBackStack(
-                    command.destination,
-                    command.inclusive,
-                )
-                is NavigationManager.Command.NavigateAndClearBackStack -> navController.navigate(
-                    command.destination,
-                ) { 
-                    popUpTo(command.popUpTo) { inclusive = true }
-                    launchSingleTop = true
-                }
+                is NavigationManager.Command.PopUpTo ->
+                    navController.popBackStack(
+                        command.destination,
+                        command.inclusive,
+                    )
+                is NavigationManager.Command.NavigateAndClearBackStack ->
+                    navController.navigate(
+                        command.destination,
+                    ) {
+                        popUpTo(command.popUpTo) { inclusive = true }
+                        launchSingleTop = true
+                    }
             }
         }.launchIn(this)
     }
@@ -132,44 +135,50 @@ fun AppNavHost(
 }
 
 // --- Транзишены для читаемости ---
-fun defaultEnterLeft(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
-    slideIntoContainer(
-        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-        animationSpec = tween(400, easing = EaseInOut),
-    ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-}
+fun defaultEnterLeft(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+    {
+        slideIntoContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+            animationSpec = tween(400, easing = EaseInOut),
+        ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
+    }
 
-fun defaultExitRight(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
-    slideOutOfContainer(
-        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-        animationSpec = tween(400, easing = EaseInOut),
-    ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-}
+fun defaultExitRight(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+    {
+        slideOutOfContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+            animationSpec = tween(400, easing = EaseInOut),
+        ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
+    }
 
-fun defaultEnterRight(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
-    slideIntoContainer(
-        towards = AnimatedContentTransitionScope.SlideDirection.Right,
-        animationSpec = tween(400, easing = EaseInOut),
-    ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-}
+fun defaultEnterRight(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+    {
+        slideIntoContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Right,
+            animationSpec = tween(400, easing = EaseInOut),
+        ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
+    }
 
-fun defaultExitLeft(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
-    slideOutOfContainer(
-        towards = AnimatedContentTransitionScope.SlideDirection.Left,
-        animationSpec = tween(400, easing = EaseInOut),
-    ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-}
+fun defaultExitLeft(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+    {
+        slideOutOfContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Left,
+            animationSpec = tween(400, easing = EaseInOut),
+        ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
+    }
 
-fun defaultEnterUp(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? = {
-    slideIntoContainer(
-        towards = AnimatedContentTransitionScope.SlideDirection.Up,
-        animationSpec = tween(400, easing = EaseInOut),
-    ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
-}
+fun defaultEnterUp(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> EnterTransition? =
+    {
+        slideIntoContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Up,
+            animationSpec = tween(400, easing = EaseInOut),
+        ) + fadeIn(animationSpec = tween(400, easing = EaseInOut))
+    }
 
-fun defaultExitDown(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? = {
-    slideOutOfContainer(
-        towards = AnimatedContentTransitionScope.SlideDirection.Down,
-        animationSpec = tween(400, easing = EaseInOut),
-    ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
-}
+fun defaultExitDown(): AnimatedContentTransitionScope<NavBackStackEntry>.() -> ExitTransition? =
+    {
+        slideOutOfContainer(
+            towards = AnimatedContentTransitionScope.SlideDirection.Down,
+            animationSpec = tween(400, easing = EaseInOut),
+        ) + fadeOut(animationSpec = tween(400, easing = EaseInOut))
+    }

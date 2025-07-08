@@ -23,14 +23,13 @@ import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.ui.theme.AppThemeProvider
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
-import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.OnboardingManager
+import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
 class FinanceActivity : ComponentActivity() {
-
     private val navigationManager: NavigationManager by inject()
     private val onboardingManager: OnboardingManager by inject()
 
@@ -56,11 +55,12 @@ class FinanceActivity : ComponentActivity() {
         val themeMode = PreferencesManager(this).getThemeMode()
         AppTheme.setTheme(themeMode)
 
-        val isDarkTheme = when (themeMode) {
-            ThemeMode.DARK -> true
-            ThemeMode.LIGHT -> false
-            ThemeMode.SYSTEM -> resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
-        }
+        val isDarkTheme =
+            when (themeMode) {
+                ThemeMode.DARK -> true
+                ThemeMode.LIGHT -> false
+                ThemeMode.SYSTEM -> resources.configuration.uiMode and android.content.res.Configuration.UI_MODE_NIGHT_MASK == android.content.res.Configuration.UI_MODE_NIGHT_YES
+            }
 
         // Устанавливаем цвет иконок в зависимости от темы:
         // - светлые иконки на темном фоне (isDarkTheme = true)
@@ -110,7 +110,7 @@ class FinanceActivity : ComponentActivity() {
                 }
             }
         }
-        
+
         // Обрабатываем шорткаты (extras)
         intent?.getStringExtra("screen")?.let { screen ->
             when (screen) {
@@ -141,7 +141,10 @@ class FinanceActivity : ComponentActivity() {
 }
 
 @Composable
-fun FinanceAppContent(navigationManager: NavigationManager, startDestination: String) {
+fun FinanceAppContent(
+    navigationManager: NavigationManager,
+    startDestination: String,
+) {
     // Получаем текущую тему из AppTheme и наблюдаем за изменениями
     val themeMode by AppTheme.currentTheme.collectAsState()
 
@@ -153,7 +156,11 @@ fun FinanceAppContent(navigationManager: NavigationManager, startDestination: St
                 color = MaterialTheme.colorScheme.background,
             ) {
                 val navController = rememberNavController()
-                AppNavHostImpl(navController = navController, navigationManager = navigationManager, startDestination = startDestination)
+                AppNavHostImpl(
+                    navController = navController,
+                    navigationManager = navigationManager,
+                    startDestination = startDestination,
+                )
             }
         }
     }

@@ -5,9 +5,9 @@ import android.os.Build
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import timber.log.Timber
 import java.io.PrintWriter
 import java.io.StringWriter
+import timber.log.Timber
 
 /**
  * Centralized crash reporting system that captures uncaught exceptions
@@ -45,7 +45,10 @@ object CrashReporter {
      * @param throwable The error to log
      * @param message Optional message providing context about the error
      */
-    fun logError(throwable: Throwable, message: String = "") {
+    fun logError(
+        throwable: Throwable,
+        message: String = "",
+    ) {
         Timber.e(throwable, message)
 
         val stackTrace = getStackTraceString(throwable)
@@ -53,12 +56,13 @@ object CrashReporter {
         val errorMessage = throwable.message ?: "No message"
 
         // Report to analytics
-        val params = android.os.Bundle().apply {
-            putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, "$message: $errorMessage")
-            putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
-            putString(AnalyticsConstants.Params.IS_FATAL, "false")
-        }
+        val params =
+            android.os.Bundle().apply {
+                putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, "$message: $errorMessage")
+                putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
+                putString(AnalyticsConstants.Params.IS_FATAL, "false")
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.APP_ERROR, params)
     }
@@ -68,7 +72,10 @@ object CrashReporter {
      * @param throwable The exception to log
      * @param customParams Additional parameters to include with the error report
      */
-    fun logException(throwable: Throwable, customParams: Map<String, String> = emptyMap()) {
+    fun logException(
+        throwable: Throwable,
+        customParams: Map<String, String> = emptyMap(),
+    ) {
         Timber.e(throwable)
 
         val stackTrace = getStackTraceString(throwable)
@@ -76,17 +83,18 @@ object CrashReporter {
         val errorMessage = throwable.message ?: "No message"
 
         // Report to analytics
-        val params = android.os.Bundle().apply {
-            putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
-            putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
-            putString(AnalyticsConstants.Params.IS_FATAL, "false")
+        val params =
+            android.os.Bundle().apply {
+                putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
+                putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
+                putString(AnalyticsConstants.Params.IS_FATAL, "false")
 
-            // Add custom parameters
-            customParams.forEach { (key, value) ->
-                putString(key, value)
+                // Add custom parameters
+                customParams.forEach { (key, value) ->
+                    putString(key, value)
+                }
             }
-        }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.APP_EXCEPTION, params)
     }
@@ -94,7 +102,10 @@ object CrashReporter {
     /**
      * Log details about a crash
      */
-    private fun logCrash(throwable: Throwable, application: Application) {
+    private fun logCrash(
+        throwable: Throwable,
+        application: Application,
+    ) {
         val stackTrace = getStackTraceString(throwable)
         val errorType = throwable::class.java.simpleName
         val errorMessage = throwable.message ?: "No message"
@@ -102,19 +113,20 @@ object CrashReporter {
         Timber.e(throwable, "FATAL CRASH: $errorType - $errorMessage")
 
         // Report to analytics
-        val params = android.os.Bundle().apply {
-            putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
-            putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
-            putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
-            putString(AnalyticsConstants.Params.IS_FATAL, "true")
-            putString(AnalyticsConstants.Params.APP_VERSION, BuildConfig.VERSION_NAME)
-            putInt(AnalyticsConstants.Params.APP_VERSION_CODE, BuildConfig.VERSION_CODE)
-            putString(AnalyticsConstants.Params.DEVICE_MODEL, "${Build.MANUFACTURER} ${Build.MODEL}")
-            putString(
-                AnalyticsConstants.Params.ANDROID_VERSION,
-                "${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})",
-            )
-        }
+        val params =
+            android.os.Bundle().apply {
+                putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
+                putString(AnalyticsConstants.Params.ERROR_MESSAGE, errorMessage)
+                putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
+                putString(AnalyticsConstants.Params.IS_FATAL, "true")
+                putString(AnalyticsConstants.Params.APP_VERSION, BuildConfig.VERSION_NAME)
+                putInt(AnalyticsConstants.Params.APP_VERSION_CODE, BuildConfig.VERSION_CODE)
+                putString(AnalyticsConstants.Params.DEVICE_MODEL, "${Build.MANUFACTURER} ${Build.MODEL}")
+                putString(
+                    AnalyticsConstants.Params.ANDROID_VERSION,
+                    "${Build.VERSION.RELEASE} (SDK ${Build.VERSION.SDK_INT})",
+                )
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.APP_CRASH, params)
     }

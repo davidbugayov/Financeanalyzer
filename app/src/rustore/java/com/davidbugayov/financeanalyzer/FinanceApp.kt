@@ -17,7 +17,6 @@ import timber.log.Timber
  * Основной класс приложения для RuStore flavor
  */
 class FinanceApp : BaseFinanceApp() {
-
     // AppMetrica API ключ
     private val appMetricaApiKey = "d4ec51de-47c3-4997-812f-97b9a6663dad"
 
@@ -54,11 +53,12 @@ class FinanceApp : BaseFinanceApp() {
     private fun initAppMetrica() {
         try {
             // Настройка AppMetrica
-            val config = AppMetricaConfig.newConfigBuilder(appMetricaApiKey)
-                .withLogs()
-                .withSessionTimeout(60)
-                .withCrashReporting(true)
-                .build()
+            val config =
+                AppMetricaConfig.newConfigBuilder(appMetricaApiKey)
+                    .withLogs()
+                    .withSessionTimeout(60)
+                    .withCrashReporting(true)
+                    .build()
 
             // Активация SDK
             AppMetrica.activate(this, config)

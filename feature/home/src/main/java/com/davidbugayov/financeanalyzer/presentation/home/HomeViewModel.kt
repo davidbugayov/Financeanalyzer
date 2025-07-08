@@ -2,6 +2,10 @@ package com.davidbugayov.financeanalyzer.presentation.home
 import android.content.Context
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.paging.PagingData
+import androidx.paging.cachedIn
+import androidx.paging.insertSeparators
+import androidx.paging.map
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
@@ -16,30 +20,26 @@ import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.FinancialMetrics
 import com.davidbugayov.financeanalyzer.utils.TestDataGenerator
+import java.text.SimpleDateFormat
 import java.util.Calendar
+import java.util.Locale
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flatMapLatest
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.koin.core.component.KoinComponent
 import timber.log.Timber
-import kotlinx.coroutines.flow.first
-import androidx.paging.map
-import androidx.paging.PagingData
-import androidx.paging.cachedIn
-import androidx.paging.insertSeparators
-import kotlinx.coroutines.flow.Flow
-import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import java.text.SimpleDateFormat
-import java.util.Locale
-import kotlinx.coroutines.flow.flatMapLatest
-import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * ViewModel для главного экрана.
@@ -63,7 +63,6 @@ class HomeViewModel(
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val navigationManager: NavigationManager,
 ) : ViewModel(), KoinComponent {
-
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
 
@@ -73,43 +72,46 @@ class HomeViewModel(
     // -------- Paging ------------
     private val pagerTrigger = kotlinx.coroutines.flow.MutableSharedFlow<Unit>(replay = 1, extraBufferCapacity = 1)
 
-    val pagedTransactions: Flow<PagingData<Transaction>> = pagerTrigger
-        .flatMapLatest {
-            val s = _state.value
-            val (startDate, endDate) = getPeriodDates(s.currentFilter)
-            val pageSize = 50
-            if (s.currentFilter == TransactionFilter.ALL) {
-                repository.getAllPaged(pageSize)
-            } else {
-                repository.getByPeriodPaged(startDate, endDate, pageSize)
-            }
-        }
-        .cachedIn(viewModelScope)
-
-    val pagedUiModels: Flow<PagingData<TransactionListItem>> = pagedTransactions
-        .map { pagingData ->
-            pagingData
-                .map { tx -> TransactionListItem.Item(tx) }
-                .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
-                    if (after == null) return@insertSeparators null
-
-                    val beforeDateKey = before?.transaction?.date?.let { dayKey(it) }
-                    val afterDateKey = dayKey(after.transaction.date)
-
-                    if (before == null || beforeDateKey != afterDateKey) {
-                        TransactionListItem.Header(afterDateKey)
-                    } else {
-                        null
-                    }
+    val pagedTransactions: Flow<PagingData<Transaction>> =
+        pagerTrigger
+            .flatMapLatest {
+                val s = _state.value
+                val (startDate, endDate) = getPeriodDates(s.currentFilter)
+                val pageSize = 50
+                if (s.currentFilter == TransactionFilter.ALL) {
+                    repository.getAllPaged(pageSize)
+                } else {
+                    repository.getByPeriodPaged(startDate, endDate, pageSize)
                 }
-        }
-        .cachedIn(viewModelScope)
+            }
+            .cachedIn(viewModelScope)
+
+    val pagedUiModels: Flow<PagingData<TransactionListItem>> =
+        pagedTransactions
+            .map { pagingData ->
+                pagingData
+                    .map { tx -> TransactionListItem.Item(tx) }
+                    .insertSeparators { before: TransactionListItem.Item?, after: TransactionListItem.Item? ->
+                        if (after == null) return@insertSeparators null
+
+                        val beforeDateKey = before?.transaction?.date?.let { dayKey(it) }
+                        val afterDateKey = dayKey(after.transaction.date)
+
+                        if (before == null || beforeDateKey != afterDateKey) {
+                            TransactionListItem.Header(afterDateKey)
+                        } else {
+                            null
+                        }
+                    }
+            }
+            .cachedIn(viewModelScope)
 
     private fun reloadPaged() {
         pagerTrigger.tryEmit(Unit)
     }
 
     private val dateFormatter = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
+
     private fun dayKey(date: java.util.Date): String = dateFormatter.format(date)
 
     init {
@@ -143,7 +145,10 @@ class HomeViewModel(
      * Обрабатывает события экрана Home
      * @param event Событие для обработки
      */
-    fun onEvent(event: HomeEvent, context: Context? = null) {
+    fun onEvent(
+        event: HomeEvent,
+        context: Context? = null,
+    ) {
         when (event) {
             is HomeEvent.SetFilter -> {
                 // Обновляем только фильтр, не трогаем остальные данные, чтобы избежать мерцания
@@ -178,12 +183,13 @@ class HomeViewModel(
                 val (startDate, endDate) = getPeriodDates(state.value.currentFilter)
 
                 // Преобразуем TransactionFilter в PeriodType
-                val periodType = when (state.value.currentFilter) {
-                    TransactionFilter.TODAY -> "DAY"
-                    TransactionFilter.WEEK -> "WEEK"
-                    TransactionFilter.MONTH -> "MONTH"
-                    TransactionFilter.ALL -> "ALL"
-                }
+                val periodType =
+                    when (state.value.currentFilter) {
+                        TransactionFilter.TODAY -> "DAY"
+                        TransactionFilter.WEEK -> "WEEK"
+                        TransactionFilter.MONTH -> "MONTH"
+                        TransactionFilter.ALL -> "ALL"
+                    }
 
                 // Передаем даты и тип периода в параметрах навигации
                 navigationManager.navigate(
@@ -217,7 +223,10 @@ class HomeViewModel(
      * @param transaction Транзакция для удаления
      * @param context Контекст для обновления виджетов (опционально)
      */
-    private fun deleteTransaction(transaction: Transaction, context: Context? = null) {
+    private fun deleteTransaction(
+        transaction: Transaction,
+        context: Context? = null,
+    ) {
         viewModelScope.launch {
             try {
                 Timber.d(
@@ -321,21 +330,25 @@ class HomeViewModel(
     /**
      * Плавное обновление отфильтрованных транзакций без показа индикатора загрузки
      */
-    private fun updateFilteredTransactionsSmoothly(filter: TransactionFilter, transactions: List<Transaction>) {
+    private fun updateFilteredTransactionsSmoothly(
+        filter: TransactionFilter,
+        transactions: List<Transaction>,
+    ) {
         viewModelScope.launch {
             Timber.d("HOME: updateFilteredTransactionsSmoothly - начинаем обновление")
             Timber.d("HOME: Текущее количество транзакций: ${_state.value.filteredTransactions.size}")
             Timber.d("HOME: Новое количество транзакций: ${transactions.size}")
 
-            val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
-                val income = financialMetrics.getTotalIncomeAsMoney()
-                val expense = financialMetrics.getTotalExpenseAsMoney()
-                val balance = financialMetrics.getCurrentBalance()
-                Triple(income, expense, balance)
-            } else {
-                val stats = calculateStats(transactions)
-                stats
-            }
+            val (filteredIncome, filteredExpense, filteredBalance) =
+                if (filter == TransactionFilter.ALL) {
+                    val income = financialMetrics.getTotalIncomeAsMoney()
+                    val expense = financialMetrics.getTotalExpenseAsMoney()
+                    val balance = financialMetrics.getCurrentBalance()
+                    Triple(income, expense, balance)
+                } else {
+                    val stats = calculateStats(transactions)
+                    stats
+                }
 
             val transactionGroups = groupTransactionsByDate(transactions)
 
@@ -403,16 +416,17 @@ class HomeViewModel(
                 }
 
                 // Группируем транзакции по категориям и суммируем значения
-                val categoryTotals = transactions
-                    .filter { it.isExpense } // Считаем только расходы
-                    .groupBy { it.category }
-                    .mapValues { (_, txs) -> // Суммируем расходы по категории с использованием Money
-                        txs.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
-                    }
-                    .toList()
-                    .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
-                    .take(3) // Берем только топ-3 категории
-                    .toMap()
+                val categoryTotals =
+                    transactions
+                        .filter { it.isExpense } // Считаем только расходы
+                        .groupBy { it.category }
+                        .mapValues { (_, txs) -> // Суммируем расходы по категории с использованием Money
+                            txs.fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+                        }
+                        .toList()
+                        .sortedByDescending { (_, amount) -> amount.amount.abs() } // Сортируем по убыванию сумм
+                        .take(3) // Берем только топ-3 категории
+                        .toMap()
 
                 // Обновляем состояние в основном потоке
                 withContext(Dispatchers.Main) {
@@ -481,15 +495,16 @@ class HomeViewModel(
             val filteredTransactions = getTransactionsForPeriodFlowUseCase(startDate, endDate).first()
             Timber.d("HOME: Получено отфильтрованных транзакций: ${filteredTransactions.size}")
 
-            val (filteredIncome, filteredExpense, filteredBalance) = if (filter == TransactionFilter.ALL) {
-                val income = financialMetrics.getTotalIncomeAsMoney()
-                val expense = financialMetrics.getTotalExpenseAsMoney()
-                val balance = financialMetrics.getCurrentBalance()
-                Triple(income, expense, balance)
-            } else {
-                val stats = calculateStats(filteredTransactions)
-                stats
-            }
+            val (filteredIncome, filteredExpense, filteredBalance) =
+                if (filter == TransactionFilter.ALL) {
+                    val income = financialMetrics.getTotalIncomeAsMoney()
+                    val expense = financialMetrics.getTotalExpenseAsMoney()
+                    val balance = financialMetrics.getCurrentBalance()
+                    Triple(income, expense, balance)
+                } else {
+                    val stats = calculateStats(filteredTransactions)
+                    stats
+                }
             val transactionGroups = groupTransactionsByDate(filteredTransactions)
 
             Timber.d("HOME: Обновляем состояние в updateFilteredTransactions")
@@ -546,16 +561,17 @@ class HomeViewModel(
         }
 
         // Группируем транзакции по дате (без времени)
-        val groupedTransactions = transactions.groupBy { transaction ->
-            // Получаем только дату без времени
-            val calendar = Calendar.getInstance()
-            calendar.time = transaction.date
-            calendar.set(Calendar.HOUR_OF_DAY, 0)
-            calendar.set(Calendar.MINUTE, 0)
-            calendar.set(Calendar.SECOND, 0)
-            calendar.set(Calendar.MILLISECOND, 0)
-            calendar.time
-        }
+        val groupedTransactions =
+            transactions.groupBy { transaction ->
+                // Получаем только дату без времени
+                val calendar = Calendar.getInstance()
+                calendar.time = transaction.date
+                calendar.set(Calendar.HOUR_OF_DAY, 0)
+                calendar.set(Calendar.MINUTE, 0)
+                calendar.set(Calendar.SECOND, 0)
+                calendar.set(Calendar.MILLISECOND, 0)
+                calendar.time
+            }
 
         // Сортируем даты по убыванию (сначала новые)
         val sortedDates = groupedTransactions.keys.sortedByDescending { it }
@@ -565,13 +581,15 @@ class HomeViewModel(
             val transactionsForDate = groupedTransactions[date] ?: emptyList()
 
             // Вычисляем сумму доходов и расходов для группы
-            val income = transactionsForDate
-                .filter { !it.isExpense }
-                .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
+            val income =
+                transactionsForDate
+                    .filter { !it.isExpense }
+                    .fold(Money.zero()) { acc, transaction -> acc + transaction.amount }
 
-            val expense = transactionsForDate
-                .filter { it.isExpense }
-                .fold(Money.zero()) { acc, transaction -> acc + transaction.amount.abs() }
+            val expense =
+                transactionsForDate
+                    .filter { it.isExpense }
+                    .fold(Money.zero()) { acc, transaction -> acc + transaction.amount.abs() }
 
             // Сортируем транзакции внутри группы по времени (сначала новые)
             val sortedTransactions = transactionsForDate.sortedByDescending { it.date }

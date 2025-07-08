@@ -16,15 +16,20 @@ import com.davidbugayov.financeanalyzer.feature.history.R
  * @param onDismiss Callback, вызываемый при отмене удаления
  */
 @Composable
-fun DeleteSourceConfirmDialog(source: String, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun DeleteSourceConfirmDialog(
+    source: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.delete)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Text(
-                text = "Вы уверены, что хотите удалить источник \"$source\"?\n\n" +
-                    "Удаление источника не повлияет на существующие транзакции.",
+                text =
+                    "Вы уверены, что хотите удалить источник \"$source\"?\n\n" +
+                        "Удаление источника не повлияет на существующие транзакции.",
             )
         },
         confirmButton = {

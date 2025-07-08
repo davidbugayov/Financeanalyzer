@@ -7,5 +7,8 @@ interface INotificationScheduler {
     /**
      * Включить / отключить ежедневное напоминание и (опционально) задать новое время.
      */
-    fun updateTransactionReminder(isEnabled: Boolean, reminderTime: Time? = null)
+    fun updateTransactionReminder(
+        isEnabled: Boolean,
+        reminderTime: Time? = null,
+    )
 }

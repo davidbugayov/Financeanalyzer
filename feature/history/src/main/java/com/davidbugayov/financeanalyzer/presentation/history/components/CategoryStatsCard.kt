@@ -16,8 +16,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.feature.history.R
 import java.math.BigDecimal
 
 /**
@@ -30,11 +30,17 @@ import java.math.BigDecimal
  * @param percentChange Процент изменения между периодами (может быть null)
  */
 @Composable
-fun CategoryStatsCard(category: String, currentTotal: Money, previousTotal: Money, percentChange: BigDecimal?) {
+fun CategoryStatsCard(
+    category: String,
+    currentTotal: Money,
+    previousTotal: Money,
+    percentChange: BigDecimal?,
+) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
         color = MaterialTheme.colorScheme.surfaceVariant,
         shape = MaterialTheme.shapes.medium,
     ) {
@@ -77,22 +83,26 @@ fun CategoryStatsCard(category: String, currentTotal: Money, previousTotal: Mone
             if (percentChange != null) {
                 Spacer(modifier = Modifier.height(dimensionResource(R.dimen.spacing_medium)))
                 val percentChangeInt = percentChange.setScale(0, java.math.RoundingMode.FLOOR).toInt()
-                val changeText = when {
-                    percentChangeInt > 0 -> stringResource(
-                        R.string.change_increase,
-                        percentChangeInt,
-                    )
-                    percentChangeInt < 0 -> stringResource(
-                        R.string.change_decrease,
-                        kotlin.math.abs(percentChangeInt),
-                    )
-                    else -> stringResource(R.string.change_no_change)
-                }
-                val percentChangeColor = when {
-                    percentChangeInt > 0 -> MaterialTheme.colorScheme.error // Красный для увеличения расходов
-                    percentChangeInt < 0 -> MaterialTheme.colorScheme.primary // Зеленый для уменьшения расходов
-                    else -> MaterialTheme.colorScheme.onSurfaceVariant
-                }
+                val changeText =
+                    when {
+                        percentChangeInt > 0 ->
+                            stringResource(
+                                R.string.change_increase,
+                                percentChangeInt,
+                            )
+                        percentChangeInt < 0 ->
+                            stringResource(
+                                R.string.change_decrease,
+                                kotlin.math.abs(percentChangeInt),
+                            )
+                        else -> stringResource(R.string.change_no_change)
+                    }
+                val percentChangeColor =
+                    when {
+                        percentChangeInt > 0 -> MaterialTheme.colorScheme.error // Красный для увеличения расходов
+                        percentChangeInt < 0 -> MaterialTheme.colorScheme.primary // Зеленый для уменьшения расходов
+                        else -> MaterialTheme.colorScheme.onSurfaceVariant
+                    }
                 Text(
                     text = changeText,
                     style = MaterialTheme.typography.bodyMedium,

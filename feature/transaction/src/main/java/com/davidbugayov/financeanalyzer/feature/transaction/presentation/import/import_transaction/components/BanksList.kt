@@ -39,9 +39,10 @@ import com.davidbugayov.financeanalyzer.feature.transaction.R
 @Composable
 fun BanksList(onBankClick: (String) -> Unit = {}) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.space_medium)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.space_medium)),
     ) {
         // Сбербанк
         BankItem(
@@ -92,29 +93,33 @@ private fun BankItem(
     onClick: () -> Unit,
 ) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = 16.dp)
-            .clickable(onClick = onClick),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-        ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp)
+                .clickable(onClick = onClick),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
         border = BorderStroke(width = 1.5.dp, color = color.copy(alpha = 0.6f)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 18.dp, horizontal = 18.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 18.dp, horizontal = 18.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             // Цветной круг с иконкой
             Box(
-                modifier = Modifier
-                    .size(52.dp)
-                    .clip(CircleShape)
-                    .background(color),
+                modifier =
+                    Modifier
+                        .size(52.dp)
+                        .clip(CircleShape)
+                        .background(color),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

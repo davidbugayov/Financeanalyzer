@@ -6,14 +6,15 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartState
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
+import java.math.BigDecimal
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharedFlow
@@ -25,7 +26,6 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
-import java.math.BigDecimal
 
 class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
@@ -83,10 +83,11 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 Timber.d("EnhancedFinanceChartViewModel: Начало загрузки транзакций для графиков")
                 _state.update { it.copy(isLoading = true, error = null) }
 
-                val filteredTransactions = getTransactionsForPeriodUseCase(
-                    _state.value.startDate,
-                    _state.value.endDate,
-                )
+                val filteredTransactions =
+                    getTransactionsForPeriodUseCase(
+                        _state.value.startDate,
+                        _state.value.endDate,
+                    )
                 allTransactions = filteredTransactions
 
                 Timber.d(
@@ -106,11 +107,12 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                     },
                 )
 
-                val metrics = calculateBalanceMetricsUseCase(
-                    filteredTransactions,
-                    _state.value.startDate,
-                    _state.value.endDate,
-                )
+                val metrics =
+                    calculateBalanceMetricsUseCase(
+                        filteredTransactions,
+                        _state.value.startDate,
+                        _state.value.endDate,
+                    )
                 val income = metrics.income
                 val expense = metrics.expense
                 val savingsRate = metrics.savingsRate
@@ -122,28 +124,37 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 )
 
                 // Агрегируем по категориям
-                val expensesByCategory = filteredTransactions
-                    .filter { it.isExpense }
-                    .groupBy { it.category.ifBlank { "Без категории" } }
-                    .mapValues { (_, transactions) ->
-                        transactions.map { it.amount.abs() }.reduceOrNull { acc, money -> acc + money } ?: Money.zero()
-                    }
-                val incomeByCategory = filteredTransactions
-                    .filter { !it.isExpense }
-                    .groupBy { it.category.ifBlank { "Без категории" } }
-                    .mapValues { (_, transactions) ->
-                        transactions.map { it.amount }.reduceOrNull { acc, money -> acc + money } ?: Money.zero()
-                    }
+                val expensesByCategory =
+                    filteredTransactions
+                        .filter { it.isExpense }
+                        .groupBy { it.category.ifBlank { "Без категории" } }
+                        .mapValues { (_, transactions) ->
+                            transactions.map { it.amount.abs() }.reduceOrNull {
+                                    acc,
+                                    money,
+                                ->
+                                acc + money
+                            } ?: Money.zero()
+                        }
+                val incomeByCategory =
+                    filteredTransactions
+                        .filter { !it.isExpense }
+                        .groupBy { it.category.ifBlank { "Без категории" } }
+                        .mapValues { (_, transactions) ->
+                            transactions.map { it.amount }.reduceOrNull { acc, money -> acc + money } ?: Money.zero()
+                        }
 
                 // --- Новое: подготовка данных для линейного графика ---
-                val incomeLineChartData = createLineChartData(
-                    transactions = filteredTransactions,
-                    isIncome = true,
-                )
-                val expenseLineChartData = createLineChartData(
-                    transactions = filteredTransactions,
-                    isIncome = false,
-                )
+                val incomeLineChartData =
+                    createLineChartData(
+                        transactions = filteredTransactions,
+                        isIncome = true,
+                    )
+                val expenseLineChartData =
+                    createLineChartData(
+                        transactions = filteredTransactions,
+                        isIncome = false,
+                    )
                 // --- конец нового ---
 
                 // --- Новое: подготовка данных для PieChart ---
@@ -178,11 +189,12 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         incomeLineChartData = incomeLineChartData,
                         expenseLineChartData = expenseLineChartData,
                         error = null,
-                        periodText = UiUtils.formatPeriod(
-                            it.periodType,
-                            it.startDate,
-                            it.endDate,
-                        ),
+                        periodText =
+                            UiUtils.formatPeriod(
+                                it.periodType,
+                                it.startDate,
+                                it.endDate,
+                            ),
                         savingsRate = savingsRate,
                         averageDailyExpense = averageDailyExpense,
                         monthsOfSavings = monthsOfSavings,
@@ -208,27 +220,29 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
         isIncome: Boolean,
     ): List<com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartPoint> {
         // Фильтруем транзакции по типу (доход/расход)
-        val filteredTransactions = transactions.filter {
-            (isIncome && !it.isExpense) || (!isIncome && it.isExpense)
-        }
+        val filteredTransactions =
+            transactions.filter {
+                (isIncome && !it.isExpense) || (!isIncome && it.isExpense)
+            }
         if (filteredTransactions.isEmpty()) return emptyList()
         // Группируем по дате (без времени)
-        val aggregatedData = filteredTransactions
-            .groupBy {
-                val calendar = java.util.Calendar.getInstance()
-                calendar.time = it.date
-                calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
-                calendar.set(java.util.Calendar.MINUTE, 0)
-                calendar.set(java.util.Calendar.SECOND, 0)
-                calendar.set(java.util.Calendar.MILLISECOND, 0)
-                calendar.time
-            }
-            .mapValues { (_, transactions) ->
-                transactions.fold(Money.zero()) { acc, transaction ->
-                    val value = if (isIncome) transaction.amount else transaction.amount.abs()
-                    acc + value
+        val aggregatedData =
+            filteredTransactions
+                .groupBy {
+                    val calendar = java.util.Calendar.getInstance()
+                    calendar.time = it.date
+                    calendar.set(java.util.Calendar.HOUR_OF_DAY, 0)
+                    calendar.set(java.util.Calendar.MINUTE, 0)
+                    calendar.set(java.util.Calendar.SECOND, 0)
+                    calendar.set(java.util.Calendar.MILLISECOND, 0)
+                    calendar.time
                 }
-            }
+                .mapValues { (_, transactions) ->
+                    transactions.fold(Money.zero()) { acc, transaction ->
+                        val value = if (isIncome) transaction.amount else transaction.amount.abs()
+                        acc + value
+                    }
+                }
         // Сортируем по дате и формируем точки
         return aggregatedData.entries
             .sortedBy { it.key }
@@ -243,65 +257,74 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private fun updatePeriodText() {
         _state.update {
             it.copy(
-                periodText = UiUtils.formatPeriod(
-                    it.periodType,
-                    it.startDate,
-                    it.endDate,
-                ),
+                periodText =
+                    UiUtils.formatPeriod(
+                        it.periodType,
+                        it.startDate,
+                        it.endDate,
+                    ),
             )
         }
     }
 
-    private fun preparePieChartData(data: Map<String, Money>, showExpenses: Boolean): List<UiCategory> {
-        val filteredData = if (showExpenses) {
-            data.filter { !it.value.isZero() }
-        } else {
-            // Для доходов фильтруем только положительные суммы
-            data.filter { it.value.amount > BigDecimal.ZERO }
-        }
+    private fun preparePieChartData(
+        data: Map<String, Money>,
+        showExpenses: Boolean,
+    ): List<UiCategory> {
+        val filteredData =
+            if (showExpenses) {
+                data.filter { !it.value.isZero() }
+            } else {
+                // Для доходов фильтруем только положительные суммы
+                data.filter { it.value.amount > BigDecimal.ZERO }
+            }
         val categories = if (showExpenses) categoriesViewModel.expenseCategories.value else categoriesViewModel.incomeCategories.value
-        val pieChartDataList = filteredData.entries.mapIndexed { index, entry ->
-            val categoryName = entry.key
-            val moneyValue = entry.value
-            val category = categories.find { it.name == categoryName }
-            val color = category?.color ?: Color.Gray
-            UiCategory(
-                id = index.toLong(),
-                name = categoryName,
-                isExpense = showExpenses,
-                isCustom = category?.isCustom == true,
-                count = 0,
-                money = moneyValue,
-                percentage = 0f,
-                transactions = emptyList(),
-                original = category?.original,
-                color = color,
-                icon = category?.icon,
-            )
-        }
-        val totalMoney = if (showExpenses) {
-            pieChartDataList.fold(BigDecimal.ZERO) { acc, item -> acc + item.money.amount }
-        } else {
-            // Для доходов считаем сумму только по положительным значениям
-            pieChartDataList.fold(BigDecimal.ZERO) { acc, item ->
-                acc + item.money.amount.max(
-                    BigDecimal.ZERO,
+        val pieChartDataList =
+            filteredData.entries.mapIndexed { index, entry ->
+                val categoryName = entry.key
+                val moneyValue = entry.value
+                val category = categories.find { it.name == categoryName }
+                val color = category?.color ?: Color.Gray
+                UiCategory(
+                    id = index.toLong(),
+                    name = categoryName,
+                    isExpense = showExpenses,
+                    isCustom = category?.isCustom == true,
+                    count = 0,
+                    money = moneyValue,
+                    percentage = 0f,
+                    transactions = emptyList(),
+                    original = category?.original,
+                    color = color,
+                    icon = category?.icon,
                 )
             }
-        }
+        val totalMoney =
+            if (showExpenses) {
+                pieChartDataList.fold(BigDecimal.ZERO) { acc, item -> acc + item.money.amount }
+            } else {
+                // Для доходов считаем сумму только по положительным значениям
+                pieChartDataList.fold(BigDecimal.ZERO) { acc, item ->
+                    acc +
+                        item.money.amount.max(
+                            BigDecimal.ZERO,
+                        )
+                }
+            }
         return if (pieChartDataList.isNotEmpty() && totalMoney != BigDecimal.ZERO) {
             pieChartDataList.map { item ->
-                val percent = if (showExpenses) {
-                    item.money.amount.divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(
-                        BigDecimal(100),
-                    ).toFloat()
-                } else {
-                    item.money.amount.max(BigDecimal.ZERO).divide(
-                        totalMoney,
-                        4,
-                        java.math.RoundingMode.HALF_EVEN,
-                    ).multiply(BigDecimal(100)).toFloat()
-                }
+                val percent =
+                    if (showExpenses) {
+                        item.money.amount.divide(totalMoney, 4, java.math.RoundingMode.HALF_EVEN).multiply(
+                            BigDecimal(100),
+                        ).toFloat()
+                    } else {
+                        item.money.amount.max(BigDecimal.ZERO).divide(
+                            totalMoney,
+                            4,
+                            java.math.RoundingMode.HALF_EVEN,
+                        ).multiply(BigDecimal(100)).toFloat()
+                    }
                 item.copy(percentage = percent)
             }
         } else {

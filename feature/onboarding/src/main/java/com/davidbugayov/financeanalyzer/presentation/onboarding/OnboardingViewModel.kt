@@ -11,7 +11,6 @@ import com.davidbugayov.financeanalyzer.utils.OnboardingManager
 class OnboardingViewModel(
     private val onboardingManager: OnboardingManager,
 ) : ViewModel() {
-
     /**
      * Проверяет, нужно ли показывать онбординг пользователю.
      * @return true, если онбординг уже был завершен ранее

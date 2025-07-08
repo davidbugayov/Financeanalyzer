@@ -5,9 +5,11 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyListState
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.filled.Add
@@ -26,18 +28,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.feature.home.R
+import androidx.paging.LoadState
+import androidx.paging.compose.LazyPagingItems
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import timber.log.Timber
-import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
-import androidx.paging.compose.LazyPagingItems
-import androidx.compose.foundation.lazy.LazyListState
-import androidx.paging.LoadState
-import androidx.compose.foundation.layout.height
+import timber.log.Timber
 
 /**
  * Компактный макет для телефонов
@@ -71,9 +71,10 @@ private fun CompactBalanceAndFilters(
 @Composable
 private fun CompactEmptyState(onAddClick: () -> Unit) {
     Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(top = 12.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(top = 12.dp),
         contentAlignment = Alignment.TopCenter,
     ) {
         Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -81,9 +82,10 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
                 imageVector = androidx.compose.material.icons.Icons.Filled.Add,
                 contentDescription = stringResource(R.string.empty_state_icon_desc),
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier
-                    .padding(bottom = 8.dp)
-                    .size(36.dp),
+                modifier =
+                    Modifier
+                        .padding(bottom = 8.dp)
+                        .size(36.dp),
             )
             Text(
                 text = stringResource(R.string.empty_state_title),
@@ -105,14 +107,16 @@ private fun CompactEmptyState(onAddClick: () -> Unit) {
             androidx.compose.material3.Button(
                 onClick = onAddClick,
                 shape = RoundedCornerShape(50),
-                colors = androidx.compose.material3.ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White,
-                ),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 16.dp)
-                    .heightIn(min = 44.dp),
+                colors =
+                    androidx.compose.material3.ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        contentColor = Color.White,
+                    ),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(horizontal = 16.dp)
+                        .heightIn(min = 44.dp),
             ) {
                 Text(
                     text = stringResource(R.string.empty_state_add_first_transaction),
@@ -196,16 +200,18 @@ fun CompactLayout(
         stablePagingItems = pagingItems
     }
 
-    val itemsToDisplay = if (pagingItems.loadState.refresh is LoadState.Loading && pagingItems.itemCount == 0) {
-        stablePagingItems
-    } else {
-        pagingItems
-    }
+    val itemsToDisplay =
+        if (pagingItems.loadState.refresh is LoadState.Loading && pagingItems.itemCount == 0) {
+            stablePagingItems
+        } else {
+            pagingItems
+        }
 
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(horizontal = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(horizontal = 8.dp),
     ) {
         CompactBalanceAndFilters(
             state = state,
@@ -218,22 +224,23 @@ fun CompactLayout(
                 CompactEmptyState(onAddClick)
             }
             else -> {
-                val headerContent: (@Composable () -> Unit)? = if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-                    {
-                        Column {
-                            HomeGroupSummary(
-                                filteredTransactions = state.filteredTransactions,
-                                totalIncome = state.filteredIncome,
-                                totalExpense = state.filteredExpense,
-                                currentFilter = state.currentFilter,
-                                balance = state.filteredBalance,
-                            )
-                            Spacer(modifier = Modifier.height(8.dp))
+                val headerContent: (@Composable () -> Unit)? =
+                    if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                        {
+                            Column {
+                                HomeGroupSummary(
+                                    filteredTransactions = state.filteredTransactions,
+                                    totalIncome = state.filteredIncome,
+                                    totalExpense = state.filteredExpense,
+                                    currentFilter = state.currentFilter,
+                                    balance = state.filteredBalance,
+                                )
+                                Spacer(modifier = Modifier.height(8.dp))
+                            }
                         }
+                    } else {
+                        null
                     }
-                } else {
-                    null
-                }
 
                 TransactionPagingList(
                     items = itemsToDisplay,

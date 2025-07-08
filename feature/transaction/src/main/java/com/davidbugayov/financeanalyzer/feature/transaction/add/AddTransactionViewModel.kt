@@ -4,7 +4,6 @@ import android.app.Application
 import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.feature.transaction.BuildConfig
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
@@ -14,12 +13,13 @@ import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.feature.transaction.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.feature.transaction.validation.ValidationBuilder
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import java.math.BigDecimal
 import java.util.Date
 import java.util.UUID
@@ -42,13 +42,12 @@ class AddTransactionViewModel(
     private val navigationManager: NavigationManager,
     application: Application,
 ) : BaseTransactionViewModel<AddTransactionState, BaseTransactionEvent>(
-    categoriesViewModel,
-    sourcePreferences,
-    walletRepository,
-    updateWalletBalancesUseCase,
-    application.resources,
-) {
-
+        categoriesViewModel,
+        sourcePreferences,
+        walletRepository,
+        updateWalletBalancesUseCase,
+        application.resources,
+    ) {
     override val _state = MutableStateFlow(AddTransactionState())
 
     private val _wallets = MutableStateFlow<List<Wallet>>(emptyList())
@@ -96,7 +95,10 @@ class AddTransactionViewModel(
         _state.update { it.copy(availableCategoryIcons = availableCategoryIcons) }
     }
 
-    private fun validateInput(amount: String, categoryId: String): Boolean {
+    private fun validateInput(
+        amount: String,
+        categoryId: String,
+    ): Boolean {
         Timber.d("ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: '%s'", amount)
         val validationBuilder = ValidationBuilder()
 
@@ -206,17 +208,19 @@ class AddTransactionViewModel(
 
     private fun prepareTransactionForAdd(parsedMoney: Money): Transaction {
         val currentState = _state.value
-        val finalAmount = if (currentState.isExpense) {
-            parsedMoney.copy(amount = parsedMoney.amount.negate())
-        } else {
-            parsedMoney
-        }
+        val finalAmount =
+            if (currentState.isExpense) {
+                parsedMoney.copy(amount = parsedMoney.amount.negate())
+            } else {
+                parsedMoney
+            }
 
-        val selectedWalletIds = getWalletIdsForTransaction(
-            isExpense = currentState.isExpense,
-            addToWallet = currentState.addToWallet,
-            selectedWallets = currentState.selectedWallets,
-        )
+        val selectedWalletIds =
+            getWalletIdsForTransaction(
+                isExpense = currentState.isExpense,
+                addToWallet = currentState.addToWallet,
+                selectedWallets = currentState.selectedWallets,
+            )
 
         return Transaction(
             id = UUID.randomUUID().toString(),
@@ -232,7 +236,10 @@ class AddTransactionViewModel(
         )
     }
 
-    override fun onEvent(event: BaseTransactionEvent, context: Context) {
+    override fun onEvent(
+        event: BaseTransactionEvent,
+        context: Context,
+    ) {
         when (event) {
             is BaseTransactionEvent.Submit -> submitTransaction(context)
             is BaseTransactionEvent.AddCustomSource -> handleBaseEvent(event, context)
@@ -398,21 +405,26 @@ class AddTransactionViewModel(
         )
     }
 
-    override fun handleBaseEvent(event: BaseTransactionEvent, context: Context) {
+    override fun handleBaseEvent(
+        event: BaseTransactionEvent,
+        context: Context,
+    ) {
         when (event) {
             is BaseTransactionEvent.AddCustomSource -> {
                 val trimmedName = event.source.trim()
                 if (trimmedName.length >= 2) {
-                    val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
-                        name = trimmedName,
-                        color = event.color,
-                        isCustom = true,
-                    )
-                    val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
-                        sourcePreferences,
-                        _state.value.sources,
-                        newSource,
-                    )
+                    val newSource =
+                        com.davidbugayov.financeanalyzer.domain.model.Source(
+                            name = trimmedName,
+                            color = event.color,
+                            isCustom = true,
+                        )
+                    val updatedSources =
+                        com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
+                            sourcePreferences,
+                            _state.value.sources,
+                            newSource,
+                        )
                     _state.update { state ->
                         state.copy(
                             sources = updatedSources,

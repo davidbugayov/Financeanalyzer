@@ -62,14 +62,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs.SettingsPermissionDialog
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BankInstructionDialog
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.BanksList
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportProgressSection
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResults
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.components.ImportResultsSection
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs.SettingsPermissionDialog
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
@@ -137,42 +137,45 @@ fun ImportTransactionsScreen(
     }
 
     // На Android 15 используем GetContent напрямую
-    val getContentLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.GetContent(),
-    ) { selectedUri ->
-        processUri(selectedUri)
-    }
+    val getContentLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.GetContent(),
+        ) { selectedUri ->
+            processUri(selectedUri)
+        }
 
     // На Android < 15 используем стандартные разрешения и открытие документа
-    val filePickerLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.OpenDocument(),
-    ) { selectedUri ->
-        processUri(selectedUri)
-    }
+    val filePickerLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.OpenDocument(),
+        ) { selectedUri ->
+            processUri(selectedUri)
+        }
 
     // Лаунчер для запроса разрешений
-    val permissionLauncher = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.RequestPermission(),
-    ) { isGranted ->
-        if (isGranted) {
-            filePickerLauncher.launch(
-                arrayOf(
-                    "text/csv",
-                    "application/pdf",
-                    "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-                ),
-            )
-        } else {
-            val activity = context as? Activity
-            val permission = PermissionUtils.getReadStoragePermission()
+    val permissionLauncher =
+        rememberLauncherForActivityResult(
+            contract = ActivityResultContracts.RequestPermission(),
+        ) { isGranted ->
+            if (isGranted) {
+                filePickerLauncher.launch(
+                    arrayOf(
+                        "text/csv",
+                        "application/pdf",
+                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+                    ),
+                )
+            } else {
+                val activity = context as? Activity
+                val permission = PermissionUtils.getReadStoragePermission()
 
-            if (activity != null) {
-                if (!activity.shouldShowRequestPermissionRationale(permission)) {
-                    showPermissionSettingsDialog = true
+                if (activity != null) {
+                    if (!activity.shouldShowRequestPermissionRationale(permission)) {
+                        showPermissionSettingsDialog = true
+                    }
                 }
             }
         }
-    }
 
     // Функция для проверки и запроса разрешений при необходимости
     fun checkAndRequestPermissions() {
@@ -242,10 +245,11 @@ fun ImportTransactionsScreen(
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     shape = CircleShape,
                     modifier = Modifier.size(64.dp),
-                    elevation = FloatingActionButtonDefaults.elevation(
-                        defaultElevation = 6.dp,
-                        pressedElevation = 8.dp,
-                    ),
+                    elevation =
+                        FloatingActionButtonDefaults.elevation(
+                            defaultElevation = 6.dp,
+                            pressedElevation = 8.dp,
+                        ),
                 ) {
                     Icon(
                         imageVector = Icons.Default.Add,
@@ -256,38 +260,44 @@ fun ImportTransactionsScreen(
             },
         ) { paddingValues ->
             Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(paddingValues),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .padding(horizontal = 16.dp)
-                        .verticalScroll(rememberScrollState()),
+                    modifier =
+                        Modifier
+                            .fillMaxSize()
+                            .padding(horizontal = 16.dp)
+                            .verticalScroll(rememberScrollState()),
                     horizontalAlignment = Alignment.CenterHorizontally,
                     verticalArrangement = Arrangement.spacedBy(16.dp),
                 ) {
                     // Секция инструкций (сворачиваемая)
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(top = 16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
-                        ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(top = 16.dp),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
+                            ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .animateContentSize(),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .animateContentSize(),
                         ) {
                             // Заголовок с кнопкой сворачивания/разворачивания
                             Row(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(16.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(16.dp),
                                 verticalAlignment = Alignment.CenterVertically,
                                 horizontalArrangement = Arrangement.SpaceBetween,
                             ) {
@@ -299,11 +309,12 @@ fun ImportTransactionsScreen(
 
                                 IconButton(onClick = { expandedInstructions = !expandedInstructions }) {
                                     Icon(
-                                        imageVector = if (expandedInstructions) {
-                                            Icons.Default.KeyboardArrowUp
-                                        } else {
-                                            Icons.Default.KeyboardArrowDown
-                                        },
+                                        imageVector =
+                                            if (expandedInstructions) {
+                                                Icons.Default.KeyboardArrowUp
+                                            } else {
+                                                Icons.Default.KeyboardArrowDown
+                                            },
                                         contentDescription = null,
                                     )
                                 }
@@ -312,9 +323,10 @@ fun ImportTransactionsScreen(
                             // Содержимое инструкций (показывается только когда развернуто)
                             AnimatedVisibility(visible = expandedInstructions) {
                                 Column(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(horizontal = 16.dp, vertical = 8.dp),
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(horizontal = 16.dp, vertical = 8.dp),
                                 ) {
                                     Text(
                                         text = stringResource(R.string.import_instructions),
@@ -325,12 +337,14 @@ fun ImportTransactionsScreen(
                                     // Кнопка импорта внутри инструкций для удобства
                                     Button(
                                         onClick = { checkAndRequestPermissions() },
-                                        modifier = Modifier
-                                            .fillMaxWidth()
-                                            .padding(vertical = 16.dp),
-                                        colors = ButtonDefaults.buttonColors(
-                                            containerColor = MaterialTheme.colorScheme.primary,
-                                        ),
+                                        modifier =
+                                            Modifier
+                                                .fillMaxWidth()
+                                                .padding(vertical = 16.dp),
+                                        colors =
+                                            ButtonDefaults.buttonColors(
+                                                containerColor = MaterialTheme.colorScheme.primary,
+                                            ),
                                     ) {
                                         Icon(
                                             imageVector = Icons.Default.CloudUpload,
@@ -350,24 +364,30 @@ fun ImportTransactionsScreen(
                         enter = fadeIn() + expandVertically(),
                     ) {
                         Card(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(vertical = 24.dp), // Увеличены отступы
-                            colors = CardDefaults.cardColors(
-                                containerColor = MaterialTheme.colorScheme.surface,
-                            ),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(vertical = 24.dp),
+                            // Увеличены отступы
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor = MaterialTheme.colorScheme.surface,
+                                ),
                             elevation = CardDefaults.cardElevation(defaultElevation = 4.dp), // Увеличена тень
                         ) {
                             Column(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(20.dp), // Увеличены внутренние отступы
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(20.dp),
+                                // Увеличены внутренние отступы
                             ) {
                                 // Заголовок с кнопкой закрытия
                                 Row(
-                                    modifier = Modifier
-                                        .fillMaxWidth()
-                                        .padding(bottom = 16.dp),
+                                    modifier =
+                                        Modifier
+                                            .fillMaxWidth()
+                                            .padding(bottom = 16.dp),
                                     horizontalArrangement = Arrangement.SpaceBetween,
                                     verticalAlignment = Alignment.CenterVertically,
                                 ) {
@@ -406,26 +426,28 @@ fun ImportTransactionsScreen(
                                     // даже если есть ошибка
                                     state.successCount > 0 -> {
                                         ImportResultsSection(
-                                            importResults = ImportResults(
-                                                importedCount = state.successCount,
-                                                skippedCount = state.skippedCount,
-                                                errorMessage = null, // Игнорируем ошибку, если есть успешно импортированные транзакции
-                                                fileName = state.fileName,
-                                                bankName = state.bankName,
-                                            ),
+                                            importResults =
+                                                ImportResults(
+                                                    importedCount = state.successCount,
+                                                    skippedCount = state.skippedCount,
+                                                    errorMessage = null, // Игнорируем ошибку, если есть успешно импортированные транзакции
+                                                    fileName = state.fileName,
+                                                    bankName = state.bankName,
+                                                ),
                                             modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
                                         )
                                     }
                                     // Показываем ошибку только если нет успешно импортированных транзакций
                                     state.error != null -> {
                                         ImportResultsSection(
-                                            importResults = ImportResults(
-                                                importedCount = 0,
-                                                skippedCount = 0,
-                                                errorMessage = state.error,
-                                                fileName = state.fileName,
-                                                bankName = state.bankName,
-                                            ),
+                                            importResults =
+                                                ImportResults(
+                                                    importedCount = 0,
+                                                    skippedCount = 0,
+                                                    errorMessage = state.error,
+                                                    fileName = state.fileName,
+                                                    bankName = state.bankName,
+                                                ),
                                             modifier = Modifier.padding(top = 8.dp), // Добавлен отступ сверху
                                         )
                                     }
@@ -436,18 +458,22 @@ fun ImportTransactionsScreen(
 
                     // Секция банков с горизонтальной прокруткой
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(bottom = 80.dp), // Добавлен отступ снизу для FAB
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                        ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(bottom = 80.dp),
+                        // Добавлен отступ снизу для FAB
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                            ),
                         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(16.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(16.dp),
                         ) {
                             Text(
                                 text = stringResource(R.string.supported_banks_title),
@@ -458,14 +484,16 @@ fun ImportTransactionsScreen(
 
                             AnimatedVisibility(
                                 visible = showBanksList,
-                                enter = fadeIn(animationSpec = tween(700)) +
-                                    slideInVertically(
-                                        initialOffsetY = { 50 },
-                                        animationSpec = spring(
-                                            dampingRatio = Spring.DampingRatioLowBouncy,
-                                            stiffness = Spring.StiffnessLow,
+                                enter =
+                                    fadeIn(animationSpec = tween(700)) +
+                                        slideInVertically(
+                                            initialOffsetY = { 50 },
+                                            animationSpec =
+                                                spring(
+                                                    dampingRatio = Spring.DampingRatioLowBouncy,
+                                                    stiffness = Spring.StiffnessLow,
+                                                ),
                                         ),
-                                    ),
                             ) {
                                 BanksList(
                                     onBankClick = { bank ->
@@ -491,10 +519,11 @@ fun ImportTransactionsScreen(
 }
 
 fun openApplicationSettings(context: Context) {
-    val intent = Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
-        data = Uri.fromParts("package", context.packageName, null)
-        addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-    }
+    val intent =
+        Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS).apply {
+            data = Uri.fromParts("package", context.packageName, null)
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        }
     try {
         context.startActivity(intent)
     } catch (e: Exception) {

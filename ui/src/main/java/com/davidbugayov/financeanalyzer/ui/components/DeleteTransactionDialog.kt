@@ -21,12 +21,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.R
+import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 
 /**
  * Диалог подтверждения удаления транзакции.
@@ -37,27 +37,32 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
  * @param onDismiss Callback, вызываемый при отмене удаления
  */
 @Composable
-fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun DeleteTransactionDialog(
+    transaction: Transaction,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     val moneyFormatter = transaction.amount
 
     val isDarkTheme = isSystemInDarkTheme()
-    val effectiveSourceColor = remember(
-        transaction.source,
-        transaction.sourceColor,
-        transaction.isExpense,
-        isDarkTheme,
-    ) {
-        val sourceColorInt = transaction.sourceColor
-        val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
+    val effectiveSourceColor =
+        remember(
+            transaction.source,
+            transaction.sourceColor,
+            transaction.isExpense,
+            isDarkTheme,
+        ) {
+            val sourceColorInt = transaction.sourceColor
+            val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
 
-        colorFromInt ?: ColorUtils.getEffectiveSourceColor(
-            sourceName = transaction.source,
-            sourceColorHex = null,
-            isExpense = transaction.isExpense,
-            isDarkTheme = isDarkTheme,
-        )
-    }
+            colorFromInt ?: ColorUtils.getEffectiveSourceColor(
+                sourceName = transaction.source,
+                sourceColorHex = null,
+                isExpense = transaction.isExpense,
+                isDarkTheme = isDarkTheme,
+            )
+        }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -66,8 +71,9 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
         text = {
             Column {
                 Text(
-                    text = stringResource(R.string.amount, transaction.amount.formatForDisplay(useMinimalDecimals = true)) + "\n" +
-                        stringResource(R.string.category, transaction.category),
+                    text =
+                        stringResource(R.string.amount, transaction.amount.formatForDisplay(useMinimalDecimals = true)) + "\n" +
+                            stringResource(R.string.category, transaction.category),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
@@ -76,11 +82,12 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
                 Text(
                     text = (if (transaction.isExpense) "-" else "+") + moneyFormatter.abs().formatForDisplay(showCurrency = true, useMinimalDecimals = true),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (transaction.isExpense) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
+                    color =
+                        if (transaction.isExpense) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        },
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -94,9 +101,10 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .background(effectiveSourceColor, CircleShape),
+                        modifier =
+                            Modifier
+                                .size(12.dp)
+                                .background(effectiveSourceColor, CircleShape),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 

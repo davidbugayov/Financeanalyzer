@@ -19,20 +19,20 @@ data class UiCategory(
     val color: Color = Color.Gray,
     val icon: ImageVector? = null,
 ) {
-
     companion object {
         fun custom(
             name: String,
             isExpense: Boolean,
             icon: ImageVector? = null,
             color: Color,
-        ): UiCategory = UiCategory(
-            id = System.currentTimeMillis(),
-            name = name,
-            isExpense = isExpense,
-            isCustom = true,
-            color = color,
-            icon = icon,
-        )
+        ): UiCategory =
+            UiCategory(
+                id = System.currentTimeMillis(),
+                name = name,
+                isExpense = isExpense,
+                isCustom = true,
+                color = color,
+                icon = icon,
+            )
     }
 }

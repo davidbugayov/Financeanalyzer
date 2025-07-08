@@ -22,24 +22,28 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColo
 @Composable
 fun ImportInstructions() {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.space_medium)),
-        colors = CardDefaults.cardColors(
-            containerColor = LocalFriendlyCardBackgroundColor.current,
-        ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(R.dimen.space_medium)),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = LocalFriendlyCardBackgroundColor.current,
+            ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.space_medium)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.space_medium)),
         ) {
             Text(
                 text = stringResource(R.string.how_to_import),
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontWeight = FontWeight.Bold,
-                ),
+                style =
+                    MaterialTheme.typography.titleMedium.copy(
+                        fontWeight = FontWeight.Bold,
+                    ),
                 color = MaterialTheme.colorScheme.onSurface,
             )
 

@@ -109,20 +109,22 @@ android {
     signingConfigs {
         create("release") {
             val keystoreProperties = getKeystoreProperties()
-            storeFile = file(
-                keystoreProperties.getProperty("keystore.file", "keystore/release.keystore"),
-            )
+            storeFile =
+                file(
+                    keystoreProperties.getProperty("keystore.file", "keystore/release.keystore"),
+                )
             storePassword = keystoreProperties.getProperty("keystore.password", "")
             keyAlias = keystoreProperties.getProperty("keystore.key.alias", "")
             keyPassword = keystoreProperties.getProperty("keystore.key.password", "")
             storeType = "PKCS12"
 
             // Check that all required properties are present
-            val requiredProperties = listOf(
-                "keystore.password",
-                "keystore.key.alias",
-                "keystore.key.password",
-            )
+            val requiredProperties =
+                listOf(
+                    "keystore.password",
+                    "keystore.key.alias",
+                    "keystore.key.password",
+                )
             requiredProperties.forEach { prop ->
                 if (!keystoreProperties.containsKey(prop)) {
                     throw GradleException("Missing required keystore property: $prop")
@@ -192,13 +194,14 @@ android {
     kotlinOptions {
         jvmTarget = libs.versions.javaVersion.get()
         // Enable compiler optimizations
-        freeCompilerArgs += listOf(
-            "-Xcontext-parameters",
-            "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all",
-            "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-            "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-        )
+        freeCompilerArgs +=
+            listOf(
+                "-Xcontext-parameters",
+                "-opt-in=kotlin.RequiresOptIn",
+                "-Xjvm-default=all",
+                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+                "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+            )
     }
 
     buildFeatures {
@@ -237,13 +240,14 @@ android {
     // Исключаем тестовые классы из релизной сборки
     packagingOptions {
         resources {
-            excludes += listOf(
-                "**/*Test.class",
-                "**/*Tests.class",
-                "**/test/**",
-                "**/androidTest/**",
-                "**/*.navigation.test*",
-            )
+            excludes +=
+                listOf(
+                    "**/*Test.class",
+                    "**/*Tests.class",
+                    "**/test/**",
+                    "**/androidTest/**",
+                    "**/*.navigation.test*",
+                )
         }
     }
 
@@ -252,23 +256,24 @@ android {
 
 dependencies {
     // Modules
-    val modules = listOf(
-        ":domain",
-        ":data",
-        ":core",
-        ":navigation",
-        ":utils",
-        ":ui",
-        ":feature",
-        ":feature:home",
-        ":feature:budget",
-        ":feature:onboarding",
-        ":feature:profile",
-        ":feature:history",
-        ":feature:statistics",
-        ":feature:transaction",
-        ":feature:widget",
-    )
+    val modules =
+        listOf(
+            ":domain",
+            ":data",
+            ":core",
+            ":navigation",
+            ":utils",
+            ":ui",
+            ":feature",
+            ":feature:home",
+            ":feature:budget",
+            ":feature:onboarding",
+            ":feature:profile",
+            ":feature:history",
+            ":feature:statistics",
+            ":feature:transaction",
+            ":feature:widget",
+        )
 
     modules.forEach { module ->
         implementation(project(module))
@@ -437,7 +442,7 @@ tasks.whenTaskAdded {
             name.contains("ProcessGoogleServices", ignoreCase = true) ||
                 name.contains("FirebaseCrashlytics", ignoreCase = true) ||
                 name.contains("FirebasePerformance", ignoreCase = true)
-            )
+        )
     ) {
         enabled = false
     }

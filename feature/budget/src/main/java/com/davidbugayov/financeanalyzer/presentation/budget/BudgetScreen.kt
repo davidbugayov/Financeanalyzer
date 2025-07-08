@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -26,11 +27,9 @@ import androidx.compose.material.icons.filled.CalendarMonth
 import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.rounded.Schedule
 import androidx.compose.material3.AlertDialog
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Card
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
@@ -39,14 +38,17 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SelectableDates
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -56,51 +58,47 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalLifecycleOwner
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
 import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.NumberTextField
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
-import com.davidbugayov.financeanalyzer.core.model.Money
-import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import java.math.BigDecimal
 import java.math.RoundingMode
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
-
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
-import androidx.compose.material3.Surface
-import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.ui.platform.LocalLifecycleOwner
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun BudgetScreen(
-    viewModel: BudgetViewModel = koinViewModel(),
-) {
+fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
     val state by viewModel.state.collectAsState()
 
     // Добавляем наблюдение за жизненным циклом, чтобы обновлять список кошельков при возврате на экран
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            if (event == Lifecycle.Event.ON_RESUME) {
-                // Перезагружаем кошельки каждый раз, когда экран становится видимым
-                viewModel.onEvent(BudgetEvent.LoadCategories)
+        val observer =
+            LifecycleEventObserver { _, event ->
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    // Перезагружаем кошельки каждый раз, когда экран становится видимым
+                    viewModel.onEvent(BudgetEvent.LoadCategories)
+                }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose {
             lifecycleOwner.lifecycle.removeObserver(observer)
@@ -168,17 +166,19 @@ fun BudgetScreen(
         floatingActionButton = { },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             Column(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 // Список кошельков с закреплённым заголовком
                 LazyColumn(
-                    modifier = Modifier
-                        .weight(1f),
+                    modifier =
+                        Modifier
+                            .weight(1f),
                 ) {
                     // Сводка бюджета (sticky)
                     stickyHeader {
@@ -194,9 +194,10 @@ fun BudgetScreen(
                             Text(
                                 text = "Мои кошельки",
                                 style = MaterialTheme.typography.titleLarge,
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(horizontal = 16.dp, vertical = 8.dp),
+                                modifier =
+                                    Modifier
+                                        .fillMaxWidth()
+                                        .padding(horizontal = 16.dp, vertical = 8.dp),
                             )
                         }
                     }
@@ -383,9 +384,10 @@ fun BudgetScreen(
                                     }
                                 }
                             },
-                            enabled = selectedWallet?.let { sw ->
-                                walletAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sw.balance.amount } == true
-                            } == true,
+                            enabled =
+                                selectedWallet?.let { sw ->
+                                    walletAmount.toBigDecimalOrNull()?.let { it > BigDecimal.ZERO && it <= sw.balance.amount } == true
+                                } == true,
                         ) {
                             Text("Потратить")
                         }
@@ -484,10 +486,11 @@ fun BudgetScreen(
                                     }
                                 }
                             },
-                            enabled = selectedFromWallet?.let { sfw ->
-                                selectedToWallet != null && transferAmount.toBigDecimalOrNull()
-                                    ?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } == true
-                            } == true,
+                            enabled =
+                                selectedFromWallet?.let { sfw ->
+                                    selectedToWallet != null && transferAmount.toBigDecimalOrNull()
+                                        ?.let { it > BigDecimal.ZERO && it <= sfw.balance.amount } == true
+                                } == true,
                         ) {
                             Text("Перевести")
                         }
@@ -527,9 +530,10 @@ fun BudgetScreen(
                                         periodDuration = it
                                     }
                                 },
-                                keyboardOptions = KeyboardOptions(
-                                    keyboardType = KeyboardType.Number,
-                                ),
+                                keyboardOptions =
+                                    KeyboardOptions(
+                                        keyboardType = KeyboardType.Number,
+                                    ),
                                 label = { Text("Количество дней") },
                                 modifier = Modifier.fillMaxWidth(),
                             )
@@ -579,18 +583,21 @@ fun BudgetScreen(
                     onDismissRequest = { showDistributeConfirmation = false },
                 ) {
                     Card(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(16.dp),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(16.dp),
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surface,
-                        ),
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = MaterialTheme.colorScheme.surface,
+                            ),
                     ) {
                         Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(24.dp),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .padding(24.dp),
                             horizontalAlignment = Alignment.CenterHorizontally,
                         ) {
                             // Заголовок с иконкой
@@ -680,14 +687,16 @@ fun BudgetScreen(
             if (showEditWalletDialog && selectedWallet != null) {
                 val currentSelectedWallet = selectedWallet!! // Гарантированно не null
 
-                val editDatePickerState = rememberDatePickerState(
-                    initialSelectedDateMillis = currentSelectedWallet.periodStartDate,
-                    selectableDates = object : SelectableDates {
-                        override fun isSelectableDate(utcTimeMillis: Long): Boolean {
-                            return true // Разрешаем выбирать любую дату
-                        }
-                    },
-                )
+                val editDatePickerState =
+                    rememberDatePickerState(
+                        initialSelectedDateMillis = currentSelectedWallet.periodStartDate,
+                        selectableDates =
+                            object : SelectableDates {
+                                override fun isSelectableDate(utcTimeMillis: Long): Boolean {
+                                    return true // Разрешаем выбирать любую дату
+                                }
+                            },
+                    )
 
                 EditWalletDialog(
                     walletName = editWalletName,
@@ -703,11 +712,12 @@ fun BudgetScreen(
                         val newStartDate = editDatePickerState.selectedDateMillis ?: currentSelectedWallet.periodStartDate
 
                         if (editWalletName.isNotBlank() && newLimit != null) {
-                            val updatedWallet = currentSelectedWallet.copy(
-                                name = editWalletName,
-                                limit = Money(newLimit),
-                                periodStartDate = newStartDate,
-                            )
+                            val updatedWallet =
+                                currentSelectedWallet.copy(
+                                    name = editWalletName,
+                                    limit = Money(newLimit),
+                                    periodStartDate = newStartDate,
+                                )
                             viewModel.onEvent(BudgetEvent.UpdateCategory(updatedWallet))
                             showEditWalletDialog = false
                         } else {
@@ -747,17 +757,20 @@ fun BudgetInfoCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .padding(vertical = 4.dp),
+        modifier =
+            modifier
+                .padding(vertical = 4.dp),
         shape = RoundedCornerShape(16.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = containerColor,
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = containerColor,
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 0.dp),
     ) {
         Column(
-            modifier = Modifier
-                .padding(vertical = 16.dp, horizontal = 12.dp),
+            modifier =
+                Modifier
+                    .padding(vertical = 16.dp, horizontal = 12.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             Text(
@@ -785,52 +798,58 @@ fun WalletCard(
 ) {
     val isDarkTheme = isSystemInDarkTheme()
     val surfaceVariantColor = MaterialTheme.colorScheme.surfaceVariant
-    val backgroundColor = remember(wallet.color, wallet.name, isDarkTheme) {
-        wallet.color?.takeIf { it != 0 }?.let { Color(it) }
-            ?: ColorUtils.getSourceColorByName(wallet.name)
-            ?: surfaceVariantColor
-    }
+    val backgroundColor =
+        remember(wallet.color, wallet.name, isDarkTheme) {
+            wallet.color?.takeIf { it != 0 }?.let { Color(it) }
+                ?: ColorUtils.getSourceColorByName(wallet.name)
+                ?: surfaceVariantColor
+        }
     val contentColor = contentColorFor(backgroundColor)
 
     val isGoal = wallet.type.name == "GOAL"
-    val percentUsed = if (isGoal && goalProgressUseCase != null) {
-        goalProgressUseCase.invoke(wallet)
-    } else if (wallet.limit.amount > BigDecimal.ZERO) {
-        (
-            wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
-                .multiply(BigDecimal(100))
+    val percentUsed =
+        if (isGoal && goalProgressUseCase != null) {
+            goalProgressUseCase.invoke(wallet)
+        } else if (wallet.limit.amount > BigDecimal.ZERO) {
+            (
+                wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN)
+                    .multiply(BigDecimal(100))
             )
-            .setScale(0, RoundingMode.FLOOR)
-            .toInt().coerceIn(0, 100)
-    } else {
-        0
-    }
+                .setScale(0, RoundingMode.FLOOR)
+                .toInt().coerceIn(0, 100)
+        } else {
+            0
+        }
 
-    val progressIndicatorColor = when {
-        isGoal && percentUsed >= 100 -> MaterialTheme.colorScheme.primary
-        isGoal -> lerpColor(MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.primary, percentUsed / 100f)
-        percentUsed > 90 -> MaterialTheme.colorScheme.error
-        percentUsed > 70 -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
-        percentUsed > 50 -> MaterialTheme.colorScheme.tertiary
-        else -> MaterialTheme.colorScheme.primary
-    }
+    val progressIndicatorColor =
+        when {
+            isGoal && percentUsed >= 100 -> MaterialTheme.colorScheme.primary
+            isGoal -> lerpColor(MaterialTheme.colorScheme.error, MaterialTheme.colorScheme.primary, percentUsed / 100f)
+            percentUsed > 90 -> MaterialTheme.colorScheme.error
+            percentUsed > 70 -> MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
+            percentUsed > 50 -> MaterialTheme.colorScheme.tertiary
+            else -> MaterialTheme.colorScheme.primary
+        }
     val progressTrackColor = progressIndicatorColor.copy(alpha = 0.3f)
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp)
-            .clickable { onClick() },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp)
+                .clickable { onClick() },
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = backgroundColor,
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = backgroundColor,
+            ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -839,12 +858,13 @@ fun WalletCard(
             ) {
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(44.dp)
-                            .background(
-                                color = contentColor.copy(alpha = 0.2f),
-                                shape = CircleShape,
-                            ),
+                        modifier =
+                            Modifier
+                                .size(44.dp)
+                                .background(
+                                    color = contentColor.copy(alpha = 0.2f),
+                                    shape = CircleShape,
+                                ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
@@ -895,10 +915,11 @@ fun WalletCard(
             Spacer(modifier = Modifier.height(8.dp))
             LinearProgressIndicator(
                 progress = { percentUsed / 100f },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(6.dp)
-                    .clip(RoundedCornerShape(3.dp)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(6.dp)
+                        .clip(RoundedCornerShape(3.dp)),
                 color = progressIndicatorColor,
                 trackColor = progressTrackColor,
             )
@@ -910,9 +931,10 @@ fun WalletCard(
             )
             Spacer(modifier = Modifier.height(8.dp))
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
@@ -929,9 +951,10 @@ fun WalletCard(
                             showCurrency = true,
                             useMinimalDecimals = true,
                         )}",
-                        style = MaterialTheme.typography.titleMedium.copy(
-                            textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
-                        ),
+                        style =
+                            MaterialTheme.typography.titleMedium.copy(
+                                textDecoration = androidx.compose.ui.text.style.TextDecoration.Underline,
+                            ),
                         fontWeight = FontWeight.Medium,
                         color = contentColor,
                     )
@@ -941,9 +964,10 @@ fun WalletCard(
                     OutlinedButton(
                         onClick = onSubWallets,
                         modifier = Modifier.height(32.dp),
-                        colors = ButtonDefaults.outlinedButtonColors(
-                            contentColor = contentColor,
-                        ),
+                        colors =
+                            ButtonDefaults.outlinedButtonColors(
+                                contentColor = contentColor,
+                            ),
                         border = BorderStroke(1.dp, contentColor.copy(alpha = 0.5f)),
                     ) {
                         Text(
@@ -1008,9 +1032,11 @@ fun EditWalletDialog(
                             modifier = Modifier.clickable(onClick = onShowDatePicker),
                         )
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable(onClick = onShowDatePicker), // Кликабельно всё поле
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable(onClick = onShowDatePicker),
+                    // Кликабельно всё поле
                 )
             }
         },
@@ -1025,21 +1051,27 @@ fun EditWalletDialog(
 }
 
 @Composable
-private fun BudgetSummaryHeader(state: BudgetState, onAddWalletClick: () -> Unit) {
+private fun BudgetSummaryHeader(
+    state: BudgetState,
+    onAddWalletClick: () -> Unit,
+) {
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp),
         shape = RoundedCornerShape(24.dp),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
         ) {
             Text(
                 text = "Сводка бюджета",
@@ -1053,12 +1085,13 @@ private fun BudgetSummaryHeader(state: BudgetState, onAddWalletClick: () -> Unit
                 modifier = Modifier.padding(bottom = 16.dp),
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(24.dp)
-                        .background(
-                            MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
-                            CircleShape,
-                        ),
+                    modifier =
+                        Modifier
+                            .size(24.dp)
+                            .background(
+                                MaterialTheme.colorScheme.primary.copy(alpha = 0.15f),
+                                CircleShape,
+                            ),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -1082,10 +1115,11 @@ private fun BudgetSummaryHeader(state: BudgetState, onAddWalletClick: () -> Unit
             ) {
                 BudgetInfoCard(
                     title = "Общий лимит",
-                    value = state.totalLimit.formatForDisplay(
-                        showCurrency = true,
-                        useMinimalDecimals = true,
-                    ),
+                    value =
+                        state.totalLimit.formatForDisplay(
+                            showCurrency = true,
+                            useMinimalDecimals = true,
+                        ),
                     containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.9f),
                     contentColor = MaterialTheme.colorScheme.onPrimary,
                     modifier = Modifier.weight(1f),
@@ -1095,10 +1129,11 @@ private fun BudgetSummaryHeader(state: BudgetState, onAddWalletClick: () -> Unit
 
                 BudgetInfoCard(
                     title = "Потрачено",
-                    value = state.totalSpent.formatForDisplay(
-                        showCurrency = true,
-                        useMinimalDecimals = true,
-                    ),
+                    value =
+                        state.totalSpent.formatForDisplay(
+                            showCurrency = true,
+                            useMinimalDecimals = true,
+                        ),
                     containerColor = MaterialTheme.colorScheme.secondary.copy(alpha = 0.9f),
                     contentColor = Color.White,
                     modifier = Modifier.weight(1f),
@@ -1108,10 +1143,11 @@ private fun BudgetSummaryHeader(state: BudgetState, onAddWalletClick: () -> Unit
 
                 BudgetInfoCard(
                     title = "Баланс",
-                    value = state.totalWalletBalance.formatForDisplay(
-                        showCurrency = true,
-                        useMinimalDecimals = true,
-                    ),
+                    value =
+                        state.totalWalletBalance.formatForDisplay(
+                            showCurrency = true,
+                            useMinimalDecimals = true,
+                        ),
                     containerColor = MaterialTheme.colorScheme.tertiary.copy(alpha = 0.9f),
                     contentColor = Color.White,
                     modifier = Modifier.weight(1f),
@@ -1121,13 +1157,15 @@ private fun BudgetSummaryHeader(state: BudgetState, onAddWalletClick: () -> Unit
             // Кнопка добавления кошелька
             Button(
                 onClick = onAddWalletClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 16.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
                 shape = RoundedCornerShape(12.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
-                ),
+                colors =
+                    ButtonDefaults.buttonColors(
+                        containerColor = MaterialTheme.colorScheme.primary.copy(alpha = 0.1f),
+                    ),
             ) {
                 Icon(
                     imageVector = Icons.Default.Add,
@@ -1147,7 +1185,11 @@ private fun BudgetSummaryHeader(state: BudgetState, onAddWalletClick: () -> Unit
 }
 
 @Composable
-fun lerpColor(start: Color, end: Color, fraction: Float): Color {
+fun lerpColor(
+    start: Color,
+    end: Color,
+    fraction: Float,
+): Color {
     return Color(
         red = lerp(start.red, end.red, fraction),
         green = lerp(start.green, end.green, fraction),
@@ -1156,4 +1198,8 @@ fun lerpColor(start: Color, end: Color, fraction: Float): Color {
     )
 }
 
-fun lerp(start: Float, stop: Float, fraction: Float): Float = start + (stop - start) * fraction
+fun lerp(
+    start: Float,
+    stop: Float,
+    fraction: Float,
+): Float = start + (stop - start) * fraction

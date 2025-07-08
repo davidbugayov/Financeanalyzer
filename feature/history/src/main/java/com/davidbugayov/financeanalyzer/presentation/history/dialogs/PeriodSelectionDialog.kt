@@ -56,9 +56,10 @@ fun PeriodSelectionDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
             ) {
                 // Все время
                 PeriodOption(
@@ -172,10 +173,11 @@ private fun PeriodOption(
     onPeriodSelected: (PeriodType) -> Unit,
 ) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .clickable { onPeriodSelected(periodType) }
-            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .clickable { onPeriodSelected(periodType) }
+                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(
@@ -194,7 +196,12 @@ private fun PeriodOption(
  * Поле для отображения и выбора даты.
  */
 @Composable
-private fun DateField(label: String, date: Date, dateFormat: SimpleDateFormat, onClick: () -> Unit) {
+private fun DateField(
+    label: String,
+    date: Date,
+    dateFormat: SimpleDateFormat,
+    onClick: () -> Unit,
+) {
     Column {
         Text(
             text = label,
@@ -202,10 +209,11 @@ private fun DateField(label: String, date: Date, dateFormat: SimpleDateFormat, o
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = onClick)
-                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = onClick)
+                    .padding(vertical = dimensionResource(R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(

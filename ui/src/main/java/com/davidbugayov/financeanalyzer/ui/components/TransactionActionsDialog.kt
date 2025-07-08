@@ -24,9 +24,9 @@ import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
+import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
 import java.text.SimpleDateFormat
 import java.util.Locale
-import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
 
 /**
  * Общий диалог для действий с транзакцией (удаление/редактирование)
@@ -64,25 +64,28 @@ fun TransactionActionsDialog(
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = if (transaction.isExpense) {
-                        "-${transaction.amount.abs().formatForDisplay(useMinimalDecimals = true)}"
-                    } else {
-                        "+${transaction.amount.formatForDisplay(useMinimalDecimals = true)}"
-                    },
+                    text =
+                        if (transaction.isExpense) {
+                            "-${transaction.amount.abs().formatForDisplay(useMinimalDecimals = true)}"
+                        } else {
+                            "+${transaction.amount.formatForDisplay(useMinimalDecimals = true)}"
+                        },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (transaction.isExpense) {
-                        LocalExpenseColor.current
-                    } else {
-                        LocalIncomeColor.current
-                    },
+                    color =
+                        if (transaction.isExpense) {
+                            LocalExpenseColor.current
+                        } else {
+                            LocalIncomeColor.current
+                        },
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
-                        transaction.date,
-                    ),
+                    text =
+                        SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
+                            transaction.date,
+                        ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
@@ -94,12 +97,13 @@ fun TransactionActionsDialog(
                 // Отображаем источник
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .background(
-                                effectiveSourceColor,
-                                CircleShape,
-                            ),
+                        modifier =
+                            Modifier
+                                .size(12.dp)
+                                .background(
+                                    effectiveSourceColor,
+                                    CircleShape,
+                                ),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 
@@ -148,7 +152,10 @@ fun TransactionActionsDialog(
 }
 
 @Composable
-private fun rememberSourceColor(transaction: Transaction, isDarkTheme: Boolean): Color {
+private fun rememberSourceColor(
+    transaction: Transaction,
+    isDarkTheme: Boolean,
+): Color {
     return remember(transaction.source, transaction.sourceColor, transaction.isExpense, isDarkTheme) {
         val sourceColorInt = transaction.sourceColor
         val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null

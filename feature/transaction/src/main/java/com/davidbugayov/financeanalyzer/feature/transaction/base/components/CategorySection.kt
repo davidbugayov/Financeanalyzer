@@ -60,27 +60,30 @@ fun CategorySection(
     val maxVisibleCategories = maxRows * columns - 1 // 7 категорий + 1 кнопка
     val showExpand = categories.size > maxVisibleCategories
     val (expanded, setExpanded) = remember { mutableStateOf(false) }
-    val visibleCategories = if (expanded || !showExpand) {
-        categories
-    } else {
-        categories.take(
-            maxVisibleCategories,
-        )
-    }
+    val visibleCategories =
+        if (expanded || !showExpand) {
+            categories
+        } else {
+            categories.take(
+                maxVisibleCategories,
+            )
+        }
 
     val errorBackgroundColor = LocalErrorStateBackgroundColor.current
     val errorContentColor = LocalErrorStateContentColor.current
 
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(R.dimen.category_section_padding_horizontal),
-                vertical = dimensionResource(R.dimen.category_section_padding_vertical),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = dimensionResource(R.dimen.category_section_padding_horizontal),
+                    vertical = dimensionResource(R.dimen.category_section_padding_vertical),
+                ),
+        verticalArrangement =
+            Arrangement.spacedBy(
+                dimensionResource(R.dimen.category_section_spacing),
             ),
-        verticalArrangement = Arrangement.spacedBy(
-            dimensionResource(R.dimen.category_section_spacing),
-        ),
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
@@ -89,39 +92,45 @@ fun CategorySection(
         ) {
             Row(
                 verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.category_header_spacing),
-                ),
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        dimensionResource(R.dimen.category_header_spacing),
+                    ),
             ) {
                 Text(
                     text = stringResource(R.string.category) + " *",
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
-                    ),
-                    modifier = Modifier.padding(
-                        horizontal = dimensionResource(R.dimen.category_header_padding_horizontal),
-                        vertical = dimensionResource(R.dimen.category_header_padding_vertical),
-                    ),
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = androidx.compose.ui.text.font.FontWeight.Bold,
+                        ),
+                    modifier =
+                        Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.category_header_padding_horizontal),
+                            vertical = dimensionResource(R.dimen.category_header_padding_vertical),
+                        ),
                     color = if (isError) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface,
                 )
             }
             if (showExpand) {
                 Spacer(
-                    modifier = Modifier.width(
-                        dimensionResource(R.dimen.category_expand_spacer_width),
-                    ),
+                    modifier =
+                        Modifier.width(
+                            dimensionResource(R.dimen.category_expand_spacer_width),
+                        ),
                 )
                 if (!expanded) {
                     Text(
                         text = stringResource(R.string.show_more_categories),
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .clickable { setExpanded(true) }
-                            .padding(
-                                vertical = dimensionResource(
-                                    R.dimen.category_expand_text_padding_vertical,
+                        modifier =
+                            Modifier
+                                .clickable { setExpanded(true) }
+                                .padding(
+                                    vertical =
+                                        dimensionResource(
+                                            R.dimen.category_expand_text_padding_vertical,
+                                        ),
                                 ),
-                            ),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -129,13 +138,15 @@ fun CategorySection(
                     Text(
                         text = stringResource(R.string.hide_categories),
                         color = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier
-                            .clickable { setExpanded(false) }
-                            .padding(
-                                vertical = dimensionResource(
-                                    R.dimen.category_expand_text_padding_vertical,
+                        modifier =
+                            Modifier
+                                .clickable { setExpanded(false) }
+                                .padding(
+                                    vertical =
+                                        dimensionResource(
+                                            R.dimen.category_expand_text_padding_vertical,
+                                        ),
                                 ),
-                            ),
                         textAlign = TextAlign.Center,
                         style = MaterialTheme.typography.bodyMedium,
                     )
@@ -145,23 +156,26 @@ fun CategorySection(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(columns),
-            modifier = Modifier
-                .fillMaxWidth()
-                .then(
-                    if (expanded || !showExpand) {
-                        Modifier.heightIn(
-                            max = dimensionResource(R.dimen.category_max_height),
-                        )
-                    } else {
-                        Modifier.height(dimensionResource(R.dimen.category_collapsed_height))
-                    },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .then(
+                        if (expanded || !showExpand) {
+                            Modifier.heightIn(
+                                max = dimensionResource(R.dimen.category_max_height),
+                            )
+                        } else {
+                            Modifier.height(dimensionResource(R.dimen.category_collapsed_height))
+                        },
+                    ),
+            horizontalArrangement =
+                Arrangement.spacedBy(
+                    dimensionResource(R.dimen.category_grid_spacing),
                 ),
-            horizontalArrangement = Arrangement.spacedBy(
-                dimensionResource(R.dimen.category_grid_spacing),
-            ),
-            verticalArrangement = Arrangement.spacedBy(
-                dimensionResource(R.dimen.category_grid_spacing),
-            ),
+            verticalArrangement =
+                Arrangement.spacedBy(
+                    dimensionResource(R.dimen.category_grid_spacing),
+                ),
             userScrollEnabled = expanded || !showExpand,
         ) {
             items(visibleCategories) { category ->
@@ -170,81 +184,90 @@ fun CategorySection(
 
                 Column(
                     horizontalAlignment = Alignment.CenterHorizontally,
-                    modifier = Modifier
-                        .width(dimensionResource(R.dimen.category_item_width))
-                        .combinedClickable(
-                            onClick = { onCategorySelected(category) },
-                            onLongClick = { onCategoryLongClick(category) },
-                        )
-                        .padding(
-                            vertical = dimensionResource(R.dimen.category_item_vertical_padding),
-                        ),
+                    modifier =
+                        Modifier
+                            .width(dimensionResource(R.dimen.category_item_width))
+                            .combinedClickable(
+                                onClick = { onCategorySelected(category) },
+                                onLongClick = { onCategoryLongClick(category) },
+                            )
+                            .padding(
+                                vertical = dimensionResource(R.dimen.category_item_vertical_padding),
+                            ),
                 ) {
                     Box(
-                        modifier = Modifier
-                            .size(dimensionResource(R.dimen.category_item_circle_size))
-                            .clip(CircleShape)
-                            .background(
-                                when {
-                                    isError && selectedCategory.isBlank() -> errorBackgroundColor
-                                    category.name == selectedCategory -> MaterialTheme.colorScheme.primaryContainer
-                                    else -> category.color
-                                },
-                            )
-                            .border(
-                                width = when {
-                                    category.name == selectedCategory -> 2.dp
-                                    isError && selectedCategory.isBlank() -> 2.dp
-                                    else -> 1.dp
-                                },
-                                color = when {
-                                    category.name == selectedCategory -> MaterialTheme.colorScheme.primary
-                                    isError && selectedCategory.isBlank() -> MaterialTheme.colorScheme.error
-                                    else -> category.color.copy(alpha = 0.5f)
-                                },
-                                shape = CircleShape,
-                            ),
+                        modifier =
+                            Modifier
+                                .size(dimensionResource(R.dimen.category_item_circle_size))
+                                .clip(CircleShape)
+                                .background(
+                                    when {
+                                        isError && selectedCategory.isBlank() -> errorBackgroundColor
+                                        category.name == selectedCategory -> MaterialTheme.colorScheme.primaryContainer
+                                        else -> category.color
+                                    },
+                                )
+                                .border(
+                                    width =
+                                        when {
+                                            category.name == selectedCategory -> 2.dp
+                                            isError && selectedCategory.isBlank() -> 2.dp
+                                            else -> 1.dp
+                                        },
+                                    color =
+                                        when {
+                                            category.name == selectedCategory -> MaterialTheme.colorScheme.primary
+                                            isError && selectedCategory.isBlank() -> MaterialTheme.colorScheme.error
+                                            else -> category.color.copy(alpha = 0.5f)
+                                        },
+                                    shape = CircleShape,
+                                ),
                         contentAlignment = Alignment.Center,
                     ) {
                         Icon(
                             imageVector = category.icon ?: Icons.Default.Category,
                             contentDescription = category.name,
-                            tint = when {
-                                isError && selectedCategory.isBlank() -> errorContentColor
-                                category.name == selectedCategory -> selectedContentColor
-                                else -> Color.White
-                            },
-                            modifier = Modifier.size(
-                                dimensionResource(R.dimen.category_item_icon_size),
-                            ),
+                            tint =
+                                when {
+                                    isError && selectedCategory.isBlank() -> errorContentColor
+                                    category.name == selectedCategory -> selectedContentColor
+                                    else -> Color.White
+                                },
+                            modifier =
+                                Modifier.size(
+                                    dimensionResource(R.dimen.category_item_icon_size),
+                                ),
                         )
                     }
                     Spacer(
-                        modifier = Modifier.height(
-                            dimensionResource(R.dimen.category_item_spacer_height),
-                        ),
+                        modifier =
+                            Modifier.height(
+                                dimensionResource(R.dimen.category_item_spacer_height),
+                            ),
                     )
                     Text(
                         text = category.name,
                         style = MaterialTheme.typography.bodySmall,
                         textAlign = TextAlign.Center,
                         maxLines = 1,
-                        color = when {
-                            isError && selectedCategory.isBlank() -> errorContentColor
-                            category.name == selectedCategory -> selectedContentColor
-                            else -> MaterialTheme.colorScheme.onSurface
-                        },
+                        color =
+                            when {
+                                isError && selectedCategory.isBlank() -> errorContentColor
+                                category.name == selectedCategory -> selectedContentColor
+                                else -> MaterialTheme.colorScheme.onSurface
+                            },
                     )
                 }
             }
             item {
                 AddCategoryItem(
                     onClick = onAddCategoryClick,
-                    modifier = Modifier
-                        .width(dimensionResource(R.dimen.category_item_width))
-                        .padding(
-                            vertical = dimensionResource(R.dimen.category_item_vertical_padding),
-                        ),
+                    modifier =
+                        Modifier
+                            .width(dimensionResource(R.dimen.category_item_width))
+                            .padding(
+                                vertical = dimensionResource(R.dimen.category_item_vertical_padding),
+                            ),
                 )
             }
         }
@@ -255,24 +278,29 @@ fun CategorySection(
  * Элемент добавления новой категории
  */
 @Composable
-fun AddCategoryItem(onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun AddCategoryItem(
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = modifier
-            .width(dimensionResource(R.dimen.category_item_width))
-            .clickable(onClick = onClick)
-            .padding(vertical = dimensionResource(R.dimen.category_item_vertical_padding)),
+        modifier =
+            modifier
+                .width(dimensionResource(R.dimen.category_item_width))
+                .clickable(onClick = onClick)
+                .padding(vertical = dimensionResource(R.dimen.category_item_vertical_padding)),
     ) {
         Box(
-            modifier = Modifier
-                .size(dimensionResource(R.dimen.category_item_circle_size))
-                .clip(CircleShape)
-                .background(MaterialTheme.colorScheme.surfaceVariant)
-                .border(
-                    width = dimensionResource(R.dimen.border_width_small),
-                    color = MaterialTheme.colorScheme.outline,
-                    shape = CircleShape,
-                ),
+            modifier =
+                Modifier
+                    .size(dimensionResource(R.dimen.category_item_circle_size))
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.surfaceVariant)
+                    .border(
+                        width = dimensionResource(R.dimen.border_width_small),
+                        color = MaterialTheme.colorScheme.outline,
+                        shape = CircleShape,
+                    ),
             contentAlignment = Alignment.Center,
         ) {
             Icon(

@@ -2,9 +2,9 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.content.Context
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
-import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,6 +35,7 @@ class FinancialMetrics private constructor() : KoinComponent {
     companion object {
         @Volatile
         private var instance: FinancialMetrics? = null
+
         fun getInstance(): FinancialMetrics {
             return instance ?: synchronized(this) {
                 instance ?: FinancialMetrics().also { instance = it }
@@ -77,13 +78,15 @@ class FinancialMetrics private constructor() : KoinComponent {
                 val visibleTransactions = repository.loadTransactions()
 
                 // Расчет доходов и расходов
-                val income = visibleTransactions
-                    .filter { !it.isExpense }
-                    .fold(Money.zero()) { acc, t -> acc + t.amount }
+                val income =
+                    visibleTransactions
+                        .filter { !it.isExpense }
+                        .fold(Money.zero()) { acc, t -> acc + t.amount }
 
-                val expense = visibleTransactions
-                    .filter { it.isExpense }
-                    .fold(Money.zero()) { acc, t -> acc + t.amount.abs() }
+                val expense =
+                    visibleTransactions
+                        .filter { it.isExpense }
+                        .fold(Money.zero()) { acc, t -> acc + t.amount.abs() }
 
                 val balance = income - expense
 
@@ -110,7 +113,9 @@ class FinancialMetrics private constructor() : KoinComponent {
     }
 
     fun getCurrentBalance(): Money = _balance.value
+
     fun getTotalIncomeAsMoney(): Money = _totalIncome.value
+
     fun getTotalExpenseAsMoney(): Money = _totalExpense.value
 
     /**

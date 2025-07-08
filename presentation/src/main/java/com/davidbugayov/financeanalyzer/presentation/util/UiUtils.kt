@@ -9,7 +9,6 @@ import java.util.Locale
  * Утилитарный класс для работы с UI компонентами
  */
 object UiUtils {
-
     /**
      * Форматирует период для отображения в пользовательском интерфейсе
      * @param periodType Тип периода
@@ -17,7 +16,11 @@ object UiUtils {
      * @param endDate Конечная дата периода
      * @return Строка с форматированным периодом
      */
-    fun formatPeriod(periodType: PeriodType, startDate: Date, endDate: Date): String {
+    fun formatPeriod(
+        periodType: PeriodType,
+        startDate: Date,
+        endDate: Date,
+    ): String {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {
@@ -38,7 +41,11 @@ object UiUtils {
      * @param endDate Конечная дата периода
      * @return Строка с кратким форматированным периодом
      */
-    fun formatPeriodCompact(periodType: PeriodType, startDate: Date, endDate: Date): String {
+    fun formatPeriodCompact(
+        periodType: PeriodType,
+        startDate: Date,
+        endDate: Date,
+    ): String {
         val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.forLanguageTag("ru"))
 
         return when (periodType) {

@@ -12,19 +12,21 @@ class AndroidWidgetRefresher(private val context: Context) : WidgetRefresher {
         val balanceComp = ComponentName(context, BalanceWidget::class.java)
         val balanceIds = manager.getAppWidgetIds(balanceComp)
         if (balanceIds.isNotEmpty()) {
-            val intent = Intent(context, BalanceWidget::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, balanceIds)
-            }
+            val intent =
+                Intent(context, BalanceWidget::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, balanceIds)
+                }
             context.sendBroadcast(intent)
         }
         val smallComp = ComponentName(context, SmallBalanceWidget::class.java)
         val smallIds = manager.getAppWidgetIds(smallComp)
         if (smallIds.isNotEmpty()) {
-            val intent = Intent(context, SmallBalanceWidget::class.java).apply {
-                action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
-                putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallIds)
-            }
+            val intent =
+                Intent(context, SmallBalanceWidget::class.java).apply {
+                    action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
+                    putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallIds)
+                }
             context.sendBroadcast(intent)
         }
     }

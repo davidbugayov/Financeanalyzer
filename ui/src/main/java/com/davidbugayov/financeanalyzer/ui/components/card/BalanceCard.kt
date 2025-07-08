@@ -33,11 +33,12 @@ private fun BalanceCardTitle(
     incomeColor: androidx.compose.ui.graphics.Color,
     expenseColor: androidx.compose.ui.graphics.Color,
 ) {
-    val titleColor = if (balance.amount.signum() >= 0) {
-        incomeColor.copy(alpha = 0.7f)
-    } else {
-        expenseColor.copy(alpha = 0.7f)
-    }
+    val titleColor =
+        if (balance.amount.signum() >= 0) {
+            incomeColor.copy(alpha = 0.7f)
+        } else {
+            expenseColor.copy(alpha = 0.7f)
+        }
     Text(
         text = stringResource(R.string.current_balance),
         style = MaterialTheme.typography.titleMedium,
@@ -86,9 +87,10 @@ fun BalanceCard(
         border = BorderStroke(width = 3.dp, color = balanceTextColor),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BalanceCardTitle(balance, incomeColor, expenseColor)

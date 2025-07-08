@@ -10,7 +10,6 @@ import timber.log.Timber
  * Реализует конечный автомат для управления жизненным циклом разрешения.
  */
 class PermissionManager(context: Context) {
-
     private val sharedPreferences: SharedPreferences =
         context.getSharedPreferences("finance_analyzer_prefs", 0)
 
@@ -18,7 +17,6 @@ class PermissionManager(context: Context) {
      * Состояния разрешения для уведомлений
      */
     enum class NotificationPermissionState {
-
         INITIAL, // Начальное состояние, после установки
         ONBOARDING_COMPLETED, // Онбординг завершен
         PERMISSION_REQUESTED, // Запрос разрешения отправлен
@@ -31,7 +29,6 @@ class PermissionManager(context: Context) {
      * События, которые могут изменить состояние разрешения
      */
     enum class PermissionEvent {
-
         FINISH_ONBOARDING, // Завершение онбординга
         REQUEST_PERMISSION, // Запрос разрешения
         GRANT_PERMISSION, // Предоставление разрешения
@@ -44,10 +41,11 @@ class PermissionManager(context: Context) {
      * Получение текущего состояния разрешения
      */
     fun getCurrentState(): NotificationPermissionState {
-        val stateOrdinal = sharedPreferences.getInt(
-            "notification_permission_state",
-            NotificationPermissionState.INITIAL.ordinal,
-        )
+        val stateOrdinal =
+            sharedPreferences.getInt(
+                "notification_permission_state",
+                NotificationPermissionState.INITIAL.ordinal,
+            )
         return NotificationPermissionState.entries[stateOrdinal]
     }
 
@@ -56,47 +54,48 @@ class PermissionManager(context: Context) {
      */
     fun processEvent(event: PermissionEvent) {
         val currentState = getCurrentState()
-        val newState = when (event) {
-            PermissionEvent.FINISH_ONBOARDING -> {
-                when (currentState) {
-                    NotificationPermissionState.INITIAL -> NotificationPermissionState.ONBOARDING_COMPLETED
-                    else -> currentState
+        val newState =
+            when (event) {
+                PermissionEvent.FINISH_ONBOARDING -> {
+                    when (currentState) {
+                        NotificationPermissionState.INITIAL -> NotificationPermissionState.ONBOARDING_COMPLETED
+                        else -> currentState
+                    }
+                }
+
+                PermissionEvent.REQUEST_PERMISSION -> {
+                    when (currentState) {
+                        NotificationPermissionState.ONBOARDING_COMPLETED,
+                        NotificationPermissionState.PERMISSION_DENIED,
+                        -> NotificationPermissionState.PERMISSION_REQUESTED
+
+                        else -> currentState
+                    }
+                }
+
+                PermissionEvent.GRANT_PERMISSION -> {
+                    NotificationPermissionState.PERMISSION_GRANTED
+                }
+
+                PermissionEvent.DENY_PERMISSION -> {
+                    when (currentState) {
+                        NotificationPermissionState.PERMISSION_REQUESTED -> NotificationPermissionState.PERMISSION_DENIED
+                        NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMANENTLY_DENIED
+                        else -> currentState
+                    }
+                }
+
+                PermissionEvent.DISMISS_DIALOG -> {
+                    when (currentState) {
+                        NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMANENTLY_DENIED
+                        else -> currentState
+                    }
+                }
+
+                PermissionEvent.OPEN_SETTINGS -> {
+                    currentState // Открытие настроек не меняет состояние
                 }
             }
-
-            PermissionEvent.REQUEST_PERMISSION -> {
-                when (currentState) {
-                    NotificationPermissionState.ONBOARDING_COMPLETED,
-                    NotificationPermissionState.PERMISSION_DENIED,
-                    -> NotificationPermissionState.PERMISSION_REQUESTED
-
-                    else -> currentState
-                }
-            }
-
-            PermissionEvent.GRANT_PERMISSION -> {
-                NotificationPermissionState.PERMISSION_GRANTED
-            }
-
-            PermissionEvent.DENY_PERMISSION -> {
-                when (currentState) {
-                    NotificationPermissionState.PERMISSION_REQUESTED -> NotificationPermissionState.PERMISSION_DENIED
-                    NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMANENTLY_DENIED
-                    else -> currentState
-                }
-            }
-
-            PermissionEvent.DISMISS_DIALOG -> {
-                when (currentState) {
-                    NotificationPermissionState.PERMISSION_DENIED -> NotificationPermissionState.PERMANENTLY_DENIED
-                    else -> currentState
-                }
-            }
-
-            PermissionEvent.OPEN_SETTINGS -> {
-                currentState // Открытие настроек не меняет состояние
-            }
-        }
 
         if (newState != currentState) {
             Timber.d("Состояние разрешения изменено: $currentState -> $newState")

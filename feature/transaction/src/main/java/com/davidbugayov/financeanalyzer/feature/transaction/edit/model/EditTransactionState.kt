@@ -2,8 +2,8 @@ package com.davidbugayov.financeanalyzer.feature.transaction.edit.model
 import androidx.compose.ui.graphics.vector.ImageVector
 import com.davidbugayov.financeanalyzer.domain.model.Source
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionState
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import java.util.Date
 
 /**

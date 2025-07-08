@@ -1,4 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.home
+import android.os.SystemClock
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
@@ -25,8 +26,7 @@ import androidx.core.content.edit
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
-import com.davidbugayov.financeanalyzer.feature.home.R
+import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
@@ -35,30 +35,30 @@ import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
+import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
-import com.davidbugayov.financeanalyzer.ui.components.AnimatedBottomNavigationBar
-import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
-import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
-import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
-import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
 import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilter
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
-import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
+import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
+import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.components.AnimatedBottomNavigationBar
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
+import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
+import com.davidbugayov.financeanalyzer.ui.components.FeedbackMessage
+import com.davidbugayov.financeanalyzer.ui.components.FeedbackType
+import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
+import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import com.davidbugayov.financeanalyzer.utils.isCompact
 import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
-import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
-import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
-import android.os.SystemClock
-import androidx.paging.compose.collectAsLazyPagingItems
-import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 
 /**
  * Главный экран приложения.
@@ -66,7 +66,10 @@ import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
  * Следует принципам MVI и Clean Architecture.
  */
 @Composable
-private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -> Unit) {
+private fun HomeTopBar(
+    onGenerateTestData: () -> Unit,
+    onNavigateToProfile: () -> Unit,
+) {
     AppTopBar(
         title = stringResource(R.string.app_title),
         actions = {
@@ -111,7 +114,11 @@ private fun HomeTopBar(onGenerateTestData: () -> Unit, onNavigateToProfile: () -
 }
 
 @Composable
-private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: () -> Unit, onNavigateToAdd: () -> Unit) {
+private fun HomeBottomBar(
+    onNavigateToChart: () -> Unit,
+    onNavigateToHistory: () -> Unit,
+    onNavigateToAdd: () -> Unit,
+) {
     AnimatedBottomNavigationBar(
         visible = true,
         onChartClick = {
@@ -238,8 +245,9 @@ private fun HomeFeedback(
         type = feedbackType,
         visible = showFeedback,
         onDismiss = onDismiss,
-        modifier = modifier
-            .padding(top = dimensionResource(R.dimen.padding_small)),
+        modifier =
+            modifier
+                .padding(top = dimensionResource(R.dimen.padding_small)),
     )
 }
 
@@ -343,21 +351,22 @@ fun HomeScreen(
     val lifecycleOwner = LocalLifecycleOwner.current
     DisposableEffect(lifecycleOwner) {
         var lastRefreshTime = 0L
-        val observer = LifecycleEventObserver { _, event ->
-            Timber.d("HOME: Событие жизненного цикла: $event")
-            if (event == Lifecycle.Event.ON_RESUME) {
-                val currentTime = System.currentTimeMillis()
-                Timber.d("HOME: ON_RESUME - время с последнего обновления: ${currentTime - lastRefreshTime}ms")
-                if (currentTime - lastRefreshTime > 2000) {
-                    Timber.d("HOME: ON_RESUME - проверяем необходимость обновления данных")
-                    // Вместо полной перезагрузки просто проверяем, нужно ли обновить данные
-                    // Плавное обновление уже происходит через subscribeToRepositoryChanges
-                    lastRefreshTime = currentTime
-                } else {
-                    Timber.d("HOME: ON_RESUME - пропускаем обновление (прошло менее 2 секунд)")
+        val observer =
+            LifecycleEventObserver { _, event ->
+                Timber.d("HOME: Событие жизненного цикла: $event")
+                if (event == Lifecycle.Event.ON_RESUME) {
+                    val currentTime = System.currentTimeMillis()
+                    Timber.d("HOME: ON_RESUME - время с последнего обновления: ${currentTime - lastRefreshTime}ms")
+                    if (currentTime - lastRefreshTime > 2000) {
+                        Timber.d("HOME: ON_RESUME - проверяем необходимость обновления данных")
+                        // Вместо полной перезагрузки просто проверяем, нужно ли обновить данные
+                        // Плавное обновление уже происходит через subscribeToRepositoryChanges
+                        lastRefreshTime = currentTime
+                    } else {
+                        Timber.d("HOME: ON_RESUME - пропускаем обновление (прошло менее 2 секунд)")
+                    }
                 }
             }
-        }
         lifecycleOwner.lifecycle.addObserver(observer)
         onDispose { lifecycleOwner.lifecycle.removeObserver(observer) }
     }
@@ -381,12 +390,13 @@ fun HomeScreen(
         selectedTransactionForActions = transaction
         showActionsDialog = true
     }
-    val onToggleGroupSummary = remember<(Boolean) -> Unit> {
-        { newValue ->
-            viewModel.onEvent(HomeEvent.SetShowGroupSummary(newValue))
-            sharedPreferences.edit { putBoolean("show_group_summary", newValue) }
+    val onToggleGroupSummary =
+        remember<(Boolean) -> Unit> {
+            { newValue ->
+                viewModel.onEvent(HomeEvent.SetShowGroupSummary(newValue))
+                sharedPreferences.edit { putBoolean("show_group_summary", newValue) }
+            }
         }
-    }
     val onFilterSelected = { filter: TransactionFilter ->
         userEventTracker.trackUserAction(
             "filter_selected",
@@ -400,7 +410,7 @@ fun HomeScreen(
         viewModel.onEvent(HomeEvent.SetFilter(filter))
     }
     AchievementNotificationManager(
-        achievementEngine = AchievementEngineProvider.get()
+        achievementEngine = AchievementEngineProvider.get(),
     ) {
         Scaffold(
             topBar = {
@@ -422,95 +432,97 @@ fun HomeScreen(
                 )
             },
         ) { paddingValues ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-        ) {
-            if (state.isLoading && state.transactions.isEmpty()) {
-                CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
-            } else {
-                HomeMainContent(
-                    windowSizeIsCompact = windowSize.isCompact(),
-                    state = state,
-                    categoriesViewModel = categoriesViewModel,
-                    pagingItems = pagingItems,
-                    showGroupSummary = state.showGroupSummary,
-                    onToggleGroupSummary = onToggleGroupSummary,
-                    onFilterSelected = onFilterSelected,
-                    onTransactionClick = onTransactionClick,
-                    onTransactionLongClick = onTransactionLongClick,
-                    onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
+            Box(
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(paddingValues),
+            ) {
+                if (state.isLoading && state.transactions.isEmpty()) {
+                    CenteredLoadingIndicator(message = stringResource(R.string.loading_data))
+                } else {
+                    HomeMainContent(
+                        windowSizeIsCompact = windowSize.isCompact(),
+                        state = state,
+                        categoriesViewModel = categoriesViewModel,
+                        pagingItems = pagingItems,
+                        showGroupSummary = state.showGroupSummary,
+                        onToggleGroupSummary = onToggleGroupSummary,
+                        onFilterSelected = onFilterSelected,
+                        onTransactionClick = onTransactionClick,
+                        onTransactionLongClick = onTransactionLongClick,
+                        onAddClick = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
+                    )
+                }
+                HomeFeedback(
+                    title =
+                        when (feedbackType) {
+                            FeedbackType.SUCCESS -> "Успех"
+                            FeedbackType.ERROR -> "Ошибка"
+                            FeedbackType.WARNING -> "Внимание"
+                            FeedbackType.INFO -> "Уведомление"
+                        },
+                    feedbackMessage = feedbackMessage,
+                    feedbackType = feedbackType,
+                    showFeedback = showFeedback,
+                    onDismiss = { showFeedback = false },
+                    modifier = Modifier.align(Alignment.TopCenter),
                 )
             }
-            HomeFeedback(
-                title = when (feedbackType) {
-                    FeedbackType.SUCCESS -> "Успех"
-                    FeedbackType.ERROR -> "Ошибка"
-                    FeedbackType.WARNING -> "Внимание"
-                    FeedbackType.INFO -> "Уведомление"
-                },
-                feedbackMessage = feedbackMessage,
-                feedbackType = feedbackType,
-                showFeedback = showFeedback,
-                onDismiss = { showFeedback = false },
-                modifier = Modifier.align(Alignment.TopCenter),
-            )
         }
-    }
 
-    HomeDialogs(
-        showActionsDialog = showActionsDialog,
-        selectedTransaction = selectedTransactionForActions,
-        onDismissActionsDialog = {
-            showActionsDialog = false
-            selectedTransactionForActions = null
-        },
-        onDeleteTransaction = { transaction ->
-            userEventTracker.trackUserAction(
-                "delete_transaction",
-                mapOf(
-                    "transaction_id" to transaction.id,
-                    "transaction_amount" to transaction.amount.amount.toString(),
-                ),
-            )
-            // Показываем диалог подтверждения вместо прямого удаления
-            viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
-            showActionsDialog = false
-            selectedTransactionForActions = null
-        },
-        onEditTransaction = { transaction ->
-            userEventTracker.trackUserAction(
-                "edit_transaction",
-                mapOf(
-                    "transaction_id" to transaction.id,
-                ),
-            )
-            userEventTracker.trackFeatureUsage("edit_transaction")
-            viewModel.onEvent(HomeEvent.EditTransaction(transaction))
-            showActionsDialog = false
-            selectedTransactionForActions = null
-        },
-        transactionToDelete = state.transactionToDelete,
-        onConfirmDelete = {
-            state.transactionToDelete?.let { transactionToDelete ->
+        HomeDialogs(
+            showActionsDialog = showActionsDialog,
+            selectedTransaction = selectedTransactionForActions,
+            onDismissActionsDialog = {
+                showActionsDialog = false
+                selectedTransactionForActions = null
+            },
+            onDeleteTransaction = { transaction ->
                 userEventTracker.trackUserAction(
                     "delete_transaction",
                     mapOf(
-                        "transaction_id" to transactionToDelete.id,
-                        "transaction_amount" to transactionToDelete.amount.amount.toString(),
+                        "transaction_id" to transaction.id,
+                        "transaction_amount" to transaction.amount.amount.toString(),
                     ),
                 )
-                viewModel.onEvent(HomeEvent.DeleteTransaction(transactionToDelete))
-                feedbackMessage = transactionDeletedMsg
-                feedbackType = FeedbackType.SUCCESS
-                showFeedback = true
-            }
-            viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
-        },
-        onDismissDelete = {
-            viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
-        },
-    )
+                // Показываем диалог подтверждения вместо прямого удаления
+                viewModel.onEvent(HomeEvent.ShowDeleteConfirmDialog(transaction))
+                showActionsDialog = false
+                selectedTransactionForActions = null
+            },
+            onEditTransaction = { transaction ->
+                userEventTracker.trackUserAction(
+                    "edit_transaction",
+                    mapOf(
+                        "transaction_id" to transaction.id,
+                    ),
+                )
+                userEventTracker.trackFeatureUsage("edit_transaction")
+                viewModel.onEvent(HomeEvent.EditTransaction(transaction))
+                showActionsDialog = false
+                selectedTransactionForActions = null
+            },
+            transactionToDelete = state.transactionToDelete,
+            onConfirmDelete = {
+                state.transactionToDelete?.let { transactionToDelete ->
+                    userEventTracker.trackUserAction(
+                        "delete_transaction",
+                        mapOf(
+                            "transaction_id" to transactionToDelete.id,
+                            "transaction_amount" to transactionToDelete.amount.amount.toString(),
+                        ),
+                    )
+                    viewModel.onEvent(HomeEvent.DeleteTransaction(transactionToDelete))
+                    feedbackMessage = transactionDeletedMsg
+                    feedbackType = FeedbackType.SUCCESS
+                    showFeedback = true
+                }
+                viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
+            },
+            onDismissDelete = {
+                viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
+            },
+        )
     }
 }

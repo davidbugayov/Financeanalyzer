@@ -30,16 +30,21 @@ import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
  * @param onDismiss Обработчик закрытия диалога.
  */
 @Composable
-fun ThemeSelectionDialog(selectedTheme: ThemeMode, onThemeSelected: (ThemeMode) -> Unit, onDismiss: () -> Unit) {
+fun ThemeSelectionDialog(
+    selectedTheme: ThemeMode,
+    onThemeSelected: (ThemeMode) -> Unit,
+    onDismiss: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         title = { Text(text = stringResource(R.string.profile_theme_select)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .selectableGroup(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .selectableGroup(),
             ) {
                 ThemeOption(
                     text = stringResource(R.string.profile_theme_light),
@@ -88,16 +93,21 @@ fun ThemeSelectionDialog(selectedTheme: ThemeMode, onThemeSelected: (ThemeMode) 
  * @param onClick Обработчик выбора темы.
  */
 @Composable
-private fun ThemeOption(text: String, selected: Boolean, onClick: () -> Unit) {
+private fun ThemeOption(
+    text: String,
+    selected: Boolean,
+    onClick: () -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .selectable(
-                selected = selected,
-                onClick = onClick,
-                role = Role.RadioButton,
-            )
-            .padding(dimensionResource(R.dimen.spacing_medium)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .selectable(
+                    selected = selected,
+                    onClick = onClick,
+                    role = Role.RadioButton,
+                )
+                .padding(dimensionResource(R.dimen.spacing_medium)),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         RadioButton(

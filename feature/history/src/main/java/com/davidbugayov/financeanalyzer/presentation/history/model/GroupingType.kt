@@ -6,7 +6,6 @@ package com.davidbugayov.financeanalyzer.presentation.history.model
  * Используется в компоненте GroupingChips для выбора типа группировки.
  */
 enum class GroupingType {
-
     /** Группировка по дням (показывает транзакции за каждый день) */
     DAY,
 

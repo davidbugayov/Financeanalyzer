@@ -19,10 +19,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import timber.log.Timber
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
+import timber.log.Timber
 
 /**
  * Заголовок с датой и типом транзакции
@@ -42,9 +42,10 @@ fun TransactionHeader(
     Timber.d("TransactionHeader рендеринг: isExpense=$isExpense, forceExpense=$forceExpense")
 
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 8.dp),
         horizontalArrangement = Arrangement.SpaceBetween,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -55,10 +56,11 @@ fun TransactionHeader(
             text = formattedDate,
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier
-                .clip(RoundedCornerShape(8.dp))
-                .clickable(onClick = onDateClick)
-                .padding(vertical = 4.dp, horizontal = 8.dp),
+            modifier =
+                Modifier
+                    .clip(RoundedCornerShape(8.dp))
+                    .clickable(onClick = onDateClick)
+                    .padding(vertical = 4.dp, horizontal = 8.dp),
         )
 
         Row(
@@ -70,10 +72,11 @@ fun TransactionHeader(
                     if (isExpense) onToggleTransactionType()
                 },
                 label = { Text(stringResource(R.string.income_type)) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = incomeColor.copy(alpha = 0.2f),
-                    selectedLabelColor = incomeColor,
-                ),
+                colors =
+                    FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = incomeColor.copy(alpha = 0.2f),
+                        selectedLabelColor = incomeColor,
+                    ),
             )
 
             FilterChip(
@@ -82,10 +85,11 @@ fun TransactionHeader(
                     if (!isExpense) onToggleTransactionType()
                 },
                 label = { Text(stringResource(R.string.expense_type)) },
-                colors = FilterChipDefaults.filterChipColors(
-                    selectedContainerColor = expenseColor.copy(alpha = 0.2f),
-                    selectedLabelColor = expenseColor,
-                ),
+                colors =
+                    FilterChipDefaults.filterChipColors(
+                        selectedContainerColor = expenseColor.copy(alpha = 0.2f),
+                        selectedLabelColor = expenseColor,
+                    ),
             )
         }
     }

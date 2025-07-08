@@ -28,8 +28,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.domain.model.Source
+import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.utils.ColorUtils
 
 /**
@@ -58,45 +58,49 @@ fun SourceSelectionDialog(
             Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                 // Кнопка "Выбрать все"
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            localSelectedSources =
-                                if (localSelectedSources.size == sourceNames.size) {
-                                    emptyList()
-                                } else {
-                                    sourceNames
-                                }
-                        }
-                        .padding(vertical = 8.dp),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                localSelectedSources =
+                                    if (localSelectedSources.size == sourceNames.size) {
+                                        emptyList()
+                                    } else {
+                                        sourceNames
+                                    }
+                            }
+                            .padding(vertical = 8.dp),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = if (localSelectedSources.isEmpty()) {
-                            stringResource(R.string.all_sources)
-                        } else if (localSelectedSources.size == sourceNames.size) {
-                            stringResource(R.string.clear_selection)
-                        } else {
-                            stringResource(R.string.select_all_sources)
-                        },
-                        color = if (localSelectedSources.isEmpty() ||
-                            localSelectedSources.size == sourceNames.size
-                        ) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        },
+                        text =
+                            if (localSelectedSources.isEmpty()) {
+                                stringResource(R.string.all_sources)
+                            } else if (localSelectedSources.size == sourceNames.size) {
+                                stringResource(R.string.clear_selection)
+                            } else {
+                                stringResource(R.string.select_all_sources)
+                            },
+                        color =
+                            if (localSelectedSources.isEmpty() ||
+                                localSelectedSources.size == sourceNames.size
+                            ) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
                         modifier = Modifier.weight(1f),
                     )
 
                     Checkbox(
                         checked = localSelectedSources.size == sourceNames.size && sourceNames.isNotEmpty(),
                         onCheckedChange = { isChecked ->
-                            localSelectedSources = if (isChecked) {
-                                sourceNames
-                            } else {
-                                emptyList()
-                            }
+                            localSelectedSources =
+                                if (isChecked) {
+                                    sourceNames
+                                } else {
+                                    emptyList()
+                                }
                         },
                     )
                 }
@@ -106,26 +110,28 @@ fun SourceSelectionDialog(
                 // Список источников
                 val isDarkTheme = isSystemInDarkTheme()
                 sources.forEach { source ->
-                    val effectiveColor = if (source.color != 0) { // Предполагаем, что 0 означает отсутствие цвета
-                        Color(source.color)
-                    } else {
-                        ColorUtils.getEffectiveSourceColor(
-                            sourceName = source.name,
-                            sourceColorHex = null, // Так как source.color (Int) не был валидным HEX
-                            isExpense = false, // Для диалога выбора источника не применимо
-                            isDarkTheme = isDarkTheme,
-                        )
-                    }
+                    val effectiveColor =
+                        if (source.color != 0) { // Предполагаем, что 0 означает отсутствие цвета
+                            Color(source.color)
+                        } else {
+                            ColorUtils.getEffectiveSourceColor(
+                                sourceName = source.name,
+                                sourceColorHex = null, // Так как source.color (Int) не был валидным HEX
+                                isExpense = false, // Для диалога выбора источника не применимо
+                                isDarkTheme = isDarkTheme,
+                            )
+                        }
                     SourceCheckboxItem(
                         sourceName = source.name,
                         color = effectiveColor, // Передаем уже готовый Color
                         isSelected = localSelectedSources.contains(source.name),
                         onToggle = { isChecked ->
-                            localSelectedSources = if (isChecked) {
-                                localSelectedSources + source.name
-                            } else {
-                                localSelectedSources - source.name
-                            }
+                            localSelectedSources =
+                                if (isChecked) {
+                                    localSelectedSources + source.name
+                                } else {
+                                    localSelectedSources - source.name
+                                }
                         },
                     )
                 }
@@ -156,25 +162,32 @@ fun SourceSelectionDialog(
  * @param onToggle Callback, вызываемый при выборе/отмене выбора источника
  */
 @Composable
-private fun SourceCheckboxItem(sourceName: String, color: Color, isSelected: Boolean, onToggle: (Boolean) -> Unit) {
+private fun SourceCheckboxItem(
+    sourceName: String,
+    color: Color,
+    isSelected: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 2.dp)
-            .clip(MaterialTheme.shapes.small)
-            .background(
-                if (isSelected) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surface
-                },
-            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 2.dp)
+                .clip(MaterialTheme.shapes.small)
+                .background(
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    },
+                ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = { onToggle(!isSelected) })
-                .padding(8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { onToggle(!isSelected) })
+                    .padding(8.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
@@ -184,14 +197,16 @@ private fun SourceCheckboxItem(sourceName: String, color: Color, isSelected: Boo
 
             Text(
                 text = sourceName,
-                color = if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    color
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = 8.dp),
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        color
+                    },
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(start = 8.dp),
             )
         }
     }

@@ -24,19 +24,20 @@ fun NumberTextField(
         value = value,
         onValueChange = { newValue ->
             if (newValue.length <= maxLength) {
-                val isValidNumber = if (allowDecimal) {
-                    if (allowNegative) {
-                        newValue.matches(Regex("^-?\\d*\\.?\\d*$"))
+                val isValidNumber =
+                    if (allowDecimal) {
+                        if (allowNegative) {
+                            newValue.matches(Regex("^-?\\d*\\.?\\d*$"))
+                        } else {
+                            newValue.matches(Regex("^\\d*\\.?\\d*$"))
+                        }
                     } else {
-                        newValue.matches(Regex("^\\d*\\.?\\d*$"))
+                        if (allowNegative) {
+                            newValue.matches(Regex("^-?\\d*$"))
+                        } else {
+                            newValue.matches(Regex("^\\d*$"))
+                        }
                     }
-                } else {
-                    if (allowNegative) {
-                        newValue.matches(Regex("^-?\\d*$"))
-                    } else {
-                        newValue.matches(Regex("^\\d*$"))
-                    }
-                }
 
                 if (isValidNumber || newValue.isEmpty()) {
                     onValueChange(newValue)
@@ -47,11 +48,12 @@ fun NumberTextField(
         modifier = modifier,
         enabled = enabled,
         isError = isError,
-        supportingText = if (isError && errorMessage != null) {
-            { Text(text = errorMessage) }
-        } else {
-            null
-        },
+        supportingText =
+            if (isError && errorMessage != null) {
+                { Text(text = errorMessage) }
+            } else {
+                null
+            },
         keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
     )
 }

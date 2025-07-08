@@ -52,9 +52,9 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
@@ -113,31 +113,36 @@ fun AnalyticsSection(
     }
 
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.card_elevation),
-        ),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.spacing_medium)),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.card_elevation),
+            ),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_large)),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surfaceVariant),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
         ) {
             // Заголовок секции с иконкой аналитики
             Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .fillMaxWidth(),
                 horizontalArrangement = Arrangement.Start,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Box(
-                    modifier = Modifier
-                        .size(40.dp)
-                        .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
+                    modifier =
+                        Modifier
+                            .size(40.dp)
+                            .background(MaterialTheme.colorScheme.primary, shape = CircleShape),
                     contentAlignment = Alignment.Center,
                 ) {
                     Icon(
@@ -221,24 +226,27 @@ fun AnalyticsSection(
                         Spacer(modifier = Modifier.width(dimensionResource(R.dimen.spacing_medium)))
 
                         // Норма сбережений
-                        val savingsRateColor = when {
-                            calculatedSavingsRate >= 20 -> incomeColor // Зеленый
-                            calculatedSavingsRate >= 10 -> LocalWarningColor.current // Желтый
-                            calculatedSavingsRate > 0 -> LocalInfoColor.current.copy(alpha = 0.8f) // Оранжевый
-                            else -> expenseColor // Красный
-                        }
+                        val savingsRateColor =
+                            when {
+                                calculatedSavingsRate >= 20 -> incomeColor // Зеленый
+                                calculatedSavingsRate >= 10 -> LocalWarningColor.current // Желтый
+                                calculatedSavingsRate > 0 -> LocalInfoColor.current.copy(alpha = 0.8f) // Оранжевый
+                                else -> expenseColor // Красный
+                            }
 
                         AnimatedFinancialCard(
                             title = stringResource(R.string.savings_rate),
                             value = String.format(Locale.US, "%.1f%%", calculatedSavingsRate),
                             color = savingsRateColor,
-                            icon = rememberVectorPainter(
-                                if (calculatedSavingsRate > 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
-                            ),
+                            icon =
+                                rememberVectorPainter(
+                                    if (calculatedSavingsRate > 0) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                                ),
                             animationDelay = 300,
-                            modifier = Modifier
-                                .weight(1f)
-                                .clickable { onSavingsRateClick() },
+                            modifier =
+                                Modifier
+                                    .weight(1f)
+                                    .clickable { onSavingsRateClick() },
                         )
                     }
                 }
@@ -306,9 +314,10 @@ fun AnalyticsSection(
 
                     // Дополнительная информация - улучшенный дизайн
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                         horizontalArrangement = Arrangement.SpaceBetween,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
@@ -334,14 +343,16 @@ fun AnalyticsSection(
                         ) {
                             Text(
                                 text = totalSourcesUsed.toString(),
-                                style = MaterialTheme.typography.bodyMedium.copy(
-                                    fontWeight = FontWeight.Bold,
-                                ),
+                                style =
+                                    MaterialTheme.typography.bodyMedium.copy(
+                                        fontWeight = FontWeight.Bold,
+                                    ),
                                 color = MaterialTheme.colorScheme.primary,
-                                modifier = Modifier.padding(
-                                    horizontal = dimensionResource(R.dimen.padding_horizontal_12dp),
-                                    vertical = dimensionResource(R.dimen.padding_vertical_6dp),
-                                ),
+                                modifier =
+                                    Modifier.padding(
+                                        horizontal = dimensionResource(R.dimen.padding_horizontal_12dp),
+                                        vertical = dimensionResource(R.dimen.padding_vertical_6dp),
+                                    ),
                             )
                         }
                     }
@@ -366,10 +377,11 @@ private fun AnimatedFinancialCard(
     var visible by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (visible) 1f else 0.8f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow,
-        ),
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow,
+            ),
         label = "scale",
     )
 
@@ -379,19 +391,21 @@ private fun AnimatedFinancialCard(
     }
 
     Surface(
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                alpha = scale
-            },
+        modifier =
+            modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    alpha = scale
+                },
         color = color.copy(alpha = 0.08f),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
         ) {
             // Иконка в кружке
             Surface(
@@ -403,9 +417,10 @@ private fun AnimatedFinancialCard(
                     painter = icon,
                     contentDescription = title,
                     tint = color,
-                    modifier = Modifier
-                        .padding(dimensionResource(R.dimen.padding_8dp))
-                        .size(dimensionResource(R.dimen.icon_size_24dp)),
+                    modifier =
+                        Modifier
+                            .padding(dimensionResource(R.dimen.padding_8dp))
+                            .size(dimensionResource(R.dimen.icon_size_24dp)),
                 )
             }
 
@@ -443,10 +458,11 @@ private fun AnimatedAnalyticCard(
     var visible by remember { mutableStateOf(false) }
     val scale by animateFloatAsState(
         targetValue = if (visible) 1f else 0.8f,
-        animationSpec = spring(
-            dampingRatio = Spring.DampingRatioMediumBouncy,
-            stiffness = Spring.StiffnessLow,
-        ),
+        animationSpec =
+            spring(
+                dampingRatio = Spring.DampingRatioMediumBouncy,
+                stiffness = Spring.StiffnessLow,
+            ),
         label = "scale",
     )
 
@@ -456,19 +472,21 @@ private fun AnimatedAnalyticCard(
     }
 
     Surface(
-        modifier = modifier
-            .graphicsLayer {
-                scaleX = scale
-                scaleY = scale
-                alpha = scale
-            },
+        modifier =
+            modifier
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    alpha = scale
+                },
         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f),
         shape = RoundedCornerShape(dimensionResource(R.dimen.radius_medium)),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.spacing_medium)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.spacing_medium)),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             // Иконка в кружке
@@ -481,9 +499,10 @@ private fun AnimatedAnalyticCard(
                     imageVector = icon,
                     contentDescription = title,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier
-                        .padding(dimensionResource(R.dimen.padding_8dp))
-                        .size(dimensionResource(R.dimen.icon_size_24dp)),
+                    modifier =
+                        Modifier
+                            .padding(dimensionResource(R.dimen.padding_8dp))
+                            .size(dimensionResource(R.dimen.icon_size_24dp)),
                 )
             }
 

@@ -8,14 +8,16 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.ime
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
-import androidx.compose.foundation.layout.Column
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assessment
@@ -39,8 +41,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.ui.R
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 
 /**
  * Enhanced bottom navigation bar with animations and support for arbitrary item set.
@@ -68,12 +68,16 @@ fun AnimatedBottomNavigationBar(
 
     AnimatedVisibility(
         visible = visible,
-        enter = fadeIn(animationSpec = tween(400, easing = EaseInOut)) + slideInVertically(
-            initialOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
-        ),
-        exit = fadeOut(animationSpec = tween(400, easing = EaseInOut)) + slideOutVertically(
-            targetOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
-        ),
+        enter =
+            fadeIn(animationSpec = tween(400, easing = EaseInOut)) +
+                slideInVertically(
+                    initialOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
+                ),
+        exit =
+            fadeOut(animationSpec = tween(400, easing = EaseInOut)) +
+                slideOutVertically(
+                    targetOffsetY = { it }, animationSpec = tween(400, easing = EaseInOut),
+                ),
         modifier = modifier,
     ) {
         Surface(
@@ -83,16 +87,17 @@ fun AnimatedBottomNavigationBar(
             tonalElevation = dimensionResource(R.dimen.elevation_small),
         ) {
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .navigationBarsPadding()
-                    .padding(
-                        start = dimensionResource(R.dimen.spacing_small),
-                        end = dimensionResource(R.dimen.spacing_small),
-                        top = dimensionResource(R.dimen.spacing_xxsmall),
-                        bottom = dimensionResource(R.dimen.spacing_xxsmall),
-                    )
-                    .heightIn(min = dimensionResource(R.dimen.nav_bar_height)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .navigationBarsPadding()
+                        .padding(
+                            start = dimensionResource(R.dimen.spacing_small),
+                            end = dimensionResource(R.dimen.spacing_small),
+                            top = dimensionResource(R.dimen.spacing_xxsmall),
+                            bottom = dimensionResource(R.dimen.spacing_xxsmall),
+                        )
+                        .heightIn(min = dimensionResource(R.dimen.nav_bar_height)),
                 horizontalArrangement = Arrangement.SpaceEvenly,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
@@ -129,17 +134,19 @@ private fun NavButton(
     val iconSize = dimensionResource(R.dimen.main_nav_icon_size)
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .padding(horizontal = spacingXx)
-            .widthIn(min = buttonSize + spacingXx),
+        modifier =
+            Modifier
+                .padding(horizontal = spacingXx)
+                .widthIn(min = buttonSize + spacingXx),
     ) {
         FilledIconButton(
             onClick = onClick,
             modifier = Modifier.size(buttonSize),
-            colors = IconButtonDefaults.filledIconButtonColors(
-                containerColor = MaterialTheme.colorScheme.primary,
-                contentColor = Color.White,
-            ),
+            colors =
+                IconButtonDefaults.filledIconButtonColors(
+                    containerColor = MaterialTheme.colorScheme.primary,
+                    contentColor = Color.White,
+                ),
         ) {
             Icon(
                 imageVector = icon,

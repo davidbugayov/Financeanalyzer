@@ -16,15 +16,16 @@ import kotlinx.coroutines.flow.update
 class AppCategoriesViewModel(
     application: Application,
 ) : AndroidViewModel(application), CategoriesViewModel {
-
-    private val _expenseCategories = MutableStateFlow<List<UiCategory>>(
-        CategoryProvider.getDefaultExpenseCategories(application),
-    )
+    private val _expenseCategories =
+        MutableStateFlow<List<UiCategory>>(
+            CategoryProvider.getDefaultExpenseCategories(application),
+        )
     override val expenseCategories: StateFlow<List<UiCategory>> = _expenseCategories
 
-    private val _incomeCategories = MutableStateFlow<List<UiCategory>>(
-        CategoryProvider.getDefaultIncomeCategories(application),
-    )
+    private val _incomeCategories =
+        MutableStateFlow<List<UiCategory>>(
+            CategoryProvider.getDefaultIncomeCategories(application),
+        )
     override val incomeCategories: StateFlow<List<UiCategory>> = _incomeCategories
 
     override fun addCustomCategory(
@@ -32,12 +33,13 @@ class AppCategoriesViewModel(
         isExpense: Boolean,
         icon: androidx.compose.ui.graphics.vector.ImageVector?,
     ) {
-        val newCategory = UiCategory.custom(
-            name = name,
-            isExpense = isExpense,
-            icon = icon,
-            color = CategoryProvider.generateCategoryColorFromPalette(isExpense),
-        )
+        val newCategory =
+            UiCategory.custom(
+                name = name,
+                isExpense = isExpense,
+                icon = icon,
+                color = CategoryProvider.generateCategoryColorFromPalette(isExpense),
+            )
         if (isExpense) {
             _expenseCategories.update { it + newCategory }
         } else {

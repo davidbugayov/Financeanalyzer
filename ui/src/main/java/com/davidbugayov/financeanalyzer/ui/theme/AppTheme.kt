@@ -33,7 +33,10 @@ val LocalAppTheme = staticCompositionLocalOf<ThemeMode> { ThemeMode.SYSTEM }
  * Провайдер для установки темы в Compose-дереве
  */
 @Composable
-fun AppThemeProvider(themeMode: ThemeMode, content: @Composable () -> Unit) {
+fun AppThemeProvider(
+    themeMode: ThemeMode,
+    content: @Composable () -> Unit,
+) {
     // Обновляем глобальную тему
     AppTheme.setTheme(themeMode)
 

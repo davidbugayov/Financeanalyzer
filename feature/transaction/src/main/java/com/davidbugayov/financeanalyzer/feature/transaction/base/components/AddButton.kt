@@ -33,17 +33,19 @@ fun AddButton(
 ) {
     Button(
         onClick = onClick,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(R.dimen.add_button_padding_horizontal),
-                vertical = dimensionResource(R.dimen.add_button_padding_vertical),
-            )
-            .height(dimensionResource(R.dimen.add_button_height)),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = dimensionResource(R.dimen.add_button_padding_horizontal),
+                    vertical = dimensionResource(R.dimen.add_button_padding_vertical),
+                )
+                .height(dimensionResource(R.dimen.add_button_height)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.add_button_corner_radius)),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = color,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = color,
+            ),
         enabled = !isLoading,
     ) {
         Box(contentAlignment = Alignment.Center) {

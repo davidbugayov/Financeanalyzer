@@ -36,10 +36,6 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
-import com.davidbugayov.financeanalyzer.ui.components.CancelConfirmationDialog
-import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
-import com.davidbugayov.financeanalyzer.ui.components.SuccessDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AddButton
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.AmountField
@@ -56,12 +52,16 @@ import com.davidbugayov.financeanalyzer.feature.transaction.base.components.Tran
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectionSection
 import com.davidbugayov.financeanalyzer.feature.transaction.base.components.WalletSelectorDialog
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
+import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
+import com.davidbugayov.financeanalyzer.ui.components.CancelConfirmationDialog
+import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
+import com.davidbugayov.financeanalyzer.ui.components.ReminderBubble
+import com.davidbugayov.financeanalyzer.ui.components.SuccessDialog
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.compose.koinInject
 import timber.log.Timber
-import com.davidbugayov.financeanalyzer.ui.components.ReminderBubble
 
 /**
  * Базовый экран для работы с транзакциями
@@ -88,37 +88,42 @@ fun <E> BaseTransactionScreen(
     }
 
     // Устанавливаем значения по умолчанию для строковых ресурсов
-    val actualScreenTitle = if (isEditMode) {
-        stringResource(R.string.edit_transaction_title)
-    } else {
-        screenTitle ?: stringResource(R.string.add_transaction)
-    }
+    val actualScreenTitle =
+        if (isEditMode) {
+            stringResource(R.string.edit_transaction_title)
+        } else {
+            screenTitle ?: stringResource(R.string.add_transaction)
+        }
 
-    val actualButtonText = if (isEditMode) {
-        stringResource(R.string.save_button_text)
-    } else {
-        buttonText ?: stringResource(R.string.add_button_text)
-    }
+    val actualButtonText =
+        if (isEditMode) {
+            stringResource(R.string.save_button_text)
+        } else {
+            buttonText ?: stringResource(R.string.add_button_text)
+        }
 
     // Сортируем категории по частоте использования при инициализации экрана
-    val sortedExpenseCategories = remember(state.expenseCategories) {
-        state.expenseCategories.sortedByDescending {
-            (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, true)
+    val sortedExpenseCategories =
+        remember(state.expenseCategories) {
+            state.expenseCategories.sortedByDescending {
+                (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, true)
+            }
         }
-    }
 
-    val sortedIncomeCategories = remember(state.incomeCategories) {
-        state.incomeCategories.sortedByDescending {
-            (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, false)
+    val sortedIncomeCategories =
+        remember(state.incomeCategories) {
+            state.incomeCategories.sortedByDescending {
+                (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(it.name, false)
+            }
         }
-    }
 
     // Сортируем источники по частоте использования
-    val sortedSources = remember(state.sources) {
-        state.sources.sortedByDescending {
-            (viewModel as BaseTransactionViewModel<*, *>).getSourceUsage(it.name)
+    val sortedSources =
+        remember(state.sources) {
+            state.sources.sortedByDescending {
+                (viewModel as BaseTransactionViewModel<*, *>).getSourceUsage(it.name)
+            }
         }
-    }
 
     // Строковые ресурсы для категорий
     val categoryOther = stringResource(R.string.category_other)
@@ -319,9 +324,10 @@ fun <E> BaseTransactionScreen(
                         IconButton(onClick = { navigateToImport() }) {
                             Icon(
                                 imageVector = Icons.Default.Upload,
-                                contentDescription = stringResource(
-                                    R.string.import_transactions_content_description,
-                                ),
+                                contentDescription =
+                                    stringResource(
+                                        R.string.import_transactions_content_description,
+                                    ),
                                 tint = MaterialTheme.colorScheme.primary,
                             )
                         }
@@ -331,16 +337,18 @@ fun <E> BaseTransactionScreen(
         },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .verticalScroll(rememberScrollState())
-                    .imePadding()
-                    .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .verticalScroll(rememberScrollState())
+                        .imePadding()
+                        .padding(horizontal = dimensionResource(R.dimen.padding_medium)),
             ) {
                 // Показываем напоминание об импорте только на экране добавления транзакции
                 if (!isEditMode && onNavigateToImport != null) {
@@ -523,9 +531,10 @@ fun <E> BaseTransactionScreen(
                             context,
                         )
                     },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
                 )
 
                 Spacer(Modifier.height(dimensionResource(R.dimen.spacing_small)))
@@ -677,19 +686,20 @@ fun <E> BaseTransactionScreen(
             if (state.showCategoryPicker) {
                 val categories = if (state.isExpense) state.expenseCategories else state.incomeCategories
                 // Sort categories by usage frequency before displaying them
-                val sortedCategories = categories.sortedByDescending {
-                    if (state.isExpense) {
-                        (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(
-                            it.name,
-                            true,
-                        )
-                    } else {
-                        (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(
-                            it.name,
-                            false,
-                        )
+                val sortedCategories =
+                    categories.sortedByDescending {
+                        if (state.isExpense) {
+                            (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(
+                                it.name,
+                                true,
+                            )
+                        } else {
+                            (viewModel as BaseTransactionViewModel<*, *>).getCategoryUsage(
+                                it.name,
+                                false,
+                            )
+                        }
                     }
-                }
 
                 CategoryPickerDialog(
                     categories = sortedCategories,

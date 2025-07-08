@@ -48,34 +48,40 @@ fun ImportProgressSection(
 ) {
     // Создаем бесконечную анимацию вращения
     val infiniteTransition = rememberInfiniteTransition(label = "rotate")
-    val rotation = infiniteTransition.animateFloat(
-        initialValue = 0f,
-        targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = tween(2000, easing = LinearEasing),
-            repeatMode = RepeatMode.Restart,
-        ),
-        label = "rotation",
-    )
+    val rotation =
+        infiniteTransition.animateFloat(
+            initialValue = 0f,
+            targetValue = 360f,
+            animationSpec =
+                infiniteRepeatable(
+                    animation = tween(2000, easing = LinearEasing),
+                    repeatMode = RepeatMode.Restart,
+                ),
+            label = "rotation",
+        )
 
     Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(bottom = dimensionResource(R.dimen.space_small)),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(bottom = dimensionResource(R.dimen.space_small)),
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
-            colors = CardDefaults.cardColors(
-                containerColor = MaterialTheme.colorScheme.surfaceVariant,
-            ),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.card_elevation),
-            ),
+            colors =
+                CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceVariant,
+                ),
+            elevation =
+                CardDefaults.cardElevation(
+                    defaultElevation = dimensionResource(R.dimen.card_elevation),
+                ),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(dimensionResource(R.dimen.space_small)),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(dimensionResource(R.dimen.space_small)),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 // Отображаем банк и имя файла в одной строке, если есть банк
@@ -130,22 +136,25 @@ fun ImportProgressSection(
                 // Прогресс-бар в красивой карточке
                 Card(
                     modifier = Modifier.fillMaxWidth(),
-                    colors = CardDefaults.cardColors(
-                        containerColor = MaterialTheme.colorScheme.primaryContainer,
-                    ),
+                    colors =
+                        CardDefaults.cardColors(
+                            containerColor = MaterialTheme.colorScheme.primaryContainer,
+                        ),
                     shape = RoundedCornerShape(dimensionResource(R.dimen.radius_card)),
                 ) {
                     Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(dimensionResource(R.dimen.space_small)),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(dimensionResource(R.dimen.space_small)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                     ) {
                         LinearProgressIndicator(
                             progress = { progress / 100f },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(dimensionResource(R.dimen.import_progress_indicator_height)),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(dimensionResource(R.dimen.import_progress_indicator_height)),
                             color = MaterialTheme.colorScheme.primary,
                             trackColor = MaterialTheme.colorScheme.onPrimaryContainer.copy(alpha = 0.2f),
                         )
@@ -162,11 +171,12 @@ fun ImportProgressSection(
                                 imageVector = Icons.Rounded.Sync,
                                 contentDescription = null,
                                 tint = MaterialTheme.colorScheme.onPrimaryContainer,
-                                modifier = Modifier
-                                    .size(dimensionResource(R.dimen.import_icon_size))
-                                    .graphicsLayer {
-                                        rotationZ = rotation.value
-                                    },
+                                modifier =
+                                    Modifier
+                                        .size(dimensionResource(R.dimen.import_icon_size))
+                                        .graphicsLayer {
+                                            rotationZ = rotation.value
+                                        },
                             )
 
                             Spacer(modifier = Modifier.width(dimensionResource(R.dimen.space_small)))

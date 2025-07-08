@@ -17,7 +17,11 @@ import java.util.Date
 import java.util.Locale
 
 @Composable
-fun DateField(date: Date, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun DateField(
+    date: Date,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+) {
     val dateFormat = SimpleDateFormat("dd MMMM yyyy", Locale.forLanguageTag("ru"))
     val formattedDate = dateFormat.format(date)
 
@@ -34,8 +38,9 @@ fun DateField(date: Date, onClick: () -> Unit, modifier: Modifier = Modifier) {
                 )
             }
         },
-        modifier = modifier
-            .fillMaxWidth()
-            .clickable(onClick = onClick),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .clickable(onClick = onClick),
     )
 }

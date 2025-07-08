@@ -33,11 +33,12 @@ android {
 
     kotlinOptions {
         jvmTarget = libs.versions.javaVersion.get()
-        freeCompilerArgs += listOf(
-            "-opt-in=kotlin.RequiresOptIn",
-            "-Xjvm-default=all",
-            "-Xcontext-parameters",
-        )
+        freeCompilerArgs +=
+            listOf(
+                "-opt-in=kotlin.RequiresOptIn",
+                "-Xjvm-default=all",
+                "-Xcontext-parameters",
+            )
     }
 
     buildFeatures {
@@ -51,12 +52,13 @@ android {
     // Исключаем тестовые классы из релизной сборки
     packaging {
         resources {
-            excludes += listOf(
-                "**/*Test.class",
-                "**/*Tests.class",
-                "**/test/**",
-                "**/androidTest/**",
-            )
+            excludes +=
+                listOf(
+                    "**/*Test.class",
+                    "**/*Tests.class",
+                    "**/test/**",
+                    "**/androidTest/**",
+                )
         }
     }
 }

@@ -44,9 +44,10 @@ fun LineChartTypeSelector(
     modifier: Modifier = Modifier,
 ) {
     Row(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = SelectorVerticalPadding),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = SelectorVerticalPadding),
         horizontalArrangement = Arrangement.Center,
         verticalAlignment = Alignment.CenterVertically,
     ) {
@@ -78,24 +79,31 @@ fun LineChartTypeSelector(
  * Кнопка для селектора типа графика
  */
 @Composable
-private fun SelectorButton(text: String, isSelected: Boolean, color: Color, onClick: () -> Unit) {
+private fun SelectorButton(
+    text: String,
+    isSelected: Boolean,
+    color: Color,
+    onClick: () -> Unit,
+) {
     Box(
-        modifier = Modifier
-            .padding(horizontal = SelectorButtonHorizontalPadding)
-            .clip(RoundedCornerShape(SelectorButtonCornerRadius))
-            .background(
-                color = if (isSelected) {
-                    color.copy(alpha = 0.15f)
-                } else {
-                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
-                },
-                shape = RoundedCornerShape(SelectorButtonCornerRadius),
-            )
-            .clickable(onClick = onClick)
-            .padding(
-                horizontal = SelectorButtonTextHorizontalPadding,
-                vertical = SelectorButtonTextVerticalPadding,
-            ),
+        modifier =
+            Modifier
+                .padding(horizontal = SelectorButtonHorizontalPadding)
+                .clip(RoundedCornerShape(SelectorButtonCornerRadius))
+                .background(
+                    color =
+                        if (isSelected) {
+                            color.copy(alpha = 0.15f)
+                        } else {
+                            MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f)
+                        },
+                    shape = RoundedCornerShape(SelectorButtonCornerRadius),
+                )
+                .clickable(onClick = onClick)
+                .padding(
+                    horizontal = SelectorButtonTextHorizontalPadding,
+                    vertical = SelectorButtonTextVerticalPadding,
+                ),
         contentAlignment = Alignment.Center,
     ) {
         Text(

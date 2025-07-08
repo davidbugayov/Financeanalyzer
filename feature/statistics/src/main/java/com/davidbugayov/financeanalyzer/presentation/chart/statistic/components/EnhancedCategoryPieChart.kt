@@ -50,10 +50,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
@@ -84,9 +84,10 @@ fun EnhancedCategoryPieChart(
     onShowExpensesChange: (Boolean) -> Unit = {},
 ) {
     // Filter out items with zero or negative percentages
-    val filteredData = remember(items, showExpenses) {
-        items.filter { it.percentage > 0f }
-    }
+    val filteredData =
+        remember(items, showExpenses) {
+            items.filter { it.percentage > 0f }
+        }
 
     if (filteredData.isEmpty()) {
         // Show empty state if no valid data
@@ -103,31 +104,34 @@ fun EnhancedCategoryPieChart(
     }
 
     // Calculate total amount from the filtered data
-    val totalMoney = remember(filteredData) {
-        val currency = filteredData.firstOrNull()?.money?.currency ?: Currency.RUB
-        val sum = filteredData.sumOf { it.money.amount }
-        Money(sum.setScale(currency.decimalPlaces, java.math.RoundingMode.HALF_EVEN), currency)
-    }
+    val totalMoney =
+        remember(filteredData) {
+            val currency = filteredData.firstOrNull()?.money?.currency ?: Currency.RUB
+            val sum = filteredData.sumOf { it.money.amount }
+            Money(sum.setScale(currency.decimalPlaces, java.math.RoundingMode.HALF_EVEN), currency)
+        }
 
     // State for selected indices - сбрасываем при смене типа (доходы/расходы)
-    val selectedIndices = remember(selectedIndex, filteredData, showExpenses) {
-        mutableStateOf(
-            if (selectedIndex != null && selectedIndex >= 0 && selectedIndex < filteredData.size) {
-                setOf(selectedIndex)
-            } else {
-                emptySet()
-            },
-        )
-    }
+    val selectedIndices =
+        remember(selectedIndex, filteredData, showExpenses) {
+            mutableStateOf(
+                if (selectedIndex != null && selectedIndex >= 0 && selectedIndex < filteredData.size) {
+                    setOf(selectedIndex)
+                } else {
+                    emptySet()
+                },
+            )
+        }
 
     // Get selected item if any
-    val selectedItem = when {
-        selectedIndices.value.isEmpty() -> null
-        else -> {
-            val index = selectedIndices.value.first()
-            if (index >= 0 && index < filteredData.size) filteredData[index] else null
+    val selectedItem =
+        when {
+            selectedIndices.value.isEmpty() -> null
+            else -> {
+                val index = selectedIndices.value.first()
+                if (index >= 0 && index < filteredData.size) filteredData[index] else null
+            }
         }
-    }
 
     // Determine if the first category is income
     val isIncome = filteredData.firstOrNull()?.original?.isExpense == false
@@ -138,55 +142,63 @@ fun EnhancedCategoryPieChart(
     // Увеличиваем карточку для отображения всех категорий
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = cardColor,
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(id = R.dimen.enhanced_pie_chart_card_elevation),
-        ),
-        shape = RoundedCornerShape(
-            dimensionResource(id = R.dimen.enhanced_pie_chart_card_corner_radius),
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = cardColor,
+            ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(id = R.dimen.enhanced_pie_chart_card_elevation),
+            ),
+        shape =
+            RoundedCornerShape(
+                dimensionResource(id = R.dimen.enhanced_pie_chart_card_corner_radius),
+            ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(
-                    all = dimensionResource(id = R.dimen.padding_medium), // Use standard padding
-                )
-                .clickable(
-                    interactionSource = remember { MutableInteractionSource() },
-                    indication = null, // Убираем визуальный эффект нажатия
-                ) {
-                    // Сбрасываем выбор только если что-то выбрано
-                    if (selectedIndices.value.isNotEmpty()) {
-                        selectedIndices.value = emptySet()
-                        onSectorClick(null)
-                    }
-                },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        all = dimensionResource(id = R.dimen.padding_medium), // Use standard padding
+                    )
+                    .clickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = null, // Убираем визуальный эффект нажатия
+                    ) {
+                        // Сбрасываем выбор только если что-то выбрано
+                        if (selectedIndices.value.isNotEmpty()) {
+                            selectedIndices.value = emptySet()
+                            onSectorClick(null)
+                        }
+                    },
         ) {
             // Горизонтальный переключатель доходы/расходы
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(bottom = dimensionResource(id = R.dimen.padding_medium)), // Use standard padding
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(bottom = dimensionResource(id = R.dimen.padding_medium)),
+                // Use standard padding
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
                     text = stringResource(R.string.chart_type_selector_expense),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal,
-                    ),
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = if (showExpenses) FontWeight.Bold else FontWeight.Normal,
+                        ),
                     color = if (showExpenses) LocalExpenseColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.clickable { onShowExpensesChange(true) },
                 )
 
                 Text(
                     text = stringResource(R.string.chart_type_selector_income),
-                    style = MaterialTheme.typography.titleMedium.copy(
-                        fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal,
-                    ),
+                    style =
+                        MaterialTheme.typography.titleMedium.copy(
+                            fontWeight = if (!showExpenses) FontWeight.Bold else FontWeight.Normal,
+                        ),
                     color = if (!showExpenses) LocalIncomeColor.current else MaterialTheme.colorScheme.onSurfaceVariant,
                     modifier = Modifier.clickable { onShowExpensesChange(false) },
                 )
@@ -194,39 +206,45 @@ fun EnhancedCategoryPieChart(
 
             // Диаграмма сверху (по центру) с меньшей высотой
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(dimensionResource(id = R.dimen.enhanced_pie_chart_size)), // Keep specific size
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(dimensionResource(id = R.dimen.enhanced_pie_chart_size)),
+                // Keep specific size
                 contentAlignment = Alignment.Center,
             ) {
                 DrawPieChart(
-                    modifier = Modifier.size(
-                        dimensionResource(id = R.dimen.enhanced_pie_chart_size),
-                    ), // Keep specific size
+                    modifier =
+                        Modifier.size(
+                            dimensionResource(id = R.dimen.enhanced_pie_chart_size),
+                        ),
+                    // Keep specific size
                     data = filteredData,
                     selectedIndices = selectedIndices.value,
                     onSectorClick = { index ->
                         // Обновляем выбранные индексы
-                        selectedIndices.value = when {
-                            // Если кликнули по центру или повторно по тому же сектору - сбрасываем выбор
-                            index < 0 || selectedIndices.value.contains(index) -> emptySet()
-                            // Иначе выбираем новый сектор, если индекс валидный
-                            index < filteredData.size -> setOf(index)
-                            // В случае невалидного индекса (что не должно происходить) - сохраняем текущее состояние
-                            else -> selectedIndices.value
-                        }
+                        selectedIndices.value =
+                            when {
+                                // Если кликнули по центру или повторно по тому же сектору - сбрасываем выбор
+                                index < 0 || selectedIndices.value.contains(index) -> emptySet()
+                                // Иначе выбираем новый сектор, если индекс валидный
+                                index < filteredData.size -> setOf(index)
+                                // В случае невалидного индекса (что не должно происходить) - сохраняем текущее состояние
+                                else -> selectedIndices.value
+                            }
 
                         // Оповещаем о выбранной категории или null, если ничего не выбрано
-                        val newSelectedItem = if (selectedIndices.value.isEmpty()) {
-                            null
-                        } else {
-                            val selectedIdx = selectedIndices.value.first()
-                            if (selectedIdx >= 0 && selectedIdx < filteredData.size) {
-                                filteredData[selectedIdx]
-                            } else {
+                        val newSelectedItem =
+                            if (selectedIndices.value.isEmpty()) {
                                 null
+                            } else {
+                                val selectedIdx = selectedIndices.value.first()
+                                if (selectedIdx >= 0 && selectedIdx < filteredData.size) {
+                                    filteredData[selectedIdx]
+                                } else {
+                                    null
+                                }
                             }
-                        }
 
                         onSectorClick(newSelectedItem)
                     },
@@ -245,10 +263,11 @@ fun EnhancedCategoryPieChart(
                 text = stringResource(id = R.string.enhanced_chart_category_list),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant,
-                modifier = Modifier.padding(
-                    start = dimensionResource(id = R.dimen.padding_small),
-                    bottom = dimensionResource(id = R.dimen.padding_small), // Use standard padding
-                ),
+                modifier =
+                    Modifier.padding(
+                        start = dimensionResource(id = R.dimen.padding_small),
+                        bottom = dimensionResource(id = R.dimen.padding_small), // Use standard padding
+                    ),
             )
 
             // Сортируем элементы по сумме (от большей к меньшей)
@@ -264,11 +283,15 @@ fun EnhancedCategoryPieChart(
 
             // Показываем все категории с высотой, подходящей для количества элементов
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = dimensionResource(id = R.dimen.padding_extra_small)) // Use standard padding
-                    .height(legendHeight) // Calculated height with constraints
-                    .verticalScroll(rememberScrollState()), // Оставляем скроллинг на всякий случай
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = dimensionResource(id = R.dimen.padding_extra_small),
+                        ) // Use standard padding
+                        .height(legendHeight) // Calculated height with constraints
+                        .verticalScroll(rememberScrollState()),
+                // Оставляем скроллинг на всякий случай
             ) {
                 // Выводим содержимое категорий для отладки
                 sortedItems.forEachIndexed { index, item ->
@@ -278,66 +301,73 @@ fun EnhancedCategoryPieChart(
 
                     // Строка категории (максимально компактная)
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable {
-                                selectedIndices.value = when {
-                                    selectedIndices.value.contains(originalIndex) -> emptySet()
-                                    else -> setOf(originalIndex)
-                                }
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .clickable {
+                                    selectedIndices.value =
+                                        when {
+                                            selectedIndices.value.contains(originalIndex) -> emptySet()
+                                            else -> setOf(originalIndex)
+                                        }
 
-                                val newSelectedItem = if (selectedIndices.value.isEmpty()) {
-                                    null
-                                } else {
-                                    val selectedIdx = selectedIndices.value.first()
-                                    if (selectedIdx >= 0 && selectedIdx < filteredData.size) {
-                                        filteredData[selectedIdx]
+                                    val newSelectedItem =
+                                        if (selectedIndices.value.isEmpty()) {
+                                            null
+                                        } else {
+                                            val selectedIdx = selectedIndices.value.first()
+                                            if (selectedIdx >= 0 && selectedIdx < filteredData.size) {
+                                                filteredData[selectedIdx]
+                                            } else {
+                                                null
+                                            }
+                                        }
+
+                                    onSectorClick(newSelectedItem)
+                                }
+                                .background(
+                                    if (isSelected) {
+                                        item.color.copy(alpha = 0.15f)
                                     } else {
-                                        null
-                                    }
-                                }
-
-                                onSectorClick(newSelectedItem)
-                            }
-                            .background(
-                                if (isSelected) {
-                                    item.color.copy(alpha = 0.15f)
-                                } else {
-                                    Color.Transparent
-                                },
-                            )
-                            .padding(
-                                vertical = dimensionResource(id = R.dimen.padding_extra_small),
-                                horizontal = dimensionResource(id = R.dimen.padding_tiny),
-                            ),
+                                        Color.Transparent
+                                    },
+                                )
+                                .padding(
+                                    vertical = dimensionResource(id = R.dimen.padding_extra_small),
+                                    horizontal = dimensionResource(id = R.dimen.padding_tiny),
+                                ),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Цветной индикатор категории
                         Box(
-                            modifier = Modifier
-                                .size(dimensionResource(id = R.dimen.legend_indicator_size)) // Use standard padding
-                                .background(
-                                    color = item.color,
-                                    shape = if (isSelected) {
-                                        RoundedCornerShape(
-                                            dimensionResource(id = R.dimen.radius_small),
-                                        )
-                                    } else {
-                                        CircleShape
-                                    },
-                                ),
+                            modifier =
+                                Modifier
+                                    .size(dimensionResource(id = R.dimen.legend_indicator_size)) // Use standard padding
+                                    .background(
+                                        color = item.color,
+                                        shape =
+                                            if (isSelected) {
+                                                RoundedCornerShape(
+                                                    dimensionResource(id = R.dimen.radius_small),
+                                                )
+                                            } else {
+                                                CircleShape
+                                            },
+                                    ),
                         )
 
                         // Название категории
                         Text(
                             text = item.name,
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
-                            ),
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Normal,
+                                ),
                             color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier
-                                .padding(start = dimensionResource(id = R.dimen.padding_small))
-                                .weight(1f),
+                            modifier =
+                                Modifier
+                                    .padding(start = dimensionResource(id = R.dimen.padding_small))
+                                    .weight(1f),
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
                         )
@@ -346,21 +376,24 @@ fun EnhancedCategoryPieChart(
                         val money = item.money
                         Text(
                             text = money.formatForDisplay(useMinimalDecimals = true),
-                            style = MaterialTheme.typography.bodySmall.copy(
-                                fontWeight = FontWeight.SemiBold,
-                            ),
+                            style =
+                                MaterialTheme.typography.bodySmall.copy(
+                                    fontWeight = FontWeight.SemiBold,
+                                ),
                             color = if (isSelected) MaterialTheme.colorScheme.onBackground else MaterialTheme.colorScheme.onSurfaceVariant,
-                            modifier = Modifier.padding(
-                                horizontal = dimensionResource(id = R.dimen.padding_tiny),
-                            ),
+                            modifier =
+                                Modifier.padding(
+                                    horizontal = dimensionResource(id = R.dimen.padding_tiny),
+                                ),
                         )
 
                         // Процент с цветом категории для выделенного элемента
                         Text(
-                            text = stringResource(
-                                R.string.enhanced_chart_percent_format,
-                                item.percentage,
-                            ),
+                            text =
+                                stringResource(
+                                    R.string.enhanced_chart_percent_format,
+                                    item.percentage,
+                                ),
                             style = MaterialTheme.typography.bodySmall,
                             color = if (isSelected) item.color else MaterialTheme.colorScheme.onSurfaceVariant,
                             modifier = Modifier.width(45.dp),
@@ -371,12 +404,13 @@ fun EnhancedCategoryPieChart(
                     // Тонкий разделитель после каждого элемента, кроме последнего
                     if (index < sortedItems.size - 1) {
                         Spacer(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(dimensionResource(id = R.dimen.divider_height))
-                                .background(
-                                    MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
-                                ),
+                            modifier =
+                                Modifier
+                                    .fillMaxWidth()
+                                    .height(dimensionResource(id = R.dimen.divider_height))
+                                    .background(
+                                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.1f),
+                                    ),
                         )
                     }
                 }
@@ -436,18 +470,23 @@ private fun DrawScope.drawInnerText(
     }
 }
 
-private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedItem: UiCategory) {
+private fun DrawScope.drawSelectedItemText(
+    center: Offset,
+    size: Size,
+    selectedItem: UiCategory,
+) {
     drawIntoCanvas { canvas ->
         val itemMoney = selectedItem.money
 
         val amountColor = selectedItem.color
-        val amountPaint = Paint().apply {
-            isAntiAlias = true
-            textSize = min(size.width, size.height) * DonutTextConstants.AMOUNT_TEXT_SIZE_FACTOR
-            color = amountColor.toArgb()
-            textAlign = Paint.Align.CENTER
-            isFakeBoldText = true
-        }
+        val amountPaint =
+            Paint().apply {
+                isAntiAlias = true
+                textSize = min(size.width, size.height) * DonutTextConstants.AMOUNT_TEXT_SIZE_FACTOR
+                color = amountColor.toArgb()
+                textAlign = Paint.Align.CENTER
+                isFakeBoldText = true
+            }
 
         // Рисуем сумму выше центра
         val amountY = center.y - amountPaint.descent() * DonutTextConstants.AMOUNT_Y_OFFSET_SELECTED
@@ -460,20 +499,22 @@ private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedI
         )
 
         // Рисуем название категории под суммой с цветом категории
-        val categoryPaint = Paint().apply {
-            color = selectedItem.color.toArgb()
-            textAlign = Paint.Align.CENTER
-            textSize = min(size.width, size.height) * DonutTextConstants.CATEGORY_TEXT_SIZE_FACTOR
-            isFakeBoldText = true
-            isAntiAlias = true
-        }
+        val categoryPaint =
+            Paint().apply {
+                color = selectedItem.color.toArgb()
+                textAlign = Paint.Align.CENTER
+                textSize = min(size.width, size.height) * DonutTextConstants.CATEGORY_TEXT_SIZE_FACTOR
+                isFakeBoldText = true
+                isAntiAlias = true
+            }
 
         // Обрезаем слишком длинные названия категорий
-        val categoryName = if (selectedItem.name.length > 15) {
-            "${selectedItem.name.take(12)}..."
-        } else {
-            selectedItem.name
-        }
+        val categoryName =
+            if (selectedItem.name.length > 15) {
+                "${selectedItem.name.take(12)}..."
+            } else {
+                selectedItem.name
+            }
 
         val categoryY = center.y + categoryPaint.descent() * DonutTextConstants.CATEGORY_Y_OFFSET
 
@@ -485,13 +526,14 @@ private fun DrawScope.drawSelectedItemText(center: Offset, size: Size, selectedI
         )
 
         // Рисуем процент ниже названия категории
-        val percentPaint = Paint().apply {
-            color = selectedItem.color.copy(alpha = 0.9f).toArgb()
-            textAlign = Paint.Align.CENTER
-            textSize = min(size.width, size.height) * DonutTextConstants.PERCENT_TEXT_SIZE_FACTOR
-            isAntiAlias = true
-            isFakeBoldText = true
-        }
+        val percentPaint =
+            Paint().apply {
+                color = selectedItem.color.copy(alpha = 0.9f).toArgb()
+                textAlign = Paint.Align.CENTER
+                textSize = min(size.width, size.height) * DonutTextConstants.PERCENT_TEXT_SIZE_FACTOR
+                isAntiAlias = true
+                isFakeBoldText = true
+            }
 
         val percentY = categoryY + percentPaint.descent() * DonutTextConstants.PERCENT_Y_OFFSET
 
@@ -517,14 +559,15 @@ private fun DrawScope.drawTotalAmountText(
     drawIntoCanvas { canvas ->
         val amountColor = if (isIncome) incomeColor else expenseColor
 
-        val amountPaint = Paint().apply {
-            color = amountColor.toArgb()
-            textAlign = Paint.Align.CENTER
-            textSize = min(size.width, size.height) * 0.11f
-            isFakeBoldText = true
-            isAntiAlias = true
-            letterSpacing = 0.02f
-        }
+        val amountPaint =
+            Paint().apply {
+                color = amountColor.toArgb()
+                textAlign = Paint.Align.CENTER
+                textSize = min(size.width, size.height) * 0.11f
+                isFakeBoldText = true
+                isAntiAlias = true
+                letterSpacing = 0.02f
+            }
 
         val amountY = center.y - amountPaint.descent() * DonutTextConstants.AMOUNT_Y_OFFSET_NORMAL
 
@@ -536,13 +579,14 @@ private fun DrawScope.drawTotalAmountText(
         )
 
         // Рисуем тип (доход/расход) - с цветом соответствующим типу
-        val typePaint = Paint().apply {
-            color = if (isIncome) incomeColor.toArgb() else expenseColor.toArgb()
-            textAlign = Paint.Align.CENTER
-            textSize = min(size.width, size.height) * DonutTextConstants.CATEGORY_TEXT_SIZE_FACTOR
-            isFakeBoldText = true
-            isAntiAlias = true
-        }
+        val typePaint =
+            Paint().apply {
+                color = if (isIncome) incomeColor.toArgb() else expenseColor.toArgb()
+                textAlign = Paint.Align.CENTER
+                textSize = min(size.width, size.height) * DonutTextConstants.CATEGORY_TEXT_SIZE_FACTOR
+                isFakeBoldText = true
+                isAntiAlias = true
+            }
 
         val typeY = center.y + typePaint.descent() * DonutTextConstants.TYPE_Y_OFFSET
 
@@ -570,13 +614,14 @@ private fun getClickedSectorIndex(
     // Сначала проверяем обычные секторы
     sectorAngles.forEachIndexed { index, (start, sweep, _) ->
         val end = (start + sweep) % 360f
-        val containsAngle = if (end < start) {
-            // Сектор пересекает границу 0°/360°
-            angle in start..360f || angle in 0f..end
-        } else {
-            // Обычный случай
-            angle in start..end
-        }
+        val containsAngle =
+            if (end < start) {
+                // Сектор пересекает границу 0°/360°
+                angle in start..360f || angle in 0f..end
+            } else {
+                // Обычный случай
+                angle in start..end
+            }
 
         if (containsAngle) {
             return index
@@ -589,24 +634,27 @@ private fun getClickedSectorIndex(
             // Для маленьких секторов увеличиваем зону обнаружения
             val end = (start + sweep) % 360f
             // Центр сектора
-            val midAngle = if (end < start) {
-                (start + 180f) % 360f
-            } else {
-                (start + sweep / 2f) % 360f
-            }
+            val midAngle =
+                if (end < start) {
+                    (start + 180f) % 360f
+                } else {
+                    (start + sweep / 2f) % 360f
+                }
 
             // Увеличиваем область до максимум 30°, но не менее размера сектора
-            val effectiveAngle = min(
-                sweep * DonutTextConstants.SMALL_SECTOR_DETECTION_MULTIPLIER,
-                DonutTextConstants.SMALL_SECTOR_MAX_DETECTION_ANGLE,
-            )
+            val effectiveAngle =
+                min(
+                    sweep * DonutTextConstants.SMALL_SECTOR_DETECTION_MULTIPLIER,
+                    DonutTextConstants.SMALL_SECTOR_MAX_DETECTION_ANGLE,
+                )
             val halfEffective = effectiveAngle / 2f
 
             // Проверка расстояния от центра сектора до места клика
-            val distanceToMid = min(
-                abs((angle - midAngle + 360f) % 360f),
-                abs((midAngle - angle + 360f) % 360f),
-            )
+            val distanceToMid =
+                min(
+                    abs((angle - midAngle + 360f) % 360f),
+                    abs((midAngle - angle + 360f) % 360f),
+                )
 
             if (distanceToMid <= halfEffective) {
                 return index
@@ -644,39 +692,45 @@ private fun DrawPieChart(
         )
         animatedProgress.animateTo(
             targetValue = 1f,
-            animationSpec = tween(
-                durationMillis = context.resources.getInteger(
-                    R.integer.enhanced_pie_chart_animation_duration,
+            animationSpec =
+                tween(
+                    durationMillis =
+                        context.resources.getInteger(
+                            R.integer.enhanced_pie_chart_animation_duration,
+                        ),
+                    easing = FastOutSlowInEasing,
                 ),
-                easing = FastOutSlowInEasing,
-            ),
         )
     }
 
     // Рассчитываем углы секторов для отрисовки и обработки кликов
-    val sectorAngles = remember(data, isIncome) {
-        val angles = mutableListOf<Triple<Float, Float, Float>>() // startAngle, sweepAngle, percentage
-        var currentAngle = 0f
+    val sectorAngles =
+        remember(data, isIncome) {
+            val angles = mutableListOf<Triple<Float, Float, Float>>() // startAngle, sweepAngle, percentage
+            var currentAngle = 0f
 
-        // Сначала вычисляем общую сумму процентов
-        val totalPercent = data.fold(BigDecimal.ZERO) { acc, item -> acc + item.percentage.toBigDecimal() }.toFloat()
+            // Сначала вычисляем общую сумму процентов
+            val totalPercent =
+                data.fold(
+                    BigDecimal.ZERO,
+                ) { acc, item -> acc + item.percentage.toBigDecimal() }.toFloat()
 
-        // Нормализуем до 100% для корректного отображения
-        val normalizationFactor = if (totalPercent > 0) 100f / totalPercent else 1f
+            // Нормализуем до 100% для корректного отображения
+            val normalizationFactor = if (totalPercent > 0) 100f / totalPercent else 1f
 
-        data.forEach { item -> // Нормализуем процент
-            val normalizedPercentage = item.percentage * normalizationFactor
-            val sweepAngle = normalizedPercentage * 3.6f // 360 / 100 = 3.6
+            data.forEach { item -> // Нормализуем процент
+                val normalizedPercentage = item.percentage * normalizationFactor
+                val sweepAngle = normalizedPercentage * 3.6f // 360 / 100 = 3.6
 
-            // Гарантируем минимальный угол для маленьких секторов при отрисовке - не менее 1°
-            val effectiveSweepAngle = max(sweepAngle, 1f)
+                // Гарантируем минимальный угол для маленьких секторов при отрисовке - не менее 1°
+                val effectiveSweepAngle = max(sweepAngle, 1f)
 
-            angles.add(Triple(currentAngle, effectiveSweepAngle, normalizedPercentage))
-            currentAngle += effectiveSweepAngle
+                angles.add(Triple(currentAngle, effectiveSweepAngle, normalizedPercentage))
+                currentAngle += effectiveSweepAngle
+            }
+
+            angles
         }
-
-        angles
-    }
 
     // Уникальный ключ для поддержки обновления pointerInput при изменении типа диаграммы
     val pointerInputKey = remember(isIncome) { System.currentTimeMillis() }
@@ -686,53 +740,55 @@ private fun DrawPieChart(
         contentAlignment = Alignment.Center,
     ) {
         Canvas(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(dimensionResource(id = R.dimen.padding_tiny))
-                .pointerInput(pointerInputKey) {
-                    detectTapGestures { offset ->
-                        val size = this.size
-                        val radius = min(size.width, size.height) / 2f * DonutTextConstants.OUTER_RADIUS_FACTOR
-                        val innerRadius = radius * DonutTextConstants.INNER_RADIUS_FACTOR
-                        val center = Offset(size.width / 2f, size.height / 2f)
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(dimensionResource(id = R.dimen.padding_tiny))
+                    .pointerInput(pointerInputKey) {
+                        detectTapGestures { offset ->
+                            val size = this.size
+                            val radius = min(size.width, size.height) / 2f * DonutTextConstants.OUTER_RADIUS_FACTOR
+                            val innerRadius = radius * DonutTextConstants.INNER_RADIUS_FACTOR
+                            val center = Offset(size.width / 2f, size.height / 2f)
 
-                        // Проверяем расстояние от центра
-                        val distanceFromCenter = (offset - center).getDistance()
+                            // Проверяем расстояние от центра
+                            val distanceFromCenter = (offset - center).getDistance()
 
-                        // Вычисляем угол клика
-                        val dx = offset.x - center.x
-                        val dy = offset.y - center.y
+                            // Вычисляем угол клика
+                            val dx = offset.x - center.x
+                            val dy = offset.y - center.y
 
-                        // Вычисляем угол в радианах и конвертируем в градусы
-                        val angleRad = atan2(dy, dx)
-                        var angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
+                            // Вычисляем угол в радианах и конвертируем в градусы
+                            val angleRad = atan2(dy, dx)
+                            var angleDeg = Math.toDegrees(angleRad.toDouble()).toFloat()
 
-                        // Нормализуем в диапазон [0, 360)
-                        if (angleDeg < 0) angleDeg += 360f
+                            // Нормализуем в диапазон [0, 360)
+                            if (angleDeg < 0) angleDeg += 360f
 
-                        // Получаем выбранный сектор
-                        val selectedSector = getClickedSectorIndex(
-                            angle = angleDeg,
-                            sectorAngles = sectorAngles,
-                            distance = distanceFromCenter,
-                            innerRadius = innerRadius,
-                            outerRadius = radius,
-                        )
+                            // Получаем выбранный сектор
+                            val selectedSector =
+                                getClickedSectorIndex(
+                                    angle = angleDeg,
+                                    sectorAngles = sectorAngles,
+                                    distance = distanceFromCenter,
+                                    innerRadius = innerRadius,
+                                    outerRadius = radius,
+                                )
 
-                        // Если сектор найден, логируем информацию
-                        if (selectedSector >= 0) {
-                            Timber.tag("[D]").d(
-                                "PieChart: выбран сектор №$selectedSector '${data[selectedSector].name}'",
-                            )
-                        } else {
-                            Timber.tag("[D]").d("PieChart: сектор не найден")
-                            // Если сектор не найден и есть выбранный элемент - сбрасываем выбор
-                            if (selectedIndices.isNotEmpty()) onSectorClick(-1)
+                            // Если сектор найден, логируем информацию
+                            if (selectedSector >= 0) {
+                                Timber.tag("[D]").d(
+                                    "PieChart: выбран сектор №$selectedSector '${data[selectedSector].name}'",
+                                )
+                            } else {
+                                Timber.tag("[D]").d("PieChart: сектор не найден")
+                                // Если сектор не найден и есть выбранный элемент - сбрасываем выбор
+                                if (selectedIndices.isNotEmpty()) onSectorClick(-1)
+                            }
+
+                            onSectorClick(selectedSector)
                         }
-
-                        onSectorClick(selectedSector)
-                    }
-                },
+                    },
         ) {
             val progressValue = animatedProgress.value
             val size = this.size
@@ -812,16 +868,18 @@ private fun DrawScope.drawDonutSection(
     // Предполагаем, что onSurface обеспечит хороший контраст с surface (который является holeColor)
     // val outlineBaseColor = MaterialTheme.colorScheme.onSurface // Убираем это
 
-    val outlineColors = object {
-        val outer = outlineBaseColor.copy(alpha = 0.4f)
-        val inner = outlineBaseColor.copy(alpha = 0.3f)
-    }
+    val outlineColors =
+        object {
+            val outer = outlineBaseColor.copy(alpha = 0.4f)
+            val inner = outlineBaseColor.copy(alpha = 0.3f)
+        }
 
     // Константы для ширины линий
-    val outlineWidths = object {
-        val outer = 1.5f
-        val inner = 1.0f
-    }
+    val outlineWidths =
+        object {
+            val outer = 1.5f
+            val inner = 1.0f
+        }
 
     // Рисуем внешний сектор
     drawArc(

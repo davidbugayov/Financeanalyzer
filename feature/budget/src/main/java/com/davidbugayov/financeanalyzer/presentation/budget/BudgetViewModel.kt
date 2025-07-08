@@ -7,17 +7,17 @@ import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.AllocateIncomeUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
-import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
-import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
+import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetEvent
+import com.davidbugayov.financeanalyzer.presentation.budget.model.BudgetState
+import java.util.UUID
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import java.util.UUID
 
 class BudgetViewModel(
     private val walletRepository: WalletRepository,
@@ -26,7 +26,6 @@ class BudgetViewModel(
     private val allocateIncomeUseCase: AllocateIncomeUseCase,
     val goalProgressUseCase: GoalProgressUseCase,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(BudgetState())
     val state: StateFlow<BudgetState> = _state.asStateFlow()
 
@@ -80,11 +79,12 @@ class BudgetViewModel(
             is BudgetEvent.DistributeIncome -> distributeIncome(event.amount)
             is BudgetEvent.AddFundsToWallet -> addFundsToWallet(event.categoryId, event.amount)
             is BudgetEvent.SpendFromWallet -> spendFromWallet(event.categoryId, event.amount)
-            is BudgetEvent.TransferBetweenWallets -> transferBetweenWallets(
-                event.fromCategoryId,
-                event.toCategoryId,
-                event.amount,
-            )
+            is BudgetEvent.TransferBetweenWallets ->
+                transferBetweenWallets(
+                    event.fromCategoryId,
+                    event.toCategoryId,
+                    event.amount,
+                )
             is BudgetEvent.SetPeriodDuration -> setPeriodDuration(event.days)
             is BudgetEvent.ResetPeriod -> resetPeriod(event.categoryId)
             is BudgetEvent.ResetAllPeriods -> resetAllPeriods()
@@ -144,18 +144,20 @@ class BudgetViewModel(
                     val walletTransactions = expenseTransactions.filter { it.category == wallet.name || it.categoryId == wallet.id }
 
                     // Рассчитываем сумму трат
-                    val totalSpent = walletTransactions.fold(Money.zero()) { acc, transaction ->
-                        if (transaction.isExpense) acc.plus(transaction.amount) else acc
-                    }
+                    val totalSpent =
+                        walletTransactions.fold(Money.zero()) { acc, transaction ->
+                            if (transaction.isExpense) acc.plus(transaction.amount) else acc
+                        }
 
                     // Если сумма трат изменилась, обновляем кошелек
                     if (totalSpent != wallet.spent) {
                         // Явно указываем linkedCategories со значением по умолчанию,
                         // чтобы избежать NullPointerException для кошельков без этого поля
-                        val updatedWallet = wallet.copy(
-                            spent = totalSpent,
-                            linkedCategories = wallet.linkedCategories,
-                        )
+                        val updatedWallet =
+                            wallet.copy(
+                                spent = totalSpent,
+                                linkedCategories = wallet.linkedCategories,
+                            )
                         walletRepository.updateWallet(updatedWallet)
                     }
                 }
@@ -189,18 +191,22 @@ class BudgetViewModel(
         }
     }
 
-    private fun addCategory(name: String, limit: Money) {
+    private fun addCategory(
+        name: String,
+        limit: Money,
+    ) {
         viewModelScope.launch {
             try {
                 _state.update { it.copy(isLoading = true) }
 
-                val newWallet = Wallet(
-                    name = name,
-                    limit = limit,
-                    spent = Money(0.0),
-                    id = UUID.randomUUID().toString(),
-                    balance = Money(0.0),
-                )
+                val newWallet =
+                    Wallet(
+                        name = name,
+                        limit = limit,
+                        spent = Money(0.0),
+                        id = UUID.randomUUID().toString(),
+                        balance = Money(0.0),
+                    )
 
                 // Добавляем кошелек в репозиторий
                 walletRepository.addWallet(newWallet)
@@ -292,17 +298,21 @@ class BudgetViewModel(
     /**
      * Добавляет средства в выбранный кошелек
      */
-    private fun addFundsToWallet(walletId: String, amount: Money) {
+    private fun addFundsToWallet(
+        walletId: String,
+        amount: Money,
+    ) {
         viewModelScope.launch {
             try {
                 // Получаем кошелек по ID
                 val wallet = walletRepository.getWalletById(walletId) ?: return@launch
 
                 // Обновляем баланс кошелька
-                val updatedWallet = wallet.copy(
-                    balance = wallet.balance.plus(amount),
-                    linkedCategories = wallet.linkedCategories,
-                )
+                val updatedWallet =
+                    wallet.copy(
+                        balance = wallet.balance.plus(amount),
+                        linkedCategories = wallet.linkedCategories,
+                    )
 
                 // Сохраняем обновленный кошелек
                 walletRepository.updateWallet(updatedWallet)
@@ -325,7 +335,10 @@ class BudgetViewModel(
     /**
      * Тратит средства из выбранного кошелька
      */
-    private fun spendFromWallet(walletId: String, amount: Money) {
+    private fun spendFromWallet(
+        walletId: String,
+        amount: Money,
+    ) {
         viewModelScope.launch {
             try {
                 // Получаем кошелек по ID
@@ -342,11 +355,12 @@ class BudgetViewModel(
                 }
 
                 // Обновляем баланс и сумму трат кошелька
-                val updatedWallet = wallet.copy(
-                    balance = wallet.balance.minus(amount),
-                    spent = wallet.spent.plus(amount),
-                    linkedCategories = wallet.linkedCategories,
-                )
+                val updatedWallet =
+                    wallet.copy(
+                        balance = wallet.balance.minus(amount),
+                        spent = wallet.spent.plus(amount),
+                        linkedCategories = wallet.linkedCategories,
+                    )
 
                 // Сохраняем обновленный кошелек
                 walletRepository.updateWallet(updatedWallet)
@@ -369,7 +383,11 @@ class BudgetViewModel(
     /**
      * Переводит средства между кошельками
      */
-    private fun transferBetweenWallets(fromWalletId: String, toWalletId: String, amount: Money) {
+    private fun transferBetweenWallets(
+        fromWalletId: String,
+        toWalletId: String,
+        amount: Money,
+    ) {
         viewModelScope.launch {
             try {
                 // Получаем кошельки по ID
@@ -387,15 +405,17 @@ class BudgetViewModel(
                 }
 
                 // Обновляем балансы кошельков
-                val updatedFromWallet = fromWallet.copy(
-                    balance = fromWallet.balance.minus(amount),
-                    linkedCategories = fromWallet.linkedCategories,
-                )
+                val updatedFromWallet =
+                    fromWallet.copy(
+                        balance = fromWallet.balance.minus(amount),
+                        linkedCategories = fromWallet.linkedCategories,
+                    )
 
-                val updatedToWallet = toWallet.copy(
-                    balance = toWallet.balance.plus(amount),
-                    linkedCategories = toWallet.linkedCategories,
-                )
+                val updatedToWallet =
+                    toWallet.copy(
+                        balance = toWallet.balance.plus(amount),
+                        linkedCategories = toWallet.linkedCategories,
+                    )
 
                 // Сохраняем обновленные кошельки
                 walletRepository.updateWallet(updatedFromWallet)
@@ -427,10 +447,11 @@ class BudgetViewModel(
 
                 // Устанавливаем новую продолжительность периода для каждого кошелька
                 wallets.forEach { wallet ->
-                    val updatedWallet = wallet.copy(
-                        periodDuration = days,
-                        linkedCategories = wallet.linkedCategories,
-                    )
+                    val updatedWallet =
+                        wallet.copy(
+                            periodDuration = days,
+                            linkedCategories = wallet.linkedCategories,
+                        )
                     walletRepository.updateWallet(updatedWallet)
                 }
 
@@ -462,11 +483,12 @@ class BudgetViewModel(
                 val wallet = walletRepository.getWalletById(walletId) ?: return@launch
 
                 // Сбрасываем период и потраченную сумму
-                val updatedWallet = wallet.copy(
-                    periodStartDate = System.currentTimeMillis(),
-                    spent = Money(0.0),
-                    linkedCategories = wallet.linkedCategories,
-                )
+                val updatedWallet =
+                    wallet.copy(
+                        periodStartDate = System.currentTimeMillis(),
+                        spent = Money(0.0),
+                        linkedCategories = wallet.linkedCategories,
+                    )
 
                 // Сохраняем обновленный кошелек
                 walletRepository.updateWallet(updatedWallet)
@@ -497,11 +519,12 @@ class BudgetViewModel(
 
                 // Сбрасываем периоды и потраченные суммы для всех кошельков
                 wallets.forEach { wallet ->
-                    val updatedWallet = wallet.copy(
-                        periodStartDate = System.currentTimeMillis(),
-                        spent = Money(0.0),
-                        linkedCategories = wallet.linkedCategories,
-                    )
+                    val updatedWallet =
+                        wallet.copy(
+                            periodStartDate = System.currentTimeMillis(),
+                            spent = Money(0.0),
+                            linkedCategories = wallet.linkedCategories,
+                        )
                     walletRepository.updateWallet(updatedWallet)
                 }
 
@@ -530,10 +553,11 @@ class BudgetViewModel(
 
                 // Удаляем все кошельки с определенными именами
                 // (сохраняем кошельки созданные пользователем)
-                val walletsToRemove = wallets.filter {
-                    it.name == "Продукты" || it.name == "Транспорт" || // Можно добавить и другие имена тестовых кошельков, если они есть
-                        it.name == "Развлечения" && it.linkedCategories.isEmpty() // Удаляем пустой кошелек "Развлечения" без связанных категорий
-                }
+                val walletsToRemove =
+                    wallets.filter {
+                        it.name == "Продукты" || it.name == "Транспорт" || // Можно добавить и другие имена тестовых кошельков, если они есть
+                            it.name == "Развлечения" && it.linkedCategories.isEmpty() // Удаляем пустой кошелек "Развлечения" без связанных категорий
+                    }
 
                 // Удаляем выбранные кошельки
                 walletsToRemove.forEach { wallet ->

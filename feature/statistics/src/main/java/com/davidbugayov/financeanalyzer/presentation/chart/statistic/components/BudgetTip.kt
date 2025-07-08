@@ -13,33 +13,41 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
-import com.davidbugayov.financeanalyzer.feature.statistics.R
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.dimensionResource
+import com.davidbugayov.financeanalyzer.feature.statistics.R
 
 @Composable
-fun BudgetTip(icon: ImageVector, title: String, description: String, modifier: Modifier = Modifier) {
+fun BudgetTip(
+    icon: ImageVector,
+    title: String,
+    description: String,
+    modifier: Modifier = Modifier,
+) {
     Surface(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.budget_tip_vertical_margin)),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.budget_tip_vertical_margin)),
         shape = RoundedCornerShape(dimensionResource(R.dimen.budget_tip_corner_radius)),
         tonalElevation = dimensionResource(R.dimen.budget_tip_elevation),
         color = MaterialTheme.colorScheme.surfaceVariant,
     ) {
         Row(
-            modifier = Modifier
-                .padding(dimensionResource(R.dimen.budget_tip_content_padding)),
+            modifier =
+                Modifier
+                    .padding(dimensionResource(R.dimen.budget_tip_content_padding)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = null,
                 tint = MaterialTheme.colorScheme.primary,
-                modifier = Modifier.padding(
-                    end = dimensionResource(R.dimen.budget_tip_icon_end_padding),
-                ),
+                modifier =
+                    Modifier.padding(
+                        end = dimensionResource(R.dimen.budget_tip_icon_end_padding),
+                    ),
             )
             Column(
                 verticalArrangement = Arrangement.Center,

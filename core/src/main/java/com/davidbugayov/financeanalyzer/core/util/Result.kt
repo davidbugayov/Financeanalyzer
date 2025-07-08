@@ -6,7 +6,6 @@ import com.davidbugayov.financeanalyzer.core.model.AppException
  * Sealed класс для представления результата операции
  */
 sealed class Result<out T> {
-
     /**
      * Успешный результат операции
      */
@@ -18,7 +17,6 @@ sealed class Result<out T> {
     data class Error(val exception: AppException) : Result<Nothing>()
 
     companion object {
-
         /**
          * Создает успешный результат
          */
@@ -32,10 +30,11 @@ sealed class Result<out T> {
         /**
          * Создает результат из блока кода
          */
-        inline fun <T> of(block: () -> T): Result<T> = try {
-            Success(block())
-        } catch (e: Exception) {
-            Error(AppException.mapException(e))
-        }
+        inline fun <T> of(block: () -> T): Result<T> =
+            try {
+                Success(block())
+            } catch (e: Exception) {
+                Error(AppException.mapException(e))
+            }
     }
 }

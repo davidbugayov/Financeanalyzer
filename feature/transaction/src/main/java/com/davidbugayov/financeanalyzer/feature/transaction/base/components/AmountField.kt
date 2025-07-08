@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
@@ -25,7 +26,6 @@ import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
@@ -65,39 +65,42 @@ fun AmountField(
             internalRawAmount = amount
         }
 
-        val textToShow = if (isFocused) {
-            internalRawAmount
-        } else {
-            val numericValue = internalRawAmount.toDoubleOrNull()
-            if (numericValue != null) {
-                // Format number without currency symbol and drop trailing .00
-                val formattedWithSymbol = Money(numericValue).format()
-                val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
-                val sep = Money(numericValue).currency.decimalSeparator.toString()
-                val zeroSuffix = sep + "0".repeat(Money(numericValue).currency.decimalPlaces)
-                if (withoutSymbol.endsWith(zeroSuffix)) {
-                    withoutSymbol.removeSuffix(zeroSuffix)
-                } else {
-                    withoutSymbol
-                }
-            } else {
+        val textToShow =
+            if (isFocused) {
                 internalRawAmount
+            } else {
+                val numericValue = internalRawAmount.toDoubleOrNull()
+                if (numericValue != null) {
+                    // Format number without currency symbol and drop trailing .00
+                    val formattedWithSymbol = Money(numericValue).format()
+                    val withoutSymbol = formattedWithSymbol.substringBeforeLast(" ")
+                    val sep = Money(numericValue).currency.decimalSeparator.toString()
+                    val zeroSuffix = sep + "0".repeat(Money(numericValue).currency.decimalPlaces)
+                    if (withoutSymbol.endsWith(zeroSuffix)) {
+                        withoutSymbol.removeSuffix(zeroSuffix)
+                    } else {
+                        withoutSymbol
+                    }
+                } else {
+                    internalRawAmount
+                }
             }
-        }
 
         // Обновляем textFieldValueForDisplay, только если текст действительно изменился
         if (textFieldValueForDisplay.text != textToShow) {
-            textFieldValueForDisplay = TextFieldValue(
-                text = textToShow,
-                selection = TextRange(textToShow.length),
-            )
+            textFieldValueForDisplay =
+                TextFieldValue(
+                    text = textToShow,
+                    selection = TextRange(textToShow.length),
+                )
         }
     }
 
     Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 0.dp),
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp, vertical = 0.dp),
     ) {
         OutlinedTextField(
             value = textFieldValueForDisplay,
@@ -115,50 +118,59 @@ fun AmountField(
                 if (isFocused) {
                     // Важно сохранить позицию курсора относительно текста без пробелов
                     val originalSelection = newTextFieldValue.selection
-                    val newSelectionStart = originalSelection.start - newTextFieldValue.text.substring(
-                        0,
-                        originalSelection.start,
-                    ).count { it == ' ' }
-                    val newSelectionEnd = originalSelection.end - newTextFieldValue.text.substring(
-                        0,
-                        originalSelection.end,
-                    ).count { it == ' ' }
+                    val newSelectionStart =
+                        originalSelection.start -
+                            newTextFieldValue.text.substring(
+                                0,
+                                originalSelection.start,
+                            ).count { it == ' ' }
+                    val newSelectionEnd =
+                        originalSelection.end -
+                            newTextFieldValue.text.substring(
+                                0,
+                                originalSelection.end,
+                            ).count { it == ' ' }
 
-                    textFieldValueForDisplay = TextFieldValue(
-                        text = rawTextWithoutSpaces,
-                        selection = TextRange(
-                            start = newSelectionStart.coerceIn(0, rawTextWithoutSpaces.length),
-                            end = newSelectionEnd.coerceIn(0, rawTextWithoutSpaces.length),
-                        ),
-                    )
+                    textFieldValueForDisplay =
+                        TextFieldValue(
+                            text = rawTextWithoutSpaces,
+                            selection =
+                                TextRange(
+                                    start = newSelectionStart.coerceIn(0, rawTextWithoutSpaces.length),
+                                    end = newSelectionEnd.coerceIn(0, rawTextWithoutSpaces.length),
+                                ),
+                        )
                 }
                 // Если поле теряет фокус, LaunchedEffect(amount, isFocused)
                 // позаботится о форматировании и обновлении textFieldValueForDisplay.
             },
-            modifier = Modifier
-                .fillMaxWidth()
-                .onFocusChanged { focusState ->
-                    isFocused = focusState.isFocused
-                    // При потере фокуса (isFocused стало false),
-                    // LaunchedEffect(amount, isFocused) автоматически применит форматирование.
-                    // При получении фокуса (isFocused стало true),
-                    // LaunchedEffect(amount, isFocused) отобразит "сырое" значение.
-                },
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .onFocusChanged { focusState ->
+                        isFocused = focusState.isFocused
+                        // При потере фокуса (isFocused стало false),
+                        // LaunchedEffect(amount, isFocused) автоматически применит форматирование.
+                        // При получении фокуса (isFocused стало true),
+                        // LaunchedEffect(amount, isFocused) отобразит "сырое" значение.
+                    },
             keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
-            textStyle = MaterialTheme.typography.titleLarge.copy(
-                textAlign = TextAlign.End,
-                fontWeight = FontWeight.Bold,
-                color = accentColor,
-            ),
+            textStyle =
+                MaterialTheme.typography.titleLarge.copy(
+                    textAlign = TextAlign.End,
+                    fontWeight = FontWeight.Bold,
+                    color = accentColor,
+                ),
             singleLine = true,
             minLines = 1,
             isError = isError,
             placeholder = {
                 Text(
                     text = "0",
-                    style = MaterialTheme.typography.titleLarge.copy(
-                        textAlign = TextAlign.End,
-                    ),
+                    style =
+                        MaterialTheme.typography.titleLarge.copy(
+                            textAlign = TextAlign.End,
+                        ),
                     modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.End,
                     color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.5f),
@@ -178,13 +190,15 @@ fun AmountField(
         )
     }
     Row(
-        horizontalArrangement = Arrangement.spacedBy(
-            space = 6.dp,
-            alignment = Alignment.CenterHorizontally,
-        ),
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp),
+        horizontalArrangement =
+            Arrangement.spacedBy(
+                space = 6.dp,
+                alignment = Alignment.CenterHorizontally,
+            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         val opButtons = listOf("+", "-", "×", "÷")
@@ -193,11 +207,12 @@ fun AmountField(
                 onClick = {
                     // Работаем с internalRawAmount для добавления операторов
                     val currentTextForOps = internalRawAmount
-                    val textWithPotentialSpace = if (currentTextForOps.isNotEmpty() && currentTextForOps.last().isDigit()) {
-                        "$currentTextForOps "
-                    } else {
-                        currentTextForOps
-                    }
+                    val textWithPotentialSpace =
+                        if (currentTextForOps.isNotEmpty() && currentTextForOps.last().isDigit()) {
+                            "$currentTextForOps "
+                        } else {
+                            currentTextForOps
+                        }
                     val newRawText = "$textWithPotentialSpace$op "
 
                     internalRawAmount = newRawText // Обновляем внутреннее "сырое" значение
@@ -206,10 +221,11 @@ fun AmountField(
                     // Если поле в фокусе, немедленно обновляем textFieldValueForDisplay
                     // для отображения добавленного оператора.
                     if (isFocused) {
-                        textFieldValueForDisplay = TextFieldValue(
-                            text = newRawText,
-                            selection = TextRange(newRawText.length),
-                        )
+                        textFieldValueForDisplay =
+                            TextFieldValue(
+                                text = newRawText,
+                                selection = TextRange(newRawText.length),
+                            )
                     }
                     // Если поле не в фокусе, LaunchedEffect(amount, isFocused)
                     // обновит textFieldValueForDisplay (скорее всего, оставит newRawText, т.к. это выражение).

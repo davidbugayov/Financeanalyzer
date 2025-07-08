@@ -1,25 +1,25 @@
 package com.davidbugayov.financeanalyzer.feature.transaction.presentation.transaction.add
 
 import android.os.Bundle
+import android.os.SystemClock
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
-import com.davidbugayov.financeanalyzer.feature.transaction.R
-import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionScreen
-import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
-import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
-import android.os.SystemClock
+import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.feature.transaction.add.AddTransactionViewModel
+import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionScreen
+import com.davidbugayov.financeanalyzer.feature.transaction.base.defaultTransactionEventFactory
+import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
@@ -146,11 +146,12 @@ fun AddTransactionScreen(
                 "navigate_back",
                 mapOf(
                     "screen" to "add_transaction",
-                    "has_unsaved_changes" to (
-                        state.amount.isNotBlank() ||
-                            state.title.isNotBlank() ||
-                            state.category.isNotBlank() ||
-                            state.note.isNotBlank()
+                    "has_unsaved_changes" to
+                        (
+                            state.amount.isNotBlank() ||
+                                state.title.isNotBlank() ||
+                                state.category.isNotBlank() ||
+                                state.note.isNotBlank()
                         ).toString(),
                 ),
             )

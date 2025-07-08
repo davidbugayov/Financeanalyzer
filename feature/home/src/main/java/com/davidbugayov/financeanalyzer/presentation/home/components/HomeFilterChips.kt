@@ -26,18 +26,23 @@ import timber.log.Timber
  * @param onFilterSelected Callback, вызываемый при выборе фильтра
  */
 @Composable
-fun PermissionUtilsHomeFilterChips(currentFilter: TransactionFilter, onFilterSelected: (TransactionFilter) -> Unit) {
-    val filters = listOf(
-        FilterChipData(TransactionFilter.TODAY, R.string.filter_today),
-        FilterChipData(TransactionFilter.WEEK, R.string.filter_week),
-        FilterChipData(TransactionFilter.MONTH, R.string.filter_month),
-        FilterChipData(TransactionFilter.ALL, R.string.all),
-    )
+fun PermissionUtilsHomeFilterChips(
+    currentFilter: TransactionFilter,
+    onFilterSelected: (TransactionFilter) -> Unit,
+) {
+    val filters =
+        listOf(
+            FilterChipData(TransactionFilter.TODAY, R.string.filter_today),
+            FilterChipData(TransactionFilter.WEEK, R.string.filter_week),
+            FilterChipData(TransactionFilter.MONTH, R.string.filter_month),
+            FilterChipData(TransactionFilter.ALL, R.string.all),
+        )
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(8.dp),
     ) {
         filters.forEach { filterData ->
@@ -56,7 +61,11 @@ fun PermissionUtilsHomeFilterChips(currentFilter: TransactionFilter, onFilterSel
 private data class FilterChipData(val filter: TransactionFilter, val labelRes: Int)
 
 @Composable
-private fun FilterChipItem(filterData: FilterChipData, isSelected: Boolean, onClick: () -> Unit) {
+private fun FilterChipItem(
+    filterData: FilterChipData,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+) {
     val selectedContainerColor = MaterialTheme.colorScheme.primaryContainer
     val selectedLabelColor = MaterialTheme.colorScheme.onPrimaryContainer
     val unselectedContainerColor = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
@@ -73,18 +82,22 @@ private fun FilterChipItem(filterData: FilterChipData, isSelected: Boolean, onCl
                 fontWeight = if (isSelected) FontWeight.Bold else FontWeight.Medium,
             )
         },
-        colors = FilterChipDefaults.filterChipColors(
-            selectedContainerColor = selectedContainerColor,
-            selectedLabelColor = selectedLabelColor,
-            containerColor = unselectedContainerColor,
-            labelColor = unselectedLabelColor,
-        ),
+        colors =
+            FilterChipDefaults.filterChipColors(
+                selectedContainerColor = selectedContainerColor,
+                selectedLabelColor = selectedLabelColor,
+                containerColor = unselectedContainerColor,
+                labelColor = unselectedLabelColor,
+            ),
         border = BorderStroke(1.2.dp, borderColor),
     )
 }
 
 @Composable
-fun HomeFilterChips(currentFilter: TransactionFilter, onFilterSelected: (TransactionFilter) -> Unit) {
+fun HomeFilterChips(
+    currentFilter: TransactionFilter,
+    onFilterSelected: (TransactionFilter) -> Unit,
+) {
     PermissionUtilsHomeFilterChips(
         currentFilter = currentFilter,
         onFilterSelected = onFilterSelected,

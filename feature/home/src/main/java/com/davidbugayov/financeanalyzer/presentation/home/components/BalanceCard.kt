@@ -17,9 +17,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
@@ -32,11 +32,12 @@ import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 private fun BalanceCardTitle(balance: Money) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
-    val titleColor = if (balance.amount.signum() >= 0) {
-        incomeColor.copy(alpha = 0.7f)
-    } else {
-        expenseColor.copy(alpha = 0.7f)
-    }
+    val titleColor =
+        if (balance.amount.signum() >= 0) {
+            incomeColor.copy(alpha = 0.7f)
+        } else {
+            expenseColor.copy(alpha = 0.7f)
+        }
     Text(
         text = stringResource(R.string.current_balance),
         style = MaterialTheme.typography.titleMedium,
@@ -60,7 +61,10 @@ private fun BalanceCardAmount(balance: Money) {
 }
 
 @Composable
-fun BalanceCard(balance: Money, modifier: Modifier = Modifier) {
+fun BalanceCard(
+    balance: Money,
+    modifier: Modifier = Modifier,
+) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val cardColor = MaterialTheme.colorScheme.background
@@ -72,9 +76,10 @@ fun BalanceCard(balance: Money, modifier: Modifier = Modifier) {
         border = BorderStroke(width = 3.dp, color = balanceTextColor),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(vertical = 16.dp, horizontal = 16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(vertical = 16.dp, horizontal = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
         ) {
             BalanceCardTitle(balance)

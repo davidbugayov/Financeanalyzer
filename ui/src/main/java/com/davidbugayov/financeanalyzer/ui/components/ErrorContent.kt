@@ -22,11 +22,15 @@ import com.davidbugayov.financeanalyzer.ui.R
  * @param onRetry Callback, вызываемый при нажатии на кнопку повтора
  */
 @Composable
-fun ErrorContent(error: String?, onRetry: () -> Unit) {
+fun ErrorContent(
+    error: String?,
+    onRetry: () -> Unit,
+) {
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(vertical = 16.dp),
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .padding(vertical = 16.dp),
         verticalArrangement = Arrangement.Center,
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {

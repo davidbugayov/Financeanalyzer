@@ -10,7 +10,6 @@ import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
 
 object PermissionDialogs {
-
     @Composable
     fun SettingsPermissionDialog(
         titleResId: Int = R.string.permission_required,

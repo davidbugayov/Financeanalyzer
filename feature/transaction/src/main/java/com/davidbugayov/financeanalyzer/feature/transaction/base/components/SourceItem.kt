@@ -42,38 +42,42 @@ fun SourceItem(
 ) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(80.dp)
-            .combinedClickable(
-                onClick = onClick,
-                onLongClick = onLongClick,
-            )
-            .padding(vertical = 8.dp),
+        modifier =
+            Modifier
+                .width(80.dp)
+                .combinedClickable(
+                    onClick = onClick,
+                    onLongClick = onLongClick,
+                )
+                .padding(vertical = 8.dp),
     ) {
         Box(
-            modifier = Modifier
-                .size(60.dp)
-                .clip(CircleShape)
-                .background(
-                    if (isError) {
-                        SourceItemErrorBackgroundColor
-                    } else {
-                        Color(source.color)
-                    },
-                )
-                .border(
-                    width = when {
-                        isSelected -> SourceItemBorderWidth
-                        isError -> SourceItemBorderWidth
-                        else -> SourceItemNoBorderWidth
-                    },
-                    color = when {
-                        isSelected -> MaterialTheme.colorScheme.primary
-                        isError -> MaterialTheme.colorScheme.error
-                        else -> Color.Transparent
-                    },
-                    shape = CircleShape,
-                ),
+            modifier =
+                Modifier
+                    .size(60.dp)
+                    .clip(CircleShape)
+                    .background(
+                        if (isError) {
+                            SourceItemErrorBackgroundColor
+                        } else {
+                            Color(source.color)
+                        },
+                    )
+                    .border(
+                        width =
+                            when {
+                                isSelected -> SourceItemBorderWidth
+                                isError -> SourceItemBorderWidth
+                                else -> SourceItemNoBorderWidth
+                            },
+                        color =
+                            when {
+                                isSelected -> MaterialTheme.colorScheme.primary
+                                isError -> MaterialTheme.colorScheme.error
+                                else -> Color.Transparent
+                            },
+                        shape = CircleShape,
+                    ),
             contentAlignment = Alignment.Center,
         ) {
             // Здесь можно добавить иконку для источника

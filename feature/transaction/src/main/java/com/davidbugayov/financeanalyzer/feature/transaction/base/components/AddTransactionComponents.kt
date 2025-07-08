@@ -53,12 +53,14 @@ fun CategoryPickerDialog(
         text = {
             LazyVerticalGrid(
                 columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.category_dialog_item_spacing),
-                ),
-                verticalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.category_dialog_item_spacing),
-                ),
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        dimensionResource(R.dimen.category_dialog_item_spacing),
+                    ),
+                verticalArrangement =
+                    Arrangement.spacedBy(
+                        dimensionResource(R.dimen.category_dialog_item_spacing),
+                    ),
             ) {
                 items(categories) { category ->
                     CategoryItemButton(
@@ -87,19 +89,24 @@ fun CategoryPickerDialog(
  * Кнопка категории в диалоге выбора
  */
 @Composable
-fun CategoryItemButton(category: UiCategory, onClick: () -> Unit) {
+fun CategoryItemButton(
+    category: UiCategory,
+    onClick: () -> Unit,
+) {
     val backgroundColor = category.color
     val contentColor = contentColorFor(backgroundColor = backgroundColor)
 
     Surface(
-        modifier = Modifier
-            .aspectRatio(1f)
-            .clickable(onClick = onClick),
+        modifier =
+            Modifier
+                .aspectRatio(1f)
+                .clickable(onClick = onClick),
         shape = MaterialTheme.shapes.medium,
-        border = BorderStroke(
-            dimensionResource(R.dimen.category_dialog_item_border),
-            backgroundColor.copy(alpha = 0.7f),
-        ),
+        border =
+            BorderStroke(
+                dimensionResource(R.dimen.category_dialog_item_border),
+                backgroundColor.copy(alpha = 0.7f),
+            ),
         color = backgroundColor,
     ) {
         Column(
@@ -113,9 +120,10 @@ fun CategoryItemButton(category: UiCategory, onClick: () -> Unit) {
                 tint = contentColor,
             )
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.category_dialog_item_spacing_vertical),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.category_dialog_item_spacing_vertical),
+                    ),
             )
             Text(
                 text = category.name,
@@ -162,55 +170,65 @@ fun CustomCategoryDialog(
                     )
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(6),
-                        horizontalArrangement = Arrangement.spacedBy(
-                            dimensionResource(R.dimen.spacing_tiny),
-                        ),
-                        verticalArrangement = Arrangement.spacedBy(
-                            dimensionResource(R.dimen.spacing_tiny),
-                        ),
-                        contentPadding = PaddingValues(
-                            top = dimensionResource(R.dimen.spacing_tiny),
-                        ),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .heightIn(
-                                min = dimensionResource(
-                                    R.dimen.category_dialog_icon_grid_max_height,
-                                ) / 2,
-                                max = dimensionResource(
-                                    R.dimen.category_dialog_icon_grid_max_height,
-                                ),
+                        horizontalArrangement =
+                            Arrangement.spacedBy(
+                                dimensionResource(R.dimen.spacing_tiny),
                             ),
+                        verticalArrangement =
+                            Arrangement.spacedBy(
+                                dimensionResource(R.dimen.spacing_tiny),
+                            ),
+                        contentPadding =
+                            PaddingValues(
+                                top = dimensionResource(R.dimen.spacing_tiny),
+                            ),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .heightIn(
+                                    min =
+                                        dimensionResource(
+                                            R.dimen.category_dialog_icon_grid_max_height,
+                                        ) / 2,
+                                    max =
+                                        dimensionResource(
+                                            R.dimen.category_dialog_icon_grid_max_height,
+                                        ),
+                                ),
                     ) {
                         items(availableIcons) { icon ->
                             Surface(
                                 shape = MaterialTheme.shapes.medium,
-                                color = if (icon == selectedIcon) {
-                                    MaterialTheme.colorScheme.primary.copy(
-                                        alpha = 0.2f,
-                                    )
-                                } else {
-                                    Color.Transparent
-                                },
-                                border = if (icon == selectedIcon) {
-                                    BorderStroke(
-                                        dimensionResource(R.dimen.category_dialog_icon_border),
-                                        MaterialTheme.colorScheme.primary,
-                                    )
-                                } else {
-                                    null
-                                },
-                                modifier = Modifier
-                                    .size(dimensionResource(R.dimen.category_dialog_icon_size))
-                                    .clickable { onIconSelected(icon) },
+                                color =
+                                    if (icon == selectedIcon) {
+                                        MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.2f,
+                                        )
+                                    } else {
+                                        Color.Transparent
+                                    },
+                                border =
+                                    if (icon == selectedIcon) {
+                                        BorderStroke(
+                                            dimensionResource(R.dimen.category_dialog_icon_border),
+                                            MaterialTheme.colorScheme.primary,
+                                        )
+                                    } else {
+                                        null
+                                    },
+                                modifier =
+                                    Modifier
+                                        .size(dimensionResource(R.dimen.category_dialog_icon_size))
+                                        .clickable { onIconSelected(icon) },
                             ) {
                                 Icon(
                                     imageVector = icon,
                                     contentDescription = null,
                                     tint = MaterialTheme.colorScheme.primary,
-                                    modifier = Modifier.padding(
-                                        dimensionResource(R.dimen.padding_small),
-                                    ),
+                                    modifier =
+                                        Modifier.padding(
+                                            dimensionResource(R.dimen.padding_small),
+                                        ),
                                 )
                             }
                         }
@@ -221,10 +239,11 @@ fun CustomCategoryDialog(
         confirmButton = {
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(
-                    dimensionResource(R.dimen.spacing_small),
-                    Alignment.End,
-                ),
+                horizontalArrangement =
+                    Arrangement.spacedBy(
+                        dimensionResource(R.dimen.spacing_small),
+                        Alignment.End,
+                    ),
             ) {
                 TextButton(onClick = onDismiss) {
                     Text(stringResource(R.string.cancel))

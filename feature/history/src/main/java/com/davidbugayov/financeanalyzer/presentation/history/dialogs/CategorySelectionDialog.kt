@@ -65,9 +65,10 @@ fun CategorySelectionDialog(
     }
 
     // Вычисляем список всех категорий
-    val allCategories = remember(expenseCategories, incomeCategories) {
-        expenseCategories + incomeCategories
-    }
+    val allCategories =
+        remember(expenseCategories, incomeCategories) {
+            expenseCategories + incomeCategories
+        }
 
     // Цвета для категорий
     val expenseColor = LocalExpenseColor.current
@@ -79,42 +80,46 @@ fun CategorySelectionDialog(
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .verticalScroll(rememberScrollState()),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .verticalScroll(rememberScrollState()),
             ) {
                 // Опция "Все категории"
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable {
-                            // Если не все категории выбраны - выбираем все,
-                            // иначе - очищаем выбор
-                            localSelectedCategories =
-                                if (localSelectedCategories.size != allCategories.size) {
-                                    allCategories
-                                } else {
-                                    emptyList()
-                                }
-                        }
-                        .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable {
+                                // Если не все категории выбраны - выбираем все,
+                                // иначе - очищаем выбор
+                                localSelectedCategories =
+                                    if (localSelectedCategories.size != allCategories.size) {
+                                        allCategories
+                                    } else {
+                                        emptyList()
+                                    }
+                            }
+                            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = if (localSelectedCategories.isEmpty()) {
-                            stringResource(R.string.all_categories)
-                        } else if (localSelectedCategories.size == allCategories.size) {
-                            stringResource(R.string.clear_selection)
-                        } else {
-                            stringResource(R.string.select_all_categories)
-                        },
-                        color = if (localSelectedCategories.isEmpty() ||
-                            localSelectedCategories.size == allCategories.size
-                        ) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.onSurface
-                        },
+                        text =
+                            if (localSelectedCategories.isEmpty()) {
+                                stringResource(R.string.all_categories)
+                            } else if (localSelectedCategories.size == allCategories.size) {
+                                stringResource(R.string.clear_selection)
+                            } else {
+                                stringResource(R.string.select_all_categories)
+                            },
+                        color =
+                            if (localSelectedCategories.isEmpty() ||
+                                localSelectedCategories.size == allCategories.size
+                            ) {
+                                MaterialTheme.colorScheme.primary
+                            } else {
+                                MaterialTheme.colorScheme.onSurface
+                            },
                         modifier = Modifier.weight(1f),
                     )
 
@@ -122,19 +127,21 @@ fun CategorySelectionDialog(
                     Checkbox(
                         checked = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty(),
                         onCheckedChange = { isChecked ->
-                            localSelectedCategories = if (isChecked) {
-                                allCategories
-                            } else {
-                                emptyList()
-                            }
+                            localSelectedCategories =
+                                if (isChecked) {
+                                    allCategories
+                                } else {
+                                    emptyList()
+                                }
                         },
                     )
                 }
 
                 Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.divider_height)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.divider_height)),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 
@@ -147,11 +154,12 @@ fun CategorySelectionDialog(
                     color = expenseColor,
                     onToggle = { isExpensesExpanded = !isExpensesExpanded },
                     onSelectAll = { isChecked ->
-                        localSelectedCategories = if (isChecked) {
-                            allCategories
-                        } else {
-                            emptyList()
-                        }
+                        localSelectedCategories =
+                            if (isChecked) {
+                                allCategories
+                            } else {
+                                emptyList()
+                            }
                     },
                     isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty(),
                 )
@@ -164,11 +172,12 @@ fun CategorySelectionDialog(
                                 isSelected = localSelectedCategories.contains(category),
                                 color = expenseColor,
                                 onToggle = { isChecked ->
-                                    localSelectedCategories = if (isChecked) {
-                                        localSelectedCategories + category
-                                    } else {
-                                        localSelectedCategories - category
-                                    }
+                                    localSelectedCategories =
+                                        if (isChecked) {
+                                            localSelectedCategories + category
+                                        } else {
+                                            localSelectedCategories - category
+                                        }
                                 },
                             )
                         }
@@ -176,9 +185,10 @@ fun CategorySelectionDialog(
                 }
 
                 Surface(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(R.dimen.divider_height)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(R.dimen.divider_height)),
                     color = MaterialTheme.colorScheme.outlineVariant,
                 ) {}
 
@@ -191,11 +201,12 @@ fun CategorySelectionDialog(
                     color = incomeColor,
                     onToggle = { isIncomeExpanded = !isIncomeExpanded },
                     onSelectAll = { isChecked ->
-                        localSelectedCategories = if (isChecked) {
-                            allCategories
-                        } else {
-                            emptyList()
-                        }
+                        localSelectedCategories =
+                            if (isChecked) {
+                                allCategories
+                            } else {
+                                emptyList()
+                            }
                     },
                     isAllSelected = localSelectedCategories.size == allCategories.size && allCategories.isNotEmpty(),
                 )
@@ -208,11 +219,12 @@ fun CategorySelectionDialog(
                                 isSelected = localSelectedCategories.contains(category),
                                 color = incomeColor,
                                 onToggle = { isChecked ->
-                                    localSelectedCategories = if (isChecked) {
-                                        localSelectedCategories + category
-                                    } else {
-                                        localSelectedCategories - category
-                                    }
+                                    localSelectedCategories =
+                                        if (isChecked) {
+                                            localSelectedCategories + category
+                                        } else {
+                                            localSelectedCategories - category
+                                        }
                                 },
                             )
                         }
@@ -254,17 +266,19 @@ private fun CategoryGroupHeader(
     )
 
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
     ) {
         // Название группы и иконка раскрытия
         Row(
-            modifier = Modifier
-                .weight(1f)
-                .clickable(onClick = onToggle),
+            modifier =
+                Modifier
+                    .weight(1f)
+                    .clickable(onClick = onToggle),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Text(
@@ -275,11 +289,12 @@ private fun CategoryGroupHeader(
 
             Icon(
                 imageVector = Icons.Default.ArrowDropDown,
-                contentDescription = if (isExpanded) {
-                    stringResource(R.string.collapse)
-                } else {
-                    stringResource(R.string.expand)
-                },
+                contentDescription =
+                    if (isExpanded) {
+                        stringResource(R.string.collapse)
+                    } else {
+                        stringResource(R.string.expand)
+                    },
                 modifier = Modifier.rotate(rotation),
                 tint = color,
             )
@@ -302,25 +317,32 @@ private fun CategoryGroupHeader(
  * @param onToggle Callback, вызываемый при выборе/отмене выбора категории
  */
 @Composable
-private fun CategoryCheckboxItem(category: String, isSelected: Boolean, color: Color, onToggle: (Boolean) -> Unit) {
+private fun CategoryCheckboxItem(
+    category: String,
+    isSelected: Boolean,
+    color: Color,
+    onToggle: (Boolean) -> Unit,
+) {
     Surface(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = dimensionResource(R.dimen.spacing_small))
-            .clip(MaterialTheme.shapes.small)
-            .background(
-                if (isSelected) {
-                    MaterialTheme.colorScheme.primaryContainer
-                } else {
-                    MaterialTheme.colorScheme.surface
-                },
-            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = dimensionResource(R.dimen.spacing_small))
+                .clip(MaterialTheme.shapes.small)
+                .background(
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.primaryContainer
+                    } else {
+                        MaterialTheme.colorScheme.surface
+                    },
+                ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clickable(onClick = { onToggle(!isSelected) })
-                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .clickable(onClick = { onToggle(!isSelected) })
+                    .padding(vertical = dimensionResource(R.dimen.spacing_small)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Checkbox(
@@ -330,14 +352,16 @@ private fun CategoryCheckboxItem(category: String, isSelected: Boolean, color: C
 
             Text(
                 text = category,
-                color = if (isSelected) {
-                    MaterialTheme.colorScheme.onPrimaryContainer
-                } else {
-                    color
-                },
-                modifier = Modifier
-                    .weight(1f)
-                    .padding(start = dimensionResource(R.dimen.spacing_small)),
+                color =
+                    if (isSelected) {
+                        MaterialTheme.colorScheme.onPrimaryContainer
+                    } else {
+                        color
+                    },
+                modifier =
+                    Modifier
+                        .weight(1f)
+                        .padding(start = dimensionResource(R.dimen.spacing_small)),
             )
         }
     }

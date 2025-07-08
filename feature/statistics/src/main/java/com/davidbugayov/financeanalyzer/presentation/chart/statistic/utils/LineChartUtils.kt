@@ -11,8 +11,8 @@ import androidx.compose.ui.graphics.drawscope.Fill
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartPoint
-import timber.log.Timber
 import kotlin.math.hypot
+import timber.log.Timber
 
 /**
  * Функция для рисования сетки графика
@@ -22,7 +22,12 @@ import kotlin.math.hypot
  * @param color Цвет линий сетки
  * @param pathEffect Эффект для линий сетки (например, пунктир)
  */
-fun DrawScope.drawGridLines(width: Float, height: Float, color: Color, pathEffect: PathEffect?) {
+fun DrawScope.drawGridLines(
+    width: Float,
+    height: Float,
+    color: Color,
+    pathEffect: PathEffect?,
+) {
     val gridStrokeWidth = 0.5.dp.toPx()
 
     // Горизонтальные линии (5 линий)
@@ -180,15 +185,17 @@ fun DrawScope.drawLineChart(
         // Рисуем заполнение под линией с улучшенным градиентом
         drawPath(
             path = fillPath,
-            brush = Brush.verticalGradient(
-                colors = listOf(
-                    fillColor.copy(alpha = 0.4f),
-                    fillColor.copy(alpha = 0.15f),
-                    fillColor.copy(alpha = 0.05f),
+            brush =
+                Brush.verticalGradient(
+                    colors =
+                        listOf(
+                            fillColor.copy(alpha = 0.4f),
+                            fillColor.copy(alpha = 0.15f),
+                            fillColor.copy(alpha = 0.05f),
+                        ),
+                    startY = 0f,
+                    endY = height,
                 ),
-                startY = 0f,
-                endY = height,
-            ),
             style = Fill,
         )
 
@@ -196,11 +203,12 @@ fun DrawScope.drawLineChart(
         drawPath(
             path = linePath,
             color = lineColor,
-            style = Stroke(
-                width = lineStrokeWidth,
-                cap = StrokeCap.Round,
-                join = androidx.compose.ui.graphics.StrokeJoin.Round,
-            ),
+            style =
+                Stroke(
+                    width = lineStrokeWidth,
+                    cap = StrokeCap.Round,
+                    join = androidx.compose.ui.graphics.StrokeJoin.Round,
+                ),
             alpha = 0.9f, // Небольшая прозрачность для красоты
         )
     }
@@ -314,7 +322,6 @@ fun DrawScope.drawLineChart(
  * Утилитные функции для линейных графиков
  */
 object LineChartUtils {
-
     /**
      * Функция для поиска ближайшей точки к месту нажатия
      *

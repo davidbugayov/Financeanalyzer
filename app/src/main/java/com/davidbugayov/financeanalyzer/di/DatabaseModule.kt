@@ -7,7 +7,8 @@ import org.koin.dsl.module
 /**
  * Module that provides database and DAO instances.
  */
-val databaseModule = module {
-    single { AppDatabase.getInstance(androidContext()) }
-    single { get<AppDatabase>().transactionDao() }
-}
+val databaseModule =
+    module {
+        single { AppDatabase.getInstance(androidContext()) }
+        single { get<AppDatabase>().transactionDao() }
+    }

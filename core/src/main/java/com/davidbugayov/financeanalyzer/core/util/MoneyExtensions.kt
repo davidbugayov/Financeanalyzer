@@ -17,7 +17,10 @@ import java.util.Locale
  * @param useMinimalDecimals Whether to show minimal decimals (omit trailing zeros)
  * @return Formatted string representation of the money amount
  */
-fun Money.formatForDisplay(showCurrency: Boolean = true, useMinimalDecimals: Boolean = false): String {
+fun Money.formatForDisplay(
+    showCurrency: Boolean = true,
+    useMinimalDecimals: Boolean = false,
+): String {
     return format(showCurrency, useMinimalDecimals)
 }
 
@@ -28,7 +31,10 @@ fun Money.formatForDisplay(showCurrency: Boolean = true, useMinimalDecimals: Boo
  * @param useMinimalDecimals Whether to show minimal decimals (omit trailing zeros)
  * @return Formatted string representation of the money amount
  */
-fun Money.format(showCurrency: Boolean = true, useMinimalDecimals: Boolean = false): String {
+fun Money.format(
+    showCurrency: Boolean = true,
+    useMinimalDecimals: Boolean = false,
+): String {
     val symbols = DecimalFormatSymbols(Locale.getDefault())
 
     // Use space as grouping separator instead of comma
@@ -41,11 +47,12 @@ fun Money.format(showCurrency: Boolean = true, useMinimalDecimals: Boolean = fal
     val isZero = amount.compareTo(BigDecimal.ZERO) == 0
 
     // Choose pattern based on whether we should show decimals
-    val pattern = if (useMinimalDecimals || isWholeNumber || isZero) {
-        "#,##0"
-    } else {
-        "#,##0.00"
-    }
+    val pattern =
+        if (useMinimalDecimals || isWholeNumber || isZero) {
+            "#,##0"
+        } else {
+            "#,##0.00"
+        }
 
     val formatter = DecimalFormat(pattern, symbols)
 

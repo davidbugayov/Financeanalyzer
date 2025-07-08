@@ -29,13 +29,15 @@ fun AchievementItem(
 ) {
     Card(
         modifier = modifier.fillMaxWidth(),
-        colors = CardDefaults.cardColors(
-            containerColor = if (achievement.isUnlocked) {
-                MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant
-            },
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (achievement.isUnlocked) {
+                        MaterialTheme.colorScheme.primary.copy(alpha = 0.08f)
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant
+                    },
+            ),
     ) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -44,11 +46,12 @@ fun AchievementItem(
             Icon(
                 imageVector = Icons.Default.EmojiEvents,
                 contentDescription = null,
-                tint = if (achievement.isUnlocked) {
-                    MaterialTheme.colorScheme.primary
-                } else {
-                    Color.Gray
-                },
+                tint =
+                    if (achievement.isUnlocked) {
+                        MaterialTheme.colorScheme.primary
+                    } else {
+                        Color.Gray
+                    },
                 modifier = Modifier.size(48.dp),
             )
             Spacer(modifier = Modifier.size(16.dp))
@@ -57,20 +60,22 @@ fun AchievementItem(
                     text = achievement.title,
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = if (achievement.isUnlocked) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        Color.Gray
-                    },
+                    color =
+                        if (achievement.isUnlocked) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            Color.Gray
+                        },
                 )
                 Text(
                     text = achievement.description,
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (achievement.isUnlocked) {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        Color.Gray
-                    },
+                    color =
+                        if (achievement.isUnlocked) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            Color.Gray
+                        },
                 )
             }
             if (achievement.isUnlocked) {

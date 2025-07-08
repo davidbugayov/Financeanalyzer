@@ -16,7 +16,6 @@ abstract class AbstractBankHandler(
     protected val transactionRepository: TransactionRepository,
     protected val context: Context,
 ) {
-
     /**
      * Уникальное имя банка, которое будет отображаться пользователю и использоваться в логах.
      */
@@ -54,22 +53,27 @@ abstract class AbstractBankHandler(
      * @param fileType Тип файла.
      * @return true, если обработчик может обработать файл.
      */
-    open fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
+    open fun canHandle(
+        fileName: String,
+        uri: Uri,
+        fileType: FileType,
+    ): Boolean {
         if (!supportsFileType(fileType)) {
             return false
         }
 
         // Проверка по имени файла
         val keywords = getFileNameKeywords()
-        val nameMatch = keywords.any { keyword ->
-            // Универсальная проверка: для расширений (начинающихся с точки) - endsWith,
-            // для остальных ключевых слов - contains.
-            if (keyword.startsWith(".")) {
-                fileName.endsWith(keyword, ignoreCase = true)
-            } else {
-                fileName.contains(keyword, ignoreCase = true)
+        val nameMatch =
+            keywords.any { keyword ->
+                // Универсальная проверка: для расширений (начинающихся с точки) - endsWith,
+                // для остальных ключевых слов - contains.
+                if (keyword.startsWith(".")) {
+                    fileName.endsWith(keyword, ignoreCase = true)
+                } else {
+                    fileName.contains(keyword, ignoreCase = true)
+                }
             }
-        }
 
         if (nameMatch) {
             Timber.d("[$bankName Handler] Matched by filename keyword for: $fileName")
@@ -84,16 +88,23 @@ abstract class AbstractPdfBankHandler(
     transactionRepository: TransactionRepository,
     context: Context,
 ) : AbstractBankHandler(transactionRepository, context) {
-
     abstract val pdfKeywords: List<String>
+
     override fun supportsFileType(fileType: FileType): Boolean = fileType == FileType.PDF
+
     override fun getFileNameKeywords(): List<String> = pdfKeywords
-    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
-        return supportsFileType(fileType) && pdfKeywords.any {
-            fileName.contains(
-                it,
-                ignoreCase = true,
-            )
-        }
+
+    override fun canHandle(
+        fileName: String,
+        uri: Uri,
+        fileType: FileType,
+    ): Boolean {
+        return supportsFileType(fileType) &&
+            pdfKeywords.any {
+                fileName.contains(
+                    it,
+                    ignoreCase = true,
+                )
+            }
     }
 }

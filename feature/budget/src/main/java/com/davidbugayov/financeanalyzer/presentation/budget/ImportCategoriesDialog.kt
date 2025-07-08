@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.presentation.budget
 
-import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -23,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.presentation.categories.model.UiCategory
 
 /**
  * Диалог для выбора категорий (импорта или связывания)
@@ -46,11 +46,12 @@ fun ImportCategoriesDialog(
     preselectedCategories: List<String> = emptyList(),
 ) {
     // Список выбранных категорий
-    val selectedCategories = remember {
-        mutableStateListOf<String>().apply {
-            addAll(preselectedCategories)
+    val selectedCategories =
+        remember {
+            mutableStateListOf<String>().apply {
+                addAll(preselectedCategories)
+            }
         }
-    }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -117,11 +118,16 @@ fun ImportCategoriesDialog(
  * Элемент списка с чекбоксом для выбора категории
  */
 @Composable
-private fun CategoryCheckboxItem(category: String, isChecked: Boolean, onCheckedChange: (Boolean) -> Unit) {
+private fun CategoryCheckboxItem(
+    category: String,
+    isChecked: Boolean,
+    onCheckedChange: (Boolean) -> Unit,
+) {
     Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(vertical = 8.dp),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Checkbox(
@@ -130,9 +136,10 @@ private fun CategoryCheckboxItem(category: String, isChecked: Boolean, onChecked
         )
 
         Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(start = 8.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(start = 8.dp),
         ) {
             Text(
                 text = category,

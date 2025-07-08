@@ -34,10 +34,15 @@ class AppUpdateInfo {
  */
 class NoOpAppUpdateInfoTask : Task<AppUpdateInfo> {
     override fun isComplete(): Boolean = true
+
     override fun isSuccessful(): Boolean = false
+
     override fun isCanceled(): Boolean = false
+
     override fun getResult(): AppUpdateInfo? = null
+
     override fun getResult(p0: Class<out RuntimeException>?): AppUpdateInfo? = null
+
     override fun getException(): Exception? = Exception("Not implemented in F-Droid flavor")
 
     override fun addOnSuccessListener(

@@ -20,21 +20,27 @@ import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.Financia
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
-fun RecommendationsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier) {
+fun RecommendationsCard(
+    metrics: FinancialMetrics,
+    modifier: Modifier = Modifier,
+) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(
-            dimensionResource(R.dimen.financial_statistics_card_corner_radius),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-        ),
+        shape =
+            RoundedCornerShape(
+                dimensionResource(R.dimen.financial_statistics_card_corner_radius),
+            ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+            ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.recommendations),
@@ -43,9 +49,10 @@ fun RecommendationsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
             )
 
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_large),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
             )
 
             // Рекомендация по норме сбережений
@@ -55,38 +62,42 @@ fun RecommendationsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(
-                    modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
-                    ),
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                        ),
                 )
             }
 
             // Рекомендация по основной категории расходов
             if (metrics.topExpenseCategory.isNotEmpty()) {
                 Text(
-                    text = stringResource(
-                        R.string.recommendation_top_expense,
-                        metrics.topExpenseCategory,
-                    ),
+                    text =
+                        stringResource(
+                            R.string.recommendation_top_expense,
+                            metrics.topExpenseCategory,
+                        ),
                     style = MaterialTheme.typography.bodyMedium,
                 )
                 Spacer(
-                    modifier = Modifier.height(
-                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
-                    ),
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                        ),
                 )
             }
 
             // Рекомендация по финансовой подушке безопасности
             if (metrics.monthsOfSavings < 6) {
                 Text(
-                    text = if (metrics.monthsOfSavings <= 0) {
-                        stringResource(R.string.recommendation_no_savings)
-                    } else if (metrics.monthsOfSavings < 3) {
-                        stringResource(R.string.recommendation_low_savings)
-                    } else {
-                        stringResource(R.string.recommendation_medium_savings)
-                    },
+                    text =
+                        if (metrics.monthsOfSavings <= 0) {
+                            stringResource(R.string.recommendation_no_savings)
+                        } else if (metrics.monthsOfSavings < 3) {
+                            stringResource(R.string.recommendation_low_savings)
+                        } else {
+                            stringResource(R.string.recommendation_medium_savings)
+                        },
                     style = MaterialTheme.typography.bodyMedium,
                 )
             }

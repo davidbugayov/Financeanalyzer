@@ -36,27 +36,32 @@ import java.util.Locale
  * @param onDismiss Callback, вызываемый при отмене удаления
  */
 @Composable
-fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun DeleteTransactionDialog(
+    transaction: Transaction,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     val dateFormatter = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
     val moneyFormatter = transaction.amount
 
     val isDarkTheme = isSystemInDarkTheme()
-    val effectiveSourceColor = remember(
-        transaction.source,
-        transaction.sourceColor,
-        transaction.isExpense,
-        isDarkTheme,
-    ) {
-        val sourceColorInt = transaction.sourceColor
-        val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
+    val effectiveSourceColor =
+        remember(
+            transaction.source,
+            transaction.sourceColor,
+            transaction.isExpense,
+            isDarkTheme,
+        ) {
+            val sourceColorInt = transaction.sourceColor
+            val colorFromInt: Color? = if (sourceColorInt != 0) Color(sourceColorInt) else null
 
-        colorFromInt ?: ColorUtils.getEffectiveSourceColor(
-            sourceName = transaction.source,
-            sourceColorHex = null,
-            isExpense = transaction.isExpense,
-            isDarkTheme = isDarkTheme,
-        )
-    }
+            colorFromInt ?: ColorUtils.getEffectiveSourceColor(
+                sourceName = transaction.source,
+                sourceColorHex = null,
+                isExpense = transaction.isExpense,
+                isDarkTheme = isDarkTheme,
+            )
+        }
 
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -65,25 +70,28 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
         text = {
             Column {
                 Text(
-                    text = "Сумма: ${transaction.amount}\n" +
-                        "Категория: ${transaction.category}",
+                    text =
+                        "Сумма: ${transaction.amount}\n" +
+                            "Категория: ${transaction.category}",
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
                 Spacer(modifier = Modifier.height(16.dp))
 
                 Text(
-                    text = if (transaction.isExpense) {
-                        "-${moneyFormatter.abs()}"
-                    } else {
-                        "+$moneyFormatter"
-                    },
+                    text =
+                        if (transaction.isExpense) {
+                            "-${moneyFormatter.abs()}"
+                        } else {
+                            "+$moneyFormatter"
+                        },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (transaction.isExpense) {
-                        MaterialTheme.colorScheme.error
-                    } else {
-                        MaterialTheme.colorScheme.primary
-                    },
+                    color =
+                        if (transaction.isExpense) {
+                            MaterialTheme.colorScheme.error
+                        } else {
+                            MaterialTheme.colorScheme.primary
+                        },
                 )
 
                 Spacer(modifier = Modifier.height(12.dp))
@@ -97,9 +105,10 @@ fun DeleteTransactionDialog(transaction: Transaction, onConfirm: () -> Unit, onD
 
                 Row(verticalAlignment = Alignment.CenterVertically) {
                     Box(
-                        modifier = Modifier
-                            .size(12.dp)
-                            .background(effectiveSourceColor, CircleShape),
+                        modifier =
+                            Modifier
+                                .size(12.dp)
+                                .background(effectiveSourceColor, CircleShape),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 

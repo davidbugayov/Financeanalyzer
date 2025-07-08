@@ -23,7 +23,10 @@ import com.davidbugayov.financeanalyzer.feature.statistics.R
  * @param text Текст элемента легенды
  */
 @Composable
-fun ChartLegendItem(color: Color, text: String) {
+fun ChartLegendItem(
+    color: Color,
+    text: String,
+) {
     val legendItemWidth = dimensionResource(id = R.dimen.chart_legend_item_width)
     val legendItemHeight = dimensionResource(id = R.dimen.chart_legend_item_height)
     val legendSpacing = dimensionResource(id = R.dimen.chart_legend_spacing)
@@ -33,10 +36,11 @@ fun ChartLegendItem(color: Color, text: String) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(
-            modifier = Modifier
-                .width(legendItemWidth)
-                .height(legendItemHeight)
-                .background(color, RoundedCornerShape(cornerRadius)),
+            modifier =
+                Modifier
+                    .width(legendItemWidth)
+                    .height(legendItemHeight)
+                    .background(color, RoundedCornerShape(cornerRadius)),
         )
 
         Spacer(modifier = Modifier.width(legendSpacing))

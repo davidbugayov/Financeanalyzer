@@ -11,7 +11,6 @@ import timber.log.Timber
  * Утилитарный класс для работы с датами
  */
 object DateUtils {
-
     /**
      * Форматирует дату по указанному шаблону
      *
@@ -19,7 +18,10 @@ object DateUtils {
      * @param pattern шаблон форматирования
      * @return отформатированная строка
      */
-    fun formatDate(date: Date, pattern: String = "dd.MM.yyyy"): String {
+    fun formatDate(
+        date: Date,
+        pattern: String = "dd.MM.yyyy",
+    ): String {
         val format = SimpleDateFormat(pattern, Locale.forLanguageTag("ru"))
         return format.format(date)
     }
@@ -32,7 +34,11 @@ object DateUtils {
      * @param pattern шаблон форматирования для отдельных дат
      * @return отформатированная строка с диапазоном дат
      */
-    fun formatDateRange(startDate: Date, endDate: Date, pattern: String = "dd.MM.yyyy"): String {
+    fun formatDateRange(
+        startDate: Date,
+        endDate: Date,
+        pattern: String = "dd.MM.yyyy",
+    ): String {
         return "${formatDate(startDate, pattern)} - ${formatDate(endDate, pattern)}"
     }
 
@@ -45,73 +51,82 @@ object DateUtils {
      */
     fun calculateDatesForPeriod(periodType: PeriodType): Pair<Date, Date> {
         val calendar = Calendar.getInstance()
-        val endDate = calendar.apply {
-            set(Calendar.HOUR_OF_DAY, 23)
-            set(Calendar.MINUTE, 59)
-            set(Calendar.SECOND, 59)
-            set(Calendar.MILLISECOND, 999)
-        }.time
-
-        val startDate = when (periodType) {
-            PeriodType.ALL -> calendar.apply {
-                add(Calendar.YEAR, -5)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+        val endDate =
+            calendar.apply {
+                set(Calendar.HOUR_OF_DAY, 23)
+                set(Calendar.MINUTE, 59)
+                set(Calendar.SECOND, 59)
+                set(Calendar.MILLISECOND, 999)
             }.time
 
-            PeriodType.DAY -> calendar.apply {
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+        val startDate =
+            when (periodType) {
+                PeriodType.ALL ->
+                    calendar.apply {
+                        add(Calendar.YEAR, -5)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }.time
 
-                Timber.d("DAY период: начало дня = ${formatDate(time, "dd.MM.yyyy")}")
-            }.time
+                PeriodType.DAY ->
+                    calendar.apply {
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
 
-            PeriodType.WEEK -> calendar.apply {
-                add(Calendar.DAY_OF_YEAR, -7)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
+                        Timber.d("DAY период: начало дня = ${formatDate(time, "dd.MM.yyyy")}")
+                    }.time
 
-                Timber.d("WEEK период: неделя назад = ${formatDate(time, "dd.MM.yyyy")}")
-            }.time
+                PeriodType.WEEK ->
+                    calendar.apply {
+                        add(Calendar.DAY_OF_YEAR, -7)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
 
-            PeriodType.MONTH -> calendar.apply {
-                add(Calendar.MONTH, -1)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
+                        Timber.d("WEEK период: неделя назад = ${formatDate(time, "dd.MM.yyyy")}")
+                    }.time
 
-            PeriodType.QUARTER -> calendar.apply {
-                add(Calendar.MONTH, -3)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
+                PeriodType.MONTH ->
+                    calendar.apply {
+                        add(Calendar.MONTH, -1)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }.time
 
-            PeriodType.YEAR -> calendar.apply {
-                add(Calendar.YEAR, -1)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
+                PeriodType.QUARTER ->
+                    calendar.apply {
+                        add(Calendar.MONTH, -3)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }.time
 
-            PeriodType.CUSTOM -> calendar.apply {
-                add(Calendar.MONTH, -1)
-                set(Calendar.HOUR_OF_DAY, 0)
-                set(Calendar.MINUTE, 0)
-                set(Calendar.SECOND, 0)
-                set(Calendar.MILLISECOND, 0)
-            }.time
-        }
+                PeriodType.YEAR ->
+                    calendar.apply {
+                        add(Calendar.YEAR, -1)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }.time
+
+                PeriodType.CUSTOM ->
+                    calendar.apply {
+                        add(Calendar.MONTH, -1)
+                        set(Calendar.HOUR_OF_DAY, 0)
+                        set(Calendar.MINUTE, 0)
+                        set(Calendar.SECOND, 0)
+                        set(Calendar.MILLISECOND, 0)
+                    }.time
+            }
 
         return Pair(startDate, endDate)
     }

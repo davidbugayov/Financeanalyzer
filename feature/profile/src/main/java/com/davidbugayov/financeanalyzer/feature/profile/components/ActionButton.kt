@@ -34,16 +34,18 @@ fun ActionButton(
         modifier = modifier.height(48.dp),
         enabled = enabled && !isLoading,
         shape = RoundedCornerShape(50),
-        colors = ButtonDefaults.buttonColors(
-            containerColor = containerColor,
-            contentColor = contentColor,
-        ),
+        colors =
+            ButtonDefaults.buttonColors(
+                containerColor = containerColor,
+                contentColor = contentColor,
+            ),
     ) {
         if (isLoading) {
             CircularProgressIndicator(
-                modifier = Modifier
-                    .padding(end = 12.dp)
-                    .size(20.dp),
+                modifier =
+                    Modifier
+                        .padding(end = 12.dp)
+                        .size(20.dp),
                 strokeWidth = 2.dp,
                 color = contentColor,
             )

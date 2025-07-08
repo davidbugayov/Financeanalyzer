@@ -67,10 +67,11 @@ fun AlfaBankInstructions() {
             append(stringResource(R.string.alfabank_instructions_web) + "\n\n")
 
             withStyle(
-                style = SpanStyle(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                ),
+                style =
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    ),
             ) {
                 append(stringResource(R.string.alfabank_note_important) + " ")
             }
@@ -113,10 +114,11 @@ fun CSVInstructions() {
             append(stringResource(R.string.csv_example) + "\n\n")
 
             withStyle(
-                style = SpanStyle(
-                    fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
-                ),
+                style =
+                    SpanStyle(
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.primary,
+                    ),
             ) {
                 append(stringResource(R.string.csv_note_title) + " ")
             }

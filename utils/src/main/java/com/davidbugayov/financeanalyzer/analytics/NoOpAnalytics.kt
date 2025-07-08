@@ -12,11 +12,17 @@ class NoOpAnalytics : IAnalytics {
         Timber.d("NoOpAnalytics: Event logged: $eventName (no-op)")
     }
 
-    override fun logEvent(eventName: String, params: Bundle) {
+    override fun logEvent(
+        eventName: String,
+        params: Bundle,
+    ) {
         Timber.d("NoOpAnalytics: Event logged: $eventName with params (no-op)")
     }
 
-    override fun setUserProperty(name: String, value: String) {
+    override fun setUserProperty(
+        name: String,
+        value: String,
+    ) {
         Timber.d("NoOpAnalytics: User property set: $name = $value (no-op)")
     }
 

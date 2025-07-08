@@ -8,11 +8,11 @@ import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.Observer
 import androidx.lifecycle.viewModelScope
-import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.core.util.Result as CoreResult
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportResult
 import com.davidbugayov.financeanalyzer.domain.usecase.importtransactions.common.ImportTransactionsUseCase
+import com.davidbugayov.financeanalyzer.feature.transaction.R
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportState
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.model.ImportTransactionsIntent
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.utils.ImportErrorHandler
@@ -35,7 +35,6 @@ class ImportTransactionsViewModel(
     private val importTransactionsUseCase: ImportTransactionsUseCase,
     application: Application,
 ) : AndroidViewModel(application), KoinComponent {
-
     // Инъекция TransactionDao через Koin
     private val transactionDao: TransactionDao by inject()
 
@@ -48,14 +47,15 @@ class ImportTransactionsViewModel(
     val uiState: LiveData<ImportUiState> = _uiState
 
     // Наблюдатель за прямыми результатами импорта
-    private val directResultObserver = Observer<ImportResult.Success?> { result ->
-        result?.let {
-            Timber.i(
-                "Получен прямой результат импорта: importedCount=${it.importedCount}, skippedCount=${it.skippedCount}",
-            )
-            setSuccessState(it.importedCount, it.skippedCount, it.bankName)
+    private val directResultObserver =
+        Observer<ImportResult.Success?> { result ->
+            result?.let {
+                Timber.i(
+                    "Получен прямой результат импорта: importedCount=${it.importedCount}, skippedCount=${it.skippedCount}",
+                )
+                setSuccessState(it.importedCount, it.skippedCount, it.bankName)
+            }
         }
-    }
 
     init {
         // Инициализируем наблюдение за прямыми результатами импорта
@@ -84,15 +84,20 @@ class ImportTransactionsViewModel(
     /**
      * Устанавливает состояние успешного импорта с указанным количеством транзакций.
      */
-    private fun setSuccessState(importedCount: Int, skippedCount: Int, bankNameFromResult: String? = null) {
+    private fun setSuccessState(
+        importedCount: Int,
+        skippedCount: Int,
+        bankNameFromResult: String? = null,
+    ) {
         val context = getApplication<Application>().applicationContext
 
         // Проверяем для определения фактически использованного обработчика
-        val actualBankName = bankNameFromResult ?: when {
-            // Если файл - справка о движении, это скорее всего Тинькофф
-            _state.value.fileName.contains("Справка_о_движении", ignoreCase = true) -> "Тинькофф"
-            else -> _state.value.bankName
-        }
+        val actualBankName =
+            bankNameFromResult ?: when {
+                // Если файл - справка о движении, это скорее всего Тинькофф
+                _state.value.fileName.contains("Справка_о_движении", ignoreCase = true) -> "Тинькофф"
+                else -> _state.value.bankName
+            }
 
         val bankInfo = actualBankName ?: _state.value.fileName
         val successMessage = context.getString(R.string.import_success_message, importedCount, skippedCount, bankInfo)
@@ -100,25 +105,27 @@ class ImportTransactionsViewModel(
         Timber.i("Импорт завершен: импортировано=$importedCount, пропущено=$skippedCount, банк=$actualBankName")
 
         // Создаем новый объект состояния
-        val newState = ImportState(
-            isLoading = false,
-            progress = 100,
-            progressMessage = context.getString(R.string.import_progress_completed, bankInfo),
-            successCount = importedCount,
-            skippedCount = skippedCount,
-            successMessage = successMessage,
-            error = null, // Гарантируем, что ошибка сброшена
-            fileName = _state.value.fileName, // Сохраняем имя файла
-            bankName = actualBankName, // Используем скорректированное название банка
-        )
+        val newState =
+            ImportState(
+                isLoading = false,
+                progress = 100,
+                progressMessage = context.getString(R.string.import_progress_completed, bankInfo),
+                successCount = importedCount,
+                skippedCount = skippedCount,
+                successMessage = successMessage,
+                error = null, // Гарантируем, что ошибка сброшена
+                fileName = _state.value.fileName, // Сохраняем имя файла
+                bankName = actualBankName, // Используем скорректированное название банка
+            )
 
         // Устанавливаем новое состояние
         _state.value = newState
-        _uiState.value = ImportUiState.Success(
-            message = successMessage,
-            importedCount = importedCount,
-            skippedCount = skippedCount,
-        )
+        _uiState.value =
+            ImportUiState.Success(
+                message = successMessage,
+                importedCount = importedCount,
+                skippedCount = skippedCount,
+            )
 
         // Состояние успешно обновлено
     }
@@ -248,16 +255,17 @@ class ImportTransactionsViewModel(
         // Обновляем состояние, показывая процесс загрузки
         val context = getApplication<Application>().applicationContext
         val startMessage = context.getString(R.string.import_progress_starting, bankName ?: fileName)
-        _state.value = _state.value.copy(
-            isLoading = true,
-            progress = 0,
-            progressMessage = startMessage,
-            error = null,
-            successCount = 0,
-            skippedCount = 0,
-            fileName = fileName,
-            bankName = bankName,
-        )
+        _state.value =
+            _state.value.copy(
+                isLoading = true,
+                progress = 0,
+                progressMessage = startMessage,
+                error = null,
+                successCount = 0,
+                skippedCount = 0,
+                fileName = fileName,
+                bankName = bankName,
+            )
 
         // Для обратной совместимости
         _uiState.postValue(ImportUiState.Loading(startMessage))
@@ -267,11 +275,12 @@ class ImportTransactionsViewModel(
                 importTransactionsUseCase.importTransactions(uri) { current, total, message ->
                     val progress = if (total > 0) (current * 100 / total) else 0
                     // Во время прогресса убираем ошибку, если она была
-                    _state.value = _state.value.copy(
-                        progress = progress,
-                        progressMessage = message,
-                        error = null, // Важно: убираем ошибку во время прогресса
-                    )
+                    _state.value =
+                        _state.value.copy(
+                            progress = progress,
+                            progressMessage = message,
+                            error = null, // Важно: убираем ошибку во время прогресса
+                        )
                     _uiState.postValue(ImportUiState.Loading(message, progress))
                 }.collect { result ->
                     // Handle different result types based on their actual class
@@ -333,24 +342,26 @@ class ImportTransactionsViewModel(
                             val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
 
                             Timber.e(result.exception, "Ошибка импорта: $originalMessage")
-                            _state.value = _state.value.copy(
-                                isLoading = false,
-                                error = userFriendlyMessage,
-                                progress = 0,
-                                progressMessage = "",
-                                fileName = _state.value.fileName, // Сохраняем имя файла
-                            )
+                            _state.value =
+                                _state.value.copy(
+                                    isLoading = false,
+                                    error = userFriendlyMessage,
+                                    progress = 0,
+                                    progressMessage = "",
+                                    fileName = _state.value.fileName, // Сохраняем имя файла
+                                )
                             _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
                         }
                         result is ImportResult.Progress -> {
                             // Обрабатываем прогресс, но не устанавливаем ошибку
                             val progress = if (result.total > 0) (result.current * 100 / result.total) else 0
-                            _state.value = _state.value.copy(
-                                isLoading = true,
-                                progress = progress,
-                                progressMessage = result.message,
-                                error = null, // Важно: убираем ошибку во время прогресса
-                            )
+                            _state.value =
+                                _state.value.copy(
+                                    isLoading = true,
+                                    progress = progress,
+                                    progressMessage = result.message,
+                                    error = null, // Важно: убираем ошибку во время прогресса
+                                )
                             _uiState.postValue(ImportUiState.Loading(result.message, progress))
                         }
                         result is ImportResult.Error -> {
@@ -361,13 +372,14 @@ class ImportTransactionsViewModel(
                             val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
 
                             Timber.e(result.exception, "Ошибка импорта (ImportResult.Error): $originalMessage")
-                            _state.value = _state.value.copy(
-                                isLoading = false,
-                                error = userFriendlyMessage,
-                                progress = 0,
-                                progressMessage = "",
-                                fileName = _state.value.fileName, // Сохраняем имя файла
-                            )
+                            _state.value =
+                                _state.value.copy(
+                                    isLoading = false,
+                                    error = userFriendlyMessage,
+                                    progress = 0,
+                                    progressMessage = "",
+                                    fileName = _state.value.fileName, // Сохраняем имя файла
+                                )
                             _uiState.postValue(ImportUiState.Error(userFriendlyMessage))
                         }
                         result is ImportResult.Success -> {
@@ -405,11 +417,12 @@ class ImportTransactionsViewModel(
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Необработанное исключение при импорте: ${e.message}")
-                _state.value = _state.value.copy(
-                    isLoading = false,
-                    error = e.message ?: "Неизвестная ошибка",
-                    fileName = _state.value.fileName, // Сохраняем имя файла
-                )
+                _state.value =
+                    _state.value.copy(
+                        isLoading = false,
+                        error = e.message ?: "Неизвестная ошибка",
+                        fileName = _state.value.fileName, // Сохраняем имя файла
+                    )
                 _uiState.postValue(ImportUiState.Error(e.message ?: "Неизвестная ошибка"))
             }
         }
@@ -432,17 +445,18 @@ class ImportTransactionsViewModel(
         Timber.d("Сброс состояния импорта")
 
         // Создаем новый объект состояния со значениями по умолчанию
-        _state.value = ImportState(
-            isLoading = false,
-            progress = 0,
-            progressMessage = "",
-            successCount = 0,
-            skippedCount = 0,
-            successMessage = "",
-            error = null,
-            fileName = "", // Сбрасываем имя файла
-            bankName = null, // Сбрасываем название банка
-        )
+        _state.value =
+            ImportState(
+                isLoading = false,
+                progress = 0,
+                progressMessage = "",
+                successCount = 0,
+                skippedCount = 0,
+                successMessage = "",
+                error = null,
+                fileName = "", // Сбрасываем имя файла
+                bankName = null, // Сбрасываем название банка
+            )
 
         // Сбрасываем состояние для обратной совместимости
         _uiState.value = ImportUiState.Initial
@@ -530,23 +544,39 @@ class ImportTransactionsViewModel(
         when (bankName?.lowercase()) {
             "тинькофф", "тинь", "tinkoff", "tbank" -> {
                 Timber.d("🏆 Триггер Тинькофф")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("tinkoff_importer")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "tinkoff_importer",
+                )
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "multi_bank_importer",
+                )
             }
             "сбербанк", "сбер", "sberbank" -> {
                 Timber.d("🏆 Триггер Сбербанк")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("sberbank_importer")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "sberbank_importer",
+                )
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "multi_bank_importer",
+                )
             }
             "альфа-банк", "альфа", "alfa", "alpha" -> {
                 Timber.d("🏆 Триггер Альфа-Банк")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("alfabank_importer")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "alfabank_importer",
+                )
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "multi_bank_importer",
+                )
             }
             "озон банк", "озон", "ozon" -> {
                 Timber.d("🏆 Триггер OZON Банк")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("ozon_importer")
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "ozon_importer",
+                )
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "multi_bank_importer",
+                )
             }
             else -> {
                 Timber.d("🏆 Банк '$bankName' не распознан для достижений")

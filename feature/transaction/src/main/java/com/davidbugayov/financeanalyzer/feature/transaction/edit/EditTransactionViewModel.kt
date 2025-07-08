@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.feature.transaction.edit
 
 import android.app.Application
+import android.content.Context
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Money
@@ -14,12 +15,12 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactio
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.navigation.NavigationManager
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.model.EditTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.validation.ValidationBuilder
+import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import java.math.BigDecimal
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
@@ -27,7 +28,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import android.content.Context
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -40,16 +40,16 @@ class EditTransactionViewModel(
     updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     private val navigationManager: NavigationManager,
 ) : BaseTransactionViewModel<EditTransactionState, BaseTransactionEvent>(
-    categoriesViewModel,
-    sourcePreferences,
-    walletRepository,
-    updateWalletBalancesUseCase,
-    application.resources,
-) {
-
-    override val _state = MutableStateFlow(
-        EditTransactionState(),
-    )
+        categoriesViewModel,
+        sourcePreferences,
+        walletRepository,
+        updateWalletBalancesUseCase,
+        application.resources,
+    ) {
+    override val _state =
+        MutableStateFlow(
+            EditTransactionState(),
+        )
 
     // Флаг для блокировки автоматической отправки формы
     private var blockAutoSubmit = false
@@ -150,7 +150,10 @@ class EditTransactionViewModel(
         }
     }
 
-    private fun validateInput(amount: String, categoryId: String): Boolean {
+    private fun validateInput(
+        amount: String,
+        categoryId: String,
+    ): Boolean {
         Timber.d("ТРАНЗАКЦИЯ: validateInput - Входящая сумма для валидации: '%s'", amount)
         val validationBuilder = ValidationBuilder()
 
@@ -225,11 +228,12 @@ class EditTransactionViewModel(
             _state.update { it.copy(isLoading = true) }
 
             if (currentState.category.isBlank()) {
-                val categoryToUse = if (currentState.isExpense) {
-                    currentState.selectedExpenseCategory
-                } else {
-                    currentState.selectedIncomeCategory
-                }
+                val categoryToUse =
+                    if (currentState.isExpense) {
+                        currentState.selectedExpenseCategory
+                    } else {
+                        currentState.selectedIncomeCategory
+                    }
 
                 if (categoryToUse.isNotBlank()) {
                     _state.update { it.copy(category = categoryToUse) }
@@ -250,18 +254,20 @@ class EditTransactionViewModel(
                 amountForValidation,
             )
 
-            val transactionToSave = prepareTransactionForEdit(moneyFromExpression) ?: run {
-                _state.update { it.copy(isLoading = false) }
-                Timber.e(
-                    "ТРАНЗАКЦИЯ: Не удалось подготовить транзакцию к редактированию после парсинга суммы",
-                )
-                return@launch
-            }
+            val transactionToSave =
+                prepareTransactionForEdit(moneyFromExpression) ?: run {
+                    _state.update { it.copy(isLoading = false) }
+                    Timber.e(
+                        "ТРАНЗАКЦИЯ: Не удалось подготовить транзакцию к редактированию после парсинга суммы",
+                    )
+                    return@launch
+                }
 
-            val isValid = validateInput(
-                amount = amountForValidation, // Используем очищенную/вычисленную сумму для валидации
-                categoryId = currentState.category,
-            )
+            val isValid =
+                validateInput(
+                    amount = amountForValidation, // Используем очищенную/вычисленную сумму для валидации
+                    categoryId = currentState.category,
+                )
 
             if (!isValid) {
                 _state.update { it.copy(isLoading = false) }
@@ -367,10 +373,11 @@ class EditTransactionViewModel(
         loadSources()
         // Форматируем сумму с использованием Money.format(), без символа валюты
         val moneyObject = transaction.amount.abs() // Получаем объект Money с абсолютной суммой
-        val formattedAmount = moneyObject.formatForDisplay(
-            showCurrency = false,
-            useMinimalDecimals = true,
-        )
+        val formattedAmount =
+            moneyObject.formatForDisplay(
+                showCurrency = false,
+                useMinimalDecimals = true,
+            )
         Timber.d(
             "ТРАНЗАКЦИЯ: Форматированная сумма для поля ввода: %s (исходная: %s)",
             formattedAmount,
@@ -523,11 +530,12 @@ class EditTransactionViewModel(
             currentState.selectedExpenseCategory,
         )
         if (currentState.category.isBlank()) {
-            val categoryToUseFromState = if (currentState.isExpense) {
-                currentState.selectedExpenseCategory
-            } else {
-                currentState.selectedIncomeCategory
-            }
+            val categoryToUseFromState =
+                if (currentState.isExpense) {
+                    currentState.selectedExpenseCategory
+                } else {
+                    currentState.selectedIncomeCategory
+                }
             if (categoryToUseFromState.isBlank()) {
                 _state.update { it.copy(categoryError = true) }
                 Timber.e("ТРАНЗАКЦИЯ: Ошибка - категория не выбрана")
@@ -551,13 +559,14 @@ class EditTransactionViewModel(
             )
             return null
         }
-        val finalAmount = if (currentState.isExpense) {
-            parsedMoney.copy(
-                amount = parsedMoney.amount.negate(),
-            )
-        } else {
-            parsedMoney
-        }
+        val finalAmount =
+            if (currentState.isExpense) {
+                parsedMoney.copy(
+                    amount = parsedMoney.amount.negate(),
+                )
+            } else {
+                parsedMoney
+            }
         val sourceToUse = if (currentState.source.isBlank()) currentState.transactionToEdit?.source ?: "" else currentState.source
         val sourceColorToUse = if (currentState.source.isBlank()) currentState.transactionToEdit?.sourceColor ?: 0 else currentState.sourceColor
         val categoryToUse = currentState.category // Категория уже должна быть установлена
@@ -567,11 +576,12 @@ class EditTransactionViewModel(
             categoryToUse,
             sourceToUse,
         )
-        val selectedWalletIds = getWalletIdsForTransaction(
-            isExpense = currentState.isExpense,
-            addToWallet = currentState.addToWallet,
-            selectedWallets = currentState.selectedWallets,
-        )
+        val selectedWalletIds =
+            getWalletIdsForTransaction(
+                isExpense = currentState.isExpense,
+                addToWallet = currentState.addToWallet,
+                selectedWallets = currentState.selectedWallets,
+            )
         return currentState.transactionToEdit?.copy(
             title = currentState.title,
             amount = finalAmount,
@@ -585,7 +595,10 @@ class EditTransactionViewModel(
         )
     }
 
-    override fun onEvent(event: BaseTransactionEvent, context: android.content.Context) {
+    override fun onEvent(
+        event: BaseTransactionEvent,
+        context: android.content.Context,
+    ) {
         // Обрабатываем события UI
         when (event) {
             is BaseTransactionEvent.SubmitEdit -> {
@@ -603,11 +616,12 @@ class EditTransactionViewModel(
             is BaseTransactionEvent.SetExpenseCategory -> {
                 Timber.d("ТРАНЗАКЦИЯ: Выбрана категория расхода: %s", event.category)
                 _state.update { state ->
-                    val newState = state.copy(
-                        category = event.category,
-                        selectedExpenseCategory = event.category,
-                        categoryError = false, // Clear any previous category error
-                    )
+                    val newState =
+                        state.copy(
+                            category = event.category,
+                            selectedExpenseCategory = event.category,
+                            categoryError = false, // Clear any previous category error
+                        )
                     newState
                 }
             }
@@ -615,20 +629,22 @@ class EditTransactionViewModel(
             is BaseTransactionEvent.SetIncomeCategory -> {
                 Timber.d("ТРАНЗАКЦИЯ: Выбрана категория дохода: %s", event.category)
                 _state.update { state ->
-                    val newState = state.copy(
-                        category = event.category,
-                        selectedIncomeCategory = event.category,
-                        categoryError = false, // Clear any previous category error
-                    )
+                    val newState =
+                        state.copy(
+                            category = event.category,
+                            selectedIncomeCategory = event.category,
+                            categoryError = false, // Clear any previous category error
+                        )
                     newState
                 }
             }
 
             is BaseTransactionEvent.ToggleAddToWallet -> {
-                val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
-                    currentAddToWallet = _state.value.addToWallet,
-                    isExpense = _state.value.isExpense,
-                )
+                val (newAddToWallet, newSelectedWallets) =
+                    handleToggleAddToWallet(
+                        currentAddToWallet = _state.value.addToWallet,
+                        isExpense = _state.value.isExpense,
+                    )
 
                 _state.update {
                     it.copy(
@@ -639,11 +655,12 @@ class EditTransactionViewModel(
             }
 
             is BaseTransactionEvent.SelectWallet -> {
-                val updatedWallets = handleSelectWallet(
-                    walletId = event.walletId,
-                    selected = event.selected,
-                    currentSelectedWallets = _state.value.selectedWallets,
-                )
+                val updatedWallets =
+                    handleSelectWallet(
+                        walletId = event.walletId,
+                        selected = event.selected,
+                        currentSelectedWallets = _state.value.selectedWallets,
+                    )
 
                 _state.update {
                     it.copy(selectedWallets = updatedWallets)
@@ -681,16 +698,18 @@ class EditTransactionViewModel(
             is BaseTransactionEvent.AddCustomSource -> {
                 val trimmedName = event.source.trim()
                 if (trimmedName.length >= 2) {
-                    val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
-                        name = trimmedName,
-                        color = event.color,
-                        isCustom = true,
-                    )
-                    val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
-                        sourcePreferences,
-                        _state.value.sources,
-                        newSource,
-                    )
+                    val newSource =
+                        com.davidbugayov.financeanalyzer.domain.model.Source(
+                            name = trimmedName,
+                            color = event.color,
+                            isCustom = true,
+                        )
+                    val updatedSources =
+                        com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
+                            sourcePreferences,
+                            _state.value.sources,
+                            newSource,
+                        )
                     _state.update { state ->
                         state.copy(
                             sources = updatedSources,
@@ -818,21 +837,26 @@ class EditTransactionViewModel(
         }
     }
 
-    override fun handleBaseEvent(event: BaseTransactionEvent, context: Context) {
+    override fun handleBaseEvent(
+        event: BaseTransactionEvent,
+        context: Context,
+    ) {
         when (event) {
             is BaseTransactionEvent.AddCustomSource -> {
                 val trimmedName = event.source.trim()
                 if (trimmedName.length >= 2) {
-                    val newSource = com.davidbugayov.financeanalyzer.domain.model.Source(
-                        name = trimmedName,
-                        color = event.color,
-                        isCustom = true,
-                    )
-                    val updatedSources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
-                        sourcePreferences,
-                        _state.value.sources,
-                        newSource,
-                    )
+                    val newSource =
+                        com.davidbugayov.financeanalyzer.domain.model.Source(
+                            name = trimmedName,
+                            color = event.color,
+                            isCustom = true,
+                        )
+                    val updatedSources =
+                        com.davidbugayov.financeanalyzer.feature.transaction.base.util.addCustomSource(
+                            sourcePreferences,
+                            _state.value.sources,
+                            newSource,
+                        )
                     _state.update { state ->
                         state.copy(
                             sources = updatedSources,

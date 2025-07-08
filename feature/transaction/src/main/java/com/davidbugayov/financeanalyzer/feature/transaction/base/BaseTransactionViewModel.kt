@@ -16,9 +16,9 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
+import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.categories.model.CategoryIconProvider
-import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent
 import java.math.BigDecimal
 import java.util.Date
 import kotlinx.coroutines.Dispatchers
@@ -37,7 +37,6 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     private val updateWalletBalancesUseCase: UpdateWalletBalancesUseCase,
     protected val resources: Resources,
 ) : ViewModel(), TransactionScreenViewModel<S, E> {
-
     protected abstract val _state: MutableStateFlow<S>
     override val state: StateFlow<S> get() = _state.asStateFlow()
     override val wallets: List<Wallet> = emptyList()
@@ -66,7 +65,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     // Вся обработка событий теперь только в наследниках
-    abstract override fun onEvent(event: E, context: android.content.Context)
+    abstract override fun onEvent(
+        event: E,
+        context: android.content.Context,
+    )
 
     /**
      * Метод для отправки транзакции, вызываемый из UI.
@@ -86,11 +88,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
         originalTransaction: Transaction?,
     ) {
         if (walletIds.isNotEmpty()) {
-            val result = updateWalletBalancesUseCase(
-                walletIdsToUpdate = walletIds,
-                amountForWallets = amount,
-                originalTransaction = originalTransaction,
-            )
+            val result =
+                updateWalletBalancesUseCase(
+                    walletIdsToUpdate = walletIds,
+                    amountForWallets = amount,
+                    originalTransaction = originalTransaction,
+                )
             if (result is CoreResult.Error) {
                 Timber.e(result.exception, "Ошибка при обновлении баланса кошельков через UseCase")
             }
@@ -190,11 +193,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     ): List<String> {
         Timber.d("SelectWallet событие - walletId=$walletId, selected=$selected")
 
-        val updatedWallets = if (selected) {
-            currentSelectedWallets + walletId
-        } else {
-            currentSelectedWallets - walletId
-        }
+        val updatedWallets =
+            if (selected) {
+                currentSelectedWallets + walletId
+            } else {
+                currentSelectedWallets - walletId
+            }
 
         Timber.d(
             "Обновление списка выбранных кошельков: было ${currentSelectedWallets.size}, стало ${updatedWallets.size}",
@@ -255,91 +259,115 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     }
 
     // --- Общая обработка событий для транзакций ---
-    open fun handleBaseEvent(event: BaseTransactionEvent, context: android.content.Context) {
+    open fun handleBaseEvent(
+        event: BaseTransactionEvent,
+        context: android.content.Context,
+    ) {
         when (event) {
-            is BaseTransactionEvent.SetAmount -> _state.update { state ->
-                copyState(state, amount = event.amount)
-            }
+            is BaseTransactionEvent.SetAmount ->
+                _state.update { state ->
+                    copyState(state, amount = event.amount)
+                }
 
-            is BaseTransactionEvent.SetTitle -> _state.update { state ->
-                copyState(state, title = event.title)
-            }
+            is BaseTransactionEvent.SetTitle ->
+                _state.update { state ->
+                    copyState(state, title = event.title)
+                }
 
-            is BaseTransactionEvent.SetCategory -> _state.update { state ->
-                copyState(state, category = event.category, showCategoryPicker = false)
-            }
+            is BaseTransactionEvent.SetCategory ->
+                _state.update { state ->
+                    copyState(state, category = event.category, showCategoryPicker = false)
+                }
 
-            is BaseTransactionEvent.SetNote -> _state.update { state ->
-                copyState(state, note = event.note)
-            }
+            is BaseTransactionEvent.SetNote ->
+                _state.update { state ->
+                    copyState(state, note = event.note)
+                }
 
-            is BaseTransactionEvent.SetDate -> _state.update { state ->
-                copyState(state, selectedDate = event.date, showDatePicker = false)
-            }
+            is BaseTransactionEvent.SetDate ->
+                _state.update { state ->
+                    copyState(state, selectedDate = event.date, showDatePicker = false)
+                }
 
-            is BaseTransactionEvent.ShowDatePicker -> _state.update { state ->
-                copyState(state, showDatePicker = true)
-            }
+            is BaseTransactionEvent.ShowDatePicker ->
+                _state.update { state ->
+                    copyState(state, showDatePicker = true)
+                }
 
-            is BaseTransactionEvent.HideDatePicker -> _state.update { state ->
-                copyState(state, showDatePicker = false)
-            }
+            is BaseTransactionEvent.HideDatePicker ->
+                _state.update { state ->
+                    copyState(state, showDatePicker = false)
+                }
 
-            is BaseTransactionEvent.ShowCategoryPicker -> _state.update { state ->
-                copyState(state, showCategoryPicker = true)
-            }
+            is BaseTransactionEvent.ShowCategoryPicker ->
+                _state.update { state ->
+                    copyState(state, showCategoryPicker = true)
+                }
 
-            is BaseTransactionEvent.HideCategoryPicker -> _state.update { state ->
-                copyState(state, showCategoryPicker = false)
-            }
+            is BaseTransactionEvent.HideCategoryPicker ->
+                _state.update { state ->
+                    copyState(state, showCategoryPicker = false)
+                }
 
-            is BaseTransactionEvent.ShowCustomCategoryDialog -> _state.update { state ->
-                copyState(state, showCustomCategoryDialog = true)
-            }
+            is BaseTransactionEvent.ShowCustomCategoryDialog ->
+                _state.update { state ->
+                    copyState(state, showCustomCategoryDialog = true)
+                }
 
-            is BaseTransactionEvent.HideCustomCategoryDialog -> _state.update { state ->
-                copyState(state, showCustomCategoryDialog = false, customCategory = "")
-            }
+            is BaseTransactionEvent.HideCustomCategoryDialog ->
+                _state.update { state ->
+                    copyState(state, showCustomCategoryDialog = false, customCategory = "")
+                }
 
-            is BaseTransactionEvent.ShowCancelConfirmation -> _state.update { state ->
-                copyState(state, showCancelConfirmation = true)
-            }
+            is BaseTransactionEvent.ShowCancelConfirmation ->
+                _state.update { state ->
+                    copyState(state, showCancelConfirmation = true)
+                }
 
-            is BaseTransactionEvent.HideCancelConfirmation -> _state.update { state ->
-                copyState(state, showCancelConfirmation = false)
-            }
+            is BaseTransactionEvent.HideCancelConfirmation ->
+                _state.update { state ->
+                    copyState(state, showCancelConfirmation = false)
+                }
 
-            is BaseTransactionEvent.ClearError -> _state.update { state ->
-                copyState(state, error = null)
-            }
+            is BaseTransactionEvent.ClearError ->
+                _state.update { state ->
+                    copyState(state, error = null)
+                }
 
-            is BaseTransactionEvent.HideSuccessDialog -> _state.update { state ->
-                copyState(state, isSuccess = false)
-            }
+            is BaseTransactionEvent.HideSuccessDialog ->
+                _state.update { state ->
+                    copyState(state, isSuccess = false)
+                }
 
-            is BaseTransactionEvent.ShowSourcePicker -> _state.update { state ->
-                copyState(state, showSourcePicker = true)
-            }
+            is BaseTransactionEvent.ShowSourcePicker ->
+                _state.update { state ->
+                    copyState(state, showSourcePicker = true)
+                }
 
-            is BaseTransactionEvent.HideSourcePicker -> _state.update { state ->
-                copyState(state, showSourcePicker = false)
-            }
+            is BaseTransactionEvent.HideSourcePicker ->
+                _state.update { state ->
+                    copyState(state, showSourcePicker = false)
+                }
 
-            is BaseTransactionEvent.ShowCustomSourceDialog -> _state.update { state ->
-                copyState(state, showCustomSourceDialog = true)
-            }
+            is BaseTransactionEvent.ShowCustomSourceDialog ->
+                _state.update { state ->
+                    copyState(state, showCustomSourceDialog = true)
+                }
 
-            is BaseTransactionEvent.HideCustomSourceDialog -> _state.update { state ->
-                copyState(state, showCustomSourceDialog = false, customSource = "")
-            }
+            is BaseTransactionEvent.HideCustomSourceDialog ->
+                _state.update { state ->
+                    copyState(state, showCustomSourceDialog = false, customSource = "")
+                }
 
-            is BaseTransactionEvent.ShowColorPicker -> _state.update { state ->
-                copyState(state, showColorPicker = true)
-            }
+            is BaseTransactionEvent.ShowColorPicker ->
+                _state.update { state ->
+                    copyState(state, showColorPicker = true)
+                }
 
-            is BaseTransactionEvent.HideColorPicker -> _state.update { state ->
-                copyState(state, showColorPicker = false)
-            }
+            is BaseTransactionEvent.HideColorPicker ->
+                _state.update { state ->
+                    copyState(state, showColorPicker = false)
+                }
 
             is BaseTransactionEvent.SetSource -> {
                 val selectedSource = _state.value.sources.find { it.name == event.source }
@@ -354,30 +382,35 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
 
-            is BaseTransactionEvent.SetCustomSource -> _state.update { state ->
-                copyState(state, customSource = event.source)
-            }
+            is BaseTransactionEvent.SetCustomSource ->
+                _state.update { state ->
+                    copyState(state, customSource = event.source)
+                }
 
             is BaseTransactionEvent.AddCustomSource -> { // Обработка в наследнике
             }
 
-            is BaseTransactionEvent.SetSourceColor -> _state.update { state ->
-                copyState(state, sourceColor = event.color)
-            }
+            is BaseTransactionEvent.SetSourceColor ->
+                _state.update { state ->
+                    copyState(state, sourceColor = event.color)
+                }
 
-            is BaseTransactionEvent.ShowWalletSelector -> _state.update { state ->
-                copyState(state, showWalletSelector = true)
-            }
+            is BaseTransactionEvent.ShowWalletSelector ->
+                _state.update { state ->
+                    copyState(state, showWalletSelector = true)
+                }
 
-            is BaseTransactionEvent.HideWalletSelector -> _state.update { state ->
-                copyState(state, showWalletSelector = false)
-            }
+            is BaseTransactionEvent.HideWalletSelector ->
+                _state.update { state ->
+                    copyState(state, showWalletSelector = false)
+                }
 
             is BaseTransactionEvent.ToggleAddToWallet -> {
-                val (newAddToWallet, newSelectedWallets) = handleToggleAddToWallet(
-                    _state.value.addToWallet,
-                    _state.value.isExpense,
-                )
+                val (newAddToWallet, newSelectedWallets) =
+                    handleToggleAddToWallet(
+                        _state.value.addToWallet,
+                        _state.value.isExpense,
+                    )
                 _state.update { state ->
                     copyState(
                         state,
@@ -388,33 +421,37 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             }
 
             is BaseTransactionEvent.SelectWallet -> {
-                val updated = if (event.selected) {
-                    _state.value.selectedWallets + event.walletId
-                } else {
-                    _state.value.selectedWallets - event.walletId
-                }
+                val updated =
+                    if (event.selected) {
+                        _state.value.selectedWallets + event.walletId
+                    } else {
+                        _state.value.selectedWallets - event.walletId
+                    }
                 _state.update { state ->
                     copyState(state, selectedWallets = updated)
                 }
             }
 
-            is BaseTransactionEvent.SelectWallets -> _state.update { state ->
-                copyState(state, selectedWallets = event.walletIds)
-            }
+            is BaseTransactionEvent.SelectWallets ->
+                _state.update { state ->
+                    copyState(state, selectedWallets = event.walletIds)
+                }
 
-            is BaseTransactionEvent.SetCustomCategory -> _state.update { state ->
-                copyState(state, customCategory = event.category)
-            }
+            is BaseTransactionEvent.SetCustomCategory ->
+                _state.update { state ->
+                    copyState(state, customCategory = event.category)
+                }
 
             is BaseTransactionEvent.AddCustomCategory -> {
                 val isExpense = _state.value.isExpense
                 val customCategoryIcon = _state.value.customCategoryIcon
                 categoriesViewModel.addCustomCategory(event.category, isExpense, customCategoryIcon)
-                val updatedCategories = if (isExpense) {
-                    categoriesViewModel.expenseCategories.value
-                } else {
-                    categoriesViewModel.incomeCategories.value
-                }
+                val updatedCategories =
+                    if (isExpense) {
+                        categoriesViewModel.expenseCategories.value
+                    } else {
+                        categoriesViewModel.incomeCategories.value
+                    }
                 _state.update {
                     if (isExpense) {
                         copyState(
@@ -450,9 +487,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
 
-            is BaseTransactionEvent.HideDeleteCategoryConfirmDialog -> _state.update { state ->
-                copyState(state, showDeleteCategoryConfirmDialog = false, categoryToDelete = null)
-            }
+            is BaseTransactionEvent.HideDeleteCategoryConfirmDialog ->
+                _state.update { state ->
+                    copyState(state, showDeleteCategoryConfirmDialog = false, categoryToDelete = null)
+                }
 
             is BaseTransactionEvent.DeleteCategory -> {
                 val category = event.category
@@ -474,15 +512,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                             if (_state.value.category == category) {
                                 // Сбрасываем текущую категорию, чтобы пользователь выбрал новую
                                 _state.update { state ->
-                                    val newState = if (isExpense) {
-                                        copyState(
-                                            state,
-                                            category = "",
-                                            selectedExpenseCategory = "",
-                                        )
-                                    } else {
-                                        copyState(state, category = "", selectedIncomeCategory = "")
-                                    }
+                                    val newState =
+                                        if (isExpense) {
+                                            copyState(
+                                                state,
+                                                category = "",
+                                                selectedExpenseCategory = "",
+                                            )
+                                        } else {
+                                            copyState(state, category = "", selectedIncomeCategory = "")
+                                        }
                                     newState
                                 }
                             }
@@ -571,11 +610,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
 
                 // Устанавливаем категорию по умолчанию для нового типа транзакции
                 val isExpense = _state.value.isExpense
-                val categories = if (isExpense) {
-                    _state.value.expenseCategories
-                } else {
-                    _state.value.incomeCategories
-                }
+                val categories =
+                    if (isExpense) {
+                        _state.value.expenseCategories
+                    } else {
+                        _state.value.incomeCategories
+                    }
 
                 if (categories.isNotEmpty()) {
                     val defaultCategory = categories.first().name
@@ -603,17 +643,20 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
 
-            is BaseTransactionEvent.HideDeleteSourceConfirmDialog -> _state.update { state ->
-                copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
-            }
+            is BaseTransactionEvent.HideDeleteSourceConfirmDialog ->
+                _state.update { state ->
+                    copyState(state, showDeleteSourceConfirmDialog = false, sourceToDelete = null)
+                }
 
-            is BaseTransactionEvent.ForceSetIncomeType -> _state.update { state ->
-                copyState(state, isExpense = false)
-            }
+            is BaseTransactionEvent.ForceSetIncomeType ->
+                _state.update { state ->
+                    copyState(state, isExpense = false)
+                }
 
-            is BaseTransactionEvent.ForceSetExpenseType -> _state.update { state ->
-                copyState(state, isExpense = true)
-            }
+            is BaseTransactionEvent.ForceSetExpenseType ->
+                _state.update { state ->
+                    copyState(state, isExpense = true)
+                }
 
             is BaseTransactionEvent.SetCustomCategoryIcon -> {
                 _state.update { state ->
@@ -621,9 +664,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                 }
             }
 
-            is BaseTransactionEvent.SetAmountError -> _state.update { state ->
-                copyState(state, amountError = event.isError)
-            }
+            is BaseTransactionEvent.SetAmountError ->
+                _state.update { state ->
+                    copyState(state, amountError = event.isError)
+                }
 
             else -> {}
         }
@@ -679,9 +723,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             categoriesViewModel.expenseCategories.collect { categories ->
                 _state.update { state ->
                     // Сортируем категории расходов по частоте использования
-                    val sortedCategories = categories.sortedByDescending {
-                        getCategoryUsage(it.name, true)
-                    }
+                    val sortedCategories =
+                        categories.sortedByDescending {
+                            getCategoryUsage(it.name, true)
+                        }
 
                     Timber.d(
                         "[CATEGORY_SORT] Категории расходов отсортированы по использованию: %s",
@@ -694,11 +739,12 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     )
 
                     // Выбираем первую категорию, если категория еще не выбрана
-                    val firstCategory = if (state.category.isBlank() && sortedCategories.isNotEmpty()) {
-                        sortedCategories.first().name
-                    } else {
-                        state.category
-                    }
+                    val firstCategory =
+                        if (state.category.isBlank() && sortedCategories.isNotEmpty()) {
+                            sortedCategories.first().name
+                        } else {
+                            state.category
+                        }
 
                     copyState(
                         state,
@@ -749,9 +795,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
             categoriesViewModel.incomeCategories.collect { categories ->
                 _state.update { state ->
                     // Сортируем категории доходов по частоте использования
-                    val sortedCategories = categories.sortedByDescending {
-                        getCategoryUsage(it.name, false)
-                    }
+                    val sortedCategories =
+                        categories.sortedByDescending {
+                            getCategoryUsage(it.name, false)
+                        }
 
                     Timber.d(
                         "[CATEGORY_SORT] Категории доходов отсортированы по использованию: %s",
@@ -860,10 +907,11 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
     protected fun loadSources() {
         viewModelScope.launch {
             try {
-                val sources = com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources(
-                    sourcePreferences,
-                    resources,
-                )
+                val sources =
+                    com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources(
+                        sourcePreferences,
+                        resources,
+                    )
                 _state.update { state ->
                     copyState(state, sources = sources)
                 }
@@ -878,7 +926,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param expr строка с выражением
      * @param currency валюта (по умолчанию RUB)
      */
-    protected fun parseMoneyExpression(expr: String, currency: Currency = Currency.RUB): Money {
+    protected fun parseMoneyExpression(
+        expr: String,
+        currency: Currency = Currency.RUB,
+    ): Money {
         // Если входная строка пустая, сразу возвращаем 0
         if (expr.isBlank()) {
             Timber.d("parseMoneyExpression: исходное выражение пустое, возвращаем 0")
@@ -986,7 +1037,10 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param categoryName Имя категории
      * @param isExpense Является ли категория расходной
      */
-    fun incrementCategoryUsage(categoryName: String, isExpense: Boolean) {
+    fun incrementCategoryUsage(
+        categoryName: String,
+        isExpense: Boolean,
+    ) {
         if (categoryName.isBlank()) return
 
         viewModelScope.launch {
@@ -1003,17 +1057,19 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     categoryName,
                 )
             }
-            
+
             // Триггер достижения за использование категорий
             com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onCategoryUsed(categoryName)
-            
+
             // Проверяем, использованы ли все возможные категории
             val expenseCategories = categoryUsagePreferences.loadExpenseCategoriesUsage()
             val incomeCategories = categoryUsagePreferences.loadIncomeCategoriesUsage()
             val totalUniqueCategories = (expenseCategories.keys + incomeCategories.keys).distinct().size
-            
+
             if (totalUniqueCategories >= 10) { // Если использовано 10+ разных категорий
-                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("all_categories_used")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "all_categories_used",
+                )
             }
         }
     }
@@ -1024,12 +1080,16 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
      * @param isExpense Является ли категория расходной
      * @return Количество использований категории
      */
-    fun getCategoryUsage(categoryName: String, isExpense: Boolean): Int {
-        val usage = if (isExpense) {
-            categoryUsagePreferences.loadExpenseCategoriesUsage()[categoryName] ?: 0
-        } else {
-            categoryUsagePreferences.loadIncomeCategoriesUsage()[categoryName] ?: 0
-        }
+    fun getCategoryUsage(
+        categoryName: String,
+        isExpense: Boolean,
+    ): Int {
+        val usage =
+            if (isExpense) {
+                categoryUsagePreferences.loadExpenseCategoriesUsage()[categoryName] ?: 0
+            } else {
+                categoryUsagePreferences.loadIncomeCategoriesUsage()[categoryName] ?: 0
+            }
         Timber.d(
             "CATEGORY: Получено количество использований категории %s: %d",
             categoryName,

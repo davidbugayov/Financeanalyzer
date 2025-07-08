@@ -33,19 +33,19 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.text.font.FontWeight
-import com.davidbugayov.financeanalyzer.feature.history.R
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
-import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
+import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.model.TransactionGroup
+import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewModel
+import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
-import kotlinx.coroutines.launch
 import java.text.SimpleDateFormat
 import java.util.Locale
-import androidx.compose.ui.unit.dp
+import kotlinx.coroutines.launch
 
 /**
  * Компонент для отображения сгруппированных транзакций с поддержкой пагинации.
@@ -75,13 +75,14 @@ fun TransactionGroupList(
 
     // Используем mutableStateMapOf для хранения состояния раскрытия групп
     // По умолчанию все группы свернуты
-    val expandedGroups = remember(transactionGroups) {
-        mutableStateMapOf<String, Boolean>().apply {
-            transactionGroups.forEachIndexed { index, group ->
-                this[dateFormat.format(group.date)] = false // Все группы свернуты по умолчанию
+    val expandedGroups =
+        remember(transactionGroups) {
+            mutableStateMapOf<String, Boolean>().apply {
+                transactionGroups.forEachIndexed { index, group ->
+                    this[dateFormat.format(group.date)] = false // Все группы свернуты по умолчанию
+                }
             }
         }
-    }
 
     // Проверяем, нужно ли загружать больше данных
     val shouldLoadMore by remember {
@@ -156,9 +157,10 @@ fun TransactionGroupList(
                     )
 
                     HorizontalDivider(
-                        modifier = Modifier.padding(
-                            horizontal = dimensionResource(id = R.dimen.spacing_normal),
-                        ),
+                        modifier =
+                            Modifier.padding(
+                                horizontal = dimensionResource(id = R.dimen.spacing_normal),
+                            ),
                         color = MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.3f),
                     )
                 }
@@ -167,9 +169,10 @@ fun TransactionGroupList(
             // Разделитель между группами
             item(key = "spacer_${groupIndex}_$formattedDate") {
                 Spacer(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(dimensionResource(id = R.dimen.spacing_small)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(dimensionResource(id = R.dimen.spacing_small)),
                 )
             }
         }
@@ -178,9 +181,10 @@ fun TransactionGroupList(
         if (isLoading) {
             item(key = "loading_indicator") {
                 Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(dimensionResource(id = R.dimen.spacing_normal)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(dimensionResource(id = R.dimen.spacing_normal)),
                     contentAlignment = Alignment.Center,
                 ) {
                     CircularProgressIndicator(
@@ -194,9 +198,10 @@ fun TransactionGroupList(
         // Spacer для отступа под FloatingActionButton
         item(key = "fab_spacer") {
             Spacer(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(80.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(80.dp),
             )
         }
     }
@@ -206,46 +211,56 @@ fun TransactionGroupList(
  * Заголовок для группы транзакций с возможностью сворачивания/разворачивания
  */
 @Composable
-private fun ExpandableGroupHeader(date: String, balance: Double, isExpanded: Boolean, onToggle: (Boolean) -> Unit) {
+private fun ExpandableGroupHeader(
+    date: String,
+    balance: Double,
+    isExpanded: Boolean,
+    onToggle: (Boolean) -> Unit,
+) {
     val incomeColor = LocalIncomeColor.current
     val expenseColor = LocalExpenseColor.current
     val balanceTextColor = if (balance >= 0) incomeColor else expenseColor
 
     // Улучшенные цвета фона для лучшей видимости на темном фоне
-    val cardBackgroundColor = if (balance >= 0) {
-        // Для доходов - более яркий зеленый фон
-        incomeColor.copy(alpha = 0.15f)
-    } else {
-        // Для расходов - более яркий красный фон
-        expenseColor.copy(alpha = 0.15f)
-    }
+    val cardBackgroundColor =
+        if (balance >= 0) {
+            // Для доходов - более яркий зеленый фон
+            incomeColor.copy(alpha = 0.15f)
+        } else {
+            // Для расходов - более яркий красный фон
+            expenseColor.copy(alpha = 0.15f)
+        }
 
     // Добавляем границу для лучшей видимости
-    val borderColor = if (balance >= 0) {
-        incomeColor.copy(alpha = 0.3f)
-    } else {
-        expenseColor.copy(alpha = 0.3f)
-    }
+    val borderColor =
+        if (balance >= 0) {
+            incomeColor.copy(alpha = 0.3f)
+        } else {
+            expenseColor.copy(alpha = 0.3f)
+        }
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                horizontal = dimensionResource(id = R.dimen.spacing_normal),
-                vertical = dimensionResource(id = R.dimen.spacing_small),
-            )
-            .clickable { onToggle(!isExpanded) },
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(
+                    horizontal = dimensionResource(id = R.dimen.spacing_normal),
+                    vertical = dimensionResource(id = R.dimen.spacing_small),
+                )
+                .clickable { onToggle(!isExpanded) },
         colors = CardDefaults.cardColors(containerColor = cardBackgroundColor),
-        border = BorderStroke(
-            width = 1.dp,
-            color = borderColor,
-        ),
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color = borderColor,
+            ),
         elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(id = R.dimen.spacing_normal)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(id = R.dimen.spacing_normal)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Icon(

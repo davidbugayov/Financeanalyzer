@@ -21,21 +21,27 @@ import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.setScale
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
-fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = Modifier) {
+fun TransactionsStatisticsCard(
+    metrics: FinancialMetrics,
+    modifier: Modifier = Modifier,
+) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(
-            dimensionResource(R.dimen.financial_statistics_card_corner_radius),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-        ),
+        shape =
+            RoundedCornerShape(
+                dimensionResource(R.dimen.financial_statistics_card_corner_radius),
+            ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+            ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.transactions_statistics),
@@ -44,9 +50,10 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
             )
 
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_large),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
             )
 
             // Общее количество транзакций
@@ -68,9 +75,10 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
             )
 
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                    ),
             )
 
             // Средний доход на транзакцию
@@ -86,9 +94,10 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
             )
 
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                    ),
             )
 
             // Максимальный доход
@@ -104,9 +113,10 @@ fun TransactionsStatisticsCard(metrics: FinancialMetrics, modifier: Modifier = M
             )
 
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                    ),
             )
 
             // Норма сбережений

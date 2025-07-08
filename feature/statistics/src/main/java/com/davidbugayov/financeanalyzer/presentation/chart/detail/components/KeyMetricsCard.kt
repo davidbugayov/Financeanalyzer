@@ -26,31 +26,41 @@ import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.feature.statistics.R
 
 @Composable
-fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: Modifier = Modifier) {
+fun KeyMetricsCard(
+    income: Money,
+    expense: Money,
+    savingsRate: Float,
+    modifier: Modifier = Modifier,
+) {
     Card(
         modifier = modifier,
-        shape = RoundedCornerShape(
-            dimensionResource(R.dimen.financial_statistics_card_corner_radius),
-        ),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-        ),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface,
-        ),
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-        ),
+        shape =
+            RoundedCornerShape(
+                dimensionResource(R.dimen.financial_statistics_card_corner_radius),
+            ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+            ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
+        border =
+            BorderStroke(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+            ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             Text(
                 text = stringResource(R.string.key_metrics),
@@ -60,9 +70,10 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: 
             )
 
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_large),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
             )
 
             Row(
@@ -98,9 +109,10 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: 
             }
 
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_large),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_large),
+                    ),
             )
 
             Row(
@@ -114,86 +126,96 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: 
                     color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
                 Text(
-                    text = if (savingsRate >= 20) {
-                        stringResource(R.string.savings_status_done)
-                    } else {
-                        stringResource(
-                            R.string.savings_status_attention,
-                        )
-                    },
+                    text =
+                        if (savingsRate >= 20) {
+                            stringResource(R.string.savings_status_done)
+                        } else {
+                            stringResource(
+                                R.string.savings_status_attention,
+                            )
+                        },
                     style = MaterialTheme.typography.bodyMedium,
-                    color = if (savingsRate >= 20) {
-                        colorResource(R.color.savings_rate_good)
-                    } else {
-                        colorResource(
-                            R.color.savings_rate_needs_attention,
-                        )
-                    },
+                    color =
+                        if (savingsRate >= 20) {
+                            colorResource(R.color.savings_rate_good)
+                        } else {
+                            colorResource(
+                                R.color.savings_rate_needs_attention,
+                            )
+                        },
                 )
             }
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_medium),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_medium),
+                    ),
             )
             Box(modifier = Modifier.fillMaxWidth()) {
                 Row(modifier = Modifier.fillMaxWidth()) {
                     Box(
-                        modifier = Modifier
-                            .weight(0.15f)
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp))
-                            .background(
-                                colorResource(R.color.savings_rate_needs_attention).copy(
-                                    alpha = 0.2f,
+                        modifier =
+                            Modifier
+                                .weight(0.15f)
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(topStart = 4.dp, bottomStart = 4.dp))
+                                .background(
+                                    colorResource(R.color.savings_rate_needs_attention).copy(
+                                        alpha = 0.2f,
+                                    ),
                                 ),
-                            ),
                     )
                     Box(
-                        modifier = Modifier
-                            .weight(0.1f)
-                            .height(8.dp)
-                            .background(
-                                colorResource(R.color.savings_rate_satisfactory).copy(alpha = 0.2f),
-                            ),
+                        modifier =
+                            Modifier
+                                .weight(0.1f)
+                                .height(8.dp)
+                                .background(
+                                    colorResource(R.color.savings_rate_satisfactory).copy(alpha = 0.2f),
+                                ),
                     )
                     Box(
-                        modifier = Modifier
-                            .weight(0.15f)
-                            .height(8.dp)
-                            .background(colorResource(R.color.savings_rate_good).copy(alpha = 0.2f)),
+                        modifier =
+                            Modifier
+                                .weight(0.15f)
+                                .height(8.dp)
+                                .background(colorResource(R.color.savings_rate_good).copy(alpha = 0.2f)),
                     )
                     Box(
-                        modifier = Modifier
-                            .weight(0.6f)
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
-                            .background(
-                                colorResource(R.color.savings_rate_excellent).copy(alpha = 0.2f),
-                            ),
+                        modifier =
+                            Modifier
+                                .weight(0.6f)
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(topEnd = 4.dp, bottomEnd = 4.dp))
+                                .background(
+                                    colorResource(R.color.savings_rate_excellent).copy(alpha = 0.2f),
+                                ),
                     )
                 }
                 val normalizedRate = (savingsRate / 100f).coerceIn(0f, 1f)
-                val progressColor = when {
-                    savingsRate >= 30 -> colorResource(R.color.savings_rate_excellent)
-                    savingsRate >= 15 -> colorResource(R.color.savings_rate_good)
-                    savingsRate >= 5 -> colorResource(R.color.savings_rate_satisfactory)
-                    else -> colorResource(R.color.savings_rate_needs_attention)
-                }
+                val progressColor =
+                    when {
+                        savingsRate >= 30 -> colorResource(R.color.savings_rate_excellent)
+                        savingsRate >= 15 -> colorResource(R.color.savings_rate_good)
+                        savingsRate >= 5 -> colorResource(R.color.savings_rate_satisfactory)
+                        else -> colorResource(R.color.savings_rate_needs_attention)
+                    }
                 LinearProgressIndicator(
                     progress = { normalizedRate },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(8.dp)
-                        .clip(RoundedCornerShape(4.dp)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .height(8.dp)
+                            .clip(RoundedCornerShape(4.dp)),
                     color = progressColor,
                     trackColor = Color.Transparent,
                 )
             }
             Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(top = 4.dp),
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 4.dp),
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
@@ -218,9 +240,10 @@ fun KeyMetricsCard(income: Money, expense: Money, savingsRate: Float, modifier: 
                 )
             }
             Spacer(
-                modifier = Modifier.height(
-                    dimensionResource(R.dimen.financial_statistics_spacer_small),
-                ),
+                modifier =
+                    Modifier.height(
+                        dimensionResource(R.dimen.financial_statistics_spacer_small),
+                    ),
             )
         }
     }

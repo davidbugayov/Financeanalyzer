@@ -2,8 +2,8 @@ package com.davidbugayov.financeanalyzer.analytics
 
 import android.os.Bundle
 import android.os.SystemClock
-import timber.log.Timber
 import java.util.concurrent.ConcurrentHashMap
+import timber.log.Timber
 
 /**
  * Класс для отслеживания и анализа производительности приложения.
@@ -60,10 +60,11 @@ object PerformanceMetrics {
         val duration = SystemClock.elapsedRealtime() - startTime
         Timber.d("Operation $operationName took $duration ms")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, duration)
-            putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.DURATION_MS, duration)
+                putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.OPERATION_COMPLETED, params)
 
@@ -76,7 +77,10 @@ object PerformanceMetrics {
      * @param block Блок кода для выполнения
      * @return Результат выполнения блока
      */
-    inline fun <T> trackOperation(operationName: String, block: () -> T): T {
+    inline fun <T> trackOperation(
+        operationName: String,
+        block: () -> T,
+    ): T {
         startOperation(operationName)
         try {
             return block()
@@ -91,26 +95,31 @@ object PerformanceMetrics {
      * @param durationMs Длительность действия в миллисекундах
      * @param additionalParams Дополнительные параметры
      */
-    fun trackAction(actionName: String, durationMs: Long, additionalParams: Map<String, Any> = emptyMap()) {
+    fun trackAction(
+        actionName: String,
+        durationMs: Long,
+        additionalParams: Map<String, Any> = emptyMap(),
+    ) {
         Timber.d("Action $actionName took $durationMs ms")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
-            putString(AnalyticsConstants.Params.ACTION_NAME, actionName)
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
+                putString(AnalyticsConstants.Params.ACTION_NAME, actionName)
 
-            // Add any additional parameters
-            additionalParams.forEach { (key, value) ->
-                when (value) {
-                    is String -> putString(key, value)
-                    is Int -> putInt(key, value)
-                    is Long -> putLong(key, value)
-                    is Float -> putFloat(key, value)
-                    is Double -> putDouble(key, value)
-                    is Boolean -> putBoolean(key, value)
-                    else -> putString(key, value.toString())
+                // Add any additional parameters
+                additionalParams.forEach { (key, value) ->
+                    when (value) {
+                        is String -> putString(key, value)
+                        is Int -> putInt(key, value)
+                        is Long -> putLong(key, value)
+                        is Float -> putFloat(key, value)
+                        is Double -> putDouble(key, value)
+                        is Boolean -> putBoolean(key, value)
+                        else -> putString(key, value.toString())
+                    }
                 }
             }
-        }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.USER_ACTION, params)
     }
@@ -120,7 +129,10 @@ object PerformanceMetrics {
      * @param screenName Name of the screen
      * @param durationMs Time taken to load the screen in milliseconds
      */
-    fun trackScreenLoad(screenName: String, durationMs: Long) {
+    fun trackScreenLoad(
+        screenName: String,
+        durationMs: Long,
+    ) {
         // Логируем предупреждение, если загрузка экрана заняла слишком много времени
         if (durationMs > SCREEN_LOAD_WARNING_THRESHOLD) {
             Timber.w(
@@ -130,10 +142,11 @@ object PerformanceMetrics {
 
         Timber.d("Screen $screenName loaded in $durationMs ms")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
-            putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
+                putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.SCREEN_LOAD, params)
     }
@@ -193,10 +206,11 @@ object PerformanceMetrics {
 
         Timber.d("DB operation $operationName took $duration ms")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, duration)
-            putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.DURATION_MS, duration)
+                putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_OPERATION, params)
     }
@@ -206,7 +220,10 @@ object PerformanceMetrics {
      * @param operationName Name of the database operation
      * @param durationMs Duration of the operation in milliseconds
      */
-    fun trackDbOperation(operationName: String, durationMs: Long) {
+    fun trackDbOperation(
+        operationName: String,
+        durationMs: Long,
+    ) {
         // Логируем предупреждение, если операция с БД заняла слишком много времени
         if (durationMs > DB_OPERATION_WARNING_THRESHOLD) {
             Timber.w(
@@ -216,10 +233,11 @@ object PerformanceMetrics {
 
         Timber.d("DB operation $operationName took $durationMs ms")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
-            putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
+                putString(AnalyticsConstants.Params.OPERATION_NAME, operationName)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.DATABASE_OPERATION, params)
     }
@@ -230,7 +248,10 @@ object PerformanceMetrics {
      * @param block Block of code to time
      * @return Result of the block
      */
-    inline fun <T> trackDbOperation(operationName: String, block: () -> T): T {
+    inline fun <T> trackDbOperation(
+        operationName: String,
+        block: () -> T,
+    ): T {
         startDbOperation(operationName)
         try {
             return block()
@@ -253,7 +274,10 @@ object PerformanceMetrics {
      * @param url URL of the network call that was timed
      * @param statusCode HTTP status code of the response
      */
-    fun endNetworkCall(url: String, statusCode: Int) {
+    fun endNetworkCall(
+        url: String,
+        statusCode: Int,
+    ) {
         val startTime = networkCallTimers.remove(url)
         if (startTime == null) {
             Timber.w("Attempted to end timing for network call that wasn't started: $url")
@@ -271,11 +295,12 @@ object PerformanceMetrics {
 
         Timber.d("Network call to $url took $duration ms with status code $statusCode")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, duration)
-            putString("url", url)
-            putInt("status_code", statusCode)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.DURATION_MS, duration)
+                putString("url", url)
+                putInt("status_code", statusCode)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_CALL, params)
     }
@@ -286,7 +311,11 @@ object PerformanceMetrics {
      * @param durationMs Duration of the call in milliseconds
      * @param statusCode HTTP status code of the response
      */
-    fun trackNetworkCall(url: String, durationMs: Long, statusCode: Int) {
+    fun trackNetworkCall(
+        url: String,
+        durationMs: Long,
+        statusCode: Int,
+    ) {
         // Логируем предупреждение, если сетевой запрос занял слишком много времени
         if (durationMs > NETWORK_CALL_WARNING_THRESHOLD) {
             Timber.w(
@@ -296,11 +325,12 @@ object PerformanceMetrics {
 
         Timber.d("Network call to $url took $durationMs ms with status code $statusCode")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
-            putString("url", url)
-            putInt("status_code", statusCode)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
+                putString("url", url)
+                putInt("status_code", statusCode)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.NETWORK_CALL, params)
     }
@@ -311,17 +341,22 @@ object PerformanceMetrics {
      * @param totalMemoryMB Total memory in MB
      * @param availableMemoryMB Available memory in MB
      */
-    fun trackMemoryUsage(usedMemoryMB: Long, totalMemoryMB: Long, availableMemoryMB: Long) {
+    fun trackMemoryUsage(
+        usedMemoryMB: Long,
+        totalMemoryMB: Long,
+        availableMemoryMB: Long,
+    ) {
         val percentUsed = (usedMemoryMB.toFloat() / totalMemoryMB.toFloat()) * 100
 
         Timber.d("Memory usage: $usedMemoryMB MB / $totalMemoryMB MB ($percentUsed%)")
 
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.MEMORY_USAGE_MB, usedMemoryMB)
-            putLong(AnalyticsConstants.Params.MEMORY_TOTAL, totalMemoryMB)
-            putLong(AnalyticsConstants.Params.MEMORY_AVAILABLE, availableMemoryMB)
-            putFloat("memory_percent_used", percentUsed)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.MEMORY_USAGE_MB, usedMemoryMB)
+                putLong(AnalyticsConstants.Params.MEMORY_TOTAL, totalMemoryMB)
+                putLong(AnalyticsConstants.Params.MEMORY_AVAILABLE, availableMemoryMB)
+                putFloat("memory_percent_used", percentUsed)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.MEMORY_USAGE, params)
     }
@@ -332,14 +367,19 @@ object PerformanceMetrics {
      * @param durationMs Duration of the task in milliseconds
      * @param result Result of the task (success, failure, etc.)
      */
-    fun trackBackgroundTask(taskName: String, durationMs: Long, result: String) {
+    fun trackBackgroundTask(
+        taskName: String,
+        durationMs: Long,
+        result: String,
+    ) {
         Timber.d("Background task $taskName completed in $durationMs ms with result: $result")
 
-        val params = Bundle().apply {
-            putString("task_name", taskName)
-            putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
-            putString(AnalyticsConstants.Params.FEATURE_RESULT, result)
-        }
+        val params =
+            Bundle().apply {
+                putString("task_name", taskName)
+                putLong(AnalyticsConstants.Params.DURATION_MS, durationMs)
+                putString(AnalyticsConstants.Params.FEATURE_RESULT, result)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.BACKGROUND_TASK, params)
     }
@@ -350,14 +390,19 @@ object PerformanceMetrics {
      * @param droppedFrames Number of dropped frames
      * @param screenName Name of the screen being rendered
      */
-    fun trackFrameMetrics(fps: Float, droppedFrames: Int, screenName: String) {
+    fun trackFrameMetrics(
+        fps: Float,
+        droppedFrames: Int,
+        screenName: String,
+    ) {
         Timber.d("Frame metrics: $fps FPS, $droppedFrames dropped frames on screen $screenName")
 
-        val params = Bundle().apply {
-            putFloat(AnalyticsConstants.Params.FRAME_RATE, fps)
-            putInt(AnalyticsConstants.Params.FRAME_DROP_COUNT, droppedFrames)
-            putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
-        }
+        val params =
+            Bundle().apply {
+                putFloat(AnalyticsConstants.Params.FRAME_RATE, fps)
+                putInt(AnalyticsConstants.Params.FRAME_DROP_COUNT, droppedFrames)
+                putString(AnalyticsConstants.Params.SCREEN_NAME, screenName)
+            }
 
         AnalyticsUtils.logEvent("frame_metrics", params)
     }

@@ -13,28 +13,29 @@ class GenericExcelHandler(
     transactionRepository: TransactionRepository,
     context: Context,
 ) : AbstractExcelBankHandler(transactionRepository, context) {
-
     override val bankName: String = "Generic Excel"
 
     // Ключевые слова для общих Excel-файлов
-    override val excelKeywords: List<String> = listOf(
-        ".xlsx",
-        ".xls",
-        "excel_export",
-        "workbook",
-        "excel",
-        "spreadsheet",
-    )
+    override val excelKeywords: List<String> =
+        listOf(
+            ".xlsx",
+            ".xls",
+            "excel_export",
+            "workbook",
+            "excel",
+            "spreadsheet",
+        )
 
     override fun createImporter(fileType: FileType): ImportTransactionsUseCase {
         if (supportsFileType(fileType)) {
-            val defaultConfig = ExcelParseConfig(
-                // Можно оставить значения по умолчанию из ExcelParseConfig,
-                // или определить специфичные "общие" настройки для Excel, если это имеет смысл.
-                // Например, если большинство Excel-файлов, которые не определяются как банковские,
-                // имеют заголовок в 2 строки, можно указать headerRowCount = 2.
-                // Для примера, оставим полностью дефолтный конфиг.
-            )
+            val defaultConfig =
+                ExcelParseConfig(
+                    // Можно оставить значения по умолчанию из ExcelParseConfig,
+                    // или определить специфичные "общие" настройки для Excel, если это имеет смысл.
+                    // Например, если большинство Excel-файлов, которые не определяются как банковские,
+                    // имеют заголовок в 2 строки, можно указать headerRowCount = 2.
+                    // Для примера, оставим полностью дефолтный конфиг.
+                )
             Timber.d(
                 "[$bankName Handler] Создание GenericExcelImportUseCase с дефолтной конфигурацией: $defaultConfig",
             )
@@ -47,7 +48,11 @@ class GenericExcelHandler(
         return listOf(".xlsx", ".xls", "excel_export", "workbook")
     }
 
-    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
+    override fun canHandle(
+        fileName: String,
+        uri: Uri,
+        fileType: FileType,
+    ): Boolean {
         // Базовая проверка (тип файла и ключевые слова в имени)
         if (super.canHandle(fileName, uri, fileType)) {
             return true

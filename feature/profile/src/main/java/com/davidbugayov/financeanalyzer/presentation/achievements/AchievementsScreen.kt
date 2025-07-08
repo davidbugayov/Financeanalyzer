@@ -11,7 +11,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.FlowRow
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -20,61 +19,52 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.CheckCircle
-import androidx.compose.material.icons.filled.EmojiEvents
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.LocalCafe
-import androidx.compose.ui.res.painterResource
-import androidx.compose.material.icons.filled.Star
-import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
-import androidx.compose.material.icons.filled.Wallet
-import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.AccountBalance
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.AutoAwesome
 import androidx.compose.material.icons.filled.Badge
 import androidx.compose.material.icons.filled.BusinessCenter
+import androidx.compose.material.icons.filled.CheckCircle
 import androidx.compose.material.icons.filled.CreditCard
 import androidx.compose.material.icons.filled.Download
+import androidx.compose.material.icons.filled.EmojiEvents
 import androidx.compose.material.icons.filled.Explore
 import androidx.compose.material.icons.filled.FavoriteBorder
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material.icons.filled.FlightTakeoff
 import androidx.compose.material.icons.filled.Groups
 import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material.icons.filled.Home
+import androidx.compose.material.icons.filled.LocalCafe
 import androidx.compose.material.icons.filled.LocalFireDepartment
 import androidx.compose.material.icons.filled.LockClock
 import androidx.compose.material.icons.filled.MilitaryTech
 import androidx.compose.material.icons.filled.MonetizationOn
 import androidx.compose.material.icons.filled.NightsStay
-import androidx.compose.material.icons.filled.Pets
 import androidx.compose.material.icons.filled.Psychology
+import androidx.compose.material.icons.filled.Savings
 import androidx.compose.material.icons.filled.Schedule
-import androidx.compose.material.icons.filled.School
 import androidx.compose.material.icons.filled.Security
 import androidx.compose.material.icons.filled.Shield
 import androidx.compose.material.icons.filled.SportsEsports
+import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.filled.TrendingUp
-import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Wallet
 import androidx.compose.material.icons.filled.WbSunny
-
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
 import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ProgressIndicatorDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -92,12 +82,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
-import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
-import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
+import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 
 /**
@@ -105,88 +95,90 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
  */
 @Composable
 fun AchievementsScreen(
-    achievements: List<Achievement>, 
-    onBack: () -> Unit
+    achievements: List<Achievement>,
+    onBack: () -> Unit,
 ) {
     AchievementNotificationManager(
-        achievementEngine = AchievementEngineProvider.get()
+        achievementEngine = AchievementEngineProvider.get(),
     ) {
         AchievementsScreenContent(
             achievements = achievements,
-            onBack = onBack
+            onBack = onBack,
         )
     }
 }
 
 @Composable
 private fun AchievementsScreenContent(
-    achievements: List<Achievement>, 
-    onBack: () -> Unit
+    achievements: List<Achievement>,
+    onBack: () -> Unit,
 ) {
     var selectedCategory by remember { mutableStateOf<AchievementCategory?>(null) }
     var selectedFilter by remember { mutableStateOf(AchievementFilter.ALL) }
-    
-    val filteredAchievements = remember(achievements, selectedCategory, selectedFilter) {
-        achievements
-            .filter { achievement ->
-                // Фильтрация по категории
-                selectedCategory?.let { category ->
-                    achievement.category == category
-                } ?: true
-            }
-            .filter { achievement ->
-                // Фильтрация по статусу
-                when (selectedFilter) {
-                    AchievementFilter.ALL -> true
-                    AchievementFilter.UNLOCKED -> achievement.isUnlocked
-                    AchievementFilter.LOCKED -> !achievement.isUnlocked
+
+    val filteredAchievements =
+        remember(achievements, selectedCategory, selectedFilter) {
+            achievements
+                .filter { achievement ->
+                    // Фильтрация по категории
+                    selectedCategory?.let { category ->
+                        achievement.category == category
+                    } ?: true
                 }
-            }
-            .filter { achievement ->
-                // Скрываем скрытые ачивки если они не разблокированы
-                if (achievement.isHidden && !achievement.isUnlocked) false else true
-            }
-    }
+                .filter { achievement ->
+                    // Фильтрация по статусу
+                    when (selectedFilter) {
+                        AchievementFilter.ALL -> true
+                        AchievementFilter.UNLOCKED -> achievement.isUnlocked
+                        AchievementFilter.LOCKED -> !achievement.isUnlocked
+                    }
+                }
+                .filter { achievement ->
+                    // Скрываем скрытые ачивки если они не разблокированы
+                    if (achievement.isHidden && !achievement.isUnlocked) false else true
+                }
+        }
 
     val scrollState = rememberScrollState()
-    
+
     Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(scrollState)
+        modifier =
+            Modifier
+                .fillMaxSize()
+                .verticalScroll(scrollState),
     ) {
         AppTopBar(
             title = stringResource(R.string.achievements),
             showBackButton = true,
             onBackClick = onBack,
         )
-        
+
         // Статистика ачивок
         ModernStatsCard(achievements = achievements)
-        
+
         // Фильтры
         ModernFilters(
             selectedCategory = selectedCategory,
             onCategorySelected = { selectedCategory = it },
             selectedFilter = selectedFilter,
-            onFilterSelected = { selectedFilter = it }
+            onFilterSelected = { selectedFilter = it },
         )
-        
+
         // Список ачивок
         Column(
             modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-            verticalArrangement = Arrangement.spacedBy(16.dp)
+            verticalArrangement = Arrangement.spacedBy(16.dp),
         ) {
             filteredAchievements.forEach { achievement ->
                 AnimatedVisibility(
                     visible = true,
-                    enter = fadeIn(tween(300)) + slideInVertically(tween(300)) { it / 4 }
+                    enter = fadeIn(tween(300)) + slideInVertically(tween(300)) { it / 4 },
                 ) {
                     UltraModernAchievementCard(achievement = achievement)
                 }
             }
         }
-        
+
         Spacer(modifier = Modifier.height(24.dp))
     }
 }
@@ -195,7 +187,9 @@ private fun AchievementsScreenContent(
  * Типы фильтров для ачивок
  */
 enum class AchievementFilter {
-    ALL, UNLOCKED, LOCKED
+    ALL,
+    UNLOCKED,
+    LOCKED,
 }
 
 /**
@@ -205,131 +199,142 @@ enum class AchievementFilter {
 private fun ModernStatsCard(achievements: List<Achievement>) {
     val unlockedCount = achievements.count { it.isUnlocked }
     val totalCoins = achievements.filter { it.isUnlocked }.sumOf { it.rewardCoins }
-    val progressPercentage = if (achievements.isNotEmpty()) {
-        unlockedCount.toFloat() / achievements.size.toFloat()
-    } else 0f
-    
+    val progressPercentage =
+        if (achievements.isNotEmpty()) {
+            unlockedCount.toFloat() / achievements.size.toFloat()
+        } else {
+            0f
+        }
+
     val animatedProgress by animateFloatAsState(
         targetValue = progressPercentage,
         animationSpec = tween(1500),
-        label = "progress"
+        label = "progress",
     )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp)
-            .shadow(
-                elevation = 12.dp,
-                shape = RoundedCornerShape(24.dp),
-                ambientColor = Color(0xFF6366F1),
-                spotColor = Color(0xFF6366F1)
-            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+                .shadow(
+                    elevation = 12.dp,
+                    shape = RoundedCornerShape(24.dp),
+                    ambientColor = Color(0xFF6366F1),
+                    spotColor = Color(0xFF6366F1),
+                ),
         shape = RoundedCornerShape(24.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surface
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor = MaterialTheme.colorScheme.surface,
+            ),
     ) {
         Box {
             // Фоновый градиент
             Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(180.dp)
-                    .background(
-                        brush = Brush.linearGradient(
-                            colors = listOf(
-                                Color(0xFF6366F1).copy(alpha = 0.1f),
-                                Color(0xFF8B5CF6).copy(alpha = 0.05f)
-                            )
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .height(180.dp)
+                        .background(
+                            brush =
+                                Brush.linearGradient(
+                                    colors =
+                                        listOf(
+                                            Color(0xFF6366F1).copy(alpha = 0.1f),
+                                            Color(0xFF8B5CF6).copy(alpha = 0.05f),
+                                        ),
+                                ),
+                            shape = RoundedCornerShape(24.dp),
                         ),
-                        shape = RoundedCornerShape(24.dp)
-                    )
             )
-            
+
             Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(24.dp)
+                modifier =
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(24.dp),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     horizontalArrangement = Arrangement.SpaceBetween,
-                    verticalAlignment = Alignment.Top
+                    verticalAlignment = Alignment.Top,
                 ) {
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
                             text = "🏆 Ваши достижения",
                             style = MaterialTheme.typography.headlineSmall,
                             fontWeight = FontWeight.Bold,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.height(8.dp))
                         Text(
                             text = "$unlockedCount из ${achievements.size} разблокировано",
                             style = MaterialTheme.typography.bodyLarge,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
-                    
+
                     // Монеты с градиентом
                     Card(
                         shape = RoundedCornerShape(16.dp),
-                        colors = CardDefaults.cardColors(
-                            containerColor = Color(0xFFFFD700).copy(alpha = 0.1f)
-                        )
+                        colors =
+                            CardDefaults.cardColors(
+                                containerColor = Color(0xFFFFD700).copy(alpha = 0.1f),
+                            ),
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.padding(12.dp)
+                            modifier = Modifier.padding(12.dp),
                         ) {
                             Icon(
                                 imageVector = Icons.Filled.Star,
                                 contentDescription = null,
                                 tint = Color(0xFFFFD700),
-                                modifier = Modifier.size(24.dp)
+                                modifier = Modifier.size(24.dp),
                             )
                             Spacer(modifier = Modifier.width(6.dp))
                             Text(
                                 text = totalCoins.toString(),
                                 style = MaterialTheme.typography.titleMedium,
                                 fontWeight = FontWeight.Bold,
-                                color = Color(0xFFFF8F00)
+                                color = Color(0xFFFF8F00),
                             )
                         }
                     }
                 }
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 // Круговой прогресс-бар с современным дизайном
                 Column {
                     Row(
                         modifier = Modifier.fillMaxWidth(),
                         horizontalArrangement = Arrangement.SpaceBetween,
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = "Общий прогресс",
                             style = MaterialTheme.typography.bodyMedium,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                         Text(
                             text = "${(progressPercentage * 100).toInt()}%",
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
-                            color = Color(0xFF6366F1)
+                            color = Color(0xFF6366F1),
                         )
                     }
-                    
+
                     Spacer(modifier = Modifier.height(12.dp))
-                    
+
                     LinearProgressIndicator(
                         progress = { animatedProgress },
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .height(8.dp)
-                            .clip(RoundedCornerShape(4.dp)),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(8.dp)
+                                .clip(RoundedCornerShape(4.dp)),
                         color = Color(0xFF6366F1),
                         trackColor = Color(0xFF6366F1).copy(alpha = 0.1f),
                     )
@@ -348,24 +353,25 @@ private fun ModernFilters(
     selectedCategory: AchievementCategory?,
     onCategorySelected: (AchievementCategory?) -> Unit,
     selectedFilter: AchievementFilter,
-    onFilterSelected: (AchievementFilter) -> Unit
+    onFilterSelected: (AchievementFilter) -> Unit,
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .padding(horizontal = 16.dp),
     ) {
         // Статусные фильтры
         Text(
             text = "📊 Фильтры",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 12.dp)
+            modifier = Modifier.padding(bottom = 12.dp),
         )
-        
+
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             AchievementFilter.values().forEach { filter ->
                 FilterChip(
@@ -373,41 +379,43 @@ private fun ModernFilters(
                     onClick = { onFilterSelected(filter) },
                     label = {
                         Text(
-                            text = when (filter) {
-                                AchievementFilter.ALL -> "Все"
-                                AchievementFilter.UNLOCKED -> "Разблокированные"
-                                AchievementFilter.LOCKED -> "Заблокированные"
-                            }
+                            text =
+                                when (filter) {
+                                    AchievementFilter.ALL -> "Все"
+                                    AchievementFilter.UNLOCKED -> "Разблокированные"
+                                    AchievementFilter.LOCKED -> "Заблокированные"
+                                },
                         )
                     },
                     leadingIcon = {
                         Icon(
-                            imageVector = when (filter) {
-                                AchievementFilter.ALL -> Icons.Filled.FilterList
-                                AchievementFilter.UNLOCKED -> Icons.Filled.CheckCircle
-                                AchievementFilter.LOCKED -> Icons.Filled.LockClock
-                            },
+                            imageVector =
+                                when (filter) {
+                                    AchievementFilter.ALL -> Icons.Filled.FilterList
+                                    AchievementFilter.UNLOCKED -> Icons.Filled.CheckCircle
+                                    AchievementFilter.LOCKED -> Icons.Filled.LockClock
+                                },
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
-                    }
+                    },
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(16.dp))
-        
+
         // Категорийные фильтры
         Text(
             text = "🎯 Категории",
             style = MaterialTheme.typography.titleMedium,
             fontWeight = FontWeight.Bold,
-            modifier = Modifier.padding(bottom = 12.dp)
+            modifier = Modifier.padding(bottom = 12.dp),
         )
-        
+
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
-            modifier = Modifier.fillMaxWidth()
+            modifier = Modifier.fillMaxWidth(),
         ) {
             // Кнопка "Все"
             FilterChip(
@@ -418,31 +426,31 @@ private fun ModernFilters(
                     Icon(
                         imageVector = Icons.Filled.AutoAwesome,
                         contentDescription = null,
-                        modifier = Modifier.size(16.dp)
+                        modifier = Modifier.size(16.dp),
                     )
-                }
+                },
             )
-            
+
             AchievementCategory.values().forEach { category ->
                 FilterChip(
                     selected = selectedCategory == category,
                     onClick = { onCategorySelected(category) },
                     label = {
                         Text(
-                            text = getCategoryDisplayName(category)
+                            text = getCategoryDisplayName(category),
                         )
                     },
                     leadingIcon = {
                         Icon(
                             imageVector = getCategoryIcon(category),
                             contentDescription = null,
-                            modifier = Modifier.size(16.dp)
+                            modifier = Modifier.size(16.dp),
                         )
-                    }
+                    },
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.height(8.dp))
     }
 }
@@ -454,237 +462,255 @@ private fun ModernFilters(
 private fun UltraModernAchievementCard(achievement: Achievement) {
     val rarityColors = getRarityGradient(achievement.rarity)
     val achievementIcon = getAchievementIcon(achievement.id, achievement.category)
-    
+
     val animatedProgress by animateFloatAsState(
         targetValue = achievement.progressPercentage,
         animationSpec = tween(1200),
-        label = "achievement_progress"
+        label = "achievement_progress",
     )
 
     Card(
-        modifier = Modifier
-            .fillMaxWidth()
-            .shadow(
-                elevation = if (achievement.isUnlocked) 16.dp else 8.dp,
-                shape = RoundedCornerShape(20.dp),
-                ambientColor = rarityColors.first().copy(alpha = 0.3f),
-                spotColor = rarityColors.first().copy(alpha = 0.5f)
-            ),
+        modifier =
+            Modifier
+                .fillMaxWidth()
+                .shadow(
+                    elevation = if (achievement.isUnlocked) 16.dp else 8.dp,
+                    shape = RoundedCornerShape(20.dp),
+                    ambientColor = rarityColors.first().copy(alpha = 0.3f),
+                    spotColor = rarityColors.first().copy(alpha = 0.5f),
+                ),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (achievement.isUnlocked) {
-                MaterialTheme.colorScheme.surface
-            } else {
-                MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
-            }
-        )
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (achievement.isUnlocked) {
+                        MaterialTheme.colorScheme.surface
+                    } else {
+                        MaterialTheme.colorScheme.surfaceVariant.copy(alpha = 0.7f)
+                    },
+            ),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(20.dp)
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(20.dp),
         ) {
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    // Иконка достижения в стильном контейнере
-                    Box(
-                        modifier = Modifier
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                // Иконка достижения в стильном контейнере
+                Box(
+                    modifier =
+                        Modifier
                             .size(64.dp)
                             .background(
-                                brush = if (achievement.isUnlocked) {
-                                    Brush.radialGradient(
-                                        listOf(
-                                            rarityColors.first().copy(alpha = 0.15f),
-                                            rarityColors.first().copy(alpha = 0.05f)
+                                brush =
+                                    if (achievement.isUnlocked) {
+                                        Brush.radialGradient(
+                                            listOf(
+                                                rarityColors.first().copy(alpha = 0.15f),
+                                                rarityColors.first().copy(alpha = 0.05f),
+                                            ),
                                         )
-                                    )
-                                } else {
-                                    Brush.radialGradient(
-                                        listOf(
-                                            Color.Gray.copy(alpha = 0.3f),
-                                            Color.Gray.copy(alpha = 0.1f)
+                                    } else {
+                                        Brush.radialGradient(
+                                            listOf(
+                                                Color.Gray.copy(alpha = 0.3f),
+                                                Color.Gray.copy(alpha = 0.1f),
+                                            ),
                                         )
-                                    )
-                                },
-                                shape = CircleShape
+                                    },
+                                shape = CircleShape,
                             )
                             .clip(CircleShape),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = achievementIcon,
-                            contentDescription = null,
-                            tint = if (achievement.isUnlocked) rarityColors.first() else Color.Gray,
-                            modifier = Modifier.size(32.dp)
-                        )
-                        
-                        // Анимированное кольцо для разблокированных
-                        if (achievement.isUnlocked) {
-                            Box(
-                                modifier = Modifier
+                    contentAlignment = Alignment.Center,
+                ) {
+                    Icon(
+                        imageVector = achievementIcon,
+                        contentDescription = null,
+                        tint = if (achievement.isUnlocked) rarityColors.first() else Color.Gray,
+                        modifier = Modifier.size(32.dp),
+                    )
+
+                    // Анимированное кольцо для разблокированных
+                    if (achievement.isUnlocked) {
+                        Box(
+                            modifier =
+                                Modifier
                                     .size(68.dp)
                                     .background(
                                         Color.Transparent,
-                                        CircleShape
+                                        CircleShape,
                                     )
-                                    .clip(CircleShape)
-                            ) {
-                                // Добавим свечение
-                            }
+                                    .clip(CircleShape),
+                        ) {
+                            // Добавим свечение
                         }
                     }
-                    
-                    Spacer(modifier = Modifier.width(16.dp))
-                    
-                    // Информация о достижении
-                    Column(modifier = Modifier.weight(1f)) {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Text(
-                                text = achievement.title,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                color = if (achievement.isUnlocked) {
+                }
+
+                Spacer(modifier = Modifier.width(16.dp))
+
+                // Информация о достижении
+                Column(modifier = Modifier.weight(1f)) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Text(
+                            text = achievement.title,
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            color =
+                                if (achievement.isUnlocked) {
                                     MaterialTheme.colorScheme.onSurface
                                 } else {
                                     MaterialTheme.colorScheme.onSurfaceVariant
                                 },
-                                modifier = Modifier.weight(1f)
-                            )
-                            
-                            // Редкость бейджик
-                            Card(
-                                shape = RoundedCornerShape(12.dp),
-                                colors = CardDefaults.cardColors(
-                                    containerColor = rarityColors.first().copy(
-                                        alpha = if (achievement.isUnlocked) 0.15f else 0.05f
-                                    )
-                                )
-                            ) {
-                                Text(
-                                    text = getRarityDisplayName(achievement.rarity),
-                                    style = MaterialTheme.typography.labelSmall,
-                                    color = if (achievement.isUnlocked) {
+                            modifier = Modifier.weight(1f),
+                        )
+
+                        // Редкость бейджик
+                        Card(
+                            shape = RoundedCornerShape(12.dp),
+                            colors =
+                                CardDefaults.cardColors(
+                                    containerColor =
+                                        rarityColors.first().copy(
+                                            alpha = if (achievement.isUnlocked) 0.15f else 0.05f,
+                                        ),
+                                ),
+                        ) {
+                            Text(
+                                text = getRarityDisplayName(achievement.rarity),
+                                style = MaterialTheme.typography.labelSmall,
+                                color =
+                                    if (achievement.isUnlocked) {
                                         rarityColors.first()
                                     } else {
                                         Color.Gray
                                     },
-                                    fontWeight = FontWeight.Bold,
-                                    modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp)
-                                )
-                            }
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(horizontal = 8.dp, vertical = 4.dp),
+                            )
                         }
-                        
-                        Spacer(modifier = Modifier.height(6.dp))
-                        
-                        Text(
-                            text = achievement.description,
-                            style = MaterialTheme.typography.bodyMedium,
-                            color = if (achievement.isUnlocked) {
+                    }
+
+                    Spacer(modifier = Modifier.height(6.dp))
+
+                    Text(
+                        text = achievement.description,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color =
+                            if (achievement.isUnlocked) {
                                 MaterialTheme.colorScheme.onSurfaceVariant
                             } else {
                                 MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.7f)
                             },
-                            maxLines = 2,
-                            overflow = TextOverflow.Ellipsis
+                        maxLines = 2,
+                        overflow = TextOverflow.Ellipsis,
+                    )
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    // Награда
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.Star,
+                            contentDescription = null,
+                            tint = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
+                            modifier = Modifier.size(16.dp),
                         )
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        // Награда
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.Star,
-                                contentDescription = null,
-                                tint = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
-                                modifier = Modifier.size(16.dp)
-                            )
-                            Spacer(modifier = Modifier.width(4.dp))
-                            Text(
-                                text = "${achievement.rewardCoins} монет",
-                                style = MaterialTheme.typography.bodySmall,
-                                color = if (achievement.isUnlocked) Color(0xFFFF8F00) else Color.Gray,
-                                fontWeight = FontWeight.Medium
-                            )
-                        }
+                        Spacer(modifier = Modifier.width(4.dp))
+                        Text(
+                            text = "${achievement.rewardCoins} монет",
+                            style = MaterialTheme.typography.bodySmall,
+                            color = if (achievement.isUnlocked) Color(0xFFFF8F00) else Color.Gray,
+                            fontWeight = FontWeight.Medium,
+                        )
                     }
-                    
-                    Spacer(modifier = Modifier.width(8.dp))
-                    
-                    // Статус
-                    if (achievement.isUnlocked) {
-                        Box(
-                            modifier = Modifier
+                }
+
+                Spacer(modifier = Modifier.width(8.dp))
+
+                // Статус
+                if (achievement.isUnlocked) {
+                    Box(
+                        modifier =
+                            Modifier
                                 .size(40.dp)
                                 .background(
                                     Color(0xFF10B981).copy(alpha = 0.1f),
-                                    CircleShape
+                                    CircleShape,
                                 ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Icon(
-                                imageVector = Icons.Filled.CheckCircle,
-                                contentDescription = "Разблокировано",
-                                tint = Color(0xFF10B981),
-                                modifier = Modifier.size(24.dp)
-                            )
-                        }
-                    }
-                }
-                
-                // Прогресс-бар (если нужен)
-                if (achievement.targetProgress > 1) {
-                    Spacer(modifier = Modifier.height(16.dp))
-                    
-                    Column {
-                        Row(
-                            modifier = Modifier.fillMaxWidth(),
-                            horizontalArrangement = Arrangement.SpaceBetween
-                        ) {
-                            Text(
-                                text = "Прогресс",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = MaterialTheme.colorScheme.onSurfaceVariant
-                            )
-                            
-                            Text(
-                                text = "${achievement.currentProgress}/${achievement.targetProgress}",
-                                style = MaterialTheme.typography.labelMedium,
-                                color = if (achievement.isUnlocked) rarityColors.first() else Color.Gray,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        
-                        Spacer(modifier = Modifier.height(8.dp))
-                        
-                        LinearProgressIndicator(
-                            progress = { animatedProgress },
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .height(6.dp)
-                                .clip(RoundedCornerShape(3.dp)),
-                            color = if (achievement.isUnlocked) {
-                                Color(0xFF10B981)
-                            } else {
-                                rarityColors.first()
-                            },
-                            trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                        contentAlignment = Alignment.Center,
+                    ) {
+                        Icon(
+                            imageVector = Icons.Filled.CheckCircle,
+                            contentDescription = "Разблокировано",
+                            tint = Color(0xFF10B981),
+                            modifier = Modifier.size(24.dp),
                         )
                     }
                 }
             }
+
+            // Прогресс-бар (если нужен)
+            if (achievement.targetProgress > 1) {
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Column {
+                    Row(
+                        modifier = Modifier.fillMaxWidth(),
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                    ) {
+                        Text(
+                            text = "Прогресс",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        )
+
+                        Text(
+                            text = "${achievement.currentProgress}/${achievement.targetProgress}",
+                            style = MaterialTheme.typography.labelMedium,
+                            color = if (achievement.isUnlocked) rarityColors.first() else Color.Gray,
+                            fontWeight = FontWeight.Bold,
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.height(8.dp))
+
+                    LinearProgressIndicator(
+                        progress = { animatedProgress },
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .height(6.dp)
+                                .clip(RoundedCornerShape(3.dp)),
+                        color =
+                            if (achievement.isUnlocked) {
+                                Color(0xFF10B981)
+                            } else {
+                                rarityColors.first()
+                            },
+                        trackColor = MaterialTheme.colorScheme.surfaceVariant,
+                    )
+                }
+            }
         }
+    }
 }
 
 /**
  * Получает иконку для конкретного достижения
  */
-private fun getAchievementIcon(achievementId: String, category: AchievementCategory): ImageVector {
+private fun getAchievementIcon(
+    achievementId: String,
+    category: AchievementCategory,
+): ImageVector {
     return when (achievementId) {
         // Транзакции
         "first_transaction" -> Icons.Filled.FlightTakeoff
@@ -698,32 +724,32 @@ private fun getAchievementIcon(achievementId: String, category: AchievementCateg
         "multi_bank_importer" -> Icons.Filled.Sync
         "export_master" -> Icons.Filled.Download
         "backup_enthusiast" -> Icons.Filled.Security
-        
+
         // Бюджет
         "first_budget" -> Icons.Filled.Home
         "budget_keeper" -> Icons.Filled.Shield
         "budget_saver" -> Icons.Filled.Savings
-        
+
         // Накопления
         "first_savings" -> Icons.Filled.MonetizationOn
         "emergency_fund" -> Icons.Filled.HealthAndSafety
-        
+
         // Привычки
         "week_no_coffee" -> Icons.Filled.LocalCafe
         "healthy_spender" -> Icons.Filled.FavoriteBorder
-        
+
         // Статистика
         "data_analyst" -> Icons.Filled.Analytics
-        
+
         // Вехи
         "app_explorer" -> Icons.Filled.Explore
         "month_user" -> Icons.Filled.Groups
-        
+
         // Специальные
         "early_bird" -> Icons.Filled.WbSunny
         "night_owl" -> Icons.Filled.NightsStay
         "perfectionist" -> Icons.Filled.AutoAwesome
-        
+
         else -> getCategoryIcon(category)
     }
 }
@@ -775,23 +801,27 @@ private fun getRarityDisplayName(rarity: AchievementRarity): String {
  */
 private fun getRarityGradient(rarity: AchievementRarity): List<Color> {
     return when (rarity) {
-        AchievementRarity.COMMON -> listOf(
-            Color(0xFF64748B), // Slate
-            Color(0xFF94A3B8)
-        )
-        AchievementRarity.RARE -> listOf(
-            Color(0xFF3B82F6), // Blue
-            Color(0xFF6366F1)  // Indigo
-        )
-        AchievementRarity.EPIC -> listOf(
-            Color(0xFF8B5CF6), // Violet
-            Color(0xFFA855F7)  // Purple
-        )
-        AchievementRarity.LEGENDARY -> listOf(
-            Color(0xFFF59E0B), // Amber
-            Color(0xFFEF4444), // Red
-            Color(0xFF8B5CF6), // Violet
-            Color(0xFF06B6D4)  // Cyan
-        )
+        AchievementRarity.COMMON ->
+            listOf(
+                Color(0xFF64748B), // Slate
+                Color(0xFF94A3B8),
+            )
+        AchievementRarity.RARE ->
+            listOf(
+                Color(0xFF3B82F6), // Blue
+                Color(0xFF6366F1), // Indigo
+            )
+        AchievementRarity.EPIC ->
+            listOf(
+                Color(0xFF8B5CF6), // Violet
+                Color(0xFFA855F7), // Purple
+            )
+        AchievementRarity.LEGENDARY ->
+            listOf(
+                Color(0xFFF59E0B), // Amber
+                Color(0xFFEF4444), // Red
+                Color(0xFF8B5CF6), // Violet
+                Color(0xFF06B6D4), // Cyan
+            )
     }
 }

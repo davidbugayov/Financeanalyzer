@@ -14,16 +14,17 @@ import kotlinx.coroutines.flow.asStateFlow
  * Отвечает за сохранение и загрузку пользовательских настроек и данных.
  */
 class PreferencesManager(context: Context) {
-
-    private val sharedPreferences: SharedPreferences = context.getSharedPreferences(
-        PREFERENCES_NAME,
-        Context.MODE_PRIVATE,
-    )
+    private val sharedPreferences: SharedPreferences =
+        context.getSharedPreferences(
+            PREFERENCES_NAME,
+            Context.MODE_PRIVATE,
+        )
 
     // Flow для темы
-    private val _themeModeFlow = MutableStateFlow(
-        getThemeModeInternal(),
-    ) // Используем внутренний метод для инициализации
+    private val _themeModeFlow =
+        MutableStateFlow(
+            getThemeModeInternal(),
+        ) // Используем внутренний метод для инициализации
     val themeModeFlow: StateFlow<ThemeMode> = _themeModeFlow.asStateFlow()
 
     /**
@@ -87,7 +88,10 @@ class PreferencesManager(context: Context) {
      * @param defaultValue Значение по умолчанию
      * @return Сохраненное значение или defaultValue
      */
-    fun getBooleanPreference(key: String, defaultValue: Boolean): Boolean {
+    fun getBooleanPreference(
+        key: String,
+        defaultValue: Boolean,
+    ): Boolean {
         return sharedPreferences.getBoolean(key, defaultValue)
     }
 
@@ -96,7 +100,10 @@ class PreferencesManager(context: Context) {
      * @param key Ключ, по которому будет храниться значение
      * @param value Значение для сохранения
      */
-    fun setBooleanPreference(key: String, value: Boolean) {
+    fun setBooleanPreference(
+        key: String,
+        value: Boolean,
+    ) {
         sharedPreferences.edit { putBoolean(key, value) }
     }
 
@@ -104,7 +111,10 @@ class PreferencesManager(context: Context) {
         sharedPreferences.edit { putBoolean(KEY_TRANSACTION_REMINDER_ENABLED, enabled) }
     }
 
-    fun setReminderTime(hour: Int, minute: Int) {
+    fun setReminderTime(
+        hour: Int,
+        minute: Int,
+    ) {
         sharedPreferences.edit {
             putInt(KEY_REMINDER_HOUR, hour)
             putInt(KEY_REMINDER_MINUTE, minute)

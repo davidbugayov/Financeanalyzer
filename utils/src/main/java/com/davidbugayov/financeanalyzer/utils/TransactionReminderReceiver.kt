@@ -15,7 +15,6 @@ import timber.log.Timber
  * BroadcastReceiver для показа уведомлений о необходимости внести транзакции.
  */
 class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
-
     companion object {
         private const val TRANSACTION_REMINDER_CHANNEL_ID = "transaction_reminder_channel"
         private const val TRANSACTION_REMINDER_NOTIFICATION_ID = 1001
@@ -29,7 +28,10 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
     private val notificationScheduler: INotificationScheduler by inject()
     private val preferencesManager: PreferencesManager by inject()
 
-    override fun onReceive(context: Context, intent: Intent) {
+    override fun onReceive(
+        context: Context,
+        intent: Intent,
+    ) {
         Timber.d("TransactionReminderReceiver: onReceive, action: ${intent.action}")
         try {
             when (intent.action) {
@@ -57,29 +59,32 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
      */
     private fun showPermissionNotification(context: Context) {
         // Создаем Intent для запуска настроек уведомлений с использованием PermissionUtils
-        val intent = Intent().apply {
-            action = Intent.ACTION_VIEW
-            data = "package:${context.packageName}".toUri()
-            // Используем специальный флаг, чтобы создать новую задачу
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        }
+        val intent =
+            Intent().apply {
+                action = Intent.ACTION_VIEW
+                data = "package:${context.packageName}".toUri()
+                // Используем специальный флаг, чтобы создать новую задачу
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK
+            }
 
         // Будем использовать тот же ID для обоих уведомлений
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            TRANSACTION_REMINDER_NOTIFICATION_ID,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
+        val pendingIntent =
+            PendingIntent.getActivity(
+                context,
+                TRANSACTION_REMINDER_NOTIFICATION_ID,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         // Создаем уведомление
-        val builder = NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_rubble)
-            .setContentTitle(context.getString(R.string.notification_disabled_title))
-            .setContentText(context.getString(R.string.notification_disabled_description))
-            .setPriority(NotificationCompat.PRIORITY_HIGH)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
+        val builder =
+            NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_rubble)
+                .setContentTitle(context.getString(R.string.notification_disabled_title))
+                .setContentText(context.getString(R.string.notification_disabled_description))
+                .setPriority(NotificationCompat.PRIORITY_HIGH)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
 
         // Показываем уведомление
         val notificationManager =
@@ -95,28 +100,31 @@ class TransactionReminderReceiver : BroadcastReceiver(), KoinComponent {
      */
     private fun showNotification(context: Context) {
         // Создаем Intent для запуска приложения при нажатии на уведомление
-        val intent = context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        } ?: Intent(Intent.ACTION_VIEW).apply {
-            data = "package:${context.packageName}".toUri()
-            flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
-        }
+        val intent =
+            context.packageManager.getLaunchIntentForPackage(context.packageName)?.apply {
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            } ?: Intent(Intent.ACTION_VIEW).apply {
+                data = "package:${context.packageName}".toUri()
+                flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+            }
 
-        val pendingIntent = PendingIntent.getActivity(
-            context,
-            TRANSACTION_REMINDER_NOTIFICATION_ID,
-            intent,
-            PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
-        )
+        val pendingIntent =
+            PendingIntent.getActivity(
+                context,
+                TRANSACTION_REMINDER_NOTIFICATION_ID,
+                intent,
+                PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE,
+            )
 
         // Создаем уведомление
-        val builder = NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
-            .setSmallIcon(R.drawable.ic_rubble) // Убедитесь, что у вас есть такая иконка
-            .setContentTitle(context.getString(R.string.transaction_reminder_title))
-            .setContentText(context.getString(R.string.transaction_reminder_text))
-            .setPriority(NotificationCompat.PRIORITY_DEFAULT)
-            .setContentIntent(pendingIntent)
-            .setAutoCancel(true)
+        val builder =
+            NotificationCompat.Builder(context, TRANSACTION_REMINDER_CHANNEL_ID)
+                .setSmallIcon(R.drawable.ic_rubble) // Убедитесь, что у вас есть такая иконка
+                .setContentTitle(context.getString(R.string.transaction_reminder_title))
+                .setContentText(context.getString(R.string.transaction_reminder_text))
+                .setPriority(NotificationCompat.PRIORITY_DEFAULT)
+                .setContentIntent(pendingIntent)
+                .setAutoCancel(true)
 
         // Показываем уведомление
         val notificationManager = context.getSystemService(Context.NOTIFICATION_SERVICE) as NotificationManager

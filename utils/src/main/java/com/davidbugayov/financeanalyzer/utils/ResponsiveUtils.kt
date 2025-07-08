@@ -19,7 +19,6 @@ class WindowSize(
  * Типы размеров экрана
  */
 enum class WindowType {
-
     COMPACT, // Телефон в портретной ориентации
     MEDIUM, // Телефон в ландшафтной ориентации или планшет в портретной
     EXPANDED, // Планшет в ландшафтной ориентации
@@ -29,7 +28,6 @@ enum class WindowType {
  * Пороговые значения для определения типа экрана
  */
 object WindowSizeThresholds {
-
     val COMPACT_WIDTH = 600.dp
     val MEDIUM_WIDTH = 840.dp
 
@@ -40,20 +38,22 @@ object WindowSizeThresholds {
 /**
  * Определяет тип размера экрана на основе ширины
  */
-fun getWindowWidthType(width: Dp): WindowType = when {
-    width < WindowSizeThresholds.COMPACT_WIDTH -> WindowType.COMPACT
-    width < WindowSizeThresholds.MEDIUM_WIDTH -> WindowType.MEDIUM
-    else -> WindowType.EXPANDED
-}
+fun getWindowWidthType(width: Dp): WindowType =
+    when {
+        width < WindowSizeThresholds.COMPACT_WIDTH -> WindowType.COMPACT
+        width < WindowSizeThresholds.MEDIUM_WIDTH -> WindowType.MEDIUM
+        else -> WindowType.EXPANDED
+    }
 
 /**
  * Определяет тип размера экрана на основе высоты
  */
-fun getWindowHeightType(height: Dp): WindowType = when {
-    height < WindowSizeThresholds.COMPACT_HEIGHT -> WindowType.COMPACT
-    height < WindowSizeThresholds.MEDIUM_HEIGHT -> WindowType.MEDIUM
-    else -> WindowType.EXPANDED
-}
+fun getWindowHeightType(height: Dp): WindowType =
+    when {
+        height < WindowSizeThresholds.COMPACT_HEIGHT -> WindowType.COMPACT
+        height < WindowSizeThresholds.MEDIUM_HEIGHT -> WindowType.MEDIUM
+        else -> WindowType.EXPANDED
+    }
 
 /**
  * Composable функция для получения текущего размера экрана

@@ -9,13 +9,10 @@ import com.davidbugayov.financeanalyzer.domain.model.Transaction
 data class TransactionDialogState(
     /** Транзакция для редактирования */
     val transactionToEdit: String? = null,
-
     /** Показывать ли диалог редактирования */
     val showEditDialog: Boolean = false,
-
     /** Транзакция для удаления */
     val transactionToDelete: Transaction? = null,
-
     /** Показывать ли диалог подтверждения удаления */
     val showDeleteConfirmDialog: Boolean = false,
 )

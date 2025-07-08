@@ -14,7 +14,6 @@ abstract class AbstractExcelBankHandler(
     transactionRepository: TransactionRepository,
     context: Context,
 ) : AbstractBankHandler(transactionRepository, context) {
-
     /**
      * Список ключевых слов для определения Excel-файлов конкретного банка.
      * Должен быть переопределен в наследниках для каждого банка.
@@ -36,7 +35,11 @@ abstract class AbstractExcelBankHandler(
      * Проверяет тип файла и наличие ключевых слов в имени файла.
      * Наследники могут переопределить этот метод для более сложной логики.
      */
-    override fun canHandle(fileName: String, uri: Uri, fileType: FileType): Boolean {
+    override fun canHandle(
+        fileName: String,
+        uri: Uri,
+        fileType: FileType,
+    ): Boolean {
         if (!supportsFileType(fileType)) {
             Timber.d("[$bankName Handler] Не поддерживает тип файла: $fileType")
             return false

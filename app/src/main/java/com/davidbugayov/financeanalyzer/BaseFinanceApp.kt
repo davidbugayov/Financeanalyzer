@@ -9,10 +9,10 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.di.allModules
-import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
-import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
+import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
 import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModuleInitializer
+import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
 import org.koin.android.ext.koin.androidContext
@@ -29,12 +29,11 @@ import timber.log.Timber
  * Конкретные реализации для разных флейворов должны наследоваться от этого класса.
  */
 abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinComponent {
-
     // Получаем компоненты аналитики через Koin
     private val analyticsUtils: AnalyticsUtils by inject()
     private val performanceMetrics: PerformanceMetrics by inject()
     private val userEventTracker: UserEventTracker by inject()
-    
+
     // Получаем движок достижений через Koin
     private val achievementEngine: AchievementEngine by inject()
 
@@ -111,10 +110,10 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         try {
             // Инициализируем триггер достижений с движком
             AchievementTrigger.initialize(achievementEngine)
-            
+
             // Инициализируем провайдер для доступа из UI
             AchievementEngineProvider.initialize(achievementEngine)
-            
+
             Timber.d("🏆 Система достижений успешно инициализирована")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка инициализации системы достижений")
@@ -147,7 +146,7 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
     override fun onStart(owner: LifecycleOwner) {
         super<DefaultLifecycleObserver>.onStart(owner)
         AnalyticsUtils.logAppForeground()
-        
+
         // Триггеры достижений за активность
         checkActivityMilestones()
     }
@@ -175,28 +174,28 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
             val currentTime = System.currentTimeMillis()
             val lastOpenTime = prefs.getLong("last_open_time", 0)
             val firstOpenTime = prefs.getLong("first_open_time", currentTime)
-            
+
             // Сохраняем время первого открытия если это первый запуск
             if (firstOpenTime == currentTime) {
                 prefs.edit().putLong("first_open_time", currentTime).apply()
             }
-            
+
             // Сохраняем текущее время открытия
             prefs.edit().putLong("last_open_time", currentTime).apply()
-            
+
             // Проверяем недельную активность (7 дней)
             val weekInMillis = 7 * 24 * 60 * 60 * 1000L
             if (currentTime - firstOpenTime >= weekInMillis) {
                 AchievementTrigger.onMilestoneReached("week_streak")
             }
-            
+
             // Проверяем месячную активность (30 дней)
             val monthInMillis = 30 * 24 * 60 * 60 * 1000L
             if (currentTime - firstOpenTime >= monthInMillis) {
                 AchievementTrigger.onMilestoneReached("month_active")
             }
-            
-            Timber.d("🏆 Проверка активности: первое открытие=${firstOpenTime}, текущее время=${currentTime}")
+
+            Timber.d("🏆 Проверка активности: первое открытие=$firstOpenTime, текущее время=$currentTime")
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при проверке активности пользователя")
         }

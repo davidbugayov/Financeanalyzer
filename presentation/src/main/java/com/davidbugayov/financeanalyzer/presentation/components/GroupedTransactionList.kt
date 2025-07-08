@@ -48,16 +48,18 @@ fun GroupedTransactionList(
             // Header
             item(key + "_header") {
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .clickable { expandedMap[key] = !expanded },
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .clickable { expandedMap[key] = !expanded },
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
-                    val tintColor = if (total.amount.signum() < 0) {
-                        colorResource(id = UiR.color.expense_primary)
-                    } else {
-                        colorResource(id = UiR.color.income_primary)
-                    }
+                    val tintColor =
+                        if (total.amount.signum() < 0) {
+                            colorResource(id = UiR.color.expense_primary)
+                        } else {
+                            colorResource(id = UiR.color.income_primary)
+                        }
 
                     Icon(
                         imageVector = if (expanded) Icons.Default.ExpandLess else Icons.Default.ExpandMore,

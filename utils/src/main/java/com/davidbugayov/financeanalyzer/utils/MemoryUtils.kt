@@ -2,18 +2,17 @@ package com.davidbugayov.financeanalyzer.utils
 
 import android.app.ActivityManager
 import android.content.Context
+import android.os.Bundle
 import android.os.Debug
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import timber.log.Timber
-import android.os.Bundle
 
 /**
  * Утилиты для работы с памятью приложения
  */
 object MemoryUtils {
-
     /**
      * Получить информацию о памяти устройства и приложения
      * @param context Контекст приложения
@@ -59,14 +58,15 @@ object MemoryUtils {
         PerformanceMetrics.trackMemoryUsage(usedMemoryMB, totalMemoryMB, availableMemoryMB)
 
         // Отправляем расширенную информацию о памяти напрямую
-        val params = Bundle().apply {
-            putLong(AnalyticsConstants.Params.MEMORY_USAGE_MB, usedMemoryMB)
-            putLong(AnalyticsConstants.Params.MEMORY_TOTAL, totalMemoryMB)
-            putLong(AnalyticsConstants.Params.MEMORY_AVAILABLE, availableMemoryMB)
-            putFloat("memory_percent_used", percentUsed)
-            putLong("native_heap_size_mb", nativeHeapSizeMB)
-            putLong("native_heap_allocated_mb", nativeHeapAllocatedMB)
-        }
+        val params =
+            Bundle().apply {
+                putLong(AnalyticsConstants.Params.MEMORY_USAGE_MB, usedMemoryMB)
+                putLong(AnalyticsConstants.Params.MEMORY_TOTAL, totalMemoryMB)
+                putLong(AnalyticsConstants.Params.MEMORY_AVAILABLE, availableMemoryMB)
+                putFloat("memory_percent_used", percentUsed)
+                putLong("native_heap_size_mb", nativeHeapSizeMB)
+                putLong("native_heap_allocated_mb", nativeHeapAllocatedMB)
+            }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.MEMORY_USAGE, params)
     }
@@ -77,7 +77,10 @@ object MemoryUtils {
      * @param requiredMemoryMB Требуемый объем памяти в МБ
      * @return true, если достаточно памяти, иначе false
      */
-    fun hasEnoughMemory(context: Context, requiredMemoryMB: Long): Boolean {
+    fun hasEnoughMemory(
+        context: Context,
+        requiredMemoryMB: Long,
+    ): Boolean {
         val (_, _, availableMemoryMB) = getMemoryInfo(context)
         return availableMemoryMB >= requiredMemoryMB
     }

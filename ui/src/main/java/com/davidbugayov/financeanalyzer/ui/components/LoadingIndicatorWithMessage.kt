@@ -24,7 +24,10 @@ import androidx.compose.ui.unit.dp
  * @param modifier Модификатор для настройки внешнего вида
  */
 @Composable
-fun CenteredLoadingIndicator(message: String, modifier: Modifier = Modifier) {
+fun CenteredLoadingIndicator(
+    message: String,
+    modifier: Modifier = Modifier,
+) {
     Box(
         modifier = modifier.fillMaxSize(),
         contentAlignment = Alignment.Center,

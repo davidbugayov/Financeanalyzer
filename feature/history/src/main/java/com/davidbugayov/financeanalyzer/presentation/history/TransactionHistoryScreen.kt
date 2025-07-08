@@ -7,10 +7,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.FilterList
-import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.AccountBalance
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Category
+import androidx.compose.material.icons.filled.FilterList
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
@@ -27,12 +27,31 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.sp
-import com.davidbugayov.financeanalyzer.feature.history.R
+import androidx.paging.LoadState
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.feature.history.R
+import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
+import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
+import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
+import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
+import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
+import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelectionDialog
+import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
+import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
+import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.DatePickerDialog
@@ -42,27 +61,8 @@ import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsDialog
 import com.davidbugayov.financeanalyzer.ui.components.TransactionActionsHandler
 import com.davidbugayov.financeanalyzer.ui.components.TransactionDialogState
 import com.davidbugayov.financeanalyzer.ui.components.TransactionEvent
-import com.davidbugayov.financeanalyzer.presentation.history.components.CategoryStatsCard
-import com.davidbugayov.financeanalyzer.presentation.history.components.GroupingChips
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.CategorySelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteCategoryConfirmDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.DeleteSourceConfirmDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.PeriodSelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.history.dialogs.SourceSelectionDialog
-import com.davidbugayov.financeanalyzer.presentation.history.event.TransactionHistoryEvent
-import com.davidbugayov.financeanalyzer.navigation.model.PeriodType
-import com.davidbugayov.financeanalyzer.presentation.history.state.TransactionHistoryState
-import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.util.UiUtils
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import timber.log.Timber
 import org.koin.androidx.compose.koinViewModel
-import com.davidbugayov.financeanalyzer.presentation.components.paging.TransactionPagingList
-import com.davidbugayov.financeanalyzer.feature.transaction.base.util.getInitialSources
-import com.davidbugayov.financeanalyzer.data.preferences.SourcePreferences
-import androidx.compose.ui.platform.LocalContext
-import androidx.paging.compose.collectAsLazyPagingItems
-import androidx.paging.LoadState
+import timber.log.Timber
 
 /**
  * Преобразует TransactionHistoryState в TransactionDialogState
@@ -136,13 +136,15 @@ fun TransactionHistoryScreen(
     val incomeCategories by viewModel.categoriesViewModel.incomeCategories.collectAsState()
 
     // Преобразуем категории в списки строк для отображения
-    val expenseCategoryNames = remember(expenseCategories) {
-        expenseCategories.map { it.name }.filter { it != "Другое" }.sorted()
-    }
+    val expenseCategoryNames =
+        remember(expenseCategories) {
+            expenseCategories.map { it.name }.filter { it != "Другое" }.sorted()
+        }
 
-    val incomeCategoryNames = remember(incomeCategories) {
-        incomeCategories.map { it.name }.filter { it != "Другое" }.sorted()
-    }
+    val incomeCategoryNames =
+        remember(incomeCategories) {
+            incomeCategories.map { it.name }.filter { it != "Другое" }.sorted()
+        }
 
     // Диалог выбора периода
     if (state.showPeriodDialog) {
@@ -220,11 +222,12 @@ fun TransactionHistoryScreen(
     // Диалог подтверждения удаления категории
     state.categoryToDelete?.let { (category, isExpense) ->
         // Проверяем, является ли категория стандартной (не пользовательской)
-        val isDefaultCategory = if (isExpense) {
-            expenseCategories.find { it.name == category }?.let { !it.isCustom } ?: false
-        } else {
-            incomeCategories.find { it.name == category }?.let { !it.isCustom } ?: false
-        }
+        val isDefaultCategory =
+            if (isExpense) {
+                expenseCategories.find { it.name == category }?.let { !it.isCustom } ?: false
+            } else {
+                incomeCategories.find { it.name == category }?.let { !it.isCustom } ?: false
+            }
 
         DeleteCategoryConfirmDialog(
             category = category,
@@ -348,14 +351,16 @@ fun TransactionHistoryScreen(
         },
     ) { paddingValues ->
         Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
+            modifier =
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(horizontal = dimensionResource(R.dimen.spacing_normal)),
             ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
@@ -371,17 +376,19 @@ fun TransactionHistoryScreen(
 
                 // Отображение выбранного периода
                 Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                    modifier =
+                        Modifier
+                            .fillMaxWidth()
+                            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(
-                        text = UiUtils.formatPeriod(
-                            state.periodType,
-                            state.startDate,
-                            state.endDate,
-                        ),
+                        text =
+                            UiUtils.formatPeriod(
+                                state.periodType,
+                                state.startDate,
+                                state.endDate,
+                            ),
                         fontSize = dimensionResource(R.dimen.text_size_medium).value.sp,
                         color = MaterialTheme.colorScheme.primary,
                         fontWeight = FontWeight.Medium,
@@ -391,9 +398,10 @@ fun TransactionHistoryScreen(
                 // Отображение выбранных фильтров
                 if (state.selectedCategories.isNotEmpty() || state.selectedSources.isNotEmpty()) {
                     Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(vertical = dimensionResource(R.dimen.spacing_small)),
+                        modifier =
+                            Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = dimensionResource(R.dimen.spacing_small)),
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
                         // Выбранные категории

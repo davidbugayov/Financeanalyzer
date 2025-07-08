@@ -47,7 +47,6 @@ sealed class ImportResult {
     ) : ImportResult()
 
     companion object {
-
         /**
          * LiveData для прямой передачи результата импорта.
          * Используется для обхода проблем с реактивностью Flow.
@@ -83,7 +82,12 @@ sealed class ImportResult {
          * @param bankName Название банка
          * @return Объект успеха
          */
-        fun success(importedCount: Int, skippedCount: Int, message: String = "", bankName: String? = null): Success {
+        fun success(
+            importedCount: Int,
+            skippedCount: Int,
+            message: String = "",
+            bankName: String? = null,
+        ): Success {
             val result = Success(importedCount, skippedCount, message, bankName)
             // Отправляем результат через LiveData для гарантированного обновления UI
             directResultLiveData.postValue(result)
@@ -98,7 +102,11 @@ sealed class ImportResult {
          * @param message Сообщение о прогрессе
          * @return Объект прогресса
          */
-        fun progress(current: Int, total: Int, message: String = ""): Progress {
+        fun progress(
+            current: Int,
+            total: Int,
+            message: String = "",
+        ): Progress {
             return Progress(current, total, message)
         }
     }

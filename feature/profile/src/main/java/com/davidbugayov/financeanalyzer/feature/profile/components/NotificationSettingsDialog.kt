@@ -33,10 +33,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import com.davidbugayov.financeanalyzer.feature.profile.R
-import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileViewModel
+import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
+import com.davidbugayov.financeanalyzer.ui.components.PermissionDialogs
 import com.davidbugayov.financeanalyzer.utils.PermissionManager
 import com.davidbugayov.financeanalyzer.utils.PermissionUtils
 import java.util.Locale
@@ -49,7 +49,10 @@ import timber.log.Timber
  */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewModel) {
+fun NotificationSettingsDialog(
+    onDismiss: () -> Unit,
+    viewModel: ProfileViewModel,
+) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
     val permissionManager = remember { PermissionManager(context) }
@@ -111,19 +114,21 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = true,
-        ),
+        properties =
+            DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = true,
+            ),
     ) {
         Surface(
             shape = MaterialTheme.shapes.medium,
             color = MaterialTheme.colorScheme.surface,
         ) {
             Column(
-                modifier = Modifier
-                    .padding(16.dp)
-                    .fillMaxWidth(),
+                modifier =
+                    Modifier
+                        .padding(16.dp)
+                        .fillMaxWidth(),
             ) {
                 Text(
                     text = stringResource(R.string.notification_settings),
@@ -196,15 +201,16 @@ fun NotificationSettingsDialog(onDismiss: () -> Unit, viewModel: ProfileViewMode
                                 style = MaterialTheme.typography.bodyLarge,
                             )
                             Text(
-                                text = stringResource(
-                                    R.string.reminder_time_description,
-                                    String.format(
-                                        Locale.getDefault(),
-                                        "%02d:%02d",
-                                        state.transactionReminderTime?.hour ?: 20,
-                                        state.transactionReminderTime?.minute ?: 0,
+                                text =
+                                    stringResource(
+                                        R.string.reminder_time_description,
+                                        String.format(
+                                            Locale.getDefault(),
+                                            "%02d:%02d",
+                                            state.transactionReminderTime?.hour ?: 20,
+                                            state.transactionReminderTime?.minute ?: 0,
+                                        ),
                                     ),
-                                ),
                                 style = MaterialTheme.typography.bodyMedium,
                                 color = MaterialTheme.colorScheme.onSurfaceVariant,
                             )
