@@ -76,31 +76,12 @@ object AnalyticsConstants {
         const val FEATURE_ENABLED = "feature_enabled"
         const val FEATURE_DISABLED = "feature_disabled"
 
-        // События виджетов
-        const val WIDGET_ADDED = "widget_added"
-        const val WIDGET_REMOVED = "widget_removed"
-        const val WIDGET_CONFIGURED = "widget_configured"
-        const val WIDGET_INTERACTION = "widget_interaction"
-
         // События пользователя
         const val USER_ENGAGEMENT = "user_engagement"
-        const val USER_RETENTION = "user_retention"
-        const val USER_CONVERSION = "user_conversion"
         const val USER_FEEDBACK = "user_feedback"
         const val USER_RATING = "user_rating"
 
-        // События уведомлений
-        const val NOTIFICATION_RECEIVED = "notification_received"
-        const val NOTIFICATION_OPENED = "notification_opened"
-        const val NOTIFICATION_DISMISSED = "notification_dismissed"
-        const val NOTIFICATION_SETTINGS_CHANGED = "notification_settings_changed"
 
-        // События обновлений
-        const val UPDATE_AVAILABLE = "update_available"
-        const val UPDATE_DOWNLOADED = "update_downloaded"
-        const val UPDATE_INSTALLED = "update_installed"
-        const val UPDATE_FAILED = "update_failed"
-        const val UPDATE_POSTPONED = "update_postponed"
     }
 
     /**
@@ -207,30 +188,11 @@ object AnalyticsConstants {
         const val FEATURE_VERSION = "feature_version"
         const val FEATURE_USAGE_COUNT = "feature_usage_count"
 
-        // Параметры виджетов
-        const val WIDGET_TYPE = "widget_type"
-        const val WIDGET_SIZE = "widget_size"
-        const val WIDGET_ID = "widget_id"
-        const val WIDGET_ACTION = "widget_action"
-
         // Параметры пользователя
-        const val USER_TYPE = "user_type"
-        const val USER_SEGMENT = "user_segment"
         const val USER_ENGAGEMENT_TIME = "user_engagement_time"
-        const val USER_RETENTION_DAYS = "user_retention_days"
         const val USER_FEEDBACK_SCORE = "user_feedback_score"
         const val USER_FEEDBACK_TEXT = "user_feedback_text"
         const val USER_RATING = "user_rating"
-
-        // Параметры уведомлений
-        const val NOTIFICATION_ID = "notification_id"
-        const val NOTIFICATION_TYPE = "notification_type"
-        const val NOTIFICATION_CHANNEL = "notification_channel"
-
-        // Параметры обновлений
-        const val UPDATE_VERSION = "update_version"
-        const val UPDATE_SIZE = "update_size"
-        const val UPDATE_SOURCE = "update_source"
     }
 
     /**
@@ -300,32 +262,6 @@ object AnalyticsConstants {
         const val NETWORK_TYPE_MOBILE = "mobile"
         const val NETWORK_TYPE_NONE = "none"
 
-        // Типы виджетов
-        const val WIDGET_TYPE_SUMMARY = "summary"
-        const val WIDGET_TYPE_QUICK_ADD = "quick_add"
-        const val WIDGET_TYPE_BUDGET = "budget"
-        const val WIDGET_TYPE_CHART = "chart"
 
-        // Размеры виджетов
-        const val WIDGET_SIZE_SMALL = "small"
-        const val WIDGET_SIZE_MEDIUM = "medium"
-        const val WIDGET_SIZE_LARGE = "large"
-
-        // Типы пользователей
-        const val USER_TYPE_NEW = "new"
-        const val USER_TYPE_RETURNING = "returning"
-        const val USER_TYPE_POWER = "power"
-        const val USER_TYPE_CASUAL = "casual"
-
-        // Сегменты пользователей
-        const val USER_SEGMENT_FREE = "free"
-        const val USER_SEGMENT_PREMIUM = "premium"
-        const val USER_SEGMENT_TRIAL = "trial"
-
-        // Типы уведомлений
-        const val NOTIFICATION_TYPE_REMINDER = "reminder"
-        const val NOTIFICATION_TYPE_ALERT = "alert"
-        const val NOTIFICATION_TYPE_INFO = "info"
-        const val NOTIFICATION_TYPE_PROMO = "promo"
     }
 }

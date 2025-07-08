@@ -1,4 +1,5 @@
 package com.davidbugayov.financeanalyzer.ui.components
+
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -69,13 +70,12 @@ fun FeedbackMessage(
         modifier = modifier,
     ) {
         Surface(
-            color =
-                when (type) {
-                    FeedbackType.SUCCESS -> MaterialTheme.colorScheme.primaryContainer
-                    FeedbackType.ERROR -> MaterialTheme.colorScheme.errorContainer
-                    FeedbackType.WARNING -> MaterialTheme.colorScheme.tertiaryContainer
-                    FeedbackType.INFO -> MaterialTheme.colorScheme.secondaryContainer
-                },
+            color = when (type) {
+                FeedbackType.SUCCESS -> MaterialTheme.colorScheme.primaryContainer
+                FeedbackType.ERROR -> MaterialTheme.colorScheme.errorContainer
+                FeedbackType.WARNING -> MaterialTheme.colorScheme.tertiaryContainer
+                FeedbackType.INFO -> MaterialTheme.colorScheme.secondaryContainer
+            },
             shape = MaterialTheme.shapes.medium,
             shadowElevation = 8.dp,
         ) {
@@ -84,21 +84,19 @@ fun FeedbackMessage(
                 modifier = Modifier.padding(20.dp),
             ) {
                 Icon(
-                    imageVector =
-                        when (type) {
-                            FeedbackType.SUCCESS -> Icons.Default.CheckCircle
-                            FeedbackType.ERROR -> Icons.Default.Error
-                            FeedbackType.WARNING -> Icons.Default.Warning
-                            FeedbackType.INFO -> Icons.Default.Info
-                        },
+                    imageVector = when (type) {
+                        FeedbackType.SUCCESS -> Icons.Default.CheckCircle
+                        FeedbackType.ERROR -> Icons.Default.Error
+                        FeedbackType.WARNING -> Icons.Default.Warning
+                        FeedbackType.INFO -> Icons.Default.Info
+                    },
                     contentDescription = null,
-                    tint =
-                        when (type) {
-                            FeedbackType.SUCCESS -> MaterialTheme.colorScheme.primary
-                            FeedbackType.ERROR -> MaterialTheme.colorScheme.error
-                            FeedbackType.WARNING -> MaterialTheme.colorScheme.tertiary
-                            FeedbackType.INFO -> MaterialTheme.colorScheme.secondary
-                        },
+                    tint = when (type) {
+                        FeedbackType.SUCCESS -> MaterialTheme.colorScheme.primary
+                        FeedbackType.ERROR -> MaterialTheme.colorScheme.error
+                        FeedbackType.WARNING -> MaterialTheme.colorScheme.tertiary
+                        FeedbackType.INFO -> MaterialTheme.colorScheme.secondary
+                    },
                     modifier = Modifier.size(40.dp),
                 )
                 Spacer(Modifier.height(8.dp))
@@ -112,41 +110,38 @@ fun FeedbackMessage(
                     if (isFilePath) {
                         Text(
                             text = message,
-                            style =
-                                MaterialTheme.typography.bodySmall.copy(
-                                    fontFamily = FontFamily.Monospace,
-                                ),
+                            style = MaterialTheme.typography.bodySmall.copy(
+                                fontFamily = FontFamily.Monospace,
+                            ),
                             textAlign = TextAlign.Center,
-                            modifier =
-                                Modifier
-                                    .background(
-                                        if (isCopied) {
-                                            MaterialTheme.colorScheme.primary.copy(
-                                                alpha = 0.18f,
-                                            )
-                                        } else {
-                                            Color.Transparent
-                                        },
-                                        shape = MaterialTheme.shapes.small,
-                                    )
-                                    .clickable {
-                                        val clipboard = android.content.Context.CLIPBOARD_SERVICE
-                                        val clip =
-                                            android.content.ClipData.newPlainText(
-                                                "file path",
-                                                message,
-                                            )
-                                        (
-                                            context.getSystemService(
-                                                clipboard,
-                                            ) as? android.content.ClipboardManager
-                                        )?.setPrimaryClip(
-                                            clip,
+                            modifier = Modifier
+                                .background(
+                                    if (isCopied) {
+                                        MaterialTheme.colorScheme.primary.copy(
+                                            alpha = 0.18f,
                                         )
-                                        Toast.makeText(context, "Путь скопирован", Toast.LENGTH_SHORT).show()
-                                        isCopied = true
-                                    }
-                                    .padding(horizontal = 8.dp, vertical = 4.dp),
+                                    } else {
+                                        Color.Transparent
+                                    },
+                                    shape = MaterialTheme.shapes.small,
+                                )
+                                .clickable {
+                                    val clipboard = android.content.Context.CLIPBOARD_SERVICE
+                                    val clip = android.content.ClipData.newPlainText(
+                                        "file path",
+                                        message,
+                                    )
+                                    (
+                                        context.getSystemService(
+                                            clipboard,
+                                        ) as? android.content.ClipboardManager
+                                        )?.setPrimaryClip(
+                                        clip,
+                                    )
+                                    Toast.makeText(context, "Путь скопирован", Toast.LENGTH_SHORT).show()
+                                    isCopied = true
+                                }
+                                .padding(horizontal = 8.dp, vertical = 4.dp),
                         )
                         if (isCopied) {
                             LaunchedEffect(isCopied) {
@@ -171,6 +166,4 @@ fun FeedbackMessage(
             }
         }
     }
-}
-
-// Компонент удален, используется EmptyContent из ui модуля
+} 
