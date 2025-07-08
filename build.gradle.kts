@@ -18,3 +18,62 @@ subprojects {
         }
     }
 }
+
+// Добавляем задачу для запуска lint для всех модулей
+tasks.register("lintAll") {
+    group = "verification"
+    description = "Runs lint for all modules"
+    
+    // Делаем задачу зависимой от lint задач всех модулей
+    dependsOn(
+        ":app:lintRustoreDebug",
+        ":core:lintDebug", 
+        ":data:lintDebug",
+        ":domain:lintDebug",
+        ":ui:lintDebug",
+        ":utils:lintDebug",
+        ":navigation:lintDebug",
+        ":presentation:lintDebug",
+        ":feature:lintDebug",
+        ":feature:home:lintDebug",
+        ":feature:budget:lintDebug",
+        ":feature:transaction:lintDebug",
+        ":feature:history:lintDebug",
+        ":feature:statistics:lintDebug",
+        ":feature:profile:lintDebug",
+        ":feature:onboarding:lintDebug",
+        ":feature:widget:lintDebug"
+    )
+    
+    doLast {
+        println("✅ Lint проверка завершена для всех модулей!")
+    }
+}
+
+// Добавляем задачу для очистки всех baseline файлов и их пересоздания
+tasks.register("resetLintBaseline") {
+    group = "verification"
+    description = "Resets all lint baseline files by deleting them and running fresh lint"
+    
+    doLast {
+        println("Resetting lint baseline files...")
+        
+        val modules = listOf(
+            "app", "core", "data", "domain", "ui", "utils", "navigation", "presentation",
+            "feature", "feature:home", "feature:budget", "feature:transaction", 
+            "feature:history", "feature:statistics", "feature:profile", 
+            "feature:onboarding", "feature:widget"
+        )
+        
+        modules.forEach { module ->
+            val baselineFile = file("$module/lint-baseline.xml")
+            if (baselineFile.exists()) {
+                baselineFile.delete()
+                println("Deleted baseline for $module")
+            }
+        }
+        
+        println("All lint baseline files have been reset!")
+        println("Run './gradlew lintAll' to generate fresh baselines")
+    }
+}

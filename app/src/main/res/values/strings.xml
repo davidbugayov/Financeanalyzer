@@ -127,8 +127,8 @@
     <string name="delete_category">Удаление категории</string>
     <string name="delete_category_confirmation">Вы уверены, что хотите удалить категорию "%1$s"?\n\nЕсли это стандартная категория, она будет скрыта из списка. Если это пользовательская категория, она будет удалена полностью.</string>
     <string name="delete_default_category_confirmation">Вы уверены, что хотите удалить стандартную категорию "%1$s"?\n\nОна будет скрыта из списка, но может быть восстановлена при переустановке приложения.</string>
-    <string name="delete_custom_category_confirmation">Вы уверены, что хотите удалить пользовательскую категорию "%1$s"?\n\nОна будет удалена полностью и не может быть восстановлена.</string>
-    <string name="category_delete_error">Категорию "Другое" нельзя удалить</string>
+    <string name="delete_custom_category_confirmation">Вы уверены, что хотите удалить пользовательскую категорию «%1$s»?\n\nОна будет удалена полностью и не может быть восстановлена.</string>
+    <string name="category_delete_error">Категорию «Другое» нельзя удалить</string>
 
     <!-- AddTransaction strings -->
     <string name="confirm">Подтвердить</string>

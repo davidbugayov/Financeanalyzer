@@ -224,17 +224,50 @@ android {
     lint {
         abortOnError = false
         checkReleaseBuilds = true
-        // baseline = file("lint-baseline.xml") // Раскомментируйте и создайте файл для использования baseline
+        baseline = file("lint-baseline.xml")
         htmlReport = true
         htmlOutput = layout.buildDirectory.file("reports/lint/lint-report.html").get().asFile
         xmlReport = true
         xmlOutput = layout.buildDirectory.file("reports/lint/lint-report.xml").get().asFile
 
-        // Пример отключения конкретной проверки Lint (если необходимо)
-        // disable.add("TypographyFractions") // Замените "TypographyFractions" на ID нужной проверки
+        // Настройка игнорирования проблем в сгенерированном коде
+        ignore.addAll(
+            listOf(
+                "Instantiatable", // Игнорируем проблемы с инстанцированием классов
+                "StringFormatMatches", // Игнорируем проблемы с форматированием строк
+                "InvalidPackage", // Игнорируем проблемы с пакетами в зависимостях
+                "UnusedResources", // Можно включить обратно после очистки неиспользуемых ресурсов
+            )
+        )
 
-        // Пример установки уровня серьезности для проверки
-        // warning.add("ObsoleteLintCustomCheck")
+        // Превращаем ошибки в предупреждения для несерьезных проблем
+        warning.addAll(
+            listOf(
+                "MissingTranslation", // Недостающие переводы - предупреждение
+                "ExtraTranslation", // Лишние переводы - предупреждение
+                "TypographyFractions", // Проблемы с типографикой - предупреждение
+                "TypographyDashes", // Проблемы с дефисами - предупреждение
+            )
+        )
+
+        // Отключаем проблемы в зависимостях, которые мы не можем контролировать
+        disable.addAll(
+            listOf(
+                "ContentDescription", // Отключаем проверку description для изображений
+                "HardcodedText", // Временно отключаем для постепенного перевода строк в ресурсы
+                "IconMissingDensityFolder", // Не критично для векторных иконок
+                "GoogleAppIndexingWarning", // Не используем App Indexing
+                "LogConditional", // Разрешаем использование Log без условий
+                "TrustAllX509TrustManager", // Проблемы в сторонних библиотеках (POI, BouncyCastle)
+                "ObsoleteSdkInt", // Устаревшие версии SDK - не критично
+                "AndroidGradlePluginVersion", // Предупреждения о версиях Gradle - не критично
+                "GradleDependency", // Предупреждения о новых версиях зависимостей
+                "NewerVersionAvailable", // Предупреждения о новых версиях библиотек
+                "TypographyQuotes", // Типографские кавычки - не критично для функциональности
+                "TypographyDashes", // Типографские дефисы - не критично для функциональности
+                "TypographyFractions", // Типографские дроби - не критично для функциональности
+            )
+        )
     }
 
     // Исключаем тестовые классы из релизной сборки

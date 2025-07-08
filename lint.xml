@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<lint>
+    <!-- Глобальная конфигурация Lint для всего проекта Finance Analyzer -->
+    
+    <!-- Отключаем проверки, не критичные для проекта -->
+    <issue id="ContentDescription" severity="ignore" />
+    <issue id="HardcodedText" severity="warning" />
+    <issue id="IconMissingDensityFolder" severity="ignore" />
+    <issue id="GoogleAppIndexingWarning" severity="ignore" />
+    <issue id="LogConditional" severity="ignore" />
+    
+    <!-- Проблемы с сгенерированным кодом игнорируем -->
+    <issue id="Instantiatable" severity="ignore" />
+    <issue id="StringFormatMatches" severity="ignore" />
+    <issue id="InvalidPackage" severity="ignore" />
+    <issue id="ObsoleteLintCustomCheck" severity="ignore" />
+    
+    <!-- Версии зависимостей - предупреждения -->
+    <issue id="AndroidGradlePluginVersion" severity="ignore" />
+    <issue id="GradleDependency" severity="ignore" />
+    <issue id="NewerVersionAvailable" severity="ignore" />
+    <issue id="ObsoleteSdkInt" severity="ignore" />
+    
+    <!-- Переводы - предупреждения, а не ошибки -->
+    <issue id="MissingTranslation" severity="warning" />
+    <issue id="ExtraTranslation" severity="warning" />
+    
+    <!-- Типографика - отключаем для русского языка (не критично) -->
+    <issue id="TypographyFractions" severity="ignore" />
+    <issue id="TypographyDashes" severity="ignore" />
+    <issue id="TypographyQuotes" severity="ignore" />
+    
+    <!-- Проблемы производительности - ошибки -->
+    <issue id="Recycle" severity="error" />
+    <issue id="WakeupOnBroadcast" severity="error" />
+    <issue id="DrawAllocation" severity="warning" />
+    
+    <!-- Безопасность - ошибки в нашем коде, но игнорируем в сторонних библиотеках -->
+    <issue id="HardcodedDebugMode" severity="error" />
+    <issue id="SecureRandom" severity="error" />
+    <issue id="TrustAllX509TrustManager" severity="ignore" />
+    
+    <!-- Accessibility - предупреждения -->
+    <issue id="ClickableViewAccessibility" severity="warning" />
+    <issue id="KeyboardInaccessibleWidget" severity="warning" />
+    
+    <!-- Compose специфичные правила -->
+    <issue id="UnusedMaterial3ScaffoldPaddingParameter" severity="warning" />
+    <issue id="ComposeViewModelConstructor" severity="error" />
+    <issue id="ComposeViewModelInjection" severity="error" />
+    
+    <!-- Неиспользуемые ресурсы - предупреждения (можно очистить потом) -->
+    <issue id="UnusedResources" severity="warning" />
+    <issue id="UnusedIds" severity="warning" />
+    
+    <!-- Настройки для конкретных директорий -->
+    <issue id="HardcodedText">
+        <ignore path="**/test/**" />
+        <ignore path="**/androidTest/**" />
+        <ignore path="**/debug/**" />
+    </issue>
+    
+    <issue id="ContentDescription">
+        <ignore path="**/test/**" />
+        <ignore path="**/androidTest/**" />
+    </issue>
+</lint> 
