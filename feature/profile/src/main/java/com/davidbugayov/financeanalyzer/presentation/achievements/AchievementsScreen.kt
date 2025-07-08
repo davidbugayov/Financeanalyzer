@@ -479,24 +479,11 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
             }
         )
     ) {
-        Box {
-            // Фоновый градиент для разблокированных достижений
-            if (achievement.isUnlocked) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(4.dp)
-                        .background(
-                            brush = Brush.horizontalGradient(rarityColors)
-                        )
-                )
-            }
-            
-            Column(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(20.dp)
-            ) {
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(20.dp)
+        ) {
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically
@@ -687,7 +674,6 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                 }
             }
         }
-    }
 }
 
 /**
