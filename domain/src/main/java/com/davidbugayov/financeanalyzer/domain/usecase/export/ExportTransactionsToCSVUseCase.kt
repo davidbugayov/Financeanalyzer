@@ -1,6 +1,5 @@
 package com.davidbugayov.financeanalyzer.domain.usecase.export
 
-import android.content.Context
 import com.davidbugayov.financeanalyzer.core.model.AppException
 import com.davidbugayov.financeanalyzer.core.util.Result
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
@@ -19,7 +18,6 @@ import timber.log.Timber
  */
 class ExportTransactionsToCSVUseCase(
     private val transactionRepository: TransactionRepository,
-    private val context: Context,
 ) {
 
     /**
@@ -46,28 +44,36 @@ class ExportTransactionsToCSVUseCase(
                 return@withContext Result.Error(AppException.Business.InvalidOperation("Нет транзакций для экспорта"))
             }
 
-            // Создаем файл в директории приложения
-            val fileName = "transactions_${getCurrentDateTimeFormatted()}.csv"
-            val file = File(context.filesDir, fileName)
+            // Создаем файл во временной директории с понятным именем
+            val fileName = "Финансы_${getCurrentDateTimeFormatted()}.csv"
+            val file = File.createTempFile("transactions_", ".csv")
+            // Переименовываем файл с красивым именем
+            val finalFile = File(file.parent, fileName)
+            file.renameTo(finalFile)
 
-            // Записываем данные в файл
-            FileWriter(file).use { writer ->
-                // Заголовок CSV
-                writer.append("ID,Date,Category,Amount,IsExpense,Note,Source\n")
+            // Записываем данные в файл с красивыми заголовками
+            FileWriter(finalFile).use { writer ->
+                // Заголовок CSV на русском языке
+                writer.append("ID,Дата,Категория,Сумма,Тип,Примечание,Источник\n")
 
                 // Данные транзакций
                 transactions.forEach { transaction ->
-                    writer.append("${transaction.id},")
-                    writer.append("${transaction.date},")
-                    writer.append("${transaction.category},")
-                    writer.append("${transaction.amount},")
-                    writer.append("${transaction.isExpense},")
-                    writer.append("${transaction.note ?: ""},")
-                    writer.append("${transaction.source}\n")
+                    writer.append("\"${transaction.id}\",")
+                    
+                    // Форматируем дату в читаемом формате
+                    val dateFormat = SimpleDateFormat("dd.MM.yyyy", Locale.getDefault())
+                    writer.append("\"${dateFormat.format(transaction.date)}\",")
+                    
+                    writer.append("\"${transaction.category}\",")
+                    writer.append("\"${transaction.amount.toPlainString()}\",")
+                    writer.append("\"${if (transaction.isExpense) "Расход" else "Доход"}\",")
+                    writer.append("\"${transaction.note ?: ""}\",")
+                    writer.append("\"${transaction.source}\"\n")
                 }
             }
 
-            return@withContext Result.Success(file)
+            Timber.d("CSV файл создан: ${finalFile.absolutePath}, размер: ${finalFile.length()} байт")
+            return@withContext Result.Success(finalFile)
         } catch (e: IOException) {
             Timber.e(e, "Ошибка при экспорте транзакций в CSV")
             return@withContext Result.Error(AppException.FileSystem.ReadError(cause = e))
@@ -77,11 +83,21 @@ class ExportTransactionsToCSVUseCase(
         }
     }
 
+    /**
+     * Открывает CSV файл в подходящем приложении
+     * Пока возвращает заглушку - логика должна быть реализована в UI слое
+     */
     fun openCSVFile(file: File): Result<Unit> {
+        Timber.d("Файл создан: ${file.absolutePath}")
         return Result.Success(Unit)
     }
 
+    /**
+     * Предоставляет CSV файл для отправки через различные приложения
+     * Пока возвращает заглушку - логика должна быть реализована в UI слое
+     */
     fun shareCSVFile(file: File): Result<Unit> {
+        Timber.d("Файл готов для отправки: ${file.absolutePath}")
         return Result.Success(Unit)
     }
 

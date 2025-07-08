@@ -6,9 +6,9 @@ import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
 import com.davidbugayov.financeanalyzer.domain.repository.AchievementsRepository
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 
@@ -204,60 +204,113 @@ class AchievementsViewModel(
             targetProgress = 50,
             rewardCoins = 80,
             isHidden = true // Скрытое достижение
+        ),
+        
+        // Достижения для импорта из банков
+        Achievement(
+            id = "tinkoff_importer",
+            title = "Тинькоff-интегратор",
+            description = "Импортируйте транзакции из Тинькофф",
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 30
+        ),
+        Achievement(
+            id = "sberbank_importer", 
+            title = "Сбер-коллекционер",
+            description = "Импортируйте транзакции из Сбербанка",
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 30
+        ),
+        Achievement(
+            id = "alfabank_importer",
+            title = "Альфа-аналитик", 
+            description = "Импортируйте транзакции из Альфа-Банка",
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 30
+        ),
+        Achievement(
+            id = "ozon_importer",
+            title = "OZON-агрегатор",
+            description = "Импортируйте транзакции из OZON Банка",
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 30
+        ),
+        Achievement(
+            id = "multi_bank_importer",
+            title = "Мульти-банковский коллектор", 
+            description = "Импортируйте данные из всех 4 банков",
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.EPIC,
+            targetProgress = 4,
+            rewardCoins = 150
+        ),
+        
+        // Достижения для экспорта
+        Achievement(
+            id = "export_master",
+            title = "Мастер экспорта",
+            description = "Экспортируйте транзакции в CSV",
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 20
+        ),
+        Achievement(
+            id = "backup_enthusiast",
+            title = "Энтузиаст резервных копий",
+            description = "Создайте 5 экспортов данных",
+            iconRes = 0,
+            category = AchievementCategory.MILESTONES,
+            rarity = AchievementRarity.RARE,
+            targetProgress = 5,
+            rewardCoins = 75
         )
     )
 
-    private val _achievements = MutableStateFlow(defaultAchievements)
-
-    val achievements: StateFlow<List<Achievement>> = _achievements.stateIn(
+    // Используем репозиторий как единственный источник истины
+    val achievements: StateFlow<List<Achievement>> = achievementsRepository.getAllAchievements().stateIn(
         viewModelScope,
         SharingStarted.WhileSubscribed(5000),
-        defaultAchievements
+        emptyList()
     )
 
     init {
-        // Инициализируем достижения в репозитории
+        // Инициализируем достижения в репозитории если их еще нет
         viewModelScope.launch {
-            achievementsRepository.initializeDefaultAchievements(defaultAchievements)
+            // Получаем текущие достижения из репозитория
+            val existingAchievements = achievementsRepository.getAllAchievements().first()
             
-            // Подписываемся на изменения из репозитория
-            achievementsRepository.getAllAchievements().collect { repositoryAchievements ->
-                _achievements.value = repositoryAchievements
+            // Если репозиторий пустой, инициализируем дефолтными достижениями
+            if (existingAchievements.isEmpty()) {
+                defaultAchievements.forEach { achievement ->
+                    achievementsRepository.updateAchievement(achievement)
+                }
             }
         }
     }
 
-    /**
-     * Имитирует прогресс для демонстрации
-     */
-    fun simulateProgress() {
-        viewModelScope.launch {
-            val updated = _achievements.value.map { achievement ->
-                when (achievement.id) {
-                    "first_transaction" -> achievement.copy(currentProgress = 1, isUnlocked = true, dateUnlocked = System.currentTimeMillis())
-                    "transaction_master" -> achievement.copy(currentProgress = 45)
-                    "daily_tracker" -> achievement.copy(currentProgress = 3)
-                    "category_organizer" -> achievement.copy(currentProgress = 7)
-                    "data_analyst" -> achievement.copy(currentProgress = 6)
-                    "app_explorer" -> achievement.copy(currentProgress = 3)
-                    else -> achievement
-                }
-            }
-            _achievements.value = updated
-            
-            // Сохраняем в репозиторий
-            updated.forEach { achievement ->
-                achievementsRepository.updateAchievement(achievement)
-            }
-        }
-    }
+
 
     /**
      * Разблокирует случайное достижение для тестирования
      */
     fun unlockRandomAchievement() {
         viewModelScope.launch {
-            val lockedAchievements = _achievements.value.filter { !it.isUnlocked }
+            val lockedAchievements = achievements.first().filter { !it.isUnlocked }
             if (lockedAchievements.isNotEmpty()) {
                 val randomAchievement = lockedAchievements.random()
                 achievementsRepository.unlockAchievement(randomAchievement.id)

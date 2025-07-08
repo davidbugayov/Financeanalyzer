@@ -1003,6 +1003,18 @@ abstract class BaseTransactionViewModel<S : BaseTransactionState, E : BaseTransa
                     categoryName,
                 )
             }
+            
+            // Триггер достижения за использование категорий
+            com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onCategoryUsed(categoryName)
+            
+            // Проверяем, использованы ли все возможные категории
+            val expenseCategories = categoryUsagePreferences.loadExpenseCategoriesUsage()
+            val incomeCategories = categoryUsagePreferences.loadIncomeCategoriesUsage()
+            val totalUniqueCategories = (expenseCategories.keys + incomeCategories.keys).distinct().size
+            
+            if (totalUniqueCategories >= 10) { // Если использовано 10+ разных категорий
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("all_categories_used")
+            }
         }
     }
 

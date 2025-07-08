@@ -32,6 +32,7 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
 import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
@@ -53,6 +54,8 @@ import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
 import com.davidbugayov.financeanalyzer.ui.components.DeleteTransactionDialog
+import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import android.os.SystemClock
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
@@ -120,7 +123,7 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
                 ),
             )
             // Триггер ачивки - посещение раздела
-            Timber.d("🏆 Триггер ачивки: Пользователь посетил раздел 'Статистика'")
+            AchievementTrigger.onAppSectionVisited("Statistics")
             onNavigateToChart()
         },
         onHistoryClick = {
@@ -132,7 +135,7 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
                 ),
             )
             // Триггер ачивки - посещение раздела
-            Timber.d("🏆 Триггер ачивки: Пользователь посетил раздел 'История'")
+            AchievementTrigger.onAppSectionVisited("History")
             onNavigateToHistory()
         },
         onAddClick = {
@@ -146,7 +149,7 @@ private fun HomeBottomBar(onNavigateToChart: () -> Unit, onNavigateToHistory: ()
             // Отслеживаем использование функции
             UserEventTracker.trackFeatureUsage("add_transaction")
             // Триггер ачивки - добавление транзакции
-            Timber.d("🏆 Триггер ачивки: Пользователь добавляет транзакцию")
+            AchievementTrigger.onTransactionAdded()
             onNavigateToAdd()
         },
     )
@@ -396,26 +399,29 @@ fun HomeScreen(
         sharedPreferences.edit { putString("current_filter", filter.name) }
         viewModel.onEvent(HomeEvent.SetFilter(filter))
     }
-    Scaffold(
-        topBar = {
-            HomeTopBar(
-                onGenerateTestData = {
-                    viewModel.onEvent(HomeEvent.GenerateTestData)
-                    feedbackMessage = testDataGeneratedMsg
-                    feedbackType = FeedbackType.SUCCESS
-                    showFeedback = true
-                },
-                onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
-            )
-        },
-        bottomBar = {
-            HomeBottomBar(
-                onNavigateToChart = { viewModel.onEvent(HomeEvent.NavigateToChart) },
-                onNavigateToHistory = { viewModel.onEvent(HomeEvent.NavigateToHistory) },
-                onNavigateToAdd = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
-            )
-        },
-    ) { paddingValues ->
+    AchievementNotificationManager(
+        achievementEngine = AchievementEngineProvider.get()
+    ) {
+        Scaffold(
+            topBar = {
+                HomeTopBar(
+                    onGenerateTestData = {
+                        viewModel.onEvent(HomeEvent.GenerateTestData)
+                        feedbackMessage = testDataGeneratedMsg
+                        feedbackType = FeedbackType.SUCCESS
+                        showFeedback = true
+                    },
+                    onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
+                )
+            },
+            bottomBar = {
+                HomeBottomBar(
+                    onNavigateToChart = { viewModel.onEvent(HomeEvent.NavigateToChart) },
+                    onNavigateToHistory = { viewModel.onEvent(HomeEvent.NavigateToHistory) },
+                    onNavigateToAdd = { viewModel.onEvent(HomeEvent.NavigateToAddTransaction) },
+                )
+            },
+        ) { paddingValues ->
         Box(
             modifier = Modifier
                 .fillMaxSize()
@@ -506,4 +512,5 @@ fun HomeScreen(
             viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
         },
     )
+    }
 }

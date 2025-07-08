@@ -310,6 +310,9 @@ class ImportTransactionsViewModel(
                                 setSuccessState(importedCount, skippedCount, bankName)
                             }
 
+                            // Триггеры достижений за импорт из банков
+                            triggerBankImportAchievements(bankName)
+
                             // Проверка наличия транзакций в базе
                             viewModelScope.launch(Dispatchers.IO) {
                                 try {
@@ -381,6 +384,9 @@ class ImportTransactionsViewModel(
                             viewModelScope.launch(Dispatchers.Main) {
                                 setSuccessState(importedCount, skippedCount, bankName)
                             }
+
+                            // Триггеры достижений за импорт из банков
+                            triggerBankImportAchievements(bankName)
 
                             // Проверка наличия транзакций в базе
                             viewModelScope.launch(Dispatchers.IO) {
@@ -514,6 +520,31 @@ class ImportTransactionsViewModel(
                 null
             }
         }
+    }
+
+    /**
+     * Триггеры достижений за импорт из банков
+     */
+    private fun triggerBankImportAchievements(bankName: String?) {
+        when (bankName?.lowercase()) {
+            "тинькофф", "тинь", "tinkoff", "tbank" -> {
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("tinkoff_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+            }
+            "сбербанк", "сбер", "sberbank" -> {
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("sberbank_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+            }
+            "альфа-банк", "альфа", "alfa", "alpha" -> {
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("alfabank_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+            }
+            "озон банк", "озон", "ozon" -> {
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("ozon_importer")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("multi_bank_importer")
+            }
+        }
+        Timber.d("🏆 Триггеры достижений для банка: $bankName")
     }
 }
 

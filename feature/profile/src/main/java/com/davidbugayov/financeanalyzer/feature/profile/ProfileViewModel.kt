@@ -195,6 +195,11 @@ class ProfileViewModel(
                                 exportError = null,
                             )
                         }
+                        
+                        // Триггеры достижений за экспорт
+                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("backup_created")
+                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("export_master")
+                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("backup_enthusiast")
 
                         when (action) {
                             ExportTransactionsToCSVUseCase.ExportAction.SHARE -> {

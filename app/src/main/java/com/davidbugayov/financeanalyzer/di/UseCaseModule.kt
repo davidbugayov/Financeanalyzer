@@ -55,7 +55,7 @@ val useCaseModule = module {
     }
 
     // Import / Export
-    single { ExportTransactionsToCSVUseCase(get(), androidContext()) }
+    single { ExportTransactionsToCSVUseCase(get()) }
     single<ImportTransactionsUseCase> {
         ImportTransactionsUseCaseImpl(get<ImportTransactionsManager>())
     }

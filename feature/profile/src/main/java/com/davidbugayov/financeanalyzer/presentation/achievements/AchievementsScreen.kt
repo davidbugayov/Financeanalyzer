@@ -36,6 +36,7 @@ import androidx.compose.material.icons.filled.Star
 import androidx.compose.material.icons.filled.Timeline
 import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Wallet
+
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -64,6 +65,8 @@ import com.davidbugayov.financeanalyzer.feature.profile.R
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
+import com.davidbugayov.financeanalyzer.ui.components.AchievementNotificationManager
+import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 
 /**
@@ -71,6 +74,21 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
  */
 @Composable
 fun AchievementsScreen(
+    achievements: List<Achievement>, 
+    onBack: () -> Unit
+) {
+    AchievementNotificationManager(
+        achievementEngine = AchievementEngineProvider.get()
+    ) {
+        AchievementsScreenContent(
+            achievements = achievements,
+            onBack = onBack
+        )
+    }
+}
+
+@Composable
+private fun AchievementsScreenContent(
     achievements: List<Achievement>, 
     onBack: () -> Unit
 ) {
@@ -204,7 +222,7 @@ private fun AchievementStatsCard(achievements: List<Achievement>) {
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Icon(
-                        painter = painterResource(com.davidbugayov.financeanalyzer.utils.R.drawable.ic_rubble),
+                        imageVector = Icons.Filled.Star,
                         contentDescription = null,
                         tint = Color(0xFFFFD700),
                         modifier = Modifier.size(20.dp)
@@ -468,7 +486,7 @@ private fun ModernAchievementCard(achievement: Achievement) {
                         )
                         Spacer(modifier = Modifier.width(2.dp))
                         Icon(
-                            painter = painterResource(com.davidbugayov.financeanalyzer.utils.R.drawable.ic_rubble),
+                            imageVector = Icons.Filled.Star,
                             contentDescription = null,
                             tint = if (achievement.isUnlocked) Color(0xFFFFD700) else Color.Gray,
                             modifier = Modifier.size(16.dp)

@@ -73,6 +73,7 @@ import com.davidbugayov.financeanalyzer.utils.DateUtils
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -111,7 +112,7 @@ fun FinancialStatisticsScreen(
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
         // Триггер ачивки - просмотр статистики
-        Timber.d("🏆 Триггер ачивки: Пользователь просматривает статистику")
+                    AchievementTrigger.onStatisticsViewed()
         
         // Если передан период с главного экрана, используем его
         if (periodType != null && startDate != null && endDate != null) {

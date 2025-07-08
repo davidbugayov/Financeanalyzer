@@ -670,7 +670,7 @@
 
     <string name="financial_cushion_title">Финансовая подушка</string>
     <string name="financial_cushion_explanation">Показывает, на сколько месяцев хватит ваших сбережений при текущем уровне расходов. Рекомендуемый минимум – 3–6 месяцев.</string>
-    <string name="financial_cushion_months">%d</string>
+    <string name="financial_cushion_months">%s</string>
     <string name="financial_cushion_months_short">мес.</string>
     <string name="financial_cushion_expenses">При ежемесячных расходах %s</string>
 

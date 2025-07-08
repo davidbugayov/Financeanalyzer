@@ -32,5 +32,5 @@ val repositoryModule = module {
     single<WalletRepository> { WalletRepositoryImpl(get(), get()) }
     
     // Репозиторий достижений
-    single<AchievementsRepository> { AchievementsRepositoryImpl() }
+    single<AchievementsRepository> { AchievementsRepositoryImpl(get()) }
 }

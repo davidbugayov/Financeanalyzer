@@ -29,7 +29,9 @@ import com.davidbugayov.financeanalyzer.domain.usecase.transaction.UpdateTransac
 import com.davidbugayov.financeanalyzer.domain.usecase.validation.ValidateTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
+import kotlinx.coroutines.GlobalScope
 
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
@@ -85,7 +87,7 @@ val appModule = module {
     single { FilterTransactionsUseCase() }
     single { GroupTransactionsUseCase() }
     single { CalculateCategoryStatsUseCase() }
-    single { ExportTransactionsToCSVUseCase(get(), androidContext()) }
+    single { ExportTransactionsToCSVUseCase(get()) }
     single { ValidateTransactionUseCase() }
     single { GetTransactionByIdUseCase(get()) }
     single { CalculateBalanceMetricsUseCase() }
@@ -109,5 +111,12 @@ val appModule = module {
         )
     }
 
+    // Achievement system
+    single<AchievementEngine> {
+        AchievementEngine(
+            achievementsRepository = get(),
+            scope = GlobalScope
+        )
+    }
 
 }

@@ -130,7 +130,7 @@ fun AppNavHostImpl(
             val achievements = achievementsViewModel.achievements.collectAsState().value
             AchievementsScreen(
                 achievements = achievements,
-                onBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
+                onBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) }
             )
         },
         onProfileScreen = {

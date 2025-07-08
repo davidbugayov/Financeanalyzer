@@ -77,6 +77,7 @@ import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import androidx.compose.material3.Surface
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
 import androidx.lifecycle.Lifecycle
@@ -146,7 +147,7 @@ fun BudgetScreen(
                 actions = {
                     IconButton(onClick = {
                         // Триггер ачивки - работа с доходами/бюджетом
-                        Timber.d("🏆 Триггер ачивки: Пользователь работает с доходами")
+                        AchievementTrigger.onBudgetCreated()
                         tempIncomeAmount = "" // Сбрасываем временную сумму
                         showDistributeConfirmation = true
                     }) {
