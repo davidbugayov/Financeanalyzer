@@ -494,7 +494,12 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                             .size(64.dp)
                             .background(
                                 brush = if (achievement.isUnlocked) {
-                                    Brush.radialGradient(rarityColors)
+                                    Brush.radialGradient(
+                                        listOf(
+                                            rarityColors.first().copy(alpha = 0.15f),
+                                            rarityColors.first().copy(alpha = 0.05f)
+                                        )
+                                    )
                                 } else {
                                     Brush.radialGradient(
                                         listOf(
@@ -511,7 +516,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                         Icon(
                             imageVector = achievementIcon,
                             contentDescription = null,
-                            tint = if (achievement.isUnlocked) Color.White else Color.Gray,
+                            tint = if (achievement.isUnlocked) rarityColors.first() else Color.Gray,
                             modifier = Modifier.size(32.dp)
                         )
                         
