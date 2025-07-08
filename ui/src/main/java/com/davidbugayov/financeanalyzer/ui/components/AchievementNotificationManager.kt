@@ -19,6 +19,7 @@ import kotlinx.coroutines.flow.collectLatest
 fun AchievementNotificationManager(
     achievementEngine: AchievementEngine?,
     modifier: Modifier = Modifier,
+    onAchievementUnlocked: ((Achievement) -> Unit)? = null,
     content: @Composable () -> Unit,
 ) {
     var currentNotification by remember { mutableStateOf<Achievement?>(null) }
@@ -27,6 +28,9 @@ fun AchievementNotificationManager(
     // Подписываемся на новые достижения
     LaunchedEffect(achievementEngine) {
         achievementEngine?.newAchievements?.collectLatest { achievement ->
+            // Вызываем callback для внешней логики (например, аналитики)
+            onAchievementUnlocked?.invoke(achievement)
+            
             currentNotification = achievement
             showNotification = true
         }

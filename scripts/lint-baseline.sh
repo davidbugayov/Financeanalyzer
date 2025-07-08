@@ -63,7 +63,15 @@ run_lint_all() {
     for module in "${MODULES[@]}"; do
         echo -e "\n${BLUE}Проверка модуля: $module${NC}"
         
-        if ./gradlew ":$module:lintRustoreDebug" --quiet; then
+        # Для app модуля используем lintRustoreDebug, для остальных - lintDebug
+        local lint_task
+        if [ "$module" = "app" ]; then
+            lint_task="lintRustoreDebug"
+        else
+            lint_task="lintDebug"
+        fi
+        
+        if ./gradlew ":$module:$lint_task" --quiet; then
             print_success "Модуль $module прошел проверку"
         else
             print_error "Ошибка в модуле $module"

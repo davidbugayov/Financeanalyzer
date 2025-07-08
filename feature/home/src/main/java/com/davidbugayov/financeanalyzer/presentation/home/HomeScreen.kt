@@ -411,6 +411,16 @@ fun HomeScreen(
     }
     AchievementNotificationManager(
         achievementEngine = AchievementEngineProvider.get(),
+        onAchievementUnlocked = { achievement ->
+            // Логируем аналитику разблокировки достижения
+            AnalyticsUtils.logAchievementUnlocked(
+                achievementId = achievement.id,
+                achievementTitle = achievement.title,
+                achievementCategory = achievement.category.name.lowercase(),
+                achievementRarity = achievement.rarity.name.lowercase(),
+                rewardCoins = achievement.rewardCoins
+            )
+        },
     ) {
         Scaffold(
             topBar = {

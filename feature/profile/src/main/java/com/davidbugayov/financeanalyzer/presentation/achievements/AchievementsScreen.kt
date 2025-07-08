@@ -67,6 +67,7 @@ import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -78,10 +79,13 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.domain.model.Achievement
 import com.davidbugayov.financeanalyzer.domain.model.AchievementCategory
 import com.davidbugayov.financeanalyzer.domain.model.AchievementRarity
@@ -100,6 +104,16 @@ fun AchievementsScreen(
 ) {
     AchievementNotificationManager(
         achievementEngine = AchievementEngineProvider.get(),
+        onAchievementUnlocked = { achievement ->
+            // Логируем аналитику разблокировки достижения
+            AnalyticsUtils.logAchievementUnlocked(
+                achievementId = achievement.id,
+                achievementTitle = achievement.title,
+                achievementCategory = achievement.category.name.lowercase(),
+                achievementRarity = achievement.rarity.name.lowercase(),
+                rewardCoins = achievement.rewardCoins
+            )
+        },
     ) {
         AchievementsScreenContent(
             achievements = achievements,
@@ -113,6 +127,26 @@ private fun AchievementsScreenContent(
     achievements: List<Achievement>,
     onBack: () -> Unit,
 ) {
+    val context = LocalContext.current
+
+    // Аналитика: отслеживаем посещение экрана достижений
+    LaunchedEffect(achievements) {
+        val unlockedCount = achievements.count { it.isUnlocked }
+        val lockedCount = achievements.count { !it.isUnlocked }
+        val totalCoinsEarned = achievements.filter { it.isUnlocked }.sumOf { it.rewardCoins }
+
+        // Отправляем аналитику в AnalyticsUtils
+        AnalyticsUtils.logAchievementsScreenViewed(
+            totalCount = achievements.size,
+            unlockedCount = unlockedCount,
+            lockedCount = lockedCount,
+            totalCoinsEarned = totalCoinsEarned
+        )
+
+        // Также уведомляем AchievementEngine о посещении экрана
+        AchievementEngineProvider.get()?.onAchievementsScreenViewed()
+    }
+
     var selectedCategory by remember { mutableStateOf<AchievementCategory?>(null) }
     var selectedFilter by remember { mutableStateOf(AchievementFilter.ALL) }
 
@@ -159,9 +193,46 @@ private fun AchievementsScreenContent(
         // Фильтры
         ModernFilters(
             selectedCategory = selectedCategory,
-            onCategorySelected = { selectedCategory = it },
+            onCategorySelected = { category -> 
+                selectedCategory = category
+                
+                // Аналитика: фильтр по категории
+                val categoryFilter = category?.name?.lowercase()
+                val resultCount = achievements.filter { achievement ->
+                    category?.let { achievement.category == it } ?: true
+                }.size
+                
+                AnalyticsUtils.logAchievementFilterChanged(
+                    filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL,
+                    categoryFilter = categoryFilter,
+                    resultCount = resultCount
+                )
+            },
             selectedFilter = selectedFilter,
-            onFilterSelected = { selectedFilter = it },
+            onFilterSelected = { filter -> 
+                selectedFilter = filter
+                
+                // Аналитика: фильтр по статусу
+                val filterType = when (filter) {
+                    AchievementFilter.ALL -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL
+                    AchievementFilter.UNLOCKED -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_UNLOCKED
+                    AchievementFilter.LOCKED -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_LOCKED
+                }
+                
+                val resultCount = achievements.filter { achievement ->
+                    when (filter) {
+                        AchievementFilter.ALL -> true
+                        AchievementFilter.UNLOCKED -> achievement.isUnlocked
+                        AchievementFilter.LOCKED -> !achievement.isUnlocked
+                    }
+                }.size
+                
+                AnalyticsUtils.logAchievementFilterChanged(
+                    filterType = filterType,
+                    categoryFilter = selectedCategory?.name?.lowercase(),
+                    resultCount = resultCount
+                )
+            },
         )
 
         // Список ачивок
