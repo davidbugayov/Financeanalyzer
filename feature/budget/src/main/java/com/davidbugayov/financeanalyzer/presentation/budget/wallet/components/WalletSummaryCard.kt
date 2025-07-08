@@ -60,6 +60,10 @@ import com.davidbugayov.financeanalyzer.ui.R
 import java.math.BigDecimal
 import java.math.RoundingMode
 import kotlin.math.min
+import timber.log.Timber
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+import androidx.compose.material3.Surface
+import com.davidbugayov.financeanalyzer.domain.usecase.wallet.GoalProgressUseCase
 
 /**
  * Современная карточка сводной информации о кошельке с улучшенным дизайном
@@ -83,6 +87,10 @@ fun WalletSummaryCard(
         val progress = wallet.spent.amount.divide(wallet.limit.amount, 4, RoundingMode.HALF_EVEN).toFloat()
         // Логируем значения для отладки
         timber.log.Timber.d("Wallet: ${wallet.name}, Spent: ${wallet.spent.amount}, Limit: ${wallet.limit.amount}, Progress: $progress")
+        
+        // Триггер достижения бюджета
+        AchievementTrigger.onBudgetProgress(progress)
+        
         progress
     } else {
         timber.log.Timber.d("Wallet: ${wallet.name}, Limit is zero or negative: ${wallet.limit.amount}")

@@ -143,15 +143,22 @@ class AchievementEngine(
      * Вызывается при изменении баланса/накоплений
      */
     fun onSavingsChanged(newAmount: Long) {
-        Timber.d("🏆 Обработка: Накопления изменились: $newAmount")
+        Timber.d("🏆 Обработка: Накопления изменились: $newAmount копеек")
         
         scope.launch {
-            // Используем checkAndUnlockAchievement для немедленной разблокировки
-            checkAndUnlockAchievement("first_savings") { newAmount >= 1000 }
+            // Конвертируем копейки в рубли для проверки
+            val amountInRubles = newAmount / 100
             
-            // Проверяем другие уровни накоплений
-            checkAndUnlockAchievement("money_saver") { newAmount >= 10000 }
-            checkAndUnlockAchievement("wealth_builder") { newAmount >= 100000 }
+            // Используем checkAndUnlockAchievement для немедленной разблокировки
+            checkAndUnlockAchievement("first_savings") { amountInRubles >= 1000 }
+            
+            // Проверяем достижение подушки безопасности
+            // Для упрощения считаем 3 месяца расходов = 100,000 рублей
+            checkAndUnlockAchievement("emergency_fund") { amountInRubles >= 100000 }
+            
+            // Дополнительные уровни накоплений (если есть)
+            checkAndUnlockAchievement("money_saver") { amountInRubles >= 10000 }
+            checkAndUnlockAchievement("wealth_builder") { amountInRubles >= 500000 }
         }
     }
     

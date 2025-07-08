@@ -4,6 +4,7 @@ import android.content.Context
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.repository.DataChangeEvent
 import com.davidbugayov.financeanalyzer.domain.repository.ITransactionRepository
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -70,7 +71,7 @@ class FinancialMetrics private constructor() : KoinComponent {
     /**
      * Пересчитывает все метрики по всем видимым транзакциям
      */
-    fun recalculateStats() {
+    private fun recalculateStats() {
         scope.launch {
             try {
                 val visibleTransactions = repository.loadTransactions()
@@ -91,12 +92,16 @@ class FinancialMetrics private constructor() : KoinComponent {
                 _totalExpense.value = expense
                 _balance.value = balance
 
+                // Триггер достижения накоплений при изменении баланса
+                val balanceInKopecks = (balance.amount.toDouble() * 100).toLong()
+                AchievementTrigger.onSavingsChanged(balanceInKopecks)
+
                 // Логгируем результаты для диагностики
                 val formattedExpenses = totalExpense.value.formatted
                 val formattedIncome = totalIncome.value.formatted
                 val formattedBalance = balance.formatted
                 Timber.d(
-                    "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance",
+                    "Метрики обновлены: доход=$formattedIncome, расход=$formattedExpenses, баланс=$formattedBalance, триггер накоплений: $balanceInKopecks копеек",
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при пересчёте метрик")

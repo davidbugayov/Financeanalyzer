@@ -162,6 +162,16 @@ class AchievementsRepositoryImpl(
             rewardCoins = 20
         ),
         Achievement(
+            id = "emergency_fund",
+            title = "Подушка безопасности",
+            description = "Накопите сумму на 3 месяца расходов",
+            iconRes = 0,
+            category = AchievementCategory.SAVINGS,
+            rarity = AchievementRarity.LEGENDARY,
+            targetProgress = 1,
+            rewardCoins = 200
+        ),
+        Achievement(
             id = "budget_saver",
             title = "Экономный",
             description = "Потратьте менее 80% от бюджета за месяц",
@@ -287,7 +297,7 @@ class AchievementsRepositoryImpl(
         )
     )
 
-    private val _achievements = kotlinx.coroutines.flow.MutableStateFlow(loadAchievements())
+    private val _achievements = MutableStateFlow(loadAchievements())
     
     /**
      * Загружает достижения из SharedPreferences
@@ -332,27 +342,27 @@ class AchievementsRepositoryImpl(
         }
     }
     
-    override fun getAllAchievements(): kotlinx.coroutines.flow.Flow<List<Achievement>> = _achievements.asStateFlow()
+    override fun getAllAchievements(): Flow<List<Achievement>> = _achievements.asStateFlow()
     
-    override fun getAchievementById(id: String): kotlinx.coroutines.flow.Flow<Achievement?> {
+    override fun getAchievementById(id: String): Flow<Achievement?> {
         return _achievements.map { achievements ->
             achievements.find { it.id == id }
         }
     }
     
-    override fun getAchievementsByCategory(category: AchievementCategory): kotlinx.coroutines.flow.Flow<List<Achievement>> {
+    override fun getAchievementsByCategory(category: AchievementCategory): Flow<List<Achievement>> {
         return _achievements.map { achievements ->
             achievements.filter { it.category == category }
         }
     }
     
-    override fun getUnlockedAchievements(): kotlinx.coroutines.flow.Flow<List<Achievement>> {
+    override fun getUnlockedAchievements(): Flow<List<Achievement>> {
         return _achievements.map { achievements ->
             achievements.filter { it.isUnlocked }
         }
     }
     
-    override fun getLockedAchievements(): kotlinx.coroutines.flow.Flow<List<Achievement>> {
+    override fun getLockedAchievements(): Flow<List<Achievement>> {
         return _achievements.map { achievements ->
             achievements.filter { !it.isUnlocked }
         }
@@ -392,7 +402,7 @@ class AchievementsRepositoryImpl(
         // Но оставляем для совместимости
     }
     
-    override fun getTotalCoins(): kotlinx.coroutines.flow.Flow<Int> {
+    override fun getTotalCoins(): Flow<Int> {
         return _achievements.map { achievements ->
             achievements.filter { it.isUnlocked }.sumOf { it.rewardCoins }
         }
