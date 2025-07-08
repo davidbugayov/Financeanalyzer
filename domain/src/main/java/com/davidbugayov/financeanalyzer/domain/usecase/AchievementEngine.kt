@@ -180,6 +180,27 @@ class AchievementEngine(
                 "month_active" -> checkAndUnlockAchievement("loyal_user") { true }
                 "all_categories_used" -> checkAndUnlockAchievement("category_expert") { true }
                 "backup_created" -> checkAndUnlockAchievement("safety_first") { true }
+                
+                // Экспорт и импорт достижения
+                "export_master" -> updateAchievementProgress("export_master", 1)
+                "backup_enthusiast" -> {
+                    val currentAchievement = achievementsRepository.getAchievementById("backup_enthusiast").first()
+                    if (currentAchievement != null) {
+                        updateAchievementProgress("backup_enthusiast", currentAchievement.currentProgress + 1)
+                    }
+                }
+                
+                // Банковские импорт достижения
+                "tinkoff_importer" -> updateAchievementProgress("tinkoff_importer", 1)
+                "sberbank_importer" -> updateAchievementProgress("sberbank_importer", 1)
+                "alfabank_importer" -> updateAchievementProgress("alfabank_importer", 1)
+                "ozon_importer" -> updateAchievementProgress("ozon_importer", 1)
+                "multi_bank_importer" -> {
+                    val currentAchievement = achievementsRepository.getAchievementById("multi_bank_importer").first()
+                    if (currentAchievement != null) {
+                        updateAchievementProgress("multi_bank_importer", currentAchievement.currentProgress + 1)
+                    }
+                }
             }
         }
     }

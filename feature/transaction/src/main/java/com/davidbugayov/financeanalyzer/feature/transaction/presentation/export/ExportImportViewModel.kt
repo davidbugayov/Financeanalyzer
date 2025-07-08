@@ -54,7 +54,6 @@ class ExportImportViewModel(
                         Timber.d("[ExportImportViewModel] Экспорт успешен: ${file.absolutePath}")
                         
                         // Триггеры достижений за экспорт
-                        com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("backup_created")
                         com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("export_master")
                         com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached("backup_enthusiast")
                         
