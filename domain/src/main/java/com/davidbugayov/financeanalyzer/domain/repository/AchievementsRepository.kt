@@ -218,7 +218,7 @@ class AchievementsRepositoryImpl(
             title = "Тинькоff-интегратор",
             description = "Импортируйте транзакции из Тинькофф",
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
             rewardCoins = 30
@@ -228,7 +228,7 @@ class AchievementsRepositoryImpl(
             title = "Сбер-коллекционер",
             description = "Импортируйте транзакции из Сбербанка",
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
             rewardCoins = 30
@@ -238,7 +238,7 @@ class AchievementsRepositoryImpl(
             title = "Альфа-аналитик", 
             description = "Импортируйте транзакции из Альфа-Банка",
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
             rewardCoins = 30
@@ -248,7 +248,7 @@ class AchievementsRepositoryImpl(
             title = "OZON-агрегатор",
             description = "Импортируйте транзакции из OZON Банка",
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
             rewardCoins = 30
@@ -258,7 +258,7 @@ class AchievementsRepositoryImpl(
             title = "Мульти-банковский коллектор", 
             description = "Импортируйте данные из всех 4 банков",
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.EPIC,
             targetProgress = 4,
             rewardCoins = 150
@@ -270,7 +270,7 @@ class AchievementsRepositoryImpl(
             title = "Мастер экспорта",
             description = "Экспортируйте транзакции в CSV",
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.COMMON,
             targetProgress = 1,
             rewardCoins = 20
@@ -280,7 +280,7 @@ class AchievementsRepositoryImpl(
             title = "Энтузиаст резервных копий",
             description = "Создайте 5 экспортов данных",
             iconRes = 0,
-            category = AchievementCategory.MILESTONES,
+            category = AchievementCategory.TRANSACTIONS,
             rarity = AchievementRarity.RARE,
             targetProgress = 5,
             rewardCoins = 75
