@@ -579,10 +579,11 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                             .background(
                                 brush =
                                     if (achievement.isUnlocked) {
+                                        val iconColor = getAchievementIconColor(achievement.id, achievement.category, true)
                                         Brush.radialGradient(
                                             listOf(
-                                                rarityColors.first().copy(alpha = 0.15f),
-                                                rarityColors.first().copy(alpha = 0.05f),
+                                                iconColor.copy(alpha = 0.15f),
+                                                iconColor.copy(alpha = 0.05f),
                                             ),
                                         )
                                     } else {
@@ -601,7 +602,7 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                     Icon(
                         imageVector = achievementIcon,
                         contentDescription = null,
-                        tint = if (achievement.isUnlocked) rarityColors.first() else Color.Gray,
+                        tint = getAchievementIconColor(achievement.id, achievement.category, achievement.isUnlocked),
                         modifier = Modifier.size(32.dp),
                     )
 
@@ -792,6 +793,7 @@ private fun getAchievementIcon(
         "sberbank_importer" -> Icons.Filled.AccountBalance
         "alfabank_importer" -> Icons.Filled.Psychology
         "ozon_importer" -> Icons.Filled.SportsEsports
+        "csv_importer" -> Icons.Filled.FilterList
         "multi_bank_importer" -> Icons.Filled.Sync
         "export_master" -> Icons.Filled.Download
         "backup_enthusiast" -> Icons.Filled.Security
@@ -864,6 +866,73 @@ private fun getRarityDisplayName(rarity: AchievementRarity): String {
         AchievementRarity.RARE -> "Редкое"
         AchievementRarity.EPIC -> "Эпическое"
         AchievementRarity.LEGENDARY -> "Легендарное"
+    }
+}
+
+/**
+ * Получает цвет иконки для конкретного достижения
+ */
+private fun getAchievementIconColor(
+    achievementId: String,
+    category: AchievementCategory,
+    isUnlocked: Boolean,
+): Color {
+    return if (!isUnlocked) {
+        Color.Gray
+    } else {
+        when (achievementId) {
+            // Транзакции - разные оттенки синего/зелёного
+            "first_transaction" -> Color(0xFF10B981) // Зелёный
+            "transaction_master" -> Color(0xFFF59E0B) // Золотой
+            "daily_tracker" -> Color(0xFF3B82F6) // Синий
+            "category_organizer" -> Color(0xFF8B5CF6) // Фиолетовый
+            
+            // Банковские импортеры - фирменные цвета банков
+            "tinkoff_importer" -> Color(0xFFFFDD2D) // Жёлтый Тинькофф
+            "sberbank_importer" -> Color(0xFF21A038) // Зелёный Сбербанк
+            "alfabank_importer" -> Color(0xFFEF3124) // Красный Альфа-Банк
+            "ozon_importer" -> Color(0xFF005BFF) // Синий OZON
+            "csv_importer" -> Color(0xFF06B6D4) // Cyan для CSV
+            "multi_bank_importer" -> Color(0xFFEF4444) // Ярко-красный для мульти
+            "export_master" -> Color(0xFF059669) // Тёмно-зелёный
+            "backup_enthusiast" -> Color(0xFF7C3AED) // Фиолетовый
+            
+            // Бюджет - оттенки зелёного/золотого
+            "first_budget" -> Color(0xFF10B981) // Зелёный
+            "budget_keeper" -> Color(0xFF059669) // Тёмно-зелёный
+            "budget_saver" -> Color(0xFFD97706) // Янтарный
+            
+            // Накопления - золотые/жёлтые оттенки
+            "first_savings" -> Color(0xFFFFD700) // Золотой
+            "emergency_fund" -> Color(0xFFF59E0B) // Янтарный
+            
+            // Привычки - тёплые цвета
+            "week_no_coffee" -> Color(0xFF92400E) // Коричневый кофе
+            "healthy_spender" -> Color(0xFFEC4899) // Розовый
+            
+            // Статистика - синие оттенки
+            "data_analyst" -> Color(0xFF1E40AF) // Тёмно-синий
+            
+            // Вехи - фиолетовые оттенки
+            "app_explorer" -> Color(0xFF7C3AED) // Фиолетовый
+            "month_user" -> Color(0xFF9333EA) // Светло-фиолетовый
+            
+            // Специальные - яркие цвета
+            "early_bird" -> Color(0xFFF59E0B) // Солнечный жёлтый
+            "night_owl" -> Color(0xFF4338CA) // Ночной синий
+            "perfectionist" -> Color(0xFFDC2626) // Красный для перфекциониста
+            
+            // Цвета по категориям для остальных
+            else -> when (category) {
+                AchievementCategory.TRANSACTIONS -> Color(0xFF3B82F6) // Синий
+                AchievementCategory.BUDGET -> Color(0xFF10B981) // Зелёный
+                AchievementCategory.SAVINGS -> Color(0xFFFFD700) // Золотой
+                AchievementCategory.HABITS -> Color(0xFFEC4899) // Розовый
+                AchievementCategory.STATISTICS -> Color(0xFF1E40AF) // Тёмно-синий
+                AchievementCategory.MILESTONES -> Color(0xFF7C3AED) // Фиолетовый
+                AchievementCategory.SPECIAL -> Color(0xFFEF4444) // Красный
+            }
+        }
     }
 }
 
