@@ -211,16 +211,6 @@ class AchievementsRepositoryImpl(
             targetProgress = 1,
             rewardCoins = 60
         ),
-        Achievement(
-            id = "safety_first",
-            title = "Безопасность прежде всего",
-            description = "Создайте резервную копию данных",
-            iconRes = 0,
-            category = AchievementCategory.MILESTONES,
-            rarity = AchievementRarity.COMMON,
-            targetProgress = 1,
-            rewardCoins = 25
-        ),
         
         // Достижения для импорта из банков
         Achievement(

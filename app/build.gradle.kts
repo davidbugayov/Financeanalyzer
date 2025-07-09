@@ -99,6 +99,18 @@ android {
             resValue("string", "app_name", "Деньги под Контролем (F-Droid)")
             resValue("string", "app_store", "F-Droid")
         }
+
+        create("huawei") {
+            dimension = "store"
+            // Huawei версия использует Firebase и AppMetrica, но не RuStore
+            buildConfigField("boolean", "USE_FIREBASE", "true")
+            buildConfigField("boolean", "USE_RUSTORE", "false")
+
+            // Суффиксы для Huawei AppGallery
+            versionNameSuffix = ".hw"
+            resValue("string", "app_name", "Деньги под Контролем")
+            resValue("string", "app_store", "Huawei AppGallery")
+        }
     }
 
     // Room schema location
@@ -174,6 +186,11 @@ android {
             java.srcDirs("src/fdroid/java")
             res.srcDirs("src/fdroid/res")
             manifest.srcFile("src/fdroid/AndroidManifest.xml")
+        }
+        getByName("huawei") {
+            java.srcDirs("src/huawei/java")
+            res.srcDirs("src/huawei/res")
+            manifest.srcFile("src/huawei/AndroidManifest.xml")
         }
     }
 
@@ -313,6 +330,7 @@ dependencies {
         add("googleImplementation", project(module))
         add("rustoreImplementation", project(module))
         add("fdroidImplementation", project(module))
+        add("huaweiImplementation", project(module))
     }
 
     // Kotlin
@@ -364,21 +382,25 @@ dependencies {
     // Используем Firebase BOM (Bill of Materials) для управления версиями
     val firebaseBom = platform(libs.firebase.bom)
     implementation(firebaseBom)
-    // Firebase BOM for google and rustore flavors
+    // Firebase BOM for google, rustore, and huawei flavors
     "googleImplementation"(firebaseBom)
     "rustoreImplementation"(firebaseBom)
+    "huaweiImplementation"(firebaseBom)
 
     // Firebase Analytics (if used)
     "googleImplementation"(libs.firebase.analytics)
     "rustoreImplementation"(libs.firebase.analytics)
+    "huaweiImplementation"(libs.firebase.analytics)
 
     // Firebase Crashlytics
     "googleImplementation"(libs.firebase.crashlytics)
     "rustoreImplementation"(libs.firebase.crashlytics)
+    "huaweiImplementation"(libs.firebase.crashlytics)
 
     // Firebase Performance
     "googleImplementation"(libs.firebase.perf)
     "rustoreImplementation"(libs.firebase.perf)
+    "huaweiImplementation"(libs.firebase.perf)
 
     // RuStore SDK только для RuStore флейвора
     "rustoreImplementation"(libs.rustore.review)
@@ -465,6 +487,7 @@ ktlint {
         include("**/src/main/**/*.kt")
         include("**/src/google/**/*.kt")
         include("**/src/fdroid/**/*.kt")
+        include("**/src/huawei/**/*.kt")
     }
 }
 
@@ -491,8 +514,8 @@ configurations.all {
         // exclude(group = "io.appmetrica")
         exclude(group = "ru.rustore")
     }
-    // Исключаем RuStore зависимости из Google flavor
-    if (name.contains("google", ignoreCase = true)) {
+    // Исключаем RuStore зависимости из Google и Huawei flavors
+    if (name.contains("google", ignoreCase = true) || name.contains("huawei", ignoreCase = true)) {
         exclude(group = "ru.rustore")
     }
 }
@@ -616,6 +639,7 @@ tasks.register("prepareAllReleases") {
         println("==========================================")
         println("Все релизы подготовлены!")
         println("Версия: ${android.defaultConfig.versionName} (${android.defaultConfig.versionCode})")
+        println("Для Huawei: переименуйте APK в .app")
         println("==========================================")
     }
 }

@@ -178,6 +178,9 @@ class AddTransactionViewModel(
                     incrementSourceUsage(transactionToSave.source)
                     updateWidgetsUseCase()
 
+                    // Триггер достижения за добавление транзакции
+                    com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onTransactionAdded()
+
                     // Запрос отзыва (только RuStore). Реализация предоставляется в app-модуле.
                     // Для независимой компиляции feature-модуля просто пропускаем вызов здесь.
 

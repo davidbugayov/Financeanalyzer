@@ -86,8 +86,17 @@ class AchievementEngine(
             
             // Проверяем время для специальных ачивок - используем checkAndUnlockAchievement
             val hour = Calendar.getInstance().get(Calendar.HOUR_OF_DAY)
-            checkAndUnlockAchievement("early_bird") { hour < 7 }
-            checkAndUnlockAchievement("night_owl") { hour >= 23 }
+            Timber.d("🏆 Текущий час: $hour")
+            
+            // Ранняя пташка: до 7 утра (0-6 часов)
+            val isEarlyBird = hour < 7
+            Timber.d("🏆 Проверка early_bird: час=$hour, условие hour < 7 = $isEarlyBird")
+            checkAndUnlockAchievement("early_bird") { isEarlyBird }
+            
+            // Ночная сова: после 23:00 (23 час и позже)
+            val isNightOwl = hour >= 23
+            Timber.d("🏆 Проверка night_owl: час=$hour, условие hour >= 23 = $isNightOwl")
+            checkAndUnlockAchievement("night_owl") { isNightOwl }
         }
     }
     
@@ -209,7 +218,6 @@ class AchievementEngine(
                 "week_streak" -> checkAndUnlockAchievement("consistent_user") { true }
                 "month_active" -> checkAndUnlockAchievement("loyal_user") { true }
                 "all_categories_used" -> checkAndUnlockAchievement("category_expert") { true }
-                "backup_created" -> checkAndUnlockAchievement("safety_first") { true }
                 
                 // Экспорт и импорт достижения
                 "export_master" -> updateAchievementProgress("export_master", 1)
@@ -281,19 +289,35 @@ class AchievementEngine(
      */
     private suspend fun checkAndUnlockAchievement(achievementId: String, condition: () -> Boolean) {
         try {
+            Timber.d("🏆 Проверка достижения: $achievementId")
             val achievement = achievementsRepository.getAchievementById(achievementId).first()
             
-            if (achievement != null && !achievement.isUnlocked && condition()) {
-                Timber.d("🏆 Разблокировано достижение: ${achievement.title}")
+            if (achievement != null) {
+                Timber.d("🏆 Найдено достижение: ${achievement.title}, разблокировано: ${achievement.isUnlocked}")
                 
-                val unlockedAchievement = achievement.copy(
-                    isUnlocked = true,
-                    dateUnlocked = System.currentTimeMillis(),
-                    currentProgress = achievement.targetProgress
-                )
-                
-                achievementsRepository.updateAchievement(unlockedAchievement)
-                _newAchievements.emit(unlockedAchievement)
+                if (!achievement.isUnlocked) {
+                    val conditionResult = condition()
+                    Timber.d("🏆 Результат условия для $achievementId: $conditionResult")
+                    
+                    if (conditionResult) {
+                        Timber.d("🏆 Разблокировано достижение: ${achievement.title}")
+                        
+                        val unlockedAchievement = achievement.copy(
+                            isUnlocked = true,
+                            dateUnlocked = System.currentTimeMillis(),
+                            currentProgress = achievement.targetProgress
+                        )
+                        
+                        achievementsRepository.updateAchievement(unlockedAchievement)
+                        _newAchievements.emit(unlockedAchievement)
+                    } else {
+                        Timber.d("🏆 Условие не выполнено для: ${achievement.title}")
+                    }
+                } else {
+                    Timber.d("🏆 Достижение уже разблокировано: ${achievement.title}")
+                }
+            } else {
+                Timber.w("🏆 Достижение $achievementId не найдено в репозитории!")
             }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при проверке достижения $achievementId")
