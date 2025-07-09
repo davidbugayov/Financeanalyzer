@@ -557,7 +557,7 @@ class ImportTransactionsViewModel(
         Timber.d("🏆 bankName?.lowercase() = '${bankName?.lowercase()}'")
         
         when (bankName?.lowercase()) {
-            "тинькофф", "тинь", "tinkoff", "tbank" -> {
+            "тинькофф", "тинь", "tinkoff", "tbank", "тинькофф банк (pdf)", "тинькофф pdf" -> {
                 Timber.d("🏆 Триггер Тинькофф")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "tinkoff_importer",
@@ -566,7 +566,7 @@ class ImportTransactionsViewModel(
                     "multi_bank_importer",
                 )
             }
-            "сбербанк", "сбер", "sberbank", "сберbank", "sber", "pao сбербанк", "пао сбербанк", "sberbank pdf", "сбербанк pdf", "сбербанк (pdf)" -> {
+            "сбербанк", "сбер", "sberbank", "сберbank", "sber", "pao сбербанк", "пао сбербанк", "sberbank pdf", "сбербанк pdf", "сбербанк (pdf)", "сбербанк pdf" -> {
                 Timber.d("🏆 Триггер Сбербанк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "sberbank_importer",
@@ -584,7 +584,7 @@ class ImportTransactionsViewModel(
                     "multi_bank_importer",
                 )
             }
-            "озон банк", "озон", "ozon" -> {
+            "озон банк", "озон", "ozon", "ozon банк (pdf)", "ozon pdf" -> {
                 Timber.d("🏆 Триггер OZON Банк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "ozon_importer",
