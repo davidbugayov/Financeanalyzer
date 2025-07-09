@@ -144,7 +144,7 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                 onBackClick = viewModel::onNavigateBack,
                 actions = {
                     IconButton(onClick = {
-                        // Триггер ачивки - работа с доходами/бюджетом
+                        // Триггер ачивки - распределение дохода (дополнительная активность с бюджетом)
                         AchievementTrigger.onBudgetCreated()
                         tempIncomeAmount = "" // Сбрасываем временную сумму
                         showDistributeConfirmation = true

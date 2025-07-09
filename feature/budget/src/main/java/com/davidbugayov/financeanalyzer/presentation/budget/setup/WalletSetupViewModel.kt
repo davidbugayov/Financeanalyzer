@@ -3,6 +3,7 @@ package com.davidbugayov.financeanalyzer.presentation.budget.setup
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Money
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
 import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
@@ -121,6 +122,9 @@ class WalletSetupViewModel(
                     )
 
                 walletRepository.addWallet(wallet)
+
+                // Триггер ачивки "Первый бюджет" при создании кошелька
+                AchievementTrigger.onBudgetCreated()
 
                 _state.value =
                     _state.value.copy(
