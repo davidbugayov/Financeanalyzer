@@ -57,6 +57,8 @@ import com.davidbugayov.financeanalyzer.feature.profile.components.NotificationS
 import com.davidbugayov.financeanalyzer.feature.profile.components.ProfileTopBar
 import com.davidbugayov.financeanalyzer.feature.profile.components.SettingsSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.ThemeSelectionDialog
+import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
+import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
@@ -402,6 +404,30 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
                 )
 
+                // Секция безопасности
+                SecuritySettingsSection(
+                    isAppLockEnabled = state.isAppLockEnabled,
+                    isBiometricEnabled = state.isBiometricEnabled,
+                    isBiometricAvailable = state.isBiometricAvailable,
+                    onAppLockClick = { 
+                        if (!state.isAppLockEnabled) {
+                            // Если блокировка не включена, сначала нужно установить PIN
+                            viewModel.onEvent(ProfileEvent.ShowPinSetupDialog)
+                        } else {
+                            // Если уже включена, выключаем
+                            viewModel.onEvent(ProfileEvent.ChangeAppLock(false))
+                        }
+                    },
+                    onBiometricClick = { viewModel.onEvent(ProfileEvent.ChangeBiometric(!state.isBiometricEnabled)) },
+                    modifier = Modifier.padding(
+                        horizontal = dimensionResource(R.dimen.profile_section_padding),
+                    ),
+                )
+
+                Spacer(
+                    modifier = Modifier.height(dimensionResource(R.dimen.profile_section_spacing)),
+                )
+
                 AppInfoSection(
                     appVersion = appVersion,
                     buildVersion = buildVersion,
@@ -493,6 +519,13 @@ private fun ShowDialogs(
         NotificationSettingsDialog(
             onDismiss = { viewModel.onEvent(ProfileEvent.HideNotificationSettingsDialog) },
             viewModel = viewModel,
+        )
+    }
+
+    if (state.isEditingPinCode) {
+        PinSetupDialog(
+            onDismiss = { viewModel.onEvent(ProfileEvent.HidePinSetupDialog) },
+            onPinSet = { pin -> viewModel.onEvent(ProfileEvent.SetPinCode(pin)) },
         )
     }
 }

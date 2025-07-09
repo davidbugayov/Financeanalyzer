@@ -73,6 +73,17 @@ object AnalyticsConstants {
         const val ACHIEVEMENTS_SCREEN_VIEWED = "achievements_screen_viewed"
         const val ACHIEVEMENT_UNLOCKED = "achievement_unlocked"
         const val ACHIEVEMENT_FILTER_CHANGED = "achievement_filter_changed"
+
+        // События безопасности
+        const val SECURITY_AUTH_SCREEN_VIEWED = "security_auth_screen_viewed"
+        const val SECURITY_AUTH_SUCCESS = "security_auth_success"
+        const val SECURITY_AUTH_FAILED = "security_auth_failed"
+        const val SECURITY_APP_LOCK_ENABLED = "security_app_lock_enabled"
+        const val SECURITY_APP_LOCK_DISABLED = "security_app_lock_disabled"
+        const val SECURITY_BIOMETRIC_ENABLED = "security_biometric_enabled"
+        const val SECURITY_BIOMETRIC_DISABLED = "security_biometric_disabled"
+        const val SECURITY_PIN_SETUP = "security_pin_setup"
+        const val SECURITY_PIN_CHANGED = "security_pin_changed"
     }
 
     /**
@@ -167,6 +178,16 @@ object AnalyticsConstants {
         const val ACHIEVEMENTS_LOCKED_COUNT = "achievements_locked_count"
         const val ACHIEVEMENT_FILTER_TYPE = "achievement_filter_type"
         const val TOTAL_COINS_EARNED = "total_coins_earned"
+
+        // Параметры безопасности
+        const val AUTH_METHOD = "auth_method"
+        const val AUTH_RESULT = "auth_result"
+        const val BIOMETRIC_SUPPORTED = "biometric_supported"
+        const val BIOMETRIC_ENROLLED = "biometric_enrolled"
+        const val HAS_PIN_CODE = "has_pin_code"
+        const val SECURITY_FEATURE = "security_feature"
+        const val PREVIOUS_STATE = "previous_state"
+        const val NEW_STATE = "new_state"
     }
 
     /**
@@ -197,5 +218,21 @@ object AnalyticsConstants {
         const val ACHIEVEMENT_FILTER_ALL = "all"
         const val ACHIEVEMENT_FILTER_UNLOCKED = "unlocked"
         const val ACHIEVEMENT_FILTER_LOCKED = "locked"
+
+        // Методы аутентификации
+        const val AUTH_METHOD_PIN = "pin"
+        const val AUTH_METHOD_BIOMETRIC = "biometric"
+        const val AUTH_METHOD_AUTO = "auto"
+
+        // Результаты аутентификации
+        const val AUTH_RESULT_SUCCESS = "success"
+        const val AUTH_RESULT_FAILED = "failed"
+        const val AUTH_RESULT_CANCELLED = "cancelled"
+        const val AUTH_RESULT_ERROR = "error"
+
+        // Функции безопасности
+        const val SECURITY_FEATURE_APP_LOCK = "app_lock"
+        const val SECURITY_FEATURE_BIOMETRIC = "biometric"
+        const val SECURITY_FEATURE_PIN = "pin"
     }
 }

@@ -14,6 +14,7 @@ class AppNavigation {
     /**
      * Создает основной граф навигации
      * @param onOnboardingScreen Функция для отображения экрана Onboarding
+     * @param onAuthScreen Функция для отображения экрана Auth
      * @param onHomeScreen Функция для отображения экрана Home
      * @param onHistoryScreen Функция для отображения экрана History
      * @param onBudgetScreen Функция для отображения экрана Budget
@@ -23,6 +24,7 @@ class AppNavigation {
      */
     fun NavGraphBuilder.mainGraph(
         onOnboardingScreen: @Composable () -> Unit,
+        onAuthScreen: @Composable () -> Unit,
         onHomeScreen: @Composable () -> Unit,
         onHistoryScreen: @Composable () -> Unit,
         onBudgetScreen: @Composable () -> Unit,
@@ -43,6 +45,15 @@ class AppNavigation {
             popExitTransition = defaultExitDown(),
         ) {
             onOnboardingScreen()
+        }
+        composable(
+            route = Screen.Auth.route,
+            enterTransition = defaultEnterUp(),
+            exitTransition = defaultExitDown(),
+            popEnterTransition = defaultEnterUp(),
+            popExitTransition = defaultExitDown(),
+        ) {
+            onAuthScreen()
         }
         composable(
             route = Screen.Home.route,

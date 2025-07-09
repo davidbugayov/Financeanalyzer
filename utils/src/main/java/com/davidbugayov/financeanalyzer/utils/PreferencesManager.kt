@@ -72,6 +72,11 @@ class PreferencesManager(context: Context) {
         // Добавим ключи для времени напоминания, если они еще не в companion object
         private const val KEY_REMINDER_HOUR = "reminder_hour"
         private const val KEY_REMINDER_MINUTE = "reminder_minute"
+
+        // Ключи для настроек безопасности
+        private const val KEY_APP_LOCK_ENABLED = "app_lock_enabled"
+        private const val KEY_BIOMETRIC_ENABLED = "biometric_enabled"
+        private const val KEY_PIN_CODE = "pin_code"
     }
 
     /**
@@ -140,5 +145,62 @@ class PreferencesManager(context: Context) {
      */
     fun setImportReminderShown() {
         sharedPreferences.edit { putBoolean(KEY_IMPORT_REMINDER_SHOWN, true) }
+    }
+
+    // Методы для настроек безопасности
+
+    /**
+     * Проверяет, включена ли блокировка приложения
+     * @return true, если блокировка приложения включена
+     */
+    fun isAppLockEnabled(): Boolean {
+        return sharedPreferences.getBoolean(KEY_APP_LOCK_ENABLED, false)
+    }
+
+    /**
+     * Устанавливает состояние блокировки приложения
+     * @param enabled Включена ли блокировка приложения
+     */
+    fun setAppLockEnabled(enabled: Boolean) {
+        sharedPreferences.edit { putBoolean(KEY_APP_LOCK_ENABLED, enabled) }
+    }
+
+    /**
+     * Проверяет, включена ли биометрическая аутентификация
+     * @return true, если биометрическая аутентификация включена
+     */
+    fun isBiometricEnabled(): Boolean {
+        return sharedPreferences.getBoolean(KEY_BIOMETRIC_ENABLED, false)
+    }
+
+    /**
+     * Устанавливает состояние биометрической аутентификации
+     * @param enabled Включена ли биометрическая аутентификация
+     */
+    fun setBiometricEnabled(enabled: Boolean) {
+        sharedPreferences.edit { putBoolean(KEY_BIOMETRIC_ENABLED, enabled) }
+    }
+
+    /**
+     * Сохраняет PIN-код
+     * @param pinCode PIN-код для сохранения
+     */
+    fun setPinCode(pinCode: String) {
+        sharedPreferences.edit { putString(KEY_PIN_CODE, pinCode) }
+    }
+
+    /**
+     * Получает сохраненный PIN-код
+     * @return Сохраненный PIN-код или null, если не установлен
+     */
+    fun getPinCode(): String? {
+        return sharedPreferences.getString(KEY_PIN_CODE, null)
+    }
+
+    /**
+     * Удаляет сохраненный PIN-код
+     */
+    fun removePinCode() {
+        sharedPreferences.edit { remove(KEY_PIN_CODE) }
     }
 }

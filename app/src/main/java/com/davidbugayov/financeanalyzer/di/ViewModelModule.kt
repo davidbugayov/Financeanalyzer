@@ -23,6 +23,7 @@ import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 
+@OptIn(ExperimentalCoroutinesApi::class)
 val viewModelModule =
     module {
         // Categories ViewModel is shared across app
@@ -33,7 +34,7 @@ val viewModelModule =
 
         viewModelOf(::AddTransactionViewModel)
 
-        viewModelOf(::ProfileViewModel)
+        viewModel { ProfileViewModel(get(), get(), get(), get(), get(), get(), get(), get()) }
 
         viewModelOf(::HomeViewModel)
 
@@ -53,7 +54,6 @@ val viewModelModule =
 
         viewModelOf(::OnboardingViewModel)
 
-        @OptIn(ExperimentalCoroutinesApi::class)
         viewModel { AchievementsViewModel(get(), get()) }
 
         viewModel { parameters -> FinancialDetailStatisticsViewModel(parameters.get(), parameters.get(), get(), get()) }

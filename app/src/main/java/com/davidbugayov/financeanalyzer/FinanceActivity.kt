@@ -3,9 +3,12 @@ package com.davidbugayov.financeanalyzer
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
-import androidx.activity.ComponentActivity
+import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -29,23 +32,26 @@ import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import org.koin.android.ext.android.inject
 import timber.log.Timber
 
-class FinanceActivity : ComponentActivity() {
+class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
     private val navigationManager: NavigationManager by inject()
     private val onboardingManager: OnboardingManager by inject()
+    private val preferencesManager: PreferencesManager by inject()
 
     // Начальный экран для навигации
     private var startDestination = Screen.Home.route
 
     override fun onCreate(savedInstanceState: Bundle?) {
         val splashScreen = installSplashScreen()
-        super.onCreate(savedInstanceState)
+        super<FragmentActivity>.onCreate(savedInstanceState)
 
         // Обрабатываем deep links
         handleIntent(intent)
 
-        // Проверяем, нужно ли показывать онбординг
-        if (!onboardingManager.isOnboardingCompleted()) {
-            startDestination = Screen.Onboarding.route
+        // Определяем начальный экран
+        startDestination = when {
+            !onboardingManager.isOnboardingCompleted() -> Screen.Onboarding.route
+            preferencesManager.isAppLockEnabled() -> Screen.Auth.route
+            else -> Screen.Home.route
         }
 
         // Делаем контент приложения отображаться под системными панелями
@@ -92,6 +98,9 @@ class FinanceActivity : ComponentActivity() {
             System.exit(10)
         }
 
+        // Добавляем наблюдатель за жизненным циклом приложения для обработки app lock
+        ProcessLifecycleOwner.get().lifecycle.addObserver(this)
+
         applyContent()
 
         // Устанавливаем флаг готовности, чтобы скрыть сплеш-скрин
@@ -137,6 +146,24 @@ class FinanceActivity : ComponentActivity() {
         setContent {
             FinanceAppContent(navigationManager, startDestination)
         }
+    }
+
+    override fun onResume(owner: LifecycleOwner) {
+        super<DefaultLifecycleObserver>.onResume(owner)
+        // Проверяем, нужна ли аутентификация при возврате в приложение
+        if (preferencesManager.isAppLockEnabled()) {
+            navigationManager.navigate(
+                NavigationManager.Command.NavigateAndClearBackStack(
+                    destination = Screen.Auth.route,
+                    popUpTo = Screen.Home.route,
+                )
+            )
+        }
+    }
+
+    override fun onDestroy() {
+        super<FragmentActivity>.onDestroy()
+        ProcessLifecycleOwner.get().lifecycle.removeObserver(this)
     }
 }
 

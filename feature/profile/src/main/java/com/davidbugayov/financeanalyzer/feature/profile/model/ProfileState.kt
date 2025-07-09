@@ -40,5 +40,7 @@ data class ProfileState(
     // Безопасность
     val isAppLockEnabled: Boolean = false,
     val isBiometricEnabled: Boolean = false,
+    val isBiometricAvailable: Boolean = false,
+    val isEditingPinCode: Boolean = false,
     val hasNotificationPermission: Boolean = true,
 )

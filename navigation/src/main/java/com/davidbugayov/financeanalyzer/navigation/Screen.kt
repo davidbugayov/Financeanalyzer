@@ -10,6 +10,9 @@ sealed class Screen(val route: String) {
     /** Экран онбординга для новых пользователей */
     data object Onboarding : Screen("onboarding")
 
+    /** Экран аутентификации */
+    data object Auth : Screen("auth")
+
     /** Главный экран с балансом и последними транзакциями */
     data object Home : Screen("home")
 

@@ -18,6 +18,7 @@ import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.Time
+import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import java.io.File
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -37,6 +38,7 @@ class ProfileViewModel(
     private val preferencesManager: PreferencesManager,
     private val notificationScheduler: INotificationScheduler,
     private val navigationManager: NavigationManager,
+    private val securityManager: SecurityManager,
     val userEventTracker: UserEventTracker,
     val errorTracker: ErrorTracker,
 ) : ViewModel() {
@@ -49,6 +51,7 @@ class ProfileViewModel(
     init {
         Timber.d("[ProfileViewModel] INIT")
         syncNotificationState()
+        syncSecurityState()
 
         loadFinancialAnalytics()
 
@@ -146,10 +149,51 @@ class ProfileViewModel(
                 syncNotificationState()
             }
             is ProfileEvent.ChangeAppLock -> {
-                _state.update { it.copy(isAppLockEnabled = event.enabled) }
+                viewModelScope.launch {
+                    preferencesManager.setAppLockEnabled(event.enabled)
+                    if (!event.enabled) {
+                        // Если блокировка отключена, отключаем и биометрию
+                        preferencesManager.setBiometricEnabled(false)
+                    }
+                    
+                    // Логируем изменение настройки блокировки приложения
+                    AnalyticsUtils.logSecurityAppLockChanged(event.enabled)
+                    
+                    syncSecurityState()
+                }
             }
             is ProfileEvent.ChangeBiometric -> {
-                _state.update { it.copy(isBiometricEnabled = event.enabled) }
+                viewModelScope.launch {
+                    if (event.enabled && securityManager.isBiometricSupported() && securityManager.isBiometricEnrolled()) {
+                        preferencesManager.setBiometricEnabled(event.enabled)
+                        AnalyticsUtils.logSecurityBiometricChanged(true)
+                    } else if (!event.enabled) {
+                        preferencesManager.setBiometricEnabled(false)
+                        AnalyticsUtils.logSecurityBiometricChanged(false)
+                    }
+                    syncSecurityState()
+                }
+            }
+            is ProfileEvent.ShowPinSetupDialog -> {
+                _state.update { it.copy(isEditingPinCode = true) }
+            }
+            is ProfileEvent.HidePinSetupDialog -> {
+                _state.update { it.copy(isEditingPinCode = false) }
+            }
+            is ProfileEvent.SetPinCode -> {
+                viewModelScope.launch {
+                    val existingPin = preferencesManager.getPinCode()
+                    val isFirstSetup = existingPin == null
+                    
+                    preferencesManager.setPinCode(event.pinCode)
+                    preferencesManager.setAppLockEnabled(true) // Автоматически включаем блокировку при установке PIN
+                    
+                    // Логируем установку или изменение PIN кода
+                    AnalyticsUtils.logSecurityPinSetup(isFirstSetup)
+                    
+                    _state.update { it.copy(isEditingPinCode = false) }
+                    syncSecurityState()
+                }
             }
             is ProfileEvent.LoadFinancialAnalytics -> {
                 loadFinancialAnalytics()
@@ -355,5 +399,20 @@ class ProfileViewModel(
             )
         }
         Timber.d("[ProfileViewModel] syncNotificationState: isEnabled=$isEnabled, time=$time")
+    }
+
+    private fun syncSecurityState() {
+        val isAppLockEnabled = preferencesManager.isAppLockEnabled()
+        val isBiometricEnabled = preferencesManager.isBiometricEnabled()
+        val isBiometricAvailable = securityManager.isBiometricSupported() && securityManager.isBiometricEnrolled()
+        
+        _state.update {
+            it.copy(
+                isAppLockEnabled = isAppLockEnabled,
+                isBiometricEnabled = isBiometricEnabled,
+                isBiometricAvailable = isBiometricAvailable,
+            )
+        }
+        Timber.d("[ProfileViewModel] syncSecurityState: isAppLockEnabled=$isAppLockEnabled, isBiometricEnabled=$isBiometricEnabled, isBiometricAvailable=$isBiometricAvailable")
     }
 }

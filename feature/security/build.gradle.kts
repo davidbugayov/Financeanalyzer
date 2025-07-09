@@ -1,12 +1,13 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.ksp)
     alias(libs.plugins.ktlint)
     alias(libs.plugins.compose.compiler)
 }
 
 android {
-    namespace = "com.davidbugayov.financeanalyzer.feature.profile"
+    namespace = "com.davidbugayov.financeanalyzer.feature.security"
     compileSdk = libs.versions.compileSdk.get().toInt()
 
     defaultConfig {
@@ -36,31 +37,55 @@ android {
             listOf(
                 "-opt-in=kotlin.RequiresOptIn",
                 "-Xjvm-default=all",
+                "-Xcontext-parameters",
             )
     }
 
     buildFeatures {
         compose = true
     }
+
+    composeOptions {
+        kotlinCompilerExtensionVersion = libs.versions.kotlin.get()
+    }
+
+    // Исключаем тестовые классы из релизной сборки
+    packaging {
+        resources {
+            excludes +=
+                listOf(
+                    "**/*Test.class",
+                    "**/*Tests.class",
+                    "**/test/**",
+                    "**/androidTest/**",
+                )
+        }
+    }
 }
 
 dependencies {
+    // Modules
     implementation(project(":domain"))
-    implementation(project(":data"))
     implementation(project(":core"))
     implementation(project(":ui"))
-    implementation(project(":navigation"))
     implementation(project(":utils"))
-    implementation(project(":feature"))
-    implementation(project(":feature:security"))
+    implementation(project(":navigation"))
+
+    // Kotlin
+    implementation(libs.kotlin.stdlib)
+    implementation(libs.kotlin.coroutines.core)
+    implementation(libs.kotlin.coroutines.android)
 
     // AndroidX
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
-    implementation(libs.androidx.lifecycle.viewmodel.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
     implementation(libs.androidx.lifecycle.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.ktx)
     implementation(libs.androidx.activity.compose)
-    implementation(libs.androidx.navigation.compose)
+
+    // Biometric authentication
+    implementation("androidx.biometric:biometric:1.1.0")
 
     // Compose
     implementation(platform(libs.compose.bom))
@@ -79,7 +104,4 @@ dependencies {
 
     // Logging
     implementation(libs.timber)
-
-    // Testing
-    testImplementation(libs.junit)
-}
+} 

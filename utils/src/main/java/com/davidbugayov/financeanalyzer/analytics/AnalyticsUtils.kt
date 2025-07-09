@@ -243,4 +243,126 @@ object AnalyticsUtils : KoinComponent {
         logEvent(AnalyticsConstants.Events.ACHIEVEMENT_FILTER_CHANGED, params)
         Timber.d("Achievement filter changed: $filterType${categoryFilter?.let { ", category: $it" } ?: ""}, results: $resultCount")
     }
+
+    // Безопасность
+
+    /**
+     * Логирует просмотр экрана аутентификации
+     * @param hasPinCode Установлен ли PIN-код
+     * @param biometricSupported Поддерживается ли биометрия
+     * @param biometricEnrolled Настроена ли биометрия
+     */
+    fun logSecurityAuthScreenViewed(
+        hasPinCode: Boolean,
+        biometricSupported: Boolean,
+        biometricEnrolled: Boolean,
+    ) {
+        val params =
+            Bundle().apply {
+                putBoolean(AnalyticsConstants.Params.HAS_PIN_CODE, hasPinCode)
+                putBoolean(AnalyticsConstants.Params.BIOMETRIC_SUPPORTED, biometricSupported)
+                putBoolean(AnalyticsConstants.Params.BIOMETRIC_ENROLLED, biometricEnrolled)
+                putString(AnalyticsConstants.Params.SCREEN_NAME, "security_auth")
+                putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
+            }
+        logEvent(AnalyticsConstants.Events.SECURITY_AUTH_SCREEN_VIEWED, params)
+        Timber.d("Security auth screen viewed - PIN: $hasPinCode, Biometric supported: $biometricSupported, enrolled: $biometricEnrolled")
+    }
+
+    /**
+     * Логирует успешную аутентификацию
+     * @param authMethod Метод аутентификации (pin, biometric, auto)
+     */
+    fun logSecurityAuthSuccess(authMethod: String) {
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.AUTH_METHOD, authMethod)
+                putString(AnalyticsConstants.Params.AUTH_RESULT, AnalyticsConstants.Values.AUTH_RESULT_SUCCESS)
+                putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
+            }
+        logEvent(AnalyticsConstants.Events.SECURITY_AUTH_SUCCESS, params)
+        Timber.d("Security auth success with method: $authMethod")
+    }
+
+    /**
+     * Логирует неудачную аутентификацию
+     * @param authMethod Метод аутентификации (pin, biometric)
+     * @param reason Причина неудачи (failed, cancelled, error)
+     */
+    fun logSecurityAuthFailed(
+        authMethod: String,
+        reason: String,
+    ) {
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.AUTH_METHOD, authMethod)
+                putString(AnalyticsConstants.Params.AUTH_RESULT, reason)
+                putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
+            }
+        logEvent(AnalyticsConstants.Events.SECURITY_AUTH_FAILED, params)
+        Timber.d("Security auth failed with method: $authMethod, reason: $reason")
+    }
+
+    /**
+     * Логирует включение/выключение блокировки приложения
+     * @param enabled Включена ли блокировка
+     */
+    fun logSecurityAppLockChanged(enabled: Boolean) {
+        val eventName =
+            if (enabled) {
+                AnalyticsConstants.Events.SECURITY_APP_LOCK_ENABLED
+            } else {
+                AnalyticsConstants.Events.SECURITY_APP_LOCK_DISABLED
+            }
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.SECURITY_FEATURE, AnalyticsConstants.Values.SECURITY_FEATURE_APP_LOCK)
+                putString(AnalyticsConstants.Params.NEW_STATE, enabled.toString())
+                putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
+            }
+        logEvent(eventName, params)
+        Timber.d("Security app lock ${if (enabled) "enabled" else "disabled"}")
+    }
+
+    /**
+     * Логирует включение/выключение биометрической аутентификации
+     * @param enabled Включена ли биометрия
+     */
+    fun logSecurityBiometricChanged(enabled: Boolean) {
+        val eventName =
+            if (enabled) {
+                AnalyticsConstants.Events.SECURITY_BIOMETRIC_ENABLED
+            } else {
+                AnalyticsConstants.Events.SECURITY_BIOMETRIC_DISABLED
+            }
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.SECURITY_FEATURE, AnalyticsConstants.Values.SECURITY_FEATURE_BIOMETRIC)
+                putString(AnalyticsConstants.Params.NEW_STATE, enabled.toString())
+                putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
+            }
+        logEvent(eventName, params)
+        Timber.d("Security biometric ${if (enabled) "enabled" else "disabled"}")
+    }
+
+    /**
+     * Логирует установку PIN-кода
+     * @param isFirstSetup Первая ли это установка PIN-кода или изменение существующего
+     */
+    fun logSecurityPinSetup(isFirstSetup: Boolean) {
+        val eventName =
+            if (isFirstSetup) {
+                AnalyticsConstants.Events.SECURITY_PIN_SETUP
+            } else {
+                AnalyticsConstants.Events.SECURITY_PIN_CHANGED
+            }
+        val params =
+            Bundle().apply {
+                putString(AnalyticsConstants.Params.SECURITY_FEATURE, AnalyticsConstants.Values.SECURITY_FEATURE_PIN)
+                putBoolean("is_first_setup", isFirstSetup)
+                putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
+            }
+        logEvent(eventName, params)
+        Timber.d("Security PIN ${if (isFirstSetup) "setup" else "changed"}")
+    }
 }

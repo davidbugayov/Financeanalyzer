@@ -89,6 +89,7 @@ fun AppNavHost(
     navigationManager: NavigationManager,
     appNavigation: AppNavigation,
     onOnboardingScreen: @Composable () -> Unit,
+    onAuthScreen: @Composable () -> Unit,
     onHomeScreen: @Composable () -> Unit,
     onHistoryScreen: @Composable () -> Unit,
     onBudgetScreen: @Composable () -> Unit,
@@ -109,6 +110,7 @@ fun AppNavHost(
         with(appNavigation) {
             mainGraph(
                 onOnboardingScreen,
+                onAuthScreen,
                 onHomeScreen,
                 onHistoryScreen,
                 onBudgetScreen,

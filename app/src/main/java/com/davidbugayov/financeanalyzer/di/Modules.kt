@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.analytics.di.analyticsUtilsModule
 import com.davidbugayov.financeanalyzer.feature.transaction.di.transactionModule
+import com.davidbugayov.financeanalyzer.feature.security.di.securityModule
 
 /**
  * Contains a single list of all Koin modules that should be loaded in [BaseFinanceApp].
@@ -18,4 +19,5 @@ val allModules =
         transactionModule,
         analyticsModule,
         analyticsUtilsModule,
+        securityModule,
     )

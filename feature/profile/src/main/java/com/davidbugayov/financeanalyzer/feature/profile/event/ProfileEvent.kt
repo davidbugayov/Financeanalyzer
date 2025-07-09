@@ -91,6 +91,22 @@ sealed class ProfileEvent {
     data class ChangeBiometric(val enabled: Boolean) : ProfileEvent()
 
     /**
+     * Событие отображения диалога настройки PIN-кода.
+     */
+    data object ShowPinSetupDialog : ProfileEvent()
+
+    /**
+     * Событие скрытия диалога настройки PIN-кода.
+     */
+    data object HidePinSetupDialog : ProfileEvent()
+
+    /**
+     * Событие установки PIN-кода.
+     * @param pinCode PIN-код для установки.
+     */
+    data class SetPinCode(val pinCode: String) : ProfileEvent()
+
+    /**
      * Событие загрузки финансовой аналитики.
      */
     data object LoadFinancialAnalytics : ProfileEvent()

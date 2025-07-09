@@ -5,6 +5,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.navigation.NavHostController
 import com.davidbugayov.financeanalyzer.feature.onboarding.OnboardingScreen
 import com.davidbugayov.financeanalyzer.feature.profile.ProfileScreen
+import com.davidbugayov.financeanalyzer.feature.security.AuthScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.presentation.export.ExportImportScreen
 import com.davidbugayov.financeanalyzer.feature.transaction.presentation.transaction.add.AddTransactionScreen
@@ -57,6 +58,19 @@ fun AppNavHostImpl(
                         ),
                     )
                 },
+            )
+        },
+        onAuthScreen = {
+            AuthScreen(
+                onAuthSuccess = {
+                    // После успешной аутентификации переходим на главный экран
+                    navigationManager.navigate(
+                        NavigationManager.Command.NavigateAndClearBackStack(
+                            destination = Screen.Home.route,
+                            popUpTo = Screen.Auth.route,
+                        ),
+                    )
+                }
             )
         },
         onHomeScreen = {
