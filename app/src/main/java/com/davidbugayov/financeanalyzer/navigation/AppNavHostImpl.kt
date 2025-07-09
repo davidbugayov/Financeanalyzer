@@ -22,6 +22,7 @@ import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTr
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import java.util.Date
 import org.koin.androidx.compose.koinViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 /**
  * Реализация AppNavHost для приложения.
@@ -126,6 +127,7 @@ fun AppNavHostImpl(
             )
         },
         onAchievementsScreen = {
+            @OptIn(ExperimentalCoroutinesApi::class)
             val achievementsViewModel =
                 koinViewModel<AchievementsViewModel>()
             val achievements = achievementsViewModel.achievements.collectAsState().value

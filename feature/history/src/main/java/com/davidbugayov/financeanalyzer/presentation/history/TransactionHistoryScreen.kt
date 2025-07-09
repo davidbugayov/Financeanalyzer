@@ -1,3 +1,5 @@
+@file:OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+
 package com.davidbugayov.financeanalyzer.presentation.history
 
 import androidx.compose.foundation.layout.Box

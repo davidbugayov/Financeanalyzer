@@ -6,6 +6,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.*
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -123,7 +124,7 @@ fun OnboardingScreen(
             Spacer(modifier = Modifier.height(16.dp))
 
             FeatureCard(
-                icon = Icons.Default.TrendingUp,
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
                 title = stringResource(R.string.onboarding_feature_analytics_title),
                 description = stringResource(R.string.onboarding_feature_analytics_description),
                 color = MaterialTheme.colorScheme.secondary,

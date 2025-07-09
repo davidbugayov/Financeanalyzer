@@ -428,7 +428,7 @@ dependencies {
     implementation(project(":feature:transaction"))
 
     // Lifecycle Process для отслеживания жизненного цикла приложения
-    implementation("androidx.lifecycle:lifecycle-process:${libs.versions.androidxLifecycle.get()}")
+    implementation(libs.androidx.lifecycle.process)
 }
 
 composeCompiler {

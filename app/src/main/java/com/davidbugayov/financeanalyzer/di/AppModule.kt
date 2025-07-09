@@ -111,6 +111,7 @@ val appModule =
         }
 
         // Achievement system
+        @Suppress("DelicateCoroutinesApi")
         single<AchievementEngine> {
             AchievementEngine(
                 achievementsRepository = get(),

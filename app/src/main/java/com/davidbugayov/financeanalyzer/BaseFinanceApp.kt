@@ -8,6 +8,7 @@ import androidx.lifecycle.ProcessLifecycleOwner
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
+import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.di.allModules
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine
@@ -177,11 +178,15 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
 
             // Сохраняем время первого открытия если это первый запуск
             if (firstOpenTime == currentTime) {
-                prefs.edit().putLong("first_open_time", currentTime).apply()
+                prefs.edit {
+                    putLong("first_open_time", currentTime)
+                }
             }
 
             // Сохраняем текущее время открытия
-            prefs.edit().putLong("last_open_time", currentTime).apply()
+            prefs.edit {
+                putLong("last_open_time", currentTime)
+            }
 
             // Проверяем недельную активность (7 дней)
             val weekInMillis = 7 * 24 * 60 * 60 * 1000L

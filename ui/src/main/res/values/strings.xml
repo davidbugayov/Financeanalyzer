@@ -1240,5 +1240,30 @@
     
     <string name="achievement_perfectionist_title">Перфекционист</string>
     <string name="achievement_perfectionist_desc">Заполните все поля в 50 транзакциях</string>
+    
+    <!-- Import/Export Achievements -->
+    <string name="achievement_csv_importer_title">CSV-импортер</string>
+    <string name="achievement_csv_importer_desc">Импортируйте транзакции из CSV-файла</string>
+    
+    <string name="achievement_tinkoff_importer_title">Тинькоff-интегратор</string>
+    <string name="achievement_tinkoff_importer_desc">Импортируйте транзакции из Тинькофф</string>
+    
+    <string name="achievement_sberbank_importer_title">Сбер-коллекционер</string>
+    <string name="achievement_sberbank_importer_desc">Импортируйте транзакции из Сбербанка</string>
+    
+    <string name="achievement_alfabank_importer_title">Альфа-аналитик</string>
+    <string name="achievement_alfabank_importer_desc">Импортируйте транзакции из Альфа-Банка</string>
+    
+    <string name="achievement_ozon_importer_title">OZON-агрегатор</string>
+    <string name="achievement_ozon_importer_desc">Импортируйте транзакции из OZON Банка</string>
+    
+    <string name="achievement_multi_bank_importer_title">Мульти-банковский коллектор</string>
+    <string name="achievement_multi_bank_importer_desc">Импортируйте данные из всех 4 банков</string>
+    
+    <string name="achievement_export_master_title">Мастер экспорта</string>
+    <string name="achievement_export_master_desc">Экспортируйте транзакции в CSV</string>
+    
+    <string name="achievement_backup_enthusiast_title">Энтузиаст резервных копий</string>
+    <string name="achievement_backup_enthusiast_desc">Создайте 5 экспортов данных</string>
 
 </resources>

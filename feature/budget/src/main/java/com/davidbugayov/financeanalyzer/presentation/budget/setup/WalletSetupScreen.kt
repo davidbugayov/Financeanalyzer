@@ -4,10 +4,11 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowBack
+import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material3.*
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -39,7 +40,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                 navigationIcon = {
                     IconButton(onClick = viewModel::navigateBack) {
                         Icon(
-                            imageVector = Icons.Default.ArrowBack,
+                            imageVector = Icons.AutoMirrored.Filled.ArrowBack,
                             contentDescription = stringResource(R.string.back),
                         )
                     }
@@ -154,7 +155,7 @@ fun WalletSetupScreen(viewModel: WalletSetupViewModel = koinViewModel()) {
                         trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded) },
                         modifier =
                             Modifier
-                                .menuAnchor()
+                                .menuAnchor(type = MenuAnchorType.PrimaryNotEditable, enabled = true)
                                 .fillMaxWidth(),
                         colors =
                             OutlinedTextFieldDefaults.colors(

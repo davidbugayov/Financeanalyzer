@@ -21,6 +21,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 val viewModelModule =
     module {
@@ -52,7 +53,8 @@ val viewModelModule =
 
         viewModelOf(::OnboardingViewModel)
 
-        viewModelOf(::AchievementsViewModel)
+        @OptIn(ExperimentalCoroutinesApi::class)
+        viewModel { AchievementsViewModel(get(), get()) }
 
         viewModel { parameters -> FinancialDetailStatisticsViewModel(parameters.get(), parameters.get(), get(), get()) }
     }

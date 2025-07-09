@@ -64,10 +64,10 @@ interface AchievementsRepository {
  * Реализация репозитория достижений с постоянным хранением в SharedPreferences
  */
 class AchievementsRepositoryImpl(
-    private val context: android.content.Context
+    context: android.content.Context
 ) : AchievementsRepository {
 
-    private val prefs = context.getSharedPreferences("achievements", android.content.Context.MODE_PRIVATE)
+    private val prefs = context.applicationContext.getSharedPreferences("achievements", android.content.Context.MODE_PRIVATE)
     
     // Предустановленные достижения
     private val defaultAchievements = listOf(
@@ -294,6 +294,18 @@ class AchievementsRepositoryImpl(
             rarity = AchievementRarity.RARE,
             targetProgress = 5,
             rewardCoins = 75
+        ),
+        
+        // Достижение для импорта CSV
+        Achievement(
+            id = "csv_importer",
+            title = "CSV-импортер",
+            description = "Импортируйте транзакции из CSV-файла",
+            iconRes = 0,
+            category = AchievementCategory.TRANSACTIONS,
+            rarity = AchievementRarity.COMMON,
+            targetProgress = 1,
+            rewardCoins = 25
         )
     )
 

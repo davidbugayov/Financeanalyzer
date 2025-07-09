@@ -216,6 +216,7 @@ class AchievementEngine(
                 "sberbank_importer" -> updateAchievementProgress("sberbank_importer", 1)
                 "alfabank_importer" -> updateAchievementProgress("alfabank_importer", 1)
                 "ozon_importer" -> updateAchievementProgress("ozon_importer", 1)
+                "csv_importer" -> updateAchievementProgress("csv_importer", 1)
                 "multi_bank_importer" -> {
                     val currentAchievement = achievementsRepository.getAchievementById("multi_bank_importer").first()
                     if (currentAchievement != null) {

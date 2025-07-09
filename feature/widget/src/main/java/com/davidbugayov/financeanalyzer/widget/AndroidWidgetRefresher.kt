@@ -6,28 +6,30 @@ import android.content.Context
 import android.content.Intent
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher
 
-class AndroidWidgetRefresher(private val context: Context) : WidgetRefresher {
+class AndroidWidgetRefresher(context: Context) : WidgetRefresher {
+    private val appContext = context.applicationContext
+    
     override fun refresh() {
-        val manager = AppWidgetManager.getInstance(context)
-        val balanceComp = ComponentName(context, BalanceWidget::class.java)
+        val manager = AppWidgetManager.getInstance(appContext)
+        val balanceComp = ComponentName(appContext, BalanceWidget::class.java)
         val balanceIds = manager.getAppWidgetIds(balanceComp)
         if (balanceIds.isNotEmpty()) {
             val intent =
-                Intent(context, BalanceWidget::class.java).apply {
+                Intent(appContext, BalanceWidget::class.java).apply {
                     action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, balanceIds)
                 }
-            context.sendBroadcast(intent)
+            appContext.sendBroadcast(intent)
         }
-        val smallComp = ComponentName(context, SmallBalanceWidget::class.java)
+        val smallComp = ComponentName(appContext, SmallBalanceWidget::class.java)
         val smallIds = manager.getAppWidgetIds(smallComp)
         if (smallIds.isNotEmpty()) {
             val intent =
-                Intent(context, SmallBalanceWidget::class.java).apply {
+                Intent(appContext, SmallBalanceWidget::class.java).apply {
                     action = AppWidgetManager.ACTION_APPWIDGET_UPDATE
                     putExtra(AppWidgetManager.EXTRA_APPWIDGET_IDS, smallIds)
                 }
-            context.sendBroadcast(intent)
+            appContext.sendBroadcast(intent)
         }
     }
 }

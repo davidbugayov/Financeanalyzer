@@ -134,6 +134,7 @@ class ImportTransactionsViewModel(
      * Запускает импорт транзакций из указанного файла.
      * @param uri URI файла для импорта
      */
+    @Suppress("USELESS_IS_CHECK")
     private fun startImport(uri: Uri) {
         if (_state.value.isLoading) {
             Timber.d("Импорт уже выполняется, запрос игнорируется")
@@ -470,6 +471,7 @@ class ImportTransactionsViewModel(
      */
     private fun determineBankName(fileName: String): String? {
         val lowerFileName = fileName.lowercase()
+        Timber.d("🏦 Определение банка для файла: '$fileName' (lowercased: '$lowerFileName')")
 
         return when {
             // Сбербанк - различные варианты
@@ -478,6 +480,7 @@ class ImportTransactionsViewModel(
                 lowerFileName.contains("выписка по счёту дебетовой карты") ||
                 lowerFileName.contains("выписка по счету дебетовой карты") ||
                 lowerFileName.contains("справка_о_движении") -> {
+                Timber.d("🏦 Определен банк: Сбербанк")
                 "Сбербанк"
             }
 
@@ -486,6 +489,7 @@ class ImportTransactionsViewModel(
                 lowerFileName.contains("тиньк") ||
                 lowerFileName.contains("тинь") ||
                 lowerFileName.contains("tbank") -> {
+                Timber.d("🏦 Определен банк: Тинькофф")
                 "Тинькофф"
             }
 
@@ -493,44 +497,53 @@ class ImportTransactionsViewModel(
             lowerFileName.contains("alfa") ||
                 lowerFileName.contains("альфа") ||
                 lowerFileName.contains("alpha") -> {
+                Timber.d("🏦 Определен банк: Альфа-Банк")
                 "Альфа-Банк"
             }
 
             // ВТБ
             lowerFileName.contains("vtb") ||
                 lowerFileName.contains("втб") -> {
+                Timber.d("🏦 Определен банк: ВТБ")
                 "ВТБ"
             }
 
             // Райффайзен
             lowerFileName.contains("raif") ||
                 lowerFileName.contains("райф") -> {
+                Timber.d("🏦 Определен банк: Райффайзен")
                 "Райффайзен"
             }
 
             // Газпромбанк
             lowerFileName.contains("gazprom") ||
                 lowerFileName.contains("газпром") -> {
+                Timber.d("🏦 Определен банк: Газпромбанк")
                 "Газпромбанк"
             }
 
             // Озон Банк
             lowerFileName.contains("ozon") ||
                 lowerFileName.contains("озон") -> {
+                Timber.d("🏦 Определен банк: Озон Банк")
                 "Озон Банк"
             }
 
             // Определение по типу файла
             lowerFileName.endsWith(".pdf") -> {
+                Timber.d("🏦 Определен тип: PDF-выписка")
                 "PDF-выписка"
             }
             lowerFileName.endsWith(".csv") -> {
+                Timber.d("🏦 Определен тип: CSV-выписка")
                 "CSV-выписка"
             }
             lowerFileName.endsWith(".xlsx") || lowerFileName.endsWith(".xls") -> {
+                Timber.d("🏦 Определен тип: Excel-выписка")
                 "Excel-выписка"
             }
             else -> {
+                Timber.w("🏦 Банк не определен для файла: '$fileName'")
                 null
             }
         }
@@ -541,6 +554,8 @@ class ImportTransactionsViewModel(
      */
     private fun triggerBankImportAchievements(bankName: String?) {
         Timber.d("🏆 Вызов триггеров достижений для банка: '$bankName'")
+        Timber.d("🏆 bankName?.lowercase() = '${bankName?.lowercase()}'")
+        
         when (bankName?.lowercase()) {
             "тинькофф", "тинь", "tinkoff", "tbank" -> {
                 Timber.d("🏆 Триггер Тинькофф")
@@ -551,7 +566,7 @@ class ImportTransactionsViewModel(
                     "multi_bank_importer",
                 )
             }
-            "сбербанк", "сбер", "sberbank" -> {
+            "сбербанк", "сбер", "sberbank", "сберbank", "sber", "pao сбербанк", "пао сбербанк", "sberbank pdf", "сбербанк pdf", "сбербанк (pdf)" -> {
                 Timber.d("🏆 Триггер Сбербанк")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "sberbank_importer",
@@ -578,8 +593,15 @@ class ImportTransactionsViewModel(
                     "multi_bank_importer",
                 )
             }
+            "csv-выписка", "generic csv" -> {
+                Timber.d("🏆 Триггер CSV импорт")
+                com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
+                    "csv_importer",
+                )
+            }
             else -> {
-                Timber.d("🏆 Банк '$bankName' не распознан для достижений")
+                Timber.w("🏆 Банк '$bankName' не распознан для достижений. Проверьте логику определения банка!")
+                Timber.w("🏆 Доступные варианты для Сбербанка: 'сбербанк', 'сбер', 'sberbank'")
             }
         }
     }
