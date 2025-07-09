@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.presentation.chart.detail.model
 
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.CategoryStats
+import com.davidbugayov.financeanalyzer.domain.model.FinancialHealthMetrics
 import java.math.BigDecimal
 import java.math.RoundingMode
 
@@ -52,6 +53,8 @@ data class FinancialMetrics(
     val maxExpense: Money = Money.zero(),
     // Общее количество транзакций
     val totalTransactions: Int = 0,
+    // Продвинутые метрики финансового здоровья
+    val healthMetrics: FinancialHealthMetrics? = null,
 )
 
 // Метод для форматирования процентов

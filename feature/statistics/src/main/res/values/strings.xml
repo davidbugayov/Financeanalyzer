@@ -1059,4 +1059,40 @@
   <string name="permission_settings_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
   <string name="permission_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Это позволит выбрать файл для импорта транзакций.</string>
   <string name="grant_permission">Разрешить</string>
+
+  <!-- New Financial Health Metrics strings -->
+  <string name="financial_health_score_title">Коэффициент финансового здоровья</string>
+  <string name="savings_rate_component">Норма сбережений</string>
+  <string name="income_stability_component">Стабильность доходов</string>
+  <string name="expense_control_component">Контроль расходов</string>
+  <string name="diversification_component">Диверсификация</string>
+  
+  <string name="health_score_excellent">Отличное финансовое здоровье! Продолжайте в том же духе</string>
+  <string name="health_score_good">Хорошее финансовое здоровье с небольшим потенциалом для улучшения</string>
+  <string name="health_score_average">Среднее финансовое здоровье. Есть области для улучшения</string>
+  <string name="health_score_poor">Финансовое здоровье требует серьезного внимания</string>
+  
+  <string name="expense_discipline_index_title">Индекс расходной дисциплины</string>
+  <string name="expense_discipline_excellent">Отличная дисциплина! Вы хорошо контролируете расходы</string>
+  <string name="expense_discipline_good">Хороший контроль расходов с небольшими возможностями улучшения</string>
+  <string name="expense_discipline_average">Средний контроль расходов. Рекомендуется планирование бюджета</string>
+  <string name="expense_discipline_poor">Низкая дисциплина расходов. Необходимо улучшить планирование</string>
+  
+  <string name="retirement_forecast_title">Прогноз пенсионных накоплений</string>
+  <string name="retirement_current_savings">Текущие накопления</string>
+  <string name="retirement_goal_progress">Прогресс к цели</string>
+  <string name="retirement_required_monthly">Необходимо ежемесячно</string>
+  <string name="retirement_years_to_goal">Лет до достижения цели</string>
+  <string name="retirement_projected_amount">Прогнозируемая сумма</string>
+  
+  <string name="peer_comparison_title">Сравнение с пользователями</string>
+  <string name="peer_income_range">Диапазон дохода: %1$s</string>
+  <string name="peer_savings_vs_average">Норма сбережений vs среднее</string>
+  <string name="peer_health_percentile">Ваша позиция по здоровью</string>
+  <string name="peer_percentile_format">%1$d-й процентиль</string>
+  
+  <string name="recommendations_title">Рекомендации</string>
+  <string name="recommendation_priority_high">Высокий приоритет</string>
+  <string name="recommendation_priority_medium">Средний приоритет</string>
+  <string name="recommendation_priority_low">Низкий приоритет</string>
 </resources>
