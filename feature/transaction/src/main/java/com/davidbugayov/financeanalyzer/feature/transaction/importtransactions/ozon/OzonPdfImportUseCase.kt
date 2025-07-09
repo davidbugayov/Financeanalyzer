@@ -239,6 +239,7 @@ class OzonPdfImportUseCase(
                     ImportResult.Success(
                         totalTransactionsSaved,
                         totalTransactionsFound - totalTransactionsSaved,
+                        bankName = bankName,
                     ),
                 )
             } catch (e: Exception) {
