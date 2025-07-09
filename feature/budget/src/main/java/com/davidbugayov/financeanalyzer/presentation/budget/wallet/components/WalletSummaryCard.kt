@@ -83,8 +83,14 @@ fun WalletSummaryCard(
                 "Wallet: ${wallet.name}, Spent: ${wallet.spent.amount}, Limit: ${wallet.limit.amount}, Progress: $progress",
             )
 
-            // Триггер достижения бюджета
-            AchievementTrigger.onBudgetProgress(progress)
+            // Триггер достижения бюджета только для значимых порогов
+            // Проверяем ачивку "Экономный" если потратили менее 80% и есть значимые траты
+            if (progress > 0.1f && progress < 0.8f && wallet.spent.amount > BigDecimal.ZERO) {
+                timber.log.Timber.d("🏆 Триггер budget_saver: прогресс $progress < 0.8, потрачено: ${wallet.spent.amount}")
+                AchievementTrigger.onBudgetProgress(progress)
+            } else if (progress > 0.8f) {
+                timber.log.Timber.d("🏆 Превышен порог экономности: прогресс $progress > 0.8")
+            }
 
             progress
         } else {

@@ -183,9 +183,18 @@ class AchievementEngine(
         Timber.d("🏆 Обработка: Прогресс бюджета: ${(spentPercentage * 100).toInt()}%")
         
         scope.launch {
-            // Используем checkAndUnlockAchievement для условной разблокировки
-            checkAndUnlockAchievement("budget_saver") { spentPercentage < 0.8f }
-            checkAndUnlockAchievement("penny_pincher") { spentPercentage < 0.5f }
+            // Ачивка "Экономный" разблокируется если пользователь активно тратит,
+            // но держится в пределах 80% от бюджета в течение значимого времени
+            if (spentPercentage > 0.5f && spentPercentage < 0.8f) {
+                Timber.d("🏆 Пользователь экономно тратит: ${(spentPercentage * 100).toInt()}% от бюджета")
+                checkAndUnlockAchievement("budget_saver") { true }
+            }
+            
+            // Ачивка "Скупердяй" для тех, кто тратит менее 50%
+            if (spentPercentage > 0.2f && spentPercentage < 0.5f) {
+                Timber.d("🏆 Пользователь очень экономно тратит: ${(spentPercentage * 100).toInt()}% от бюджета")
+                checkAndUnlockAchievement("penny_pincher") { true }
+            }
         }
     }
     
