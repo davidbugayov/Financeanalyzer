@@ -593,7 +593,7 @@ class ImportTransactionsViewModel(
                     "multi_bank_importer",
                 )
             }
-            "csv-выписка", "generic csv" -> {
+            "csv-выписка", "generic csv", "generic csv (configurable)" -> {
                 Timber.d("🏆 Триггер CSV импорт")
                 com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger.onMilestoneReached(
                     "csv_importer",
