@@ -4,6 +4,7 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.domain.model.Wallet
+import com.davidbugayov.financeanalyzer.domain.model.WalletType
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
@@ -60,7 +61,24 @@ class WalletPreferences private constructor(context: Context) {
                 emptyList()
             } else {
                 val type = object : TypeToken<List<Wallet>>() {}.type
-                gson.fromJson(walletsJson, type) ?: emptyList()
+                val wallets: List<Wallet> = gson.fromJson(walletsJson, type) ?: emptyList()
+                
+                // Миграция данных: устанавливаем значения по умолчанию для старых кошельков
+                val migratedWallets = wallets.map { wallet ->
+                    if (wallet.type == null) {
+                        wallet.copy(type = WalletType.CARD)
+                    } else {
+                        wallet
+                    }
+                }
+                
+                // Сохраняем обновлённые данные, если была выполнена миграция
+                if (migratedWallets != wallets) {
+                    saveWallets(migratedWallets)
+                    Timber.i("Выполнена миграция ${wallets.size - migratedWallets.count { it.type != null }} кошельков с установкой type по умолчанию")
+                }
+                
+                migratedWallets
             }
         } catch (e: Exception) {
             Timber.e(e, "Error loading wallets")

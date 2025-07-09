@@ -806,7 +806,7 @@ fun WalletCard(
         }
     val contentColor = contentColorFor(backgroundColor)
 
-    val isGoal = wallet.type.name == "GOAL"
+    val isGoal = wallet.type?.name == "GOAL"
     val percentUsed =
         if (isGoal && goalProgressUseCase != null) {
             goalProgressUseCase.invoke(wallet)
