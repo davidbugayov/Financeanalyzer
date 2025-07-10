@@ -2,7 +2,7 @@
 # SDK versions
 compileSdk = "36"
 minSdk = "26"
-javaVersion = "21"
+javaVersion = "17"
 
 # Plugins
 androidGradlePlugin = "8.11.0"
