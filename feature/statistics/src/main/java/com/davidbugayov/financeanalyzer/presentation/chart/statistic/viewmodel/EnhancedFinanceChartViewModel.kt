@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodUseCase
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
@@ -30,6 +31,7 @@ import timber.log.Timber
 class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private val getTransactionsForPeriodUseCase: GetTransactionsForPeriodUseCase by inject()
     private val calculateBalanceMetricsUseCase: CalculateBalanceMetricsUseCase by inject()
+    private val calculateEnhancedFinancialMetricsUseCase: CalculateEnhancedFinancialMetricsUseCase by inject()
     private val categoriesViewModel: CategoriesViewModel by inject()
     private val navigationManager: NavigationManager by inject()
     private val _state = MutableStateFlow(EnhancedFinanceChartState())
@@ -178,6 +180,10 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                     )
                 }
 
+                // --- Новое: получаем рекомендации ---
+                val financialMetrics = calculateEnhancedFinancialMetricsUseCase.invoke(filteredTransactions)
+                val recommendations = financialMetrics.recommendations
+
                 _state.update {
                     it.copy(
                         isLoading = false,
@@ -199,6 +205,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         averageDailyExpense = averageDailyExpense,
                         monthsOfSavings = monthsOfSavings,
                         pieChartData = pieChartData,
+                        recommendations = recommendations
                     )
                 }
                 Timber.d(

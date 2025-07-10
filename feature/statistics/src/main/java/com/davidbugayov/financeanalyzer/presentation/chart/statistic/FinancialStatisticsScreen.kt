@@ -78,6 +78,8 @@ import java.util.Locale
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.ui.components.card.AdviceCard
+import com.davidbugayov.financeanalyzer.ui.components.card.AdvicePriority
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -545,6 +547,35 @@ fun FinancialStatisticsScreen(
                                                 ),
                                             ),
                                     )
+
+                                    // Блок рекомендаций по бюджету
+                                    if (state.recommendations.isNotEmpty()) {
+                                        Column(
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(bottom = 12.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            Text(
+                                                text = "Умные советы и предупреждения",
+                                                style = MaterialTheme.typography.titleMedium,
+                                                color = MaterialTheme.colorScheme.primary,
+                                                modifier = Modifier.padding(bottom = 8.dp)
+                                            )
+                                            state.recommendations.forEach { rec ->
+                                                AdviceCard(
+                                                    title = rec.title,
+                                                    description = rec.description,
+                                                    priority = when (rec.priority.name) {
+                                                        "HIGH" -> AdvicePriority.HIGH
+                                                        "MEDIUM" -> AdvicePriority.MEDIUM
+                                                        else -> AdvicePriority.NORMAL
+                                                    },
+                                                    modifier = Modifier.padding(bottom = 6.dp)
+                                                )
+                                            }
+                                        }
+                                    }
 
                                     // Блок рекомендаций по бюджету
                                     Column(

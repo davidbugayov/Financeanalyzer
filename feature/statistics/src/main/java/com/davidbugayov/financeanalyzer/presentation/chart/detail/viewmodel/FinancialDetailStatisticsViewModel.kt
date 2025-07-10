@@ -133,7 +133,7 @@ class FinancialDetailStatisticsViewModel(
     /**
      * Расчет расширенных финансовых метрик
      */
-    private fun calculateFinancialMetrics(
+    private suspend fun calculateFinancialMetrics(
         transactions: List<Transaction>,
         income: Money,
         expense: Money,

@@ -1266,4 +1266,16 @@
     <string name="achievement_backup_enthusiast_title">Энтузиаст резервных копий</string>
     <string name="achievement_backup_enthusiast_desc">Создайте 5 экспортов данных</string>
 
+    <!-- Smart Advices & Budget Warnings -->
+    <string name="advice_save_on_coffee">Вы тратите больше на кафе, чем обычно. Попробуйте готовить дома!</string>
+    <string name="advice_save_on_transport">Траты на транспорт выросли. Рассмотрите альтернативные маршруты или транспорт.</string>
+    <string name="advice_subscription_unused">Вы не пользовались подпиской %1$s 2 месяца — отменить?</string>
+    <string name="advice_monthly_limit_close">Вы близки к превышению месячного лимита по категории %1$s.</string>
+    <string name="warning_budget_exceeded">Вы превысили бюджет по категории %1$s!</string>
+    <string name="advice_review_expenses">Проанализируйте свои расходы за месяц — возможно, есть категории для оптимизации.</string>
+    <string name="advice_set_budget">Установите бюджет для категории %1$s, чтобы лучше контролировать расходы.</string>
+    <string name="advice_regular_payments">Проверьте регулярные платежи — все ли они актуальны?</string>
+    <string name="advice_cashback">Используйте кэшбэк и скидки для экономии на покупках.</string>
+    <string name="advice_compare_shops">Сравнивайте цены в разных магазинах перед крупной покупкой.</string>
+
 </resources>

@@ -7,6 +7,7 @@ import com.davidbugayov.financeanalyzer.domain.model.RecommendationCategory
 import com.davidbugayov.financeanalyzer.domain.model.RecommendationPriority
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import kotlin.math.max
+import java.math.BigDecimal
 
 /**
  * Главный UseCase для расчета продвинутых метрик финансового здоровья.
@@ -17,10 +18,11 @@ class CalculateEnhancedFinancialMetricsUseCase(
     private val calculateFinancialHealthScoreUseCase: CalculateFinancialHealthScoreUseCase,
     private val calculateExpenseDisciplineIndexUseCase: CalculateExpenseDisciplineIndexUseCase,
     private val calculateRetirementForecastUseCase: CalculateRetirementForecastUseCase,
-    private val calculatePeerComparisonUseCase: CalculatePeerComparisonUseCase
+    private val calculatePeerComparisonUseCase: CalculatePeerComparisonUseCase,
+    private val walletRepository: com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 ) {
 
-    operator fun invoke(
+    suspend operator fun invoke(
         transactions: List<Transaction>,
         currentAge: Int = 30,
         retirementAge: Int = 65,
@@ -68,7 +70,7 @@ class CalculateEnhancedFinancialMetricsUseCase(
     /**
      * Генерирует персонализированные рекомендации по улучшению финансового здоровья
      */
-    private fun generateRecommendations(
+    private suspend fun generateRecommendations(
         healthScore: Double,
         expenseDisciplineIndex: Double,
         retirementForecast: com.davidbugayov.financeanalyzer.domain.model.RetirementForecast,
@@ -171,6 +173,64 @@ class CalculateEnhancedFinancialMetricsUseCase(
             )
         }
         
+        // --- Новая логика: советы по экономии и предупреждения о бюджете ---
+        val wallets = walletRepository.getAllWallets()
+        wallets.forEach { wallet ->
+            if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount) {
+                recommendations.add(
+                    FinancialRecommendation(
+                        title = "Превышен бюджет по категории ${wallet.name}",
+                        description = "Вы превысили бюджет по категории ${wallet.name}. Пересмотрите траты или увеличьте лимит.",
+                        priority = RecommendationPriority.HIGH,
+                        category = RecommendationCategory.EXPENSES,
+                        potentialImpact = 15.0
+                    )
+                )
+            } else if (wallet.limit.amount > java.math.BigDecimal.ZERO && wallet.spent.amount > wallet.limit.amount.multiply(java.math.BigDecimal("0.8"))) {
+                recommendations.add(
+                    FinancialRecommendation(
+                        title = "Близко к лимиту по категории ${wallet.name}",
+                        description = "Вы близки к превышению лимита по категории ${wallet.name}. Контролируйте расходы!",
+                        priority = RecommendationPriority.MEDIUM,
+                        category = RecommendationCategory.EXPENSES,
+                        potentialImpact = 8.0
+                    )
+                )
+            }
+        }
+        // Анализ повторяющихся подписок и крупных трат (пример)
+        val subscriptionCategories = listOf("Подписка", "Subscription", "Сервисы")
+        val unusedSubscriptions = transactions.filter { tx ->
+            subscriptionCategories.any { cat -> tx.category.contains(cat, ignoreCase = true) }
+            // Здесь можно добавить анализ неиспользуемых подписок
+        }
+        if (unusedSubscriptions.isNotEmpty()) {
+            recommendations.add(
+                FinancialRecommendation(
+                    title = "Проверьте подписки",
+                    description = "У вас есть регулярные подписки. Проверьте, все ли они актуальны и нужны ли вам.",
+                    priority = RecommendationPriority.MEDIUM,
+                    category = RecommendationCategory.EXPENSES,
+                    potentialImpact = 6.0
+                )
+            )
+        }
+        // Совет по экономии на кафе
+        val cafeCategories = listOf("Кафе", "Ресторан", "Coffee", "Restaurant")
+        val cafeExpenses = transactions.filter { tx ->
+            tx.isExpense && cafeCategories.any { cat -> tx.category.contains(cat, ignoreCase = true) }
+        }
+        if (cafeExpenses.size > 5) { // Порог можно скорректировать
+            recommendations.add(
+                FinancialRecommendation(
+                    title = "Экономьте на кафе и ресторанах",
+                    description = "Вы часто тратите на кафе и рестораны. Попробуйте готовить дома, чтобы сэкономить.",
+                    priority = RecommendationPriority.LOW,
+                    category = RecommendationCategory.EXPENSES,
+                    potentialImpact = 4.0
+                )
+            )
+        }
         // Сортируем рекомендации по приоритету и потенциальному влиянию
         return recommendations.sortedWith(
             compareByDescending<FinancialRecommendation> { 

@@ -70,7 +70,8 @@ val useCaseModule =
                 calculateFinancialHealthScoreUseCase = get(),
                 calculateExpenseDisciplineIndexUseCase = get(),
                 calculateRetirementForecastUseCase = get(),
-                calculatePeerComparisonUseCase = get()
+                calculatePeerComparisonUseCase = get(),
+                walletRepository = get()
             )
         }
 
