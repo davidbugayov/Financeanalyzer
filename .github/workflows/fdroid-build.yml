@@ -34,7 +34,7 @@ jobs:
         run: ./gradlew :app:fdroidRelease
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: app-fdroid-release
           path: app/build/outputs/apk/fdroid/release/*.apk
