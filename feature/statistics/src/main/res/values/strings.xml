@@ -1095,4 +1095,181 @@
   <string name="recommendation_priority_high">Высокий приоритет</string>
   <string name="recommendation_priority_medium">Средний приоритет</string>
   <string name="recommendation_priority_low">Низкий приоритет</string>
+  
+  <!-- Expense Insights Card strings -->
+  <string name="expense_insights_title">Глубокий анализ трат</string>
+  <string name="expense_overview_title">Обзор расходов</string>
+  <string name="daily_average_title">Средний дневной</string>
+  <string name="monthly_average_title">Средний месячный</string>
+  <string name="expense_transactions_info">Всего транзакций расходов: %1$d</string>
+  <string name="top_expense_categories_title">Топ категории расходов</string>
+  <string name="expense_trends_title">Тренды расходов</string>
+  <string name="average_transaction_insights_title">Средняя транзакция</string>
+  <string name="largest_expense_title">Максимальная трата</string>
+  <string name="financial_warnings_title">⚠️ Предупреждения</string>
+  
+  <!-- Category insights -->
+  <string name="food_expense_insight">Рассмотрите возможность планирования покупок и готовки дома</string>
+  <string name="transport_expense_insight">Изучите альтернативные способы передвижения</string>
+  <string name="entertainment_expense_insight">Ищите бесплатные развлечения и акции</string>
+  <string name="high_category_spending_insight">Эта категория занимает большую долю бюджета</string>
+  
+  <!-- Warnings -->
+  <string name="low_savings_rate_warning">Низкая норма сбережений - рекомендуется увеличить до 15-20%</string>
+  <string name="concentrated_spending_warning">Слишком большая концентрация трат в одной категории</string>
+  <string name="frequent_transactions_warning">Очень частые траты - попробуйте планировать покупки</string>
+  
+  <!-- Savings Optimization Card strings -->
+  <string name="savings_optimization_title">Оптимизация сбережений</string>
+  <string name="current_savings_status_title">Текущее состояние</string>
+  <string name="net_savings_label">Чистые сбережения</string>
+  <string name="savings_goals_title">Финансовые цели</string>
+  <string name="emergency_fund_goal">Фонд на случай ЧС (6 мес.)</string>
+  <string name="yearly_savings_goal">Годовая цель (20% дохода)</string>
+  <string name="goal_progress_format">%1$s из %2$s</string>
+  <string name="personalized_tips_title">💡 Персональные советы</string>
+  <string name="potential_savings_format">Потенциальная экономия: %1$s</string>
+  <string name="automation_title">🤖 Автоматизация</string>
+  
+  <!-- Savings status detailed -->
+  <string name="savings_status_detailed_excellent">Отличная норма сбережений! Цель 30% почти достигнута</string>
+  <string name="savings_status_detailed_good">Хорошая норма сбережений, стремитесь к 20-25%</string>
+  <string name="savings_status_detailed_satisfactory">Удовлетворительно, попробуйте увеличить до 15%</string>
+  <string name="savings_status_detailed_needs_improvement">Требует улучшения, начните с 10%</string>
+  
+  <!-- Automation tips -->
+  <string name="auto_transfer_title">Автоперевод на сбережения</string>
+  <string name="auto_transfer_description">Настройте автоматический перевод 10-20% дохода на отдельный счет</string>
+  <string name="savings_app_title">Приложения для сбережений</string>
+  <string name="savings_app_description">Используйте приложения, которые автоматически откладывают сдачу</string>
+  <string name="round_up_title">Округление покупок</string>
+  <string name="round_up_description">Округляйте покупки до целого рубля и сохраняйте разницу</string>
+  
+  <!-- Spending Patterns Card strings -->
+  <string name="spending_patterns_title">Паттерны трат</string>
+  <string name="spending_frequency_title">Частота трат</string>
+  <string name="daily_transactions_title">В день</string>
+  <string name="weekly_transactions_title">В неделю</string>
+  <string name="time_patterns_title">Временные закономерности</string>
+  <string name="transaction_size_title">Размер транзакций</string>
+  <string name="typical_expense_title">Типичная трата</string>
+  <string name="largest_expense_patterns_title">Максимальная трата</string>
+  <string name="behavioral_insights_title">🧠 Поведенческие инсайты</string>
+  
+  <!-- Time patterns -->
+  <string name="weekend_spending_title">Повышенные траты в выходные</string>
+  <string name="weekend_spending_description">Вы тратите больше в субботу и воскресенье</string>
+  <string name="evening_shopping_title">Вечерние покупки</string>
+  <string name="evening_shopping_description">Активность покупок возрастает после 18:00</string>
+  <string name="month_end_spike_title">Всплеск в конце месяца</string>
+  <string name="month_end_spike_description">Увеличение трат в последние дни месяца</string>
+  
+  <!-- Transaction size insights -->
+  <string name="average_transaction_description">Ваша обычная покупка</string>
+  <string name="unusually_large_transaction">Необычно крупная трата</string>
+  <string name="normal_large_transaction">Крупная, но нормальная трата</string>
+  
+  <!-- Behavioral insights -->
+  <string name="frequent_spender_insight_title">Активный потребитель</string>
+  <string name="frequent_spender_insight_description">Вы делаете покупки очень часто - попробуйте планировать заранее</string>
+  <string name="controlled_spender_insight_title">Контролируемые траты</string>
+  <string name="controlled_spender_insight_description">У вас хорошая дисциплина трат - редкие но обдуманные покупки</string>
+  <string name="occasional_large_spender_title">Периодические крупные покупки</string>
+  <string name="occasional_large_spender_description">Вы иногда делаете значительные покупки - планируйте их заранее</string>
+  
+  <!-- Frequency insights -->
+  <string name="very_frequent_spending_insight">Очень частые траты - рекомендуется еженедельное планирование</string>
+  <string name="frequent_spending_insight">Частые траты - составьте список покупок</string>
+  <string name="normal_spending_insight">Нормальная частота трат - продолжайте в том же духе</string>
+  <string name="rare_spending_insight">Редкие, но обдуманные покупки - отличный самоконтроль</string>
+  
+  <!-- Actionable Tips Card strings -->
+  <string name="actionable_tips_title">⚡ Конкретные действия</string>
+  <string name="immediate_actions_title">🚀 Сегодня (0-7 дней)</string>
+  <string name="short_term_actions_title">📅 Краткосрочно (1-3 месяца)</string>
+  <string name="long_term_actions_title">🎯 Долгосрочно (3+ месяцев)</string>
+  <string name="expected_impact_format">Ожидаемый эффект: %1$s</string>
+  <string name="action_steps_title">Как это сделать:</string>
+  
+  <!-- Immediate actions -->
+  <string name="track_expenses_action_title">Начните отслеживать все траты</string>
+  <string name="track_expenses_action_description">Записывайте каждую покупку в течение недели</string>
+  <string name="track_expenses_impact">Повышение осознанности на 30-40%</string>
+  <string name="track_expenses_step_1">Скачайте приложение для учета расходов</string>
+  <string name="track_expenses_step_2">Записывайте каждую покупку сразу после неё</string>
+  <string name="track_expenses_step_3">Анализируйте траты в конце дня</string>
+  
+  <string name="grocery_planning_action_title">Планируйте покупки продуктов</string>
+  <string name="grocery_planning_action_description">Составляйте список и придерживайтесь его</string>
+  <string name="grocery_planning_impact">Экономия 15-25% на продуктах</string>
+  <string name="grocery_planning_step_1">Планируйте меню на неделю</string>
+  <string name="grocery_planning_step_2">Составляйте список по категориям</string>
+  <string name="grocery_planning_step_3">Покупайте только то, что в списке</string>
+  
+  <string name="shopping_list_action_title">Используйте списки покупок</string>
+  <string name="shopping_list_action_description">Сократите импульсивные покупки</string>
+  <string name="shopping_list_impact">Снижение незапланированных трат на 20%</string>
+  <string name="shopping_list_step_1">Всегда составляйте список перед походом в магазин</string>
+  <string name="shopping_list_step_2">Оставляйте кредитные карты дома при походе за продуктами</string>
+  
+  <!-- Short-term actions -->
+  <string name="automate_savings_action_title">Автоматизируйте сбережения</string>
+  <string name="automate_savings_action_description">Настройте автоматический перевод 10-15% дохода</string>
+  <string name="automate_savings_impact">Гарантированные сбережения +10-15%</string>
+  <string name="automate_savings_step_1">Откройте отдельный сберегательный счет</string>
+  <string name="automate_savings_step_2">Настройте автоперевод на день зарплаты</string>
+  <string name="automate_savings_step_3">Начните с 10% и постепенно увеличивайте</string>
+  
+  <string name="subscription_audit_action_title">Проведите аудит подписок</string>
+  <string name="subscription_audit_action_description">Отмените неиспользуемые сервисы</string>
+  <string name="subscription_audit_impact">Экономия 500-2000₽ в месяц</string>
+  <string name="subscription_audit_step_1">Проверьте выписки за последние 3 месяца</string>
+  <string name="subscription_audit_step_2">Составьте список всех подписок</string>
+  <string name="subscription_audit_step_3">Отмените те, которыми не пользуетесь</string>
+  
+  <!-- Long-term actions -->
+  <string name="investment_research_action_title">Изучите возможности инвестиций</string>
+  <string name="investment_research_action_description">Начните инвестировать свободные средства</string>
+  <string name="investment_research_impact">Потенциальная доходность 6-12% в год</string>
+  <string name="investment_research_step_1">Изучите основы инвестирования</string>
+  <string name="investment_research_step_2">Откройте брокерский счет</string>
+  <string name="investment_research_step_3">Начните с консервативных инструментов</string>
+  
+  <string name="financial_education_action_title">Повысьте финансовую грамотность</string>
+  <string name="financial_education_action_description">Читайте книги и проходите курсы</string>
+  <string name="financial_education_impact">Улучшение финансовых решений на 40-60%</string>
+  <string name="financial_education_step_1">Читайте по 15 минут в день о финансах</string>
+  <string name="financial_education_step_2">Слушайте подкасты о личных финансах</string>
+  
+  <!-- Enhanced Recommendations Card strings -->
+  <string name="smart_recommendations_title">💡 Умные рекомендации</string>
+  <string name="all_good_no_recommendations">🎉 Отличная работа! Ваши финансы в порядке</string>
+  <string name="recommendations_cta">Следуйте этим советам для улучшения финансового состояния</string>
+  
+  <!-- Recommendation types -->
+  <string name="critical_savings_title">Начните экономить немедленно</string>
+  <string name="critical_savings_description">Критически низкая норма сбережений требует срочных действий</string>
+  <string name="critical_savings_impact">Защитит от финансовых кризисов</string>
+  
+  <string name="improve_savings_title">Увеличьте норму сбережений</string>
+  <string name="improve_savings_description">Стремитесь к сохранению 15-20% дохода</string>
+  <string name="improve_savings_impact">+5-10% к финансовой стабильности</string>
+  
+  <string name="optimize_category_title">Оптимизируйте "%1$s"</string>
+  <string name="optimize_category_description">Эта категория занимает %1$d%% бюджета - слишком много</string>
+  <string name="optimize_category_impact">Экономия до 20% в месяц</string>
+  
+  <string name="emergency_fund_recommendation_title">Создайте фонд на случай ЧС</string>
+  <string name="emergency_fund_recommendation_description">Накопите 3-6 месячных расходов для финансовой подушки</string>
+  <string name="emergency_fund_recommendation_impact">Защита от непредвиденных расходов</string>
+  
+  <string name="investment_suggestion_title">Рассмотрите инвестиции</string>
+  <string name="investment_suggestion_description">У вас отличная норма сбережений - время инвестировать</string>
+  <string name="investment_suggestion_impact">Потенциальная доходность 8-12% в год</string>
+
+    <!-- Recommendations Enhancements -->
+    <string name="expense_transactions_summary">Всего расходных транзакций: %1$d</string>
+    <string name="recommendation_reduce_small_expenses_title">Сократите мелкие расходы</string>
+    <string name="recommendation_reduce_small_expenses_description">У вас %1$d расходных транзакций за период — проанализируйте мелкие траты, чтобы сократить ненужные покупки</string>
+    <string name="recommendation_reduce_small_expenses_impact">Экономия до 5–10% в месяц</string>
 </resources>

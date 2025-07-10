@@ -29,9 +29,6 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
 
-// Проверка на RuStore flavor через константу из BuildConfig
-private val isRustoreFlavor = BuildConfig.IS_RUSTORE_FLAVOR
-
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
     categoriesViewModel: CategoriesViewModel,

@@ -30,8 +30,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ExpenseAnalysisCard
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.RecommendationsCard
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ExpenseInsightsCard
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SpendingPatternsCard
+import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ActionableTipsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.TransactionsStatisticsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
@@ -157,6 +162,21 @@ fun FinancialDetailStatisticsScreen(
                             dimensionResource(R.dimen.financial_statistics_spacer_large),
                         ),
                 )
+                
+                // Карточка коэффициента финансового здоровья
+                metrics.healthMetrics?.let { healthMetrics ->
+                    FinancialHealthScoreCard(
+                        healthScore = healthMetrics.financialHealthScore,
+                        breakdown = healthMetrics.healthScoreBreakdown,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                    Spacer(
+                        modifier =
+                            Modifier.height(
+                                dimensionResource(R.dimen.financial_statistics_spacer_large),
+                            ),
+                    )
+                }
                 TransactionsStatisticsCard(
                     metrics = metrics,
                     modifier = Modifier.fillMaxWidth(),
@@ -168,6 +188,49 @@ fun FinancialDetailStatisticsScreen(
                         ),
                 )
                 ExpenseAnalysisCard(
+                    metrics = metrics,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
+                )
+                SavingsOptimizationCard(
+                    metrics = metrics,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
+                )
+
+                ExpenseInsightsCard(
+                    metrics = metrics,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
+                )
+
+                SpendingPatternsCard(
+                    metrics = metrics,
+                    modifier = Modifier.fillMaxWidth(),
+                )
+                Spacer(
+                    modifier =
+                        Modifier.height(
+                            dimensionResource(R.dimen.financial_statistics_spacer_large),
+                        ),
+                )
+
+                ActionableTipsCard(
                     metrics = metrics,
                     modifier = Modifier.fillMaxWidth(),
                 )

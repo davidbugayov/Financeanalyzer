@@ -2,6 +2,11 @@ package com.davidbugayov.financeanalyzer.di
 
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateExpenseDisciplineIndexUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateFinancialHealthScoreUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculatePeerComparisonUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateRetirementForecastUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetCategoriesWithAmountUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnalyticsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
@@ -52,6 +57,20 @@ val useCaseModule =
             GetProfileAnalyticsUseCase(
                 transactionRepository = get(),
                 walletRepository = get(),
+            )
+        }
+        
+        // Financial Health Analytics
+        single { CalculateFinancialHealthScoreUseCase() }
+        single { CalculateExpenseDisciplineIndexUseCase() }
+        single { CalculateRetirementForecastUseCase() }
+        single { CalculatePeerComparisonUseCase() }
+        single { 
+            CalculateEnhancedFinancialMetricsUseCase(
+                calculateFinancialHealthScoreUseCase = get(),
+                calculateExpenseDisciplineIndexUseCase = get(),
+                calculateRetirementForecastUseCase = get(),
+                calculatePeerComparisonUseCase = get()
             )
         }
 

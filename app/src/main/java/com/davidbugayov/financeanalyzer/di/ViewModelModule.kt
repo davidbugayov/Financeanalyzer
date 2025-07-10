@@ -56,5 +56,5 @@ val viewModelModule =
 
         viewModel { AchievementsViewModel(get(), get()) }
 
-        viewModel { parameters -> FinancialDetailStatisticsViewModel(parameters.get(), parameters.get(), get(), get()) }
+        viewModel { parameters -> FinancialDetailStatisticsViewModel(parameters.get(), parameters.get(), get(), get(), get()) }
     }

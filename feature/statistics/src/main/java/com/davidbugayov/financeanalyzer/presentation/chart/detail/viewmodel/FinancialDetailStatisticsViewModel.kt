@@ -6,6 +6,7 @@ import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateCategoryStatsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateEnhancedFinancialMetricsUseCase
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.utils.DateUtils
@@ -36,6 +37,7 @@ class FinancialDetailStatisticsViewModel(
     private val endDate: Long,
     private val transactionRepository: TransactionRepository,
     private val calculateCategoryStatsUseCase: CalculateCategoryStatsUseCase,
+    private val calculateEnhancedFinancialMetricsUseCase: CalculateEnhancedFinancialMetricsUseCase? = null,
 ) : ViewModel() {
     private val _state = MutableStateFlow(FinancialDetailStatisticsContract.State())
     val state: StateFlow<FinancialDetailStatisticsContract.State> = _state.asStateFlow()
@@ -227,6 +229,9 @@ class FinancialDetailStatisticsViewModel(
                 .maxByOrNull { it.value }
                 ?.key ?: ""
 
+        // Рассчитываем продвинутые метрики финансового здоровья (если UseCase доступен)
+        val healthMetrics = calculateEnhancedFinancialMetricsUseCase?.invoke(transactions)
+        
         // Обновляем метрики
         _metrics.value =
             FinancialMetrics(
@@ -251,6 +256,7 @@ class FinancialDetailStatisticsViewModel(
                 averageExpensePerTransaction = averageExpensePerTransaction,
                 maxIncome = maxIncome,
                 maxExpense = maxExpense,
+                healthMetrics = healthMetrics,
             )
     }
 

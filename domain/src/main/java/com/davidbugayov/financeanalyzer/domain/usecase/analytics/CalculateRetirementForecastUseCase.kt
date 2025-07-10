@@ -171,7 +171,8 @@ class CalculateRetirementForecastUseCase {
         desiredMonthlyPension?.let { monthlyPension ->
             // 25x правило: умножаем годовые расходы на 25
             val annualPension = monthlyPension.amount.multiply(BigDecimal(12))
-            return Money(annualPension.multiply(BigDecimal(25)))
+            val totalAmount = annualPension.multiply(BigDecimal(25)).setScale(2, RoundingMode.HALF_UP)
+            return Money(totalAmount)
         }
         
         // Иначе рассчитываем на основе текущих расходов
@@ -182,17 +183,18 @@ class CalculateRetirementForecastUseCase {
         val annualPension = recommendedMonthlyPension.multiply(BigDecimal(12))
         
         // Применяем 25x правило
-        return Money(annualPension.multiply(BigDecimal(25)))
+        val totalAmount = annualPension.multiply(BigDecimal(25)).setScale(2, RoundingMode.HALF_UP)
+        return Money(totalAmount)
     }
 
     /**
      * Рассчитывает средние месячные расходы
      */
     private fun calculateAverageMonthlyExpense(transactions: List<Transaction>): Money {
-        if (transactions.isEmpty()) return Money(BigDecimal(50000)) // Дефолт 50k рублей
+        if (transactions.isEmpty()) return Money(BigDecimal(50000).setScale(2, RoundingMode.HALF_UP)) // Дефолт 50k рублей
         
         val expenseTransactions = transactions.filter { it.isExpense }
-        if (expenseTransactions.isEmpty()) return Money(BigDecimal(50000))
+        if (expenseTransactions.isEmpty()) return Money(BigDecimal(50000).setScale(2, RoundingMode.HALF_UP))
         
         val monthlyData = expenseTransactions.groupBy { transaction ->
             val calendar = java.util.Calendar.getInstance()
@@ -209,7 +211,7 @@ class CalculateRetirementForecastUseCase {
                 .divide(BigDecimal(monthlyExpenses.size), 2, RoundingMode.HALF_UP)
             Money(averageExpense)
         } else {
-            Money(BigDecimal(50000))
+            Money(BigDecimal(50000).setScale(2, RoundingMode.HALF_UP))
         }
     }
 
