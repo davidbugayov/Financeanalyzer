@@ -520,7 +520,7 @@ tasks.whenTaskAdded {
     if (name.contains("fdroid", ignoreCase = true) &&
         (
             name.contains("GoogleServices", ignoreCase = true) ||
-                name.contains("FirebaseCrashlytics", ignoreCase = true) ||
+                name.contains("Crashlytics", ignoreCase = true) ||
                 name.contains("FirebasePerformance", ignoreCase = true)
         )
     ) {
