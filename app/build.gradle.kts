@@ -1,5 +1,6 @@
 import java.io.FileInputStream
 import java.util.Properties
+import java.io.File
 
 plugins {
     alias(libs.plugins.android.application)
@@ -123,8 +124,39 @@ android {
             val keystoreProperties = getKeystoreProperties()
             val isCi = System.getenv("CI") != null
             if (isCi) {
-                // Используем стандартный debug.keystore для CI/F-Droid сборок
-                storeFile = file(System.getenv("HOME") + "/.android/debug.keystore")
+                // Путь к стандартному debug.keystore
+                val debugKeystore = File(System.getenv("HOME") + "/.android/debug.keystore")
+
+                // Если файл отсутствует на CI-агенте, создаём его динамически
+                if (!debugKeystore.exists()) {
+                    debugKeystore.parentFile.mkdirs()
+                    println("[CI] Generating debug.keystore at ${debugKeystore.absolutePath}")
+                    project.exec {
+                        commandLine(
+                            "keytool",
+                            "-genkeypair",
+                            "-v",
+                            "-keystore",
+                            debugKeystore.absolutePath,
+                            "-storepass",
+                            "android",
+                            "-alias",
+                            "androiddebugkey",
+                            "-keypass",
+                            "android",
+                            "-dname",
+                            "CN=Android Debug,O=Android,C=US",
+                            "-keyalg",
+                            "RSA",
+                            "-keysize",
+                            "2048",
+                            "-validity",
+                            "10000"
+                        )
+                    }
+                }
+
+                storeFile = debugKeystore
                 storePassword = "android"
                 keyAlias = "androiddebugkey"
                 keyPassword = "android"
