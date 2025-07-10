@@ -31,7 +31,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build with Gradle
-        run: ./gradlew :app:fdroidRelease
+        run: ./gradlew :app:assembleFdroidRelease
 
       - name: Upload APK
         uses: actions/upload-artifact@v4
