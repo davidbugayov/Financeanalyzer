@@ -498,7 +498,7 @@ ktlint {
 tasks.whenTaskAdded {
     if (name.contains("fdroid", ignoreCase = true) &&
         (
-            name.contains("ProcessGoogleServices", ignoreCase = true) ||
+            name.contains("GoogleServices", ignoreCase = true) ||
                 name.contains("FirebaseCrashlytics", ignoreCase = true) ||
                 name.contains("FirebasePerformance", ignoreCase = true)
         )
