@@ -15,12 +15,12 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.TrendingDown
-import androidx.compose.material.icons.filled.TrendingFlat
-import androidx.compose.material.icons.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
+import androidx.compose.material.icons.automirrored.filled.TrendingFlat
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.filled.HealthAndSafety
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -38,17 +38,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.davidbugayov.financeanalyzer.domain.model.HealthScoreBreakdown
 import com.davidbugayov.financeanalyzer.feature.statistics.R
-import kotlin.math.min
 
 /**
  * Карточка с коэффициентом финансового здоровья.
@@ -61,11 +56,11 @@ fun FinancialHealthScoreCard(
     modifier: Modifier = Modifier
 ) {
     var isVisible by remember { mutableStateOf(false) }
-    
+
     LaunchedEffect(Unit) {
         isVisible = true
     }
-    
+
     Card(
         modifier = modifier.fillMaxWidth(),
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
@@ -77,18 +72,30 @@ fun FinancialHealthScoreCard(
         )
     ) {
         Column(
-            modifier = Modifier.padding(dimensionResource(R.dimen.financial_statistics_spacer_large))
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
-            // Заголовок
-            Text(
-                text = stringResource(R.string.financial_health_score_title),
-                style = MaterialTheme.typography.headlineSmall,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colorScheme.onSurface
-            )
-            
-            Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
-            
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                Icon(
+                    Icons.Default.HealthAndSafety,
+                    contentDescription = null,
+                    tint = MaterialTheme.colorScheme.primary,
+                    modifier = Modifier.size(24.dp),
+                )
+                Spacer(Modifier.width(8.dp))
+                Text(
+                    text = stringResource(R.string.financial_health_score_title),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
+                )
+            }
+
+            Spacer(Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)))
+
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 horizontalArrangement = Arrangement.SpaceBetween,
@@ -100,9 +107,9 @@ fun FinancialHealthScoreCard(
                     isVisible = isVisible,
                     modifier = Modifier.size(120.dp)
                 )
-                
+
                 Spacer(modifier = Modifier.width(16.dp))
-                
+
                 // Детализация по компонентам
                 Column(
                     modifier = Modifier.weight(1f)
@@ -112,25 +119,25 @@ fun FinancialHealthScoreCard(
                         score = breakdown.savingsRateScore,
                         maxScore = 25.0
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     HealthScoreComponent(
                         title = stringResource(R.string.income_stability_component),
                         score = breakdown.incomeStabilityScore,
                         maxScore = 25.0
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     HealthScoreComponent(
                         title = stringResource(R.string.expense_control_component),
                         score = breakdown.expenseControlScore,
                         maxScore = 25.0
                     )
-                    
+
                     Spacer(modifier = Modifier.height(8.dp))
-                    
+
                     HealthScoreComponent(
                         title = stringResource(R.string.diversification_component),
                         score = breakdown.diversificationScore,
@@ -138,9 +145,9 @@ fun FinancialHealthScoreCard(
                     )
                 }
             }
-            
+
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
-            
+
             // Интерпретация скора
             HealthScoreInterpretation(healthScore)
         }
@@ -161,14 +168,14 @@ private fun HealthScoreCircle(
         animationSpec = tween(durationMillis = 1500),
         label = "health_score_progress"
     )
-    
+
     val scoreColor = getHealthScoreColor(score)
     val animatedColor by animateColorAsState(
         targetValue = scoreColor,
         animationSpec = tween(durationMillis = 1000),
         label = "health_score_color"
     )
-    
+
     Box(
         modifier = modifier,
         contentAlignment = Alignment.Center
@@ -176,14 +183,14 @@ private fun HealthScoreCircle(
         Canvas(modifier = Modifier.size(120.dp)) {
             val strokeWidth = 12.dp.toPx()
             val radius = (size.minDimension - strokeWidth) / 2
-            
+
             // Фоновая окружность
             drawCircle(
                 color = Color.LightGray.copy(alpha = 0.3f),
                 radius = radius,
                 style = Stroke(width = strokeWidth)
             )
-            
+
             // Прогресс
             drawArc(
                 color = animatedColor,
@@ -193,7 +200,7 @@ private fun HealthScoreCircle(
                 style = Stroke(width = strokeWidth, cap = StrokeCap.Round)
             )
         }
-        
+
         Column(
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
@@ -223,7 +230,7 @@ private fun HealthScoreComponent(
     modifier: Modifier = Modifier
 ) {
     val progress = (score / maxScore).coerceIn(0.0, 1.0)
-    
+
     Row(
         modifier = modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically
@@ -236,9 +243,9 @@ private fun HealthScoreComponent(
                 style = MaterialTheme.typography.bodyMedium,
                 color = MaterialTheme.colorScheme.onSurfaceVariant
             )
-            
+
             Spacer(modifier = Modifier.height(4.dp))
-            
+
             // Прогресс-бар
             Box(
                 modifier = Modifier
@@ -256,9 +263,9 @@ private fun HealthScoreComponent(
                 )
             }
         }
-        
+
         Spacer(modifier = Modifier.width(8.dp))
-        
+
         Text(
             text = "${score.toInt()}/${maxScore.toInt()}",
             style = MaterialTheme.typography.bodySmall,
@@ -276,26 +283,26 @@ private fun HealthScoreInterpretation(score: Double) {
     val (interpretation, icon, color) = when {
         score >= 80 -> Triple(
             stringResource(R.string.health_score_excellent),
-            Icons.Filled.TrendingUp,
-            Color(0xFF4CAF50)
+            Icons.AutoMirrored.Filled.TrendingUp,
+            Color(0xFF4CAF50),
         )
         score >= 60 -> Triple(
             stringResource(R.string.health_score_good),
-            Icons.Filled.TrendingUp,
-            Color(0xFF8BC34A)
+            Icons.AutoMirrored.Filled.TrendingUp,
+            Color(0xFF8BC34A),
         )
         score >= 40 -> Triple(
             stringResource(R.string.health_score_average),
-            Icons.Filled.TrendingFlat,
-            Color(0xFFFF9800)
+            Icons.AutoMirrored.Filled.TrendingFlat,
+            Color(0xFFFF9800),
         )
         else -> Triple(
             stringResource(R.string.health_score_poor),
-            Icons.Filled.TrendingDown,
-            Color(0xFFF44336)
+            Icons.AutoMirrored.Filled.TrendingDown,
+            Color(0xFFF44336),
         )
     }
-    
+
     Row(
         modifier = Modifier
             .fillMaxWidth()
@@ -310,9 +317,9 @@ private fun HealthScoreInterpretation(score: Double) {
             tint = color,
             modifier = Modifier.size(20.dp)
         )
-        
+
         Spacer(modifier = Modifier.width(8.dp))
-        
+
         Text(
             text = interpretation,
             style = MaterialTheme.typography.bodyMedium,
@@ -344,4 +351,4 @@ private fun getComponentScoreColor(progress: Double): Color {
         progress >= 0.4 -> Color(0xFFFF9800)
         else -> Color(0xFFF44336)
     }
-} 
+}

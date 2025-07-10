@@ -165,4 +165,7 @@
     <color name="financial_statistics_progress_good">#66BB6A</color>
     <color name="financial_statistics_progress_ok">#FFA726</color>
     <color name="financial_statistics_progress_attention">#EF5350</color>
+
+  <!-- Pleasant blue for text -->
+
 </resources>

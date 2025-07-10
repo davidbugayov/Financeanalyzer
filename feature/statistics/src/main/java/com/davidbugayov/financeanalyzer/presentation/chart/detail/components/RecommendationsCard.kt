@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer.presentation.chart.detail.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -15,11 +14,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material.icons.filled.Lightbulb
 import androidx.compose.material.icons.filled.PriorityHigh
 import androidx.compose.material.icons.filled.Savings
-import androidx.compose.material.icons.filled.TrendingUp
 import androidx.compose.material.icons.filled.Warning
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -49,7 +48,7 @@ fun RecommendationsCard(
     modifier: Modifier = Modifier,
 ) {
     val recommendations = generateSmartRecommendations(metrics)
-    
+
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
@@ -78,7 +77,7 @@ fun RecommendationsCard(
                     text = stringResource(R.string.smart_recommendations_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.onSurface
+                    color = MaterialTheme.colorScheme.primary,
                 )
             }
 
@@ -152,9 +151,9 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                         modifier = Modifier.size(18.dp)
                     )
                 }
-                
+
                 Spacer(modifier = Modifier.width(12.dp))
-                
+
                 Column(modifier = Modifier.weight(1f)) {
                     Row(
                         verticalAlignment = Alignment.CenterVertically
@@ -168,33 +167,33 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                         Spacer(modifier = Modifier.width(8.dp))
                         PriorityBadge(recommendation.priority)
                     }
-                    
+
                     Text(
                         text = recommendation.description,
                         style = MaterialTheme.typography.bodySmall,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
-                
+
                 Icon(
-                    imageVector = Icons.Filled.ArrowForward,
+                    imageVector = Icons.AutoMirrored.Filled.ArrowForward,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.onSurfaceVariant,
-                    modifier = Modifier.size(16.dp)
+                    modifier = Modifier.size(16.dp),
                 )
             }
-            
+
             if (recommendation.impact.isNotEmpty()) {
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Icon(
-                        imageVector = Icons.Filled.TrendingUp,
+                        imageVector = Icons.AutoMirrored.Filled.TrendingUp,
                         contentDescription = null,
                         tint = Color(0xFF38A169),
-                        modifier = Modifier.size(14.dp)
+                        modifier = Modifier.size(14.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -235,7 +234,7 @@ private fun PriorityBadge(priority: RecommendationPriority) {
 @Composable
 private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartRecommendation> {
     val recommendations = mutableListOf<SmartRecommendation>()
-    
+
     // Критические рекомендации
     if (metrics.savingsRate < 5f) {
         recommendations.add(
@@ -248,7 +247,7 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
             )
         )
     }
-    
+
     // Высокий приоритет
     if (metrics.savingsRate in 5f..10f) {
         recommendations.add(
@@ -261,25 +260,25 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
             )
         )
     }
-    
+
     // Рекомендации по категориям расходов
     if (metrics.topExpenseCategory.isNotEmpty()) {
         val topCategoryPercentage = metrics.expenseCategories
             .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f
-        
+
         if (topCategoryPercentage > 35f) {
             recommendations.add(
                 SmartRecommendation(
                     title = stringResource(R.string.optimize_category_title, metrics.topExpenseCategory),
                     description = stringResource(R.string.optimize_category_description, topCategoryPercentage.toInt()),
-                    icon = Icons.Filled.TrendingUp,
+                    icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = RecommendationPriority.MEDIUM,
-                    impact = stringResource(R.string.optimize_category_impact)
-                )
+                    impact = stringResource(R.string.optimize_category_impact),
+                ),
             )
         }
     }
-    
+
     // Рекомендации по финансовой подушке
     if (metrics.monthsOfSavings < 3) {
         val priority = if (metrics.monthsOfSavings < 1) RecommendationPriority.HIGH else RecommendationPriority.MEDIUM
@@ -293,17 +292,17 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
             )
         )
     }
-    
+
     // Позитивные рекомендации для хороших показателей
     if (metrics.savingsRate > 20f) {
         recommendations.add(
             SmartRecommendation(
                 title = stringResource(R.string.investment_suggestion_title),
                 description = stringResource(R.string.investment_suggestion_description),
-                icon = Icons.Filled.TrendingUp,
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
                 priority = RecommendationPriority.LOW,
-                impact = stringResource(R.string.investment_suggestion_impact)
-            )
+                impact = stringResource(R.string.investment_suggestion_impact),
+            ),
         )
     }
 
@@ -318,7 +317,7 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
             )
         )
     }
-    
+
     return recommendations.sortedBy { it.priority.order }
 }
 
