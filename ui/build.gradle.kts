@@ -28,8 +28,10 @@ android {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
     }
-    kotlinOptions {
-        jvmTarget = libs.versions.javaVersion.get()
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.javaVersion.get()))
+        }
     }
     buildFeatures {
         compose = true

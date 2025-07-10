@@ -210,17 +210,20 @@ android {
         unitTests.isReturnDefaultValues = true
     }
 
-    kotlinOptions {
-        jvmTarget = libs.versions.javaVersion.get()
-        // Enable compiler optimizations
-        freeCompilerArgs +=
-            listOf(
-                "-Xcontext-parameters",
-                "-opt-in=kotlin.RequiresOptIn",
-                "-Xjvm-default=all",
-                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
-                "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+    // Migrated to new Kotlin compilerOptions DSL
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.javaVersion.get()))
+            freeCompilerArgs.addAll(
+                listOf(
+                    "-Xcontext-parameters",
+                    "-opt-in=kotlin.RequiresOptIn",
+                    "-Xjvm-default=all",
+                    "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+                    "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+                )
             )
+        }
     }
 
     buildFeatures {
@@ -287,20 +290,6 @@ android {
                 "TypographyFractions", // Типографские дроби - не критично для функциональности
             )
         )
-    }
-
-    // Исключаем тестовые классы из релизной сборки
-    packagingOptions {
-        resources {
-            excludes +=
-                listOf(
-                    "**/*Test.class",
-                    "**/*Tests.class",
-                    "**/test/**",
-                    "**/androidTest/**",
-                    "**/*.navigation.test*",
-                )
-        }
     }
 
     buildToolsVersion = "36.0.0"

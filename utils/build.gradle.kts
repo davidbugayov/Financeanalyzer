@@ -31,14 +31,17 @@ android {
         targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
     }
 
-    kotlinOptions {
-        jvmTarget = libs.versions.javaVersion.get()
-        freeCompilerArgs +=
-            listOf(
-                "-opt-in=kotlin.RequiresOptIn",
-                "-Xjvm-default=all",
-                "-Xcontext-parameters",
+    kotlin {
+        compilerOptions {
+            jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.javaVersion.get()))
+            freeCompilerArgs.addAll(
+                listOf(
+                    "-opt-in=kotlin.RequiresOptIn",
+                    "-Xjvm-default=all",
+                    "-Xcontext-parameters",
+                )
             )
+        }
     }
 
     buildFeatures {
