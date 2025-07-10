@@ -1,7 +1,7 @@
 ---
 Categories:
   - Money
-License: GPL-3.0-only
+License: MIT
 WebSite: https://github.com/davidbugayov/Financeanalyzer
 SourceCode: https://github.com/davidbugayov/Financeanalyzer
 IssueTracker: https://github.com/davidbugayov/Financeanalyzer/issues
@@ -57,8 +57,21 @@ Builds:
       • Улучшено: Навигация между экранами стала надёжнее, исправлены ошибки с параметрами
       • Улучшено: UI/UX — обновлены диалоги выбора кошелька, улучшено отображение балансов
       • Исправлено: Мелкие баги и повышена стабильность приложения
+  - versionName: 2.22.0.fd
+    versionCode: 41
+    commit: v2.22.0
+    subdir: app
+    init: |
+      export FDROID_BUILD=1
+    gradle:
+      - fdroidRelease
+    changelog: |
+      • Новое: Персональные финансовые рекомендации (AdviceCard)
+      • Улучшено: Обновлены скриншоты в fastlane, добавлена MIT лицензия
+      • Исправлено: Сборка F-Droid — исключены Crashlytics/Google-services
+      • Улучшено: Перешли на kotlin { compilerOptions } DSL, удалены устаревшие опции
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.21.0.fd
-CurrentVersionCode: 40 
+CurrentVersion: 2.22.0.fd
+CurrentVersionCode: 41 

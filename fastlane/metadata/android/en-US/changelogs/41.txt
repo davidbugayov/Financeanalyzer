@@ -1,0 +1,8 @@
+Financeanalyzer 2.22.0
+
+• NEW: Personal financial advice – see actionable recommendations directly in statistics (AdviceCard)
+• UI: Updated store screenshots and icon for F-Droid/Play
+• BUILD: Migrated to modern Kotlin compilerOptions DSL, removed deprecated packagingOptions
+• BUILD: F-Droid flavor – fully strips Google/Firebase tasks, build now reproducible
+• LICENSE: Project is now MIT-licensed
+• FIX: Compilation warnings cleaned up, overall stability improvements 
