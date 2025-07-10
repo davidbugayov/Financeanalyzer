@@ -12,6 +12,22 @@ plugins {
 }
 
 subprojects {
+    // Унифицируем JVM target и общие compilerArgs для всех Kotlin-проектов
+    pluginManager.withPlugin("org.jetbrains.kotlin.android") {
+        extensions.configure<org.jetbrains.kotlin.gradle.dsl.KotlinAndroidProjectExtension> {
+            compilerOptions {
+                // Используем версию Java из libs.versions.toml (21)
+                jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.fromTarget(libs.versions.javaVersion.get()))
+                freeCompilerArgs.addAll(
+                    listOf(
+                        "-Xcontext-parameters",
+                        "-opt-in=kotlin.RequiresOptIn",
+                        "-Xjvm-default=all",
+                    )
+                )
+            }
+        }
+    }
     plugins.withId("org.jlleitschuh.gradle.ktlint") {
         extensions.configure<org.jlleitschuh.gradle.ktlint.KtlintExtension> {
             ignoreFailures.set(true)
