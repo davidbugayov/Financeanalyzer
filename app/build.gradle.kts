@@ -121,25 +121,27 @@ android {
     signingConfigs {
         create("release") {
             val keystoreProperties = getKeystoreProperties()
-            storeFile =
-                file(
-                    keystoreProperties.getProperty("keystore.file", "keystore/release.keystore"),
-                )
-            storePassword = keystoreProperties.getProperty("keystore.password", "")
-            keyAlias = keystoreProperties.getProperty("keystore.key.alias", "")
-            keyPassword = keystoreProperties.getProperty("keystore.key.password", "")
-            storeType = "PKCS12"
+            val isCi = System.getenv("CI") != null
+            if (isCi) {
+                // Используем стандартный debug.keystore для CI/F-Droid сборок
+                storeFile = file(System.getenv("HOME") + "/.android/debug.keystore")
+                storePassword = "android"
+                keyAlias = "androiddebugkey"
+                keyPassword = "android"
+                storeType = "JKS"
+            } else {
+                storeFile = file(keystoreProperties.getProperty("keystore.file", "keystore/release.keystore"))
+                storePassword = keystoreProperties.getProperty("keystore.password", "")
+                keyAlias = keystoreProperties.getProperty("keystore.key.alias", "")
+                keyPassword = keystoreProperties.getProperty("keystore.key.password", "")
+                storeType = "PKCS12"
 
-            // Check that all required properties are present
-            val requiredProperties =
-                listOf(
-                    "keystore.password",
-                    "keystore.key.alias",
-                    "keystore.key.password",
-                )
-            requiredProperties.forEach { prop ->
-                if (!keystoreProperties.containsKey(prop)) {
-                    throw GradleException("Missing required keystore property: $prop")
+                // Check that all required properties are present only for local release builds
+                val requiredProperties = listOf("keystore.password", "keystore.key.alias", "keystore.key.password")
+                requiredProperties.forEach { prop ->
+                    if (!keystoreProperties.containsKey(prop)) {
+                        throw GradleException("Missing required keystore property: $prop")
+                    }
                 }
             }
         }
