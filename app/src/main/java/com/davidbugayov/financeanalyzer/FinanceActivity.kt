@@ -3,12 +3,8 @@ package com.davidbugayov.financeanalyzer
 import android.content.Intent
 import android.os.Bundle
 import android.os.Process
-import androidx.fragment.app.FragmentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
-import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -19,6 +15,10 @@ import androidx.compose.ui.Modifier
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.core.view.WindowCompat
 import androidx.core.view.WindowInsetsControllerCompat
+import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.ProcessLifecycleOwner
 import androidx.navigation.compose.rememberNavController
 import com.davidbugayov.financeanalyzer.navigation.AppNavHostImpl
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
@@ -48,11 +48,12 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
         handleIntent(intent)
 
         // Определяем начальный экран
-        startDestination = when {
-            !onboardingManager.isOnboardingCompleted() -> Screen.Onboarding.route
-            preferencesManager.isAppLockEnabled() -> Screen.Auth.route
-            else -> Screen.Home.route
-        }
+        startDestination =
+            when {
+                !onboardingManager.isOnboardingCompleted() -> Screen.Onboarding.route
+                preferencesManager.isAppLockEnabled() -> Screen.Auth.route
+                else -> Screen.Home.route
+            }
 
         // Делаем контент приложения отображаться под системными панелями
         WindowCompat.setDecorFitsSystemWindows(window, false)
@@ -156,7 +157,7 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
                 NavigationManager.Command.NavigateAndClearBackStack(
                     destination = Screen.Auth.route,
                     popUpTo = Screen.Home.route,
-                )
+                ),
             )
         }
     }

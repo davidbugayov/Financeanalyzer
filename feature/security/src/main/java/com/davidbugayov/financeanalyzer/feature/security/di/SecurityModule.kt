@@ -9,10 +9,11 @@ import org.koin.dsl.module
 /**
  * Модуль DI для компонентов безопасности
  */
-val securityModule = module {
-    // SecurityManager
-    single { SecurityManager(androidContext(), get()) }
-    
-    // ViewModels
-    viewModel { AuthViewModel(get()) }
-} 
+val securityModule =
+    module {
+        // SecurityManager
+        single { SecurityManager(androidContext(), get()) }
+
+        // ViewModels
+        viewModel { AuthViewModel(get()) }
+    } 

@@ -22,8 +22,8 @@ import com.davidbugayov.financeanalyzer.presentation.home.HomeScreen
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsScreen
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
 import java.util.Date
-import org.koin.androidx.compose.koinViewModel
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import org.koin.androidx.compose.koinViewModel
 
 /**
  * Реализация AppNavHost для приложения.
@@ -33,6 +33,7 @@ import kotlinx.coroutines.ExperimentalCoroutinesApi
  * @param navigationManager Менеджер навигации
  * @param startDestination Начальный экран
  */
+@OptIn(ExperimentalCoroutinesApi::class)
 @Composable
 fun AppNavHostImpl(
     navController: NavHostController,
@@ -70,7 +71,7 @@ fun AppNavHostImpl(
                             popUpTo = Screen.Auth.route,
                         ),
                     )
-                }
+                },
             )
         },
         onHomeScreen = {

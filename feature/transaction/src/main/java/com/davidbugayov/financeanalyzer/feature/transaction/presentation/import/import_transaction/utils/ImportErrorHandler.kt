@@ -9,6 +9,7 @@ import timber.log.Timber
  */
 class ImportErrorHandler(context: Context) {
     private val appContext = context.applicationContext
+
     /**
      * Преобразует техническое сообщение об ошибке в понятное пользователю
      *

@@ -57,10 +57,10 @@ import com.davidbugayov.financeanalyzer.feature.profile.components.NotificationS
 import com.davidbugayov.financeanalyzer.feature.profile.components.ProfileTopBar
 import com.davidbugayov.financeanalyzer.feature.profile.components.SettingsSection
 import com.davidbugayov.financeanalyzer.feature.profile.components.ThemeSelectionDialog
-import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
-import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
+import com.davidbugayov.financeanalyzer.feature.security.components.PinSetupDialog
+import com.davidbugayov.financeanalyzer.feature.security.components.SecuritySettingsSection
 import com.davidbugayov.financeanalyzer.ui.theme.FinanceAnalyzerTheme
 import com.davidbugayov.financeanalyzer.ui.theme.ThemeMode
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
@@ -409,7 +409,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                     isAppLockEnabled = state.isAppLockEnabled,
                     isBiometricEnabled = state.isBiometricEnabled,
                     isBiometricAvailable = state.isBiometricAvailable,
-                    onAppLockClick = { 
+                    onAppLockClick = {
                         if (!state.isAppLockEnabled) {
                             // Если блокировка не включена, сначала нужно установить PIN
                             viewModel.onEvent(ProfileEvent.ShowPinSetupDialog)
@@ -419,9 +419,10 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                         }
                     },
                     onBiometricClick = { viewModel.onEvent(ProfileEvent.ChangeBiometric(!state.isBiometricEnabled)) },
-                    modifier = Modifier.padding(
-                        horizontal = dimensionResource(R.dimen.profile_section_padding),
-                    ),
+                    modifier =
+                        Modifier.padding(
+                            horizontal = dimensionResource(R.dimen.profile_section_padding),
+                        ),
                 )
 
                 Spacer(

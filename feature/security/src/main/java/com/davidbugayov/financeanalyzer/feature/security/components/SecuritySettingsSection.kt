@@ -59,7 +59,7 @@ fun SecuritySettingsSection(
             style = MaterialTheme.typography.titleMedium,
             modifier = Modifier.padding(start = 8.dp, bottom = 8.dp, top = 8.dp),
         )
-        
+
         AnimatedVisibility(visible = true, enter = fadeIn()) {
             SecurityActionCard(
                 icon = Icons.Default.Lock,
@@ -70,7 +70,7 @@ fun SecuritySettingsSection(
                 onClick = onAppLockClick,
             )
         }
-        
+
         if (isBiometricAvailable) {
             AnimatedVisibility(visible = true, enter = fadeIn()) {
                 SecurityActionCard(
@@ -102,33 +102,38 @@ private fun SecurityActionCard(
     modifier: Modifier = Modifier,
 ) {
     Card(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(vertical = 4.dp)
-            .clickable(enabled = enabled) { onClick() },
+        modifier =
+            modifier
+                .fillMaxWidth()
+                .padding(vertical = 4.dp)
+                .clickable(enabled = enabled) { onClick() },
         elevation = CardDefaults.cardElevation(defaultElevation = 8.dp),
         shape = RoundedCornerShape(20.dp),
-        colors = CardDefaults.cardColors(
-            containerColor = if (enabled) {
-                MaterialTheme.colorScheme.surface
-            } else {
-                MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
-            }
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor =
+                    if (enabled) {
+                        MaterialTheme.colorScheme.surface
+                    } else {
+                        MaterialTheme.colorScheme.surface.copy(alpha = 0.6f)
+                    },
+            ),
     ) {
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             verticalAlignment = Alignment.CenterVertically,
         ) {
             Box(
-                modifier = Modifier
-                    .size(48.dp)
-                    .background(
-                        color = if (enabled) iconBackground else iconBackground.copy(alpha = 0.6f),
-                        shape = CircleShape
-                    ),
+                modifier =
+                    Modifier
+                        .size(48.dp)
+                        .background(
+                            color = if (enabled) iconBackground else iconBackground.copy(alpha = 0.6f),
+                            shape = CircleShape,
+                        ),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(
@@ -138,9 +143,9 @@ private fun SecurityActionCard(
                     modifier = Modifier.size(24.dp),
                 )
             }
-            
+
             Spacer(modifier = Modifier.width(16.dp))
-            
+
             Column(
                 modifier = Modifier.weight(1f),
             ) {
@@ -148,23 +153,25 @@ private fun SecurityActionCard(
                     text = title,
                     style = MaterialTheme.typography.titleSmall,
                     fontWeight = FontWeight.Medium,
-                    color = if (enabled) {
-                        MaterialTheme.colorScheme.onSurface
-                    } else {
-                        MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
-                    }
+                    color =
+                        if (enabled) {
+                            MaterialTheme.colorScheme.onSurface
+                        } else {
+                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.6f)
+                        },
                 )
                 Text(
                     text = subtitle,
                     style = MaterialTheme.typography.bodySmall,
-                    color = if (enabled) {
-                        MaterialTheme.colorScheme.onSurfaceVariant
-                    } else {
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
-                    }
+                    color =
+                        if (enabled) {
+                            MaterialTheme.colorScheme.onSurfaceVariant
+                        } else {
+                            MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.6f)
+                        },
                 )
             }
-            
+
             Switch(
                 checked = isEnabled,
                 onCheckedChange = { if (enabled) onClick() },

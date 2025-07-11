@@ -39,7 +39,7 @@ android {
                     "-opt-in=kotlin.RequiresOptIn",
                     "-Xjvm-default=all",
                     "-Xcontext-parameters",
-                )
+                ),
             )
         }
     }

@@ -279,4 +279,4 @@ private fun BenefitItem(text: String) {
             color = MaterialTheme.colorScheme.onSurfaceVariant,
         )
     }
-} 
+}

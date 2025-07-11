@@ -1,6 +1,6 @@
+import java.io.File
 import java.io.FileInputStream
 import java.util.Properties
-import java.io.File
 
 plugins {
     alias(libs.plugins.android.application)
@@ -151,7 +151,7 @@ android {
                             "-keysize",
                             "2048",
                             "-validity",
-                            "10000"
+                            "10000",
                         )
                     }
                 }
@@ -253,7 +253,7 @@ android {
                     "-Xjvm-default=all",
                     "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
                     "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
-                )
+                ),
             )
         }
     }
@@ -291,7 +291,7 @@ android {
                 "StringFormatMatches", // Игнорируем проблемы с форматированием строк
                 "InvalidPackage", // Игнорируем проблемы с пакетами в зависимостях
                 "UnusedResources", // Можно включить обратно после очистки неиспользуемых ресурсов
-            )
+            ),
         )
 
         // Превращаем ошибки в предупреждения для несерьезных проблем
@@ -301,7 +301,7 @@ android {
                 "ExtraTranslation", // Лишние переводы - предупреждение
                 "TypographyFractions", // Проблемы с типографикой - предупреждение
                 "TypographyDashes", // Проблемы с дефисами - предупреждение
-            )
+            ),
         )
 
         // Отключаем проблемы в зависимостях, которые мы не можем контролировать
@@ -320,7 +320,7 @@ android {
                 "TypographyQuotes", // Типографские кавычки - не критично для функциональности
                 "TypographyDashes", // Типографские дефисы - не критично для функциональности
                 "TypographyFractions", // Типографские дроби - не критично для функциональности
-            )
+            ),
         )
     }
 

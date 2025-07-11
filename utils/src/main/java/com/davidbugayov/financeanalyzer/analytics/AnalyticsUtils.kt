@@ -241,7 +241,9 @@ object AnalyticsUtils : KoinComponent {
                 putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
             }
         logEvent(AnalyticsConstants.Events.ACHIEVEMENT_FILTER_CHANGED, params)
-        Timber.d("Achievement filter changed: $filterType${categoryFilter?.let { ", category: $it" } ?: ""}, results: $resultCount")
+        Timber.d(
+            "Achievement filter changed: $filterType${categoryFilter?.let { ", category: $it" } ?: ""}, results: $resultCount",
+        )
     }
 
     // Безопасность
@@ -266,7 +268,9 @@ object AnalyticsUtils : KoinComponent {
                 putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
             }
         logEvent(AnalyticsConstants.Events.SECURITY_AUTH_SCREEN_VIEWED, params)
-        Timber.d("Security auth screen viewed - PIN: $hasPinCode, Biometric supported: $biometricSupported, enrolled: $biometricEnrolled")
+        Timber.d(
+            "Security auth screen viewed - PIN: $hasPinCode, Biometric supported: $biometricSupported, enrolled: $biometricEnrolled",
+        )
     }
 
     /**
@@ -316,7 +320,10 @@ object AnalyticsUtils : KoinComponent {
             }
         val params =
             Bundle().apply {
-                putString(AnalyticsConstants.Params.SECURITY_FEATURE, AnalyticsConstants.Values.SECURITY_FEATURE_APP_LOCK)
+                putString(
+                    AnalyticsConstants.Params.SECURITY_FEATURE,
+                    AnalyticsConstants.Values.SECURITY_FEATURE_APP_LOCK,
+                )
                 putString(AnalyticsConstants.Params.NEW_STATE, enabled.toString())
                 putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
             }
@@ -337,7 +344,10 @@ object AnalyticsUtils : KoinComponent {
             }
         val params =
             Bundle().apply {
-                putString(AnalyticsConstants.Params.SECURITY_FEATURE, AnalyticsConstants.Values.SECURITY_FEATURE_BIOMETRIC)
+                putString(
+                    AnalyticsConstants.Params.SECURITY_FEATURE,
+                    AnalyticsConstants.Values.SECURITY_FEATURE_BIOMETRIC,
+                )
                 putString(AnalyticsConstants.Params.NEW_STATE, enabled.toString())
                 putString(AnalyticsConstants.Params.SESSION_ID, sessionId)
             }

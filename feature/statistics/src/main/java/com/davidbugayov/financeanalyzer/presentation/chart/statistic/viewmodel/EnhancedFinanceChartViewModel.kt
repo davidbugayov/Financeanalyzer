@@ -205,7 +205,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         averageDailyExpense = averageDailyExpense,
                         monthsOfSavings = monthsOfSavings,
                         pieChartData = pieChartData,
-                        recommendations = recommendations
+                        recommendations = recommendations,
                     )
                 }
                 Timber.d(

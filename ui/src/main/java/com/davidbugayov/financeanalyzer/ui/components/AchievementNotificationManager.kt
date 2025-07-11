@@ -30,7 +30,7 @@ fun AchievementNotificationManager(
         achievementEngine?.newAchievements?.collectLatest { achievement ->
             // Вызываем callback для внешней логики (например, аналитики)
             onAchievementUnlocked?.invoke(achievement)
-            
+
             currentNotification = achievement
             showNotification = true
         }
@@ -72,4 +72,4 @@ object AchievementEngineProvider {
     }
 
     fun get(): AchievementEngine? = _engine
-} 
+}

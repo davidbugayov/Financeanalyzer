@@ -52,25 +52,27 @@ fun RecommendationsCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-        ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+            ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(dimensionResource(R.dimen.financial_statistics_card_padding)),
         ) {
             // Заголовок с иконкой
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 Icon(
                     imageVector = Icons.Filled.Lightbulb,
                     contentDescription = null,
                     tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(24.dp)
+                    modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
                 Text(
@@ -86,7 +88,7 @@ fun RecommendationsCard(
             Text(
                 text = stringResource(R.string.expense_transactions_summary, metrics.expenseTransactionsCount),
                 style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.onSurfaceVariant
+                color = MaterialTheme.colorScheme.onSurfaceVariant,
             )
 
             Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)))
@@ -95,7 +97,7 @@ fun RecommendationsCard(
                 Text(
                     text = stringResource(R.string.all_good_no_recommendations),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
             } else {
                 recommendations.forEach { recommendation ->
@@ -111,7 +113,7 @@ fun RecommendationsCard(
                     text = stringResource(R.string.recommendations_cta),
                     style = MaterialTheme.typography.bodySmall,
                     color = MaterialTheme.colorScheme.primary,
-                    fontWeight = FontWeight.Medium
+                    fontWeight = FontWeight.Medium,
                 )
             }
         }
@@ -124,31 +126,33 @@ fun RecommendationsCard(
 @Composable
 private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
     Card(
-        colors = CardDefaults.cardColors(
-            containerColor = recommendation.priority.color.copy(alpha = 0.08f)
-        ),
+        colors =
+            CardDefaults.cardColors(
+                containerColor = recommendation.priority.color.copy(alpha = 0.08f),
+            ),
         shape = RoundedCornerShape(12.dp),
-        modifier = Modifier.clickable { /* Можно добавить навигацию */ }
+        modifier = Modifier.clickable { /* Можно добавить навигацию */ },
     ) {
         Column(
-            modifier = Modifier.padding(16.dp)
+            modifier = Modifier.padding(16.dp),
         ) {
             Row(
-                verticalAlignment = Alignment.CenterVertically
+                verticalAlignment = Alignment.CenterVertically,
             ) {
                 // Иконка приоритета
                 Box(
-                    modifier = Modifier
-                        .size(36.dp)
-                        .clip(CircleShape)
-                        .background(recommendation.priority.color.copy(alpha = 0.15f)),
-                    contentAlignment = Alignment.Center
+                    modifier =
+                        Modifier
+                            .size(36.dp)
+                            .clip(CircleShape)
+                            .background(recommendation.priority.color.copy(alpha = 0.15f)),
+                    contentAlignment = Alignment.Center,
                 ) {
                     Icon(
                         imageVector = recommendation.icon,
                         contentDescription = null,
                         tint = recommendation.priority.color,
-                        modifier = Modifier.size(18.dp)
+                        modifier = Modifier.size(18.dp),
                     )
                 }
 
@@ -156,13 +160,13 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
 
                 Column(modifier = Modifier.weight(1f)) {
                     Row(
-                        verticalAlignment = Alignment.CenterVertically
+                        verticalAlignment = Alignment.CenterVertically,
                     ) {
                         Text(
                             text = recommendation.title,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface
+                            color = MaterialTheme.colorScheme.onSurface,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         PriorityBadge(recommendation.priority)
@@ -171,7 +175,7 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                     Text(
                         text = recommendation.description,
                         style = MaterialTheme.typography.bodySmall,
-                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
                     )
                 }
 
@@ -187,7 +191,7 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                 Spacer(modifier = Modifier.height(8.dp))
 
                 Row(
-                    verticalAlignment = Alignment.CenterVertically
+                    verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.TrendingUp,
@@ -200,7 +204,7 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                         text = recommendation.impact,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF38A169)
+                        color = Color(0xFF38A169),
                     )
                 }
             }
@@ -214,16 +218,17 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
 @Composable
 private fun PriorityBadge(priority: RecommendationPriority) {
     Box(
-        modifier = Modifier
-            .clip(RoundedCornerShape(6.dp))
-            .background(priority.color.copy(alpha = 0.15f))
-            .padding(horizontal = 6.dp, vertical = 2.dp)
+        modifier =
+            Modifier
+                .clip(RoundedCornerShape(6.dp))
+                .background(priority.color.copy(alpha = 0.15f))
+                .padding(horizontal = 6.dp, vertical = 2.dp),
     ) {
         Text(
             text = priority.label,
             style = MaterialTheme.typography.labelSmall,
             color = priority.color,
-            fontWeight = FontWeight.Medium
+            fontWeight = FontWeight.Medium,
         )
     }
 }
@@ -243,8 +248,8 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
                 description = stringResource(R.string.critical_savings_description),
                 icon = Icons.Filled.Warning,
                 priority = RecommendationPriority.CRITICAL,
-                impact = stringResource(R.string.critical_savings_impact)
-            )
+                impact = stringResource(R.string.critical_savings_impact),
+            ),
         )
     }
 
@@ -256,15 +261,16 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
                 description = stringResource(R.string.improve_savings_description),
                 icon = Icons.Filled.Savings,
                 priority = RecommendationPriority.HIGH,
-                impact = stringResource(R.string.improve_savings_impact)
-            )
+                impact = stringResource(R.string.improve_savings_impact),
+            ),
         )
     }
 
     // Рекомендации по категориям расходов
     if (metrics.topExpenseCategory.isNotEmpty()) {
-        val topCategoryPercentage = metrics.expenseCategories
-            .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f
+        val topCategoryPercentage =
+            metrics.expenseCategories
+                .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f
 
         if (topCategoryPercentage > 35f) {
             recommendations.add(
@@ -288,8 +294,8 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
                 description = stringResource(R.string.emergency_fund_recommendation_description),
                 icon = Icons.Filled.PriorityHigh,
                 priority = priority,
-                impact = stringResource(R.string.emergency_fund_recommendation_impact)
-            )
+                impact = stringResource(R.string.emergency_fund_recommendation_impact),
+            ),
         )
     }
 
@@ -310,11 +316,15 @@ private fun generateSmartRecommendations(metrics: FinancialMetrics): List<SmartR
         recommendations.add(
             SmartRecommendation(
                 title = stringResource(R.string.recommendation_reduce_small_expenses_title),
-                description = stringResource(R.string.recommendation_reduce_small_expenses_description, metrics.expenseTransactionsCount),
+                description =
+                    stringResource(
+                        R.string.recommendation_reduce_small_expenses_description,
+                        metrics.expenseTransactionsCount,
+                    ),
                 icon = Icons.Filled.PriorityHigh,
                 priority = RecommendationPriority.MEDIUM,
-                impact = stringResource(R.string.recommendation_reduce_small_expenses_impact)
-            )
+                impact = stringResource(R.string.recommendation_reduce_small_expenses_impact),
+            ),
         )
     }
 
@@ -329,7 +339,7 @@ data class SmartRecommendation(
     val description: String,
     val icon: ImageVector,
     val priority: RecommendationPriority,
-    val impact: String
+    val impact: String,
 )
 
 /**
@@ -338,10 +348,10 @@ data class SmartRecommendation(
 enum class RecommendationPriority(
     val label: String,
     val color: Color,
-    val order: Int
+    val order: Int,
 ) {
     CRITICAL("Критично", Color(0xFFE53E3E), 0),
     HIGH("Высокий", Color(0xFFED8936), 1),
     MEDIUM("Средний", Color(0xFF4299E1), 2),
-    LOW("Низкий", Color(0xFF38A169), 3)
+    LOW("Низкий", Color(0xFF38A169), 3),
 }

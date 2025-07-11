@@ -29,9 +29,10 @@ fun ExpenseInsightsCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-        ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+            ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(
@@ -56,7 +57,10 @@ fun ExpenseInsightsCard(
             // Перечисляем топ-3 категорий расходов
             metrics.topExpenseCategories.forEach { (category, amount) ->
                 Row(
-                    modifier = Modifier.fillMaxWidth().padding(vertical = dimensionResource(R.dimen.financial_statistics_metric_row_vertical)),
+                    modifier =
+                        Modifier.fillMaxWidth().padding(
+                            vertical = dimensionResource(R.dimen.financial_statistics_metric_row_vertical),
+                        ),
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
                     Text(

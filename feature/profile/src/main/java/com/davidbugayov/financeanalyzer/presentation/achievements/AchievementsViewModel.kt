@@ -16,7 +16,7 @@ import kotlinx.coroutines.launch
 
 /**
  * ViewModel для экрана достижений
- * 
+ *
  * @param achievementsRepository Репозиторий для управления достижениями
  * @param context Контекст приложения для доступа к строковым ресурсам
  */
@@ -26,7 +26,7 @@ class AchievementsViewModel(
 ) : ViewModel() {
     // Используем applicationContext для избежания утечки памяти
     private val appContext = context.applicationContext
-    
+
     // Предустановленные достижения с расширенными данными
     private val defaultAchievements =
         listOf(
@@ -280,7 +280,6 @@ class AchievementsViewModel(
                 targetProgress = 5,
                 rewardCoins = 75,
             ),
-            
             // Достижение для импорта CSV
             Achievement(
                 id = "csv_importer",

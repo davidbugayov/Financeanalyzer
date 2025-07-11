@@ -8,7 +8,7 @@ import com.davidbugayov.financeanalyzer.domain.usecase.widgets.WidgetRefresher
 
 class AndroidWidgetRefresher(context: Context) : WidgetRefresher {
     private val appContext = context.applicationContext
-    
+
     override fun refresh() {
         val manager = AppWidgetManager.getInstance(appContext)
         val balanceComp = ComponentName(appContext, BalanceWidget::class.java)

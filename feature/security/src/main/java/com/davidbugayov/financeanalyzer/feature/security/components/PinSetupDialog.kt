@@ -14,9 +14,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Backspace
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -56,69 +53,72 @@ fun PinSetupDialog(
     var confirmPin by remember { mutableStateOf("") }
     var isConfirming by remember { mutableStateOf(false) }
     var error by remember { mutableStateOf<String?>(null) }
-    
+
     // Pre-load string resources
     val pinMismatchMessage = stringResource(R.string.pin_mismatch)
 
     Dialog(
         onDismissRequest = onDismiss,
-        properties = DialogProperties(
-            dismissOnBackPress = true,
-            dismissOnClickOutside = false
-        )
+        properties =
+            DialogProperties(
+                dismissOnBackPress = true,
+                dismissOnClickOutside = false,
+            ),
     ) {
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(16.dp),
+            modifier =
+                Modifier
+                    .fillMaxWidth()
+                    .padding(16.dp),
             shape = RoundedCornerShape(16.dp),
-            color = MaterialTheme.colorScheme.surface
+            color = MaterialTheme.colorScheme.surface,
         ) {
             Column(
                 modifier = Modifier.padding(24.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
                 Text(
                     text = title,
                     style = MaterialTheme.typography.headlineSmall,
                     fontWeight = FontWeight.Bold,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 Text(
-                    text = if (isConfirming) {
-                        stringResource(R.string.pin_confirm_new)
-                    } else {
-                        stringResource(R.string.pin_enter_new)
-                    },
+                    text =
+                        if (isConfirming) {
+                            stringResource(R.string.pin_confirm_new)
+                        } else {
+                            stringResource(R.string.pin_enter_new)
+                        },
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 // Отображение точек PIN-кода
                 PinDots(
                     pinLength = if (isConfirming) confirmPin.length else currentPin.length,
-                    maxLength = 4
+                    maxLength = 4,
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Отображение ошибки
                 error?.let { errorMessage ->
                     Text(
                         text = errorMessage,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(16.dp))
                 }
-                
+
                 // Цифровая клавиатура
                 PinKeyboard(
                     onNumberClick = { number ->
@@ -160,18 +160,18 @@ fun PinSetupDialog(
                                 currentPin = currentPin.dropLast(1)
                             }
                         }
-                    }
+                    },
                 )
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 // Кнопки действий
                 Row(
                     modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.End
+                    horizontalArrangement = Arrangement.End,
                 ) {
                     TextButton(
-                        onClick = onDismiss
+                        onClick = onDismiss,
                     ) {
                         Text(stringResource(R.string.cancel))
                     }
@@ -191,26 +191,26 @@ private fun PinDots(
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(maxLength) { index ->
             Box(
-                modifier = Modifier
-                    .size(16.dp)
-                    .background(
-                        color = if (index < pinLength) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        },
-                        shape = CircleShape
-                    )
+                modifier =
+                    Modifier
+                        .size(16.dp)
+                        .background(
+                            color =
+                                if (index < pinLength) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                },
+                            shape = CircleShape,
+                        ),
             )
         }
     }
 }
-
-
 
 /**
  * Кнопка цифровой клавиатуры
@@ -222,16 +222,17 @@ private fun PinKeyboardButton(
     content: @Composable (() -> Unit)? = null,
 ) {
     Box(
-        modifier = Modifier
-            .size(64.dp)
-            .clip(CircleShape)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                shape = CircleShape
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                    shape = CircleShape,
+                )
+                .clickable { onClick() },
+        contentAlignment = Alignment.Center,
     ) {
         if (content != null) {
             content()
@@ -241,7 +242,7 @@ private fun PinKeyboardButton(
                 style = MaterialTheme.typography.headlineMedium,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }

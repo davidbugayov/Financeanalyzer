@@ -11,7 +11,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Backspace
+import androidx.compose.material.icons.automirrored.filled.Backspace
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,69 +32,69 @@ fun PinKeyboard(
     onBackspaceClick: () -> Unit,
 ) {
     Column(
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(12.dp),
     ) {
         // Первый ряд: 1, 2, 3
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             repeat(3) { index ->
                 PinKeyboardButton(
                     text = (index + 1).toString(),
-                    onClick = { onNumberClick((index + 1).toString()) }
+                    onClick = { onNumberClick((index + 1).toString()) },
                 )
             }
         }
-        
+
         // Второй ряд: 4, 5, 6
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             repeat(3) { index ->
                 PinKeyboardButton(
                     text = (index + 4).toString(),
-                    onClick = { onNumberClick((index + 4).toString()) }
+                    onClick = { onNumberClick((index + 4).toString()) },
                 )
             }
         }
-        
+
         // Третий ряд: 7, 8, 9
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             repeat(3) { index ->
                 PinKeyboardButton(
                     text = (index + 7).toString(),
-                    onClick = { onNumberClick((index + 7).toString()) }
+                    onClick = { onNumberClick((index + 7).toString()) },
                 )
             }
         }
-        
+
         // Четвертый ряд: пусто, 0, backspace
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceEvenly
+            horizontalArrangement = Arrangement.SpaceEvenly,
         ) {
             // Пустое место
             Spacer(modifier = Modifier.size(64.dp))
-            
+
             // Кнопка 0
             PinKeyboardButton(
                 text = "0",
-                onClick = { onNumberClick("0") }
+                onClick = { onNumberClick("0") },
             )
-            
+
             // Кнопка backspace
             PinKeyboardButton(
-                onClick = onBackspaceClick
+                onClick = onBackspaceClick,
             ) {
                 Icon(
-                    imageVector = Icons.Default.Backspace,
+                    imageVector = Icons.AutoMirrored.Filled.Backspace,
                     contentDescription = "Удалить",
-                    tint = MaterialTheme.colorScheme.onSurface
+                    tint = MaterialTheme.colorScheme.onSurface,
                 )
             }
         }
@@ -111,16 +111,17 @@ private fun PinKeyboardButton(
     content: @Composable (() -> Unit)? = null,
 ) {
     Box(
-        modifier = Modifier
-            .size(64.dp)
-            .clip(CircleShape)
-            .border(
-                width = 1.dp,
-                color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
-                shape = CircleShape
-            )
-            .clickable { onClick() },
-        contentAlignment = Alignment.Center
+        modifier =
+            Modifier
+                .size(64.dp)
+                .clip(CircleShape)
+                .border(
+                    width = 1.dp,
+                    color = MaterialTheme.colorScheme.outline.copy(alpha = 0.2f),
+                    shape = CircleShape,
+                )
+                .clickable { onClick() },
+        contentAlignment = Alignment.Center,
     ) {
         if (content != null) {
             content()
@@ -130,7 +131,7 @@ private fun PinKeyboardButton(
                 style = MaterialTheme.typography.headlineMedium,
                 fontSize = 24.sp,
                 fontWeight = FontWeight.Medium,
-                color = MaterialTheme.colorScheme.onSurface
+                color = MaterialTheme.colorScheme.onSurface,
             )
         }
     }

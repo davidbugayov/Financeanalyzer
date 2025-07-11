@@ -555,7 +555,7 @@ class ImportTransactionsViewModel(
     private fun triggerBankImportAchievements(bankName: String?) {
         Timber.d("🏆 Вызов триггеров достижений для банка: '$bankName'")
         Timber.d("🏆 bankName?.lowercase() = '${bankName?.lowercase()}'")
-        
+
         when (bankName?.lowercase()) {
             "тинькофф", "тинь", "tinkoff", "tbank", "тинькофф банк (pdf)", "тинькофф pdf" -> {
                 Timber.d("🏆 Триггер Тинькофф")

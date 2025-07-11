@@ -59,19 +59,19 @@ val useCaseModule =
                 walletRepository = get(),
             )
         }
-        
+
         // Financial Health Analytics
         single { CalculateFinancialHealthScoreUseCase() }
         single { CalculateExpenseDisciplineIndexUseCase() }
         single { CalculateRetirementForecastUseCase() }
         single { CalculatePeerComparisonUseCase() }
-        single { 
+        single {
             CalculateEnhancedFinancialMetricsUseCase(
                 calculateFinancialHealthScoreUseCase = get(),
                 calculateExpenseDisciplineIndexUseCase = get(),
                 calculateRetirementForecastUseCase = get(),
                 calculatePeerComparisonUseCase = get(),
-                walletRepository = get()
+                walletRepository = get(),
             )
         }
 

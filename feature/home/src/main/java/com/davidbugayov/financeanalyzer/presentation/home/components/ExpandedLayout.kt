@@ -21,9 +21,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -118,13 +118,7 @@ private fun ExpandedLeftPanel(
             onFilterSelected = onFilterSelected,
         )
 
-        var showTips by remember { mutableStateOf(true) }
-        if (showTips) {
-            HomeTipsCard(
-                onClose = { showTips = false },
-                modifier = Modifier.padding(vertical = 8.dp),
-            )
-        }
+        // Tips card moved to transaction list header for scrolling interaction
         HomeTransactionsHeader(
             currentFilter = state.currentFilter,
             showGroupSummary = showGroupSummary,
@@ -179,6 +173,15 @@ private fun ExpandedRightPanel(
                     onTransactionClick = onTransactionClick,
                     onTransactionLongClick = onTransactionLongClick,
                     listState = listState,
+                    headerContent = {
+                        var showTips by remember { mutableStateOf(true) }
+                        if (showTips) {
+                            HomeTipsCard(
+                                onClose = { showTips = false },
+                                modifier = Modifier.padding(bottom = 8.dp),
+                            )
+                        }
+                    },
                 )
             }
         }

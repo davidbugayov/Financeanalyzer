@@ -16,12 +16,12 @@ import com.davidbugayov.financeanalyzer.presentation.history.TransactionHistoryV
 import com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel
 import com.davidbugayov.financeanalyzer.presentation.import_transaction.ImportTransactionsViewModel
 import com.davidbugayov.financeanalyzer.presentation.onboarding.OnboardingViewModel
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import org.koin.core.module.dsl.bind
 import org.koin.core.module.dsl.singleOf
 import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
-import kotlinx.coroutines.ExperimentalCoroutinesApi
 
 @OptIn(ExperimentalCoroutinesApi::class)
 val viewModelModule =
@@ -56,5 +56,13 @@ val viewModelModule =
 
         viewModel { AchievementsViewModel(get(), get()) }
 
-        viewModel { parameters -> FinancialDetailStatisticsViewModel(parameters.get(), parameters.get(), get(), get(), get()) }
+        viewModel { parameters ->
+            FinancialDetailStatisticsViewModel(
+                parameters.get(),
+                parameters.get(),
+                get(),
+                get(),
+                get(),
+            )
+        }
     }

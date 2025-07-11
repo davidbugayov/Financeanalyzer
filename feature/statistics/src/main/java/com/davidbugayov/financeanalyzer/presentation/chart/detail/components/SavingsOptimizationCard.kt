@@ -15,7 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.setScale
@@ -29,9 +28,10 @@ fun SavingsOptimizationCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-        ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+            ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(

@@ -12,13 +12,13 @@ import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetProfileAnaly
 import com.davidbugayov.financeanalyzer.domain.usecase.export.ExportTransactionsToCSVUseCase
 import com.davidbugayov.financeanalyzer.feature.profile.event.ProfileEvent
 import com.davidbugayov.financeanalyzer.feature.profile.model.ProfileState
+import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.navigation.NavigationManager
 import com.davidbugayov.financeanalyzer.navigation.Screen
 import com.davidbugayov.financeanalyzer.ui.theme.AppTheme
 import com.davidbugayov.financeanalyzer.utils.INotificationScheduler
 import com.davidbugayov.financeanalyzer.utils.PreferencesManager
 import com.davidbugayov.financeanalyzer.utils.Time
-import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import java.io.File
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -155,10 +155,10 @@ class ProfileViewModel(
                         // Если блокировка отключена, отключаем и биометрию
                         preferencesManager.setBiometricEnabled(false)
                     }
-                    
+
                     // Логируем изменение настройки блокировки приложения
                     AnalyticsUtils.logSecurityAppLockChanged(event.enabled)
-                    
+
                     syncSecurityState()
                 }
             }
@@ -184,13 +184,13 @@ class ProfileViewModel(
                 viewModelScope.launch {
                     val existingPin = preferencesManager.getPinCode()
                     val isFirstSetup = existingPin == null
-                    
+
                     preferencesManager.setPinCode(event.pinCode)
                     preferencesManager.setAppLockEnabled(true) // Автоматически включаем блокировку при установке PIN
-                    
+
                     // Логируем установку или изменение PIN кода
                     AnalyticsUtils.logSecurityPinSetup(isFirstSetup)
-                    
+
                     _state.update { it.copy(isEditingPinCode = false) }
                     syncSecurityState()
                 }
@@ -405,7 +405,7 @@ class ProfileViewModel(
         val isAppLockEnabled = preferencesManager.isAppLockEnabled()
         val isBiometricEnabled = preferencesManager.isBiometricEnabled()
         val isBiometricAvailable = securityManager.isBiometricSupported() && securityManager.isBiometricEnrolled()
-        
+
         _state.update {
             it.copy(
                 isAppLockEnabled = isAppLockEnabled,
@@ -413,6 +413,8 @@ class ProfileViewModel(
                 isBiometricAvailable = isBiometricAvailable,
             )
         }
-        Timber.d("[ProfileViewModel] syncSecurityState: isAppLockEnabled=$isAppLockEnabled, isBiometricEnabled=$isBiometricEnabled, isBiometricAvailable=$isBiometricAvailable")
+        Timber.d(
+            "[ProfileViewModel] syncSecurityState: isAppLockEnabled=$isAppLockEnabled, isBiometricEnabled=$isBiometricEnabled, isBiometricAvailable=$isBiometricAvailable",
+        )
     }
 }

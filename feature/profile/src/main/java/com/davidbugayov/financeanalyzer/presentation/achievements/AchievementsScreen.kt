@@ -111,7 +111,7 @@ fun AchievementsScreen(
                 achievementTitle = achievement.title,
                 achievementCategory = achievement.category.name.lowercase(),
                 achievementRarity = achievement.rarity.name.lowercase(),
-                rewardCoins = achievement.rewardCoins
+                rewardCoins = achievement.rewardCoins,
             )
         },
     ) {
@@ -140,7 +140,7 @@ private fun AchievementsScreenContent(
             totalCount = achievements.size,
             unlockedCount = unlockedCount,
             lockedCount = lockedCount,
-            totalCoinsEarned = totalCoinsEarned
+            totalCoinsEarned = totalCoinsEarned,
         )
 
         // Также уведомляем AchievementEngine о посещении экрана
@@ -193,44 +193,47 @@ private fun AchievementsScreenContent(
         // Фильтры
         ModernFilters(
             selectedCategory = selectedCategory,
-            onCategorySelected = { category -> 
+            onCategorySelected = { category ->
                 selectedCategory = category
-                
+
                 // Аналитика: фильтр по категории
                 val categoryFilter = category?.name?.lowercase()
-                val resultCount = achievements.filter { achievement ->
-                    category?.let { achievement.category == it } ?: true
-                }.size
-                
+                val resultCount =
+                    achievements.filter { achievement ->
+                        category?.let { achievement.category == it } ?: true
+                    }.size
+
                 AnalyticsUtils.logAchievementFilterChanged(
                     filterType = AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL,
                     categoryFilter = categoryFilter,
-                    resultCount = resultCount
+                    resultCount = resultCount,
                 )
             },
             selectedFilter = selectedFilter,
-            onFilterSelected = { filter -> 
+            onFilterSelected = { filter ->
                 selectedFilter = filter
-                
+
                 // Аналитика: фильтр по статусу
-                val filterType = when (filter) {
-                    AchievementFilter.ALL -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL
-                    AchievementFilter.UNLOCKED -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_UNLOCKED
-                    AchievementFilter.LOCKED -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_LOCKED
-                }
-                
-                val resultCount = achievements.filter { achievement ->
+                val filterType =
                     when (filter) {
-                        AchievementFilter.ALL -> true
-                        AchievementFilter.UNLOCKED -> achievement.isUnlocked
-                        AchievementFilter.LOCKED -> !achievement.isUnlocked
+                        AchievementFilter.ALL -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_ALL
+                        AchievementFilter.UNLOCKED -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_UNLOCKED
+                        AchievementFilter.LOCKED -> AnalyticsConstants.Values.ACHIEVEMENT_FILTER_LOCKED
                     }
-                }.size
-                
+
+                val resultCount =
+                    achievements.filter { achievement ->
+                        when (filter) {
+                            AchievementFilter.ALL -> true
+                            AchievementFilter.UNLOCKED -> achievement.isUnlocked
+                            AchievementFilter.LOCKED -> !achievement.isUnlocked
+                        }
+                    }.size
+
                 AnalyticsUtils.logAchievementFilterChanged(
                     filterType = filterType,
                     categoryFilter = selectedCategory?.name?.lowercase(),
-                    resultCount = resultCount
+                    resultCount = resultCount,
                 )
             },
         )
@@ -579,7 +582,8 @@ private fun UltraModernAchievementCard(achievement: Achievement) {
                             .background(
                                 brush =
                                     if (achievement.isUnlocked) {
-                                        val iconColor = getAchievementIconColor(achievement.id, achievement.category, true)
+                                        val iconColor =
+                                            getAchievementIconColor(achievement.id, achievement.category, true)
                                         Brush.radialGradient(
                                             listOf(
                                                 iconColor.copy(alpha = 0.15f),
@@ -890,7 +894,7 @@ private fun getAchievementIconColor(
             "transaction_master" -> Color(0xFFF59E0B) // Золотой
             "daily_tracker" -> Color(0xFF3B82F6) // Синий
             "category_organizer" -> Color(0xFF8B5CF6) // Фиолетовый
-            
+
             // Банковские импортеры - фирменные цвета банков
             "tinkoff_importer" -> Color(0xFFFFDD2D) // Жёлтый Тинькофф
             "sberbank_importer" -> Color(0xFF21A038) // Зелёный Сбербанк
@@ -900,42 +904,43 @@ private fun getAchievementIconColor(
             "multi_bank_importer" -> Color(0xFFEF4444) // Ярко-красный для мульти
             "export_master" -> Color(0xFF059669) // Тёмно-зелёный
             "backup_enthusiast" -> Color(0xFF7C3AED) // Фиолетовый
-            
+
             // Бюджет - оттенки зелёного/золотого
             "first_budget" -> Color(0xFF10B981) // Зелёный
             "budget_keeper" -> Color(0xFF059669) // Тёмно-зелёный
             "budget_saver" -> Color(0xFFD97706) // Янтарный
-            
+
             // Накопления - золотые/жёлтые оттенки
             "first_savings" -> Color(0xFFFFD700) // Золотой
             "emergency_fund" -> Color(0xFFF59E0B) // Янтарный
-            
+
             // Привычки - тёплые цвета
             "week_no_coffee" -> Color(0xFF92400E) // Коричневый кофе
             "healthy_spender" -> Color(0xFFEC4899) // Розовый
-            
+
             // Статистика - синие оттенки
             "data_analyst" -> Color(0xFF1E40AF) // Тёмно-синий
-            
+
             // Вехи - фиолетовые оттенки
             "app_explorer" -> Color(0xFF7C3AED) // Фиолетовый
             "month_user" -> Color(0xFF9333EA) // Светло-фиолетовый
-            
+
             // Специальные - яркие цвета
             "early_bird" -> Color(0xFFF59E0B) // Солнечный жёлтый
             "night_owl" -> Color(0xFF4338CA) // Ночной синий
             "perfectionist" -> Color(0xFFDC2626) // Красный для перфекциониста
-            
+
             // Цвета по категориям для остальных
-            else -> when (category) {
-                AchievementCategory.TRANSACTIONS -> Color(0xFF3B82F6) // Синий
-                AchievementCategory.BUDGET -> Color(0xFF10B981) // Зелёный
-                AchievementCategory.SAVINGS -> Color(0xFFFFD700) // Золотой
-                AchievementCategory.HABITS -> Color(0xFFEC4899) // Розовый
-                AchievementCategory.STATISTICS -> Color(0xFF1E40AF) // Тёмно-синий
-                AchievementCategory.MILESTONES -> Color(0xFF7C3AED) // Фиолетовый
-                AchievementCategory.SPECIAL -> Color(0xFFEF4444) // Красный
-            }
+            else ->
+                when (category) {
+                    AchievementCategory.TRANSACTIONS -> Color(0xFF3B82F6) // Синий
+                    AchievementCategory.BUDGET -> Color(0xFF10B981) // Зелёный
+                    AchievementCategory.SAVINGS -> Color(0xFFFFD700) // Золотой
+                    AchievementCategory.HABITS -> Color(0xFFEC4899) // Розовый
+                    AchievementCategory.STATISTICS -> Color(0xFF1E40AF) // Тёмно-синий
+                    AchievementCategory.MILESTONES -> Color(0xFF7C3AED) // Фиолетовый
+                    AchievementCategory.SPECIAL -> Color(0xFFEF4444) // Красный
+                }
         }
     }
 }

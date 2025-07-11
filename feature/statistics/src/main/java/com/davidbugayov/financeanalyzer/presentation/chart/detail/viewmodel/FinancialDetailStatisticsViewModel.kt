@@ -231,7 +231,7 @@ class FinancialDetailStatisticsViewModel(
 
         // Рассчитываем продвинутые метрики финансового здоровья (если UseCase доступен)
         val healthMetrics = calculateEnhancedFinancialMetricsUseCase?.invoke(transactions)
-        
+
         // Обновляем метрики
         _metrics.value =
             FinancialMetrics(

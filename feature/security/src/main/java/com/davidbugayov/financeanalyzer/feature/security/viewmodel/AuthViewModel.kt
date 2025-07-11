@@ -16,7 +16,6 @@ import timber.log.Timber
 class AuthViewModel(
     private val securityManager: SecurityManager,
 ) : ViewModel() {
-
     private val _state = MutableStateFlow(AuthState())
     val state: StateFlow<AuthState> = _state.asStateFlow()
 
@@ -36,12 +35,13 @@ class AuthViewModel(
      */
     suspend fun authenticateWithBiometric(activity: FragmentActivity): SecurityManager.AuthResult {
         Timber.d("AuthViewModel - запуск биометрической аутентификации")
-        val result = securityManager.authenticateWithBiometric(
-            activity = activity,
-            title = "Аутентификация",
-            subtitle = "Подтвердите свою личность для входа в приложение",
-            negativeButtonText = "Использовать PIN"
-        )
+        val result =
+            securityManager.authenticateWithBiometric(
+                activity = activity,
+                title = "Аутентификация",
+                subtitle = "Подтвердите свою личность для входа в приложение",
+                negativeButtonText = "Использовать PIN",
+            )
         Timber.d("AuthViewModel - результат биометрической аутентификации: $result")
         return result
     }
@@ -51,7 +51,7 @@ class AuthViewModel(
      */
     fun authenticateWithBiometric(
         activity: FragmentActivity,
-        onResult: (SecurityManager.AuthResult) -> Unit
+        onResult: (SecurityManager.AuthResult) -> Unit,
     ) {
         viewModelScope.launch {
             val result = authenticateWithBiometric(activity)
@@ -66,12 +66,15 @@ class AuthViewModel(
         val isSupported = securityManager.isBiometricSupported()
         val isEnrolled = securityManager.isBiometricEnrolled()
         val canUseBiometric = isSupported && isEnrolled
-        
-        Timber.d("AuthViewModel - обновление состояния: supported=$isSupported, enrolled=$isEnrolled, canUse=$canUseBiometric")
-        
-        _state.value = _state.value.copy(
-            canUseBiometric = canUseBiometric
+
+        Timber.d(
+            "AuthViewModel - обновление состояния: supported=$isSupported, enrolled=$isEnrolled, canUse=$canUseBiometric",
         )
+
+        _state.value =
+            _state.value.copy(
+                canUseBiometric = canUseBiometric,
+            )
     }
 }
 
@@ -81,5 +84,5 @@ class AuthViewModel(
 data class AuthState(
     val canUseBiometric: Boolean = false,
     val isLoading: Boolean = false,
-    val error: String? = null
+    val error: String? = null,
 ) 

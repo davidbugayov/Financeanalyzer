@@ -2,13 +2,13 @@ package com.davidbugayov.financeanalyzer
 
 import android.app.Application
 import android.os.Build
+import androidx.core.content.edit
 import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
-import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.di.allModules
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.domain.usecase.AchievementEngine

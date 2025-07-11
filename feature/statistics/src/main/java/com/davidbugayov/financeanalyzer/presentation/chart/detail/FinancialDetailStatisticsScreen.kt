@@ -174,7 +174,11 @@ fun FinancialDetailStatisticsScreen(
                         }
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
                         KeyMetricsCard(
@@ -185,7 +189,11 @@ fun FinancialDetailStatisticsScreen(
                         )
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
                 metrics.healthMetrics?.let { healthMetrics ->
                     item {
                         AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
@@ -196,7 +204,11 @@ fun FinancialDetailStatisticsScreen(
                             )
                         }
                     }
-                    item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium))) }
+                    item {
+                        Spacer(
+                            modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                        )
+                    }
                 }
 
                 // Статистика
@@ -220,13 +232,21 @@ fun FinancialDetailStatisticsScreen(
                         TransactionsStatisticsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
                         ExpenseAnalysisCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
+                    )
+                }
 
                 // Инсайты
                 item {
@@ -249,19 +269,31 @@ fun FinancialDetailStatisticsScreen(
                         SavingsOptimizationCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
                         ExpenseInsightsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
                         SpendingPatternsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
+                    )
+                }
 
                 // Советы
                 item {
@@ -284,13 +316,21 @@ fun FinancialDetailStatisticsScreen(
                         ActionableTipsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_medium)),
+                    )
+                }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
                         RecommendationsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
-                item { Spacer(modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large))) }
+                item {
+                    Spacer(
+                        modifier = Modifier.height(dimensionResource(R.dimen.financial_statistics_spacer_large)),
+                    )
+                }
             }
         }
     }

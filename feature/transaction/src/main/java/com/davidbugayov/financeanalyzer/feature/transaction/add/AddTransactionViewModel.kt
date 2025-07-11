@@ -13,7 +13,6 @@ import com.davidbugayov.financeanalyzer.domain.repository.WalletRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.wallet.UpdateWalletBalancesUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.feature.transaction.BuildConfig
 import com.davidbugayov.financeanalyzer.feature.transaction.add.model.AddTransactionState
 import com.davidbugayov.financeanalyzer.feature.transaction.base.BaseTransactionViewModel
 import com.davidbugayov.financeanalyzer.feature.transaction.base.model.BaseTransactionEvent

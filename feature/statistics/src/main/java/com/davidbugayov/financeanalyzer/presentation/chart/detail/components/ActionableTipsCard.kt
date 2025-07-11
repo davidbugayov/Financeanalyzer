@@ -37,9 +37,10 @@ fun ActionableTipsCard(
     Card(
         modifier = modifier,
         shape = RoundedCornerShape(dimensionResource(R.dimen.financial_statistics_card_corner_radius)),
-        elevation = CardDefaults.cardElevation(
-            defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-        ),
+        elevation =
+            CardDefaults.cardElevation(
+                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
+            ),
         colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
     ) {
         Column(

@@ -4,10 +4,10 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -36,9 +36,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.activity.ComponentActivity
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.feature.security.components.PinKeyboard
 import com.davidbugayov.financeanalyzer.feature.security.manager.SecurityManager
 import com.davidbugayov.financeanalyzer.feature.security.viewmodel.AuthViewModel
@@ -62,56 +61,61 @@ fun AuthScreen(
     val context = LocalContext.current
     val lifecycleOwner = LocalLifecycleOwner.current
     val preferencesManager: PreferencesManager = koinInject()
-    
+
     var pin by remember { mutableStateOf("") }
     var error by remember { mutableStateOf<String?>(null) }
-    
+
     // Получаем FragmentActivity из контекста
-    val activity = remember(context) {
-        Timber.d("AuthScreen - поиск FragmentActivity в контексте: ${context::class.simpleName}")
-        when (context) {
-            is FragmentActivity -> {
-                Timber.d("AuthScreen - найдена FragmentActivity: ${context::class.simpleName}")
-                context
-            }
-            else -> {
-                // Попробуем найти FragmentActivity в цепочке контекстов
-                var currentContext = context
-                while (currentContext is android.content.ContextWrapper) {
-                    Timber.d("AuthScreen - проверяем контекст: ${currentContext::class.simpleName}")
-                    if (currentContext is FragmentActivity) {
-                        Timber.d("AuthScreen - найдена FragmentActivity в цепочке: ${currentContext::class.simpleName}")
-                        return@remember currentContext
-                    }
-                    currentContext = currentContext.baseContext
+    val activity =
+        remember(context) {
+            Timber.d("AuthScreen - поиск FragmentActivity в контексте: ${context::class.simpleName}")
+            when (context) {
+                is FragmentActivity -> {
+                    Timber.d("AuthScreen - найдена FragmentActivity: ${context::class.simpleName}")
+                    context
                 }
-                Timber.w("AuthScreen - FragmentActivity не найдена")
-                null
+                else -> {
+                    // Попробуем найти FragmentActivity в цепочке контекстов
+                    var currentContext = context
+                    while (currentContext is android.content.ContextWrapper) {
+                        Timber.d("AuthScreen - проверяем контекст: ${currentContext::class.simpleName}")
+                        if (currentContext is FragmentActivity) {
+                            Timber.d(
+                                "AuthScreen - найдена FragmentActivity в цепочке: ${currentContext::class.simpleName}",
+                            )
+                            return@remember currentContext
+                        }
+                        currentContext = currentContext.baseContext
+                    }
+                    Timber.w("AuthScreen - FragmentActivity не найдена")
+                    null
+                }
             }
         }
-    }
 
     // Обновляем состояние безопасности при запуске
     LaunchedEffect(Unit) {
         viewModel.updateSecurityState()
-        
+
         // Логируем просмотр экрана аутентификации
         val hasPinCode = preferencesManager.getPinCode() != null
         val biometricSupported = state.canUseBiometric
         val biometricEnrolled = state.canUseBiometric && preferencesManager.isBiometricEnabled()
-        
+
         AnalyticsUtils.logSecurityAuthScreenViewed(
             hasPinCode = hasPinCode,
             biometricSupported = biometricSupported,
-            biometricEnrolled = biometricEnrolled
+            biometricEnrolled = biometricEnrolled,
         )
     }
 
     // Автоматически пробуем биометрическую аутентификацию при запуске, если она включена
     LaunchedEffect(state.canUseBiometric) {
         val isBiometricEnabled = preferencesManager.isBiometricEnabled()
-        Timber.d("AuthScreen - проверка автозапуска биометрии: canUse=${state.canUseBiometric}, enabled=$isBiometricEnabled, activity=$activity")
-        
+        Timber.d(
+            "AuthScreen - проверка автозапуска биометрии: canUse=${state.canUseBiometric}, enabled=$isBiometricEnabled, activity=$activity",
+        )
+
         if (state.canUseBiometric && isBiometricEnabled && activity != null) {
             Timber.d("AuthScreen - запуск автоматической биометрической аутентификации")
             val result = viewModel.authenticateWithBiometric(activity)
@@ -124,27 +128,28 @@ fun AuthScreen(
                 SecurityManager.AuthResult.Error -> {
                     AnalyticsUtils.logSecurityAuthFailed(
                         authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                        reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR
+                        reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR,
                     )
                 }
                 SecurityManager.AuthResult.UserCancel -> {
                     AnalyticsUtils.logSecurityAuthFailed(
                         authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                        reason = AnalyticsConstants.Values.AUTH_RESULT_CANCELLED
+                        reason = AnalyticsConstants.Values.AUTH_RESULT_CANCELLED,
                     )
                 }
                 SecurityManager.AuthResult.Failed -> {
                     AnalyticsUtils.logSecurityAuthFailed(
                         authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                        reason = AnalyticsConstants.Values.AUTH_RESULT_FAILED
+                        reason = AnalyticsConstants.Values.AUTH_RESULT_FAILED,
                     )
                 }
                 SecurityManager.AuthResult.HardwareUnavailable,
                 SecurityManager.AuthResult.FeatureUnavailable,
-                SecurityManager.AuthResult.NoneEnrolled -> {
+                SecurityManager.AuthResult.NoneEnrolled,
+                -> {
                     AnalyticsUtils.logSecurityAuthFailed(
                         authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                        reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR
+                        reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR,
                     )
                 }
             }
@@ -154,63 +159,64 @@ fun AuthScreen(
     FinanceAnalyzerTheme {
         Surface(
             modifier = Modifier.fillMaxSize(),
-            color = MaterialTheme.colorScheme.background
+            color = MaterialTheme.colorScheme.background,
         ) {
             Column(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
+                modifier =
+                    Modifier
+                        .fillMaxSize()
+                        .padding(24.dp),
                 horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.Center
+                verticalArrangement = Arrangement.Center,
             ) {
                 // Логотип и заголовок
                 Icon(
                     imageVector = Icons.Default.Fingerprint,
                     contentDescription = null,
                     modifier = Modifier.size(80.dp),
-                    tint = MaterialTheme.colorScheme.primary
+                    tint = MaterialTheme.colorScheme.primary,
                 )
-                
+
                 Spacer(modifier = Modifier.height(32.dp))
-                
+
                 Text(
                     text = stringResource(R.string.auth_title),
                     style = MaterialTheme.typography.headlineMedium,
                     fontWeight = FontWeight.Bold,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onBackground
+                    color = MaterialTheme.colorScheme.onBackground,
                 )
-                
+
                 Spacer(modifier = Modifier.height(8.dp))
-                
+
                 Text(
                     text = stringResource(R.string.auth_enter_pin),
                     style = MaterialTheme.typography.bodyLarge,
                     textAlign = TextAlign.Center,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                    color = MaterialTheme.colorScheme.onSurfaceVariant,
                 )
-                
+
                 Spacer(modifier = Modifier.height(48.dp))
-                
+
                 // Отображение точек PIN-кода
                 PinDots(
                     pinLength = pin.length,
-                    maxLength = 4
+                    maxLength = 4,
                 )
-                
+
                 Spacer(modifier = Modifier.height(24.dp))
-                
+
                 // Отображение ошибки
                 error?.let { errorMessage ->
                     Text(
                         text = errorMessage,
                         color = MaterialTheme.colorScheme.error,
                         style = MaterialTheme.typography.bodyMedium,
-                        textAlign = TextAlign.Center
+                        textAlign = TextAlign.Center,
                     )
                     Spacer(modifier = Modifier.height(24.dp))
                 }
-                
+
                 // Кнопка биометрической аутентификации
                 if (state.canUseBiometric && preferencesManager.isBiometricEnabled() && activity != null) {
                     Button(
@@ -220,59 +226,62 @@ fun AuthScreen(
                                 Timber.d("AuthScreen - результат ручной аутентификации: $result")
                                 when (result) {
                                     SecurityManager.AuthResult.Success -> {
-                                        AnalyticsUtils.logSecurityAuthSuccess(AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC)
+                                        AnalyticsUtils.logSecurityAuthSuccess(
+                                            AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
+                                        )
                                         onAuthSuccess()
                                     }
                                     SecurityManager.AuthResult.Error -> {
                                         AnalyticsUtils.logSecurityAuthFailed(
                                             authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                                            reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR
+                                            reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR,
                                         )
                                     }
                                     SecurityManager.AuthResult.UserCancel -> {
                                         AnalyticsUtils.logSecurityAuthFailed(
                                             authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                                            reason = AnalyticsConstants.Values.AUTH_RESULT_CANCELLED
+                                            reason = AnalyticsConstants.Values.AUTH_RESULT_CANCELLED,
                                         )
                                     }
                                     SecurityManager.AuthResult.Failed -> {
                                         AnalyticsUtils.logSecurityAuthFailed(
                                             authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                                            reason = AnalyticsConstants.Values.AUTH_RESULT_FAILED
+                                            reason = AnalyticsConstants.Values.AUTH_RESULT_FAILED,
                                         )
                                     }
                                     SecurityManager.AuthResult.HardwareUnavailable,
                                     SecurityManager.AuthResult.FeatureUnavailable,
-                                    SecurityManager.AuthResult.NoneEnrolled -> {
+                                    SecurityManager.AuthResult.NoneEnrolled,
+                                    -> {
                                         AnalyticsUtils.logSecurityAuthFailed(
                                             authMethod = AnalyticsConstants.Values.AUTH_METHOD_BIOMETRIC,
-                                            reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR
+                                            reason = AnalyticsConstants.Values.AUTH_RESULT_ERROR,
                                         )
                                     }
                                 }
                             }
                         },
-                        modifier = Modifier.fillMaxWidth()
+                        modifier = Modifier.fillMaxWidth(),
                     ) {
                         Icon(
                             imageVector = Icons.Default.Fingerprint,
                             contentDescription = null,
-                            modifier = Modifier.size(20.dp)
+                            modifier = Modifier.size(20.dp),
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         Text(stringResource(R.string.auth_use_biometric))
                     }
-                    
+
                     Spacer(modifier = Modifier.height(32.dp))
                 }
-                
+
                 // Цифровая клавиатура
                 PinKeyboard(
                     onNumberClick = { number ->
                         error = null
                         if (pin.length < 4) {
                             pin += number
-                            
+
                             // Проверяем PIN когда введено 4 символа
                             if (pin.length == 4) {
                                 if (viewModel.validatePin(pin)) {
@@ -281,7 +290,7 @@ fun AuthScreen(
                                 } else {
                                     AnalyticsUtils.logSecurityAuthFailed(
                                         authMethod = AnalyticsConstants.Values.AUTH_METHOD_PIN,
-                                        reason = AnalyticsConstants.Values.AUTH_RESULT_FAILED
+                                        reason = AnalyticsConstants.Values.AUTH_RESULT_FAILED,
                                     )
                                     error = context.getString(R.string.auth_wrong_pin)
                                     pin = ""
@@ -294,7 +303,7 @@ fun AuthScreen(
                         if (pin.isNotEmpty()) {
                             pin = pin.dropLast(1)
                         }
-                    }
+                    },
                 )
             }
         }
@@ -311,20 +320,22 @@ private fun PinDots(
 ) {
     Row(
         horizontalArrangement = Arrangement.spacedBy(12.dp),
-        verticalAlignment = Alignment.CenterVertically
+        verticalAlignment = Alignment.CenterVertically,
     ) {
         repeat(maxLength) { index ->
             Box(
-                modifier = Modifier
-                    .size(16.dp)
-                    .background(
-                        color = if (index < pinLength) {
-                            MaterialTheme.colorScheme.primary
-                        } else {
-                            MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
-                        },
-                        shape = CircleShape
-                    )
+                modifier =
+                    Modifier
+                        .size(16.dp)
+                        .background(
+                            color =
+                                if (index < pinLength) {
+                                    MaterialTheme.colorScheme.primary
+                                } else {
+                                    MaterialTheme.colorScheme.outline.copy(alpha = 0.3f)
+                                },
+                            shape = CircleShape,
+                        ),
             )
         }
     }
