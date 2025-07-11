@@ -22,23 +22,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
-import androidx.core.content.edit
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import androidx.paging.compose.collectAsLazyPagingItems
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
-import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
-import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
-import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
-import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
-import com.davidbugayov.financeanalyzer.domain.model.Transaction
-import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
-import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
-import com.davidbugayov.financeanalyzer.feature.home.R
-import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
-import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
 import com.davidbugayov.financeanalyzer.presentation.home.components.CompactLayout
 import com.davidbugayov.financeanalyzer.presentation.home.components.ExpandedLayout
 import com.davidbugayov.financeanalyzer.presentation.home.event.HomeEvent
@@ -59,6 +42,23 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import androidx.core.content.edit
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.paging.compose.collectAsLazyPagingItems
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
+import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
+import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
+import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
+import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.domain.usecase.widgets.UpdateWidgetsUseCase
+import com.davidbugayov.financeanalyzer.feature.home.BuildConfig
+import com.davidbugayov.financeanalyzer.feature.home.R
+import com.davidbugayov.financeanalyzer.feature.transaction.edit.EditTransactionViewModel
+import com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel
 
 /**
  * Главный экран приложения.
@@ -69,6 +69,7 @@ import timber.log.Timber
 private fun HomeTopBar(
     onGenerateTestData: () -> Unit,
     onNavigateToProfile: () -> Unit,
+    profileIconModifier: Modifier = Modifier,
 ) {
     AppTopBar(
         title = stringResource(R.string.app_title),
@@ -93,6 +94,7 @@ private fun HomeTopBar(
                 }
             }
             IconButton(
+                modifier = profileIconModifier,
                 onClick = {
                     // Отслеживаем действие пользователя
                     UserEventTracker.trackUserAction(
@@ -273,6 +275,8 @@ fun HomeScreen(
     var showActionsDialog by remember { mutableStateOf(false) }
     val sharedPreferences = context.getSharedPreferences("finance_analyzer_prefs", 0)
 
+    // Tips will be shown every time the screen opens; no persistence needed.
+
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }
 
@@ -432,6 +436,7 @@ fun HomeScreen(
                         showFeedback = true
                     },
                     onNavigateToProfile = { viewModel.onEvent(HomeEvent.NavigateToProfile) },
+                    profileIconModifier = Modifier,
                 )
             },
             bottomBar = {
@@ -478,6 +483,8 @@ fun HomeScreen(
                     onDismiss = { showFeedback = false },
                     modifier = Modifier.align(Alignment.TopCenter),
                 )
+
+                // Bubble tips overlays removed
             }
         }
 

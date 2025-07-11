@@ -1059,4 +1059,16 @@
   <string name="permission_settings_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
   <string name="permission_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Это позволит выбрать файл для импорта транзакций.</string>
   <string name="grant_permission">Разрешить</string>
+
+    <!-- Home Tips Card -->
+    <string name="home_tips_card_title">Полезные подсказки</string>
+    <string name="tip_achievements">Открывайте достижения и отслеживайте прогресс</string>
+    <string name="tip_imports">Импортируйте транзакции из банков для удобства</string>
+    <string name="tip_statistics">Анализируйте расходы в разделе «Статистика»</string>
+    <string name="tip_recommendations">Получайте персональные финансовые рекомендации</string>
+
+    <!-- Bubble tips messages -->
+    <string name="bubble_profile_message">Загляните в профиль, чтобы открыть достижения и настройки</string>
+    <string name="bubble_statistics_message">Откройте статистику для анализа расходов и доходов</string>
+
 </resources>

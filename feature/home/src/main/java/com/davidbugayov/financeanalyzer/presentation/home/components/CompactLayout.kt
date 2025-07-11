@@ -61,6 +61,14 @@ private fun CompactBalanceAndFilters(
         currentFilter = state.currentFilter,
         onFilterSelected = onFilterSelected,
     )
+
+    var showTips by remember { mutableStateOf(true) }
+    if (showTips) {
+        HomeTipsCard(
+            onClose = { showTips = false },
+            modifier = Modifier.padding(vertical = 8.dp),
+        )
+    }
     HomeTransactionsHeader(
         currentFilter = state.currentFilter,
         showGroupSummary = showGroupSummary,
