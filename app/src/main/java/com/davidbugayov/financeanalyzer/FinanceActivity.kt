@@ -2,7 +2,6 @@ package com.davidbugayov.financeanalyzer
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Process
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
@@ -82,22 +81,6 @@ class FinanceActivity : FragmentActivity(), DefaultLifecycleObserver {
         splashScreen.setKeepOnScreenCondition { !isReady }
 
         enableEdgeToEdge()
-
-        Thread.setDefaultUncaughtExceptionHandler { _, e ->
-            // Логирование и оповещение об ошибке
-            Timber.tag("FinanceActivity").e(e, "Unhandled exception")
-
-            // Перезапускаем приложение
-            val intent = Intent(this, FinanceActivity::class.java)
-            intent.addFlags(
-                Intent.FLAG_ACTIVITY_CLEAR_TOP or Intent.FLAG_ACTIVITY_CLEAR_TASK or Intent.FLAG_ACTIVITY_NEW_TASK,
-            )
-            startActivity(intent)
-
-            // Завершаем текущий процесс
-            Process.killProcess(Process.myPid())
-            System.exit(10)
-        }
 
         // Добавляем наблюдатель за жизненным циклом приложения для обработки app lock
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)

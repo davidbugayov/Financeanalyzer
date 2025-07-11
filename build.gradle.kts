@@ -93,3 +93,14 @@ tasks.register("resetLintBaseline") {
         println("Run './gradlew lintAll' to generate fresh baselines")
     }
 }
+
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+        maven("https://developer.huawei.com/repo/")
+    }
+    dependencies {
+        classpath(libs.agconnect.gradle.plugin)
+    }
+}

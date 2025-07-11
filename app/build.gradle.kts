@@ -429,6 +429,8 @@ dependencies {
     // RuStore SDK только для RuStore флейвора
     "rustoreImplementation"(libs.rustore.review)
     "rustoreImplementation"(libs.rustore.appupdate)
+    // Huawei AGConnect Core dependency для Huawei флейвора
+    "huaweiImplementation"(libs.agconnect.core)
 
     // Logging
     implementation(libs.timber)
@@ -476,6 +478,8 @@ dependencies {
     // Lifecycle Process для отслеживания жизненного цикла приложения
     implementation(libs.androidx.lifecycle.process)
 }
+
+apply(plugin = "com.huawei.agconnect")
 
 composeCompiler {
     // Включаем генерацию отчетов компилятора Compose (полезно для анализа рекомпозиций)

@@ -14,6 +14,9 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://developer.huawei.com/repo/")
+        }
 
         // Репозиторий для RuStore SDK - используется только для rustore flavor
         // Исключаем для F-Droid сканера

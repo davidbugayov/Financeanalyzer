@@ -9,6 +9,7 @@ androidGradlePlugin = "8.11.0"
 kotlin = "2.2.0"
 googleServices = "4.4.3"
 coroutines = "1.10.2"
+agconnectPlugin = "1.5.2.300"
 kotlinx-datetime = "0.7.0"
 kotlinx-serialization = "1.9.0"
 composeBom = "2025.06.01"
@@ -156,6 +157,10 @@ appmetrica-sdk = { group = "io.appmetrica.analytics", name = "analytics", versio
 # Paging
 paging-runtime = { group = "androidx.paging", name = "paging-runtime-ktx", version.ref = "paging" }
 paging-compose = { group = "androidx.paging", name = "paging-compose", version.ref = "paging" }
+
+# Huawei AGConnect Gradle Plugin
+agconnect-gradle-plugin = { group = "com.huawei.agconnect", name = "agcp", version.ref = "agconnectPlugin" }
+agconnect-core = { group = "com.huawei.agconnect", name = "agconnect-core", version.ref = "agconnectPlugin" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
