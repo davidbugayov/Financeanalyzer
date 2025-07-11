@@ -38,6 +38,7 @@ import com.davidbugayov.financeanalyzer.presentation.home.model.TransactionFilte
 import com.davidbugayov.financeanalyzer.presentation.home.state.HomeState
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import timber.log.Timber
+import androidx.compose.ui.platform.LocalContext
 
 /**
  * Компактный макет для телефонов
@@ -62,13 +63,6 @@ private fun CompactBalanceAndFilters(
         onFilterSelected = onFilterSelected,
     )
 
-    var showTips by remember { mutableStateOf(true) }
-    if (showTips) {
-        HomeTipsCard(
-            onClose = { showTips = false },
-            modifier = Modifier.padding(vertical = 8.dp),
-        )
-    }
     HomeTransactionsHeader(
         currentFilter = state.currentFilter,
         showGroupSummary = showGroupSummary,
@@ -232,23 +226,32 @@ fun CompactLayout(
                 CompactEmptyState(onAddClick)
             }
             else -> {
-                val headerContent: (@Composable () -> Unit)? =
-                    if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
-                        {
-                            Column {
-                                HomeGroupSummary(
-                                    filteredTransactions = state.filteredTransactions,
-                                    totalIncome = state.filteredIncome,
-                                    totalExpense = state.filteredExpense,
-                                    currentFilter = state.currentFilter,
-                                    balance = state.filteredBalance,
-                                )
-                                Spacer(modifier = Modifier.height(8.dp))
-                            }
+                val context = LocalContext.current
+                val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", 0) }
+                var showTips by remember { mutableStateOf(!prefs.getBoolean("tips_hidden", false)) }
+
+                val headerContent: (@Composable () -> Unit) = {
+                    Column {
+                        if (showTips) {
+                            HomeTipsCard(
+                                onClose = {
+                                    showTips = false
+                                    prefs.edit().putBoolean("tips_hidden", true).apply()
+                                },
+                                modifier = Modifier.padding(bottom = 8.dp),
+                            )
                         }
-                    } else {
-                        null
+                        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+                            HomeGroupSummary(
+                                filteredTransactions = state.filteredTransactions,
+                                totalIncome = state.filteredIncome,
+                                totalExpense = state.filteredExpense,
+                                currentFilter = state.currentFilter,
+                                balance = state.filteredBalance,
+                            )
+                        }
                     }
+                }
 
                 TransactionPagingList(
                     items = itemsToDisplay,
