@@ -199,23 +199,13 @@ android {
         }
         debug {
             isDebuggable = true
-            applicationIdSuffix = ".debug"
+            // applicationIdSuffix removed to keep same package for AGConnect compatibility
             versionNameSuffix = "-debug"
             buildConfigField("boolean", "DEBUG", "true")
             resValue("string", "app_name", "Finanalyzer Debug")
 
             // Enable Compose inspection
             manifestPlaceholders["enableComposeCompilerReports"] = "true"
-        }
-    }
-
-    variantFilter {
-        val buildType = buildType?.name
-        val flavorNames = flavors.map { it.name }
-        if (buildType == "debug" && flavorNames.contains("huawei")) {
-            // Remove applicationIdSuffix for huaweiDebug so that packageName matches agconnect config
-            setIgnore(false)
-            mergedFlavor.applicationIdSuffix = ""
         }
     }
 
