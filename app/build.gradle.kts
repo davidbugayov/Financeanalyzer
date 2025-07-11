@@ -209,6 +209,16 @@ android {
         }
     }
 
+    variantFilter {
+        val buildType = buildType?.name
+        val flavorNames = flavors.map { it.name }
+        if (buildType == "debug" && flavorNames.contains("huawei")) {
+            // Remove applicationIdSuffix for huaweiDebug so that packageName matches agconnect config
+            setIgnore(false)
+            mergedFlavor.applicationIdSuffix = ""
+        }
+    }
+
     // Указываем исходные директории для каждого флейвора
     sourceSets {
         getByName("google") {
