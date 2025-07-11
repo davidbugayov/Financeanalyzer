@@ -1,0 +1,23 @@
+{
+  "project_info": {
+    "project_number": "0",
+    "project_id": "placeholder"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:0:android:0",
+        "android_client_info": {
+          "package_name": "com.davidbugayov.financeanalyzer"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyD-PLACEHOLDER"
+        }
+      ]
+    }
+  ],
+  "configuration_version": "1"
+}
