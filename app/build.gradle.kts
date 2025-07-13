@@ -13,11 +13,6 @@ plugins {
     alias(libs.plugins.firebase.perf)
 }
 
-// Функция для определения, является ли текущая сборка F-Droid
-fun isNotFDroidBuild(): Boolean {
-    return System.getenv("FDROID_BUILD") != "1"
-}
-
 fun getKeystoreProperties(): Properties {
     val properties = Properties()
     val propertiesFile = rootProject.file("keystore/keystore.properties")
@@ -35,7 +30,7 @@ android {
         applicationId = "com.davidbugayov.financeanalyzer"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = libs.versions.compileSdk.get().toInt()
-        versionCode = 41
+        versionCode = 42
         versionName = "2.22.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

@@ -2,6 +2,7 @@ package com.davidbugayov.financeanalyzer.feature.profile
 import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Context
+import android.os.Build
 import android.os.SystemClock
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -98,7 +99,13 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
     val appVersion = remember { packageInfo?.versionName ?: context.getString(R.string.unknown) }
 
     @SuppressLint("NewApi")
-    val buildVersion = remember { (packageInfo?.longVersionCode ?: 0L).toString() }
+    val buildVersion = remember { 
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            (packageInfo?.longVersionCode ?: 0L).toString()
+        } else {
+            (packageInfo?.versionCode ?: 0).toString()
+        }
+    }
 
     // Отслеживаем время загрузки экрана
     val screenLoadStartTime = remember { SystemClock.elapsedRealtime() }

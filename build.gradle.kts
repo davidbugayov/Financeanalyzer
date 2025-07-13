@@ -102,5 +102,7 @@ buildscript {
     }
     dependencies {
         classpath(libs.agconnect.gradle.plugin)
+        // AGConnect plugin expects explicit AGP classpath
+        classpath("com.android.tools.build:gradle:${libs.versions.androidGradlePlugin.get()}")
     }
 }

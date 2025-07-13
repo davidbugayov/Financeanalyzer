@@ -11,6 +11,7 @@ import com.davidbugayov.financeanalyzer.analytics.IAnalytics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.google.firebase.FirebaseApp
 import com.google.firebase.analytics.FirebaseAnalytics
+import com.google.firebase.perf.FirebasePerformance
 import io.appmetrica.analytics.AppMetrica
 import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
@@ -33,6 +34,14 @@ val analyticsModule =
                 composite.addAnalytics(FirebaseAnalyticsAdapter(firebaseAnalytics))
             } catch (e: Exception) {
                 Timber.e(e, "Error initializing Firebase Analytics")
+            }
+
+            // Firebase Performance
+            try {
+                FirebasePerformance.getInstance()
+                Timber.d("Firebase Performance initialized successfully")
+            } catch (e: Exception) {
+                Timber.e(e, "Error initializing Firebase Performance")
             }
 
             // AppMetrica Analytics
