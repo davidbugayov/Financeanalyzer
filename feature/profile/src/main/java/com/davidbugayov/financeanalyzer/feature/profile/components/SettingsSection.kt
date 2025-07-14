@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.Payments
 import androidx.compose.material.icons.filled.Timer
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -51,7 +50,6 @@ import com.davidbugayov.financeanalyzer.utils.Time
  * @param hasNotificationPermission Флаг наличия разрешения на уведомления.
  * @param modifier Модификатор для настройки внешнего вида.
  */
-@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SettingsSection(
     onThemeClick: () -> Unit,
@@ -145,12 +143,12 @@ fun SettingsActionCard(
     onClick: () -> Unit,
 ) {
     Card(
+        onClick = onClick,
         modifier =
             Modifier
                 .fillMaxWidth()
                 .padding(vertical = 4.dp, horizontal = 0.dp)
-                .background(Color.Transparent)
-                .clickable(onClick = onClick),
+                .background(Color.Transparent),
         elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
         shape = RoundedCornerShape(18.dp),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),

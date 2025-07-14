@@ -7,6 +7,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.combinedClickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -27,6 +28,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -244,11 +246,7 @@ fun TransactionItem(
                 .graphicsLayer {
                     alpha = animatedAlpha
                     translationY = animatedTranslationY
-                }
-                .combinedClickable(
-                    onClick = { onClick(transaction) },
-                    onLongClick = { onTransactionLongClick(transaction) },
-                ),
+                },
         elevation =
             CardDefaults.cardElevation(
                 defaultElevation = dimensionResource(id = R.dimen.card_elevation_default),
@@ -263,6 +261,12 @@ fun TransactionItem(
             modifier =
                 Modifier
                     .fillMaxWidth()
+                    .combinedClickable(
+                        interactionSource = remember { MutableInteractionSource() },
+                        indication = ripple(bounded = true),
+                        onClick = { onClick(transaction) },
+                        onLongClick = { onTransactionLongClick(transaction) },
+                    )
                     .padding(dimensionResource(id = R.dimen.card_content_padding_medium)),
             verticalAlignment = Alignment.CenterVertically,
         ) {
