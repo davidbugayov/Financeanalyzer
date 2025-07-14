@@ -4,6 +4,7 @@ import android.os.Bundle
 import java.io.PrintWriter
 import java.io.StringWriter
 import timber.log.Timber
+import io.appmetrica.analytics.AppMetrica
 
 /**
  * Класс для отслеживания и анализа ошибок приложения.
@@ -46,6 +47,8 @@ object ErrorTracker {
             }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.ERROR, params)
+        // Отправляем ошибку в AppMetrica
+        AppMetrica.reportError("ERROR: $errorType - $errorMessage", null)
     }
 
     /**
@@ -92,6 +95,12 @@ object ErrorTracker {
 
         val eventName = if (isFatal) AnalyticsConstants.Events.APP_CRASH else AnalyticsConstants.Events.APP_EXCEPTION
         AnalyticsUtils.logEvent(eventName, params)
+        // Отправляем ошибку в AppMetrica
+        if (isFatal) {
+            AppMetrica.reportUnhandledException(throwable)
+        } else {
+            AppMetrica.reportError("APP_EXCEPTION: $errorType - $errorMessage", throwable)
+        }
     }
 
     /**

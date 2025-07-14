@@ -8,6 +8,7 @@ import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import java.io.PrintWriter
 import java.io.StringWriter
 import timber.log.Timber
+import io.appmetrica.analytics.AppMetrica
 
 /**
  * Centralized crash reporting system that captures uncaught exceptions
@@ -65,6 +66,8 @@ object CrashReporter {
             }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.APP_ERROR, params)
+        // Отправляем ошибку в AppMetrica
+        AppMetrica.reportError("APP_ERROR: $errorType - $errorMessage", throwable)
     }
 
     /**
@@ -97,6 +100,8 @@ object CrashReporter {
             }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.APP_EXCEPTION, params)
+        // Отправляем ошибку в AppMetrica
+        AppMetrica.reportError("APP_EXCEPTION: $errorType - $errorMessage", throwable)
     }
 
     /**
@@ -129,6 +134,8 @@ object CrashReporter {
             }
 
         AnalyticsUtils.logEvent(AnalyticsConstants.Events.APP_CRASH, params)
+        // Отправляем фатальный крэш в AppMetrica
+        AppMetrica.reportUnhandledException(throwable)
     }
 
     /**
