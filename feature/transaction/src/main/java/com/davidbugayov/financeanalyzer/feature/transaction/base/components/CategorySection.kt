@@ -25,6 +25,7 @@ import androidx.compose.material.icons.filled.Category
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -119,37 +120,43 @@ fun CategorySection(
                         ),
                 )
                 if (!expanded) {
-                    Text(
-                        text = stringResource(R.string.show_more_categories),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier =
-                            Modifier
-                                .clickable { setExpanded(true) }
-                                .padding(
-                                    vertical =
-                                        dimensionResource(
-                                            R.dimen.category_expand_text_padding_vertical,
-                                        ),
-                                ),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                    TextButton(
+                        onClick = { setExpanded(true) },
+                    ) {
+                        Text(
+                            text = stringResource(R.string.show_more_categories),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier =
+                                Modifier
+                                    .padding(
+                                        vertical =
+                                            dimensionResource(
+                                                R.dimen.category_expand_text_padding_vertical,
+                                            ),
+                                    ),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 } else {
-                    Text(
-                        text = stringResource(R.string.hide_categories),
-                        color = MaterialTheme.colorScheme.primary,
-                        modifier =
-                            Modifier
-                                .clickable { setExpanded(false) }
-                                .padding(
-                                    vertical =
-                                        dimensionResource(
-                                            R.dimen.category_expand_text_padding_vertical,
-                                        ),
-                                ),
-                        textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.bodyMedium,
-                    )
+                    TextButton(
+                        onClick = { setExpanded(false) },
+                    ) {
+                        Text(
+                            text = stringResource(R.string.hide_categories),
+                            color = MaterialTheme.colorScheme.primary,
+                            modifier =
+                                Modifier
+                                    .padding(
+                                        vertical =
+                                            dimensionResource(
+                                                R.dimen.category_expand_text_padding_vertical,
+                                            ),
+                                    ),
+                            textAlign = TextAlign.Center,
+                            style = MaterialTheme.typography.bodyMedium,
+                        )
+                    }
                 }
             }
         }
