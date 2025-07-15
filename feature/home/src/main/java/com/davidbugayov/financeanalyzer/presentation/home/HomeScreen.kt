@@ -29,7 +29,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.paging.compose.collectAsLazyPagingItems
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
@@ -261,7 +261,6 @@ fun HomeScreen(
     editViewModel: EditTransactionViewModel = koinViewModel(),
     updateWidgetsUseCase: UpdateWidgetsUseCase = koinInject(),
     userEventTracker: UserEventTracker = koinInject(),
-    errorTracker: ErrorTracker = koinInject(),
 ) {
     val state by viewModel.state.collectAsState()
     val context = LocalContext.current
@@ -308,14 +307,7 @@ fun HomeScreen(
             Timber.e(e, "Ошибка при загрузке данных для главного экрана")
 
             // Отслеживаем ошибку
-            errorTracker.trackException(
-                e,
-                isFatal = false,
-                mapOf(
-                    "location" to "home_screen",
-                    "action" to "load_data",
-                ),
-            )
+            CrashLoggerProvider.crashLogger.logException(e)
         }
 
         // Завершаем отслеживание загрузки экрана

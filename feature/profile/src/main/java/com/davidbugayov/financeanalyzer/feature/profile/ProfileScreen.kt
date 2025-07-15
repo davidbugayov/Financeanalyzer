@@ -70,6 +70,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Экран профиля пользователя.
@@ -89,7 +90,8 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
 
     // Получаем компоненты аналитики из ViewModel
     val userEventTracker = viewModel.userEventTracker
-    val errorTracker = viewModel.errorTracker
+    // val errorTracker = viewModel.errorTracker
+    val crashLogger = CrashLoggerProvider.crashLogger
 
     val packageInfo =
         remember {
@@ -153,14 +155,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
             Timber.e(e, "Ошибка при запросе оценки в RuStore")
 
             // Отслеживаем ошибку
-            errorTracker.trackException(
-                e,
-                isFatal = false,
-                mapOf(
-                    "location" to "profile_screen",
-                    "action" to "request_review",
-                ),
-            )
+            CrashLoggerProvider.crashLogger.logException(e)
         }
 
         // Завершаем отслеживание загрузки экрана
@@ -211,15 +206,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 Timber.e(e, "Failed to start activity for intent: $intent")
 
                 // Отслеживаем ошибку
-                errorTracker.trackException(
-                    e,
-                    isFatal = false,
-                    mapOf(
-                        "location" to "profile_screen",
-                        "action" to "start_activity",
-                        "intent" to intent.toString(),
-                    ),
-                )
+                CrashLoggerProvider.crashLogger.logException(e)
 
                 scope.launch {
                     snackbarHostState.showSnackbar(

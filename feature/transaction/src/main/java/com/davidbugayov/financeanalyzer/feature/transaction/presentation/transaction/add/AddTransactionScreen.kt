@@ -12,7 +12,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsConstants
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.feature.transaction.R
@@ -34,7 +34,6 @@ fun AddTransactionScreen(
     forceExpense: Boolean? = null,
     viewModel: AddTransactionViewModel = koinViewModel(),
     userEventTracker: UserEventTracker = koinInject(),
-    errorTracker: ErrorTracker = koinInject(),
 ) {
     val context = LocalContext.current
     val state by viewModel.state.collectAsState()
@@ -81,14 +80,7 @@ fun AddTransactionScreen(
             Timber.e(e, "Ошибка при инициализации экрана добавления транзакции")
 
             // Отслеживаем ошибку
-            errorTracker.trackException(
-                e,
-                isFatal = false,
-                mapOf(
-                    "location" to "add_transaction_screen",
-                    "action" to "initialize_screen",
-                ),
-            )
+            CrashLoggerProvider.crashLogger.logException(e)
         }
 
         // Завершаем отслеживание загрузки экрана

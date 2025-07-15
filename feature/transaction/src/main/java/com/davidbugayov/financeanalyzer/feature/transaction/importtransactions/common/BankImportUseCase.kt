@@ -12,6 +12,7 @@ import kotlinx.coroutines.flow.emitAll
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Абстрактный базовый UseCase для импорта транзакций из файла конкретного банка.
@@ -205,6 +206,7 @@ abstract class BankImportUseCase(
                                     "[ИМПОРТ-ОТЛАДКА] 🔍 Детали транзакции с ошибкой: ID=${transaction.id}, amount=${transaction.amount}, date=${transaction.date}, category=${transaction.category}, title=${transaction.title}",
                                 )
                                 Timber.e("[ИМПОРТ-ОТЛАДКА] 🔍 Стек вызовов: ${ex.stackTraceToString()}")
+                                CrashLoggerProvider.crashLogger.logDatabaseError("importTransactions", "Ошибка при сохранении транзакции ID=${transaction.id}", ex)
                             }
                         }
 

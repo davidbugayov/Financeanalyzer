@@ -1,11 +1,11 @@
 package com.davidbugayov.financeanalyzer.di
 
 import android.app.Application
+import android.content.Context
 import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
-import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.IAnalytics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
@@ -27,21 +27,38 @@ val analyticsModule =
             val app = androidContext() as Application
             val composite = CompositeAnalytics()
 
-            // Firebase Analytics
-            try {
-                FirebaseApp.initializeApp(app)
-                val firebaseAnalytics = FirebaseAnalytics.getInstance(app)
-                composite.addAnalytics(FirebaseAnalyticsAdapter(firebaseAnalytics))
-            } catch (e: Exception) {
-                Timber.e(e, "Error initializing Firebase Analytics")
+            // Проверка наличия GMS
+            fun isGmsAvailable(context: Context): Boolean {
+                return try {
+                    val gms = Class.forName("com.google.android.gms.common.GoogleApiAvailability")
+                    val method = gms.getMethod("isGooglePlayServicesAvailable", Context::class.java)
+                    val result = method.invoke(gms.getDeclaredConstructor().newInstance(), context) as Int
+                    result == 0
+                } catch (e: Exception) {
+                    false
+                }
             }
 
-            // Firebase Performance
-            try {
-                FirebasePerformance.getInstance()
-                Timber.d("Firebase Performance initialized successfully")
-            } catch (e: Exception) {
-                Timber.e(e, "Error initializing Firebase Performance")
+            // Firebase Analytics (только если есть GMS)
+            if (isGmsAvailable(app)) {
+                try {
+                    FirebaseApp.initializeApp(app)
+                    val firebaseAnalytics = FirebaseAnalytics.getInstance(app)
+                    composite.addAnalytics(FirebaseAnalyticsAdapter(firebaseAnalytics))
+                    Timber.d("Firebase Analytics initialized (GMS present)")
+                } catch (e: Exception) {
+                    Timber.e(e, "Error initializing Firebase Analytics")
+                }
+
+                // Firebase Performance
+                try {
+                    FirebasePerformance.getInstance()
+                    Timber.d("Firebase Performance initialized successfully")
+                } catch (e: Exception) {
+                    Timber.e(e, "Error initializing Firebase Performance")
+                }
+            } else {
+                Timber.w("GMS not available: Firebase Analytics will NOT be initialized on this device")
             }
 
             // AppMetrica Analytics
@@ -67,5 +84,4 @@ val analyticsModule =
 
         // Добавляем трекеры для аналитики
         single { UserEventTracker }
-        single { ErrorTracker }
     }

@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 abstract class AbstractPdfImportUseCase(
     context: Context,
@@ -230,6 +231,7 @@ abstract class AbstractPdfImportUseCase(
                                 e,
                                 "$currentBankName importTransactions: Ошибка при сохранении транзакции: ${transaction.title}",
                             )
+                            CrashLoggerProvider.crashLogger.logDatabaseError("importTransactions", "Ошибка при сохранении транзакции: ${transaction.title}", e)
                         }
                     }
                     Timber.i(

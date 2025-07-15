@@ -1,7 +1,6 @@
 package com.davidbugayov.financeanalyzer.analytics.di
 
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
 import com.davidbugayov.financeanalyzer.analytics.IAnalytics
 import com.davidbugayov.financeanalyzer.analytics.NoOpAnalytics
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
@@ -25,6 +24,5 @@ val analyticsUtilsModule =
 
         // Компоненты аналитики
         single { PerformanceMetrics }
-        single { ErrorTracker }
         single { UserEventTracker }
     }

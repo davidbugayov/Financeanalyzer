@@ -5,7 +5,6 @@ import com.davidbugayov.financeanalyzer.BuildConfig
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
 import com.davidbugayov.financeanalyzer.analytics.AppMetricaAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.CompositeAnalytics
-import com.davidbugayov.financeanalyzer.analytics.ErrorTracker
 import com.davidbugayov.financeanalyzer.analytics.FirebaseAnalyticsAdapter
 import com.davidbugayov.financeanalyzer.analytics.IAnalytics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
@@ -67,5 +66,4 @@ val analyticsModule =
 
         // Добавляем трекеры для аналитики
         single { UserEventTracker }
-        single { ErrorTracker }
     }

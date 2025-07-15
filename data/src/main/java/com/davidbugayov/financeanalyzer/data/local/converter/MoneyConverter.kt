@@ -5,6 +5,7 @@ import com.davidbugayov.financeanalyzer.core.model.Currency
 import com.davidbugayov.financeanalyzer.core.model.Money
 import java.math.BigDecimal
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 class MoneyConverter {
     @TypeConverter
@@ -41,6 +42,7 @@ class MoneyConverter {
                 Money(BigDecimal(amountStr), currency)
             } catch (e: NumberFormatException) {
                 Timber.e(e, "Failed to parse amount: $amountStr")
+                CrashLoggerProvider.crashLogger.logException(e)
                 throw IllegalArgumentException("Invalid amount format: $amountStr", e)
             }
         }

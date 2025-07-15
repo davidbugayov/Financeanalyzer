@@ -23,6 +23,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.withContext
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Класс для импорта транзакций из PDF-выписок Ozon Банка
@@ -244,6 +245,7 @@ class OzonPdfImportUseCase(
                 )
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при обработке транзакций: ${e.message}")
+                CrashLoggerProvider.crashLogger.logException(e)
                 emit(
                     ImportResult.Error(
                         exception = e,
@@ -271,6 +273,7 @@ class OzonPdfImportUseCase(
                     savedCount++
                 } catch (e: Exception) {
                     Timber.e(e, "Ошибка при сохранении транзакции: ${e.message}")
+                    CrashLoggerProvider.crashLogger.logDatabaseError("saveBatchOfTransactions", "Ошибка при сохранении транзакции", e)
                 }
             }
         } catch (e: Exception) {

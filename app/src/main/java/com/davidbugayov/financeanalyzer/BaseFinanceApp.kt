@@ -7,6 +7,7 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.di.allModules
@@ -51,21 +52,47 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
 
         // Инициализация системы отчетов об ошибках
         CrashReporter.init(this)
+        CrashLoggerProvider.crashLogger = CrashReporter.instance
 
-        // Инициализация Koin
-        initKoin()
+        try {
+            // Инициализация Koin
+            initKoin()
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка инициализации Koin")
+            CrashReporter.trackError("KoinInit", "Ошибка инициализации Koin: ${e.message}")
+        }
 
-        // Инициализация модулей
-        initModules()
+        try {
+            // Инициализация модулей
+            initModules()
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка инициализации модулей")
+            CrashReporter.trackError("ModuleInit", "Ошибка инициализации модулей: ${e.message}")
+        }
 
-        // Инициализация системы достижений
-        initAchievements()
+        try {
+            // Инициализация системы достижений
+            initAchievements()
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка инициализации системы достижений")
+            CrashReporter.trackError("AchievementsInit", "Ошибка инициализации системы достижений: ${e.message}")
+        }
 
-        // Логируем основные данные устройства для диагностики
-        logDeviceInfo()
+        try {
+            // Логируем основные данные устройства для диагностики
+            logDeviceInfo()
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка логирования device info")
+            CrashReporter.trackError("DeviceInfoLog", "Ошибка логирования device info: ${e.message}")
+        }
 
-        // Инициализируем специфичные для флейвора компоненты
-        initFlavor()
+        try {
+            // Инициализируем специфичные для флейвора компоненты
+            initFlavor()
+        } catch (e: Exception) {
+            Timber.e(e, "Ошибка инициализации flavor")
+            CrashReporter.trackError("FlavorInit", "Ошибка инициализации flavor: ${e.message}")
+        }
 
         // Регистрируем наблюдатель за жизненным циклом приложения
         ProcessLifecycleOwner.get().lifecycle.addObserver(this)
