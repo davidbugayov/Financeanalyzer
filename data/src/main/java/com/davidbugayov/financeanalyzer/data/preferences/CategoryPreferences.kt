@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.data.utils.GsonUtils
 import com.google.gson.Gson
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Класс для управления пользовательскими категориями через SharedPreferences.
@@ -56,6 +57,7 @@ class CategoryPreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving expense categories")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 
@@ -69,7 +71,8 @@ class CategoryPreferences private constructor(context: Context) {
                 gson.fromJson<List<CustomCategoryData>>(json, typeCustomCategoryList) ?: emptyList()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing expense categories")
-                emptyList()
+                CrashLoggerProvider.crashLogger.logException(e)
+                return emptyList()
             }
         } else {
             emptyList()
@@ -87,6 +90,7 @@ class CategoryPreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving income categories")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 
@@ -100,7 +104,8 @@ class CategoryPreferences private constructor(context: Context) {
                 gson.fromJson<List<CustomCategoryData>>(json, typeCustomCategoryList) ?: emptyList()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing income categories")
-                emptyList()
+                CrashLoggerProvider.crashLogger.logException(e)
+                return emptyList()
             }
         } else {
             emptyList()
@@ -160,6 +165,7 @@ class CategoryPreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving deleted default expense categories")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 
@@ -173,7 +179,8 @@ class CategoryPreferences private constructor(context: Context) {
                 GsonUtils.fromJsonToStringList(gson, json)
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing deleted default expense categories")
-                emptyList()
+                CrashLoggerProvider.crashLogger.logException(e)
+                return emptyList()
             }
         } else {
             emptyList()
@@ -191,6 +198,7 @@ class CategoryPreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving deleted default income categories")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 
@@ -204,7 +212,8 @@ class CategoryPreferences private constructor(context: Context) {
                 GsonUtils.fromJsonToStringList(gson, json)
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing deleted default income categories")
-                emptyList()
+                CrashLoggerProvider.crashLogger.logException(e)
+                return emptyList()
             }
         } else {
             emptyList()

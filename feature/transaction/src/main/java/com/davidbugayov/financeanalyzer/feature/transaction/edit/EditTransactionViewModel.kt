@@ -28,6 +28,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 class EditTransactionViewModel(
     private val getTransactionByIdUseCase: GetTransactionByIdUseCase,
@@ -170,6 +171,7 @@ class EditTransactionViewModel(
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
             Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая сумма")
+            CrashLoggerProvider.crashLogger.logException(Exception("Пустая сумма"))
         } else {
             try {
                 val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
@@ -179,10 +181,12 @@ class EditTransactionViewModel(
                         "ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %f",
                         amountValue,
                     )
+                    CrashLoggerProvider.crashLogger.logException(Exception("Сумма меньше или равна нулю: $amountValue"))
                 }
             } catch (e: Exception) {
                 validationBuilder.addAmountError()
                 Timber.e("ТРАНЗАКЦИЯ: Ошибка валидации при парсинге суммы: %s", e.message)
+                CrashLoggerProvider.crashLogger.logException(e)
             }
         }
 
@@ -190,6 +194,7 @@ class EditTransactionViewModel(
         if (categoryId.isBlank()) {
             validationBuilder.addCategoryError()
             Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая категория")
+            CrashLoggerProvider.crashLogger.logException(Exception("Пустая категория"))
         }
 
         // No validation for source - allowing empty sources
@@ -260,6 +265,9 @@ class EditTransactionViewModel(
                     Timber.e(
                         "ТРАНЗАКЦИЯ: Не удалось подготовить транзакцию к редактированию после парсинга суммы",
                     )
+                    CrashLoggerProvider.crashLogger.logException(
+                        Exception("Не удалось подготовить транзакцию к редактированию после парсинга суммы")
+                    )
                     return@launch
                 }
 
@@ -272,6 +280,7 @@ class EditTransactionViewModel(
             if (!isValid) {
                 _state.update { it.copy(isLoading = false) }
                 Timber.e("ТРАНЗАКЦИЯ: Валидация не прошла для суммы: $amountForValidation")
+                CrashLoggerProvider.crashLogger.logException(Exception("Валидация не прошла для суммы: $amountForValidation"))
                 return@launch
             }
 

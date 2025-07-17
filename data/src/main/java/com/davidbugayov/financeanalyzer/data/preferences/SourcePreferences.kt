@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import com.davidbugayov.financeanalyzer.data.utils.GsonUtils
 import com.google.gson.Gson
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Класс для управления источниками транзакций через SharedPreferences.
@@ -51,6 +52,7 @@ class SourcePreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving custom sources")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 
@@ -64,7 +66,8 @@ class SourcePreferences private constructor(context: Context) {
                 gson.fromJson<List<CustomSourceData>>(json, typeCustomSourceList) ?: emptyList()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing custom sources")
-                emptyList()
+                CrashLoggerProvider.crashLogger.logException(e)
+                return emptyList()
             }
         } else {
             emptyList()
@@ -106,6 +109,7 @@ class SourcePreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving deleted default sources")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 
@@ -119,7 +123,8 @@ class SourcePreferences private constructor(context: Context) {
                 GsonUtils.fromJsonToStringList(gson, json)
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing deleted default sources")
-                emptyList()
+                CrashLoggerProvider.crashLogger.logException(e)
+                return emptyList()
             }
         } else {
             emptyList()

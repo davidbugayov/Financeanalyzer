@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Класс для управления статистикой использования источников через SharedPreferences.
@@ -45,6 +46,7 @@ class SourceUsagePreferences private constructor(context: Context) {
                 gson.fromJson(json, type) ?: emptyMap()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing sources usage")
+                CrashLoggerProvider.crashLogger.logException(e)
                 emptyMap()
             }
         } else {
@@ -63,6 +65,7 @@ class SourceUsagePreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving sources usage")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 

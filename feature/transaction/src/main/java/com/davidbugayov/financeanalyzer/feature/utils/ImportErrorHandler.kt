@@ -1,6 +1,7 @@
 package com.davidbugayov.financeanalyzer.feature.utils
 
 import android.content.Context
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.feature.transaction.R
 import timber.log.Timber
 
@@ -21,6 +22,7 @@ object ImportErrorHandler {
     ): String {
         // Логирование ошибки
         Timber.e(error)
+        CrashLoggerProvider.crashLogger.logException(error ?: Exception("Unknown import error"))
 
         return when {
             error == null -> context.getString(R.string.import_unknown_error)

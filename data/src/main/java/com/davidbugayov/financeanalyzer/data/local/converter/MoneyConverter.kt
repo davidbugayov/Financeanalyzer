@@ -40,10 +40,10 @@ class MoneyConverter {
 
             try {
                 Money(BigDecimal(amountStr), currency)
-            } catch (e: NumberFormatException) {
+            } catch (e: Exception) {
                 Timber.e(e, "Failed to parse amount: $amountStr")
                 CrashLoggerProvider.crashLogger.logException(e)
-                throw IllegalArgumentException("Invalid amount format: $amountStr", e)
+                return null
             }
         }
     }

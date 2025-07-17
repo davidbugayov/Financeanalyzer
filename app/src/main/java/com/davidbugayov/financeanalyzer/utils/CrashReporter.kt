@@ -13,29 +13,29 @@ import com.davidbugayov.financeanalyzer.analytics.CrashLogger
 import com.davidbugayov.financeanalyzer.analytics.CrashlyticsUtils
 
 /**
- * Centralized crash reporting system that captures uncaught exceptions
- * and reports them through the analytics system.
+ * Централизованная система отчетности о сбоях, которая перехватывает неперехваченные исключения
+ * и отправляет их через систему аналитики.
  */
 object CrashReporter : CrashLogger {
-    private const val MAX_STACK_TRACE_LENGTH = 4000 // Limit stack trace length for analytics
+    private const val MAX_STACK_TRACE_LENGTH = 4000 // Ограничение длины стека для аналитики
 
     /**
-     * Initialize the crash reporter
-     * @param application Application instance
+     * Инициализация системы отчетности о сбоях
+     * @param application Экземпляр приложения
      */
     fun init(application: Application) {
-        // Preserve existing handler
+        // Сохраняем существующий обработчик
         val defaultHandler = Thread.getDefaultUncaughtExceptionHandler()
 
         Thread.setDefaultUncaughtExceptionHandler { thread, throwable ->
             try {
-                // Log detailed crash information
+                // Логируем подробную информацию о сбое
                 logCrash(throwable, application)
             } catch (e: Exception) {
-                // If crash reporting fails, log the error but don't crash again
-                Timber.e(e, "Error in crash reporting")
+                // Если отправка отчета о сбое не удалась, логируем ошибку, но не перезапускаем
+                Timber.e(e, "Ошибка при отправке отчета о сбое")
             } finally {
-                // Always delegate to default handler
+                // Всегда делегируем по умолчанию
                 defaultHandler?.uncaughtException(thread, throwable)
             }
         }
@@ -44,9 +44,9 @@ object CrashReporter : CrashLogger {
     }
 
     /**
-     * Log a non-fatal error that doesn't crash the app
-     * @param throwable The error to log
-     * @param message Optional message providing context about the error
+     * Логирует нефатальную ошибку, которая не приводит к краху приложения
+     * @param throwable Ошибка для логирования
+     * @param message Опциональное сообщение, предоставляющее контекст ошибки
      */
     fun logError(
         throwable: Throwable,
@@ -62,7 +62,7 @@ object CrashReporter : CrashLogger {
         val errorType = throwable::class.java.simpleName
         val errorMessage = throwable.message ?: "No message"
 
-        // Report to analytics
+        // Отправка в аналитику
         val params =
             android.os.Bundle().apply {
                 putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
@@ -77,9 +77,9 @@ object CrashReporter : CrashLogger {
     }
 
     /**
-     * Log a handled exception with custom parameters
-     * @param throwable The exception to log
-     * @param customParams Additional parameters to include with the error report
+     * Логирует обработанное исключение с пользовательскими параметрами
+     * @param throwable Исключение для логирования
+     * @param customParams Дополнительные параметры для включения в отчет об ошибке
      */
     fun logException(
         throwable: Throwable,
@@ -95,7 +95,7 @@ object CrashReporter : CrashLogger {
         val errorType = throwable::class.java.simpleName
         val errorMessage = throwable.message ?: "No message"
 
-        // Report to analytics
+        // Отправка в аналитику
         val params =
             android.os.Bundle().apply {
                 putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
@@ -103,7 +103,7 @@ object CrashReporter : CrashLogger {
                 putString(AnalyticsConstants.Params.STACK_TRACE, stackTrace)
                 putString(AnalyticsConstants.Params.IS_FATAL, "false")
 
-                // Add custom parameters
+                // Добавляем пользовательские параметры
                 customParams.forEach { (key, value) ->
                     putString(key, value)
                 }
@@ -115,7 +115,7 @@ object CrashReporter : CrashLogger {
     }
 
     /**
-     * Log details about a crash
+     * Логирует детали о сбое
      */
     private fun logCrash(
         throwable: Throwable,
@@ -131,7 +131,7 @@ object CrashReporter : CrashLogger {
             CrashlyticsUtils.logException(throwable)
         }
 
-        // Report to analytics
+        // Отправка в аналитику
         val params =
             android.os.Bundle().apply {
                 putString(AnalyticsConstants.Params.ERROR_TYPE, errorType)
@@ -153,7 +153,7 @@ object CrashReporter : CrashLogger {
     }
 
     /**
-     * Log a custom error (аналог trackError из ErrorTracker)
+     * Логирует пользовательскую ошибку (аналог trackError из ErrorTracker)
      */
     fun trackError(
         errorType: String,
@@ -170,7 +170,7 @@ object CrashReporter : CrashLogger {
     }
 
     /**
-     * Log a validation error (аналог trackValidationError из ErrorTracker)
+     * Логирует ошибку валидации (аналог trackValidationError из ErrorTracker)
      */
     fun trackValidationError(
         field: String,
@@ -186,7 +186,7 @@ object CrashReporter : CrashLogger {
     }
 
     /**
-     * Log a database error (аналог trackDatabaseError из ErrorTracker)
+     * Логирует ошибку базы данных (аналог trackDatabaseError из ErrorTracker)
      */
     fun trackDatabaseError(
         operation: String,
@@ -221,7 +221,7 @@ object CrashReporter : CrashLogger {
     }
 
     /**
-     * Convert a Throwable to a string representation of its stack trace
+     * Преобразует Throwable в строковое представление его стека вызовов
      */
     private fun getStackTraceString(throwable: Throwable): String {
         val sw = StringWriter()
@@ -229,7 +229,7 @@ object CrashReporter : CrashLogger {
         throwable.printStackTrace(pw)
         var stackTrace = sw.toString()
 
-        // Limit stack trace length for analytics
+        // Ограничиваем длину стека для аналитики
         if (stackTrace.length > MAX_STACK_TRACE_LENGTH) {
             stackTrace = stackTrace.substring(0, MAX_STACK_TRACE_LENGTH) + "... (truncated)"
         }

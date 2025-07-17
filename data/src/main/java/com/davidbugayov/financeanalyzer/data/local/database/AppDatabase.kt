@@ -14,6 +14,7 @@ import com.davidbugayov.financeanalyzer.data.local.converter.StringListConverter
 import com.davidbugayov.financeanalyzer.data.local.dao.TransactionDao
 import com.davidbugayov.financeanalyzer.data.local.entity.TransactionEntity
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Класс базы данных Room для приложения.
@@ -44,10 +45,14 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_1_2 = object : Migration(1, 2) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Добавляем колонку currencyCode с значением по умолчанию RUB
-                db.execSQL(
-                    "ALTER TABLE transactions ADD COLUMN currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}'",
-                )
+                try {
+                    db.execSQL(
+                        "ALTER TABLE transactions ADD COLUMN currencyCode TEXT NOT NULL DEFAULT '${Currency.RUB.code}'",
+                    )
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_1_2", "Ошибка миграции с 1 на 2", e)
+                    throw e
+                }
             }
         }
 
@@ -57,9 +62,10 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_2_3 = object : Migration(2, 3) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Создаем временную таблицу с новой схемой
-                db.execSQL(
-                    """
+                try {
+                    // Создаем временную таблицу с новой схемой
+                    db.execSQL(
+                        """
                     CREATE TABLE transactions_temp (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         amount REAL NOT NULL,
@@ -70,21 +76,25 @@ abstract class AppDatabase : RoomDatabase() {
                         note TEXT
                     )
                 """,
-                )
+                    )
 
-                // Копируем данные из старой таблицы в новую
-                db.execSQL(
-                    """
+                    // Копируем данные из старой таблицы в новую
+                    db.execSQL(
+                        """
                     INSERT INTO transactions_temp (id, amount, currencyCode, category, isExpense, date, note)
                     SELECT id, amount, currencyCode, category, isExpense, date, note FROM transactions
                 """,
-                )
+                    )
 
-                // Удаляем старую таблицу
-                db.execSQL("DROP TABLE transactions")
+                    // Удаляем старую таблицу
+                    db.execSQL("DROP TABLE transactions")
 
-                // Переименовываем временную таблицу
-                db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+                    // Переименовываем временную таблицу
+                    db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_2_3", "Ошибка миграции с 2 на 3", e)
+                    throw e
+                }
             }
         }
 
@@ -94,10 +104,15 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_3_4 = object : Migration(3, 4) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Добавляем колонку source с значением по умолчанию "Наличные"
-                db.execSQL(
-                    "ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Наличные'",
-                )
+                try {
+                    // Добавляем колонку source с значением по умолчанию "Наличные"
+                    db.execSQL(
+                        "ALTER TABLE transactions ADD COLUMN source TEXT NOT NULL DEFAULT 'Наличные'",
+                    )
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_3_4", "Ошибка миграции с 3 на 4", e)
+                    throw e
+                }
             }
         }
 
@@ -107,10 +122,15 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_4_5 = object : Migration(4, 5) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Добавляем колонку destination с значением по умолчанию "Наличные"
-                db.execSQL(
-                    "ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'",
-                )
+                try {
+                    // Добавляем колонку destination с значением по умолчанию "Наличные"
+                    db.execSQL(
+                        "ALTER TABLE transactions ADD COLUMN destination TEXT NOT NULL DEFAULT 'Наличные'",
+                    )
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_4_5", "Ошибка миграции с 4 на 5", e)
+                    throw e
+                }
             }
         }
 
@@ -120,9 +140,10 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_5_6 = object : Migration(5, 6) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Создаем временную таблицу с новой схемой
-                db.execSQL(
-                    """
+                try {
+                    // Создаем временную таблицу с новой схемой
+                    db.execSQL(
+                        """
                     CREATE TABLE transactions_temp (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         amount TEXT NOT NULL,
@@ -135,21 +156,25 @@ abstract class AppDatabase : RoomDatabase() {
                         destination TEXT NOT NULL DEFAULT 'Наличные'
                     )
                 """,
-                )
+                    )
 
-                // Копируем данные из старой таблицы в новую, преобразуя amount в TEXT
-                db.execSQL(
-                    """
+                    // Копируем данные из старой таблицы в новую, преобразуя amount в TEXT
+                    db.execSQL(
+                        """
                     INSERT INTO transactions_temp (id, amount, currencyCode, category, isExpense, date, note, source, destination)
                     SELECT id, CAST(amount AS TEXT), currencyCode, category, isExpense, date, note, source, destination FROM transactions
                 """,
-                )
+                    )
 
-                // Удаляем старую таблицу
-                db.execSQL("DROP TABLE transactions")
+                    // Удаляем старую таблицу
+                    db.execSQL("DROP TABLE transactions")
 
-                // Переименовываем временную таблицу
-                db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+                    // Переименовываем временную таблицу
+                    db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_5_6", "Ошибка миграции с 5 на 6", e)
+                    throw e
+                }
             }
         }
 
@@ -159,7 +184,12 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_6_7 = object : Migration(6, 7) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Миграция не требуется
+                try {
+                    // Миграция не требуется
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_6_7", "Ошибка миграции с 6 на 7", e)
+                    throw e
+                }
             }
         }
 
@@ -169,9 +199,10 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_7_8 = object : Migration(7, 8) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Создаем временную таблицу с правильной схемой
-                db.execSQL(
-                    """
+                try {
+                    // Создаем временную таблицу с правильной схемой
+                    db.execSQL(
+                        """
                     CREATE TABLE transactions_temp (
                         id INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL,
                         amount TEXT NOT NULL,
@@ -182,21 +213,25 @@ abstract class AppDatabase : RoomDatabase() {
                         source TEXT NOT NULL DEFAULT 'Сбер'
                     )
                     """,
-                )
+                    )
 
-                // Копируем данные из старой таблицы в новую, игнорируя лишние колонки
-                db.execSQL(
-                    """
+                    // Копируем данные из старой таблицы в новую, игнорируя лишние колонки
+                    db.execSQL(
+                        """
                     INSERT INTO transactions_temp (id, amount, category, isExpense, date, note, source)
                     SELECT id, amount, category, isExpense, date, note, source FROM transactions
                     """,
-                )
+                    )
 
-                // Удаляем старую таблицу
-                db.execSQL("DROP TABLE transactions")
+                    // Удаляем старую таблицу
+                    db.execSQL("DROP TABLE transactions")
 
-                // Переименовываем временную таблицу
-                db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+                    // Переименовываем временную таблицу
+                    db.execSQL("ALTER TABLE transactions_temp RENAME TO transactions")
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_7_8", "Ошибка миграции с 7 на 8", e)
+                    throw e
+                }
             }
         }
 
@@ -206,11 +241,16 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_8_9 = object : Migration(8, 9) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Эта миграция не изменяет структуру таблицы,
-                // а только синхронизирует схему Room с фактической схемой базы данных
-                // Можно добавить пустой блок или выполнить SQL для обновления данных
-                // Например, обновить источник "Сбер" на "Наличные" если нужно
-                db.execSQL("UPDATE transactions SET source = 'Наличные' WHERE source = 'Сбер'")
+                try {
+                    // Эта миграция не изменяет структуру таблицы,
+                    // а только синхронизирует схему Room с фактической схемой базы данных
+                    // Можно добавить пустой блок или выполнить SQL для обновления данных
+                    // Например, обновить источник "Сбер" на "Наличные" если нужно
+                    db.execSQL("UPDATE transactions SET source = 'Наличные' WHERE source = 'Сбер'")
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_8_9", "Ошибка миграции с 8 на 9", e)
+                    throw e
+                }
             }
         }
 
@@ -220,17 +260,22 @@ abstract class AppDatabase : RoomDatabase() {
          */
         private val MIGRATION_9_10 = object : Migration(9, 10) {
             override fun migrate(db: SupportSQLiteDatabase) {
-                // Добавляем колонку sourceColor с NULL значением по умолчанию
-                db.execSQL("ALTER TABLE transactions ADD COLUMN sourceColor INTEGER")
+                try {
+                    // Добавляем колонку sourceColor с NULL значением по умолчанию
+                    db.execSQL("ALTER TABLE transactions ADD COLUMN sourceColor INTEGER")
 
-                // Обновляем цвета для стандартных источников
-                db.execSQL("UPDATE transactions SET sourceColor = 0xFF21A038 WHERE source = 'Сбер'")
-                db.execSQL(
-                    "UPDATE transactions SET sourceColor = 0xFFFFDD2D WHERE source = 'Т-Банк'",
-                )
-                db.execSQL(
-                    "UPDATE transactions SET sourceColor = 0xFFEF3124 WHERE source = 'Альфа'",
-                )
+                    // Обновляем цвета для стандартных источников
+                    db.execSQL("UPDATE transactions SET sourceColor = 0xFF21A038 WHERE source = 'Сбер'")
+                    db.execSQL(
+                        "UPDATE transactions SET sourceColor = 0xFFFFDD2D WHERE source = 'Т-Банк'",
+                    )
+                    db.execSQL(
+                        "UPDATE transactions SET sourceColor = 0xFFEF3124 WHERE source = 'Альфа'",
+                    )
+                } catch (e: Exception) {
+                    CrashLoggerProvider.crashLogger.logDatabaseError("MIGRATION_9_10", "Ошибка миграции с 9 на 10", e)
+                    throw e
+                }
             }
         }
 

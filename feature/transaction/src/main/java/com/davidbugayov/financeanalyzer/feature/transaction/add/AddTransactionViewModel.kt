@@ -27,6 +27,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 class AddTransactionViewModel(
     private val addTransactionUseCase: AddTransactionUseCase,
@@ -109,6 +110,7 @@ class AddTransactionViewModel(
         if (amount.isBlank()) {
             validationBuilder.addAmountError()
             Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая сумма")
+            CrashLoggerProvider.crashLogger.logException(Exception("Пустая сумма"))
         } else {
             try {
                 val amountValue = amount.replace(",", ".").toBigDecimalOrNull() ?: BigDecimal.ZERO
@@ -118,16 +120,19 @@ class AddTransactionViewModel(
                         "ТРАНЗАКЦИЯ: Ошибка валидации - сумма меньше или равна нулю: %f",
                         amountValue,
                     )
+                    CrashLoggerProvider.crashLogger.logException(Exception("Сумма меньше или равна нулю: $amountValue"))
                 }
             } catch (e: Exception) {
                 validationBuilder.addAmountError()
                 Timber.e("ТРАНЗАКЦИЯ: Ошибка валидации при парсинге суммы: %s", e.message)
+                CrashLoggerProvider.crashLogger.logException(e)
             }
         }
 
         if (categoryId.isBlank()) {
             validationBuilder.addCategoryError()
             Timber.d("ТРАНЗАКЦИЯ: Ошибка валидации - пустая категория")
+            CrashLoggerProvider.crashLogger.logException(Exception("Пустая категория"))
         }
 
         val validationResult = validationBuilder.build()

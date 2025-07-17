@@ -25,6 +25,7 @@ import kotlinx.coroutines.launch
 import org.koin.core.component.KoinComponent
 import org.koin.core.component.inject
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * ViewModel для экрана импорта транзакций.
@@ -343,6 +344,7 @@ class ImportTransactionsViewModel(
                             val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
 
                             Timber.e(result.exception, "Ошибка импорта: $originalMessage")
+                            CrashLoggerProvider.crashLogger.logException(result.exception ?: Exception("Unknown import error"))
                             _state.value =
                                 _state.value.copy(
                                     isLoading = false,
@@ -373,6 +375,7 @@ class ImportTransactionsViewModel(
                             val userFriendlyMessage = errorHandler.getUserFriendlyErrorMessage(originalMessage)
 
                             Timber.e(result.exception, "Ошибка импорта (ImportResult.Error): $originalMessage")
+                            CrashLoggerProvider.crashLogger.logException(result.exception ?: Exception("Unknown import error"))
                             _state.value =
                                 _state.value.copy(
                                     isLoading = false,

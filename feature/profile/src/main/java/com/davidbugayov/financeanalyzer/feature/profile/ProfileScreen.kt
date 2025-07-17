@@ -153,8 +153,6 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Ошибка при запросе оценки в RuStore")
-
-            // Отслеживаем ошибку
             CrashLoggerProvider.crashLogger.logException(e)
         }
 
@@ -185,6 +183,7 @@ fun ProfileScreen(viewModel: ProfileViewModel = koinViewModel()) {
                 }
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка при отслеживании памяти")
+                CrashLoggerProvider.crashLogger.logException(e)
             }
         }
     }

@@ -6,6 +6,7 @@ import androidx.core.content.edit
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 /**
  * Класс для управления статистикой использования категорий через SharedPreferences.
@@ -46,6 +47,7 @@ class CategoryUsagePreferences private constructor(context: Context) {
                 gson.fromJson(json, type) ?: emptyMap()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing expense categories usage")
+                CrashLoggerProvider.crashLogger.logException(e)
                 emptyMap()
             }
         } else {
@@ -65,6 +67,7 @@ class CategoryUsagePreferences private constructor(context: Context) {
                 gson.fromJson(json, type) ?: emptyMap()
             } catch (e: Exception) {
                 Timber.e(e, "Error parsing income categories usage")
+                CrashLoggerProvider.crashLogger.logException(e)
                 emptyMap()
             }
         } else {
@@ -83,6 +86,7 @@ class CategoryUsagePreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving expense categories usage")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 
@@ -97,6 +101,7 @@ class CategoryUsagePreferences private constructor(context: Context) {
             }
         } catch (e: Exception) {
             Timber.e(e, "Error saving income categories usage")
+            CrashLoggerProvider.crashLogger.logException(e)
         }
     }
 

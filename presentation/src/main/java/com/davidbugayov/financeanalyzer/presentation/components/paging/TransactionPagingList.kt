@@ -25,6 +25,7 @@ import com.davidbugayov.financeanalyzer.presentation.categories.CategoriesViewMo
 import com.davidbugayov.financeanalyzer.presentation.components.TransactionItem
 import com.davidbugayov.financeanalyzer.ui.paging.TransactionListItem
 import timber.log.Timber
+import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 
 @Composable
 fun TransactionPagingList(
@@ -96,6 +97,7 @@ fun TransactionPagingList(
                 loadState.append is LoadState.Error -> {
                     val e = (loadState.append as LoadState.Error).error
                     Timber.e(e, "Paging append error")
+                    CrashLoggerProvider.crashLogger.logException(e)
                 }
             }
         }
