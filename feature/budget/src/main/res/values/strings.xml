@@ -1059,4 +1059,8 @@
   <string name="permission_settings_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Пожалуйста, предоставьте разрешение в настройках приложения.</string>
   <string name="permission_rationale">Для импорта файлов необходимо разрешение на доступ к файлам. Это позволит выбрать файл для импорта транзакций.</string>
   <string name="grant_permission">Разрешить</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="budget_over_limit_title">Внимание: превышен лимит бюджета</string>
+    <string name="budget_over_limit_message">Вы превысили лимит по следующим категориям: %1$s. Пожалуйста, пересмотрите расходы или увеличьте лимит.</string>
 </resources>

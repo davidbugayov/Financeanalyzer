@@ -11,6 +11,8 @@ import com.davidbugayov.financeanalyzer.core.util.fold
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
 import com.davidbugayov.financeanalyzer.domain.repository.TransactionRepository
 import com.davidbugayov.financeanalyzer.domain.usecase.analytics.CalculateBalanceMetricsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetSmartExpenseTipsUseCase
+import com.davidbugayov.financeanalyzer.domain.usecase.analytics.GetExpenseOptimizationRecommendationsUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.AddTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.DeleteTransactionUseCase
 import com.davidbugayov.financeanalyzer.domain.usecase.transaction.GetTransactionsForPeriodFlowUseCase
@@ -62,6 +64,8 @@ class HomeViewModel(
     private val repository: TransactionRepository,
     private val updateWidgetsUseCase: UpdateWidgetsUseCase,
     private val navigationManager: NavigationManager,
+    private val getSmartExpenseTipsUseCase: GetSmartExpenseTipsUseCase, // внедряем use case
+    private val getExpenseOptimizationRecommendationsUseCase: GetExpenseOptimizationRecommendationsUseCase, // внедряем use case
 ) : ViewModel(), KoinComponent {
     private val _state = MutableStateFlow(HomeState())
     val state: StateFlow<HomeState> = _state.asStateFlow()
@@ -506,10 +510,9 @@ class HomeViewModel(
                     stats
                 }
             val transactionGroups = groupTransactionsByDate(filteredTransactions)
-
-            Timber.d("HOME: Обновляем состояние в updateFilteredTransactions")
+            val tips = getSmartExpenseTipsUseCase.invoke(filteredTransactions)
+            val recommendations = getExpenseOptimizationRecommendationsUseCase.invoke(filteredTransactions)
             _state.update {
-                Timber.d("HOME: Внутри updateFilteredTransactions _state.update - старый isLoading: ${it.isLoading}")
                 it.copy(
                     filteredTransactions = filteredTransactions,
                     transactionGroups = transactionGroups,
@@ -517,6 +520,8 @@ class HomeViewModel(
                     filteredExpense = filteredExpense,
                     filteredBalance = filteredBalance,
                     isLoading = false,
+                    smartExpenseTips = tips, // обновляем советы
+                    expenseOptimizationRecommendations = recommendations, // сохраняем рекомендации
                 )
             }
             Timber.d("HOME: updateFilteredTransactions завершен, новый isLoading: ${_state.value.isLoading}")

@@ -83,6 +83,8 @@ import java.util.Date
 import java.util.Locale
 import org.koin.androidx.compose.koinViewModel
 import timber.log.Timber
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.feature.budget.R
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -745,6 +747,21 @@ fun BudgetScreen(viewModel: BudgetViewModel = koinViewModel()) {
                 }
             }
         }
+    }
+
+    if (state.overBudgetWallets.isNotEmpty()) {
+        AlertDialog(
+            onDismissRequest = {},
+            title = { Text(text = stringResource(R.string.budget_over_limit_title)) },
+            text = {
+                Text(text = stringResource(R.string.budget_over_limit_message, state.overBudgetWallets.joinToString(", ")))
+            },
+            confirmButton = {
+                Button(onClick = {/* TODO: скрыть предупреждение */}) {
+                    Text(text = stringResource(android.R.string.ok))
+                }
+            }
+        )
     }
 }
 

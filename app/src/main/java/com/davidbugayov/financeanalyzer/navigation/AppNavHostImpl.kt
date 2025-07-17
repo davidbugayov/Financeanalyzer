@@ -111,6 +111,9 @@ fun AppNavHostImpl(
                     endDate = Date(endDate),
                     periodType = periodType,
                     onNavigateBack = { navigationManager.navigate(NavigationManager.Command.NavigateUp) },
+                    onAddTransaction = {
+                        navigationManager.navigate(NavigationManager.Command.Navigate(Screen.AddTransaction.createRoute(forceExpense = true)))
+                    }
                 )
             }
         },

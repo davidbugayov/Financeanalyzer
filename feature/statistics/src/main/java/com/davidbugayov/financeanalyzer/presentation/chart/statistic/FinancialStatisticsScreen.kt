@@ -98,6 +98,7 @@ fun FinancialStatisticsScreen(
     periodType: com.davidbugayov.financeanalyzer.navigation.model.PeriodType? = null,
     startDate: Date? = null,
     endDate: Date? = null,
+    onAddTransaction: () -> Unit,
 ) {
     // Используем новую ViewModel
     val viewModel: EnhancedFinanceChartViewModel = viewModel()
@@ -217,9 +218,7 @@ fun FinancialStatisticsScreen(
                                         vertical = 16.dp,
                                     )
                                     .clickable {
-                                        viewModel.handleIntent(
-                                            EnhancedFinanceChartIntent.AddTransactionClicked,
-                                        )
+                                        onAddTransaction()
                                     },
                         ) {
                             Row(

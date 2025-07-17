@@ -1071,4 +1071,10 @@
     <string name="bubble_profile_message">Загляните в профиль, чтобы открыть достижения и настройки</string>
     <string name="bubble_statistics_message">Откройте статистику для анализа расходов и доходов</string>
 
+    <!-- Smart Tips -->
+    <string name="smart_tips_title">Советы по экономии</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="expense_optimization_title">Рекомендации по оптимизации расходов</string>
+
 </resources>

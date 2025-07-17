@@ -9,14 +9,9 @@ import androidx.compose.material.icons.filled.Person
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Scaffold
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.material3.Card
+import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.Column
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -59,6 +54,16 @@ import com.davidbugayov.financeanalyzer.utils.rememberWindowSize
 import org.koin.androidx.compose.koinViewModel
 import org.koin.compose.koinInject
 import timber.log.Timber
+import androidx.compose.ui.unit.dp
+import androidx.compose.runtime.*
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.Composable
 
 /**
  * Главный экран приложения.
@@ -533,5 +538,29 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
             },
         )
+        if (state.smartExpenseTips.isNotEmpty()) {
+            Card(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(text = stringResource(R.string.smart_tips_title))
+                    state.smartExpenseTips.forEach { tip ->
+                        Text(text = tip, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
+            }
+        }
+        if (state.expenseOptimizationRecommendations.isNotEmpty()) {
+            Card(
+                modifier = Modifier.padding(8.dp)
+            ) {
+                Column(modifier = Modifier.padding(8.dp)) {
+                    Text(text = stringResource(R.string.expense_optimization_title))
+                    state.expenseOptimizationRecommendations.forEach { rec ->
+                        Text(text = rec, modifier = Modifier.padding(top = 4.dp))
+                    }
+                }
+            }
+        }
     }
 }
