@@ -239,15 +239,7 @@ fun CompactLayout(
 
                 val headerContent: (@Composable () -> Unit) = {
                     Column {
-                        if (showTips) {
-                            HomeTipsCard(
-                                onClose = {
-                                    showTips = false
-                                    prefs.edit().putBoolean("tips_hidden", true).apply()
-                                },
-                                modifier = Modifier.padding(bottom = 8.dp),
-                            )
-                        }
+                        // HomeTipsCard удалён по решению UX
                         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
                             HomeGroupSummary(
                                 filteredTransactions = state.filteredTransactions,

@@ -201,6 +201,7 @@ fun FinancialStatisticsScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState),
                 ) {
+                    StatisticTipCard()
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
                     if (state.transactions.isEmpty()) {
                         Surface(

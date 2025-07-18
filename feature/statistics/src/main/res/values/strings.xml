@@ -1272,4 +1272,9 @@
     <string name="recommendation_reduce_small_expenses_title">Сократите мелкие расходы</string>
     <string name="recommendation_reduce_small_expenses_description">У вас %1$d расходных транзакций за период — проанализируйте мелкие траты, чтобы сократить ненужные покупки</string>
     <string name="recommendation_reduce_small_expenses_impact">Экономия до 5–10% в месяц</string>
+
+    <!-- New strings for FinanceChartScreen -->
+    <string name="statistics_tip_title">Аналитика — ваш инструмент роста</string>
+    <string name="statistics_tip_text">Используйте аналитику, чтобы находить скрытые возможности для экономии и роста. Сравнивайте периоды, анализируйте категории и принимайте решения на основе данных!</string>
+
 </resources>
