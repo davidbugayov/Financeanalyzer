@@ -37,10 +37,10 @@ object TestDataGenerator {
 
     /**
      * Генерирует список тестовых транзакций
-     * @param count Количество транзакций для генерации (по умолчанию 500)
+     * @param count Количество транзакций для генерации (по умолчанию 50)
      * @return Список сгенерированных транзакций за последний календарный месяц
      */
-    fun generateTransactions(count: Int = 500): List<Transaction> {
+    fun generateTransactions(count: Int = 50): List<Transaction> {
         val transactions = mutableListOf<Transaction>()
         val calendar = Calendar.getInstance()
 

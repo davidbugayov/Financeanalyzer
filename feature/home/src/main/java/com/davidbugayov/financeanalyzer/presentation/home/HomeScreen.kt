@@ -538,29 +538,29 @@ fun HomeScreen(
                 viewModel.onEvent(HomeEvent.HideDeleteConfirmDialog)
             },
         )
-        if (state.smartExpenseTips.isNotEmpty()) {
-            Card(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    Text(text = stringResource(R.string.smart_tips_title))
-                    state.smartExpenseTips.forEach { tip ->
-                        Text(text = tip, modifier = Modifier.padding(top = 4.dp))
-                    }
-                }
-            }
-        }
-        if (state.expenseOptimizationRecommendations.isNotEmpty()) {
-            Card(
-                modifier = Modifier.padding(8.dp)
-            ) {
-                Column(modifier = Modifier.padding(8.dp)) {
-                    Text(text = stringResource(R.string.expense_optimization_title))
-                    state.expenseOptimizationRecommendations.forEach { rec ->
-                        Text(text = rec, modifier = Modifier.padding(top = 4.dp))
-                    }
-                }
-            }
-        }
+//        if (state.smartExpenseTips.isNotEmpty()) {
+//            Card(
+//                modifier = Modifier.padding(8.dp)
+//            ) {
+//                Column(modifier = Modifier.padding(8.dp)) {
+//                    Text(text = stringResource(R.string.smart_tips_title))
+//                    state.smartExpenseTips.forEach { tip ->
+//                        Text(text = tip, modifier = Modifier.padding(top = 4.dp))
+//                    }
+//                }
+//            }
+//        }
+//        if (state.expenseOptimizationRecommendations.isNotEmpty()) {
+//            Card(
+//                modifier = Modifier.padding(8.dp)
+//            ) {
+//                Column(modifier = Modifier.padding(8.dp)) {
+//                    Text(text = stringResource(R.string.expense_optimization_title))
+//                    state.expenseOptimizationRecommendations.forEach { rec ->
+//                        Text(text = rec, modifier = Modifier.padding(top = 4.dp))
+//                    }
+//                }
+//            }
+//        }
     }
 }

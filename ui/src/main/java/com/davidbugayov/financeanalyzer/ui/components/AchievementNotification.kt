@@ -235,7 +235,7 @@ fun AchievementNotification(
                                     )
                                     Spacer(modifier = Modifier.width(4.dp))
                                     Text(
-                                        text = "+$rewardCoins",
+                                        text = "★ $rewardCoins",
                                         style = MaterialTheme.typography.labelLarge,
                                         fontWeight = FontWeight.Bold,
                                         color = Color(0xFFFFD700),
