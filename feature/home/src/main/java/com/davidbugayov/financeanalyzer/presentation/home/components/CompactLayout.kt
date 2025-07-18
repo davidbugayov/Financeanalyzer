@@ -193,6 +193,15 @@ fun CompactLayout(
         }
     }
 
+    // --- Добавлено: автоскролл при показе сводки ---
+    LaunchedEffect(showGroupSummary, state.filteredTransactions.size) {
+        if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
+            listState.animateScrollToItem(0)
+            Timber.d("CompactLayout: Скроллим к началу списка при показе сводки (fixed)")
+        }
+    }
+    // --- Конец добавления ---
+
     var stablePagingItems by remember { mutableStateOf(pagingItems) }
 
     // Обновляем cache, когда пришли данные
