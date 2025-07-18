@@ -31,6 +31,7 @@ import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHost
@@ -85,6 +86,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
 import kotlin.random.Random
+import androidx.compose.material.icons.outlined.Lightbulb
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -131,6 +133,7 @@ fun FinancialStatisticsScreen(
     )
     var tipIndex by remember { mutableStateOf(Random.nextInt(tips.size)) }
     val currentTip = tips[tipIndex]
+    var tipRequestedFromTopBar by remember { mutableStateOf(false) }
 
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
@@ -195,6 +198,25 @@ fun FinancialStatisticsScreen(
                 onBackClick = {
                     onNavigateBack()
                 },
+                actions = {
+                    if (!showTip) {
+                        IconButton(onClick = {
+                            var newIndex: Int
+                            do {
+                                newIndex = Random.nextInt(tips.size)
+                            } while (newIndex == tipIndex && tips.size > 1)
+                            tipIndex = newIndex
+                            showTip = true
+                            tipRequestedFromTopBar = true
+                        }) {
+                            Icon(
+                                imageVector = Icons.Outlined.Lightbulb,
+                                contentDescription = "Показать совет",
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                        }
+                    }
+                }
             )
         },
         snackbarHost = { SnackbarHost(snackbarHostState) },
@@ -221,31 +243,17 @@ fun FinancialStatisticsScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState),
                 ) {
-                    // --- Динамический типс: всегда разные, можно показать по кнопке ---
                     if (showTip) {
                         StatisticTipCard(
                             title = currentTip.first,
                             text = currentTip.second,
                             onClose = {
                                 showTip = false
+                                tipRequestedFromTopBar = false
                             }
                         )
-                    } else {
-                        Button(
-                            onClick = {
-                                var newIndex: Int
-                                do {
-                                    newIndex = Random.nextInt(tips.size)
-                                } while (newIndex == tipIndex && tips.size > 1)
-                                tipIndex = newIndex
-                                showTip = true
-                            },
-                            modifier = Modifier.padding(12.dp)
-                        ) {
-                            Text("Показать совет")
-                        }
                     }
-                    // --- Конец блока типса ---
+                    // --- Динамический типс: всегда разные, можно показать по кнопке ---
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
                     if (state.transactions.isEmpty()) {
                         Surface(
