@@ -27,6 +27,7 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
@@ -50,6 +51,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -127,7 +129,8 @@ fun FinancialStatisticsScreen(
         Pair("Планируйте бюджет", "Используйте аналитику для постановки финансовых целей и отслеживания прогресса."),
         Pair("Следите за сбережениями", "Проверьте, сколько месяцев вы сможете прожить на свои накопления — это ваш финансовый буфер.")
     )
-    val randomTip = remember { tips[Random.nextInt(tips.size)] }
+    var tipIndex by remember { mutableStateOf(Random.nextInt(tips.size)) }
+    val currentTip = tips[tipIndex]
 
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
@@ -218,16 +221,31 @@ fun FinancialStatisticsScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState),
                 ) {
+                    // --- Динамический типс: всегда разные, можно показать по кнопке ---
                     if (showTip) {
                         StatisticTipCard(
-                            title = randomTip.first,
-                            text = randomTip.second,
+                            title = currentTip.first,
+                            text = currentTip.second,
                             onClose = {
                                 showTip = false
-                                prefs.edit().putBoolean("show_statistics_tip", false).apply()
                             }
                         )
+                    } else {
+                        Button(
+                            onClick = {
+                                var newIndex: Int
+                                do {
+                                    newIndex = Random.nextInt(tips.size)
+                                } while (newIndex == tipIndex && tips.size > 1)
+                                tipIndex = newIndex
+                                showTip = true
+                            },
+                            modifier = Modifier.padding(12.dp)
+                        ) {
+                            Text("Показать совет")
+                        }
                     }
+                    // --- Конец блока типса ---
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
                     if (state.transactions.isEmpty()) {
                         Surface(
