@@ -108,13 +108,6 @@ class FinanceApp : BaseFinanceApp() {
     }
 
     override fun onCreate() {
-        val config = AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
-            .withLogs()
-            .withSessionTimeout(60)
-            .withCrashReporting(true)
-            .build()
-        AppMetrica.activate(this, config)
-        AppMetrica.enableActivityAutoTracking(this)
         super.onCreate()
     }
 }

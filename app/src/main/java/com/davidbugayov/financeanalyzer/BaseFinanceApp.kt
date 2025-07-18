@@ -17,6 +17,8 @@ import com.davidbugayov.financeanalyzer.feature.transaction.di.TransactionModule
 import com.davidbugayov.financeanalyzer.ui.components.AchievementEngineProvider
 import com.davidbugayov.financeanalyzer.utils.CrashReporter
 import com.davidbugayov.financeanalyzer.utils.MemoryUtils
+import io.appmetrica.analytics.AppMetrica
+import io.appmetrica.analytics.AppMetricaConfig
 import org.koin.android.ext.koin.androidContext
 import org.koin.android.ext.koin.androidLogger
 import org.koin.core.component.KoinComponent
@@ -48,6 +50,22 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
         // Настройка Timber для логирования
         if (BuildConfig.DEBUG) {
             Timber.plant(Timber.DebugTree())
+        }
+
+        // Инициализация AppMetrica только для релизных билдов
+        if (!BuildConfig.DEBUG) {
+            try {
+                val config = AppMetricaConfig.newConfigBuilder(BuildConfig.APPMETRICA_API_KEY)
+                    .withLogs()
+                    .withSessionTimeout(60)
+                    .withCrashReporting(true)
+                    .build()
+                AppMetrica.activate(this, config)
+                AppMetrica.enableActivityAutoTracking(this)
+                Timber.d("AppMetrica успешно инициализирована (release build)")
+            } catch (e: Exception) {
+                Timber.e(e, "Ошибка инициализации AppMetrica")
+            }
         }
 
         // Инициализация системы отчетов об ошибках
