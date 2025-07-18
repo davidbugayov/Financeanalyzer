@@ -1,5 +1,6 @@
 package com.davidbugayov.financeanalyzer.presentation.chart.statistic
 
+import android.content.Context
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -63,6 +64,7 @@ import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.FinancialHealthMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.LineChartTypeSelector
+import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.StatisticTipCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
@@ -80,6 +82,7 @@ import java.util.Locale
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import timber.log.Timber
+import kotlin.random.Random
 
 /**
  * Улучшенный экран с финансовыми графиками.
@@ -111,6 +114,20 @@ fun FinancialStatisticsScreen(
     var selectedCategory by remember { mutableStateOf<String?>(null) }
     val pagerState = rememberPagerState(pageCount = { 3 }, initialPage = 0)
     var lineChartDisplayMode by remember { mutableStateOf(LineChartDisplayMode.BOTH) }
+
+    val context = LocalContext.current
+    val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", Context.MODE_PRIVATE) }
+    var showTip by remember { mutableStateOf(prefs.getBoolean("show_statistics_tip", true)) }
+
+    // Список динамических советов
+    val tips = listOf(
+        Pair(stringResource(R.string.statistics_tip_title), stringResource(R.string.statistics_tip_text)),
+        Pair("Сравнивайте периоды", "Смотрите, как меняются ваши расходы и доходы от месяца к месяцу — ищите тренды!"),
+        Pair("Категории под контролем", "Анализируйте, на что уходит больше всего денег, и оптимизируйте свои траты."),
+        Pair("Планируйте бюджет", "Используйте аналитику для постановки финансовых целей и отслеживания прогресса."),
+        Pair("Следите за сбережениями", "Проверьте, сколько месяцев вы сможете прожить на свои накопления — это ваш финансовый буфер.")
+    )
+    val randomTip = remember { tips[Random.nextInt(tips.size)] }
 
     // Логируем открытие экрана и загружаем данные с учетом выбранного периода
     LaunchedEffect(Unit) {
@@ -201,7 +218,16 @@ fun FinancialStatisticsScreen(
                             .fillMaxSize()
                             .verticalScroll(scrollState),
                 ) {
-                    StatisticTipCard()
+                    if (showTip) {
+                        StatisticTipCard(
+                            title = randomTip.first,
+                            text = randomTip.second,
+                            onClose = {
+                                showTip = false
+                                prefs.edit().putBoolean("show_statistics_tip", false).apply()
+                            }
+                        )
+                    }
                     // Если нет транзакций, показываем кнопку "Добавить транзакцию" над графиками
                     if (state.transactions.isEmpty()) {
                         Surface(

@@ -3,10 +3,10 @@ package com.davidbugayov.financeanalyzer.presentation.chart.statistic.components
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -24,6 +24,8 @@ import com.davidbugayov.financeanalyzer.feature.statistics.R
 
 @Composable
 fun StatisticTipCard(
+    title: String,
+    text: String,
     modifier: Modifier = Modifier,
     onClose: () -> Unit = {},
 ) {
@@ -56,13 +58,13 @@ fun StatisticTipCard(
                     Spacer(modifier = Modifier.width(16.dp))
                     Column(modifier = Modifier.weight(1f)) {
                         Text(
-                            text = stringResource(R.string.statistics_tip_title),
+                            text = title,
                             style = MaterialTheme.typography.titleMedium,
                             color = MaterialTheme.colorScheme.primary,
                         )
                         Spacer(modifier = Modifier.height(6.dp))
                         Text(
-                            text = stringResource(R.string.statistics_tip_text),
+                            text = text,
                             style = MaterialTheme.typography.bodyMedium,
                             color = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
@@ -73,10 +75,10 @@ fun StatisticTipCard(
                     modifier = Modifier.align(Alignment.TopEnd)
                 ) {
                     Icon(
-                        imageVector = Icons.Default.BarChart,
+                        imageVector = Icons.Default.Close,
                         contentDescription = "Закрыть",
                         tint = MaterialTheme.colorScheme.primary,
-                        modifier = Modifier.size(0.dp) // скрываем иконку, можно заменить на close
+                        modifier = Modifier.size(22.dp)
                     )
                 }
             }
