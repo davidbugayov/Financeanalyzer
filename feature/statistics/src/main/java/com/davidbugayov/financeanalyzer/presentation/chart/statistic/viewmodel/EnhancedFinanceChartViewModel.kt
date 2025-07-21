@@ -82,7 +82,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
     private fun loadData() {
         viewModelScope.launch {
             try {
-                Timber.d("EnhancedFinanceChartViewModel: Начало загрузки транзакций для графиков")
                 _state.update { it.copy(isLoading = true, error = null) }
 
                 val filteredTransactions =
@@ -91,23 +90,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         _state.value.endDate,
                     )
                 allTransactions = filteredTransactions
-
-                Timber.d(
-                    "EnhancedFinanceChartViewModel: После фильтрации по дате осталось: %d транзакций",
-                    filteredTransactions.size,
-                )
-                Timber.d(
-                    "[DEBUG] Все транзакции за период: %s",
-                    filteredTransactions.map {
-                        String.format(
-                            "%s: %s (%s), категория: %s",
-                            it.date,
-                            it.amount,
-                            if (it.isExpense) "расход" else "доход",
-                            it.category,
-                        )
-                    },
-                )
 
                 val metrics =
                     calculateBalanceMetricsUseCase(
@@ -120,10 +102,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val savingsRate = metrics.savingsRate
                 val averageDailyExpense = metrics.averageDailyExpense
                 val monthsOfSavings = metrics.monthsOfSavings
-
-                Timber.d(
-                    "[DEBUG] Сумма доходов: $income, сумма расходов: $expense, баланс: ${income - expense}",
-                )
 
                 // Агрегируем по категориям
                 val expensesByCategory =
@@ -164,22 +142,6 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                 val categoryData = if (showExpenses) expensesByCategory else incomeByCategory
                 val pieChartData = preparePieChartData(categoryData, showExpenses)
 
-                Timber.d(
-                    "EnhancedFinanceChartViewModel: Категорий расходов: %d, доходов: %d",
-                    expensesByCategory.size,
-                    incomeByCategory.size,
-                )
-                if (!showExpenses) {
-                    Timber.d(
-                        "[DEBUG] incomeByCategory: %s",
-                        incomeByCategory.map { it.key + ": " + it.value.amount },
-                    )
-                    Timber.d(
-                        "[DEBUG] pieChartData (income): %s",
-                        pieChartData.map { it.name + ": " + it.money.amount + ", %: " + it.percentage },
-                    )
-                }
-
                 // --- Новое: получаем рекомендации ---
                 val financialMetrics = calculateEnhancedFinancialMetricsUseCase.invoke(filteredTransactions)
                 val recommendations = financialMetrics.recommendations
@@ -208,14 +170,7 @@ class EnhancedFinanceChartViewModel : ViewModel(), KoinComponent {
                         recommendations = recommendations,
                     )
                 }
-                Timber.d(
-                    "EnhancedFinanceChartViewModel: Загрузка транзакций для графиков завершена успешно",
-                )
             } catch (e: Exception) {
-                Timber.e(
-                    e,
-                    "EnhancedFinanceChartViewModel: Ошибка загрузки транзакций для графиков",
-                )
                 _state.update { it.copy(isLoading = false, error = e.message) }
                 _effect.emit(EnhancedFinanceChartEffect.ShowError(e.message ?: "Unknown error"))
             }

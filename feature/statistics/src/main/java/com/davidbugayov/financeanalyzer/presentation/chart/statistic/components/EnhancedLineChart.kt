@@ -198,24 +198,6 @@ fun EnhancedLineChart(
             0f to calculatedMaxValue.toFloat()
         }
 
-    // Логируем значения для отладки масштабирования
-    LaunchedEffect(
-        minValue,
-        maxValue,
-        hasIncomeData,
-        hasExpenseData,
-        incomeData.size,
-        expenseData.size,
-    ) {
-        Timber.d("EnhancedLineChart: Y range: $minValue - $maxValue")
-        Timber.d(
-            "EnhancedLineChart: Income - ${if (hasIncomeData) "${incomeData.size} points" else "no data"}",
-        )
-        Timber.d(
-            "EnhancedLineChart: Expense - ${if (hasExpenseData) "${expenseData.size} points" else "no data"}",
-        )
-    }
-
     // Получаем крайние даты для оси X, обрабатывая случай с одной точкой
     val (chartStartDate, chartEndDate) =
         remember(allPoints) {
@@ -231,7 +213,6 @@ fun EnhancedLineChart(
                     val start = calendar.timeInMillis
                     calendar.add(Calendar.DAY_OF_YEAR, 2) // +1 день от исходного
                     val end = calendar.timeInMillis
-                    Timber.d("EnhancedLineChart: Calculated range for single point: $start - $end")
                     start to end
                 } else {
                     minTime to maxTime
@@ -374,7 +355,6 @@ fun EnhancedLineChart(
                                 animatedProgress,
                             ) {
                                 detectTapGestures { offset ->
-                                    Timber.d("Tap detected in Canvas at $offset")
                                     val canvasWidth = size.width.toFloat()
                                     val canvasHeight = size.height.toFloat()
 
@@ -417,10 +397,6 @@ fun EnhancedLineChart(
                                             null
                                         }
 
-                                    Timber.d(
-                                        "findNearestPoint result - income: ${incomePoint?.value?.amount}, expense: ${expensePoint?.value?.amount}",
-                                    )
-
                                     val currentlySelected = selectedIncomePoint ?: selectedExpensePoint
 
                                     // Логика выбора ближайшей точки
@@ -451,9 +427,6 @@ fun EnhancedLineChart(
                                                         canvasHeight,
                                                         animatedProgress,
                                                     )
-                                                Timber.d(
-                                                    "Tap Handler: Both points. IncomeDist=$incomeDist, ExpenseDist=$expenseDist",
-                                                )
                                                 if (incomeDist <= expenseDist) incomePoint else expensePoint
                                             }
                                             incomePoint != null -> incomePoint
@@ -464,20 +437,15 @@ fun EnhancedLineChart(
                                     // Обновляем состояние, если выбор изменился или сбросился
                                     if (newSelection != currentlySelected) {
                                         if (newSelection == null) {
-                                            Timber.d(
-                                                "Tap Handler: No point found nearby or tapped empty space, clearing selection.",
-                                            )
                                             selectedIncomePoint = null
                                             selectedExpensePoint = null
                                             onPointSelected(null)
                                         } else {
                                             if (newSelection in incomeData) {
-                                                Timber.d("Tap Handler: Selecting income point.")
                                                 selectedIncomePoint = newSelection
                                                 selectedExpensePoint = null
                                                 onPointSelected(newSelection)
                                             } else if (newSelection in expenseData) {
-                                                Timber.d("Tap Handler: Selecting expense point.")
                                                 selectedIncomePoint = null
                                                 selectedExpensePoint = newSelection
                                                 onPointSelected(newSelection)
@@ -486,9 +454,6 @@ fun EnhancedLineChart(
                                     }
                                     // Если тапнули на уже выбранную точку - ничего не делаем
                                     else {
-                                        Timber.d(
-                                            "Tap Handler: Tapped on the already selected point or no change.",
-                                        )
                                     }
                                 }
                             }
@@ -667,16 +632,11 @@ fun EnhancedLineChart(
 
     // Отслеживаем изменения видимости и сбрасываем точки, если нужно
     LaunchedEffect(showIncome, showExpense) {
-        Timber.d(
-            "Visibility changed: showIncome=$showIncome, showExpense=$showExpense. Selected: I=${selectedIncomePoint?.value?.amount} E=${selectedExpensePoint?.value?.amount}",
-        )
         if (!showIncome && selectedIncomePoint != null) {
-            Timber.d("Hiding income, deselecting income point.")
             selectedIncomePoint = null
             if (selectedExpensePoint == null) onPointSelected(null)
         }
         if (!showExpense && selectedExpensePoint != null) {
-            Timber.d("Hiding expense, deselecting expense point.")
             selectedExpensePoint = null
             if (selectedIncomePoint == null) onPointSelected(null)
         }
@@ -688,10 +648,6 @@ fun EnhancedLineChart(
         } else if (selectedIncomePoint == null && selectedExpensePoint == null) {
             onPointSelected(null)
         }
-
-        Timber.d(
-            "Visibility change processed. Selected: I=${selectedIncomePoint?.value?.amount} E=${selectedExpensePoint?.value?.amount}",
-        )
     }
 }
 

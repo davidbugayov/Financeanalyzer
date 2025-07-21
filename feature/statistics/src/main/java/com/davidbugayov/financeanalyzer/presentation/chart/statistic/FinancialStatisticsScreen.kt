@@ -123,6 +123,13 @@ fun FinancialStatisticsScreen(
     val prefs = remember { context.getSharedPreferences("finance_analyzer_prefs", Context.MODE_PRIVATE) }
     var showTip by remember { mutableStateOf(prefs.getBoolean("show_statistics_tip", true)) }
 
+    // Показываем типс только один раз автоматически
+    LaunchedEffect(Unit) {
+        if (showTip) {
+            prefs.edit().putBoolean("show_statistics_tip", false).apply()
+        }
+    }
+
     // Список динамических советов
     val tips = listOf(
         Pair(stringResource(R.string.statistics_tip_title), stringResource(R.string.statistics_tip_text)),
@@ -381,32 +388,8 @@ fun FinancialStatisticsScreen(
                                     // Получаем данные категорий в зависимости от выбранного режима
                                     val categoryData =
                                         if (state.showExpenses) {
-                                            Timber.d(
-                                                "Данные по расходам за период ${DateUtils.formatDate(
-                                                    state.startDate,
-                                                )} – ${DateUtils.formatDate(
-                                                    state.endDate,
-                                                )}: ${state.expensesByCategory.size} категорий, сумма: ${state.expensesByCategory.values.fold(
-                                                    BigDecimal.ZERO,
-                                                ) { acc, money -> acc.add(money.amount) }}",
-                                            )
-                                            Timber.d(
-                                                "Список категорий расходов: ${state.expensesByCategory.keys.joinToString()}",
-                                            )
                                             state.expensesByCategory
                                         } else {
-                                            Timber.d(
-                                                "Данные по доходам за период ${DateUtils.formatDate(
-                                                    state.startDate,
-                                                )} – ${DateUtils.formatDate(
-                                                    state.endDate,
-                                                )}: ${state.incomeByCategory.size} категорий, сумма: ${state.incomeByCategory.values.fold(
-                                                    BigDecimal.ZERO,
-                                                ) { acc, money -> acc.add(money.amount) }}",
-                                            )
-                                            Timber.d(
-                                                "Список категорий доходов: ${state.incomeByCategory.keys.joinToString()}",
-                                            )
                                             state.incomeByCategory
                                         }
 

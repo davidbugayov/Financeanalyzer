@@ -141,17 +141,14 @@ private fun CompactTransactionList(
 
     // Логируем изменения состояния
     LaunchedEffect(state.isLoading) {
-        Timber.d("UI: CompactTransactionList - isLoading изменился на: ${state.isLoading}")
     }
 
     LaunchedEffect(state.filteredTransactions.size) {
-        Timber.d("UI: CompactTransactionList - количество транзакций изменилось на: ${state.filteredTransactions.size}")
     }
 
     LaunchedEffect(showGroupSummary) {
         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
             lazyListState.animateScrollToItem(0)
-            Timber.d("CompactLayout: Скроллим к началу списка при показе сводки")
         }
     }
 
@@ -159,12 +156,6 @@ private fun CompactTransactionList(
     val previousTransactionCount = remember { mutableStateOf(0) }
     val currentTransactionCount = state.filteredTransactions.size
 
-    Timber.d(
-        "UI: CompactTransactionList рендеринг - isLoading: ${state.isLoading}, транзакций: ${state.filteredTransactions.size}",
-    )
-
-    val pagingItems = remember { com.davidbugayov.financeanalyzer.presentation.home.HomeViewModel::class }
-    // NOTE: viewModel not accessible here; require param. Simplify: keep old for now.
 }
 
 @Composable
@@ -197,7 +188,6 @@ fun CompactLayout(
     LaunchedEffect(showGroupSummary, state.filteredTransactions.size) {
         if (showGroupSummary && state.filteredTransactions.isNotEmpty()) {
             listState.animateScrollToItem(0)
-            Timber.d("CompactLayout: Скроллим к началу списка при показе сводки (fixed)")
         }
     }
     // --- Конец добавления ---

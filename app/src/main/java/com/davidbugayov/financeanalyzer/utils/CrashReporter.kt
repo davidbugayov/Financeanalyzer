@@ -19,6 +19,11 @@ import com.davidbugayov.financeanalyzer.analytics.CrashlyticsUtils
 object CrashReporter : CrashLogger {
     private const val MAX_STACK_TRACE_LENGTH = 4000 // Ограничение длины стека для аналитики
 
+    @Volatile
+    var instance: CrashLogger = this
+    @JvmStatic
+    var isAppMetricaInitialized: Boolean = false
+
     /**
      * Инициализация системы отчетности о сбоях
      * @param application Экземпляр приложения
@@ -213,7 +218,15 @@ object CrashReporter : CrashLogger {
     }
 
     override fun logException(throwable: Throwable) {
-        logException(throwable, emptyMap())
+        if (!isAppMetricaInitialized) {
+            Timber.e(throwable, "[CrashReporter] AppMetrica не инициализирована, ошибка только в логах: %s", throwable.message)
+            return
+        }
+        try {
+            io.appmetrica.analytics.AppMetrica.reportError(throwable.message ?: "", throwable)
+        } catch (e: Exception) {
+            Timber.e(e, "[CrashReporter] Ошибка при отправке в AppMetrica: %s", e.message)
+        }
     }
 
     override fun logDatabaseError(operation: String, errorMessage: String, throwable: Throwable?) {
@@ -236,6 +249,4 @@ object CrashReporter : CrashLogger {
 
         return stackTrace
     }
-
-    var instance: CrashLogger = CrashReporter
 }

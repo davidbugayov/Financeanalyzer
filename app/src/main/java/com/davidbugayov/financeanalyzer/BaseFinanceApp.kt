@@ -63,14 +63,18 @@ abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinCom
                 AppMetrica.activate(this, config)
                 AppMetrica.enableActivityAutoTracking(this)
                 Timber.d("AppMetrica успешно инициализирована (release build)")
+                CrashReporter.isAppMetricaInitialized = true
             } catch (e: Exception) {
                 Timber.e(e, "Ошибка инициализации AppMetrica")
+                CrashReporter.isAppMetricaInitialized = false
             }
+        } else {
+            CrashReporter.isAppMetricaInitialized = false
         }
 
         // Инициализация системы отчетов об ошибках
-        CrashReporter.init(this)
-        CrashLoggerProvider.crashLogger = CrashReporter.instance
+        com.davidbugayov.financeanalyzer.utils.CrashReporter.init(this)
+        com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider.crashLogger = com.davidbugayov.financeanalyzer.utils.CrashReporter.instance
 
         try {
             // Инициализация Koin

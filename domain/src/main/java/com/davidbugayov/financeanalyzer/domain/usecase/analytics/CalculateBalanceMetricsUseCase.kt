@@ -15,7 +15,7 @@ class CalculateBalanceMetricsUseCase {
 
         val expense = transactions
             .filter { it.isExpense }
-            .sumOf { it.amount.amount }
+            .sumOf { it.amount.amount.abs() }
 
         val balance = income - expense
 

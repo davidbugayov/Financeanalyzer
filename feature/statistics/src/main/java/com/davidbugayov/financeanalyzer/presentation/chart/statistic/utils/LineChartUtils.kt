@@ -353,9 +353,8 @@ object LineChartUtils {
 
         var closestPoint: LineChartPoint? = null
         var minDistance = Float.MAX_VALUE
-        Timber.d("findNearestPoint: Checking points against threshold: $threshold") // Лог порога
 
-        points.forEachIndexed { index, point -> // Добавляем index для лога
+        points.forEachIndexed { index, point ->
             val normalizedX = (point.date.time - startDate).toFloat() / (endDate - startDate).toFloat()
             val normalizedY = 1f - (point.value.amount.toFloat() - minValue) / (maxValue - minValue)
 
@@ -364,22 +363,13 @@ object LineChartUtils {
 
             val distance = hypot(x - tapPosition.x, y - tapPosition.y)
 
-            // Логируем данные для каждой точки
-
             if (distance < threshold && distance < minDistance) {
-                Timber.d(
-                    "findNearestPoint [Point $index]: Found closer point within threshold. Updating minDistance to $distance",
-                ) // Лог обновления
                 minDistance = distance
                 closestPoint = point
             } else if (distance < threshold) {
-                Timber.d(
-                    "findNearestPoint [Point $index]: Point within threshold ($distance < $threshold) but not closer than current min ($minDistance)",
-                )
+                // No Timber.d here
             } else {
-                Timber.d(
-                    "findNearestPoint [Point $index]: Point outside threshold ($distance >= $threshold)",
-                )
+                // No Timber.d here
             }
         }
 

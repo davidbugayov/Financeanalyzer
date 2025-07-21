@@ -524,6 +524,7 @@ class HomeViewModel(
                     expenseOptimizationRecommendations = recommendations, // сохраняем рекомендации
                 )
             }
+            Timber.d("HOME: filteredBalance = ${filteredBalance.amount}")
             Timber.d("HOME: updateFilteredTransactions завершен, новый isLoading: ${_state.value.isLoading}")
             reloadPaged()
         }
