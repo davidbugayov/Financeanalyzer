@@ -265,8 +265,8 @@ fun FinancialDetailStatisticsScreen(
                             averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
                             topIncomeCategory = metrics.topIncomeCategory,
                             topExpenseCategory = metrics.topExpenseCategory,
-                            topExpenseCategories = metrics.topExpenseCategories.map { 
-                                it.key to it.value.format(true) 
+                            topExpenseCategories = metrics.topExpenseCategories.map {
+                                it.first to it.second.format(true)
                             },
                             mostFrequentExpenseDay = metrics.mostFrequentExpenseDay
                         )
@@ -317,7 +317,7 @@ fun FinancialDetailStatisticsScreen(
                         // Премиум карточка инсайтов расходов
                         val expenseInsights = FinancialDataMapper.createExpenseInsights(
                             topExpenseCategories = metrics.topExpenseCategories.map { 
-                                it.key to it.value.format(true) 
+                                it.first to it.second.format(true) 
                             },
                             savingsRate = metrics.savingsRate,
                             monthsOfSavings = metrics.monthsOfSavings,
@@ -343,7 +343,7 @@ fun FinancialDetailStatisticsScreen(
                         val spendingPatterns = FinancialDataMapper.createSpendingPatternInsights(
                             mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
                             expenseTransactionsCount = metrics.expenseTransactionsCount,
-                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount
+                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat()
                         )
                         
                         PremiumInsightsCard(
