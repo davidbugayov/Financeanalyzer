@@ -167,5 +167,7 @@
     <color name="financial_statistics_progress_attention">#EF5350</color>
 
   <!-- Pleasant blue for text -->
+    <color name="primaryContainer">#E3F2FD</color> <!-- светлый голубой фон карточки -->
+    <color name="onPrimaryContainer">#263238</color> <!-- тёмно-синий для текста/иконок на карточке -->
 
 </resources>
