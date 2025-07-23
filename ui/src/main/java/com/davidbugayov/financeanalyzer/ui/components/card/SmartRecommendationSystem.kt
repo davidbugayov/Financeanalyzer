@@ -32,6 +32,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * 🎯 Профессиональная система умных рекомендаций
@@ -40,8 +42,8 @@ import androidx.compose.ui.unit.sp
 @Composable
 fun SmartRecommendationCard(
     recommendations: List<SmartRecommendation>,
-    title: String = "💡 Персональные советы",
-    subtitle: String = "На основе анализа ваших финансов",
+    title: String = stringResource(R.string.smart_card_default_title),
+    subtitle: String = stringResource(R.string.smart_card_default_subtitle),
     style: SmartCardStyle = SmartCardStyle.ENHANCED,
     showPriorityIndicator: Boolean = true,
     onRecommendationClick: ((SmartRecommendation) -> Unit)? = null,

@@ -16,9 +16,11 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Analytics
 import androidx.compose.material.icons.filled.BarChart
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lightbulb
+import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.ThumbUp
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -41,13 +43,12 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.statistics.R
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ExpenseAnalysisCard
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ExpenseInsightsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SpendingPatternsCard
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.TransactionsStatisticsCard
+import com.davidbugayov.financeanalyzer.ui.components.card.PremiumStatisticsCard
+import com.davidbugayov.financeanalyzer.ui.components.card.PremiumInsightsCard
+import com.davidbugayov.financeanalyzer.ui.components.card.FinancialDataMapper
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
 import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
@@ -230,7 +231,25 @@ fun FinancialDetailStatisticsScreen(
                 }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        TransactionsStatisticsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
+                        // Премиум карточка статистики транзакций
+                        val transactionStats = FinancialDataMapper.createTransactionStatistics(
+                            totalTransactions = metrics.totalTransactions,
+                            incomeTransactionsCount = metrics.incomeTransactionsCount,
+                            expenseTransactionsCount = metrics.expenseTransactionsCount,
+                            averageIncomePerTransaction = metrics.averageIncomePerTransaction.format(true),
+                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.format(true),
+                            maxIncome = metrics.maxIncome.format(true),
+                            maxExpense = metrics.maxExpense.format(true),
+                            savingsRate = metrics.savingsRate,
+                            monthsOfSavings = metrics.monthsOfSavings
+                        )
+                        
+                        PremiumStatisticsCard(
+                            title = "Статистика транзакций",
+                            icon = Icons.Default.Receipt,
+                            statistics = transactionStats,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 item {
@@ -240,7 +259,25 @@ fun FinancialDetailStatisticsScreen(
                 }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        ExpenseAnalysisCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
+                        // Премиум карточка анализа расходов
+                        val expenseAnalysis = FinancialDataMapper.createExpenseAnalysis(
+                            averageDailyExpense = metrics.averageDailyExpense.format(true),
+                            averageMonthlyExpense = metrics.averageMonthlyExpense.format(true),
+                            topIncomeCategory = metrics.topIncomeCategory,
+                            topExpenseCategory = metrics.topExpenseCategory,
+                            topExpenseCategories = metrics.topExpenseCategories.map { 
+                                it.key to it.value.format(true) 
+                            },
+                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay
+                        )
+                        
+                        PremiumStatisticsCard(
+                            title = "Анализ расходов",
+                            icon = Icons.Default.Analytics,
+                            statistics = expenseAnalysis,
+                            accentColor = MaterialTheme.colorScheme.tertiary,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 item {
@@ -277,7 +314,22 @@ fun FinancialDetailStatisticsScreen(
                 }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        ExpenseInsightsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
+                        // Премиум карточка инсайтов расходов
+                        val expenseInsights = FinancialDataMapper.createExpenseInsights(
+                            topExpenseCategories = metrics.topExpenseCategories.map { 
+                                it.key to it.value.format(true) 
+                            },
+                            savingsRate = metrics.savingsRate,
+                            monthsOfSavings = metrics.monthsOfSavings,
+                            totalTransactions = metrics.expenseTransactionsCount,
+                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay
+                        )
+                        
+                        PremiumInsightsCard(
+                            title = "Анализ расходов",
+                            insights = expenseInsights,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 item {
@@ -287,7 +339,18 @@ fun FinancialDetailStatisticsScreen(
                 }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        SpendingPatternsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
+                        // Премиум карточка паттернов трат
+                        val spendingPatterns = FinancialDataMapper.createSpendingPatternInsights(
+                            mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
+                            expenseTransactionsCount = metrics.expenseTransactionsCount,
+                            averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount
+                        )
+                        
+                        PremiumInsightsCard(
+                            title = "Паттерны трат",
+                            insights = spendingPatterns,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 item {

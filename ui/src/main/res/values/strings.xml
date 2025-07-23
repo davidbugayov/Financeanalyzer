@@ -1291,4 +1291,73 @@
     <string name="file_path">file path</string>
     <string name="path_copied">Путь скопирован</string>
 
+    <string name="rec_critical_emergency_title">Создайте финансовую подушку СРОЧНО</string>
+    <string name="rec_critical_emergency_desc">У вас менее месяца расходов в резерве. Это критически опасно для финансовой стабильности</string>
+    <string name="rec_critical_emergency_impact">Защита от финансового краха при потере дохода</string>
+    <string name="rec_critical_savings_title">Норма сбережений ниже критической</string>
+    <string name="rec_critical_savings_desc">Вы откладываете менее 5% дохода. Это ставит под угрозу ваше финансовое будущее</string>
+    <string name="rec_critical_savings_impact">Начните с 10% - это минимум для финансовой безопасности</string>
+    <string name="rec_critical_debt_title">Опасный уровень задолженности</string>
+    <string name="rec_critical_debt_desc">Долги составляют более 40% вашего дохода. Это может привести к финансовой яме</string>
+    <string name="rec_critical_debt_impact">Срочное погашение долгов освободит %1$d%% дохода</string>
+    <string name="rec_high_emergency_title">Увеличьте финансовую подушку</string>
+    <string name="rec_high_emergency_desc">Ваших накоплений хватит только на %1$d мес. Эксперты рекомендуют 3-6 месяцев</string>
+    <string name="rec_high_emergency_impact">Финансовая подушка на 6 месяцев даст полную защиту</string>
+    <string name="rec_high_savings_title">Увеличьте норму сбережений</string>
+    <string name="rec_high_savings_desc">Вы откладываете %1$d%%. Это хорошо, но можно лучше!</string>
+    <string name="rec_high_savings_impact">Увеличение до 20% ускорит достижение финансовых целей в 2 раза</string>
+    <string name="rec_high_expense_title">Оптимизируйте "%1$s"</string>
+    <string name="rec_high_expense_desc">Эта категория "съедает" %1$d%% ваших расходов. Слишком много!</string>
+    <string name="rec_high_expense_impact">Сокращение на 10% освободит значительные средства</string>
+    <string name="rec_medium_habits_title">Слишком много мелких трат</string>
+    <string name="rec_medium_habits_desc">У вас %1$d операций. Много мелких покупок "съедают" бюджет незаметно</string>
+    <string name="rec_medium_habits_impact">Планирование покупок сэкономит до 15% расходов</string>
+    <string name="rec_medium_unusual_title">Обнаружены нетипичные траты</string>
+    <string name="rec_medium_unusual_desc">В этом периоде ваши расходы отличаются от обычного паттерна</string>
+    <string name="rec_medium_unusual_impact">Анализ поможет выявить "утечки" в бюджете</string>
+    <string name="rec_normal_invest_title">Пора подумать об инвестициях</string>
+    <string name="rec_normal_invest_desc">У вас отличная финансовая дисциплина! Время приумножать капитал</string>
+    <string name="rec_normal_invest_impact">Инвестиции помогут обогнать инфляцию и накопить на крупные цели</string>
+    <string name="rec_normal_weekly_title">Еженедельный анализ трат</string>
+    <string name="rec_normal_weekly_desc">Потратьте 10 минут в неделю на анализ расходов. Это изменит ваши финансы!</string>
+    <string name="rec_normal_weekly_impact">Регулярный контроль помогает экономить до 20% бюджета</string>
+    <string name="rec_onboarding_achievements_title">Изучите свои достижения</string>
+    <string name="rec_onboarding_achievements_desc">Отслеживайте прогресс и получайте мотивацию для финансовых целей</string>
+    <string name="rec_onboarding_import_title">Импортируйте операции</string>
+    <string name="rec_onboarding_import_desc">Загрузите выписки банка для автоматического анализа</string>
+    <string name="rec_onboarding_stats_title">Анализируйте статистику</string>
+    <string name="rec_onboarding_stats_desc">Изучайте графики доходов и расходов для принятия решений</string>
+    <string name="rec_onboarding_tips_title">Получайте умные советы</string>
+    <string name="rec_onboarding_tips_desc">Персональные рекомендации на основе анализа ваших финансов</string>
+    <string name="rec_stats_tip1">Сравнивайте периоды для выявления трендов</string>
+    <string name="rec_stats_tip2">Анализируйте категории расходов</string>
+    <string name="rec_stats_tip3">Планируйте бюджет на основе данных</string>
+    <string name="rec_stats_tip4">Следите за нормой сбережений</string>
+    <string name="rec_stats_tip5">Контролируйте импульсивные покупки</string>
+    <string name="rec_stats_tip_desc">Профессиональный совет №%1$d</string>
+    <string name="rec_budget_rule_title">Правило 50/30/20</string>
+    <string name="rec_budget_rule_desc" formatted="false">50% на нужды, 30% на желания, 20% на сбережения и долги</string>
+    <string name="rec_budget_rule_impact">Золотое правило личных финансов</string>
+    <string name="rec_budget_auto_title">Автоматизируйте сбережения</string>
+    <string name="rec_budget_auto_desc">Настройте автоперевод в первый день после зарплаты</string>
+    <string name="rec_budget_auto_impact">Увеличивает сбережения на 30-50%</string>
+    <string name="rec_budget_track_title">Отслеживайте каждую трату</string>
+    <string name="rec_budget_track_desc">Записывайте все расходы в течение месяца</string>
+    <string name="rec_budget_track_impact">Экономия до 20% бюджета от осознанности</string>
+    <string name="rec_budget_category_title">Создайте целевые категории</string>
+    <string name="rec_budget_category_desc">Распределите бюджет по конкретным целям и потребностям</string>
+    <string name="rec_budget_category_impact">Структурированный подход к тратам</string>
+
+    <string name="preview_enhanced_title">🎯 Персональные советы</string>
+    <string name="preview_enhanced_subtitle">На основе анализа ваших финансов</string>
+    <string name="preview_compact_title">💡 Быстрые советы</string>
+    <string name="preview_compact_subtitle">Простые шаги к финансовой стабильности</string>
+    <string name="preview_minimal_title">🚀 Добро пожаловать!</string>
+    <string name="preview_minimal_subtitle">Изучите возможности приложения</string>
+    <string name="preview_empty_title">💡 Рекомендации</string>
+    <string name="preview_empty_subtitle">Персональные советы появятся здесь</string>
+
+    <string name="smart_card_default_title">💡 Персональные советы</string>
+    <string name="smart_card_default_subtitle">На основе анализа ваших финансов</string>
+
 </resources>

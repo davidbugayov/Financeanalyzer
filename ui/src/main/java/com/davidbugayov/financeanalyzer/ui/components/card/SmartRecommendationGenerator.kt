@@ -34,11 +34,11 @@ object SmartRecommendationGenerator {
         if (monthsOfEmergencyFund < 1f) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Создайте финансовую подушку СРОЧНО",
-                    description = "У вас менее месяца расходов в резерве. Это критически опасно для финансовой стабильности",
+                    title = stringResource(R.string.rec_critical_emergency_title),
+                    description = stringResource(R.string.rec_critical_emergency_desc),
                     icon = Icons.Default.Warning,
                     priority = SmartRecommendationPriority.CRITICAL,
-                    impact = "Защита от финансового краха при потере дохода",
+                    impact = stringResource(R.string.rec_critical_emergency_impact),
                     category = RecommendationCategory.EMERGENCY_FUND
                 )
             )
@@ -48,11 +48,11 @@ object SmartRecommendationGenerator {
         if (savingsRate < 5f) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Норма сбережений ниже критической",
-                    description = "Вы откладываете менее 5% дохода. Это ставит под угрозу ваше финансовое будущее",
+                    title = stringResource(R.string.rec_critical_savings_title),
+                    description = stringResource(R.string.rec_critical_savings_desc),
                     icon = Icons.Default.PriorityHigh,
                     priority = SmartRecommendationPriority.CRITICAL,
-                    impact = "Начните с 10% - это минимум для финансовой безопасности",
+                    impact = stringResource(R.string.rec_critical_savings_impact),
                     category = RecommendationCategory.SAVINGS
                 )
             )
@@ -62,11 +62,11 @@ object SmartRecommendationGenerator {
         if (debtToIncomeRatio > 0.4f) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Опасный уровень задолженности",
-                    description = "Долги составляют более 40% вашего дохода. Это может привести к финансовой яме",
+                    title = stringResource(R.string.rec_critical_debt_title),
+                    description = stringResource(R.string.rec_critical_debt_desc),
                     icon = Icons.Default.Error,
                     priority = SmartRecommendationPriority.CRITICAL,
-                    impact = "Срочное погашение долгов освободит ${(debtToIncomeRatio * 100).toInt()}% дохода",
+                    impact = stringResource(R.string.rec_critical_debt_impact, (debtToIncomeRatio * 100).toInt()),
                     category = RecommendationCategory.EXPENSES
                 )
             )
@@ -78,11 +78,11 @@ object SmartRecommendationGenerator {
         if (monthsOfEmergencyFund in 1f..3f) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Увеличьте финансовую подушку",
-                    description = "Ваших накоплений хватит только на ${monthsOfEmergencyFund.toInt()} мес. Эксперты рекомендуют 3-6 месяцев",
+                    title = stringResource(R.string.rec_high_emergency_title),
+                    description = stringResource(R.string.rec_high_emergency_desc, monthsOfEmergencyFund.toInt()),
                     icon = Icons.Default.Savings,
                     priority = SmartRecommendationPriority.HIGH,
-                    impact = "Финансовая подушка на 6 месяцев даст полную защиту",
+                    impact = stringResource(R.string.rec_high_emergency_impact),
                     category = RecommendationCategory.EMERGENCY_FUND
                 )
             )
@@ -92,11 +92,11 @@ object SmartRecommendationGenerator {
         if (savingsRate in 5f..15f) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Увеличьте норму сбережений",
-                    description = "Вы откладываете ${savingsRate.toInt()}%. Это хорошо, но можно лучше!",
+                    title = stringResource(R.string.rec_high_savings_title),
+                    description = stringResource(R.string.rec_high_savings_desc, savingsRate.toInt()),
                     icon = Icons.Default.AccountBalance,
                     priority = SmartRecommendationPriority.HIGH,
-                    impact = "Увеличение до 20% ускорит достижение финансовых целей в 2 раза",
+                    impact = stringResource(R.string.rec_high_savings_impact),
                     category = RecommendationCategory.SAVINGS
                 )
             )
@@ -106,11 +106,11 @@ object SmartRecommendationGenerator {
         if (topExpenseCategory.isNotEmpty() && topCategoryPercentage > 40f) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Оптимизируйте \"$topExpenseCategory\"",
-                    description = "Эта категория \"съедает\" ${topCategoryPercentage.toInt()}% ваших расходов. Слишком много!",
+                    title = stringResource(R.string.rec_high_expense_title, topExpenseCategory),
+                    description = stringResource(R.string.rec_high_expense_desc, topCategoryPercentage.toInt()),
                     icon = Icons.Default.PieChart,
                     priority = SmartRecommendationPriority.HIGH,
-                    impact = "Сокращение на 10% освободит значительные средства",
+                    impact = stringResource(R.string.rec_high_expense_impact),
                     category = RecommendationCategory.EXPENSES
                 )
             )
@@ -122,11 +122,11 @@ object SmartRecommendationGenerator {
         if (totalTransactions > 150) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Слишком много мелких трат",
-                    description = "У вас $totalTransactions операций. Много мелких покупок \"съедают\" бюджет незаметно",
+                    title = stringResource(R.string.rec_medium_habits_title),
+                    description = stringResource(R.string.rec_medium_habits_desc, totalTransactions),
                     icon = Icons.Default.ShoppingCart,
                     priority = SmartRecommendationPriority.MEDIUM,
-                    impact = "Планирование покупок сэкономит до 15% расходов",
+                    impact = stringResource(R.string.rec_medium_habits_impact),
                     category = RecommendationCategory.HABITS
                 )
             )
@@ -136,11 +136,11 @@ object SmartRecommendationGenerator {
         if (unusualSpendingDetected) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Обнаружены нетипичные траты",
-                    description = "В этом периоде ваши расходы отличаются от обычного паттерна",
+                    title = stringResource(R.string.rec_medium_unusual_title),
+                    description = stringResource(R.string.rec_medium_unusual_desc),
                     icon = Icons.Default.Analytics,
                     priority = SmartRecommendationPriority.MEDIUM,
-                    impact = "Анализ поможет выявить \"утечки\" в бюджете",
+                    impact = stringResource(R.string.rec_medium_unusual_impact),
                     category = RecommendationCategory.BUDGETING
                 )
             )
@@ -152,11 +152,11 @@ object SmartRecommendationGenerator {
         if (savingsRate > 20f && monthsOfEmergencyFund > 3f) {
             recommendations.add(
                 SmartRecommendation(
-                    title = "Пора подумать об инвестициях",
-                    description = "У вас отличная финансовая дисциплина! Время приумножать капитал",
+                    title = stringResource(R.string.rec_normal_invest_title),
+                    description = stringResource(R.string.rec_normal_invest_desc),
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = SmartRecommendationPriority.NORMAL,
-                    impact = "Инвестиции помогут обогнать инфляцию и накопить на крупные цели",
+                    impact = stringResource(R.string.rec_normal_invest_impact),
                     category = RecommendationCategory.INVESTMENTS
                 )
             )
@@ -165,11 +165,11 @@ object SmartRecommendationGenerator {
         // Регулярный анализ бюджета
         recommendations.add(
             SmartRecommendation(
-                title = "Еженедельный анализ трат",
-                description = "Потратьте 10 минут в неделю на анализ расходов. Это изменит ваши финансы!",
+                title = stringResource(R.string.rec_normal_weekly_title),
+                description = stringResource(R.string.rec_normal_weekly_desc),
                 icon = Icons.Default.Schedule,
                 priority = SmartRecommendationPriority.NORMAL,
-                impact = "Регулярный контроль помогает экономить до 20% бюджета",
+                impact = stringResource(R.string.rec_normal_weekly_impact),
                 category = RecommendationCategory.HABITS
             )
         )
@@ -184,29 +184,29 @@ object SmartRecommendationGenerator {
     fun generateOnboardingRecommendations(): List<SmartRecommendation> {
         return listOf(
             SmartRecommendation(
-                title = "Изучите свои достижения",
-                description = "Отслеживайте прогресс и получайте мотивацию для финансовых целей",
+                title = stringResource(R.string.rec_onboarding_achievements_title),
+                description = stringResource(R.string.rec_onboarding_achievements_desc),
                 icon = Icons.Default.EmojiEvents,
                 priority = SmartRecommendationPriority.NORMAL,
                 category = RecommendationCategory.GENERAL
             ),
             SmartRecommendation(
-                title = "Импортируйте операции",
-                description = "Загрузите выписки банка для автоматического анализа",
+                title = stringResource(R.string.rec_onboarding_import_title),
+                description = stringResource(R.string.rec_onboarding_import_desc),
                 icon = Icons.Default.Upload,
                 priority = SmartRecommendationPriority.HIGH,
                 category = RecommendationCategory.GENERAL
             ),
             SmartRecommendation(
-                title = "Анализируйте статистику",
-                description = "Изучайте графики доходов и расходов для принятия решений",
+                title = stringResource(R.string.rec_onboarding_stats_title),
+                description = stringResource(R.string.rec_onboarding_stats_desc),
                 icon = Icons.Default.Analytics,
                 priority = SmartRecommendationPriority.MEDIUM,
                 category = RecommendationCategory.GENERAL
             ),
             SmartRecommendation(
-                title = "Получайте умные советы",
-                description = "Персональные рекомендации на основе анализа ваших финансов",
+                title = stringResource(R.string.rec_onboarding_tips_title),
+                description = stringResource(R.string.rec_onboarding_tips_desc),
                 icon = Icons.Default.Lightbulb,
                 priority = SmartRecommendationPriority.NORMAL,
                 category = RecommendationCategory.GENERAL
@@ -220,17 +220,17 @@ object SmartRecommendationGenerator {
     @Composable
     fun generateStatisticsTips(): List<SmartRecommendation> {
         val tips = listOf(
-            "Сравнивайте периоды для выявления трендов",
-            "Анализируйте категории расходов",
-            "Планируйте бюджет на основе данных",
-            "Следите за нормой сбережений",
-            "Контролируйте импульсивные покупки"
+            stringResource(R.string.rec_stats_tip1),
+            stringResource(R.string.rec_stats_tip2),
+            stringResource(R.string.rec_stats_tip3),
+            stringResource(R.string.rec_stats_tip4),
+            stringResource(R.string.rec_stats_tip5)
         )
 
         return tips.mapIndexed { index, tip ->
             SmartRecommendation(
                 title = tip,
-                description = "Профессиональный совет №${index + 1}",
+                description = stringResource(R.string.rec_stats_tip_desc, index + 1),
                 icon = when (index % 5) {
                     0 -> Icons.Default.Compare
                     1 -> Icons.Default.PieChart
@@ -251,35 +251,35 @@ object SmartRecommendationGenerator {
     fun generateTopBudgetingTips(): List<SmartRecommendation> {
         return listOf(
             SmartRecommendation(
-                title = "Правило 50/30/20",
-                description = "50% на нужды, 30% на желания, 20% на сбережения и долги",
+                title = stringResource(R.string.rec_budget_rule_title),
+                description = stringResource(R.string.rec_budget_rule_desc),
                 icon = Icons.Default.Percent,
                 priority = SmartRecommendationPriority.HIGH,
-                impact = "Золотое правило личных финансов",
+                impact = stringResource(R.string.rec_budget_rule_impact),
                 category = RecommendationCategory.BUDGETING
             ),
             SmartRecommendation(
-                title = "Автоматизируйте сбережения",
-                description = "Настройте автоперевод в первый день после зарплаты",
+                title = stringResource(R.string.rec_budget_auto_title),
+                description = stringResource(R.string.rec_budget_auto_desc),
                 icon = Icons.Default.AutoMode,
                 priority = SmartRecommendationPriority.HIGH,
-                impact = "Увеличивает сбережения на 30-50%",
+                impact = stringResource(R.string.rec_budget_auto_impact),
                 category = RecommendationCategory.SAVINGS
             ),
             SmartRecommendation(
-                title = "Отслеживайте каждую трату",
-                description = "Записывайте все расходы в течение месяца",
+                title = stringResource(R.string.rec_budget_track_title),
+                description = stringResource(R.string.rec_budget_track_desc),
                 icon = Icons.Default.Visibility,
                 priority = SmartRecommendationPriority.MEDIUM,
-                impact = "Экономия до 20% бюджета от осознанности",
+                impact = stringResource(R.string.rec_budget_track_impact),
                 category = RecommendationCategory.HABITS
             ),
             SmartRecommendation(
-                title = "Создайте целевые категории",
-                description = "Распределите бюджет по конкретным целям и потребностям",
+                title = stringResource(R.string.rec_budget_category_title),
+                description = stringResource(R.string.rec_budget_category_desc),
                 icon = Icons.Default.Category,
                 priority = SmartRecommendationPriority.MEDIUM,
-                impact = "Структурированный подход к тратам",
+                impact = stringResource(R.string.rec_budget_category_impact),
                 category = RecommendationCategory.BUDGETING
             )
         )

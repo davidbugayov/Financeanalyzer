@@ -11,6 +11,8 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
+import com.davidbugayov.financeanalyzer.ui.R
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.tooling.preview.PreviewParameterProvider
@@ -42,7 +44,6 @@ class SmartRecommendationPreviewProvider : PreviewParameterProvider<List<SmartRe
                 category = RecommendationCategory.SAVINGS
             )
         ),
-        
         // Обычные рекомендации
         listOf(
             SmartRecommendation(
@@ -62,7 +63,6 @@ class SmartRecommendationPreviewProvider : PreviewParameterProvider<List<SmartRe
                 category = RecommendationCategory.INVESTMENTS
             )
         ),
-        
         // Минимальные рекомендации
         listOf(
             SmartRecommendation(
@@ -88,8 +88,8 @@ private fun SmartRecommendationCardEnhancedPreview(
             ) {
                 SmartRecommendationCard(
                     recommendations = recommendations,
-                    title = "🎯 Персональные советы",
-                    subtitle = "На основе анализа ваших финансов",
+                    title = stringResource(R.string.preview_enhanced_title),
+                    subtitle = stringResource(R.string.preview_enhanced_subtitle),
                     style = SmartCardStyle.ENHANCED,
                     showPriorityIndicator = true,
                     modifier = Modifier.fillMaxWidth()
@@ -104,19 +104,18 @@ private fun SmartRecommendationCardEnhancedPreview(
 private fun SmartRecommendationCardCompactPreview() {
     val recommendations = listOf(
         SmartRecommendation(
-            title = "Увеличьте норму сбережений до 10% и выше",
+            title = stringResource(R.string.increase_savings),
             icon = Icons.Default.Savings,
             priority = SmartRecommendationPriority.HIGH,
             category = RecommendationCategory.SAVINGS
         ),
         SmartRecommendation(
-            title = "Создайте финансовую подушку на 3-6 месяцев расходов",
+            title = stringResource(R.string.create_emergency_fund),
             icon = Icons.Default.PriorityHigh,
             priority = SmartRecommendationPriority.HIGH,
             category = RecommendationCategory.EMERGENCY_FUND
         )
     )
-    
     MaterialTheme {
         Surface {
             Column(
@@ -124,8 +123,8 @@ private fun SmartRecommendationCardCompactPreview() {
             ) {
                 SmartRecommendationCard(
                     recommendations = recommendations,
-                    title = "💡 Быстрые советы",
-                    subtitle = "Простые шаги к финансовой стабильности",
+                    title = stringResource(R.string.preview_compact_title),
+                    subtitle = stringResource(R.string.preview_compact_subtitle),
                     style = SmartCardStyle.COMPACT,
                     showPriorityIndicator = true,
                     modifier = Modifier.fillMaxWidth()
@@ -140,21 +139,20 @@ private fun SmartRecommendationCardCompactPreview() {
 private fun SmartRecommendationCardMinimalPreview() {
     val recommendations = listOf(
         SmartRecommendation(
-            title = "Изучите свои достижения",
-            description = "Отслеживайте прогресс и получайте мотивацию для финансовых целей",
+            title = stringResource(R.string.rec_onboarding_achievements_title),
+            description = stringResource(R.string.rec_onboarding_achievements_desc),
             icon = Icons.Default.EmojiEvents,
             priority = SmartRecommendationPriority.NORMAL,
             category = RecommendationCategory.GENERAL
         ),
         SmartRecommendation(
-            title = "Импортируйте операции",
-            description = "Загрузите выписки банка для автоматического анализа",
+            title = stringResource(R.string.rec_onboarding_import_title),
+            description = stringResource(R.string.rec_onboarding_import_desc),
             icon = Icons.Default.Upload,
             priority = SmartRecommendationPriority.HIGH,
             category = RecommendationCategory.GENERAL
         )
     )
-    
     MaterialTheme {
         Surface {
             Column(
@@ -162,8 +160,8 @@ private fun SmartRecommendationCardMinimalPreview() {
             ) {
                 SmartRecommendationCard(
                     recommendations = recommendations,
-                    title = "🚀 Добро пожаловать!",
-                    subtitle = "Изучите возможности приложения",
+                    title = stringResource(R.string.preview_minimal_title),
+                    subtitle = stringResource(R.string.preview_minimal_subtitle),
                     style = SmartCardStyle.MINIMAL,
                     showPriorityIndicator = false,
                     modifier = Modifier.fillMaxWidth()
@@ -178,23 +176,22 @@ private fun SmartRecommendationCardMinimalPreview() {
 private fun SmartRecommendationCardDarkPreview() {
     val recommendations = listOf(
         SmartRecommendation(
-            title = "Создайте финансовую подушку СРОЧНО",
-            description = "У вас менее месяца расходов в резерве. Это критически опасно для финансовой стабильности",
+            title = stringResource(R.string.rec_critical_emergency_title),
+            description = stringResource(R.string.rec_critical_emergency_desc),
             icon = Icons.Default.Warning,
             priority = SmartRecommendationPriority.CRITICAL,
-            impact = "Защита от финансового краха при потере дохода",
+            impact = stringResource(R.string.rec_critical_emergency_impact),
             category = RecommendationCategory.EMERGENCY_FUND
         ),
         SmartRecommendation(
-            title = "Пора подумать об инвестициях",
-            description = "У вас отличная финансовая дисциплина! Время приумножать капитал",
+            title = stringResource(R.string.rec_normal_invest_title),
+            description = stringResource(R.string.rec_normal_invest_desc),
             icon = Icons.Default.TrendingUp,
             priority = SmartRecommendationPriority.NORMAL,
-            impact = "Инвестиции помогут обогнать инфляцию и накопить на крупные цели",
+            impact = stringResource(R.string.rec_normal_invest_impact),
             category = RecommendationCategory.INVESTMENTS
         )
     )
-    
     MaterialTheme {
         Surface {
             Column(
@@ -202,8 +199,8 @@ private fun SmartRecommendationCardDarkPreview() {
             ) {
                 SmartRecommendationCard(
                     recommendations = recommendations,
-                    title = "🎯 Персональные советы",
-                    subtitle = "На основе анализа ваших финансов",
+                    title = stringResource(R.string.preview_enhanced_title),
+                    subtitle = stringResource(R.string.preview_enhanced_subtitle),
                     style = SmartCardStyle.ENHANCED,
                     showPriorityIndicator = true,
                     modifier = Modifier.fillMaxWidth()
@@ -223,8 +220,8 @@ private fun SmartRecommendationCardEmptyPreview() {
             ) {
                 SmartRecommendationCard(
                     recommendations = emptyList(),
-                    title = "💡 Рекомендации",
-                    subtitle = "Персональные советы появятся здесь",
+                    title = stringResource(R.string.preview_empty_title),
+                    subtitle = stringResource(R.string.preview_empty_subtitle),
                     style = SmartCardStyle.ENHANCED,
                     showPriorityIndicator = true,
                     modifier = Modifier.fillMaxWidth()
