@@ -41,15 +41,16 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.statistics.R
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ActionableTipsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ExpenseAnalysisCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.ExpenseInsightsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.FinancialHealthScoreCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.KeyMetricsCard
-import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.RecommendationsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SavingsOptimizationCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.SpendingPatternsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.components.TransactionsStatisticsCard
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.state.FinancialDetailStatisticsContract
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.viewmodel.FinancialDetailStatisticsViewModel
 import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
@@ -313,7 +314,25 @@ fun FinancialDetailStatisticsScreen(
                 }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        ActionableTipsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
+                        // Генерируем критические финансовые рекомендации на основе реальных данных
+                        val criticalRecommendations = SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
+                            savingsRate = metrics.savingsRate,
+                            monthsOfEmergencyFund = metrics.monthsOfSavings,
+                            topExpenseCategory = metrics.topExpenseCategory,
+                            topCategoryPercentage = metrics.expenseCategories
+                                .maxByOrNull { it.amount.amount }?.percentage?.toFloat() ?: 0f,
+                            totalTransactions = metrics.expenseTransactionsCount,
+                            unusualSpendingDetected = false // TODO: добавить логику определения необычных трат
+                        )
+                        
+                        SmartRecommendationCard(
+                            recommendations = criticalRecommendations,
+                            title = "🎯 Персональный финансовый анализ",
+                            subtitle = "Критические рекомендации для вашего бюджета",
+                            style = SmartCardStyle.ENHANCED,
+                            showPriorityIndicator = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 item {
@@ -323,7 +342,17 @@ fun FinancialDetailStatisticsScreen(
                 }
                 item {
                     AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
-                        RecommendationsCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
+                        // Генерируем топ бюджетные советы
+                        val budgetingTips = SmartRecommendationGenerator.generateTopBudgetingTips()
+                        
+                        SmartRecommendationCard(
+                            recommendations = budgetingTips,
+                            title = "💡 Золотые правила бюджета",
+                            subtitle = "Профессиональные принципы финансового планирования",
+                            style = SmartCardStyle.COMPACT,
+                            showPriorityIndicator = true,
+                            modifier = Modifier.fillMaxWidth()
+                        )
                     }
                 }
                 item {

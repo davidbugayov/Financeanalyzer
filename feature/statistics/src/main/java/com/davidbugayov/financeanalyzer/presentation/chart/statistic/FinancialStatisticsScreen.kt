@@ -61,13 +61,11 @@ import androidx.lifecycle.viewmodel.compose.viewModel
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.domain.achievements.AchievementTrigger
 import com.davidbugayov.financeanalyzer.feature.statistics.R
-import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.BudgetTip
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedCategoryPieChart
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedLineChart
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.EnhancedSummaryCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.FinancialHealthMetricsCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.LineChartTypeSelector
-import com.davidbugayov.financeanalyzer.presentation.chart.statistic.components.StatisticTipCard
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.model.LineChartDisplayMode
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartEffect
 import com.davidbugayov.financeanalyzer.presentation.chart.statistic.state.EnhancedFinanceChartIntent
@@ -77,6 +75,9 @@ import com.davidbugayov.financeanalyzer.ui.components.CenteredLoadingIndicator
 import com.davidbugayov.financeanalyzer.ui.components.ErrorContent
 import com.davidbugayov.financeanalyzer.ui.components.card.AdviceCard
 import com.davidbugayov.financeanalyzer.ui.components.card.AdvicePriority
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 import com.davidbugayov.financeanalyzer.utils.DateUtils
 import java.math.BigDecimal
 import java.text.SimpleDateFormat
@@ -251,13 +252,21 @@ fun FinancialStatisticsScreen(
                             .verticalScroll(scrollState),
                 ) {
                     if (showTip) {
-                        StatisticTipCard(
+                        // Используем новую систему рекомендаций для статистики
+                        val statisticsTips = SmartRecommendationGenerator.generateStatisticsTips()
+                        val randomTip = statisticsTips.random()
+
+                        SmartRecommendationCard(
+                            recommendations = listOf(randomTip),
                             title = currentTip.first,
-                            text = currentTip.second,
-                            onClose = {
+                            subtitle = currentTip.second,
+                            style = SmartCardStyle.MINIMAL,
+                            showPriorityIndicator = false,
+                            onDismiss = {
                                 showTip = false
                                 tipRequestedFromTopBar = false
-                            }
+                            },
+                            modifier = Modifier.padding(horizontal = 12.dp, vertical = 8.dp)
                         )
                     }
                     // --- Динамический типс: всегда разные, можно показать по кнопке ---
@@ -583,96 +592,43 @@ fun FinancialStatisticsScreen(
                                             ),
                                     )
 
-                                    // Блок рекомендаций по бюджету
+                                    // Блок критических финансовых рекомендаций
                                     if (state.recommendations.isNotEmpty()) {
-                                        Column(
-                                            modifier =
-                                                Modifier
-                                                    .fillMaxWidth()
-                                                    .padding(bottom = 12.dp),
-                                            horizontalAlignment = Alignment.CenterHorizontally,
-                                        ) {
-                                            Text(
-                                                text = "Умные советы и предупреждения",
-                                                style = MaterialTheme.typography.titleMedium,
-                                                color = MaterialTheme.colorScheme.primary,
-                                                modifier = Modifier.padding(bottom = 8.dp),
-                                            )
-                                            state.recommendations.forEach { rec ->
-                                                AdviceCard(
-                                                    title = rec.title,
-                                                    description = rec.description,
-                                                    priority =
-                                                        when (rec.priority.name) {
-                                                            "HIGH" -> AdvicePriority.HIGH
-                                                            "MEDIUM" -> AdvicePriority.MEDIUM
-                                                            else -> AdvicePriority.NORMAL
-                                                        },
-                                                    modifier = Modifier.padding(bottom = 6.dp),
-                                                )
-                                            }
-                                        }
+                                        // Генерируем умные рекомендации на основе реальных данных
+                                        val smartRecommendations = SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
+                                            savingsRate = state.savingsRate.toFloat(),
+                                            monthsOfEmergencyFund = state.monthsOfSavings.toFloat(),
+                                            topExpenseCategory = state.expensesByCategory.maxByOrNull { it.value.amount }?.key ?: "",
+                                            topCategoryPercentage = (state.expensesByCategory.maxByOrNull { it.value.amount }?.value?.amount?.toFloat() ?: 0f) /
+                                                (state.expense?.amount?.toFloat() ?: 1f) * 100f,
+                                            totalTransactions = state.transactions.size,
+                                            unusualSpendingDetected = false
+                                        )
+
+                                        SmartRecommendationCard(
+                                            recommendations = smartRecommendations,
+                                            title = "🎯 Персональные советы",
+                                            subtitle = "На основе анализа ваших финансов",
+                                            style = SmartCardStyle.COMPACT,
+                                            showPriorityIndicator = true,
+                                            modifier = Modifier
+                                                .fillMaxWidth()
+                                                .padding(bottom = 12.dp)
+                                        )
                                     }
 
-                                    // Блок рекомендаций по бюджету
-                                    Column(
-                                        modifier =
-                                            Modifier
-                                                .fillMaxWidth()
-                                                .padding(vertical = 4.dp),
-                                        horizontalAlignment = Alignment.CenterHorizontally,
-                                    ) {
-                                        Text(
-                                            text = stringResource(R.string.budget_tips_title),
-                                            style = MaterialTheme.typography.titleMedium,
-                                            color = MaterialTheme.colorScheme.primary,
-                                            modifier = Modifier.padding(bottom = 8.dp),
-                                        )
-                                        BudgetTip(
-                                            icon = Icons.Filled.AccountBalanceWallet,
-                                            title =
-                                                stringResource(
-                                                    R.string.budget_tip_save_10_title,
-                                                ),
-                                            description =
-                                                stringResource(
-                                                    R.string.budget_tip_save_10_desc,
-                                                ),
-                                        )
-                                        BudgetTip(
-                                            icon = Icons.Filled.BarChart,
-                                            title =
-                                                stringResource(
-                                                    R.string.budget_tip_control_categories_title,
-                                                ),
-                                            description =
-                                                stringResource(
-                                                    R.string.budget_tip_control_categories_desc,
-                                                ),
-                                        )
-                                        BudgetTip(
-                                            icon = Icons.AutoMirrored.Filled.TrendingUp,
-                                            title =
-                                                stringResource(
-                                                    R.string.budget_tip_set_goals_title,
-                                                ),
-                                            description =
-                                                stringResource(
-                                                    R.string.budget_tip_set_goals_desc,
-                                                ),
-                                        )
-                                        BudgetTip(
-                                            icon = Icons.Filled.Check,
-                                            title =
-                                                stringResource(
-                                                    R.string.budget_tip_check_weekly_title,
-                                                ),
-                                            description =
-                                                stringResource(
-                                                    R.string.budget_tip_check_weekly_desc,
-                                                ),
-                                        )
-                                    }
+                                    // Блок профессиональных бюджетных советов
+                                    val budgetTips = SmartRecommendationGenerator.generateTopBudgetingTips()
+                                    SmartRecommendationCard(
+                                        recommendations = budgetTips,
+                                        title = "💰 Золотые правила бюджета",
+                                        subtitle = "Проверенные принципы финансового планирования",
+                                        style = SmartCardStyle.ENHANCED,
+                                        showPriorityIndicator = true,
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 4.dp)
+                                    )
                                 }
                             }
                         }

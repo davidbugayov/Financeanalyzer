@@ -17,12 +17,14 @@ import androidx.compose.ui.unit.dp
 
 /**
  * Карточка для отображения совета или предупреждения.
+ * DEPRECATED: Используйте UnifiedRecommendationCard для новых реализаций
  *
  * @param title Заголовок совета (строка или stringResource)
  * @param description Описание совета (строка или stringResource)
  * @param priority Приоритет (цветовая индикация)
  * @param modifier Модификатор
  */
+@Deprecated("Используйте UnifiedRecommendationCard для новых реализаций")
 @Composable
 fun AdviceCard(
     title: String,
@@ -30,36 +32,19 @@ fun AdviceCard(
     priority: AdvicePriority = AdvicePriority.NORMAL,
     modifier: Modifier = Modifier,
 ) {
-    val color =
-        when (priority) {
-            AdvicePriority.HIGH -> MaterialTheme.colorScheme.errorContainer
-            AdvicePriority.MEDIUM -> MaterialTheme.colorScheme.tertiaryContainer
-            AdvicePriority.NORMAL -> MaterialTheme.colorScheme.primaryContainer
-        }
-    Card(
-        modifier =
-            modifier
-                .fillMaxWidth()
-                .padding(vertical = 4.dp, horizontal = 0.dp),
-        shape = RoundedCornerShape(16.dp),
-    ) {
-        Column(
-            modifier =
-                Modifier
-                    .background(color)
-                    .padding(16.dp),
-        ) {
-            Text(
-                text = title,
-                style = MaterialTheme.typography.titleMedium.copy(fontWeight = FontWeight.Bold),
-            )
-            Spacer(modifier = Modifier.height(6.dp))
-            Text(
-                text = description,
-                style = MaterialTheme.typography.bodyMedium,
-            )
-        }
-    }
+    // Используем новый унифицированный компонент
+    val unifiedRecommendation = RecommendationGenerator.convertAdviceToUnified(
+        title = title,
+        description = description,
+        priority = priority
+    )
+    
+    UnifiedRecommendationCard(
+        recommendations = listOf(unifiedRecommendation),
+        title = "",
+        cardStyle = RecommendationCardStyle.COMPACT,
+        modifier = modifier
+    )
 }
 
 enum class AdvicePriority {

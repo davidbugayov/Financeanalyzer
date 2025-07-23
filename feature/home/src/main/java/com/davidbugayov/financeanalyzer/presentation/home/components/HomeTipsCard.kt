@@ -23,7 +23,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.home.R
 import com.davidbugayov.financeanalyzer.ui.R as UiR
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationCard
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartRecommendationGenerator
+import com.davidbugayov.financeanalyzer.ui.components.card.SmartCardStyle
 
+/**
+ * 🏠 Современная карточка советов для главного экрана
+ * Использует новую Smart Recommendation System
+ */
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun HomeTipsCard(
@@ -39,104 +46,36 @@ fun HomeTipsCard(
         exit = slideOutVertically(targetOffsetY = { it / 2 }) + fadeOut(),
     ) {
         Box(
-            modifier =
-                modifier
-                    .fillMaxWidth()
-                    .padding(horizontal = 8.dp)
-                    .pointerInput(Unit) {
-                        detectHorizontalDragGestures { _, dragAmount ->
-                            offsetX += dragAmount
-                            if (offsetX > 200f || offsetX < -200f) {
-                                visible = false
-                                onClose()
-                            }
-                        }
-                    },
-        ) {
-            Card(
-                shape = RoundedCornerShape(16.dp),
-                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-                modifier =
-                    Modifier
-                        .border(1.5.dp, MaterialTheme.colorScheme.primary, RoundedCornerShape(16.dp))
-                        .alpha(if (visible) 1f else 0f),
-                elevation = CardDefaults.cardElevation(defaultElevation = 2.dp),
-            ) {
-                Box(modifier = Modifier.fillMaxWidth()) {
-                    // иллюстрация убрана для минимализма
-                    // Кнопка закрытия
-                    IconButton(
-                        onClick = {
+            modifier = modifier
+                .fillMaxWidth()
+                .padding(horizontal = 8.dp)
+                .pointerInput(Unit) {
+                    detectHorizontalDragGestures { _, dragAmount ->
+                        offsetX += dragAmount
+                        if (offsetX > 200f || offsetX < -200f) {
                             visible = false
                             onClose()
-                        },
-                        modifier =
-                            Modifier
-                                .align(Alignment.TopEnd)
-                                .padding(8.dp)
-                                .size(28.dp),
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.Close,
-                            contentDescription = stringResource(R.string.close),
-                            tint = MaterialTheme.colorScheme.primary,
-                            modifier = Modifier.size(24.dp),
-                        )
-                    }
-                    Column(
-                        modifier =
-                            Modifier
-                                .padding(start = 24.dp, end = 56.dp, top = 24.dp, bottom = 24.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.home_tips_card_title),
-                            style = MaterialTheme.typography.titleLarge,
-                            color = MaterialTheme.colorScheme.primary,
-                        )
-                        Spacer(modifier = Modifier.height(12.dp))
-                        CustomTipRow(
-                            iconRes = UiR.drawable.ic_profile, // достижения
-                            text = stringResource(R.string.tip_achievements),
-                        )
-                        CustomTipRow(
-                            iconRes = UiR.drawable.ic_receipt, // импорт
-                            text = stringResource(R.string.tip_imports),
-                        )
-                        CustomTipRow(
-                            iconRes = UiR.drawable.ic_chart, // статистика
-                            text = stringResource(R.string.tip_statistics),
-                        )
-                        CustomTipRow(
-                            iconRes = UiR.drawable.ic_profile, // рекомендации (или ic_star если появится)
-                            text = stringResource(R.string.tip_recommendations),
-                        )
+                        }
                     }
                 }
-            }
+        ) {
+            // Используем новую систему рекомендаций
+            val onboardingRecommendations = SmartRecommendationGenerator.generateOnboardingRecommendations()
+            
+            SmartRecommendationCard(
+                recommendations = onboardingRecommendations,
+                title = "🚀 Добро пожаловать!",
+                subtitle = "Изучите возможности приложения",
+                style = SmartCardStyle.MINIMAL,
+                showPriorityIndicator = false,
+                onDismiss = {
+                    visible = false
+                    onClose()
+                },
+                modifier = Modifier.alpha(if (visible) 1f else 0f)
+            )
         }
     }
 }
 
-@Composable
-private fun CustomTipRow(
-    iconRes: Int,
-    text: String,
-) {
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        modifier = Modifier.padding(vertical = 6.dp),
-    ) {
-        Icon(
-            painter = painterResource(iconRes),
-            contentDescription = null,
-            tint = MaterialTheme.colorScheme.primary,
-            modifier = Modifier.size(22.dp),
-        )
-        Spacer(modifier = Modifier.width(12.dp))
-        Text(
-            text = text,
-            style = MaterialTheme.typography.bodyLarge,
-            color = MaterialTheme.colorScheme.onSurface,
-        )
-    }
-} 
+ 
