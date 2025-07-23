@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Card backgrounds -->
+    <color name="primaryContainer">#232B36</color>
+    <color name="surface">#181C20</color>
+    <color name="surface_variant">#232B36</color>
+    <!-- Text colors -->
+    <color name="text_primary">#FFFFFF</color>
+    <color name="text_secondary">#B0BEC5</color>
+    <color name="text_hint">#607D8B</color>
+    <!-- Акцент для заголовков -->
+    <color name="primary">#40C4FF</color>
+    <color name="accent">#00B8D4</color>
+    <color name="onPrimaryContainer">#FFFFFF</color>
+    <!-- Divider -->
+    <color name="divider">#263238</color>
+    <!-- Card outline -->
+    <color name="outline">#37474F</color>
+    <!-- Для графиков и иконок -->
+    <color name="chart_text">#B0BEC5</color>
+    <color name="chart_legend_text">#B0BEC5</color>
+    <color name="chart_background">#232B36</color>
+</resources> 

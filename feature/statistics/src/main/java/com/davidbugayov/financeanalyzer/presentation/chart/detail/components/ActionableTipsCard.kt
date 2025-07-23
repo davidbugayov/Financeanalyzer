@@ -55,7 +55,7 @@ fun ActionableTipsCard(
                 Icon(
                     Icons.Default.ThumbUp,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(24.dp),
                 )
                 Spacer(Modifier.width(8.dp))
@@ -63,7 +63,7 @@ fun ActionableTipsCard(
                     text = stringResource(R.string.actionable_tips_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
 

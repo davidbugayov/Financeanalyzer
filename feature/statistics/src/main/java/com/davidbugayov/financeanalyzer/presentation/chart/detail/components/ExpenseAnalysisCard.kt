@@ -26,6 +26,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.feature.statistics.R
 import com.davidbugayov.financeanalyzer.presentation.chart.detail.model.FinancialMetrics
+import com.davidbugayov.financeanalyzer.ui.components.card.StatusCard
 import com.davidbugayov.financeanalyzer.ui.theme.LocalFriendlyCardBackgroundColor
 
 @Composable
@@ -33,18 +34,7 @@ fun ExpenseAnalysisCard(
     metrics: FinancialMetrics,
     modifier: Modifier = Modifier,
 ) {
-    Card(
-        modifier = modifier,
-        shape =
-            RoundedCornerShape(
-                dimensionResource(R.dimen.financial_statistics_card_corner_radius),
-            ),
-        elevation =
-            CardDefaults.cardElevation(
-                defaultElevation = dimensionResource(R.dimen.financial_statistics_card_elevation),
-            ),
-        colors = CardDefaults.cardColors(containerColor = LocalFriendlyCardBackgroundColor.current),
-    ) {
+    StatusCard(modifier = modifier) {
         Column(
             modifier =
                 Modifier

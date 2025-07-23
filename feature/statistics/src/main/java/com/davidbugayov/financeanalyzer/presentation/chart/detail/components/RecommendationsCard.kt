@@ -71,7 +71,7 @@ fun RecommendationsCard(
                 Icon(
                     imageVector = Icons.Filled.Lightbulb,
                     contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
+                    tint = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.size(24.dp),
                 )
                 Spacer(modifier = Modifier.width(8.dp))
@@ -79,7 +79,7 @@ fun RecommendationsCard(
                     text = stringResource(R.string.smart_recommendations_title),
                     style = MaterialTheme.typography.titleMedium,
                     fontWeight = FontWeight.Bold,
-                    color = MaterialTheme.colorScheme.primary,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                 )
             }
 
@@ -151,7 +151,7 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                     Icon(
                         imageVector = recommendation.icon,
                         contentDescription = null,
-                        tint = recommendation.priority.color,
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(18.dp),
                     )
                 }
@@ -166,7 +166,7 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                             text = recommendation.title,
                             style = MaterialTheme.typography.bodyMedium,
                             fontWeight = FontWeight.Medium,
-                            color = MaterialTheme.colorScheme.onSurface,
+                            color = MaterialTheme.colorScheme.onPrimaryContainer,
                         )
                         Spacer(modifier = Modifier.width(8.dp))
                         PriorityBadge(recommendation.priority)
@@ -196,7 +196,7 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                     Icon(
                         imageVector = Icons.AutoMirrored.Filled.TrendingUp,
                         contentDescription = null,
-                        tint = Color(0xFF38A169),
+                        tint = MaterialTheme.colorScheme.onPrimaryContainer,
                         modifier = Modifier.size(14.dp),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
@@ -204,7 +204,7 @@ private fun EnhancedRecommendationItem(recommendation: SmartRecommendation) {
                         text = recommendation.impact,
                         style = MaterialTheme.typography.bodySmall,
                         fontWeight = FontWeight.Medium,
-                        color = Color(0xFF38A169),
+                        color = MaterialTheme.colorScheme.onPrimaryContainer,
                     )
                 }
             }
@@ -227,7 +227,7 @@ private fun PriorityBadge(priority: RecommendationPriority) {
         Text(
             text = priority.label,
             style = MaterialTheme.typography.labelSmall,
-            color = priority.color,
+            color = MaterialTheme.colorScheme.onPrimaryContainer,
             fontWeight = FontWeight.Medium,
         )
     }

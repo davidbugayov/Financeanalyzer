@@ -7,7 +7,6 @@ import androidx.lifecycle.DefaultLifecycleObserver
 import androidx.lifecycle.LifecycleOwner
 import androidx.lifecycle.ProcessLifecycleOwner
 import com.davidbugayov.financeanalyzer.analytics.AnalyticsUtils
-import com.davidbugayov.financeanalyzer.analytics.CrashLoggerProvider
 import com.davidbugayov.financeanalyzer.analytics.PerformanceMetrics
 import com.davidbugayov.financeanalyzer.analytics.UserEventTracker
 import com.davidbugayov.financeanalyzer.di.allModules
@@ -34,8 +33,6 @@ import timber.log.Timber
  */
 abstract class BaseFinanceApp : Application(), DefaultLifecycleObserver, KoinComponent {
     // Получаем компоненты аналитики через Koin
-    private val analyticsUtils: AnalyticsUtils by inject()
-    private val performanceMetrics: PerformanceMetrics by inject()
     private val userEventTracker: UserEventTracker by inject()
 
     // Получаем движок достижений через Koin
