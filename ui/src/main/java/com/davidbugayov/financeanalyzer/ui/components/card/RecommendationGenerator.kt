@@ -134,7 +134,7 @@ object RecommendationGenerator {
         if (savingsRate < 10f) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Увеличьте норму сбережений до 10% и выше",
+                    title = stringResource(R.string.increase_savings),
                     icon = Icons.Filled.Savings,
                     priority = UnifiedRecommendationPriority.HIGH,
                     category = "savings"
@@ -145,7 +145,7 @@ object RecommendationGenerator {
         if (topExpenseCategory.isNotEmpty()) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Сократите расходы в категории \"$topExpenseCategory\"",
+                    title = stringResource(R.string.reduce_expenses_category, topExpenseCategory),
                     icon = Icons.AutoMirrored.Filled.TrendingUp,
                     priority = UnifiedRecommendationPriority.MEDIUM,
                     category = "expenses"
@@ -156,7 +156,7 @@ object RecommendationGenerator {
         if (monthsOfSavings < 3) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Создайте финансовую подушку на 3-6 месяцев расходов",
+                    title = stringResource(R.string.create_emergency_fund),
                     icon = Icons.Filled.PriorityHigh,
                     priority = UnifiedRecommendationPriority.HIGH,
                     category = "emergency_fund"
@@ -167,7 +167,7 @@ object RecommendationGenerator {
         if (mostFrequentExpenseDay.isNotEmpty()) {
             tips.add(
                 UnifiedRecommendation(
-                    title = "Планируйте покупки заранее — особенно по ${mostFrequentExpenseDay.lowercase()}",
+                    title = stringResource(R.string.plan_purchases, mostFrequentExpenseDay.lowercase()),
                     icon = Icons.Filled.Lightbulb,
                     priority = UnifiedRecommendationPriority.NORMAL,
                     category = "planning"
@@ -177,44 +177,7 @@ object RecommendationGenerator {
 
         return tips
     }
-
-    /**
-     * Генерация статических бюджетных советов
-     */
-    @Composable
-    fun generateBudgetTips(): List<UnifiedRecommendation> {
-        return listOf(
-            UnifiedRecommendation(
-                title = "Откладывайте 10% с каждой зарплаты",
-                description = "Это простое правило поможет накопить финансовую подушку",
-                icon = Icons.Filled.AccountBalanceWallet,
-                priority = UnifiedRecommendationPriority.NORMAL,
-                category = "savings"
-            ),
-            UnifiedRecommendation(
-                title = "Контролируйте расходы по категориям", 
-                description = "Следите за тем, на что тратите больше всего денег",
-                icon = Icons.Filled.BarChart,
-                priority = UnifiedRecommendationPriority.NORMAL,
-                category = "tracking"
-            ),
-            UnifiedRecommendation(
-                title = "Ставьте финансовые цели",
-                description = "Четкие цели помогают лучше планировать бюджет",
-                icon = Icons.AutoMirrored.Filled.TrendingUp,
-                priority = UnifiedRecommendationPriority.NORMAL,
-                category = "planning"
-            ),
-            UnifiedRecommendation(
-                title = "Проверяйте бюджет еженедельно",
-                description = "Регулярный контроль поможет избежать перерасходов",
-                icon = Icons.Filled.Check,
-                priority = UnifiedRecommendationPriority.NORMAL,
-                category = "tracking"
-            )
-        )
-    }
-
+    
     /**
      * Конвертация старых AdviceCard рекомендаций в унифицированный формат
      */
@@ -228,7 +191,7 @@ object RecommendationGenerator {
             AdvicePriority.MEDIUM -> UnifiedRecommendationPriority.MEDIUM
             AdvicePriority.NORMAL -> UnifiedRecommendationPriority.NORMAL
         }
-        
+
         return UnifiedRecommendation(
             title = title,
             description = description,

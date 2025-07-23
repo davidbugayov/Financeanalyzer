@@ -1278,4 +1278,17 @@
     <string name="advice_cashback">Используйте кэшбэк и скидки для экономии на покупках.</string>
     <string name="advice_compare_shops">Сравнивайте цены в разных магазинах перед крупной покупкой.</string>
 
+    <string name="increase_savings">Увеличьте норму сбережений до 10% и выше</string>
+    <string name="reduce_expenses_category">Сократите расходы в категории "%1$s"</string>
+    <string name="create_emergency_fund">Создайте финансовую подушку на 3-6 месяцев расходов</string>
+    <string name="plan_purchases">Планируйте покупки заранее — особенно по %1$s</string>
+    <string name="transaction_actions">Действия с транзакцией</string>
+    <string name="amount_colon">Сумма: %1$s</string>
+    <string name="category_colon">Категория: %1$s</string>
+    <string name="date_colon">Дата: %1$s</string>
+    <string name="source_colon">Источник: %1$s</string>
+    <string name="note_colon">Примечание: %1$s</string>
+    <string name="file_path">file path</string>
+    <string name="path_copied">Путь скопирован</string>
+
 </resources>

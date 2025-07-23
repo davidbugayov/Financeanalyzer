@@ -19,9 +19,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
 import com.davidbugayov.financeanalyzer.domain.model.Transaction
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.utils.ColorUtils
@@ -47,17 +49,17 @@ fun TransactionActionsDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-        title = { Text("Действия с транзакцией") },
+        title = { Text(stringResource(R.string.transaction_actions)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column {
                 Text(
-                    text = "Сумма: ${transaction.amount.formatForDisplay(useMinimalDecimals = true)}",
+                    text = stringResource(R.string.amount_colon, transaction.amount.formatForDisplay(useMinimalDecimals = true)),
                     style = MaterialTheme.typography.bodyLarge,
                 )
                 Spacer(modifier = Modifier.height(4.dp))
                 Text(
-                    text = "Категория: ${transaction.category}",
+                    text = stringResource(R.string.category_colon, transaction.category),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
@@ -66,9 +68,9 @@ fun TransactionActionsDialog(
                 Text(
                     text =
                         if (transaction.isExpense) {
-                            "-${transaction.amount.abs().formatForDisplay(useMinimalDecimals = true)}"
+                            "-" + transaction.amount.abs().formatForDisplay(useMinimalDecimals = true)
                         } else {
-                            "+${transaction.amount.formatForDisplay(useMinimalDecimals = true)}"
+                            "+" + transaction.amount.formatForDisplay(useMinimalDecimals = true)
                         },
                     style = MaterialTheme.typography.bodyMedium,
                     color =
@@ -82,10 +84,7 @@ fun TransactionActionsDialog(
                 Spacer(modifier = Modifier.height(12.dp))
 
                 Text(
-                    text =
-                        SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(
-                            transaction.date,
-                        ),
+                    text = stringResource(R.string.date_colon, SimpleDateFormat("dd.MM.yyyy", Locale.getDefault()).format(transaction.date)),
                     style = MaterialTheme.typography.bodyMedium,
                 )
 
@@ -100,52 +99,44 @@ fun TransactionActionsDialog(
                         modifier =
                             Modifier
                                 .size(12.dp)
-                                .background(
-                                    effectiveSourceColor,
-                                    CircleShape,
-                                ),
+                                .background(effectiveSourceColor, CircleShape),
                     )
                     Spacer(modifier = Modifier.width(4.dp))
 
                     Text(
-                        text = "Источник: ${transaction.source}",
-                        style = MaterialTheme.typography.bodySmall,
+                        text = stringResource(R.string.source_colon, transaction.source),
+                        style = MaterialTheme.typography.bodyMedium,
                         color = effectiveSourceColor,
                     )
                 }
 
-                // Отображаем примечание, если оно есть
                 transaction.note?.let { note ->
                     if (note.isNotBlank()) {
                         Spacer(modifier = Modifier.height(12.dp))
-
                         Text(
-                            text = "Примечание: $note",
+                            text = stringResource(R.string.note_colon, note),
                             style = MaterialTheme.typography.bodySmall,
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
                         )
                     }
                 }
+
+                Spacer(modifier = Modifier.height(16.dp))
+
+                Text(
+                    text = stringResource(R.string.delete_transaction_confirm),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.error,
+                )
             }
         },
         confirmButton = {
-            TextButton(
-                onClick = {
-                    onDelete(transaction)
-                    onDismiss()
-                },
-            ) {
-                Text("Удалить")
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.yes))
             }
         },
         dismissButton = {
-            TextButton(
-                onClick = {
-                    onEdit(transaction)
-                    onDismiss()
-                },
-            ) {
-                Text("Редактировать")
+            TextButton(onClick = onDismiss) {
+                Text(text = stringResource(R.string.no))
             }
         },
     )
