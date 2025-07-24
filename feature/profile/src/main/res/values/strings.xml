@@ -42,7 +42,6 @@
     <string name="expenses">Расходы</string>
     <string name="balance">Баланс</string>
     <string name="savings_rate">Сбережения</string>
-    <string name="total_transactions">Транзакций</string>
     <string name="expense_categories">Категорий расхода</string>
     <string name="income_categories">Категорий дохода</string>
     <string name="average_expense">Средний расход</string>

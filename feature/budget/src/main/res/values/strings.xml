@@ -250,7 +250,6 @@
 
     <!-- Analytics strings -->
     <string name="analytics_title">Финансовая аналитика</string>
-    <string name="total_transactions">Всего транзакций</string>
     <string name="expense_categories">Категории расходов</string>
     <string name="income_categories">Категории доходов</string>
     <string name="average_expense">Средний расход</string>

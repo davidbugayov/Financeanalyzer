@@ -58,6 +58,9 @@ import com.davidbugayov.financeanalyzer.ui.components.AppTopBar
 import kotlinx.coroutines.flow.collectLatest
 import org.koin.androidx.compose.koinViewModel
 import org.koin.core.parameter.parametersOf
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.setValue
 
 /**
  * Экран подробной финансовой статистики
@@ -144,7 +147,9 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownOverview by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownOverview = true }
+                    AnimatedVisibility(visible = shownOverview, enter = fadeIn(), exit = fadeOut()) {
                         // Заголовок с периодом
                         Card(
                             modifier = Modifier.fillMaxWidth(),
@@ -182,7 +187,9 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownKeyMetrics by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownKeyMetrics = true }
+                    AnimatedVisibility(visible = shownKeyMetrics, enter = fadeIn(), exit = fadeOut()) {
                         KeyMetricsCard(
                             income = state.income,
                             expense = state.expense,
@@ -198,7 +205,9 @@ fun FinancialDetailStatisticsScreen(
                 }
                 metrics.healthMetrics?.let { healthMetrics ->
                     item {
-                        AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                        var shownHealthScore by remember { mutableStateOf(false) }
+                        LaunchedEffect(Unit) { shownHealthScore = true }
+                        AnimatedVisibility(visible = shownHealthScore, enter = fadeIn(), exit = fadeOut()) {
                             FinancialHealthScoreCard(
                                 healthScore = healthMetrics.financialHealthScore,
                                 breakdown = healthMetrics.healthScoreBreakdown,
@@ -230,7 +239,9 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownStats by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownStats = true }
+                    AnimatedVisibility(visible = shownStats, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка статистики транзакций
                         val transactionStats = FinancialDataMapper.createTransactionStatistics(
                             totalTransactions = metrics.totalTransactions,
@@ -243,7 +254,7 @@ fun FinancialDetailStatisticsScreen(
                             savingsRate = metrics.savingsRate,
                             monthsOfSavings = metrics.monthsOfSavings
                         )
-                        
+
                         PremiumStatisticsCard(
                             title = "Статистика транзакций",
                             icon = Icons.Default.Receipt,
@@ -258,7 +269,9 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownExpenseAnalysis by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownExpenseAnalysis = true }
+                    AnimatedVisibility(visible = shownExpenseAnalysis, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка анализа расходов
                         val expenseAnalysis = FinancialDataMapper.createExpenseAnalysis(
                             averageDailyExpense = metrics.averageDailyExpense.format(true),
@@ -270,7 +283,7 @@ fun FinancialDetailStatisticsScreen(
                             },
                             mostFrequentExpenseDay = metrics.mostFrequentExpenseDay
                         )
-                        
+
                         PremiumStatisticsCard(
                             title = "Анализ расходов",
                             icon = Icons.Default.Analytics,
@@ -288,6 +301,8 @@ fun FinancialDetailStatisticsScreen(
 
                 // Инсайты
                 item {
+                    var shownInsightsTitle by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownInsightsTitle = true }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -303,7 +318,9 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownSavingsOpt by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownSavingsOpt = true }
+                    AnimatedVisibility(visible = shownSavingsOpt, enter = fadeIn(), exit = fadeOut()) {
                         SavingsOptimizationCard(metrics = metrics, modifier = Modifier.fillMaxWidth())
                     }
                 }
@@ -313,18 +330,20 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownExpenseInsights by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownExpenseInsights = true }
+                    AnimatedVisibility(visible = shownExpenseInsights, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка инсайтов расходов
                         val expenseInsights = FinancialDataMapper.createExpenseInsights(
-                            topExpenseCategories = metrics.topExpenseCategories.map { 
-                                it.first to it.second.format(true) 
+                            topExpenseCategories = metrics.topExpenseCategories.map {
+                                it.first to it.second.format(true)
                             },
                             savingsRate = metrics.savingsRate,
                             monthsOfSavings = metrics.monthsOfSavings,
                             totalTransactions = metrics.expenseTransactionsCount,
                             mostFrequentExpenseDay = metrics.mostFrequentExpenseDay
                         )
-                        
+
                         PremiumInsightsCard(
                             title = "Анализ расходов",
                             insights = expenseInsights,
@@ -338,14 +357,16 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownSpendingPatterns by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownSpendingPatterns = true }
+                    AnimatedVisibility(visible = shownSpendingPatterns, enter = fadeIn(), exit = fadeOut()) {
                         // Премиум карточка паттернов трат
                         val spendingPatterns = FinancialDataMapper.createSpendingPatternInsights(
                             mostFrequentExpenseDay = metrics.mostFrequentExpenseDay,
                             expenseTransactionsCount = metrics.expenseTransactionsCount,
                             averageExpensePerTransaction = metrics.averageExpensePerTransaction.amount.toFloat()
                         )
-                        
+
                         PremiumInsightsCard(
                             title = "Паттерны трат",
                             insights = spendingPatterns,
@@ -361,6 +382,8 @@ fun FinancialDetailStatisticsScreen(
 
                 // Советы
                 item {
+                    var shownTipsTitle by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownTipsTitle = true }
                     Row(
                         verticalAlignment = Alignment.CenterVertically,
                         modifier = Modifier.padding(top = 16.dp, bottom = 8.dp),
@@ -376,7 +399,9 @@ fun FinancialDetailStatisticsScreen(
                     }
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownCriticalTips by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownCriticalTips = true }
+                    AnimatedVisibility(visible = shownCriticalTips, enter = fadeIn(), exit = fadeOut()) {
                         // Генерируем критические финансовые рекомендации на основе реальных данных
                         val criticalRecommendations = SmartRecommendationGenerator.generateCriticalFinancialRecommendations(
                             savingsRate = metrics.savingsRate,
@@ -387,7 +412,7 @@ fun FinancialDetailStatisticsScreen(
                             totalTransactions = metrics.expenseTransactionsCount,
                             unusualSpendingDetected = false // TODO: добавить логику определения необычных трат
                         )
-                        
+
                         SmartRecommendationCard(
                             recommendations = criticalRecommendations,
                             title = "🎯 Персональный финансовый анализ",
@@ -404,10 +429,12 @@ fun FinancialDetailStatisticsScreen(
                     )
                 }
                 item {
-                    AnimatedVisibility(visible = true, enter = fadeIn(), exit = fadeOut()) {
+                    var shownBudgetingTips by remember { mutableStateOf(false) }
+                    LaunchedEffect(Unit) { shownBudgetingTips = true }
+                    AnimatedVisibility(visible = shownBudgetingTips, enter = fadeIn(), exit = fadeOut()) {
                         // Генерируем топ бюджетные советы
                         val budgetingTips = SmartRecommendationGenerator.generateTopBudgetingTips()
-                        
+
                         SmartRecommendationCard(
                             recommendations = budgetingTips,
                             title = "💡 Золотые правила бюджета",

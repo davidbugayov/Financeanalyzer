@@ -54,7 +54,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.core.util.formatForDisplay
-import com.davidbugayov.financeanalyzer.feature.profile.R
+import com.davidbugayov.financeanalyzer.ui.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 import com.davidbugayov.financeanalyzer.ui.theme.LocalInfoColor
@@ -267,7 +267,7 @@ fun AnalyticsSection(
                     ) {
                         AnimatedAnalyticCard(
                             icon = Icons.Default.Assessment,
-                            title = stringResource(R.string.total_transactions),
+                            title = stringResource(com.davidbugayov.financeanalyzer.ui.R.string.total_transactions),
                             value = totalTransactions.toString(),
                             animationDelay = 0,
                             modifier = Modifier.weight(1f),

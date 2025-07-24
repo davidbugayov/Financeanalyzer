@@ -85,6 +85,12 @@
     <string name="period_year">Год</string>
     <string name="period_custom">Произвольный</string>
     <string name="period_custom_range">%1$s – %2$s</string>
+    <string name="period_day_format">День: %s</string>
+    <string name="period_week_format">Неделя: %s - %s</string>
+    <string name="period_month_format">Месяц: %s - %s</string>
+    <string name="period_quarter_format">Квартал: %s - %s</string>
+    <string name="period_year_format">Год: %s - %s</string>
+    <string name="period_date_range">%s - %s</string>
     <string name="from_date">С: %s</string>
     <string name="to_date">По: %s</string>
     <string name="select_start_date">Выберите начальную дату</string>
