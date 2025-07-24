@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
@@ -57,7 +58,7 @@ class SmartRecommendationPreviewProvider : PreviewParameterProvider<List<SmartRe
             SmartRecommendation(
                 title = "Пора подумать об инвестициях",
                 description = "У вас отличная финансовая дисциплина! Время приумножать капитал",
-                icon = Icons.Default.TrendingUp,
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
                 priority = SmartRecommendationPriority.NORMAL,
                 impact = "Инвестиции помогут обогнать инфляцию",
                 category = RecommendationCategory.INVESTMENTS
@@ -186,7 +187,7 @@ private fun SmartRecommendationCardDarkPreview() {
         SmartRecommendation(
             title = stringResource(R.string.rec_normal_invest_title),
             description = stringResource(R.string.rec_normal_invest_desc),
-            icon = Icons.Default.TrendingUp,
+            icon = Icons.AutoMirrored.Filled.TrendingUp,
             priority = SmartRecommendationPriority.NORMAL,
             impact = stringResource(R.string.rec_normal_invest_impact),
             category = RecommendationCategory.INVESTMENTS

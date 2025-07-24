@@ -2,6 +2,8 @@ package com.davidbugayov.financeanalyzer.ui.components.card
 
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.automirrored.filled.TrendingUp
+import androidx.compose.material.icons.automirrored.filled.TrendingDown
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.R
@@ -29,59 +31,59 @@ object FinancialDataMapper {
     ): List<StatisticItem> {
         return listOf(
             StatisticItem(
-                label = "Всего операций",
+                label = stringResource(R.string.stat_total_transactions),
                 value = totalTransactions.toString(),
-                description = "За выбранный период",
+                description = stringResource(R.string.stat_total_transactions_desc),
                 icon = Icons.Default.Receipt,
                 type = StatisticType.NEUTRAL
             ),
             StatisticItem(
-                label = "Операции доходов",
+                label = stringResource(R.string.stat_income_transactions),
                 value = incomeTransactionsCount.toString(),
-                description = "${(incomeTransactionsCount.toFloat() / totalTransactions * 100).toInt()}% от общего",
-                icon = Icons.Default.TrendingUp,
+                description = stringResource(R.string.stat_income_transactions_desc, (incomeTransactionsCount.toFloat() / totalTransactions * 100).toInt()),
+                icon = Icons.AutoMirrored.Filled.TrendingUp,
                 type = StatisticType.POSITIVE
             ),
             StatisticItem(
-                label = "Операции расходов", 
+                label = stringResource(R.string.stat_expense_transactions),
                 value = expenseTransactionsCount.toString(),
-                description = "${(expenseTransactionsCount.toFloat() / totalTransactions * 100).toInt()}% от общего",
-                icon = Icons.Default.TrendingDown,
+                description = stringResource(R.string.stat_expense_transactions_desc, (expenseTransactionsCount.toFloat() / totalTransactions * 100).toInt()),
+                icon = Icons.AutoMirrored.Filled.TrendingDown,
                 type = StatisticType.NEGATIVE
             ),
             StatisticItem(
-                label = "Средний доход",
+                label = stringResource(R.string.stat_avg_income),
                 value = averageIncomePerTransaction,
-                description = "На операцию",
+                description = stringResource(R.string.stat_avg_income_desc),
                 icon = Icons.Default.AttachMoney,
                 type = StatisticType.POSITIVE
             ),
             StatisticItem(
-                label = "Средний расход",
+                label = stringResource(R.string.stat_avg_expense),
                 value = averageExpensePerTransaction,
-                description = "На операцию", 
+                description = stringResource(R.string.stat_avg_expense_desc),
                 icon = Icons.Default.Money,
                 type = StatisticType.NEGATIVE
             ),
             StatisticItem(
-                label = "Максимальный доход",
+                label = stringResource(R.string.stat_max_income),
                 value = maxIncome,
-                description = "Самая крупная сумма",
+                description = stringResource(R.string.stat_max_income_desc),
                 icon = Icons.Default.Star,
                 type = StatisticType.POSITIVE
             ),
             StatisticItem(
-                label = "Максимальный расход",
+                label = stringResource(R.string.stat_max_expense),
                 value = maxExpense,
-                description = "Самая крупная трата",
+                description = stringResource(R.string.stat_max_expense_desc),
                 icon = Icons.Default.Warning,
-                type = if (maxExpense.replace(Regex("[^\\d.]"), "").toFloatOrNull() ?: 0f > 50000f) 
+                type = if (maxExpense.replace(Regex("[^\\d.]"), "").toFloatOrNull() ?: 0f > 50000f)
                     StatisticType.WARNING else StatisticType.NEGATIVE
             ),
             StatisticItem(
-                label = "Норма сбережений",
+                label = stringResource(R.string.stat_savings_rate),
                 value = "${savingsRate.toInt()}%",
-                description = "От общего дохода",
+                description = stringResource(R.string.stat_savings_rate_desc),
                 icon = Icons.Default.Savings,
                 type = when {
                     savingsRate >= 20f -> StatisticType.POSITIVE
@@ -90,9 +92,9 @@ object FinancialDataMapper {
                 }
             ),
             StatisticItem(
-                label = "Финансовая подушка",
+                label = stringResource(R.string.stat_financial_cushion),
                 value = "${monthsOfSavings.toInt()} мес",
-                description = "На текущие расходы",
+                description = stringResource(R.string.stat_financial_cushion_desc),
                 icon = Icons.Default.Shield,
                 type = when {
                     monthsOfSavings >= 6f -> StatisticType.POSITIVE
@@ -119,9 +121,9 @@ object FinancialDataMapper {
         
         statistics.add(
             StatisticItem(
-                label = "Ежедневные расходы",
+                label = stringResource(R.string.stat_daily_expense),
                 value = averageDailyExpense,
-                description = "В среднем за день",
+                description = stringResource(R.string.stat_daily_expense_desc),
                 icon = Icons.Default.CalendarToday,
                 type = StatisticType.NEUTRAL
             )
@@ -129,9 +131,9 @@ object FinancialDataMapper {
         
         statistics.add(
             StatisticItem(
-                label = "Месячные расходы",
+                label = stringResource(R.string.stat_monthly_expense),
                 value = averageMonthlyExpense,
-                description = "В среднем за месяц",
+                description = stringResource(R.string.stat_monthly_expense_desc),
                 icon = Icons.Default.DateRange,
                 type = StatisticType.NEUTRAL
             )
@@ -140,9 +142,9 @@ object FinancialDataMapper {
         if (topIncomeCategory.isNotEmpty()) {
             statistics.add(
                 StatisticItem(
-                    label = "Основной доход",
+                    label = stringResource(R.string.stat_main_income_category),
                     value = topIncomeCategory,
-                    description = "Главный источник",
+                    description = stringResource(R.string.stat_main_income_category_desc),
                     icon = Icons.Default.AccountBalance,
                     type = StatisticType.POSITIVE
                 )
@@ -152,9 +154,9 @@ object FinancialDataMapper {
         if (topExpenseCategory.isNotEmpty()) {
             statistics.add(
                 StatisticItem(
-                    label = "Основной расход",
+                    label = stringResource(R.string.stat_main_expense_category),
                     value = topExpenseCategory,
-                    description = "Больше всего тратите",
+                    description = stringResource(R.string.stat_main_expense_category_desc),
                     icon = Icons.Default.PieChart,
                     type = StatisticType.WARNING
                 )
@@ -164,9 +166,9 @@ object FinancialDataMapper {
         if (mostFrequentExpenseDay.isNotEmpty()) {
             statistics.add(
                 StatisticItem(
-                    label = "Активный день",
+                    label = stringResource(R.string.stat_most_frequent_expense_day),
                     value = mostFrequentExpenseDay,
-                    description = "Чаще всего тратите",
+                    description = stringResource(R.string.stat_most_frequent_expense_day_desc),
                     icon = Icons.Default.Schedule,
                     type = StatisticType.NEUTRAL
                 )
@@ -201,15 +203,13 @@ object FinancialDataMapper {
             
             insights.add(
                 InsightItem(
-                    title = "Концентрация расходов",
-                    description = "Категория \"${topCategory.first}\" составляет ${percentage}% ваших расходов. ${
-                        when {
-                            percentage > 50 -> "Это критически много - стоит диверсифицировать траты"
-                            percentage > 30 -> "Довольно высокая концентрация - рекомендуем оптимизировать"
-                            else -> "Хорошее распределение расходов по категориям"
-                        }
-                    }",
-                    metric = "${percentage}% в одной категории",
+                    title = stringResource(R.string.insight_expense_concentration),
+                    description = stringResource(R.string.insight_expense_concentration_desc, topCategory.first, percentage, when {
+                        percentage > 50 -> stringResource(R.string.insight_expense_concentration_critical)
+                        percentage > 30 -> stringResource(R.string.insight_expense_concentration_high)
+                        else -> stringResource(R.string.insight_expense_concentration_good)
+                    }),
+                    metric = stringResource(R.string.insight_expense_concentration_metric, percentage),
                     icon = Icons.Default.PieChart,
                     importance = when {
                         percentage > 50 -> InsightImportance.HIGH
@@ -223,17 +223,17 @@ object FinancialDataMapper {
         // Анализ нормы сбережений
         insights.add(
             InsightItem(
-                title = "Финансовое здоровье",
+                title = stringResource(R.string.insight_financial_health),
                 description = when {
-                    savingsRate >= 20f -> "Отличная норма сбережений! Вы на правильном пути к финансовой независимости"
-                    savingsRate >= 15f -> "Хорошая норма сбережений. Попробуйте довести до 20% для оптимального результата"
-                    savingsRate >= 10f -> "Неплохо, но есть потенциал для улучшения. Эксперты рекомендуют откладывать 15-20%"
-                    savingsRate >= 5f -> "Низкая норма сбережений. Попробуйте увеличить до 10% как минимум"
-                    else -> "Критически низкий уровень сбережений. Необходимо срочно пересмотреть бюджет"
+                    savingsRate >= 20f -> stringResource(R.string.insight_financial_health_excellent)
+                    savingsRate >= 15f -> stringResource(R.string.insight_financial_health_good)
+                    savingsRate >= 10f -> stringResource(R.string.insight_financial_health_ok)
+                    savingsRate >= 5f -> stringResource(R.string.insight_financial_health_low)
+                    else -> stringResource(R.string.insight_financial_health_critical)
                 },
-                metric = "${savingsRate.toInt()}% от дохода",
+                metric = stringResource(R.string.insight_financial_health_metric, savingsRate.toInt()),
                 icon = when {
-                    savingsRate >= 15f -> Icons.Default.TrendingUp
+                    savingsRate >= 15f -> Icons.AutoMirrored.Filled.TrendingUp
                     savingsRate >= 10f -> Icons.Default.Balance
                     else -> Icons.Default.Warning
                 },
@@ -248,14 +248,14 @@ object FinancialDataMapper {
         // Анализ финансовой подушки
         insights.add(
             InsightItem(
-                title = "Финансовая защита",
+                title = stringResource(R.string.insight_financial_protection),
                 description = when {
-                    monthsOfSavings >= 6f -> "У вас отличная финансовая подушка! Вы защищены от большинства непредвиденных ситуаций"
-                    monthsOfSavings >= 3f -> "Хорошая финансовая подушка. Для полной безопасности рекомендуется 6 месяцев расходов"
-                    monthsOfSavings >= 1f -> "Минимальная финансовая защита. Стремитесь к 3-6 месяцам расходов в резерве"
-                    else -> "Отсутствует финансовая подушка. Это очень рискованно - любая непредвиденная ситуация может стать критической"
+                    monthsOfSavings >= 6f -> stringResource(R.string.insight_financial_protection_excellent)
+                    monthsOfSavings >= 3f -> stringResource(R.string.insight_financial_protection_good)
+                    monthsOfSavings >= 1f -> stringResource(R.string.insight_financial_protection_minimal)
+                    else -> stringResource(R.string.insight_financial_protection_none)
                 },
-                metric = "${monthsOfSavings.toInt()} мес. расходов",
+                metric = stringResource(R.string.insight_financial_protection_metric, monthsOfSavings.toInt()),
                 icon = when {
                     monthsOfSavings >= 3f -> Icons.Default.Shield
                     monthsOfSavings >= 1f -> Icons.Default.Security
@@ -273,9 +273,9 @@ object FinancialDataMapper {
         if (totalTransactions > 100) {
             insights.add(
                 InsightItem(
-                    title = "Частота трат",
-                    description = "У вас много мелких операций ($totalTransactions). Это может указывать на импульсивные покупки. Попробуйте планировать траты заранее и объединять покупки.",
-                    metric = "$totalTransactions операций",
+                    title = stringResource(R.string.insight_expense_frequency),
+                    description = stringResource(R.string.insight_expense_frequency_desc, totalTransactions),
+                    metric = stringResource(R.string.insight_expense_frequency_metric, totalTransactions),
                     icon = Icons.Default.ShoppingCart,
                     importance = if (totalTransactions > 200) InsightImportance.MEDIUM else InsightImportance.LOW
                 )
@@ -286,9 +286,9 @@ object FinancialDataMapper {
         if (mostFrequentExpenseDay.isNotEmpty()) {
             insights.add(
                 InsightItem(
-                    title = "Паттерн расходов",
-                    description = "Вы чаще всего тратите деньги по $mostFrequentExpenseDay. Это может быть связано с зарплатой, выходными или распорядком дня. Понимание этого паттерна поможет лучше планировать бюджет.",
-                    metric = "Пик: $mostFrequentExpenseDay",
+                    title = stringResource(R.string.insight_expense_pattern),
+                    description = stringResource(R.string.insight_expense_pattern_desc, mostFrequentExpenseDay),
+                    metric = stringResource(R.string.insight_expense_pattern_metric, mostFrequentExpenseDay),
                     icon = Icons.Default.Timeline,
                     importance = InsightImportance.LOW
                 )
@@ -312,9 +312,9 @@ object FinancialDataMapper {
         if (mostFrequentExpenseDay.isNotEmpty()) {
             insights.add(
                 InsightItem(
-                    title = "Активный день недели",
-                    description = "По статистике, $mostFrequentExpenseDay - ваш самый \"дорогой\" день. Планируйте бюджет с учетом этого паттерна.",
-                    metric = "Пик: $mostFrequentExpenseDay",
+                    title = stringResource(R.string.insight_active_weekday),
+                    description = stringResource(R.string.insight_active_weekday_desc, mostFrequentExpenseDay),
+                    metric = stringResource(R.string.insight_active_weekday_metric, mostFrequentExpenseDay),
                     icon = Icons.Default.CalendarToday,
                     importance = InsightImportance.LOW
                 )
@@ -326,9 +326,9 @@ object FinancialDataMapper {
             averageExpensePerTransaction < 500f -> {
                 insights.add(
                     InsightItem(
-                        title = "Мелкие частые траты",
-                        description = "Ваши расходы состоят в основном из мелких покупок. Это хорошо для контроля, но следите за их накоплением.",
-                        metric = "Средняя трата: ${averageExpensePerTransaction.toInt()}₽",
+                        title = stringResource(R.string.insight_small_expenses),
+                        description = stringResource(R.string.insight_small_expenses_desc),
+                        metric = stringResource(R.string.insight_small_expenses_metric, averageExpensePerTransaction.toInt()),
                         icon = Icons.Default.LocalGroceryStore,
                         importance = InsightImportance.LOW
                     )
@@ -337,9 +337,9 @@ object FinancialDataMapper {
             averageExpensePerTransaction > 2000f -> {
                 insights.add(
                     InsightItem(
-                        title = "Крупные покупки",
-                        description = "У вас преобладают крупные траты. Убедитесь, что каждая такая покупка хорошо продумана.",
-                        metric = "Средняя трата: ${averageExpensePerTransaction.toInt()}₽",
+                        title = stringResource(R.string.insight_large_expenses),
+                        description = stringResource(R.string.insight_large_expenses_desc),
+                        metric = stringResource(R.string.insight_large_expenses_metric, averageExpensePerTransaction.toInt()),
                         icon = Icons.Default.ShoppingBag,
                         importance = InsightImportance.MEDIUM
                     )
@@ -351,9 +351,9 @@ object FinancialDataMapper {
         if (expenseTransactionsCount > 150) {
             insights.add(
                 InsightItem(
-                    title = "Высокая активность",
-                    description = "У вас очень много операций расходов ($expenseTransactionsCount). Возможно, стоит оптимизировать процесс покупок.",
-                    metric = "$expenseTransactionsCount операций",
+                    title = stringResource(R.string.insight_high_activity),
+                    description = stringResource(R.string.insight_high_activity_desc, expenseTransactionsCount),
+                    metric = stringResource(R.string.insight_high_activity_metric, expenseTransactionsCount),
                     icon = Icons.Default.Speed,
                     importance = InsightImportance.MEDIUM
                 )
