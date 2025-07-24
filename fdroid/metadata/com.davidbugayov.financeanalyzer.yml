@@ -70,8 +70,22 @@ Builds:
       • Улучшено: Обновлены скриншоты в fastlane, добавлена MIT лицензия
       • Исправлено: Сборка F-Droid — исключены Crashlytics/Google-services
       • Улучшено: Перешли на kotlin { compilerOptions } DSL, удалены устаревшие опции
+  - versionName: 2.23.0.fd
+    versionCode: 45
+    commit: v2.23
+    subdir: app
+    init: |
+      export FDROID_BUILD=1
+    gradle:
+      - fdroidRelease
+    changelog: |
+      • Исправлено: Полностью устранены все варнинги по устаревшим иконкам TrendingUp/TrendingDown (замена на AutoMirrored)
+      • Рефакторинг: Все UI-строки вынесены в ресурсы, устранён хардкод
+      • Обновление: Повышен versionCode и versionName для релиза
+      • F-Droid: Подготовлена чистая сборка без проприетарных зависимостей
+      • Улучшено: Мелкие улучшения стабильности и кода
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags
-CurrentVersion: 2.22.0.fd
-CurrentVersionCode: 41 
+CurrentVersion: 2.23.0.fd
+CurrentVersionCode: 45 
