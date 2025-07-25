@@ -237,7 +237,6 @@
 
     <!-- FinanceChartScreen strings -->
     <string name="error_loading_transactions">Ошибка при загрузке транзакций: %s</string>
-    <string name="no_data_to_display">Нет данных для отображения</string>
     <string name="expenses_by_category">Расходы по категориям</string>
     <string name="no_expense_data">Нет данных о расходах</string>
     <string name="income_by_category">Доходы по категориям</string>

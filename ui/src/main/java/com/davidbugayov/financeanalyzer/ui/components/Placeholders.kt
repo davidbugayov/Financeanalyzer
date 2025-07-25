@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import com.davidbugayov.financeanalyzer.ui.R
 
 /**
  * Компонент для отображения индикатора загрузки по центру экрана
@@ -58,10 +60,10 @@ fun CenteredLoadingIndicator(message: String = "Загрузка данных...
  */
 @Composable
 fun EmptyContent(
-    message: String = "Нет данных для отображения",
-    description: String = "Добавьте транзакции, чтобы увидеть аналитику",
+    message: String = stringResource(R.string.no_data_to_display),
+    description: String = stringResource(R.string.add_transactions_to_see_analytics),
     onActionClick: (() -> Unit)? = null,
-    actionText: String = "Обновить",
+    actionText: String = stringResource(R.string.refresh),
 ) {
     Box(
         modifier = Modifier.fillMaxSize(),
@@ -120,7 +122,7 @@ fun ErrorContent(
             modifier = Modifier.padding(16.dp),
         ) {
             Text(
-                text = "Ошибка загрузки данных",
+                text = stringResource(R.string.loading_error),
                 style = MaterialTheme.typography.titleMedium,
                 color = MaterialTheme.colorScheme.error,
                 textAlign = TextAlign.Center,
@@ -139,8 +141,9 @@ fun ErrorContent(
 
             Button(
                 onClick = onRetry,
+                modifier = Modifier.padding(bottom = 8.dp),
             ) {
-                Text("Повторить")
+                Text(stringResource(R.string.retry))
             }
         }
     }
