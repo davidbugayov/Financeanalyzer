@@ -173,7 +173,7 @@ private fun HomeBottomBar(
 private fun HomeMainContent(
     windowSizeIsCompact: Boolean,
     state: HomeState,
-    categoriesViewModel: com.davidbugayov.financeanalyzer.presentation.categories.AppCategoriesViewModel,
+    categoriesViewModel: AppCategoriesViewModel,
     pagingItems: androidx.paging.compose.LazyPagingItems<TransactionListItem>,
     showGroupSummary: Boolean,
     onToggleGroupSummary: (Boolean) -> Unit,

@@ -77,6 +77,7 @@ import kotlinx.coroutines.delay
  * @param dateRange Строка с диапазоном дат для отображения
  * @param onSavingsRateClick Обработчик нажатия на норму сбережений
  * @param modifier Модификатор для настройки внешнего вида
+ * @param onSectionClick Обработчик нажатия на секцию
  */
 @Composable
 fun AnalyticsSection(
@@ -92,6 +93,7 @@ fun AnalyticsSection(
     totalSourcesUsed: Int,
     dateRange: String = stringResource(R.string.all_time),
     onSavingsRateClick: () -> Unit = {},
+    onSectionClick: () -> Unit,
 ) {
     // Цвета для финансовых показателей
     val incomeColor = LocalIncomeColor.current
@@ -113,6 +115,7 @@ fun AnalyticsSection(
     }
 
     Card(
+        onClick = onSectionClick,
         modifier =
             modifier
                 .fillMaxWidth()

@@ -7,6 +7,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -18,19 +19,21 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Assessment
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material3.FilledIconButton
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Icon
-import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalDensity
@@ -132,37 +135,32 @@ private fun NavButton(
     val spacingXx = dimensionResource(R.dimen.spacing_xxsmall)
     val buttonSize = dimensionResource(R.dimen.main_nav_button_size)
     val iconSize = dimensionResource(R.dimen.main_nav_icon_size)
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier =
-            Modifier
-                .padding(horizontal = spacingXx)
-                .widthIn(min = buttonSize + spacingXx),
+    Card(
+        onClick = onClick,
+        colors = CardDefaults.cardColors(containerColor = Color.Transparent, contentColor = Color.Transparent),
     ) {
-        FilledIconButton(
-            onClick = onClick,
-            modifier = Modifier.size(buttonSize),
-            colors =
-                IconButtonDefaults.filledIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    contentColor = Color.White,
-                ),
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier
+                .padding(start = spacingXx, end = spacingXx, top = 4.dp)
+                .widthIn(min = buttonSize + spacingXx),
         ) {
             Icon(
                 imageVector = icon,
                 contentDescription = text,
-                modifier = Modifier.size(iconSize),
+                modifier = Modifier.clip(CircleShape).background(MaterialTheme.colorScheme.primary).padding(8.dp).size(iconSize),
+                tint = Color.White,
+            )
+
+            Text(
+                text = text,
+                fontSize = dimensionResource(R.dimen.text_small).value.sp,
+                textAlign = TextAlign.Center,
+                fontWeight = FontWeight.Medium,
+                modifier = Modifier.padding(top = 2.dp),
+                color = MaterialTheme.colorScheme.onSurface,
+                maxLines = 1,
             )
         }
-
-        Text(
-            text = text,
-            fontSize = dimensionResource(R.dimen.text_small).value.sp,
-            textAlign = TextAlign.Center,
-            fontWeight = FontWeight.Medium,
-            modifier = Modifier.padding(top = 2.dp),
-            color = MaterialTheme.colorScheme.onSurface,
-            maxLines = 1,
-        )
     }
 }
