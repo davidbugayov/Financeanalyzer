@@ -35,6 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.dimensionResource
 import com.davidbugayov.financeanalyzer.feature.history.R
 import com.davidbugayov.financeanalyzer.ui.theme.LocalExpenseColor
+import androidx.compose.ui.res.stringResource
 import com.davidbugayov.financeanalyzer.ui.theme.LocalIncomeColor
 
 /**
@@ -75,7 +76,7 @@ fun CategorySelectionDialog(
 
     AlertDialog(
         onDismissRequest = onDismiss,
-                    title = { Text("Выбрать категорию") },
+                    title = { Text(stringResource(R.string.select_category)) },
         containerColor = MaterialTheme.colorScheme.surface,
         text = {
             Column(
@@ -105,11 +106,11 @@ fun CategorySelectionDialog(
                     Text(
                         text =
                             if (localSelectedCategories.isEmpty()) {
-                                "Все категории"
+                                stringResource(R.string.all_categories)
                             } else if (localSelectedCategories.size == allCategories.size) {
-                                "Очистить выбор"
+                                stringResource(R.string.clear_selection)
                             } else {
-                                "Выбрать все"
+                                stringResource(R.string.select_all)
                             },
                         color =
                             if (localSelectedCategories.isEmpty() ||
@@ -148,7 +149,7 @@ fun CategorySelectionDialog(
 
                 // Группа "Расходы" с выпадающим списком
                 CategoryGroupHeader(
-                    title = "Расходы",
+                    title = stringResource(R.string.expenses),
                     isExpanded = isExpensesExpanded,
                     color = expenseColor,
                     onToggle = { isExpensesExpanded = !isExpensesExpanded },
@@ -195,7 +196,7 @@ fun CategorySelectionDialog(
 
                 // Группа "Доходы" с выпадающим списком
                 CategoryGroupHeader(
-                    title = "Доходы",
+                    title = stringResource(R.string.incomes),
                     isExpanded = isIncomeExpanded,
                     color = incomeColor,
                     onToggle = { isIncomeExpanded = !isIncomeExpanded },
@@ -236,12 +237,12 @@ fun CategorySelectionDialog(
                 onCategoriesSelected(localSelectedCategories)
                 onDismiss()
             }) {
-                Text("Применить")
+                Text(stringResource(R.string.apply))
             }
         },
         dismissButton = {
             TextButton(onClick = onDismiss) {
-                Text("Закрыть")
+                Text(stringResource(R.string.close))
             }
         },
     )

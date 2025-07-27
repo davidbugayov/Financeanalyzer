@@ -18,6 +18,7 @@ import androidx.compose.ui.text.font.FontWeight
 import com.davidbugayov.financeanalyzer.core.model.Money
 import com.davidbugayov.financeanalyzer.feature.history.R
 import java.math.BigDecimal
+import androidx.compose.ui.res.stringResource
 
 /**
  * Карточка со статистикой по выбранной категории.
@@ -58,7 +59,7 @@ fun CategoryStatsCard(
             ) {
                 Column {
                     Text(
-                        text = "Текущий период",
+                        text = stringResource(R.string.current_period),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -69,7 +70,7 @@ fun CategoryStatsCard(
                 }
                 Column(horizontalAlignment = Alignment.End) {
                     Text(
-                        text = "Предыдущий период",
+                        text = stringResource(R.string.previous_period),
                         style = MaterialTheme.typography.bodyMedium,
                     )
                     Text(
@@ -85,10 +86,10 @@ fun CategoryStatsCard(
                 val changeText =
                     when {
                         percentChangeInt > 0 ->
-                            "Увеличение на $percentChangeInt%"
+                            stringResource(R.string.increase_by_percent, percentChangeInt)
                         percentChangeInt < 0 ->
-                            "Уменьшение на ${kotlin.math.abs(percentChangeInt)}%"
-                        else -> "Без изменений"
+                            stringResource(R.string.decrease_by_percent, kotlin.math.abs(percentChangeInt))
+                        else -> stringResource(R.string.no_changes)
                     }
                 val percentChangeColor =
                     when {
